@@ -22,6 +22,9 @@ camera.position.set(3.5, 2.8, 3.5);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.domElement.style.width = '100%';
+renderer.domElement.style.height = '100%';
+renderer.domElement.style.display = 'block';
 sceneHost.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
