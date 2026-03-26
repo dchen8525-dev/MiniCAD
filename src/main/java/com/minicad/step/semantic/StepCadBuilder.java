@@ -5,6 +5,8 @@ import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
+import com.minicad.geometry.CylindricalSurface;
+import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.Plane;
@@ -14,6 +16,7 @@ import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
@@ -51,6 +54,7 @@ public final class StepCadBuilder {
     private final Map<Integer, Line3> lines = new LinkedHashMap<>();
     private final Map<Integer, Plane> planes = new LinkedHashMap<>();
     private final Map<Integer, Circle> circles = new LinkedHashMap<>();
+    private final Map<Integer, CylindricalSurface> cylindricalSurfaces = new LinkedHashMap<>();
     private final Map<Integer, Vertex> vertices = new LinkedHashMap<>();
     private final Map<Integer, Edge> edges = new LinkedHashMap<>();
     private final Map<Integer, OrientedEdge> orientedEdges = new LinkedHashMap<>();
@@ -210,6 +214,23 @@ public final class StepCadBuilder {
     }
 
     /**
+     * Builds a cylindrical surface geometry object.
+     *
+     * @param id STEP entity id
+     * @return built cylindrical surface
+     */
+    public CylindricalSurface buildCylindricalSurface(int id) {
+        CylindricalSurface existing = cylindricalSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCylindricalSurface surface = requireEntity(id, StepCylindricalSurface.class, "CYLINDRICAL_SURFACE");
+        CylindricalSurface built = new CylindricalSurface(buildPlacement(surface.position().id()), surface.radius());
+        cylindricalSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
      * Builds a topological vertex.
      *
      * @param id STEP entity id
@@ -227,7 +248,7 @@ public final class StepCadBuilder {
     }
 
     /**
-     * Builds a straight topological edge.
+     * Builds a topological edge backed by a supported curve.
      *
      * @param id STEP entity id
      * @return built edge
@@ -238,16 +259,15 @@ public final class StepCadBuilder {
             return existing;
         }
         StepEdgeCurve edgeCurve = requireEntity(id, StepEdgeCurve.class, "EDGE_CURVE");
-        if (!(edgeCurve.edgeGeometry() instanceof StepLine line)) {
-            if (edgeCurve.edgeGeometry() instanceof StepCircle) {
-                throw new UnsupportedGeometryException("circular EDGE_CURVE topology is unsupported");
-            }
-            throw new UnsupportedGeometryException("EDGE_CURVE topology requires LINE geometry");
-        }
+        Curve3 curve = switch (edgeCurve.edgeGeometry()) {
+            case StepLine line -> buildLine(line.id());
+            case StepCircle circle -> buildCircle(circle.id());
+            default -> throw new UnsupportedGeometryException("EDGE_CURVE topology requires LINE or CIRCLE geometry");
+        };
         Edge built = new Edge(
                 buildVertex(edgeCurve.start().id()),
                 buildVertex(edgeCurve.end().id()),
-                buildLine(line.id()),
+                curve,
                 edgeCurve.sameSense()
         );
         edges.put(id, built);
@@ -320,6 +340,10 @@ public final class StepCadBuilder {
         }
         StepAdvancedFace stepFace = requireEntity(id, StepAdvancedFace.class, "ADVANCED_FACE");
         if (!(stepFace.faceGeometry() instanceof StepPlane plane)) {
+            if (stepFace.faceGeometry() instanceof StepCylindricalSurface cylindricalSurface) {
+                buildCylindricalSurface(cylindricalSurface.id());
+                throw new UnsupportedGeometryException("ADVANCED_FACE construction for CYLINDRICAL_SURFACE is unsupported");
+            }
             throw new UnsupportedGeometryException("ADVANCED_FACE construction requires PLANE geometry");
         }
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();

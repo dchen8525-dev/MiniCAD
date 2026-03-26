@@ -4,6 +4,7 @@ import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.Circle;
+import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.Plane;
 import com.minicad.step.model.StepEntity;
@@ -19,6 +20,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StepCadBuilderTest {
 
@@ -32,18 +34,21 @@ class StepCadBuilderTest {
                 #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
                 #5=PLANE('PL0',#4);
                 #6=CIRCLE('C0',#4,2.0);
-                #7=VECTOR('V0',#3,5.0);
-                #8=LINE('L0',#1,#7);
+                #7=CYLINDRICAL_SURFACE('CY0',#4,3.0);
+                #8=VECTOR('V0',#3,5.0);
+                #9=LINE('L0',#1,#8);
                 ENDSEC;
                 """);
 
         Axis2Placement3D placement = builder.buildPlacement(4);
         Plane plane = builder.buildPlane(5);
         Circle circle = builder.buildCircle(6);
-        Line3 line = builder.buildLine(8);
+        CylindricalSurface cylindricalSurface = builder.buildCylindricalSurface(7);
+        Line3 line = builder.buildLine(9);
 
         assertEquals(0.0, placement.location().x());
         assertEquals(2.0, circle.radius());
+        assertEquals(3.0, cylindricalSurface.radius());
         assertEquals(1.0, plane.normal().z(), 1.0e-12);
         assertEquals(1.0, line.direction().x(), 1.0e-12);
     }
@@ -107,27 +112,27 @@ class StepCadBuilderTest {
     }
 
     @Test
-    void shouldRejectCircularEdgeTopologyConstruction() {
+    void shouldBuildCircularEdgeTopology() {
         StepCadBuilder builder = builder("""
                 DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=DIRECTION('DZ',(0.0,0.0,1.0));
-                #4=DIRECTION('DX',(1.0,0.0,0.0));
-                #5=AXIS2_PLACEMENT_3D('AX',#1,#3,#4);
-                #6=CIRCLE('C0',#5,2.0);
-                #10=VERTEX_POINT('V0',#1);
-                #11=VERTEX_POINT('V1',#2);
-                #20=EDGE_CURVE('E0',#10,#11,#6,.T.);
+                #1=CARTESIAN_POINT('CENTER',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P1',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=CIRCLE('C0',#12,1.0);
+                #20=VERTEX_POINT('V0',#2);
+                #21=VERTEX_POINT('V1',#3);
+                #30=EDGE_CURVE('E0',#20,#21,#13,.T.);
                 ENDSEC;
                 """);
 
-        UnsupportedGeometryException exception = assertThrows(
-                UnsupportedGeometryException.class,
-                () -> builder.buildEdge(20)
-        );
+        Edge edge = builder.buildEdge(30);
 
-        assertEquals("circular EDGE_CURVE topology is unsupported", exception.getMessage());
+        assertInstanceOf(Circle.class, edge.curve());
+        assertTrue(edge.curve().contains(edge.start().point()));
+        assertTrue(edge.curve().contains(edge.end().point()));
     }
 
     @Test
@@ -144,6 +149,36 @@ class StepCadBuilderTest {
         );
 
         assertEquals("entity #1 is not a MANIFOLD_SOLID_BREP", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectCylindricalAdvancedFaceConstruction() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P0',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P1',(0.0,2.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=CYLINDRICAL_SURFACE('CY0',#12,2.0);
+                #20=VERTEX_POINT('V0',#2);
+                #21=VERTEX_POINT('V1',#3);
+                #30=CIRCLE('C0',#12,2.0);
+                #40=EDGE_CURVE('E0',#20,#21,#30,.T.);
+                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
+                #60=EDGE_LOOP('L0',(#50));
+                #61=FACE_OUTER_BOUND('B0',#60,.T.);
+                #70=ADVANCED_FACE('F0',(#61),#13,.T.);
+                ENDSEC;
+                """);
+
+        UnsupportedGeometryException exception = assertThrows(
+                UnsupportedGeometryException.class,
+                () -> builder.buildFace(70)
+        );
+
+        assertEquals("ADVANCED_FACE construction for CYLINDRICAL_SURFACE is unsupported", exception.getMessage());
     }
 
     private static StepCadBuilder builder(String step) {

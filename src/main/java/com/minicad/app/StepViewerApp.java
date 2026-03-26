@@ -1,20 +1,22 @@
 package com.minicad.app;
 
+import com.minicad.common.GeometryException;
 import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
+import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.Executors;
 
 /**
  * Lightweight local web app for viewing supported STEP topology in the browser.
@@ -30,20 +32,22 @@ public final class StepViewerApp {
      * Starts the local preview server.
      *
      * @param args optional single port argument
-     * @throws IOException if the server cannot start
+     * @throws Exception if the server cannot start
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         int port = parsePort(args);
-        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
-        server.createContext("/", new StaticHandler());
-        server.createContext("/viewer.js", new StaticHandler());
-        server.createContext("/api/preview", new PreviewHandler());
-        server.createContext("/api/example", new ExampleHandler());
-        server.setExecutor(Executors.newCachedThreadPool());
+        Server server = new Server(port);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        context.addServlet(new ServletHolder(new StaticServlet()), "/");
+        context.addServlet(new ServletHolder(new StaticServlet()), "/viewer.js");
+        context.addServlet(new ServletHolder(new StaticServlet()), "/vendor/*");
+        context.addServlet(new ServletHolder(new PreviewServlet()), "/api/preview");
+        context.addServlet(new ServletHolder(new ExampleServlet()), "/api/example");
+        server.setHandler(context);
         server.start();
 
-        System.out.println("STEP viewer started on http://127.0.0.1:" + port);
-        System.out.println("Press Ctrl+C to stop.");
+        printStartupInfo(port);
+        server.join();
     }
 
     private static int parsePort(String[] args) {
@@ -51,84 +55,162 @@ public final class StepViewerApp {
             return DEFAULT_PORT;
         }
         if (args.length != 1) {
-            throw new IllegalArgumentException("Usage: StepViewerApp [port]");
+            throw new IllegalArgumentException(usage());
         }
-        return Integer.parseInt(args[0]);
+        String arg = args[0];
+        String portText;
+        if (arg.startsWith("--port=")) {
+            portText = arg.substring("--port=".length());
+        } else {
+            portText = arg;
+        }
+
+        try {
+            int port = Integer.parseInt(portText);
+            if (port < 1 || port > 65535) {
+                throw new IllegalArgumentException("port must be between 1 and 65535");
+            }
+            return port;
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("invalid port: " + portText + System.lineSeparator() + usage(), ex);
+        }
     }
 
-    private static final class StaticHandler implements HttpHandler {
+    private static String usage() {
+        return """
+                Usage: StepViewerApp [port]
+                       StepViewerApp --port=<port>
+                """.stripTrailing();
+    }
+
+    private static void printStartupInfo(int port) {
+        System.out.println("MiniCAD STEP viewer is running.");
+        System.out.println("URL: http://127.0.0.1:" + port);
+        System.out.println("Routes:");
+        System.out.println("  GET  /");
+        System.out.println("  GET  /api/example?name=minimal-square");
+        System.out.println("  GET  /api/example?name=plate-with-round-hole");
+        System.out.println("  POST /api/preview");
+        System.out.println("Press Ctrl+C to stop.");
+    }
+
+    private static final class StaticServlet extends HttpServlet {
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String path = exchange.getRequestURI().getPath();
-            if (!"GET".equals(exchange.getRequestMethod())) {
-                send(exchange, 405, "text/plain; charset=utf-8", "Method Not Allowed");
-                return;
-            }
-
-            String resourcePath = switch (path) {
-                case "/" -> "/static/index.html";
-                case "/viewer.js" -> "/static/viewer.js";
-                default -> null;
-            };
-
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            String resourcePath = resolveStaticResource(request.getRequestURI());
             if (resourcePath == null) {
-                send(exchange, 404, "text/plain; charset=utf-8", "Not Found");
+                sendTextError(response, HttpServletResponse.SC_NOT_FOUND, "Not Found");
                 return;
             }
 
             try (InputStream input = StepViewerApp.class.getResourceAsStream(resourcePath)) {
                 if (input == null) {
-                    send(exchange, 404, "text/plain; charset=utf-8", "Not Found");
+                    sendTextError(response, HttpServletResponse.SC_NOT_FOUND, "Not Found");
                     return;
                 }
                 byte[] body = input.readAllBytes();
-                String contentType = resourcePath.endsWith(".js")
-                        ? "application/javascript; charset=utf-8"
-                        : "text/html; charset=utf-8";
-                send(exchange, 200, contentType, body);
+                String contentType = contentTypeFor(resourcePath);
+                send(response, HttpServletResponse.SC_OK, contentType, body);
             }
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            sendTextError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
         }
     }
 
-    private static final class PreviewHandler implements HttpHandler {
+    private static String resolveStaticResource(String path) {
+        if ("/".equals(path)) {
+            return "/static/index.html";
+        }
+        if (!path.startsWith("/")) {
+            return null;
+        }
+        if (path.contains("..")) {
+            return null;
+        }
+        return "/static" + path;
+    }
+
+    private static String contentTypeFor(String resourcePath) {
+        if (resourcePath.endsWith(".html")) {
+            return "text/html; charset=utf-8";
+        }
+        if (resourcePath.endsWith(".js")) {
+            return "application/javascript; charset=utf-8";
+        }
+        if (resourcePath.endsWith(".css")) {
+            return "text/css; charset=utf-8";
+        }
+        if (resourcePath.endsWith(".json")) {
+            return "application/json; charset=utf-8";
+        }
+        if (resourcePath.endsWith(".txt") || resourcePath.endsWith(".md") || resourcePath.endsWith(".LICENSE")) {
+            return "text/plain; charset=utf-8";
+        }
+        return "application/octet-stream";
+    }
+
+    private static final class PreviewServlet extends HttpServlet {
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if (!"POST".equals(exchange.getRequestMethod())) {
-                send(exchange, 405, "text/plain; charset=utf-8", "Method Not Allowed");
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            if (stepText.isBlank()) {
+                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
-
-            String stepText = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             try {
                 String json = StepPreviewJsonExporter.export(stepText);
-                send(exchange, 200, "application/json; charset=utf-8", json);
-            } catch (StepParseException | StepResolutionException | UnsupportedGeometryException ex) {
-                send(exchange, 400, "application/json; charset=utf-8", errorJson(ex.getMessage()));
+                send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
+            } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
+                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
             }
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            sendJsonError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "use POST /api/preview");
         }
     }
 
-    private static final class ExampleHandler implements HttpHandler {
+    private static final class ExampleServlet extends HttpServlet {
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if (!"GET".equals(exchange.getRequestMethod())) {
-                send(exchange, 405, "text/plain; charset=utf-8", "Method Not Allowed");
-                return;
-            }
-
-            Path examplePath = Path.of("examples/minimal-square.step");
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            Path examplePath = resolveExamplePath(request.getParameter("name"));
             if (!Files.exists(examplePath)) {
-                send(exchange, 404, "text/plain; charset=utf-8", "Example file not found");
+                send(response, HttpServletResponse.SC_NOT_FOUND, "text/plain; charset=utf-8", "Example file not found");
                 return;
             }
 
             String text = Files.readString(examplePath);
-            send(exchange, 200, "text/plain; charset=utf-8", text);
+            send(response, HttpServletResponse.SC_OK, "text/plain; charset=utf-8", text);
         }
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            sendTextError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
+        }
+    }
+
+    private static Path resolveExamplePath(String name) {
+        return switch (name == null || name.isBlank() ? "minimal-square" : name) {
+            case "minimal-square" -> Path.of("examples/minimal-square.step");
+            case "plate-with-round-hole" -> Path.of("examples/plate-with-round-hole.step");
+            default -> Path.of("examples", name + ".step");
+        };
     }
 
     private static String errorJson(String message) {
         return "{\"error\":\"" + escapeJson(message) + "\"}";
+    }
+
+    private static void sendJsonError(HttpServletResponse response, int status, String message) throws IOException {
+        send(response, status, "application/json; charset=utf-8", errorJson(message));
+    }
+
+    private static void sendTextError(HttpServletResponse response, int status, String message) throws IOException {
+        send(response, status, "text/plain; charset=utf-8", message);
     }
 
     private static String escapeJson(String text) {
@@ -147,16 +229,15 @@ public final class StepViewerApp {
         return escaped.toString();
     }
 
-    private static void send(HttpExchange exchange, int status, String contentType, String body) throws IOException {
-        send(exchange, status, contentType, body.getBytes(StandardCharsets.UTF_8));
+    private static void send(HttpServletResponse response, int status, String contentType, String body) throws IOException {
+        send(response, status, contentType, body.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static void send(HttpExchange exchange, int status, String contentType, byte[] body) throws IOException {
-        Headers headers = exchange.getResponseHeaders();
-        headers.set("Content-Type", contentType);
-        headers.set("Cache-Control", "no-store");
-        exchange.sendResponseHeaders(status, body.length);
-        exchange.getResponseBody().write(body);
-        exchange.close();
+    private static void send(HttpServletResponse response, int status, String contentType, byte[] body) throws IOException {
+        response.setStatus(status);
+        response.setContentType(contentType);
+        response.setHeader("Cache-Control", "no-store");
+        response.setContentLength(body.length);
+        response.getOutputStream().write(body);
     }
 }

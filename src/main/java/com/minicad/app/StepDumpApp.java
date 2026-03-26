@@ -2,8 +2,12 @@ package com.minicad.app;
 
 import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
+import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.common.GeometryException;
+import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepOpenShell;
@@ -11,8 +15,6 @@ import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
-import com.minicad.topology.Shell;
-import com.minicad.topology.Solid;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -64,7 +66,7 @@ public final class StepDumpApp {
             out.println();
             printBuildSummary(resolved, builder, out);
             return 0;
-        } catch (StepParseException | StepResolutionException | UnsupportedGeometryException ex) {
+        } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
             err.println("STEP processing failed: " + ex.getMessage());
             return 1;
         }
@@ -96,23 +98,47 @@ public final class StepDumpApp {
         int openShells = 0;
         int closedShells = 0;
         int solids = 0;
+        int unsupportedFaces = 0;
 
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepOpenShell openShell) {
-                Shell shell = builder.buildShell(openShell.id());
-                out.println("  openShell #" + openShell.id() + ": faces=" + shell.faces().size());
+                FaceBuildCounts counts = summarizeShell(openShell.faces(), builder);
+                out.println("  openShell #" + openShell.id() + ": faces=" + counts.supportedFaces()
+                        + ", unsupportedFaces=" + counts.unsupportedFaces());
                 openShells++;
+                unsupportedFaces += counts.unsupportedFaces();
             } else if (entity instanceof StepClosedShell closedShell) {
-                Shell shell = builder.buildShell(closedShell.id());
-                out.println("  closedShell #" + closedShell.id() + ": faces=" + shell.faces().size());
+                FaceBuildCounts counts = summarizeShell(closedShell.faces(), builder);
+                out.println("  closedShell #" + closedShell.id() + ": faces=" + counts.supportedFaces()
+                        + ", unsupportedFaces=" + counts.unsupportedFaces());
                 closedShells++;
+                unsupportedFaces += counts.unsupportedFaces();
             } else if (entity instanceof StepManifoldSolidBrep solidBrep) {
-                Solid solid = builder.buildSolid(solidBrep.id());
-                out.println("  solid #" + solidBrep.id() + ": shellFaces=" + solid.outerShell().faces().size());
+                FaceBuildCounts counts = summarizeShell(solidBrep.outer().faces(), builder);
+                out.println("  solid #" + solidBrep.id() + ": shellFaces=" + counts.supportedFaces()
+                        + ", unsupportedFaces=" + counts.unsupportedFaces());
                 solids++;
             }
         }
 
-        out.println("  totals: openShells=" + openShells + ", closedShells=" + closedShells + ", solids=" + solids);
+        out.println("  totals: openShells=" + openShells + ", closedShells=" + closedShells
+                + ", solids=" + solids + ", unsupportedFaces=" + unsupportedFaces);
+    }
+
+    private static FaceBuildCounts summarizeShell(Iterable<StepAdvancedFace> faces, StepCadBuilder builder) {
+        int supported = 0;
+        int unsupported = 0;
+        for (StepAdvancedFace face : faces) {
+            if (face.faceGeometry() instanceof StepCylindricalSurface) {
+                unsupported++;
+                continue;
+            }
+            builder.buildFace(face.id());
+            supported++;
+        }
+        return new FaceBuildCounts(supported, unsupported);
+    }
+
+    private record FaceBuildCounts(int supportedFaces, int unsupportedFaces) {
     }
 }

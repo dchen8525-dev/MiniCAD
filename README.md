@@ -60,6 +60,7 @@
 - `Line3`
 - `Plane`
 - `Circle`
+- `CylindricalSurface`
 
 ### 拓扑层
 
@@ -98,6 +99,7 @@
 - `LINE`
 - `PLANE`
 - `CIRCLE`
+- `CYLINDRICAL_SURFACE`
 - `VERTEX_POINT`
 - `EDGE_CURVE`
 - `ORIENTED_EDGE`
@@ -115,11 +117,16 @@
 
 - `AXIS2_PLACEMENT_3D` 目前要求显式提供 `axis` 和 `ref_direction`
 - `ADVANCED_FACE` 目前只支持 `PLANE`
-- 内部拓扑构建目前只支持由 `LINE` 支撑的 `EDGE_CURVE`
+- 内部拓扑构建目前支持由 `LINE` 和 `CIRCLE` 支撑的 `EDGE_CURVE`
 - `CIRCLE` 目前支持：
   - STEP 语义解析
   - 内部几何对象构建
-  - 但**不支持**作为拓扑边进行构建
+  - 作为拓扑边进行构建
+- `CYLINDRICAL_SURFACE` 目前支持：
+  - STEP 语义解析
+  - 内部几何对象构建
+  - 作为 `ADVANCED_FACE` 的语义几何被识别
+  - 但**不支持** `ADVANCED_FACE` 构面与浏览器预览
 - `ORIENTED_EDGE` 当前只支持 `$,$,#edge,.T./.F.` 这种最小形式
 - parser 的错误位置目前是相对于提取出的 `DATA` 段，不是整文件绝对位置
 
@@ -165,7 +172,7 @@ mvn exec:java -Dexec.args="examples/minimal-square.step"
 
 项目还提供了一个本地浏览器预览器，使用：
 
-- Java 自带 `HttpServer`
+- 内嵌 Jetty
 - 原生 JavaScript
 - Three.js
 
@@ -189,14 +196,14 @@ http://127.0.0.1:8080
 
 当前预览范围：
 
-- 直线 `EDGE_CURVE` 线框
+- 直线和圆弧 `EDGE_CURVE` 线框
 - 平面 `ADVANCED_FACE` 面片
 - 基于当前支持范围的 shell / solid 结构统计
 
 说明：
 
-- 页面中的 Three.js 通过 CDN 加载，因此首次打开页面需要网络访问 CDN
-- 当前仍然不支持圆弧边拓扑、NURBS 和复杂工业级修剪面
+- Three.js 已随项目静态资源一起提供，浏览器离线也可以打开页面
+- 当前仍然不支持 NURBS、圆柱/圆锥曲面的构面/网格化，以及复杂工业级修剪面
 
 ## 开发说明
 

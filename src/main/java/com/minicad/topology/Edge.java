@@ -2,17 +2,17 @@ package com.minicad.topology;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.TopologyException;
-import com.minicad.geometry.Line3;
+import com.minicad.geometry.Curve3;
 
 /**
- * Minimal topological edge backed by a straight 3D line.
+ * Minimal topological edge backed by a supported 3D curve.
  *
  * @param start start vertex
  * @param end end vertex
  * @param curve underlying curve geometry
  * @param sameSense whether the topological direction matches the curve direction
  */
-public record Edge(Vertex start, Vertex end, Line3 curve, boolean sameSense) {
+public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
 
     /**
      * Creates an edge and validates its invariants.

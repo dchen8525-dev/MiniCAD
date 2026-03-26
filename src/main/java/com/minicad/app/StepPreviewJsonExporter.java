@@ -4,8 +4,13 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.Circle;
+import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
+import com.minicad.geometry.Line3;
+import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepOpenShell;
@@ -17,7 +22,6 @@ import com.minicad.topology.Edge;
 import com.minicad.topology.Face;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.OrientedEdge;
-import com.minicad.topology.Shell;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -56,6 +60,7 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<Integer> shellIds = new TreeSet<>();
         int solidCount = 0;
+        int unsupportedFaceCount = 0;
 
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepOpenShell openShell) {
@@ -73,8 +78,12 @@ public final class StepPreviewJsonExporter {
         BoundsAccumulator bounds = new BoundsAccumulator();
 
         for (Integer shellId : shellIds) {
-            Shell shell = builder.buildShell(shellId);
-            for (Face face : shell.faces()) {
+            for (StepAdvancedFace stepFace : shellFaces(resolved.get(shellId))) {
+                if (stepFace.faceGeometry() instanceof StepCylindricalSurface) {
+                    unsupportedFaceCount++;
+                    continue;
+                }
+                Face face = builder.buildFace(stepFace.id());
                 faces.add(toFacePayload(face, bounds));
                 for (FaceBound bound : face.bounds()) {
                     for (OrientedEdge orientedEdge : bound.loop().edges()) {
@@ -86,28 +95,39 @@ public final class StepPreviewJsonExporter {
 
         List<EdgePayload> edges = new ArrayList<>();
         for (Edge edge : uniqueEdges) {
-            CartesianPoint start = edge.start().point();
-            CartesianPoint end = edge.end().point();
-            bounds.include(start);
-            bounds.include(end);
-            edges.add(new EdgePayload(toPointPayload(start), toPointPayload(end)));
+            List<CartesianPoint> polyline = sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense());
+            includeAll(bounds, polyline);
+            edges.add(new EdgePayload(toPointPayloads(polyline)));
         }
 
-        PreviewStats stats = new PreviewStats(stepFile.entities().size(), solidCount, shellIds.size(), faces.size(), edges.size());
+        PreviewStats stats = new PreviewStats(
+                stepFile.entities().size(),
+                solidCount,
+                shellIds.size(),
+                faces.size(),
+                edges.size(),
+                unsupportedFaceCount
+        );
         BoundsPayload boundsPayload = bounds.toPayload();
         return new PreviewPayload(stats, boundsPayload, edges, faces);
+    }
+
+    private static List<StepAdvancedFace> shellFaces(StepEntity entity) {
+        if (entity instanceof StepOpenShell openShell) {
+            return openShell.faces();
+        }
+        if (entity instanceof StepClosedShell closedShell) {
+            return closedShell.faces();
+        }
+        throw new UnsupportedGeometryException("preview export requires OPEN_SHELL or CLOSED_SHELL");
     }
 
     private static FacePayload toFacePayload(Face face, BoundsAccumulator bounds) {
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
-            List<PointPayload> points = new ArrayList<>();
-            for (OrientedEdge orientedEdge : bound.loop().edges()) {
-                CartesianPoint point = orientedEdge.startVertex().point();
-                bounds.include(point);
-                points.add(toPointPayload(point));
-            }
-            loops.add(new LoopPayload(bound.outer(), points));
+            List<CartesianPoint> loopPoints = sampleLoop(bound);
+            includeAll(bounds, loopPoints);
+            loops.add(new LoopPayload(bound.outer(), toPointPayloads(loopPoints)));
         }
         Direction3 normal = face.surface().normal();
         return new FacePayload(
@@ -120,6 +140,82 @@ public final class StepPreviewJsonExporter {
 
     private static PointPayload toPointPayload(CartesianPoint point) {
         return new PointPayload(point.x(), point.y(), point.z());
+    }
+
+    private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
+        return points.stream().map(StepPreviewJsonExporter::toPointPayload).toList();
+    }
+
+    private static void includeAll(BoundsAccumulator bounds, List<CartesianPoint> points) {
+        for (CartesianPoint point : points) {
+            bounds.include(point);
+        }
+    }
+
+    private static List<CartesianPoint> sampleLoop(FaceBound bound) {
+        List<CartesianPoint> sampled = new ArrayList<>();
+        boolean firstEdge = true;
+        for (OrientedEdge orientedEdge : bound.loop().edges()) {
+            List<CartesianPoint> edgePoints = sampleOrientedEdge(orientedEdge);
+            int startIndex = firstEdge ? 0 : 1;
+            for (int i = startIndex; i < edgePoints.size(); i++) {
+                sampled.add(edgePoints.get(i));
+            }
+            firstEdge = false;
+        }
+        if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
+            sampled.add(sampled.getFirst());
+        }
+        return sampled;
+    }
+
+    private static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
+        Edge edge = orientedEdge.edge();
+        boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
+        return sampleEdge(
+                orientedEdge.startVertex().point(),
+                orientedEdge.endVertex().point(),
+                edge.curve(),
+                naturalForward
+        );
+    }
+
+    private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
+        if (curve instanceof Line3) {
+            return List.of(start, end);
+        }
+        if (curve instanceof Circle circle) {
+            return sampleCircleArc(circle, start, end, naturalForward);
+        }
+        throw new UnsupportedGeometryException("preview export requires LINE or CIRCLE topology");
+    }
+
+    private static List<CartesianPoint> sampleCircleArc(
+            Circle circle,
+            CartesianPoint start,
+            CartesianPoint end,
+            boolean naturalForward
+    ) {
+        double startAngle = circle.angleOf(start);
+        double endAngle = circle.angleOf(end);
+        double delta = endAngle - startAngle;
+        if (naturalForward) {
+            if (delta < 0.0) {
+                delta += Math.PI * 2.0;
+            }
+        } else if (delta > 0.0) {
+            delta -= Math.PI * 2.0;
+        }
+
+        int segments = Math.max(8, (int) Math.ceil(Math.abs(delta) / (Math.PI / 12.0)));
+        List<CartesianPoint> points = new ArrayList<>(segments + 1);
+        for (int i = 0; i <= segments; i++) {
+            double angle = startAngle + delta * i / segments;
+            points.add(circle.pointAt(angle));
+        }
+        points.set(0, start);
+        points.set(points.size() - 1, end);
+        return points;
     }
 
     private static String toJson(PreviewPayload payload) {
@@ -144,6 +240,7 @@ public final class StepPreviewJsonExporter {
         json.append(",\"shellCount\":").append(stats.shellCount());
         json.append(",\"faceCount\":").append(stats.faceCount());
         json.append(",\"edgeCount\":").append(stats.edgeCount());
+        json.append(",\"unsupportedFaceCount\":").append(stats.unsupportedFaceCount());
         json.append('}');
     }
 
@@ -164,10 +261,8 @@ public final class StepPreviewJsonExporter {
             }
             EdgePayload edge = edges.get(i);
             json.append('{');
-            json.append("\"start\":");
-            appendPoint(json, edge.start());
-            json.append(",\"end\":");
-            appendPoint(json, edge.end());
+            json.append("\"points\":");
+            appendPoints(json, edge.points());
             json.append('}');
         }
         json.append(']');
@@ -247,13 +342,20 @@ public final class StepPreviewJsonExporter {
     private record PreviewPayload(PreviewStats stats, BoundsPayload bounds, List<EdgePayload> edges, List<FacePayload> faces) {
     }
 
-    private record PreviewStats(int entityCount, int solidCount, int shellCount, int faceCount, int edgeCount) {
+    private record PreviewStats(
+            int entityCount,
+            int solidCount,
+            int shellCount,
+            int faceCount,
+            int edgeCount,
+            int unsupportedFaceCount
+    ) {
     }
 
     private record BoundsPayload(PointPayload min, PointPayload max) {
     }
 
-    private record EdgePayload(PointPayload start, PointPayload end) {
+    private record EdgePayload(List<PointPayload> points) {
     }
 
     private record FacePayload(PointPayload origin, VectorPayload normal, boolean sameSense, List<LoopPayload> loops) {

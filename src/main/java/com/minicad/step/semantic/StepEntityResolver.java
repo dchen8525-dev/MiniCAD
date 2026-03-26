@@ -7,6 +7,7 @@ import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
@@ -76,6 +77,7 @@ public final class StepEntityResolver {
             case "LINE" -> resolveLine(instance);
             case "PLANE" -> resolvePlane(instance);
             case "CIRCLE" -> resolveCircle(instance);
+            case "CYLINDRICAL_SURFACE" -> resolveCylindricalSurface(instance);
             case "VERTEX_POINT" -> resolveVertexPoint(instance);
             case "EDGE_CURVE" -> resolveEdgeCurve(instance);
             case "ORIENTED_EDGE" -> resolveOrientedEdge(instance);
@@ -163,6 +165,17 @@ public final class StepEntityResolver {
         );
     }
 
+    private StepCylindricalSurface resolveCylindricalSurface(StepEntityInstance instance) {
+        requireParameterCount(instance, 3);
+        return new StepCylindricalSurface(
+                instance.id(),
+                stringValue(instance, 0),
+                requireEntity(referenceId(instance, 1), StepAxis2Placement3D.class,
+                        "CYLINDRICAL_SURFACE position must reference AXIS2_PLACEMENT_3D"),
+                numberValue(instance, 2)
+        );
+    }
+
     private StepVertexPoint resolveVertexPoint(StepEntityInstance instance) {
         requireParameterCount(instance, 2);
         return new StepVertexPoint(
@@ -227,8 +240,8 @@ public final class StepEntityResolver {
     private StepAdvancedFace resolveAdvancedFace(StepEntityInstance instance) {
         requireParameterCount(instance, 4);
         StepEntity faceGeometry = resolve(referenceId(instance, 2));
-        if (!(faceGeometry instanceof StepPlane)) {
-            throw new UnsupportedStepEntityException("ADVANCED_FACE geometry must be PLANE");
+        if (!(faceGeometry instanceof StepPlane) && !(faceGeometry instanceof StepCylindricalSurface)) {
+            throw new UnsupportedStepEntityException("ADVANCED_FACE geometry must be PLANE or CYLINDRICAL_SURFACE");
         }
         return new StepAdvancedFace(
                 instance.id(),

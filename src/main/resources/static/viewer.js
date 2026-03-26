@@ -5,7 +5,9 @@ const stepInput = document.querySelector('#step-input');
 const fileInput = document.querySelector('#file-input');
 const renderButton = document.querySelector('#render-button');
 const loadExampleButton = document.querySelector('#load-example');
+const exampleSelect = document.querySelector('#example-select');
 const statusText = document.querySelector('#status-text');
+const selectionDetails = document.querySelector('#selection-details');
 const statElements = new Map(
     Array.from(document.querySelectorAll('[data-stat]')).map((element) => [element.dataset.stat, element])
 );
@@ -48,6 +50,12 @@ scene.add(axes);
 const modelRoot = new THREE.Group();
 scene.add(modelRoot);
 
+const raycaster = new THREE.Raycaster();
+raycaster.params.Line.threshold = 0.14;
+const pointer = new THREE.Vector2();
+let interactiveObjects = [];
+let selectedObject = null;
+
 function resize() {
     const width = sceneHost.clientWidth;
     const height = sceneHost.clientHeight;
@@ -77,12 +85,29 @@ function updateStats(stats = {}) {
     }
 }
 
+function setSelection(entries) {
+    selectionDetails.innerHTML = entries.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
+}
+
+function resetSelection() {
+    if (selectedObject) {
+        applySelectionStyle(selectedObject, false);
+        selectedObject = null;
+    }
+    setSelection([
+        ['类型', '未选中'],
+        ['说明', '点击右侧模型中的面或边查看详情。']
+    ]);
+}
+
 function clearModel() {
     while (modelRoot.children.length > 0) {
         const child = modelRoot.children[0];
         modelRoot.remove(child);
         disposeObject(child);
     }
+    interactiveObjects = [];
+    resetSelection();
 }
 
 function disposeObject(object) {
@@ -226,16 +251,33 @@ function buildFaceMesh(face) {
     return new THREE.Mesh(geometry, material);
 }
 
-function buildEdgeLines(edges) {
-    const positions = [];
-    for (const edge of edges) {
-        positions.push(...edge.start, ...edge.end);
-    }
-
+function buildEdgeObject(edge, edgeIndex) {
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
     const material = new THREE.LineBasicMaterial({ color: 0x1b2d33 });
-    return new THREE.LineSegments(geometry, material);
+    const line = new THREE.Line(geometry, material);
+    line.userData.selection = [
+        ['类型', `边 #${edgeIndex + 1}`],
+        ['采样点', String(edge.points.length)],
+        ['线段数', String(Math.max(0, edge.points.length - 1))],
+        ['起点', formatPoint(edge.points[0])],
+        ['终点', formatPoint(edge.points[edge.points.length - 1])]
+    ];
+    line.userData.baseColor = 0x1b2d33;
+    line.userData.selectedColor = 0xf06d3a;
+    return line;
+}
+
+function formatPoint(point) {
+    return point.map((value) => Number(value).toFixed(3)).join(', ');
+}
+
+function applySelectionStyle(object, selected) {
+    const color = selected ? object.userData.selectedColor : object.userData.baseColor;
+    object.material.color.setHex(color);
+    if (object.isMesh) {
+        object.material.opacity = selected ? 0.9 : 0.62;
+    }
 }
 
 function fitCamera(bounds) {
@@ -256,19 +298,35 @@ function fitCamera(bounds) {
 function renderPreview(preview) {
     clearModel();
 
-    const meshGroup = new THREE.Group();
-    for (const face of preview.faces) {
+    for (let index = 0; index < preview.faces.length; index += 1) {
+        const face = preview.faces[index];
         const mesh = buildFaceMesh(face);
         if (mesh) {
-            meshGroup.add(mesh);
+            const innerLoopCount = face.loops.filter((loop) => !loop.outer).length;
+            const outerLoop = face.loops.find((loop) => loop.outer);
+            mesh.userData.selection = [
+                ['类型', `面 #${index + 1}`],
+                ['边界环', String(face.loops.length)],
+                ['内环', String(innerLoopCount)],
+                ['外环采样点', String(outerLoop ? outerLoop.points.length : 0)],
+                ['法向', formatPoint(face.normal)]
+            ];
+            mesh.userData.baseColor = 0xc87a52;
+            mesh.userData.selectedColor = 0xf0b15a;
+            interactiveObjects.push(mesh);
+            modelRoot.add(mesh);
         }
     }
 
-    modelRoot.add(meshGroup);
-    modelRoot.add(buildEdgeLines(preview.edges));
+    for (let index = 0; index < preview.edges.length; index += 1) {
+        const line = buildEdgeObject(preview.edges[index], index);
+        interactiveObjects.push(line);
+        modelRoot.add(line);
+    }
 
     updateStats(preview.stats);
     fitCamera(preview.bounds);
+    resetSelection();
 }
 
 async function requestPreview(stepText) {
@@ -309,7 +367,9 @@ async function renderCurrentInput() {
     try {
         const preview = await requestPreview(stepText);
         renderPreview(preview);
-        setStatus(`渲染完成：${preview.stats.faceCount} 个面，${preview.stats.edgeCount} 条边。`);
+        const unsupported = preview.stats.unsupportedFaceCount ?? 0;
+        const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
+        setStatus(`渲染完成：${preview.stats.faceCount} 个面，${preview.stats.edgeCount} 条边${suffix}`);
     } catch (error) {
         clearModel();
         updateStats();
@@ -324,12 +384,12 @@ renderButton.addEventListener('click', () => {
 loadExampleButton.addEventListener('click', async () => {
     setStatus('正在加载示例...');
     try {
-        const response = await fetch('/api/example');
+        const response = await fetch(`/api/example?name=${encodeURIComponent(exampleSelect.value)}`);
         if (!response.ok) {
             throw new Error('示例文件不可用');
         }
         stepInput.value = await response.text();
-        setStatus('示例已加载，可以直接渲染。');
+        setStatus(`示例 ${exampleSelect.value} 已加载，可以直接渲染。`);
     } catch (error) {
         setStatus(error.message);
     }
@@ -342,4 +402,33 @@ fileInput.addEventListener('change', async (event) => {
     }
     stepInput.value = await file.text();
     setStatus(`已载入文件：${file.name}`);
+});
+
+renderer.domElement.addEventListener('click', (event) => {
+    if (interactiveObjects.length === 0) {
+        return;
+    }
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+
+    const hits = raycaster.intersectObjects(interactiveObjects, false);
+    if (selectedObject) {
+        applySelectionStyle(selectedObject, false);
+        selectedObject = null;
+    }
+
+    if (hits.length === 0) {
+        setSelection([
+            ['类型', '未选中'],
+            ['说明', '点击右侧模型中的面或边查看详情。']
+        ]);
+        return;
+    }
+
+    selectedObject = hits[0].object;
+    applySelectionStyle(selectedObject, true);
+    setSelection(selectedObject.userData.selection);
 });

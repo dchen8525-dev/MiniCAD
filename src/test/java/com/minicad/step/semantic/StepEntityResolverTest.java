@@ -5,6 +5,7 @@ import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepManifoldSolidBrep;
@@ -149,7 +150,28 @@ class StepEntityResolverTest {
                 () -> StepEntityResolver.resolveAll(StepParser.parse(step))
         );
 
-        assertEquals("ADVANCED_FACE geometry must be PLANE", exception.getMessage());
+        assertEquals("ADVANCED_FACE geometry must be PLANE or CYLINDRICAL_SURFACE", exception.getMessage());
+    }
+
+    @Test
+    void shouldResolveCylindricalSurfaceAdvancedFaceGeometry() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=CYLINDRICAL_SURFACE('CY0',#4,2.0);
+                #10=EDGE_LOOP('L0',());
+                #11=FACE_OUTER_BOUND('B0',#10,.T.);
+                #12=ADVANCED_FACE('F0',(#11),#5,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCylindricalSurface surface = assertInstanceOf(StepCylindricalSurface.class, resolved.get(5));
+        assertEquals(2.0, surface.radius());
     }
 
     @Test

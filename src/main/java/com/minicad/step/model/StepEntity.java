@@ -4,7 +4,7 @@ package com.minicad.step.model;
  * Marker interface for resolved STEP semantic entities.
  */
 public sealed interface StepEntity permits StepCartesianPoint, StepDirection, StepVector,
-        StepAxis2Placement3D, StepLine, StepPlane, StepCircle, StepVertexPoint, StepEdgeCurve,
+        StepAxis2Placement3D, StepLine, StepPlane, StepCircle, StepCylindricalSurface, StepVertexPoint, StepEdgeCurve,
         StepOrientedEdge, StepEdgeLoop, StepFaceBound, StepAdvancedFace, StepOpenShell,
         StepClosedShell, StepManifoldSolidBrep {
 

@@ -76,7 +76,7 @@ class StepDumpAppTest {
     }
 
     @Test
-    void shouldFailClearlyOnUnsupportedTopologyBuild() throws IOException {
+    void shouldFailClearlyOnInvalidTopologyBuild() throws IOException {
         Path file = Files.createTempFile("minicad-circle-edge", ".step");
         Files.writeString(file, """
                 DATA;
@@ -108,6 +108,45 @@ class StepDumpAppTest {
         );
 
         assertEquals(1, exitCode);
-        assertTrue(stderr.toString().contains("circular EDGE_CURVE topology is unsupported"));
+        assertTrue(stderr.toString().contains("start vertex must lie on edge curve"));
+    }
+
+    @Test
+    void shouldReportUnsupportedCylindricalFacesWithoutFailingWholeDump() throws IOException {
+        Path file = Files.createTempFile("minicad-cylinder-face", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P0',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P1',(0.0,2.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=CYLINDRICAL_SURFACE('CY0',#12,2.0);
+                #20=VERTEX_POINT('V0',#2);
+                #21=VERTEX_POINT('V1',#3);
+                #30=CIRCLE('C0',#12,2.0);
+                #40=EDGE_CURVE('E0',#20,#21,#30,.T.);
+                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
+                #60=EDGE_LOOP('L0',(#50));
+                #61=FACE_OUTER_BOUND('B0',#60,.T.);
+                #70=ADVANCED_FACE('F0',(#61),#13,.T.);
+                #80=OPEN_SHELL('OS',(#70));
+                ENDSEC;
+                """);
+
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+        int exitCode = StepDumpApp.run(
+                new String[]{file.toString()},
+                new PrintStream(stdout),
+                new PrintStream(stderr)
+        );
+
+        String output = stdout.toString();
+        assertEquals(0, exitCode);
+        assertTrue(output.contains("openShell #80: faces=0, unsupportedFaces=1"));
+        assertTrue(output.contains("unsupportedFaces=1"));
     }
 }

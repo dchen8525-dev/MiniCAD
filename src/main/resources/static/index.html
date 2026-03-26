@@ -61,7 +61,8 @@
 
         .controls,
         .stats,
-        .status-card {
+        .status-card,
+        .selection-card {
             padding: 1rem;
             border: 1px solid var(--panel-border);
             border-radius: 1rem;
@@ -101,6 +102,16 @@
             color: var(--muted);
         }
 
+        select {
+            width: 100%;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--panel-border);
+            border-radius: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
         textarea {
             width: 100%;
             min-height: 17rem;
@@ -134,6 +145,28 @@
         .status-card p {
             margin: 0;
             line-height: 1.5;
+        }
+
+        .selection-card h2 {
+            margin: 0 0 0.55rem;
+            font-size: 1rem;
+        }
+
+        .selection-card dl {
+            margin: 0;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.45rem 0.75rem;
+            font-size: 0.92rem;
+        }
+
+        .selection-card dt {
+            color: var(--muted);
+        }
+
+        .selection-card dd {
+            margin: 0;
+            word-break: break-word;
         }
 
         .viewer {
@@ -185,6 +218,10 @@
         </header>
 
         <section class="controls">
+            <select id="example-select">
+                <option value="minimal-square">minimal-square</option>
+                <option value="plate-with-round-hole">plate-with-round-hole</option>
+            </select>
             <div class="actions">
                 <button id="load-example">加载示例</button>
                 <button id="render-button" class="secondary">解析并渲染</button>
@@ -199,10 +236,19 @@
             <div><span class="stat-label">Shells</span><span class="stat-value" data-stat="shellCount">0</span></div>
             <div><span class="stat-label">Faces</span><span class="stat-value" data-stat="faceCount">0</span></div>
             <div><span class="stat-label">Edges</span><span class="stat-value" data-stat="edgeCount">0</span></div>
+            <div><span class="stat-label">Unsupported</span><span class="stat-value" data-stat="unsupportedFaceCount">0</span></div>
         </section>
 
         <section class="status-card">
             <p id="status-text">等待输入 STEP 数据。</p>
+        </section>
+
+        <section class="selection-card">
+            <h2>当前选中</h2>
+            <dl id="selection-details">
+                <dt>类型</dt><dd>未选中</dd>
+                <dt>说明</dt><dd>点击右侧模型中的面或边查看详情。</dd>
+            </dl>
         </section>
     </aside>
 
@@ -215,8 +261,8 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+    "three": "/vendor/three/build/three.module.js",
+    "three/addons/": "/vendor/three/examples/jsm/"
   }
 }
 </script>

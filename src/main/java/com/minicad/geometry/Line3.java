@@ -9,7 +9,7 @@ import com.minicad.common.Preconditions;
  * @param origin point on the line
  * @param direction unit direction of the line
  */
-public record Line3(CartesianPoint origin, Direction3 direction) {
+public record Line3(CartesianPoint origin, Direction3 direction) implements Curve3 {
 
     /**
      * Creates a line and validates its fields.
