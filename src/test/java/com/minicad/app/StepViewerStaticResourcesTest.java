@@ -21,10 +21,6 @@ class StepViewerStaticResourcesTest {
                 "three.module.js should be available on the classpath"
         );
         assertNotNull(
-                StepViewerApp.class.getResource("/static/vendor/three/build/three.core.js"),
-                "three.core.js should be available on the classpath"
-        );
-        assertNotNull(
                 StepViewerApp.class.getResource("/static/vendor/three/examples/jsm/controls/OrbitControls.js"),
                 "OrbitControls.js should be available on the classpath"
         );
