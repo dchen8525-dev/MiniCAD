@@ -57,6 +57,7 @@
 - `Vector3`
 - `Direction3`
 - `Axis2Placement3D`
+- `Curve3`
 - `Line3`
 - `Plane`
 - `Circle`
@@ -116,7 +117,7 @@
 请特别注意，当前支持是**最小实现**，不是通用支持：
 
 - `AXIS2_PLACEMENT_3D` 目前要求显式提供 `axis` 和 `ref_direction`
-- `ADVANCED_FACE` 目前只支持 `PLANE`
+- `ADVANCED_FACE` 语义层目前支持 `PLANE` 和 `CYLINDRICAL_SURFACE`
 - 内部拓扑构建目前支持由 `LINE` 和 `CIRCLE` 支撑的 `EDGE_CURVE`
 - `CIRCLE` 目前支持：
   - STEP 语义解析
@@ -154,7 +155,8 @@ mvn test
 
 示例 STEP 文件：
 
-- [examples/minimal-square.step](/root/work/java-cad-kernel/examples/minimal-square.step)
+- [examples/minimal-square.step](/root/work/MiniCAD/examples/minimal-square.step)
+- [examples/plate-with-round-hole.step](/root/work/MiniCAD/examples/plate-with-round-hole.step)
 
 运行命令：
 
@@ -167,6 +169,8 @@ mvn exec:java -Dexec.args="examples/minimal-square.step"
 - `Syntax Summary`
 - `Semantic Summary`
 - `Build Summary`
+
+对于当前无法构面的曲面面，`Build Summary` 会明确统计 `unsupportedFaces`，而不是伪装成已支持。
 
 ## Web 预览
 
@@ -192,18 +196,24 @@ http://127.0.0.1:8080
 
 - 上传 `.step` / `.stp` 文件
 - 直接粘贴 STEP 文本
-- 加载 `examples/minimal-square.step` 示例
+- 在页面中切换并加载 `minimal-square` 与 `plate-with-round-hole` 示例
+- 点击模型中的面或边查看基础选中信息
 
 当前预览范围：
 
 - 直线和圆弧 `EDGE_CURVE` 线框
 - 平面 `ADVANCED_FACE` 面片
 - 基于当前支持范围的 shell / solid 结构统计
+- 对暂不支持渲染的面返回 `unsupportedFaceCount`
 
 说明：
 
 - Three.js 已随项目静态资源一起提供，浏览器离线也可以打开页面
-- 当前仍然不支持 NURBS、圆柱/圆锥曲面的构面/网格化，以及复杂工业级修剪面
+- `CYLINDRICAL_SURFACE` 当前只做到：
+  - 语义解析
+  - 内部几何对象构建
+  - 在 CLI / Web 统计中识别并计入 unsupported face
+- 当前仍然不支持圆柱/圆锥曲面的构面或网格化、NURBS，以及复杂工业级修剪面
 
 ## 开发说明
 
