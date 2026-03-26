@@ -59,12 +59,16 @@ let selectedObject = null;
 function resize() {
     const width = sceneHost.clientWidth;
     const height = sceneHost.clientHeight;
+    if (width === 0 || height === 0) {
+        return;
+    }
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 }
 
 window.addEventListener('resize', resize);
+new ResizeObserver(() => resize()).observe(sceneHost);
 resize();
 
 function animate() {
