@@ -13,6 +13,7 @@
 - STEP 语义解析（semantic model）
 - 内部几何 / 拓扑对象构建
 - CLI 结构摘要输出
+- 浏览器中的最小 Three.js 预览
 
 设计原则是：
 
@@ -159,6 +160,43 @@ mvn exec:java -Dexec.args="examples/minimal-square.step"
 - `Syntax Summary`
 - `Semantic Summary`
 - `Build Summary`
+
+## Web 预览
+
+项目还提供了一个本地浏览器预览器，使用：
+
+- Java 自带 `HttpServer`
+- 原生 JavaScript
+- Three.js
+
+启动方式：
+
+```bash
+mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp
+```
+
+默认地址：
+
+```text
+http://127.0.0.1:8080
+```
+
+你可以：
+
+- 上传 `.step` / `.stp` 文件
+- 直接粘贴 STEP 文本
+- 加载 `examples/minimal-square.step` 示例
+
+当前预览范围：
+
+- 直线 `EDGE_CURVE` 线框
+- 平面 `ADVANCED_FACE` 面片
+- 基于当前支持范围的 shell / solid 结构统计
+
+说明：
+
+- 页面中的 Three.js 通过 CDN 加载，因此首次打开页面需要网络访问 CDN
+- 当前仍然不支持圆弧边拓扑、NURBS 和复杂工业级修剪面
 
 ## 开发说明
 
