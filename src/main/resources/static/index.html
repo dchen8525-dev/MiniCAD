@@ -14,6 +14,8 @@
             --accent: #c45f35;
             --accent-dark: #8f3f20;
             --canvas: #dfe7e8;
+            --app-width: min(96vw, 1500px);
+            --app-height: min(92dvh, 960px);
         }
 
         * {
@@ -22,6 +24,7 @@
 
         body {
             margin: 0;
+            padding: 1.5rem;
             font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
             color: var(--text);
             background:
@@ -29,12 +32,21 @@
                 radial-gradient(circle at bottom right, rgba(66, 118, 128, 0.15), transparent 28rem),
                 linear-gradient(135deg, #efe8da 0%, #f8f5ef 55%, #e7eceb 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .layout {
             display: grid;
             grid-template-columns: 22rem 1fr;
-            min-height: 100vh;
+            width: var(--app-width);
+            min-height: var(--app-height);
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(63, 58, 46, 0.08);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(53, 47, 39, 0.12);
         }
 
         .sidebar {
@@ -174,11 +186,13 @@
             background:
                 radial-gradient(circle at center, rgba(255, 255, 255, 0.4), transparent 32rem),
                 var(--canvas);
+            min-height: 0;
         }
 
         #scene {
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            min-height: var(--app-height);
         }
 
         .overlay {
@@ -194,8 +208,16 @@
         }
 
         @media (max-width: 960px) {
+            body {
+                padding: 0.75rem;
+                align-items: stretch;
+            }
+
             .layout {
                 grid-template-columns: 1fr;
+                width: 100%;
+                min-height: calc(100dvh - 1.5rem);
+                border-radius: 1.1rem;
             }
 
             .sidebar {
@@ -204,7 +226,7 @@
             }
 
             #scene {
-                height: 60vh;
+                min-height: 58dvh;
             }
         }
     </style>
