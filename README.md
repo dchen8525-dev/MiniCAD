@@ -1,4 +1,4 @@
-# java-cad-kernel
+# mini-cad
 
 一个**教学性质**的最小 CAD kernel 与 STEP 解析器示例项目，使用 Java 实现。
 
