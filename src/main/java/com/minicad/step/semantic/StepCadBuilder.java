@@ -1,5 +1,6 @@
 package com.minicad.step.semantic;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
@@ -20,9 +21,15 @@ import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
 import com.minicad.geometry2d.Direction2;
 import com.minicad.geometry2d.BSplineCurve2;
+import com.minicad.geometry2d.Circle2;
+import com.minicad.geometry2d.Curve2;
+import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
+import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.geometry2d.Vector2;
 import com.minicad.step.model.StepAdvancedFace;
+import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
@@ -81,7 +88,10 @@ public final class StepCadBuilder {
     private final Map<Integer, Point2> points2d = new LinkedHashMap<>();
     private final Map<Integer, Direction2> directions2d = new LinkedHashMap<>();
     private final Map<Integer, Line2> lines2d = new LinkedHashMap<>();
+    private final Map<Integer, Circle2> circles2d = new LinkedHashMap<>();
+    private final Map<Integer, Ellipse2> ellipses2d = new LinkedHashMap<>();
     private final Map<Integer, BSplineCurve2> splineCurves2d = new LinkedHashMap<>();
+    private final Map<Integer, TrimmedCurve2> trimmedCurves2d = new LinkedHashMap<>();
     private final Map<Integer, Line3> lines = new LinkedHashMap<>();
     private final Map<Integer, Plane> planes = new LinkedHashMap<>();
     private final Map<Integer, Circle> circles = new LinkedHashMap<>();
@@ -271,13 +281,7 @@ public final class StepCadBuilder {
     public Object buildPcurve2(int id) {
         StepPcurve pcurve = requireEntity(id, StepPcurve.class, "PCURVE");
         StepEntity item = pcurve.referenceToCurve().items().getFirst();
-        if (item instanceof StepLine line) {
-            return buildLine2(line.id());
-        }
-        if (item instanceof StepBSplineCurveWithKnots spline) {
-            return buildBSplineCurve2(spline.id());
-        }
-        throw new UnsupportedGeometryException("PCURVE currently supports 2D LINE or B_SPLINE_CURVE_WITH_KNOTS");
+        return buildCurve2(item);
     }
 
     public BSplineCurve2 buildBSplineCurve2(int id) {
@@ -300,6 +304,85 @@ public final class StepCadBuilder {
                 spline.knots()
         );
         splineCurves2d.put(id, built);
+        return built;
+    }
+
+    public Circle2 buildCircle2(int id) {
+        Circle2 existing = circles2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCircle circle = requireEntity(id, StepCircle.class, "CIRCLE");
+        if (!(circle.position() instanceof StepAxis2Placement2D placement2d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D CIRCLE");
+        }
+        Circle2 built = new Circle2(
+                buildPoint2(placement2d.location().id()),
+                buildDirection2(placement2d.refDirection().id()),
+                circle.radius()
+        );
+        circles2d.put(id, built);
+        return built;
+    }
+
+    public Ellipse2 buildEllipse2(int id) {
+        Ellipse2 existing = ellipses2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
+        if (!(ellipse.position() instanceof StepAxis2Placement2D placement2d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D ELLIPSE");
+        }
+        Ellipse2 built = new Ellipse2(
+                buildPoint2(placement2d.location().id()),
+                buildDirection2(placement2d.refDirection().id()),
+                ellipse.semiAxis1(),
+                ellipse.semiAxis2()
+        );
+        ellipses2d.put(id, built);
+        return built;
+    }
+
+    private Object buildCurve2(StepEntity item) {
+        if (item instanceof StepLine line) {
+            return buildLine2(line.id());
+        }
+        if (item instanceof StepCircle circle) {
+            return buildCircle2(circle.id());
+        }
+        if (item instanceof StepEllipse ellipse) {
+            return buildEllipse2(ellipse.id());
+        }
+        if (item instanceof StepBSplineCurveWithKnots spline) {
+            return buildBSplineCurve2(spline.id());
+        }
+        if (item instanceof StepTrimmedCurve trimmedCurve) {
+            return buildTrimmedCurve2(trimmedCurve.id());
+        }
+        throw new UnsupportedGeometryException("PCURVE currently supports 2D LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS or TRIMMED_CURVE");
+    }
+
+    public TrimmedCurve2 buildTrimmedCurve2(int id) {
+        TrimmedCurve2 existing = trimmedCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
+        Object basis = buildCurve2(trimmedCurve.basisCurve());
+        if (!(basis instanceof Curve2 basisCurve)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
+        }
+        Point2 trimStart = snapTrimPoint2(requireTrimPoint2(trimmedCurve.trim1(), "trim_1"), basisCurve);
+        Point2 trimEnd = snapTrimPoint2(requireTrimPoint2(trimmedCurve.trim2(), "trim_2"), basisCurve);
+        if (!basisCurve.contains(trimStart)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE trim_1 point must lie on basis curve");
+        }
+        if (!basisCurve.contains(trimEnd)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE trim_2 point must lie on basis curve");
+        }
+        TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimStart, trimEnd, trimmedCurve.senseAgreement());
+        trimmedCurves2d.put(id, built);
         return built;
     }
 
@@ -333,7 +416,10 @@ public final class StepCadBuilder {
             return existing;
         }
         StepCircle circle = requireEntity(id, StepCircle.class, "CIRCLE");
-        Circle built = new Circle(buildPlacement(circle.position().id()), circle.radius());
+        if (!(circle.position() instanceof StepAxis2Placement3D placement3d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D CIRCLE");
+        }
+        Circle built = new Circle(buildPlacement(placement3d.id()), circle.radius());
         circles.put(id, built);
         return built;
     }
@@ -350,7 +436,10 @@ public final class StepCadBuilder {
             return existing;
         }
         StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
-        Ellipse3 built = new Ellipse3(buildPlacement(ellipse.position().id()), ellipse.semiAxis1(), ellipse.semiAxis2());
+        if (!(ellipse.position() instanceof StepAxis2Placement3D placement3d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D ELLIPSE");
+        }
+        Ellipse3 built = new Ellipse3(buildPlacement(placement3d.id()), ellipse.semiAxis1(), ellipse.semiAxis2());
         ellipses.put(id, built);
         return built;
     }
@@ -795,5 +884,66 @@ public final class StepCadBuilder {
         if (!basis.contains(trimPoint)) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must lie on basis curve");
         }
+    }
+
+    private Point2 requireTrimPoint2(List<StepEntity> trims, String slot) {
+        if (trims.isEmpty() || !(trims.getFirst() instanceof StepCartesianPoint point)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
+        }
+        if (point.coordinates().size() != 2) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must be 2D for PCURVE");
+        }
+        return buildPoint2(point.id());
+    }
+
+    private Point2 snapTrimPoint2(Point2 point, Curve2 basisCurve) {
+        if (basisCurve.contains(point)) {
+            return point;
+        }
+        if (basisCurve instanceof Line2 line) {
+            return line.closestPoint(point);
+        }
+        if (basisCurve instanceof Circle2 circle) {
+            Vector2 offset = point.subtract(circle.center());
+            double norm = offset.norm();
+            if (norm <= Epsilon.EPS) {
+                return circle.pointAt(0.0);
+            }
+            return circle.center().add(offset.scale(circle.radius() / norm));
+        }
+        if (basisCurve instanceof Ellipse2 ellipse) {
+            Vector2 offset = point.subtract(ellipse.center());
+            if (offset.norm() <= Epsilon.EPS) {
+                return ellipse.pointAt(0.0);
+            }
+            Vector2 x = ellipse.xDirection().asVector();
+            Vector2 y = new Vector2(-x.y(), x.x());
+            double nx = offset.dot(x) / ellipse.semiAxis1();
+            double ny = offset.dot(y) / ellipse.semiAxis2();
+            double norm = Math.hypot(nx, ny);
+            if (norm <= Epsilon.EPS) {
+                return ellipse.pointAt(0.0);
+            }
+            double angle = Math.atan2(ny / norm, nx / norm);
+            return ellipse.pointAt(angle);
+        }
+        if (basisCurve instanceof BSplineCurve2 spline) {
+            Point2 best = null;
+            double bestDistance = Double.POSITIVE_INFINITY;
+            for (Point2 sample : spline.sample(192)) {
+                double distance = sample.subtract(point).norm();
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = sample;
+                }
+            }
+            if (best != null) {
+                return best;
+            }
+        }
+        if (basisCurve instanceof TrimmedCurve2 trimmed) {
+            return snapTrimPoint2(point, trimmed.basisCurve());
+        }
+        return point;
     }
 }

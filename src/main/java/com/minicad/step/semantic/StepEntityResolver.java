@@ -5,6 +5,7 @@ import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepApplicationContext;
+import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
@@ -175,6 +176,19 @@ public final class StepEntityResolver {
         );
     }
 
+    private StepAxis2Placement2D resolveAxis2Placement2D(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "AXIS2_PLACEMENT_2D");
+        requireParameterCount(instance, definition, 3);
+        return new StepAxis2Placement2D(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                requireEntity(referenceId(instance, definition, 1), StepCartesianPoint.class,
+                        "AXIS2_PLACEMENT_2D location must reference CARTESIAN_POINT"),
+                requireEntity(referenceId(instance, definition, 2), StepDirection.class,
+                        "AXIS2_PLACEMENT_2D ref direction must reference DIRECTION")
+        );
+    }
+
     private StepLine resolveLine(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "LINE");
         requireParameterCount(instance, definition, 3);
@@ -202,11 +216,14 @@ public final class StepEntityResolver {
     private StepCircle resolveCircle(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "CIRCLE");
         requireParameterCount(instance, definition, 3);
+        StepEntity position = resolve(referenceId(instance, definition, 1));
+        if (!(position instanceof StepAxis2Placement3D) && !(position instanceof StepAxis2Placement2D)) {
+            throw new StepResolutionException("CIRCLE position must reference AXIS2_PLACEMENT_3D or AXIS2_PLACEMENT_2D");
+        }
         return new StepCircle(
                 instance.id(),
                 stringValue(instance, definition, 0),
-                requireEntity(referenceId(instance, definition, 1), StepAxis2Placement3D.class,
-                        "CIRCLE position must reference AXIS2_PLACEMENT_3D"),
+                position,
                 numberValue(instance, definition, 2)
         );
     }
@@ -214,11 +231,14 @@ public final class StepEntityResolver {
     private StepEllipse resolveEllipse(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "ELLIPSE");
         requireParameterCount(instance, definition, 4);
+        StepEntity position = resolve(referenceId(instance, definition, 1));
+        if (!(position instanceof StepAxis2Placement3D) && !(position instanceof StepAxis2Placement2D)) {
+            throw new StepResolutionException("ELLIPSE position must reference AXIS2_PLACEMENT_3D or AXIS2_PLACEMENT_2D");
+        }
         return new StepEllipse(
                 instance.id(),
                 stringValue(instance, definition, 0),
-                requireEntity(referenceId(instance, definition, 1), StepAxis2Placement3D.class,
-                        "ELLIPSE position must reference AXIS2_PLACEMENT_3D"),
+                position,
                 numberValue(instance, definition, 2),
                 numberValue(instance, definition, 3)
         );
@@ -356,8 +376,12 @@ public final class StepEntityResolver {
             throw new UnsupportedStepEntityException("PCURVE reference_to_curve must contain exactly one 2D curve item");
         }
         StepEntity item = representation.items().getFirst();
-        if (!(item instanceof StepLine) && !(item instanceof StepBSplineCurveWithKnots)) {
-            throw new UnsupportedStepEntityException("PCURVE currently supports 2D LINE or B_SPLINE_CURVE_WITH_KNOTS items");
+        if (!(item instanceof StepLine)
+                && !(item instanceof StepCircle)
+                && !(item instanceof StepEllipse)
+                && !(item instanceof StepBSplineCurveWithKnots)
+                && !(item instanceof StepTrimmedCurve)) {
+            throw new UnsupportedStepEntityException("PCURVE currently supports 2D LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS or TRIMMED_CURVE items");
         }
         return new StepPcurve(instance.id(), stringValue(instance, definition, 0), basisSurface, representation);
     }
@@ -1344,6 +1368,7 @@ public final class StepEntityResolver {
         registry.put("CARTESIAN_POINT", StepEntityResolver::resolveCartesianPoint);
         registry.put("DIRECTION", StepEntityResolver::resolveDirection);
         registry.put("VECTOR", StepEntityResolver::resolveVector);
+        registry.put("AXIS2_PLACEMENT_2D", StepEntityResolver::resolveAxis2Placement2D);
         registry.put("AXIS2_PLACEMENT_3D", StepEntityResolver::resolveAxis2Placement3D);
         registry.put("LINE", StepEntityResolver::resolveLine);
         registry.put("PLANE", StepEntityResolver::resolvePlane);

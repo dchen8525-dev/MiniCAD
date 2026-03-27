@@ -9,6 +9,7 @@ const exampleSelect = document.querySelector('#example-select');
 const statusText = document.querySelector('#status-text');
 const validationDetails = document.querySelector('#validation-details');
 const validationReport = document.querySelector('#validation-report');
+const unsupportedFacesList = document.querySelector('#unsupported-faces');
 const selectionDetails = document.querySelector('#selection-details');
 const assemblyTree = document.querySelector('#assembly-tree');
 const pmiOverlay = document.querySelector('#pmi-overlay');
@@ -69,6 +70,7 @@ let interactiveObjects = [];
 let selectedObject = null;
 let selectedAssemblyButton = null;
 let selectedAssemblyGroup = null;
+let selectedUnsupportedButton = null;
 const assemblyGroups = new Map();
 const assemblyButtons = new Map();
 const stepObjects = new Map();
@@ -148,6 +150,26 @@ function updateValidationReport(report = {}) {
     }).join('');
 }
 
+function updateUnsupportedFaces(unsupportedFaces = []) {
+    if (!Array.isArray(unsupportedFaces) || unsupportedFaces.length === 0) {
+        unsupportedFacesList.innerHTML = '<li><button type="button" disabled><strong>无</strong><span>当前预览没有被跳过的面。</span></button></li>';
+        return;
+    }
+    unsupportedFacesList.innerHTML = '';
+    for (const face of unsupportedFaces) {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        const name = face.name || `FACE #${face.id}`;
+        const surfaceType = face.surfaceType || 'UNKNOWN';
+        const reason = face.reason || '当前导出器已识别该面，但本轮预览仍将其跳过。';
+        button.innerHTML = `<strong>#${face.id} ${name}</strong><span>${surfaceType}</span><span>${reason}</span>`;
+        button.addEventListener('click', () => selectUnsupportedFace(face, button));
+        item.appendChild(button);
+        unsupportedFacesList.appendChild(item);
+    }
+}
+
 function setSelection(entries) {
     selectionDetails.innerHTML = entries.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
 }
@@ -166,9 +188,42 @@ function resetSelection() {
         selectedAssemblyButton.classList.remove('active');
         selectedAssemblyButton = null;
     }
+    if (selectedUnsupportedButton) {
+        selectedUnsupportedButton.classList.remove('active');
+        selectedUnsupportedButton = null;
+    }
     setSelection([
         ['类型', '未选中'],
         ['说明', '点击右侧模型中的面或边查看详情。']
+    ]);
+    syncPmiTargetHighlight();
+}
+
+function selectUnsupportedFace(face, button) {
+    if (selectedObject) {
+        selectedObject.userData.objectSelected = false;
+        refreshRenderableStyle(selectedObject);
+        selectedObject = null;
+    }
+    if (selectedAssemblyGroup) {
+        applyAssemblyHighlight(selectedAssemblyGroup, false);
+        selectedAssemblyGroup = null;
+    }
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.remove('active');
+        selectedAssemblyButton = null;
+    }
+    if (selectedUnsupportedButton) {
+        selectedUnsupportedButton.classList.remove('active');
+    }
+    selectedUnsupportedButton = button;
+    selectedUnsupportedButton.classList.add('active');
+    setSelection([
+        ['类型', '未支持面'],
+        ['STEP', `#${face.id}`],
+        ['名称', face.name || ''],
+        ['曲面', face.surfaceType || 'UNKNOWN'],
+        ['说明', face.reason || '当前导出器已识别该面，但本轮预览仍将其跳过。']
     ]);
     syncPmiTargetHighlight();
 }
@@ -192,6 +247,7 @@ function clearModel() {
     stepObjects.clear();
     resetSelection();
     updateValidation();
+    updateUnsupportedFaces();
     renderAssemblyTree([]);
     if (togglePmiButton) {
         togglePmiButton.textContent = '隐藏 PMI';
@@ -707,6 +763,7 @@ function fitCamera(bounds) {
 function renderPreview(preview) {
     clearModel();
     renderPmi(preview.pmi);
+    updateUnsupportedFaces(preview.unsupportedFaces);
 
     if (Array.isArray(preview.instances) && preview.instances.length > 0
         && Array.isArray(preview.representations) && preview.representations.length > 0) {

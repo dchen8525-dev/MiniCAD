@@ -8,5 +8,5 @@ package com.minicad.step.model;
  * @param position circle placement
  * @param radius radius value
  */
-public record StepCircle(int id, String name, StepAxis2Placement3D position, double radius) implements StepEntity {
+public record StepCircle(int id, String name, StepEntity position, double radius) implements StepEntity {
 }

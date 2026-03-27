@@ -149,4 +149,21 @@ class StepDumpAppTest {
         assertTrue(output.contains("openShell #80: faces=0, unsupportedFaces=1"));
         assertTrue(output.contains("unsupportedFaces=1"));
     }
+
+    @Test
+    void shouldReportUnsupportedToroidalFacesWithoutFailingWholeDump() throws IOException {
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+        int exitCode = StepDumpApp.run(
+                new String[]{"examples/toroidal-trimmed-loops-with-hole.step"},
+                new PrintStream(stdout),
+                new PrintStream(stderr)
+        );
+
+        String output = stdout.toString();
+        assertEquals(0, exitCode);
+        assertTrue(output.contains("openShell #155: faces=0, unsupportedFaces=1"));
+        assertTrue(output.contains("unsupportedFaces=1"));
+    }
 }

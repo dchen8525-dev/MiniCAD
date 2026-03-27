@@ -12,7 +12,7 @@ package com.minicad.step.model;
 public record StepEllipse(
         int id,
         String name,
-        StepAxis2Placement3D position,
+        StepEntity position,
         double semiAxis1,
         double semiAxis2
 ) implements StepEntity {

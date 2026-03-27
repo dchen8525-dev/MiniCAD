@@ -5,15 +5,11 @@ import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.common.GeometryException;
-import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepClosedShell;
-import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepOpenShell;
-import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
@@ -132,30 +128,16 @@ public final class StepDumpApp {
         int supported = 0;
         int unsupported = 0;
         for (StepFaceEntity face : faces) {
-            StepEntity geometry = faceGeometry(face);
-            if (geometry instanceof StepCylindricalSurface || geometry instanceof StepConicalSurface) {
+            try {
+                builder.buildFace(face.id());
+                supported++;
+            } catch (UnsupportedGeometryException ex) {
                 unsupported++;
-                continue;
             }
-            builder.buildFace(face.id());
-            supported++;
         }
         return new FaceBuildCounts(supported, unsupported);
     }
 
     private record FaceBuildCounts(int supportedFaces, int unsupportedFaces) {
-    }
-
-    private static StepEntity faceGeometry(StepFaceEntity face) {
-        if (face instanceof com.minicad.step.model.StepAdvancedFace advancedFace) {
-            return advancedFace.faceGeometry();
-        }
-        if (face instanceof StepFaceSurface faceSurface) {
-            return faceSurface.faceGeometry();
-        }
-        if (face instanceof StepOrientedFace orientedFace) {
-            return faceGeometry(orientedFace.faceElement());
-        }
-        return null;
     }
 }

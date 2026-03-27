@@ -17,6 +17,7 @@ import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
+import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepDraughtingCallout;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
@@ -44,6 +45,7 @@ import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
 import com.minicad.step.model.StepContextDependentShapeRepresentation;
+import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepUncertaintyMeasureWithUnit;
 import com.minicad.step.model.StepVertexLoop;
 import com.minicad.step.syntax.StepFile;
@@ -339,6 +341,26 @@ class StepEntityResolverTest {
         assertEquals(1, surfaceCurve.associatedGeometry().size());
         assertEquals(16, surfaceCurve.associatedGeometry().getFirst().id());
         assertEquals("PCURVE_S1", surfaceCurve.masterRepresentation());
+    }
+
+    @Test
+    void shouldResolve2dAxisPlacementAndCircle() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('UV0',(1.0,2.0));
+                #2=DIRECTION('DUV',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('A2',#1,#2);
+                #4=CIRCLE('PC',#3,0.5);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAxis2Placement2D placement = assertInstanceOf(StepAxis2Placement2D.class, resolved.get(3));
+        StepCircle circle = assertInstanceOf(StepCircle.class, resolved.get(4));
+        assertEquals(1, placement.location().id());
+        assertEquals(3, circle.position().id());
+        assertEquals(0.5, circle.radius());
     }
 
     @Test

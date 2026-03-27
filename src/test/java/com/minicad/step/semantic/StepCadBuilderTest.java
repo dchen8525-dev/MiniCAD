@@ -17,6 +17,9 @@ import com.minicad.geometry.TrimmedCurve3;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.BSplineCurve2;
+import com.minicad.geometry2d.Circle2;
+import com.minicad.geometry2d.Ellipse2;
+import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.Edge;
@@ -511,6 +514,92 @@ class StepCadBuilderTest {
         assertEquals(new Point2(0.0, 0.0), spline.pointAt(spline.startParameter()));
         assertEquals(new Point2(0.0, 1.0), spline.pointAt(spline.endParameter()));
         assertTrue(spline.sample(8).size() >= 9);
+    }
+
+    @Test
+    void shouldBuild2dCircularPcurveAndTrimmedBasis() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=CYLINDRICAL_SURFACE('CY0',#4,1.0);
+                #10=CARTESIAN_POINT('UV0',(1.0,2.0));
+                #11=DIRECTION('DUV',(1.0,0.0));
+                #12=AXIS2_PLACEMENT_2D('A2',#10,#11);
+                #13=CIRCLE('PC',#12,0.5);
+                #14=CARTESIAN_POINT('T0',(1.5,2.0));
+                #15=CARTESIAN_POINT('T1',(1.0,2.5));
+                #16=TRIMMED_CURVE('TC0',#13,(#14),(#15),.T.,.CARTESIAN.);
+                #17=REPRESENTATION_CONTEXT('PC','PARAMETRIC');
+                #18=DEFINITIONAL_REPRESENTATION('DEF',(#16),#17);
+                #19=PCURVE('PC0',#5,#18);
+                ENDSEC;
+                """);
+
+        TrimmedCurve2 trimmed = assertInstanceOf(TrimmedCurve2.class, builder.buildPcurve2(19));
+        Circle2 circle = assertInstanceOf(Circle2.class, trimmed.basisCurve());
+
+        assertEquals(new Point2(1.5, 2.0), trimmed.trimStart());
+        assertEquals(new Point2(1.0, 2.5), trimmed.trimEnd());
+        assertEquals(new Point2(1.5, 2.0), circle.pointAt(0.0));
+        assertEquals(Math.PI * 0.5, circle.angleOf(new Point2(1.0, 2.5)), 1.0e-12);
+    }
+
+    @Test
+    void shouldSnapOffCurveTrimPointsFor2dTrimmedPcurve() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=CYLINDRICAL_SURFACE('CY0',#4,1.0);
+                #10=CARTESIAN_POINT('UV0',(1.0,2.0));
+                #11=DIRECTION('DUV',(1.0,0.0));
+                #12=AXIS2_PLACEMENT_2D('A2',#10,#11);
+                #13=CIRCLE('PC',#12,0.5);
+                #14=CARTESIAN_POINT('T0',(1.500000001,2.000000002));
+                #15=CARTESIAN_POINT('T1',(0.999999998,2.499999999));
+                #16=TRIMMED_CURVE('TC0',#13,(#14),(#15),.T.,.CARTESIAN.);
+                #17=REPRESENTATION_CONTEXT('PC','PARAMETRIC');
+                #18=DEFINITIONAL_REPRESENTATION('DEF',(#16),#17);
+                #19=PCURVE('PC0',#5,#18);
+                ENDSEC;
+                """);
+
+        TrimmedCurve2 trimmed = assertInstanceOf(TrimmedCurve2.class, builder.buildPcurve2(19));
+
+        assertEquals(1.5, trimmed.trimStart().x(), 1.0e-6);
+        assertEquals(2.0, trimmed.trimStart().y(), 1.0e-6);
+        assertEquals(1.0, trimmed.trimEnd().x(), 1.0e-6);
+        assertEquals(2.5, trimmed.trimEnd().y(), 1.0e-6);
+    }
+
+    @Test
+    void shouldBuild2dEllipsePcurve() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=CYLINDRICAL_SURFACE('CY0',#4,1.0);
+                #10=CARTESIAN_POINT('UV0',(1.0,2.0));
+                #11=DIRECTION('DUV',(1.0,0.0));
+                #12=AXIS2_PLACEMENT_2D('A2',#10,#11);
+                #13=ELLIPSE('PE',#12,0.5,0.25);
+                #14=REPRESENTATION_CONTEXT('PC','PARAMETRIC');
+                #15=DEFINITIONAL_REPRESENTATION('DEF',(#13),#14);
+                #16=PCURVE('PC0',#5,#15);
+                ENDSEC;
+                """);
+
+        Ellipse2 ellipse = assertInstanceOf(Ellipse2.class, builder.buildPcurve2(16));
+
+        assertEquals(new Point2(1.5, 2.0), ellipse.pointAt(0.0));
+        assertEquals(Math.PI * 0.5, ellipse.angleOf(new Point2(1.0, 2.25)), 1.0e-12);
     }
 
     @Test

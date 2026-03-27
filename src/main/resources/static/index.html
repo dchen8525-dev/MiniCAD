@@ -222,6 +222,56 @@
             border-color: rgba(196, 95, 53, 0.28);
         }
 
+        .unsupported-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .unsupported-list li {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+
+        .unsupported-list button {
+            width: 100%;
+            text-align: left;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(63, 58, 46, 0.08);
+            cursor: pointer;
+            transition: border-color 140ms ease, background 140ms ease;
+        }
+
+        .unsupported-list button:hover {
+            border-color: rgba(63, 58, 46, 0.2);
+            background: rgba(255, 255, 255, 0.84);
+        }
+
+        .unsupported-list button.active {
+            border-color: rgba(196, 95, 53, 0.42);
+            background: rgba(232, 195, 168, 0.28);
+        }
+
+        .unsupported-list strong {
+            display: block;
+            font-size: 0.92rem;
+        }
+
+        .unsupported-list span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.35;
+            margin-top: 0.12rem;
+        }
+
         .selection-card h2 {
             margin: 0 0 0.55rem;
             font-size: 1rem;
@@ -400,8 +450,26 @@
                 <option value="two-squares-open-shell">two-squares-open-shell</option>
                 <option value="cylindrical-face">cylindrical-face</option>
                 <option value="cylindrical-band">cylindrical-band</option>
+                <option value="cylindrical-trimmed-circle-pcurve">cylindrical-trimmed-circle-pcurve</option>
+                <option value="cylindrical-trimmed-bspline-pcurve">cylindrical-trimmed-bspline-pcurve</option>
+                <option value="cylindrical-trimmed-ellipse-pcurve">cylindrical-trimmed-ellipse-pcurve</option>
+                <option value="cylindrical-hole-ellipse-pcurve">cylindrical-hole-ellipse-pcurve</option>
+                <option value="cylindrical-seam-two-holes">cylindrical-seam-two-holes</option>
+                <option value="cylindrical-two-holes">cylindrical-two-holes</option>
+                <option value="cylindrical-multi-trimmed-loop">cylindrical-multi-trimmed-loop</option>
+                <option value="cylindrical-trimmed-loops-with-hole">cylindrical-trimmed-loops-with-hole</option>
                 <option value="conical-band">conical-band</option>
+                <option value="conical-hole">conical-hole</option>
+                <option value="conical-seam-two-holes">conical-seam-two-holes</option>
+                <option value="conical-trimmed-ellipse-pcurve">conical-trimmed-ellipse-pcurve</option>
+                <option value="conical-trimmed-loops-with-hole">conical-trimmed-loops-with-hole</option>
+                <option value="conical-two-holes">conical-two-holes</option>
                 <option value="toroidal-band">toroidal-band</option>
+                <option value="toroidal-hole">toroidal-hole</option>
+                <option value="toroidal-seam-two-holes">toroidal-seam-two-holes</option>
+                <option value="toroidal-trimmed-circle-pcurve">toroidal-trimmed-circle-pcurve</option>
+                <option value="toroidal-trimmed-loops-with-hole">toroidal-trimmed-loops-with-hole</option>
+                <option value="toroidal-two-holes">toroidal-two-holes</option>
                 <option value="ellipse-face">ellipse-face</option>
                 <option value="bspline-patch">bspline-patch</option>
                 <option value="metadata-square">metadata-square</option>
@@ -447,6 +515,13 @@
             <h2>校验报告</h2>
             <ul id="validation-report" class="validation-report">
                 <li><strong>未生成</strong><span>渲染后会显示逐项 native validation 对比。</span></li>
+            </ul>
+        </section>
+
+        <section class="validation-report-card">
+            <h2>Unsupported Faces</h2>
+            <ul id="unsupported-faces" class="unsupported-list">
+                <li><strong>无</strong><span>当前预览没有被跳过的面。</span></li>
             </ul>
         </section>
 

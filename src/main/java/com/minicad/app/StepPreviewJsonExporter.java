@@ -26,6 +26,9 @@ import com.minicad.geometry.TrimmedCurve3;
 import com.minicad.geometry.Vector3;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.BSplineCurve2;
+import com.minicad.geometry2d.Circle2;
+import com.minicad.geometry2d.Ellipse2;
+import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepClosedShell;
 import com.minicad.step.model.StepConicalSurface;
@@ -42,6 +45,7 @@ import com.minicad.step.model.StepBSplineCurveWithKnots;
 import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepDraughtingCallout;
+import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepOpenShell;
@@ -124,6 +128,7 @@ public final class StepPreviewJsonExporter {
                 bounds.toPayload(),
                 validation,
                 pmi,
+                legacyGeometry.unsupportedFaces(),
                 legacyGeometry.edges(),
                 legacyGeometry.faces(),
                 assembly.representations(),
@@ -157,19 +162,21 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepMetadataExtractor.DisplayMetadata> inheritedShellMetadata
     ) {
         List<FacePayload> faces = new ArrayList<>();
+        List<UnsupportedFacePayload> unsupportedFaces = new ArrayList<>();
         Set<Integer> uniqueEdgeIds = new LinkedHashSet<>();
 
         for (Integer shellId : shellIds) {
             for (StepFaceEntity stepFace : shellFaces(resolved.get(shellId))) {
-                FacePayload previewFace = toPreviewFacePayload(
+                PreviewFaceResult previewFace = buildPreviewFaceResult(
                         stepFace,
                         builder,
                         mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
                 );
-                if (previewFace == null) {
+                if (previewFace.face() == null) {
+                    unsupportedFaces.add(previewFace.unsupportedFace());
                     continue;
                 }
-                faces.add(previewFace);
+                faces.add(previewFace.face());
                 for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
                     if (bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop) {
                         uniqueEdgeIds.addAll(edgeLoop.edges().stream().map(edge -> edge.edgeElement().id()).toList());
@@ -180,35 +187,47 @@ public final class StepPreviewJsonExporter {
 
         List<EdgePayload> edges = new ArrayList<>();
         for (Integer edgeId : uniqueEdgeIds) {
-            Edge edge = builder.buildEdge(edgeId);
-            List<CartesianPoint> polyline = sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense());
+            List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
             edges.add(new EdgePayload(edgeId, toPointPayloads(polyline)));
         }
-        return new GeometryCollection(List.copyOf(edges), List.copyOf(faces));
+        return new GeometryCollection(List.copyOf(edges), List.copyOf(faces), List.copyOf(unsupportedFaces));
     }
 
-    private static FacePayload toPreviewFacePayload(
+    private static PreviewFaceResult buildPreviewFaceResult(
             StepFaceEntity stepFace,
             StepCadBuilder builder,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         if (stepFace instanceof StepOrientedFace orientedFace) {
-            FacePayload base = toPreviewFacePayload(orientedFace.faceElement(), builder, metadata);
-            if (base == null || orientedFace.orientation()) {
-                return base;
+            PreviewFaceResult base = buildPreviewFaceResult(orientedFace.faceElement(), builder, metadata);
+            if (base.face() == null) {
+                return new PreviewFaceResult(
+                        null,
+                        toUnsupportedFacePayload(stepFace, base.unsupportedFace() == null ? null : base.unsupportedFace().reason())
+                );
             }
-            return reverseFacePayload(base);
+            if (orientedFace.orientation()) {
+                return new PreviewFaceResult(base.face(), null);
+            }
+            return new PreviewFaceResult(reverseFacePayload(base.face()), null);
         }
 
         StepEntity geometry = faceGeometry(stepFace);
         if (geometry instanceof StepPlane) {
-            return toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
+            try {
+                return new PreviewFaceResult(
+                        toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata),
+                        null
+                );
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
+            }
         }
         if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
             try {
                 FacePayload payload = toCylindricalFacePayload(stepFace, cylindricalSurface, builder, metadata);
                 if (payload != null) {
-                    return payload;
+                    return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
             }
@@ -217,23 +236,23 @@ public final class StepPreviewJsonExporter {
             try {
                 FacePayload payload = toConicalFacePayload(stepFace, conicalSurface, builder, metadata);
                 if (payload != null) {
-                    return payload;
+                    return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
             }
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
             try {
-                return toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata);
+                return new PreviewFaceResult(toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata), null);
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
-                return null;
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
             }
         }
         if (geometry instanceof StepToroidalSurface toroidalSurface) {
             try {
                 FacePayload payload = toToroidalFacePayload(stepFace, toroidalSurface, builder, metadata);
                 if (payload != null) {
-                    return payload;
+                    return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
             }
@@ -241,13 +260,9 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepCylindricalSurface
                 || geometry instanceof StepConicalSurface
                 || geometry instanceof StepToroidalSurface) {
-            try {
-                return toParametricTrimmedFacePayload(stepFace, geometry, metadata, builder);
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
-                return null;
-            }
+            return toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
         }
-        return null;
+        return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface type not previewable"));
     }
 
     private static AssemblyData buildAssemblyData(
@@ -355,6 +370,16 @@ public final class StepPreviewJsonExporter {
         return stepFace.name();
     }
 
+    private static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
+        StepEntity geometry = faceGeometry(stepFace);
+        return new UnsupportedFacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                surfaceTypeName(geometry),
+                reason == null ? "preview export returned no mesh" : reason
+        );
+    }
+
     private static ColorPayload toColorPayload(int[] rgb) {
         if (rgb == null) {
             return null;
@@ -386,7 +411,7 @@ public final class StepPreviewJsonExporter {
         int unsupported = 0;
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepFaceEntity stepFace
-                    && toPreviewFacePayload(stepFace, builder, StepMetadataExtractor.DisplayMetadata.EMPTY) == null) {
+                    && buildPreviewFaceResult(stepFace, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
                 unsupported++;
             }
         }
@@ -725,38 +750,48 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    private static FacePayload toParametricTrimmedFacePayload(
+    private static PreviewFaceResult toParametricTrimmedFaceResult(
             StepFaceEntity stepFace,
             StepEntity geometry,
             StepMetadataExtractor.DisplayMetadata metadata,
             StepCadBuilder builder
     ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.isEmpty() || bounds.stream().noneMatch(FaceBound::outer)) {
-            return null;
+        if (stepFace.bounds().isEmpty() || stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer)) {
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
         if (mapper == null) {
-            return null;
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "no parametric mapper for surface"));
         }
         List<ParametricLoopPayload> loops = buildParametricLoops(stepFace, geometry, mapper, builder);
         if (loops.isEmpty()) {
-            loops = buildParametricLoops(bounds, mapper);
+            try {
+                loops = buildParametricLoops(buildFaceBounds(stepFace, builder), mapper);
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to derive face bounds"));
+            }
         }
         if (loops.isEmpty()) {
-            return null;
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to build parametric loops"));
         }
         UvBounds uvBounds = boundsOf(loops);
         if (uvBounds == null || uvBounds.uSpan() <= Epsilon.EPS || uvBounds.vSpan() <= Epsilon.EPS) {
-            return null;
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "degenerate parametric bounds"));
         }
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        int uSegments = Math.max(18, Math.min(72, sampleCount * 2));
-        int vSegments = Math.max(12, Math.min(48, sampleCount));
-        List<PointPayload> triangles = triangulateParametricFace(mapper, loops, uvBounds, uSegments, vSegments, faceSameSense(stepFace));
+        int baseUSegments = Math.max(18, Math.min(72, sampleCount * 2));
+        int baseVSegments = Math.max(12, Math.min(48, sampleCount));
+        List<PointPayload> triangles = triangulateParametricFaceAdaptive(
+                mapper,
+                loops,
+                uvBounds,
+                baseUSegments,
+                baseVSegments,
+                faceSameSense(stepFace)
+        );
         if (triangles.isEmpty()) {
-            return null;
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "parametric triangulation produced no cells"));
         }
 
         double centerU = (uvBounds.minU() + uvBounds.maxU()) * 0.5;
@@ -765,17 +800,20 @@ public final class StepPreviewJsonExporter {
         if (!faceSameSense(stepFace)) {
             normal = normal.scale(-1.0);
         }
-        return new FacePayload(
-                stepFace.id(),
-                faceDisplayName(stepFace),
-                surfaceTypeName(geometry),
-                toPointPayload(mapper.pointAt(centerU, centerV)),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
-                metadata.layers(),
-                bounds.stream().map(bound -> new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound)))).toList(),
-                triangles
+        return new PreviewFaceResult(
+                new FacePayload(
+                        stepFace.id(),
+                        faceDisplayName(stepFace),
+                        surfaceTypeName(geometry),
+                        toPointPayload(mapper.pointAt(centerU, centerV)),
+                        new VectorPayload(normal.x(), normal.y(), normal.z()),
+                        faceSameSense(stepFace),
+                        toColorPayload(metadata.rgb()),
+                        metadata.layers(),
+                        toParametricLoopPayloads(loops, mapper),
+                        triangles
+                ),
+                null
         );
     }
 
@@ -926,6 +964,7 @@ public final class StepPreviewJsonExporter {
                 uvPoints.add(uv);
                 previous = uv;
             }
+            uvPoints = normalizePeriodicLoop(uvPoints, mapper);
             uvPoints.set(0, uvPoints.getFirst());
             uvPoints.set(uvPoints.size() - 1, uvPoints.getFirst());
             loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(uvPoints)));
@@ -960,12 +999,55 @@ public final class StepPreviewJsonExporter {
             if (loopPoints.size() < 4) {
                 return List.of();
             }
+            if (!bound.orientation()) {
+                loopPoints = reverseClosedLoop(loopPoints);
+            }
+            loopPoints = normalizePeriodicLoop(loopPoints, mapper);
             if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
                 loopPoints.add(loopPoints.getFirst());
             }
             loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(loopPoints)));
         }
         return List.copyOf(loops);
+    }
+
+    private static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
+        if (points.size() < 2) {
+            return points;
+        }
+        Double uPeriod = mapper.uPeriod();
+        Double vPeriod = mapper.vPeriod();
+        List<UvPoint> normalized = new ArrayList<>(points.size());
+        UvPoint previous = null;
+        for (UvPoint point : points) {
+            double u = point.u();
+            double v = point.v();
+            if (previous != null) {
+                if (uPeriod != null) {
+                    u = unwrapPeriodic(u, previous.u(), uPeriod);
+                }
+                if (vPeriod != null) {
+                    v = unwrapPeriodic(v, previous.v(), vPeriod);
+                }
+            }
+            UvPoint normalizedPoint = new UvPoint(u, v);
+            normalized.add(normalizedPoint);
+            previous = normalizedPoint;
+        }
+        if (normalized.size() >= 2) {
+            UvPoint first = normalized.getFirst();
+            UvPoint last = normalized.getLast();
+            double u = last.u();
+            double v = last.v();
+            if (uPeriod != null) {
+                u = unwrapPeriodic(u, first.u(), uPeriod);
+            }
+            if (vPeriod != null) {
+                v = unwrapPeriodic(v, first.v(), vPeriod);
+            }
+            normalized.set(normalized.size() - 1, new UvPoint(u, v));
+        }
+        return normalized;
     }
 
     private static UvBounds boundsOf(List<ParametricLoopPayload> loops) {
@@ -1013,7 +1095,12 @@ public final class StepPreviewJsonExporter {
         List<UvPoint> best = null;
         double bestScore = Double.POSITIVE_INFINITY;
         for (StepPcurve pcurve : pcurves) {
-            Object built = builder.buildPcurve2(pcurve.id());
+            Object built;
+            try {
+                built = builder.buildPcurve2(pcurve.id());
+            } catch (UnsupportedGeometryException ex) {
+                continue;
+            }
             if (built instanceof Line2 line) {
                 UvPoint start = snapToLine(projectedStart, line);
                 UvPoint end = snapToLine(projectedEnd, line);
@@ -1027,6 +1114,39 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof BSplineCurve2 spline) {
                 List<UvPoint> samples = sampleSplinePcurve(spline, projectedStart, projectedEnd);
+                if (!samples.isEmpty()) {
+                    double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
+                    if (best == null || score < bestScore) {
+                        best = samples;
+                        bestScore = score;
+                    }
+                }
+                continue;
+            }
+            if (built instanceof Circle2 circle) {
+                UvPoint start = snapToCircle(projectedStart, circle);
+                UvPoint end = snapToCircle(projectedEnd, circle);
+                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = sampleCirclePcurve(circle, start, end);
+                if (!samples.isEmpty() && (best == null || score < bestScore)) {
+                    best = samples;
+                    bestScore = score;
+                }
+                continue;
+            }
+            if (built instanceof Ellipse2 ellipse) {
+                UvPoint start = snapToEllipse(projectedStart, ellipse);
+                UvPoint end = snapToEllipse(projectedEnd, ellipse);
+                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = sampleEllipsePcurve(ellipse, start, end);
+                if (!samples.isEmpty() && (best == null || score < bestScore)) {
+                    best = samples;
+                    bestScore = score;
+                }
+                continue;
+            }
+            if (built instanceof TrimmedCurve2 trimmed) {
+                List<UvPoint> samples = sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
                     double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
                     if (best == null || score < bestScore) {
@@ -1051,6 +1171,23 @@ public final class StepPreviewJsonExporter {
 
     private static UvPoint snapToLine(UvPoint point, Line2 line) {
         com.minicad.geometry2d.Point2 snapped = line.closestPoint(new com.minicad.geometry2d.Point2(point.u(), point.v()));
+        return new UvPoint(snapped.x(), snapped.y());
+    }
+
+    private static UvPoint snapToCircle(UvPoint point, Circle2 circle) {
+        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(circle.center());
+        double norm = offset.norm();
+        if (norm <= Epsilon.EPS) {
+            com.minicad.geometry2d.Point2 fallback = circle.pointAt(0.0);
+            return new UvPoint(fallback.x(), fallback.y());
+        }
+        com.minicad.geometry2d.Point2 snapped = circle.center().add(offset.scale(circle.radius() / norm));
+        return new UvPoint(snapped.x(), snapped.y());
+    }
+
+    private static UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
+        double angle = ellipse.angleOf(ellipse.pointAt(ellipse.angleOf(snapEllipseSeed(point, ellipse))));
+        com.minicad.geometry2d.Point2 snapped = ellipse.pointAt(angle);
         return new UvPoint(snapped.x(), snapped.y());
     }
 
@@ -1090,6 +1227,141 @@ public final class StepPreviewJsonExporter {
         points.set(0, projectedStart);
         points.set(points.size() - 1, projectedEnd);
         return List.copyOf(points);
+    }
+
+    private static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
+        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
+        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
+        double startAngle = circle.angleOf(startPoint);
+        double endAngle = circle.angleOf(endPoint);
+        double delta = endAngle - startAngle;
+        if (delta > Math.PI) {
+            delta -= Math.PI * 2.0;
+        } else if (delta < -Math.PI) {
+            delta += Math.PI * 2.0;
+        }
+        int segments = Math.max(12, (int) Math.ceil(Math.abs(delta) * 12.0));
+        List<UvPoint> points = new ArrayList<>(segments + 1);
+        for (int index = 0; index <= segments; index++) {
+            double angle = startAngle + delta * index / segments;
+            com.minicad.geometry2d.Point2 point = circle.pointAt(angle);
+            points.add(new UvPoint(point.x(), point.y()));
+        }
+        points.set(0, start);
+        points.set(points.size() - 1, end);
+        return List.copyOf(points);
+    }
+
+    private static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
+        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
+        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
+        double startAngle = ellipse.angleOf(startPoint);
+        double endAngle = ellipse.angleOf(endPoint);
+        double delta = endAngle - startAngle;
+        if (delta > Math.PI) {
+            delta -= Math.PI * 2.0;
+        } else if (delta < -Math.PI) {
+            delta += Math.PI * 2.0;
+        }
+        int segments = Math.max(12, (int) Math.ceil(Math.abs(delta) * 12.0));
+        List<UvPoint> points = new ArrayList<>(segments + 1);
+        for (int index = 0; index <= segments; index++) {
+            double angle = startAngle + delta * index / segments;
+            com.minicad.geometry2d.Point2 point = ellipse.pointAt(angle);
+            points.add(new UvPoint(point.x(), point.y()));
+        }
+        points.set(0, start);
+        points.set(points.size() - 1, end);
+        return List.copyOf(points);
+    }
+
+    private static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint projectedStart, UvPoint projectedEnd) {
+        UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());
+        UvPoint trimEnd = new UvPoint(trimmed.trimEnd().x(), trimmed.trimEnd().y());
+        List<UvPoint> forward = sampleCurve2(trimmed.basisCurve(), trimStart, trimEnd);
+        List<UvPoint> reverse = sampleCurve2(trimmed.basisCurve(), trimEnd, trimStart);
+        if (forward.isEmpty() && reverse.isEmpty()) {
+            return List.of();
+        }
+        List<UvPoint> preferred;
+        if (!trimmed.senseAgreement()) {
+            preferred = reverse.isEmpty() ? forward : reverse;
+        } else {
+            preferred = score(projectedStart, projectedEnd, forward) <= score(projectedStart, projectedEnd, reverse)
+                    ? forward
+                    : reverse;
+        }
+        return alignTrimmedSamples(preferred, projectedStart, projectedEnd);
+    }
+
+    private static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
+        if (curve instanceof Line2 line) {
+            return sampleLinePcurve(line, start, end);
+        }
+        if (curve instanceof Circle2 circle) {
+            return sampleCirclePcurve(circle, start, end);
+        }
+        if (curve instanceof Ellipse2 ellipse) {
+            return sampleEllipsePcurve(ellipse, start, end);
+        }
+        if (curve instanceof BSplineCurve2 spline) {
+            return sampleSplinePcurve(spline, start, end);
+        }
+        if (curve instanceof TrimmedCurve2 trimmed) {
+            return sampleTrimmedPcurve(trimmed, start, end);
+        }
+        return List.of();
+    }
+
+    private static double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
+        if (samples.isEmpty()) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return distanceSquared(start, samples.getFirst()) + distanceSquared(end, samples.getLast());
+    }
+
+    private static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
+        if (samples.isEmpty()) {
+            return samples;
+        }
+        List<UvPoint> aligned = new ArrayList<>(samples);
+        double forwardScore = distanceSquared(projectedStart, aligned.getFirst()) + distanceSquared(projectedEnd, aligned.getLast());
+        double reverseScore = distanceSquared(projectedStart, aligned.getLast()) + distanceSquared(projectedEnd, aligned.getFirst());
+        if (reverseScore < forwardScore) {
+            java.util.Collections.reverse(aligned);
+        }
+        aligned.set(0, projectedStart);
+        aligned.set(aligned.size() - 1, projectedEnd);
+        return List.copyOf(aligned);
+    }
+
+    private static com.minicad.geometry2d.Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
+        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(ellipse.center());
+        if (offset.norm() <= Epsilon.EPS) {
+            return ellipse.pointAt(0.0);
+        }
+        com.minicad.geometry2d.Vector2 x = ellipse.xDirection().asVector();
+        com.minicad.geometry2d.Vector2 y = new com.minicad.geometry2d.Vector2(-x.y(), x.x());
+        double nx = offset.dot(x) / ellipse.semiAxis1();
+        double ny = offset.dot(y) / ellipse.semiAxis2();
+        double norm = Math.hypot(nx, ny);
+        if (norm <= Epsilon.EPS) {
+            return ellipse.pointAt(0.0);
+        }
+        double angle = Math.atan2(ny / norm, nx / norm);
+        return ellipse.pointAt(angle);
+    }
+
+    private static List<LoopPayload> toParametricLoopPayloads(List<ParametricLoopPayload> loops, ParametricSurfaceMapper mapper) {
+        List<LoopPayload> payloads = new ArrayList<>(loops.size());
+        for (ParametricLoopPayload loop : loops) {
+            List<PointPayload> points = new ArrayList<>(loop.points().size());
+            for (UvPoint point : loop.points()) {
+                points.add(toPointPayload(mapper.pointAt(point.u(), point.v())));
+            }
+            payloads.add(new LoopPayload(loop.outer(), List.copyOf(points)));
+        }
+        return List.copyOf(payloads);
     }
 
     private static int closestPointIndex(List<com.minicad.geometry2d.Point2> points, UvPoint target) {
@@ -1167,9 +1439,33 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(triangles);
     }
 
+    private static List<PointPayload> triangulateParametricFaceAdaptive(
+            ParametricSurfaceMapper mapper,
+            List<ParametricLoopPayload> loops,
+            UvBounds bounds,
+            int baseUSegments,
+            int baseVSegments,
+            boolean sameSense
+    ) {
+        int uSegments = baseUSegments;
+        int vSegments = baseVSegments;
+        for (int attempt = 0; attempt < 4; attempt++) {
+            List<PointPayload> triangles = triangulateParametricFace(mapper, loops, bounds, uSegments, vSegments, sameSense);
+            if (!triangles.isEmpty()) {
+                return triangles;
+            }
+            uSegments = Math.min(uSegments * 2, 288);
+            vSegments = Math.min(vSegments * 2, 192);
+        }
+        return List.of();
+    }
+
     private static boolean contains(List<UvPoint> polygon, UvPoint point) {
         if (polygon.size() < 3) {
             return false;
+        }
+        if (isOnPolygonBoundary(polygon, point)) {
+            return true;
         }
         boolean inside = false;
         for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
@@ -1182,6 +1478,35 @@ public final class StepPreviewJsonExporter {
             }
         }
         return inside;
+    }
+
+    private static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
+        for (int index = 0; index + 1 < polygon.size(); index++) {
+            if (isOnSegment(polygon.get(index), polygon.get(index + 1), point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
+        double abU = b.u() - a.u();
+        double abV = b.v() - a.v();
+        double lengthSquared = abU * abU + abV * abV;
+        if (lengthSquared <= 1.0e-18) {
+            return distanceSquared(a, point) <= 1.0e-18;
+        }
+        double apU = point.u() - a.u();
+        double apV = point.v() - a.v();
+        double cross = abU * apV - abV * apU;
+        if (Math.abs(cross) > 1.0e-9) {
+            return false;
+        }
+        double dot = apU * abU + apV * abV;
+        if (dot < -1.0e-9) {
+            return false;
+        }
+        return dot <= lengthSquared + 1.0e-9;
     }
 
     private static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
@@ -1203,6 +1528,11 @@ public final class StepPreviewJsonExporter {
                 public Vector3 normalAt(double u, double v) {
                     return cylindricalNormal(surface, u, true);
                 }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
             };
         }
         if (geometry instanceof StepConicalSurface conicalSurface) {
@@ -1222,6 +1552,11 @@ public final class StepPreviewJsonExporter {
                 @Override
                 public Vector3 normalAt(double u, double v) {
                     return conicalNormal(surface, u, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
                 }
             };
         }
@@ -1245,6 +1580,16 @@ public final class StepPreviewJsonExporter {
                 @Override
                 public Vector3 normalAt(double u, double v) {
                     return toroidalNormal(surface, u, v, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+
+                @Override
+                public Double vPeriod() {
+                    return Math.PI * 2.0;
                 }
             };
         }
@@ -1622,13 +1967,67 @@ public final class StepPreviewJsonExporter {
         if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
             sampled.add(sampled.getFirst());
         }
-        return sampled;
+        return bound.orientation() ? sampled : reverseClosedLoop(sampled);
+    }
+
+    private static <T> List<T> reverseClosedLoop(List<T> points) {
+        if (points.size() < 2) {
+            return points;
+        }
+        List<T> reversed = new ArrayList<>(points);
+        if (reversed.getFirst().equals(reversed.getLast())) {
+            T start = reversed.removeLast();
+            java.util.Collections.reverse(reversed);
+            reversed.add(reversed.getFirst());
+            reversed.set(0, start);
+            reversed.set(reversed.size() - 1, start);
+            return reversed;
+        }
+        java.util.Collections.reverse(reversed);
+        return reversed;
     }
 
     private static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
         Edge edge = orientedEdge.edge();
         boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
         return sampleEdge(orientedEdge.startVertex().point(), orientedEdge.endVertex().point(), edge.curve(), naturalForward);
+    }
+
+    private static List<CartesianPoint> sampleEdgePreview(
+            int edgeId,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder
+    ) {
+        try {
+            Edge edge = builder.buildEdge(edgeId);
+            return sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense());
+        } catch (TopologyException ex) {
+            StepEdgeCurve edge = (StepEdgeCurve) resolved.get(edgeId);
+            CartesianPoint start = pointFromStep(edge.start().point());
+            CartesianPoint end = pointFromStep(edge.end().point());
+            StepEntity edgeGeometry = edge.edgeGeometry();
+            Curve3 curve;
+            if (edgeGeometry instanceof StepLine line) {
+                curve = builder.buildLine(line.id());
+            } else if (edgeGeometry instanceof StepCircle circle) {
+                curve = builder.buildCircle(circle.id());
+            } else if (edgeGeometry instanceof StepEllipse ellipse) {
+                curve = builder.buildEllipse(ellipse.id());
+            } else if (edgeGeometry instanceof StepBSplineCurveWithKnots spline) {
+                curve = builder.buildBSplineCurve(spline.id());
+            } else if (edgeGeometry instanceof StepSurfaceCurve surfaceCurve) {
+                curve = builder.buildSurfaceCurve(surfaceCurve.id());
+            } else if (edgeGeometry instanceof StepTrimmedCurve trimmedCurve) {
+                curve = builder.buildTrimmedCurve(trimmedCurve.id());
+            } else {
+                throw ex;
+            }
+            try {
+                return sampleEdge(start, end, curve, edge.sameSense());
+            } catch (GeometryException geometryException) {
+                return List.of(start, end);
+            }
+        }
     }
 
     private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
@@ -2218,6 +2617,8 @@ public final class StepPreviewJsonExporter {
         appendValidation(json, payload.validation());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
+        json.append(",\"unsupportedFaces\":");
+        appendUnsupportedFaces(json, payload.unsupportedFaces());
         json.append(",\"edges\":");
         appendEdges(json, payload.edges());
         json.append(",\"faces\":");
@@ -2317,6 +2718,23 @@ public final class StepPreviewJsonExporter {
             appendIntegerList(json, item.targetIds());
             json.append(",\"targets\":");
             appendPmiTargets(json, item.targets());
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static void appendUnsupportedFaces(StringBuilder json, List<UnsupportedFacePayload> unsupportedFaces) {
+        json.append('[');
+        for (int i = 0; i < unsupportedFaces.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            UnsupportedFacePayload face = unsupportedFaces.get(i);
+            json.append('{');
+            json.append("\"id\":").append(face.stepId());
+            json.append(",\"name\":").append(quote(face.name()));
+            json.append(",\"surfaceType\":").append(quote(face.surfaceType()));
+            json.append(",\"reason\":").append(quote(face.reason()));
             json.append('}');
         }
         json.append(']');
@@ -2551,6 +2969,7 @@ public final class StepPreviewJsonExporter {
             BoundsPayload bounds,
             ValidationPayload validation,
             List<PmiPayload> pmi,
+            List<UnsupportedFacePayload> unsupportedFaces,
             List<EdgePayload> edges,
             List<FacePayload> faces,
             List<RepresentationPayload> representations,
@@ -2561,7 +2980,11 @@ public final class StepPreviewJsonExporter {
     private record AssemblyData(List<RepresentationPayload> representations, List<InstancePayload> instances) {
     }
 
-    private record GeometryCollection(List<EdgePayload> edges, List<FacePayload> faces) {
+    private record GeometryCollection(
+            List<EdgePayload> edges,
+            List<FacePayload> faces,
+            List<UnsupportedFacePayload> unsupportedFaces
+    ) {
     }
 
     private record PreviewStats(
@@ -2668,6 +3091,14 @@ public final class StepPreviewJsonExporter {
         CartesianPoint pointAt(double u, double v);
 
         Vector3 normalAt(double u, double v);
+
+        default Double uPeriod() {
+            return null;
+        }
+
+        default Double vPeriod() {
+            return null;
+        }
     }
 
     private record UvPoint(double u, double v) {
@@ -2701,6 +3132,17 @@ public final class StepPreviewJsonExporter {
             List<LoopPayload> loops,
             List<PointPayload> triangles
     ) {
+    }
+
+    private record UnsupportedFacePayload(
+            int stepId,
+            String name,
+            String surfaceType,
+            String reason
+    ) {
+    }
+
+    private record PreviewFaceResult(FacePayload face, UnsupportedFacePayload unsupportedFace) {
     }
 
     private record SurfacePatch(
