@@ -63,7 +63,10 @@
 
         .controls,
         .stats,
+        .assembly-card,
         .status-card,
+        .validation-card,
+        .validation-report-card,
         .selection-card {
             padding: 1rem;
             border: 1px solid var(--panel-border);
@@ -155,6 +158,70 @@
             line-height: 1.5;
         }
 
+        .validation-card h2 {
+            margin: 0 0 0.55rem;
+            font-size: 1rem;
+        }
+
+        .validation-card dl {
+            margin: 0;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.45rem 0.75rem;
+            font-size: 0.92rem;
+        }
+
+        .validation-card dt {
+            color: var(--muted);
+        }
+
+        .validation-card dd {
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .validation-report-card h2 {
+            margin: 0 0 0.55rem;
+            font-size: 1rem;
+        }
+
+        .validation-report {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .validation-report li {
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(63, 58, 46, 0.08);
+        }
+
+        .validation-report strong {
+            display: block;
+            font-size: 0.92rem;
+        }
+
+        .validation-report span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.35;
+            margin-top: 0.12rem;
+        }
+
+        .validation-report li.ok {
+            border-color: rgba(86, 135, 96, 0.25);
+        }
+
+        .validation-report li.warn {
+            border-color: rgba(196, 95, 53, 0.28);
+        }
+
         .selection-card h2 {
             margin: 0 0 0.55rem;
             font-size: 1rem;
@@ -177,6 +244,70 @@
             word-break: break-word;
         }
 
+        .assembly-card h2 {
+            margin: 0 0 0.55rem;
+            font-size: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .toolbar button {
+            padding: 0.55rem 0.8rem;
+            font-size: 0.84rem;
+        }
+
+        .assembly-tree {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .assembly-tree li {
+            margin: 0;
+        }
+
+        .assembly-tree button {
+            width: 100%;
+            text-align: left;
+            border-radius: 0.85rem;
+            padding: 0.75rem 0.9rem;
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--text);
+            border: 1px solid rgba(63, 58, 46, 0.08);
+            transform: none;
+        }
+
+        .assembly-tree button:hover {
+            background: rgba(240, 177, 90, 0.24);
+            transform: none;
+        }
+
+        .assembly-tree button.active {
+            background: rgba(196, 95, 53, 0.16);
+            border-color: rgba(196, 95, 53, 0.35);
+        }
+
+        .assembly-item-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .assembly-item-meta {
+            display: block;
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.35;
+        }
+
         .viewer {
             position: relative;
             background:
@@ -194,6 +325,29 @@
             display: block;
             width: 100%;
             height: 100%;
+        }
+
+        .pmi-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .pmi-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            padding: 0.3rem 0.45rem;
+            border-radius: 0.45rem;
+            background: rgba(28, 39, 44, 0.82);
+            color: rgba(255, 255, 255, 0.94);
+            font-size: 0.78rem;
+            line-height: 1.2;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .pmi-label.dimmed {
+            opacity: 0.45;
         }
 
         .overlay {
@@ -234,7 +388,7 @@
     <aside class="sidebar">
         <header>
             <h1 class="title">MiniCAD STEP Viewer</h1>
-            <p class="subtitle">原生 JavaScript + Three.js。当前支持直线边、平面面和简单闭合环预览。</p>
+            <p class="subtitle">原生 JavaScript + Three.js。当前支持装配、基础 PMI，以及平面和部分曲面 B-Rep 预览。</p>
         </header>
 
         <section class="controls">
@@ -245,6 +399,17 @@
                 <option value="rectangular-frame">rectangular-frame</option>
                 <option value="two-squares-open-shell">two-squares-open-shell</option>
                 <option value="cylindrical-face">cylindrical-face</option>
+                <option value="cylindrical-band">cylindrical-band</option>
+                <option value="conical-band">conical-band</option>
+                <option value="toroidal-band">toroidal-band</option>
+                <option value="ellipse-face">ellipse-face</option>
+                <option value="bspline-patch">bspline-patch</option>
+                <option value="metadata-square">metadata-square</option>
+                <option value="pmi-validation-square">pmi-validation-square</option>
+                <option value="pmi-validation-mismatch">pmi-validation-mismatch</option>
+                <option value="translated-part-assembly">translated-part-assembly</option>
+                <option value="two-instance-assembly">two-instance-assembly</option>
+                <option value="nested-assembly">nested-assembly</option>
             </select>
             <div class="actions">
                 <button id="load-example">加载示例</button>
@@ -267,6 +432,36 @@
             <p id="status-text">等待输入 STEP 数据。</p>
         </section>
 
+        <section class="validation-card">
+            <h2>验证摘要</h2>
+            <dl id="validation-details">
+                <dt>面</dt><dd>0</dd>
+                <dt>边</dt><dd>0</dd>
+                <dt>面积</dt><dd>0</dd>
+                <dt>线长</dt><dd>0</dd>
+                <dt>中心</dt><dd>0, 0, 0</dd>
+            </dl>
+        </section>
+
+        <section class="validation-report-card">
+            <h2>校验报告</h2>
+            <ul id="validation-report" class="validation-report">
+                <li><strong>未生成</strong><span>渲染后会显示逐项 native validation 对比。</span></li>
+            </ul>
+        </section>
+
+        <section class="assembly-card">
+            <h2>装配树</h2>
+            <div class="toolbar">
+                <button id="isolate-selection" type="button" class="secondary">隔离选中</button>
+                <button id="show-all" type="button" class="secondary">恢复显示</button>
+                <button id="toggle-pmi" type="button" class="secondary">隐藏 PMI</button>
+            </div>
+            <ul id="assembly-tree" class="assembly-tree">
+                <li><button type="button" disabled><span class="assembly-item-label">未加载</span><span class="assembly-item-meta">渲染装配 STEP 后会显示实例层级。</span></button></li>
+            </ul>
+        </section>
+
         <section class="selection-card">
             <h2>当前选中</h2>
             <dl id="selection-details">
@@ -278,6 +473,7 @@
 
     <main class="viewer">
         <div id="scene"></div>
+        <div id="pmi-overlay" class="pmi-overlay"></div>
         <div class="overlay">左键旋转 / 右键平移 / 滚轮缩放</div>
     </main>
 </div>

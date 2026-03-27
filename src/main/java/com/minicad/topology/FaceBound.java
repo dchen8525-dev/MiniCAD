@@ -3,13 +3,13 @@ package com.minicad.topology;
 import com.minicad.common.TopologyException;
 
 /**
- * Face boundary based on a closed edge loop.
+ * Face boundary based on a loop subtype.
  *
  * @param loop boundary loop
  * @param orientation orientation relative to the face
  * @param outer whether this is the outer boundary
  */
-public record FaceBound(EdgeLoop loop, boolean orientation, boolean outer) {
+public record FaceBound(Loop loop, boolean orientation, boolean outer) {
 
     /**
      * Creates a face bound.
@@ -27,7 +27,7 @@ public record FaceBound(EdgeLoop loop, boolean orientation, boolean outer) {
      * @param orientation orientation relative to the face
      * @return outer face bound
      */
-    public static FaceBound outer(EdgeLoop loop, boolean orientation) {
+    public static FaceBound outer(Loop loop, boolean orientation) {
         return new FaceBound(loop, orientation, true);
     }
 
@@ -38,7 +38,7 @@ public record FaceBound(EdgeLoop loop, boolean orientation, boolean outer) {
      * @param orientation orientation relative to the face
      * @return inner face bound
      */
-    public static FaceBound inner(EdgeLoop loop, boolean orientation) {
+    public static FaceBound inner(Loop loop, boolean orientation) {
         return new FaceBound(loop, orientation, false);
     }
 }

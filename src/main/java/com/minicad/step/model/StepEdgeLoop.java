@@ -9,7 +9,7 @@ import java.util.List;
  * @param name step label
  * @param edges oriented edges in loop order
  */
-public record StepEdgeLoop(int id, String name, List<StepOrientedEdge> edges) implements StepEntity {
+public record StepEdgeLoop(int id, String name, List<StepOrientedEdge> edges) implements StepLoop {
 
     /**
      * Creates an immutable edge-loop record.

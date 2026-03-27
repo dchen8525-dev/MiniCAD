@@ -7,7 +7,14 @@ const renderButton = document.querySelector('#render-button');
 const loadExampleButton = document.querySelector('#load-example');
 const exampleSelect = document.querySelector('#example-select');
 const statusText = document.querySelector('#status-text');
+const validationDetails = document.querySelector('#validation-details');
+const validationReport = document.querySelector('#validation-report');
 const selectionDetails = document.querySelector('#selection-details');
+const assemblyTree = document.querySelector('#assembly-tree');
+const pmiOverlay = document.querySelector('#pmi-overlay');
+const isolateSelectionButton = document.querySelector('#isolate-selection');
+const showAllButton = document.querySelector('#show-all');
+const togglePmiButton = document.querySelector('#toggle-pmi');
 const statElements = new Map(
     Array.from(document.querySelectorAll('[data-stat]')).map((element) => [element.dataset.stat, element])
 );
@@ -52,12 +59,21 @@ scene.add(axes);
 
 const modelRoot = new THREE.Group();
 scene.add(modelRoot);
+const pmiRoot = new THREE.Group();
+scene.add(pmiRoot);
 
 const raycaster = new THREE.Raycaster();
 raycaster.params.Line.threshold = 0.14;
 const pointer = new THREE.Vector2();
 let interactiveObjects = [];
 let selectedObject = null;
+let selectedAssemblyButton = null;
+let selectedAssemblyGroup = null;
+const assemblyGroups = new Map();
+const assemblyButtons = new Map();
+const stepObjects = new Map();
+let pmiLabels = [];
+let pmiVisible = true;
 
 function resize() {
     const width = sceneHost.clientWidth;
@@ -76,6 +92,7 @@ resize();
 
 function animate() {
     controls.update();
+    updatePmiOverlay();
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
@@ -92,19 +109,68 @@ function updateStats(stats = {}) {
     }
 }
 
+function updateValidation(validation = {}) {
+    const center = Array.isArray(validation.center) ? formatPoint(validation.center) : '0.000, 0.000, 0.000';
+    const checks = Array.isArray(validation.report?.checks)
+        ? validation.report.checks
+        : (Array.isArray(validation.nativeChecks) ? validation.nativeChecks : []);
+    const nativeChecks = checks.length > 0
+        ? checks.map((check) => `${check.name}: ${check.matches ? 'OK' : `差异 ${formatMetric(check.delta)}`}`).join(' | ')
+        : '无';
+    const reportStatus = validation.report?.status ?? 'empty';
+    validationDetails.innerHTML = [
+        ['面', String(validation.renderedFaceCount ?? 0)],
+        ['边', String(validation.renderedEdgeCount ?? 0)],
+        ['面积', formatMetric(validation.approxSurfaceArea)],
+        ['线长', formatMetric(validation.approxEdgeLength)],
+        ['表示', String(validation.representationCount ?? 0)],
+        ['实例', String(validation.instanceCount ?? 0)],
+        ['中心', center],
+        ['状态', reportStatus],
+        ['校验', nativeChecks]
+    ].map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
+    updateValidationReport(validation.report ?? validation.nativeChecks);
+}
+
+function updateValidationReport(report = {}) {
+    const checks = Array.isArray(report.checks) ? report.checks : (Array.isArray(report) ? report : []);
+    const okCount = Number(report.okCount ?? checks.filter((check) => check.matches).length);
+    const warnCount = Number(report.warnCount ?? checks.filter((check) => !check.matches).length);
+    if (checks.length === 0) {
+        validationReport.innerHTML = '<li><strong>无 native validation</strong><span>当前 STEP 未导出可对比的原生校验项。</span></li>';
+        return;
+    }
+    const summary = `<li><strong>汇总</strong><span>OK ${okCount} 项 / Warn ${warnCount} 项</span></li>`;
+    validationReport.innerHTML = summary + checks.map((check) => {
+        const cssClass = check.matches ? 'ok' : 'warn';
+        const detail = `${check.measureType}: 期望 ${formatMetric(check.expected)} / 实际 ${formatMetric(check.actual)} / 差值 ${formatMetric(check.delta)}`;
+        return `<li class="${cssClass}"><strong>${check.name}</strong><span>${detail}</span></li>`;
+    }).join('');
+}
+
 function setSelection(entries) {
     selectionDetails.innerHTML = entries.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
 }
 
 function resetSelection() {
     if (selectedObject) {
-        applySelectionStyle(selectedObject, false);
+        selectedObject.userData.objectSelected = false;
+        refreshRenderableStyle(selectedObject);
         selectedObject = null;
+    }
+    if (selectedAssemblyGroup) {
+        applyAssemblyHighlight(selectedAssemblyGroup, false);
+        selectedAssemblyGroup = null;
+    }
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.remove('active');
+        selectedAssemblyButton = null;
     }
     setSelection([
         ['类型', '未选中'],
         ['说明', '点击右侧模型中的面或边查看详情。']
     ]);
+    syncPmiTargetHighlight();
 }
 
 function clearModel() {
@@ -113,8 +179,32 @@ function clearModel() {
         modelRoot.remove(child);
         disposeObject(child);
     }
+    while (pmiRoot.children.length > 0) {
+        const child = pmiRoot.children[0];
+        pmiRoot.remove(child);
+        disposeObject(child);
+    }
+    pmiOverlay.innerHTML = '';
+    pmiLabels = [];
     interactiveObjects = [];
+    assemblyGroups.clear();
+    assemblyButtons.clear();
+    stepObjects.clear();
     resetSelection();
+    updateValidation();
+    renderAssemblyTree([]);
+    if (togglePmiButton) {
+        togglePmiButton.textContent = '隐藏 PMI';
+    }
+}
+
+function matrixFromRowMajor(elements) {
+    return new THREE.Matrix4().set(
+        elements[0], elements[1], elements[2], elements[3],
+        elements[4], elements[5], elements[6], elements[7],
+        elements[8], elements[9], elements[10], elements[11],
+        elements[12], elements[13], elements[14], elements[15]
+    );
 }
 
 function disposeObject(object) {
@@ -185,6 +275,24 @@ function signedArea(points) {
 }
 
 function buildFaceMesh(face) {
+    const color = Array.isArray(face.color) ? new THREE.Color(face.color[0] / 255, face.color[1] / 255, face.color[2] / 255) : new THREE.Color(0xc87a52);
+    if (Array.isArray(face.triangles) && face.triangles.length >= 3) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(face.triangles.flat(), 3));
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshStandardMaterial({
+            color,
+            transparent: true,
+            opacity: 0.62,
+            side: THREE.DoubleSide,
+            roughness: 0.48,
+            metalness: 0.08
+        });
+
+        return new THREE.Mesh(geometry, material);
+    }
+
     const outerLoop = face.loops.find((loop) => loop.outer);
     if (!outerLoop || outerLoop.points.length < 3) {
         return null;
@@ -247,7 +355,7 @@ function buildFaceMesh(face) {
     geometry.computeVertexNormals();
 
     const material = new THREE.MeshStandardMaterial({
-        color: 0xc87a52,
+        color,
         transparent: true,
         opacity: 0.62,
         side: THREE.DoubleSide,
@@ -272,19 +380,313 @@ function buildEdgeObject(edge, edgeIndex) {
     ];
     line.userData.baseColor = 0x1b2d33;
     line.userData.selectedColor = 0xf06d3a;
+    line.userData.instanceSelectedColor = 0x537983;
+    line.userData.objectSelected = false;
+    line.userData.instanceHighlighted = false;
     return line;
+}
+
+function buildEdgeObjectForInstance(edge, label) {
+    const line = buildEdgeObject(edge, 0);
+    line.userData.selection = [
+        ['类型', label],
+        ['采样点', String(edge.points.length)],
+        ['线段数', String(Math.max(0, edge.points.length - 1))],
+        ['起点', formatPoint(edge.points[0])],
+        ['终点', formatPoint(edge.points[edge.points.length - 1])]
+    ];
+    return line;
+}
+
+function renderAssemblyTree(instances) {
+    assemblyTree.innerHTML = '';
+    assemblyButtons.clear();
+    if (!Array.isArray(instances) || instances.length === 0) {
+        const item = document.createElement('li');
+        item.innerHTML = '<button type="button" disabled><span class="assembly-item-label">无装配实例</span><span class="assembly-item-meta">当前预览未导出实例树。</span></button>';
+        assemblyTree.appendChild(item);
+        return;
+    }
+
+    const childrenByParent = new Map();
+    for (const instance of instances) {
+        const key = instance.parentId ?? '__root__';
+        if (!childrenByParent.has(key)) {
+            childrenByParent.set(key, []);
+        }
+        childrenByParent.get(key).push(instance);
+    }
+
+    const appendItems = (parentId, depth) => {
+        const items = childrenByParent.get(parentId ?? '__root__') ?? [];
+        for (const instance of items) {
+            const item = document.createElement('li');
+            item.style.paddingLeft = `${depth * 0.9}rem`;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.instanceId = instance.id;
+            assemblyButtons.set(instance.id, button);
+            button.title = instance.description || instance.label || instance.id;
+            button.innerHTML = `<span class="assembly-item-label">${instance.label || instance.id}</span>
+                <span class="assembly-item-meta">pd #${instance.productDefinitionId}${instance.occurrenceId ? ` / occ #${instance.occurrenceId}` : ''}${Array.isArray(instance.representationIds) && instance.representationIds.length > 0 ? ` / rep ${instance.representationIds.map((id) => `#${id}`).join(', ')}` : ''}</span>`;
+            button.addEventListener('click', () => focusAssemblyInstance(instance.id, button));
+            item.appendChild(button);
+            assemblyTree.appendChild(item);
+            appendItems(instance.id, depth + 1);
+        }
+    };
+
+    appendItems(null, 0);
+}
+
+function focusAssemblyInstance(instanceId, button = null) {
+    const group = assemblyGroups.get(instanceId);
+    if (!group) {
+        return;
+    }
+
+    if (selectedObject) {
+        selectedObject.userData.objectSelected = false;
+        refreshRenderableStyle(selectedObject);
+        selectedObject = null;
+    }
+    if (selectedAssemblyGroup && selectedAssemblyGroup !== group) {
+        applyAssemblyHighlight(selectedAssemblyGroup, false);
+    }
+    selectedAssemblyGroup = group;
+    applyAssemblyHighlight(group, true);
+
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.remove('active');
+    }
+    selectedAssemblyButton = button ?? assemblyButtons.get(instanceId) ?? null;
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.add('active');
+    }
+
+    const box = new THREE.Box3().setFromObject(group);
+    if (box.isEmpty()) {
+        return;
+    }
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const radius = Math.max(size.length() * 0.7, 1);
+
+    controls.target.copy(center);
+    camera.position.copy(center.clone().add(new THREE.Vector3(radius, radius * 0.75, radius)));
+    camera.near = Math.max(radius / 200, 0.01);
+    camera.far = Math.max(radius * 40, 100);
+    camera.updateProjectionMatrix();
+    controls.update();
+
+    setSelection([
+        ['类型', '装配实例'],
+        ['实例', group.userData.instanceLabel || instanceId],
+        ['描述', group.userData.instanceDescription || ''],
+        ['层级', String(group.userData.instanceDepth ?? 0)],
+        ['表示', String(group.userData.representationCount ?? 0)],
+        ['说明', '已定位并高亮该实例。']
+    ]);
 }
 
 function formatPoint(point) {
     return point.map((value) => Number(value).toFixed(3)).join(', ');
 }
 
-function applySelectionStyle(object, selected) {
-    const color = selected ? object.userData.selectedColor : object.userData.baseColor;
+function formatMetric(value) {
+    const numeric = Number(value ?? 0);
+    return numeric.toFixed(3);
+}
+
+function formatColor(color) {
+    if (!Array.isArray(color) || color.length !== 3) {
+        return '未指定';
+    }
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+}
+
+function formatLayers(layers) {
+    return Array.isArray(layers) && layers.length > 0 ? layers.join(', ') : '未指定';
+}
+
+function renderPmi(pmi) {
+    if (!Array.isArray(pmi) || pmi.length === 0) {
+        return;
+    }
+    for (const item of pmi) {
+        if (Array.isArray(item.leader) && item.leader.length >= 2) {
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(item.leader.flat(), 3));
+            const material = new THREE.LineBasicMaterial({ color: 0x4a423d });
+            pmiRoot.add(new THREE.Line(geometry, material));
+        }
+        const label = document.createElement('div');
+        label.className = 'pmi-label';
+        label.textContent = item.text || item.name || 'PMI';
+        const targets = Array.isArray(item.targets) ? item.targets : [];
+        if ((Array.isArray(item.targetIds) && item.targetIds.length > 0) || targets.length > 0) {
+            label.style.cursor = 'pointer';
+            const displayTargets = targets.length > 0 ? targets.map((target) => `#${target.id} ${target.type}`) : item.targetIds.map((id) => `#${id}`);
+            label.title = `关联 STEP 项: ${displayTargets.join(', ')}`;
+            label.addEventListener('click', () => selectPmiTargets(targets, item.targetIds));
+        }
+        pmiOverlay.appendChild(label);
+        pmiLabels.push({
+            element: label,
+            anchor: new THREE.Vector3(item.position[0], item.position[1], item.position[2]),
+            targetIds: Array.isArray(item.targetIds) ? item.targetIds : [],
+            targets
+        });
+    }
+    applyPmiVisibility();
+}
+
+function updatePmiOverlay() {
+    if (pmiLabels.length === 0) {
+        return;
+    }
+    const width = sceneHost.clientWidth;
+    const height = sceneHost.clientHeight;
+    for (const label of pmiLabels) {
+        const screen = label.anchor.clone().project(camera);
+        if (screen.z < -1 || screen.z > 1) {
+            label.element.style.display = 'none';
+            continue;
+        }
+        label.element.style.display = pmiVisible ? '' : 'none';
+        label.element.style.left = `${(screen.x * 0.5 + 0.5) * width}px`;
+        label.element.style.top = `${(-screen.y * 0.5 + 0.5) * height}px`;
+    }
+}
+
+function applyPmiVisibility() {
+    pmiOverlay.style.display = pmiVisible ? '' : 'none';
+    pmiRoot.visible = pmiVisible;
+    if (togglePmiButton) {
+        togglePmiButton.textContent = pmiVisible ? '隐藏 PMI' : '显示 PMI';
+    }
+}
+
+function refreshRenderableStyle(object) {
+    const color = object.userData.objectSelected
+        ? object.userData.selectedColor
+        : object.userData.instanceHighlighted
+            ? object.userData.instanceSelectedColor
+            : object.userData.baseColor;
     object.material.color.setHex(color);
     if (object.isMesh) {
-        object.material.opacity = selected ? 0.9 : 0.62;
+        object.material.opacity = object.userData.objectSelected ? 0.9 : object.userData.instanceHighlighted ? 0.78 : 0.62;
     }
+}
+
+function registerStepObject(stepId, object) {
+    if (stepId == null) {
+        return;
+    }
+    if (!stepObjects.has(stepId)) {
+        stepObjects.set(stepId, []);
+    }
+    stepObjects.get(stepId).push(object);
+}
+
+function selectRenderable(object) {
+    if (!object) {
+        return;
+    }
+    if (selectedObject && selectedObject !== object) {
+        selectedObject.userData.objectSelected = false;
+        refreshRenderableStyle(selectedObject);
+    }
+    selectedObject = object;
+    if (selectedObject.userData.instanceId) {
+        focusAssemblyInstance(selectedObject.userData.instanceId, assemblyButtons.get(selectedObject.userData.instanceId));
+    }
+    selectedObject.userData.objectSelected = true;
+    refreshRenderableStyle(selectedObject);
+    setSelection(selectedObject.userData.selection);
+    syncPmiTargetHighlight();
+}
+
+function setGroupVisibility(group, visible) {
+    group.visible = visible;
+}
+
+function showOnlyInstance(instanceId) {
+    if (assemblyGroups.size === 0) {
+        return;
+    }
+    for (const [id, group] of assemblyGroups.entries()) {
+        setGroupVisibility(group, id === instanceId);
+    }
+}
+
+function showAllInstances() {
+    if (assemblyGroups.size > 0) {
+        for (const group of assemblyGroups.values()) {
+            setGroupVisibility(group, true);
+        }
+    }
+    for (const object of interactiveObjects) {
+        object.visible = true;
+    }
+}
+
+function syncPmiTargetHighlight() {
+    const selectedIds = new Set();
+    if (selectedObject?.userData?.stepId != null) {
+        selectedIds.add(selectedObject.userData.stepId);
+    }
+    for (const label of pmiLabels) {
+        if (selectedIds.size === 0 || label.targetIds.length === 0) {
+            label.element.classList.remove('dimmed');
+            continue;
+        }
+        const matches = label.targetIds.some((id) => selectedIds.has(id));
+        label.element.classList.toggle('dimmed', !matches);
+    }
+}
+
+function selectPmiTargets(targets, targetIds = []) {
+    const effectiveTargets = Array.isArray(targets) ? targets : [];
+    const effectiveIds = effectiveTargets.length > 0
+        ? effectiveTargets.map((target) => target.id)
+        : (Array.isArray(targetIds) ? targetIds : []);
+    const instanceIds = effectiveTargets.flatMap((target) => Array.isArray(target.instanceIds) ? target.instanceIds : []);
+    for (const instanceId of instanceIds) {
+        if (assemblyGroups.has(instanceId)) {
+            focusAssemblyInstance(instanceId, assemblyButtons.get(instanceId));
+            break;
+        }
+    }
+    if (effectiveIds.length === 0) {
+        return;
+    }
+    for (const targetId of effectiveIds) {
+        const matches = stepObjects.get(targetId);
+        if (Array.isArray(matches) && matches.length > 0) {
+            selectRenderable(matches[0]);
+            return;
+        }
+    }
+    const targetSummary = effectiveTargets.length > 0
+        ? effectiveTargets.map((target) => `#${target.id} ${target.type}${target.name ? ` (${target.name})` : ''}`).join(', ')
+        : effectiveIds.map((id) => `#${id}`).join(', ');
+    setSelection([
+        ['类型', 'PMI'],
+        ['目标', targetSummary],
+        ['实例', instanceIds.length > 0 ? instanceIds.join(', ') : '无实例映射'],
+        ['说明', '已解析 semantic PMI 关联，但当前视图中没有可直接选中的对象。']
+    ]);
+}
+
+function applyAssemblyHighlight(group, selected) {
+    group.traverse((node) => {
+        if (!node.material) {
+            return;
+        }
+        node.userData.instanceHighlighted = selected;
+        refreshRenderableStyle(node);
+    });
 }
 
 function fitCamera(bounds) {
@@ -304,6 +706,17 @@ function fitCamera(bounds) {
 
 function renderPreview(preview) {
     clearModel();
+    renderPmi(preview.pmi);
+
+    if (Array.isArray(preview.instances) && preview.instances.length > 0
+        && Array.isArray(preview.representations) && preview.representations.length > 0) {
+        renderAssemblyPreview(preview);
+        updateStats(preview.stats);
+        updateValidation(preview.validation);
+        fitCamera(preview.bounds);
+        resetSelection();
+        return;
+    }
 
     for (let index = 0; index < preview.faces.length; index += 1) {
         const face = preview.faces[index];
@@ -313,27 +726,146 @@ function renderPreview(preview) {
             const outerLoop = face.loops.find((loop) => loop.outer);
             mesh.userData.selection = [
                 ['类型', `面 #${index + 1}`],
+                ['STEP', `#${face.id}`],
+                ['名称', face.name || ''],
+                ['曲面', face.surfaceType || 'PLANE'],
+                ['颜色', formatColor(face.color)],
+                ['图层', formatLayers(face.layers)],
                 ['边界环', String(face.loops.length)],
                 ['内环', String(innerLoopCount)],
                 ['外环采样点', String(outerLoop ? outerLoop.points.length : 0)],
                 ['法向', formatPoint(face.normal)]
             ];
-            mesh.userData.baseColor = 0xc87a52;
+            mesh.userData.baseColor = mesh.material.color.getHex();
             mesh.userData.selectedColor = 0xf0b15a;
+            mesh.userData.instanceSelectedColor = 0xe2a46f;
+            mesh.userData.objectSelected = false;
+            mesh.userData.instanceHighlighted = false;
+            mesh.userData.stepId = face.id;
             interactiveObjects.push(mesh);
+            registerStepObject(face.id, mesh);
             modelRoot.add(mesh);
         }
     }
 
     for (let index = 0; index < preview.edges.length; index += 1) {
         const line = buildEdgeObject(preview.edges[index], index);
+        line.userData.selection.splice(1, 0, ['STEP', `#${preview.edges[index].id}`]);
+        line.userData.stepId = preview.edges[index].id;
         interactiveObjects.push(line);
+        registerStepObject(preview.edges[index].id, line);
         modelRoot.add(line);
     }
 
     updateStats(preview.stats);
+    updateValidation(preview.validation);
+    renderAssemblyTree([]);
     fitCamera(preview.bounds);
     resetSelection();
+}
+
+function renderAssemblyPreview(preview) {
+    const representationsById = new Map(preview.representations.map((representation) => [representation.id, representation]));
+    renderAssemblyTree(preview.instances);
+
+    for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
+        const instance = preview.instances[instanceIndex];
+        const instanceGroup = new THREE.Group();
+        const transform = matrixFromRowMajor(Array.isArray(instance.localMatrix) ? instance.localMatrix : instance.matrix);
+        instanceGroup.applyMatrix4(transform);
+        instanceGroup.userData.instanceLabel = instance.label || `实例 #${instanceIndex + 1}`;
+        instanceGroup.userData.instanceDescription = instance.description || '';
+        instanceGroup.userData.instanceId = instance.id;
+        instanceGroup.userData.instanceDepth = instance.depth ?? 0;
+        instanceGroup.userData.representationCount = Array.isArray(instance.representationIds) ? instance.representationIds.length : (instance.representationId != null ? 1 : 0);
+        assemblyGroups.set(instance.id, instanceGroup);
+    }
+
+    for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
+        const instance = preview.instances[instanceIndex];
+        const instanceGroup = assemblyGroups.get(instance.id);
+        if (!instanceGroup) {
+            continue;
+        }
+
+        if (instance.parentId && assemblyGroups.has(instance.parentId)) {
+            assemblyGroups.get(instance.parentId).add(instanceGroup);
+        } else {
+            modelRoot.add(instanceGroup);
+        }
+
+        const representationIds = Array.isArray(instance.representationIds) && instance.representationIds.length > 0
+            ? instance.representationIds
+            : (instance.representationId != null ? [instance.representationId] : []);
+
+        for (const representationId of representationIds) {
+            const representation = representationsById.get(representationId);
+            if (!representation) {
+                continue;
+            }
+            for (let faceIndex = 0; faceIndex < representation.faces.length; faceIndex += 1) {
+                const face = representation.faces[faceIndex];
+                const mesh = buildFaceMesh(face);
+                if (!mesh) {
+                    continue;
+                }
+                if ((!Array.isArray(face.color) || face.color.length === 0) && Array.isArray(representation.color)) {
+                    mesh.material.color.setRGB(representation.color[0] / 255, representation.color[1] / 255, representation.color[2] / 255);
+                }
+                const innerLoopCount = face.loops.filter((loop) => !loop.outer).length;
+                mesh.userData.selection = [
+                    ['类型', `${instanceGroup.userData.instanceLabel} / 面 #${faceIndex + 1}`],
+                    ['STEP', `#${face.id}`],
+                    ['名称', face.name || ''],
+                    ['曲面', face.surfaceType || 'PLANE'],
+                    ['表示', representation.name || `#${representation.id}`],
+                    ['实例', instance.id],
+                    ['颜色', formatColor(face.color || representation.color)],
+                    ['图层', formatLayers((face.layers && face.layers.length > 0) ? face.layers : representation.layers)],
+                    ['边界环', String(face.loops.length)],
+                    ['内环', String(innerLoopCount)],
+                    ['法向', formatPoint(face.normal)]
+                ];
+                mesh.userData.baseColor = mesh.material.color.getHex();
+                mesh.userData.selectedColor = 0xf0b15a;
+                mesh.userData.instanceSelectedColor = 0xe2a46f;
+                mesh.userData.instanceId = instance.id;
+                mesh.userData.objectSelected = false;
+                mesh.userData.instanceHighlighted = false;
+                mesh.userData.stepId = face.id;
+                interactiveObjects.push(mesh);
+                registerStepObject(face.id, mesh);
+                instanceGroup.add(mesh);
+            }
+
+            for (let edgeIndex = 0; edgeIndex < representation.edges.length; edgeIndex += 1) {
+                const line = buildEdgeObjectForInstance(
+                    representation.edges[edgeIndex],
+                    `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`
+                );
+                line.userData.selection = [
+                    ['类型', `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`],
+                    ['STEP', `#${representation.edges[edgeIndex].id}`],
+                    ['表示', representation.name || `#${representation.id}`],
+                    ['实例', instance.id],
+                    ['图层', formatLayers(representation.layers)],
+                    ['颜色', formatColor(representation.color)],
+                    ['采样点', String(representation.edges[edgeIndex].points.length)],
+                    ['线段数', String(Math.max(0, representation.edges[edgeIndex].points.length - 1))],
+                    ['起点', formatPoint(representation.edges[edgeIndex].points[0])],
+                    ['终点', formatPoint(representation.edges[edgeIndex].points[representation.edges[edgeIndex].points.length - 1])]
+                ];
+                line.userData.instanceSelectedColor = 0x537983;
+                line.userData.instanceId = instance.id;
+                line.userData.objectSelected = false;
+                line.userData.instanceHighlighted = false;
+                line.userData.stepId = representation.edges[edgeIndex].id;
+                interactiveObjects.push(line);
+                registerStepObject(representation.edges[edgeIndex].id, line);
+                instanceGroup.add(line);
+            }
+        }
+    }
 }
 
 async function requestPreview(stepText) {
@@ -423,7 +955,8 @@ renderer.domElement.addEventListener('click', (event) => {
 
     const hits = raycaster.intersectObjects(interactiveObjects, false);
     if (selectedObject) {
-        applySelectionStyle(selectedObject, false);
+        selectedObject.userData.objectSelected = false;
+        refreshRenderableStyle(selectedObject);
         selectedObject = null;
     }
 
@@ -435,7 +968,37 @@ renderer.domElement.addEventListener('click', (event) => {
         return;
     }
 
-    selectedObject = hits[0].object;
-    applySelectionStyle(selectedObject, true);
-    setSelection(selectedObject.userData.selection);
+    selectRenderable(hits[0].object);
+    syncPmiTargetHighlight();
 });
+
+if (isolateSelectionButton) {
+    isolateSelectionButton.addEventListener('click', () => {
+        if (selectedAssemblyGroup?.userData?.instanceId) {
+            showOnlyInstance(selectedAssemblyGroup.userData.instanceId);
+            return;
+        }
+        if (selectedObject?.userData?.instanceId) {
+            showOnlyInstance(selectedObject.userData.instanceId);
+            return;
+        }
+        if (selectedObject) {
+            for (const object of interactiveObjects) {
+                object.visible = object === selectedObject;
+            }
+        }
+    });
+}
+
+if (showAllButton) {
+    showAllButton.addEventListener('click', () => {
+        showAllInstances();
+    });
+}
+
+if (togglePmiButton) {
+    togglePmiButton.addEventListener('click', () => {
+        pmiVisible = !pmiVisible;
+        applyPmiVisibility();
+    });
+}

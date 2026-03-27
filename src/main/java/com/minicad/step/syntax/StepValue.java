@@ -6,7 +6,8 @@ import java.util.List;
  * Generic STEP parameter value used by the syntax layer.
  */
 public sealed interface StepValue permits StepValue.ReferenceValue, StepValue.NumberValue,
-        StepValue.StringValue, StepValue.EnumValue, StepValue.OmittedValue, StepValue.ListValue {
+        StepValue.StringValue, StepValue.EnumValue, StepValue.TypedValue, StepValue.OmittedValue,
+        StepValue.NotProvidedValue, StepValue.ListValue {
 
     /**
      * STEP reference such as {@code #42}.
@@ -42,9 +43,24 @@ public sealed interface StepValue permits StepValue.ReferenceValue, StepValue.Nu
     }
 
     /**
+     * Typed STEP value such as {@code LENGTH_MEASURE(1.0)}.
+     *
+     * @param typeName wrapper type name
+     * @param value wrapped value
+     */
+    record TypedValue(String typeName, StepValue value) implements StepValue {
+    }
+
+    /**
      * Omitted parameter represented by {@code $}.
      */
     record OmittedValue() implements StepValue {
+    }
+
+    /**
+     * Not-provided parameter represented by {@code *}.
+     */
+    record NotProvidedValue() implements StepValue {
     }
 
     /**

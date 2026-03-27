@@ -10,11 +10,15 @@ import java.util.List;
  */
 public final class StepParser {
 
+    private static final String HEADER_SECTION = "HEADER;";
+    private static final String DATA_SECTION = "DATA;";
+    private static final String ENDSEC = "ENDSEC;";
+
     private final StepTokenizer tokenizer;
     private StepToken current;
 
-    private StepParser(String input) {
-        this.tokenizer = new StepTokenizer(extractDataSection(input));
+    private StepParser(String sectionText) {
+        this.tokenizer = new StepTokenizer(sectionText);
         this.current = tokenizer.next();
     }
 
@@ -25,7 +29,7 @@ public final class StepParser {
      * @return parsed file
      */
     public static StepFile parse(String input) {
-        return new StepParser(input).parseFile();
+        return parseSections(input);
     }
 
     private StepFile parseFile() {
@@ -36,16 +40,46 @@ public final class StepParser {
         return new StepFile(entities);
     }
 
+    private List<StepHeaderEntry> parseHeaderEntries() {
+        List<StepHeaderEntry> entries = new ArrayList<>();
+        while (current.type() != StepTokenType.EOF) {
+            String name = expect(StepTokenType.IDENTIFIER, "expected header entry name").text();
+            expect(StepTokenType.LPAREN, "expected '(' after header entry name");
+            List<StepValue> parameters = parseParameterList();
+            expect(StepTokenType.RPAREN, "expected ')' after header entry parameters");
+            expect(StepTokenType.SEMICOLON, "expected ';' after header entry");
+            entries.add(new StepHeaderEntry(name, parameters));
+        }
+        return List.copyOf(entries);
+    }
+
     private StepEntityInstance parseEntityInstance() {
         expect(StepTokenType.HASH, "expected '#'");
         int id = parseInteger(expect(StepTokenType.INTEGER, "expected entity id"));
         expect(StepTokenType.EQUALS, "expected '='");
+        List<StepEntityDefinition> definitions = current.type() == StepTokenType.LPAREN
+                ? parseComplexEntity()
+                : List.of(parseEntityDefinition());
+        expect(StepTokenType.SEMICOLON, "expected ';' after entity instance");
+        return new StepEntityInstance(id, definitions);
+    }
+
+    private List<StepEntityDefinition> parseComplexEntity() {
+        expect(StepTokenType.LPAREN, "expected '(' to open complex entity");
+        List<StepEntityDefinition> definitions = new ArrayList<>();
+        while (current.type() != StepTokenType.RPAREN) {
+            definitions.add(parseEntityDefinition());
+        }
+        expect(StepTokenType.RPAREN, "expected ')' to close complex entity");
+        return List.copyOf(definitions);
+    }
+
+    private StepEntityDefinition parseEntityDefinition() {
         String name = expect(StepTokenType.IDENTIFIER, "expected entity name").text();
         expect(StepTokenType.LPAREN, "expected '(' after entity name");
         List<StepValue> parameters = parseParameterList();
         expect(StepTokenType.RPAREN, "expected ')' after entity parameters");
-        expect(StepTokenType.SEMICOLON, "expected ';' after entity instance");
-        return new StepEntityInstance(id, name, parameters);
+        return new StepEntityDefinition(name, parameters);
     }
 
     private List<StepValue> parseParameterList() {
@@ -67,18 +101,28 @@ public final class StepParser {
             case INTEGER, NUMBER -> parseNumber();
             case STRING -> new StepValue.StringValue(consume().text());
             case ENUM -> new StepValue.EnumValue(consume().text());
+            case STAR -> {
+                consume();
+                yield new StepValue.NotProvidedValue();
+            }
             case DOLLAR -> {
                 consume();
                 yield new StepValue.OmittedValue();
             }
             case LPAREN -> parseList();
-            case IDENTIFIER -> throw new StepParseException(
-                    "typed parameters are unsupported at position " + current.position()
-            );
+            case IDENTIFIER -> parseTypedValue();
             default -> throw new StepParseException(
                     "unexpected token " + current.type() + " at position " + current.position()
             );
         };
+    }
+
+    private StepValue.TypedValue parseTypedValue() {
+        String typeName = expect(StepTokenType.IDENTIFIER, "expected typed value name").text();
+        expect(StepTokenType.LPAREN, "expected '(' after typed value name");
+        StepValue wrapped = parseValue();
+        expect(StepTokenType.RPAREN, "expected ')' after typed value payload");
+        return new StepValue.TypedValue(typeName, wrapped);
     }
 
     private StepValue.ReferenceValue parseReference() {
@@ -127,21 +171,33 @@ public final class StepParser {
         }
     }
 
-    private static String extractDataSection(String input) {
+    private static StepFile parseSections(String input) {
         if (input == null || input.isBlank()) {
             throw new StepParseException("STEP input must not be blank");
         }
 
         String upper = input.toUpperCase();
-        int dataStart = upper.indexOf("DATA;");
+        int headerStart = upper.indexOf(HEADER_SECTION);
+        List<StepHeaderEntry> headerEntries = List.of();
+        if (headerStart >= 0) {
+            int headerContentStart = headerStart + HEADER_SECTION.length();
+            int headerEnd = upper.indexOf(ENDSEC, headerContentStart);
+            if (headerEnd < 0) {
+                throw new StepParseException("missing ENDSEC for HEADER section");
+            }
+            headerEntries = new StepParser(input.substring(headerContentStart, headerEnd)).parseHeaderEntries();
+        }
+
+        int dataStart = upper.indexOf(DATA_SECTION);
         if (dataStart < 0) {
             throw new StepParseException("missing DATA section");
         }
-        int contentStart = dataStart + "DATA;".length();
-        int endSec = upper.indexOf("ENDSEC;", contentStart);
+        int contentStart = dataStart + DATA_SECTION.length();
+        int endSec = upper.indexOf(ENDSEC, contentStart);
         if (endSec < 0) {
             throw new StepParseException("missing ENDSEC for DATA section");
         }
-        return input.substring(contentStart, endSec);
+        StepFile dataFile = new StepParser(input.substring(contentStart, endSec)).parseFile();
+        return new StepFile(headerEntries, dataFile.entities());
     }
 }

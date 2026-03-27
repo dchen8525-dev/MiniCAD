@@ -17,6 +17,7 @@ class StepParserTest {
         String step = """
                 ISO-10303-21;
                 HEADER;
+                FILE_DESCRIPTION(('mini cad'),'1');
                 ENDSEC;
                 DATA;
                 #10=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
@@ -28,6 +29,8 @@ class StepParserTest {
         StepFile file = StepParser.parse(step);
 
         assertEquals(2, file.entities().size());
+        assertEquals(1, file.headerEntries().size());
+        assertEquals("FILE_DESCRIPTION", file.headerEntries().getFirst().name());
         assertEquals("CARTESIAN_POINT", file.entities().getFirst().name());
         assertEquals(10, file.entities().getFirst().id());
     }
@@ -50,10 +53,10 @@ class StepParserTest {
     }
 
     @Test
-    void shouldParseStringsEnumsOmittedValuesAndLists() {
+    void shouldParseStringsEnumsOmittedValuesTypedValuesAndLists() {
         String step = """
                 DATA;
-                #1=EXAMPLE('A''B',$,.T.,(1.0,#2,'X'));
+                #1=EXAMPLE('A''B',$,*,.T.,LENGTH_MEASURE(1.0),(1.0,#2,'X'));
                 ENDSEC;
                 """;
 
@@ -61,8 +64,11 @@ class StepParserTest {
 
         assertEquals("A'B", ((StepValue.StringValue) entity.parameters().get(0)).value());
         assertInstanceOf(StepValue.OmittedValue.class, entity.parameters().get(1));
-        assertEquals("T", ((StepValue.EnumValue) entity.parameters().get(2)).value());
-        StepValue.ListValue list = (StepValue.ListValue) entity.parameters().get(3);
+        assertInstanceOf(StepValue.NotProvidedValue.class, entity.parameters().get(2));
+        assertEquals("T", ((StepValue.EnumValue) entity.parameters().get(3)).value());
+        StepValue.TypedValue typedValue = assertInstanceOf(StepValue.TypedValue.class, entity.parameters().get(4));
+        assertEquals("LENGTH_MEASURE", typedValue.typeName());
+        StepValue.ListValue list = (StepValue.ListValue) entity.parameters().get(5);
         assertEquals(3, list.elements().size());
     }
 
@@ -93,16 +99,19 @@ class StepParserTest {
     }
 
     @Test
-    void shouldRejectUnsupportedTypedParameterSyntax() {
+    void shouldParseComplexEntityInstance() {
         String step = """
                 DATA;
-                #1=SHAPE_REPRESENTATION_RELATIONSHIP('A',B_SOMETHING(#2));
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
                 ENDSEC;
                 """;
 
-        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
+        StepEntityInstance instance = StepParser.parse(step).entities().getFirst();
 
-        assertTrue(exception.getMessage().startsWith("typed parameters are unsupported at position "));
+        assertTrue(instance.isComplex());
+        assertEquals(2, instance.definitions().size());
+        assertTrue(instance.hasDefinition("GEOMETRIC_REPRESENTATION_CONTEXT"));
+        assertTrue(instance.hasDefinition("REPRESENTATION_CONTEXT"));
     }
 
     @Test

@@ -17,8 +17,7 @@ public record StepAdvancedFace(
         List<StepFaceBound> bounds,
         StepEntity faceGeometry,
         boolean sameSense
-) implements StepEntity {
-
+) implements StepFaceEntity {
     /**
      * Creates an immutable advanced-face record.
      */

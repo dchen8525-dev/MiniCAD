@@ -1,0 +1,16 @@
+package com.minicad.step.model;
+
+/**
+ * Minimal surface style usage.
+ *
+ * @param id STEP instance id
+ * @param side side enum
+ * @param style referenced side style
+ */
+public record StepSurfaceStyleUsage(int id, String side, StepSurfaceSideStyle style) implements StepEntity {
+
+    @Override
+    public String name() {
+        return side;
+    }
+}

@@ -9,18 +9,32 @@ import java.util.Map;
 /**
  * Parsed STEP DATA section represented as raw entity instances.
  *
+ * @param headerEntries optional HEADER section entries
  * @param entities entities in source order
  */
-public record StepFile(List<StepEntityInstance> entities) {
+public record StepFile(List<StepHeaderEntry> headerEntries, List<StepEntityInstance> entities) {
+
+    public StepFile(List<StepEntityInstance> entities) {
+        this(List.of(), entities);
+    }
 
     /**
      * Creates an immutable STEP file representation.
      */
     public StepFile {
+        if (headerEntries == null) {
+            throw new StepParseException("header entries must not be null");
+        }
         if (entities == null) {
             throw new StepParseException("entities must not be null");
         }
+        headerEntries = List.copyOf(headerEntries);
         entities = List.copyOf(entities);
+        for (StepHeaderEntry headerEntry : headerEntries) {
+            if (headerEntry == null) {
+                throw new StepParseException("header entries must not contain null");
+            }
+        }
         for (StepEntityInstance entity : entities) {
             if (entity == null) {
                 throw new StepParseException("entities must not contain null");

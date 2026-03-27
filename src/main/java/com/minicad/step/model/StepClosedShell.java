@@ -9,7 +9,7 @@ import java.util.List;
  * @param name step label
  * @param faces shell faces
  */
-public record StepClosedShell(int id, String name, List<StepAdvancedFace> faces) implements StepEntity {
+public record StepClosedShell(int id, String name, List<StepFaceEntity> faces) implements StepEntity {
 
     /**
      * Creates an immutable shell record.

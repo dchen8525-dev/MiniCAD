@@ -9,6 +9,6 @@ package com.minicad.step.model;
  * @param orientation orientation flag
  * @param outer whether this is the outer bound
  */
-public record StepFaceBound(int id, String name, StepEdgeLoop loop, boolean orientation, boolean outer)
+public record StepFaceBound(int id, String name, StepLoop loop, boolean orientation, boolean outer)
         implements StepEntity {
 }

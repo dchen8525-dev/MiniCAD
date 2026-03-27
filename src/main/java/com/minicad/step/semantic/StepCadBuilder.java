@@ -3,40 +3,67 @@ package com.minicad.step.semantic;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
+import com.minicad.geometry.BSplineCurve3;
+import com.minicad.geometry.BSplineSurface3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
+import com.minicad.geometry.ConicalSurface;
 import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
+import com.minicad.geometry.Ellipse3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.Plane;
+import com.minicad.geometry.SurfaceCurve3;
+import com.minicad.geometry.TrimmedCurve3;
+import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
+import com.minicad.geometry2d.Direction2;
+import com.minicad.geometry2d.BSplineCurve2;
+import com.minicad.geometry2d.Line2;
+import com.minicad.geometry2d.Point2;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepBSplineCurveWithKnots;
+import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepEllipse;
+import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.StepFaceBound;
+import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepOpenShell;
 import com.minicad.step.model.StepOrientedEdge;
+import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepPlane;
+import com.minicad.step.model.StepPcurve;
+import com.minicad.step.model.StepSeamCurve;
+import com.minicad.step.model.StepSurfaceCurve;
+import com.minicad.step.model.StepTrimmedCurve;
+import com.minicad.step.model.StepToroidalSurface;
+import com.minicad.step.model.StepVertexLoop;
 import com.minicad.step.model.StepVertexPoint;
 import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
 import com.minicad.topology.Face;
 import com.minicad.topology.FaceBound;
+import com.minicad.topology.Loop;
 import com.minicad.topology.OrientedEdge;
 import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 import com.minicad.topology.Vertex;
+import com.minicad.topology.VertexLoop;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +78,26 @@ public final class StepCadBuilder {
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
     private final Map<Integer, Axis2Placement3D> placements = new LinkedHashMap<>();
+    private final Map<Integer, Point2> points2d = new LinkedHashMap<>();
+    private final Map<Integer, Direction2> directions2d = new LinkedHashMap<>();
+    private final Map<Integer, Line2> lines2d = new LinkedHashMap<>();
+    private final Map<Integer, BSplineCurve2> splineCurves2d = new LinkedHashMap<>();
     private final Map<Integer, Line3> lines = new LinkedHashMap<>();
     private final Map<Integer, Plane> planes = new LinkedHashMap<>();
     private final Map<Integer, Circle> circles = new LinkedHashMap<>();
+    private final Map<Integer, Ellipse3> ellipses = new LinkedHashMap<>();
     private final Map<Integer, CylindricalSurface> cylindricalSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, ConicalSurface> conicalSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, ToroidalSurface> toroidalSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, BSplineCurve3> bsplineCurves = new LinkedHashMap<>();
+    private final Map<Integer, BSplineSurface3> bsplineSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, SurfaceCurve3> surfaceCurves = new LinkedHashMap<>();
+    private final Map<Integer, TrimmedCurve3> trimmedCurves = new LinkedHashMap<>();
     private final Map<Integer, Vertex> vertices = new LinkedHashMap<>();
     private final Map<Integer, Edge> edges = new LinkedHashMap<>();
     private final Map<Integer, OrientedEdge> orientedEdges = new LinkedHashMap<>();
     private final Map<Integer, EdgeLoop> loops = new LinkedHashMap<>();
+    private final Map<Integer, VertexLoop> vertexLoops = new LinkedHashMap<>();
     private final Map<Integer, FaceBound> faceBounds = new LinkedHashMap<>();
     private final Map<Integer, Face> faces = new LinkedHashMap<>();
     private final Map<Integer, Shell> shells = new LinkedHashMap<>();
@@ -99,6 +138,20 @@ public final class StepCadBuilder {
         return built;
     }
 
+    public Point2 buildPoint2(int id) {
+        Point2 existing = points2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCartesianPoint point = requireEntity(id, StepCartesianPoint.class, "CARTESIAN_POINT");
+        if (point.coordinates().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D CARTESIAN_POINT");
+        }
+        Point2 built = new Point2(point.coordinates().get(0), point.coordinates().get(1));
+        points2d.put(id, built);
+        return built;
+    }
+
     /**
      * Builds a direction.
      *
@@ -111,12 +164,32 @@ public final class StepCadBuilder {
             return existing;
         }
         StepDirection direction = requireEntity(id, StepDirection.class, "DIRECTION");
+        if (direction.directionRatios().size() != 3) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D DIRECTION");
+        }
         Direction3 built = Direction3.from(new Vector3(
                 direction.directionRatios().get(0),
                 direction.directionRatios().get(1),
                 direction.directionRatios().get(2)
         ));
         directions.put(id, built);
+        return built;
+    }
+
+    public Direction2 buildDirection2(int id) {
+        Direction2 existing = directions2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepDirection direction = requireEntity(id, StepDirection.class, "DIRECTION");
+        if (direction.directionRatios().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D DIRECTION");
+        }
+        Direction2 built = Direction2.from(new com.minicad.geometry2d.Vector2(
+                direction.directionRatios().get(0),
+                direction.directionRatios().get(1)
+        ));
+        directions2d.put(id, built);
         return built;
     }
 
@@ -178,6 +251,58 @@ public final class StepCadBuilder {
         return built;
     }
 
+    public Line2 buildLine2(int id) {
+        Line2 existing = lines2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepLine line = requireEntity(id, StepLine.class, "LINE");
+        if (line.point().coordinates().size() != 2 || line.vector().orientation().directionRatios().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D LINE");
+        }
+        Line2 built = new Line2(
+                buildPoint2(line.point().id()),
+                buildDirection2(line.vector().orientation().id())
+        );
+        lines2d.put(id, built);
+        return built;
+    }
+
+    public Object buildPcurve2(int id) {
+        StepPcurve pcurve = requireEntity(id, StepPcurve.class, "PCURVE");
+        StepEntity item = pcurve.referenceToCurve().items().getFirst();
+        if (item instanceof StepLine line) {
+            return buildLine2(line.id());
+        }
+        if (item instanceof StepBSplineCurveWithKnots spline) {
+            return buildBSplineCurve2(spline.id());
+        }
+        throw new UnsupportedGeometryException("PCURVE currently supports 2D LINE or B_SPLINE_CURVE_WITH_KNOTS");
+    }
+
+    public BSplineCurve2 buildBSplineCurve2(int id) {
+        BSplineCurve2 existing = splineCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineCurveWithKnots spline = requireEntity(id, StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS");
+        List<Point2> controlPoints = new ArrayList<>(spline.controlPoints().size());
+        for (StepCartesianPoint point : spline.controlPoints()) {
+            if (point.coordinates().size() != 2) {
+                throw new UnsupportedGeometryException("B_SPLINE_CURVE_WITH_KNOTS is not a 2D spline");
+            }
+            controlPoints.add(buildPoint2(point.id()));
+        }
+        BSplineCurve2 built = new BSplineCurve2(
+                spline.degree(),
+                controlPoints,
+                spline.knotMultiplicities(),
+                spline.knots()
+        );
+        splineCurves2d.put(id, built);
+        return built;
+    }
+
     /**
      * Builds a plane.
      *
@@ -214,6 +339,23 @@ public final class StepCadBuilder {
     }
 
     /**
+     * Builds an ellipse geometry object.
+     *
+     * @param id STEP entity id
+     * @return built ellipse
+     */
+    public Ellipse3 buildEllipse(int id) {
+        Ellipse3 existing = ellipses.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
+        Ellipse3 built = new Ellipse3(buildPlacement(ellipse.position().id()), ellipse.semiAxis1(), ellipse.semiAxis2());
+        ellipses.put(id, built);
+        return built;
+    }
+
+    /**
      * Builds a cylindrical surface geometry object.
      *
      * @param id STEP entity id
@@ -228,6 +370,153 @@ public final class StepCadBuilder {
         CylindricalSurface built = new CylindricalSurface(buildPlacement(surface.position().id()), surface.radius());
         cylindricalSurfaces.put(id, built);
         return built;
+    }
+
+    /**
+     * Builds a conical surface geometry object.
+     *
+     * @param id STEP entity id
+     * @return built conical surface
+     */
+    public ConicalSurface buildConicalSurface(int id) {
+        ConicalSurface existing = conicalSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepConicalSurface surface = requireEntity(id, StepConicalSurface.class, "CONICAL_SURFACE");
+        ConicalSurface built = new ConicalSurface(buildPlacement(surface.position().id()), surface.radius(), surface.semiAngle());
+        conicalSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a toroidal surface geometry object.
+     *
+     * @param id STEP entity id
+     * @return built toroidal surface
+     */
+    public ToroidalSurface buildToroidalSurface(int id) {
+        ToroidalSurface existing = toroidalSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepToroidalSurface surface = requireEntity(id, StepToroidalSurface.class, "TOROIDAL_SURFACE");
+        ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.position().id()), surface.majorRadius(), surface.minorRadius());
+        toroidalSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a B-spline curve geometry object.
+     *
+     * @param id STEP entity id
+     * @return built B-spline curve
+     */
+    public BSplineCurve3 buildBSplineCurve(int id) {
+        BSplineCurve3 existing = bsplineCurves.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineCurveWithKnots spline = requireEntity(id, StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS");
+        List<CartesianPoint> controlPoints = spline.controlPoints().stream().map(point -> buildPoint(point.id())).toList();
+        BSplineCurve3 built = new BSplineCurve3(spline.degree(), controlPoints, spline.knotMultiplicities(), spline.knots());
+        bsplineCurves.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a B-spline surface geometry object.
+     *
+     * @param id STEP entity id
+     * @return built B-spline surface
+     */
+    public BSplineSurface3 buildBSplineSurface(int id) {
+        BSplineSurface3 existing = bsplineSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineSurfaceWithKnots surface = requireEntity(id, StepBSplineSurfaceWithKnots.class, "B_SPLINE_SURFACE_WITH_KNOTS");
+        List<List<CartesianPoint>> controlPoints = surface.controlPoints().stream()
+                .map(row -> row.stream().map(point -> buildPoint(point.id())).toList())
+                .toList();
+        BSplineSurface3 built = new BSplineSurface3(
+                surface.uDegree(),
+                surface.vDegree(),
+                controlPoints,
+                surface.uMultiplicities(),
+                surface.vMultiplicities(),
+                surface.uKnots(),
+                surface.vKnots()
+        );
+        bsplineSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a trimmed curve backed by a supported basis curve.
+     *
+     * @param id STEP entity id
+     * @return built trimmed curve
+     */
+    public TrimmedCurve3 buildTrimmedCurve(int id) {
+        TrimmedCurve3 existing = trimmedCurves.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
+        Curve3 basis = switch (trimmedCurve.basisCurve()) {
+            case StepLine line -> buildLine(line.id());
+            case StepCircle circle -> buildCircle(circle.id());
+            case StepEllipse ellipse -> buildEllipse(ellipse.id());
+            case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
+            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            default -> throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve requires LINE, CIRCLE, ELLIPSE, SURFACE_CURVE or B_SPLINE_CURVE_WITH_KNOTS");
+        };
+        for (StepEntity trim : trimmedCurve.trim1()) {
+            validateTrimPoint(trim, basis, "trim_1");
+        }
+        for (StepEntity trim : trimmedCurve.trim2()) {
+            validateTrimPoint(trim, basis, "trim_2");
+        }
+        TrimmedCurve3 built = new TrimmedCurve3(basis);
+        trimmedCurves.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a surface curve backed by a supported 3D curve.
+     *
+     * @param id STEP entity id
+     * @return built surface curve
+     */
+    public SurfaceCurve3 buildSurfaceCurve(int id) {
+        SurfaceCurve3 existing = surfaceCurves.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepSurfaceCurve surfaceCurve = requireEntity(id, StepSurfaceCurve.class, "SURFACE_CURVE");
+        Curve3 curve3d = switch (surfaceCurve.curve3d()) {
+            case StepLine line -> buildLine(line.id());
+            case StepCircle circle -> buildCircle(circle.id());
+            case StepEllipse ellipse -> buildEllipse(ellipse.id());
+            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            default -> throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d requires LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
+        };
+        SurfaceCurve3 built = new SurfaceCurve3(curve3d);
+        surfaceCurves.put(id, built);
+        return built;
+    }
+
+    public SurfaceCurve3 buildSeamCurve(int id) {
+        StepSeamCurve seamCurve = requireEntity(id, StepSeamCurve.class, "SEAM_CURVE");
+        Curve3 curve3d = switch (seamCurve.curve3d()) {
+            case StepLine line -> buildLine(line.id());
+            case StepCircle circle -> buildCircle(circle.id());
+            case StepEllipse ellipse -> buildEllipse(ellipse.id());
+            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            default -> throw new UnsupportedGeometryException("SEAM_CURVE curve_3d requires LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
+        };
+        return new SurfaceCurve3(curve3d);
     }
 
     /**
@@ -262,7 +551,12 @@ public final class StepCadBuilder {
         Curve3 curve = switch (edgeCurve.edgeGeometry()) {
             case StepLine line -> buildLine(line.id());
             case StepCircle circle -> buildCircle(circle.id());
-            default -> throw new UnsupportedGeometryException("EDGE_CURVE topology requires LINE or CIRCLE geometry");
+            case StepEllipse ellipse -> buildEllipse(ellipse.id());
+            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
+            case StepSeamCurve seamCurve -> buildSeamCurve(seamCurve.id());
+            case StepTrimmedCurve trimmedCurve -> buildTrimmedCurve(trimmedCurve.id());
+            default -> throw new UnsupportedGeometryException("EDGE_CURVE topology requires LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE geometry");
         };
         Edge built = new Edge(
                 buildVertex(edgeCurve.start().id()),
@@ -309,6 +603,23 @@ public final class StepCadBuilder {
     }
 
     /**
+     * Builds a vertex loop.
+     *
+     * @param id STEP entity id
+     * @return built vertex loop
+     */
+    public VertexLoop buildVertexLoop(int id) {
+        VertexLoop existing = vertexLoops.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepVertexLoop loop = requireEntity(id, StepVertexLoop.class, "VERTEX_LOOP");
+        VertexLoop built = new VertexLoop(buildVertex(loop.loopVertex().id()));
+        vertexLoops.put(id, built);
+        return built;
+    }
+
+    /**
      * Builds a face bound.
      *
      * @param id STEP entity id
@@ -320,9 +631,14 @@ public final class StepCadBuilder {
             return existing;
         }
         StepFaceBound stepFaceBound = requireEntity(id, StepFaceBound.class, "FACE_BOUND");
+        Loop builtLoop = switch (stepFaceBound.loop()) {
+            case StepEdgeLoop edgeLoop -> buildEdgeLoop(edgeLoop.id());
+            case StepVertexLoop vertexLoop -> buildVertexLoop(vertexLoop.id());
+            default -> throw new UnsupportedGeometryException("FACE_BOUND construction requires EDGE_LOOP or VERTEX_LOOP");
+        };
         FaceBound built = stepFaceBound.outer()
-                ? FaceBound.outer(buildEdgeLoop(stepFaceBound.loop().id()), stepFaceBound.orientation())
-                : FaceBound.inner(buildEdgeLoop(stepFaceBound.loop().id()), stepFaceBound.orientation());
+                ? FaceBound.outer(builtLoop, stepFaceBound.orientation())
+                : FaceBound.inner(builtLoop, stepFaceBound.orientation());
         faceBounds.put(id, built);
         return built;
     }
@@ -338,18 +654,49 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepAdvancedFace stepFace = requireEntity(id, StepAdvancedFace.class, "ADVANCED_FACE");
-        if (!(stepFace.faceGeometry() instanceof StepPlane plane)) {
-            if (stepFace.faceGeometry() instanceof StepCylindricalSurface cylindricalSurface) {
-                buildCylindricalSurface(cylindricalSurface.id());
-                throw new UnsupportedGeometryException("ADVANCED_FACE construction for CYLINDRICAL_SURFACE is unsupported");
-            }
-            throw new UnsupportedGeometryException("ADVANCED_FACE construction requires PLANE geometry");
+        StepEntity entity = requireExistingEntity(id);
+        Face built;
+        if (entity instanceof StepOrientedFace orientedFace) {
+            Face baseFace = buildFace(orientedFace.faceElement().id());
+            built = new Face(
+                    baseFace.surface(),
+                    baseFace.bounds(),
+                    orientedFace.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
+            );
+        } else if (entity instanceof StepAdvancedFace advancedFace) {
+            built = buildFaceSurface(advancedFace, "ADVANCED_FACE");
+        } else if (entity instanceof StepFaceSurface faceSurface) {
+            built = buildFaceSurface(faceSurface, "FACE_SURFACE");
+        } else {
+            throw new StepResolutionException("entity #" + id + " is not a FACE");
         }
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();
-        Face built = new Face(buildPlane(plane.id()), bounds, stepFace.sameSense());
         faces.put(id, built);
         return built;
+    }
+
+    private Face buildFaceSurface(StepFaceEntity stepFace, String faceType) {
+        StepEntity geometry = faceGeometry(stepFace);
+        if (!(geometry instanceof StepPlane plane)) {
+            if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
+                buildCylindricalSurface(cylindricalSurface.id());
+                throw new UnsupportedGeometryException(faceType + " construction for CYLINDRICAL_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepConicalSurface conicalSurface) {
+                buildConicalSurface(conicalSurface.id());
+                throw new UnsupportedGeometryException(faceType + " construction for CONICAL_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+                buildBSplineSurface(splineSurface.id());
+                throw new UnsupportedGeometryException(faceType + " construction for B_SPLINE_SURFACE_WITH_KNOTS is unsupported");
+            }
+            if (geometry instanceof StepToroidalSurface toroidalSurface) {
+                buildToroidalSurface(toroidalSurface.id());
+                throw new UnsupportedGeometryException(faceType + " construction for TOROIDAL_SURFACE is unsupported");
+            }
+            throw new UnsupportedGeometryException(faceType + " construction requires PLANE geometry");
+        }
+        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();
+        return new Face(buildPlane(plane.id()), bounds, faceSameSense(stepFace));
     }
 
     /**
@@ -407,5 +754,46 @@ public final class StepCadBuilder {
             throw new StepResolutionException("entity #" + id + " is not a " + expectedName);
         }
         return type.cast(entity);
+    }
+
+    private static StepEntity faceGeometry(StepFaceEntity stepFace) {
+        if (stepFace instanceof StepAdvancedFace advancedFace) {
+            return advancedFace.faceGeometry();
+        }
+        if (stepFace instanceof StepFaceSurface faceSurface) {
+            return faceSurface.faceGeometry();
+        }
+        if (stepFace instanceof StepOrientedFace orientedFace) {
+            return faceGeometry(orientedFace.faceElement());
+        }
+        throw new UnsupportedGeometryException("unsupported face subtype");
+    }
+
+    private static boolean faceSameSense(StepFaceEntity stepFace) {
+        if (stepFace instanceof StepAdvancedFace advancedFace) {
+            return advancedFace.sameSense();
+        }
+        if (stepFace instanceof StepFaceSurface faceSurface) {
+            return faceSurface.sameSense();
+        }
+        if (stepFace instanceof StepOrientedFace orientedFace) {
+            boolean base = faceSameSense(orientedFace.faceElement());
+            return orientedFace.orientation() ? base : !base;
+        }
+        throw new UnsupportedGeometryException("unsupported face subtype");
+    }
+
+    private static void validateTrimPoint(StepEntity trim, Curve3 basis, String slot) {
+        if (!(trim instanceof StepCartesianPoint point)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
+        }
+        CartesianPoint trimPoint = new CartesianPoint(
+                point.coordinates().get(0),
+                point.coordinates().get(1),
+                point.coordinates().get(2)
+        );
+        if (!basis.contains(trimPoint)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must lie on basis curve");
+        }
     }
 }

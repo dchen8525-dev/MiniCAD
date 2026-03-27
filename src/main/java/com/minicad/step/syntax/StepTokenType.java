@@ -11,6 +11,7 @@ public enum StepTokenType {
     COMMA,
     SEMICOLON,
     DOLLAR,
+    STAR,
     INTEGER,
     NUMBER,
     IDENTIFIER,

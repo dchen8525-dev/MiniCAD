@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @param id step id
  * @param name step label
- * @param coordinates 3D coordinates
+ * @param coordinates 2D or 3D coordinates
  */
 public record StepCartesianPoint(int id, String name, List<Double> coordinates) implements StepEntity {
 

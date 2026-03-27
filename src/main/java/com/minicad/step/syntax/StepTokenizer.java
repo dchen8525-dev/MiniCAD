@@ -39,6 +39,7 @@ public final class StepTokenizer {
             case ',' -> single(StepTokenType.COMMA);
             case ';' -> single(StepTokenType.SEMICOLON);
             case '$' -> single(StepTokenType.DOLLAR);
+            case '*' -> single(StepTokenType.STAR);
             case '\'' -> stringToken();
             case '.' -> enumToken();
             default -> {

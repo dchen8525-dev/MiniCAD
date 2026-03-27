@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @param edges oriented edges in traversal order
  */
-public record EdgeLoop(List<OrientedEdge> edges) {
+public record EdgeLoop(List<OrientedEdge> edges) implements Loop {
 
     /**
      * Creates a loop and validates closure/connectivity.

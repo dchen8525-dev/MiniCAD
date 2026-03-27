@@ -37,11 +37,17 @@ public record Face(Plane surface, List<FaceBound> bounds, boolean sameSense) {
             if (bound.outer()) {
                 hasOuter = true;
             }
-            for (OrientedEdge edge : bound.loop().edges()) {
-                if (!surface.contains(edge.startVertex().point())) {
-                    throw new TopologyException("all face vertices must lie on the plane");
+            if (bound.loop() instanceof EdgeLoop edgeLoop) {
+                for (OrientedEdge edge : edgeLoop.edges()) {
+                    if (!surface.contains(edge.startVertex().point())) {
+                        throw new TopologyException("all face vertices must lie on the plane");
+                    }
+                    if (!surface.contains(edge.endVertex().point())) {
+                        throw new TopologyException("all face vertices must lie on the plane");
+                    }
                 }
-                if (!surface.contains(edge.endVertex().point())) {
+            } else if (bound.loop() instanceof VertexLoop vertexLoop) {
+                if (!surface.contains(vertexLoop.vertex().point())) {
                     throw new TopologyException("all face vertices must lie on the plane");
                 }
             }
