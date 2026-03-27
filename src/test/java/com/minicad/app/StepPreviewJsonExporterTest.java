@@ -358,6 +358,7 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"edgeCount\":3"));
         assertTrue(json.contains("\"unsupportedFaceCount\":0"));
         assertTrue(json.contains("\"triangles\":[["));
+        assertTrue(countOccurrences(json, "],[") > 120);
     }
 
     @Test
