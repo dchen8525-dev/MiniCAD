@@ -28,7 +28,8 @@ const camera = new THREE.PerspectiveCamera(55, 1, 0.01, 5000);
 camera.position.set(3.5, 2.8, 3.5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const basePixelRatio = Math.min(window.devicePixelRatio, 2.5);
+renderer.setPixelRatio(basePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.domElement.style.width = '100%';
 renderer.domElement.style.height = '100%';
@@ -147,6 +148,38 @@ const assemblyButtons = new Map();
 const stepObjects = new Map();
 let pmiLabels = [];
 let pmiVisible = true;
+let lastRenderScale = -1;
+
+function currentRenderScale() {
+    const distance = camera.position.distanceTo(controls.target);
+    if (distance <= 2.5) {
+        return 2.2;
+    }
+    if (distance <= 4.5) {
+        return 1.8;
+    }
+    if (distance <= 8.0) {
+        return 1.4;
+    }
+    return 1.0;
+}
+
+function updateRenderResolution(force = false) {
+    const width = sceneHost.clientWidth;
+    const height = sceneHost.clientHeight;
+    if (width === 0 || height === 0) {
+        return;
+    }
+    const renderScale = currentRenderScale();
+    if (!force && Math.abs(renderScale - lastRenderScale) < 0.05) {
+        return;
+    }
+    lastRenderScale = renderScale;
+    const scaledWidth = Math.max(1, Math.floor(width * renderer.getPixelRatio() * renderScale));
+    const scaledHeight = Math.max(1, Math.floor(height * renderer.getPixelRatio() * renderScale));
+    renderTarget.setSize(scaledWidth, scaledHeight);
+    postMaterial.uniforms.resolution.value.set(scaledWidth, scaledHeight);
+}
 
 function resize() {
     const width = sceneHost.clientWidth;
@@ -155,10 +188,7 @@ function resize() {
         return;
     }
     renderer.setSize(width, height, false);
-    const scaledWidth = Math.max(1, Math.floor(width * renderer.getPixelRatio()));
-    const scaledHeight = Math.max(1, Math.floor(height * renderer.getPixelRatio()));
-    renderTarget.setSize(scaledWidth, scaledHeight);
-    postMaterial.uniforms.resolution.value.set(scaledWidth, scaledHeight);
+    updateRenderResolution(true);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 }
@@ -169,6 +199,7 @@ resize();
 
 function animate() {
     controls.update();
+    updateRenderResolution();
     updatePmiOverlay();
     renderer.setRenderTarget(renderTarget);
     renderer.render(scene, camera);
