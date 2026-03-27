@@ -35,6 +35,77 @@ renderer.domElement.style.height = '100%';
 renderer.domElement.style.display = 'block';
 sceneHost.appendChild(renderer.domElement);
 
+const renderTarget = new THREE.WebGLRenderTarget(1, 1, {
+    colorSpace: THREE.SRGBColorSpace
+});
+const postScene = new THREE.Scene();
+const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const postMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        tDiffuse: { value: renderTarget.texture },
+        resolution: { value: new THREE.Vector2(1, 1) }
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec2 resolution;
+        varying vec2 vUv;
+
+        void main() {
+            vec2 inverseResolution = 1.0 / resolution;
+            vec3 rgbNW = texture2D(tDiffuse, vUv + vec2(-1.0, -1.0) * inverseResolution).rgb;
+            vec3 rgbNE = texture2D(tDiffuse, vUv + vec2(1.0, -1.0) * inverseResolution).rgb;
+            vec3 rgbSW = texture2D(tDiffuse, vUv + vec2(-1.0, 1.0) * inverseResolution).rgb;
+            vec3 rgbSE = texture2D(tDiffuse, vUv + vec2(1.0, 1.0) * inverseResolution).rgb;
+            vec3 rgbM = texture2D(tDiffuse, vUv).rgb;
+
+            vec3 luma = vec3(0.299, 0.587, 0.114);
+            float lumaNW = dot(rgbNW, luma);
+            float lumaNE = dot(rgbNE, luma);
+            float lumaSW = dot(rgbSW, luma);
+            float lumaSE = dot(rgbSE, luma);
+            float lumaM = dot(rgbM, luma);
+
+            float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+            float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+            vec2 dir;
+            dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+            dir.y = ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+
+            float dirReduce = max(
+                (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * (1.0 / 8.0)),
+                1.0 / 128.0
+            );
+            float reciprocalDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+            dir = clamp(dir * reciprocalDirMin, vec2(-8.0), vec2(8.0)) * inverseResolution;
+
+            vec3 rgbA = 0.5 * (
+                texture2D(tDiffuse, vUv + dir * (1.0 / 3.0 - 0.5)).rgb +
+                texture2D(tDiffuse, vUv + dir * (2.0 / 3.0 - 0.5)).rgb
+            );
+            vec3 rgbB = rgbA * 0.5 + 0.25 * (
+                texture2D(tDiffuse, vUv + dir * -0.5).rgb +
+                texture2D(tDiffuse, vUv + dir * 0.5).rgb
+            );
+
+            float lumaB = dot(rgbB, luma);
+            if (lumaB < lumaMin || lumaB > lumaMax) {
+                gl_FragColor = vec4(rgbA, 1.0);
+            } else {
+                gl_FragColor = vec4(rgbB, 1.0);
+            }
+        }
+    `
+});
+postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial));
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
@@ -84,6 +155,10 @@ function resize() {
         return;
     }
     renderer.setSize(width, height, false);
+    const scaledWidth = Math.max(1, Math.floor(width * renderer.getPixelRatio()));
+    const scaledHeight = Math.max(1, Math.floor(height * renderer.getPixelRatio()));
+    renderTarget.setSize(scaledWidth, scaledHeight);
+    postMaterial.uniforms.resolution.value.set(scaledWidth, scaledHeight);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 }
@@ -95,7 +170,10 @@ resize();
 function animate() {
     controls.update();
     updatePmiOverlay();
+    renderer.setRenderTarget(renderTarget);
     renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    renderer.render(postScene, postCamera);
     requestAnimationFrame(animate);
 }
 
@@ -425,7 +503,7 @@ function buildFaceMesh(face) {
 function buildEdgeObject(edge, edgeIndex) {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
-    const material = new THREE.LineBasicMaterial({ color: 0x7b5b4d, transparent: true, opacity: 0.88 });
+    const material = new THREE.LineBasicMaterial({ color: 0x9b8578, transparent: true, opacity: 0.62 });
     const object = new THREE.Line(geometry, material);
     object.userData.selection = [
         ['类型', `边 #${edgeIndex + 1}`],
@@ -434,7 +512,7 @@ function buildEdgeObject(edge, edgeIndex) {
         ['起点', formatPoint(edge.points[0])],
         ['终点', formatPoint(edge.points[edge.points.length - 1])]
     ];
-    object.userData.baseColor = 0x1b2d33;
+    object.userData.baseColor = 0x9b8578;
     object.userData.selectedColor = 0xf06d3a;
     object.userData.instanceSelectedColor = 0x537983;
     object.userData.objectSelected = false;
