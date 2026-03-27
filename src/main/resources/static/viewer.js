@@ -423,23 +423,41 @@ function buildFaceMesh(face) {
 }
 
 function buildEdgeObject(edge, edgeIndex) {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
-    const material = new THREE.LineBasicMaterial({ color: 0x1b2d33 });
-    const line = new THREE.Line(geometry, material);
-    line.userData.selection = [
+    const points = edge.points.map(toVector3);
+    let object;
+    if (points.length >= 2) {
+        const length = points.slice(1).reduce((sum, point, index) => sum + point.distanceTo(points[index]), 0);
+        const radius = Math.max(length / 320, 0.006);
+        const tubularSegments = Math.max(24, Math.min(256, points.length * 24));
+        const curvePoints = points.length >= 3 ? points : [points[0], points[0].clone().lerp(points[1], 0.5), points[1]];
+        const curve = new THREE.CatmullRomCurve3(curvePoints, false, 'centripetal');
+        const geometry = new THREE.TubeGeometry(curve, tubularSegments, radius, 10, false);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x1b2d33,
+            roughness: 0.32,
+            metalness: 0.05
+        });
+        object = new THREE.Mesh(geometry, material);
+        object.userData.edgeRenderable = true;
+    } else {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
+        const material = new THREE.LineBasicMaterial({ color: 0x1b2d33 });
+        object = new THREE.Line(geometry, material);
+    }
+    object.userData.selection = [
         ['类型', `边 #${edgeIndex + 1}`],
         ['采样点', String(edge.points.length)],
         ['线段数', String(Math.max(0, edge.points.length - 1))],
         ['起点', formatPoint(edge.points[0])],
         ['终点', formatPoint(edge.points[edge.points.length - 1])]
     ];
-    line.userData.baseColor = 0x1b2d33;
-    line.userData.selectedColor = 0xf06d3a;
-    line.userData.instanceSelectedColor = 0x537983;
-    line.userData.objectSelected = false;
-    line.userData.instanceHighlighted = false;
-    return line;
+    object.userData.baseColor = 0x1b2d33;
+    object.userData.selectedColor = 0xf06d3a;
+    object.userData.instanceSelectedColor = 0x537983;
+    object.userData.objectSelected = false;
+    object.userData.instanceHighlighted = false;
+    return object;
 }
 
 function buildEdgeObjectForInstance(edge, label) {
@@ -631,7 +649,11 @@ function refreshRenderableStyle(object) {
             : object.userData.baseColor;
     object.material.color.setHex(color);
     if (object.isMesh) {
-        object.material.opacity = object.userData.objectSelected ? 0.9 : object.userData.instanceHighlighted ? 0.78 : 0.62;
+        if (object.userData.edgeRenderable) {
+            object.material.emissive?.setHex(color);
+        } else {
+            object.material.opacity = object.userData.objectSelected ? 0.9 : object.userData.instanceHighlighted ? 0.78 : 0.62;
+        }
     }
 }
 

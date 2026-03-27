@@ -780,9 +780,9 @@ public final class StepPreviewJsonExporter {
         }
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        // Start with a denser grid so small curved patches do not show visibly faceted silhouettes.
-        int baseUSegments = Math.max(32, Math.min(128, sampleCount * 3));
-        int baseVSegments = Math.max(20, Math.min(72, sampleCount * 2));
+        // Start with a much denser grid so small curved patches keep a smoother silhouette.
+        int baseUSegments = Math.max(128, Math.min(256, sampleCount * 5));
+        int baseVSegments = Math.max(48, Math.min(128, sampleCount * 4));
         List<PointPayload> triangles = triangulateParametricFaceAdaptive(
                 mapper,
                 loops,
