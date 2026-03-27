@@ -51,17 +51,36 @@
 
 ### 几何层
 
-已支持：
+已支持的最小子集已明显扩大，当前包括：
 
-- `CartesianPoint`
-- `Vector3`
-- `Direction3`
-- `Axis2Placement3D`
-- `Curve3`
-- `Line3`
-- `Plane`
-- `Circle`
-- `CylindricalSurface`
+- 3D 基础几何：
+  - `CartesianPoint`
+  - `Vector3`
+  - `Direction3`
+  - `Axis2Placement3D`
+- 3D 曲线：
+  - `Curve3`
+  - `Line3`
+  - `Circle`
+  - `Ellipse3`
+  - `TrimmedCurve3`
+  - `SurfaceCurve3`
+  - `BSplineCurve3`
+- 3D 曲面：
+  - `Plane`
+  - `CylindricalSurface`
+  - `ConicalSurface`
+  - `ToroidalSurface`
+  - `BSplineSurface3`
+- 2D 参数域几何：
+  - `Point2`
+  - `Vector2`
+  - `Direction2`
+  - `Line2`
+  - `Circle2`
+  - `Ellipse2`
+  - `TrimmedCurve2`
+  - `BSplineCurve2`
 
 ### 拓扑层
 
@@ -71,6 +90,7 @@
 - `Edge`
 - `OrientedEdge`
 - `EdgeLoop`
+- `VertexLoop`
 - `FaceBound`
 - `Face`
 - `Shell`
@@ -80,56 +100,106 @@
 
 已支持：
 
-- `DATA; ... ENDSEC;`
+- `HEADER;` 与 `DATA; ... ENDSEC;`
 - 实体实例，例如 `#10=CARTESIAN_POINT(...);`
 - 引用 `#id`
-- 数字
-- 字符串
-- 枚举值，例如 `.T.` / `.F.`
-- 省略值 `$`
+- 数字、字符串、枚举
+- 省略值 `$` 与 omitted `*`
 - 列表 `( ... )`
+- complex entity
+- typed value，例如 `LENGTH_MEASURE(1.0)`
 
 ### STEP 语义层
 
-当前支持以下最小实体子集：
+当前支持的是一个“教学用途但已可扩展”的 AP242 基础子集，主要包括：
 
-- `CARTESIAN_POINT`
-- `DIRECTION`
-- `VECTOR`
-- `AXIS2_PLACEMENT_3D`
-- `LINE`
-- `PLANE`
-- `CIRCLE`
-- `CYLINDRICAL_SURFACE`
-- `VERTEX_POINT`
-- `EDGE_CURVE`
-- `ORIENTED_EDGE`
-- `EDGE_LOOP`
-- `FACE_BOUND`
-- `FACE_OUTER_BOUND`
-- `ADVANCED_FACE`
-- `OPEN_SHELL`
-- `CLOSED_SHELL`
-- `MANIFOLD_SOLID_BREP`
+- 基础几何 / 拓扑：
+  - `CARTESIAN_POINT`
+  - `DIRECTION`
+  - `VECTOR`
+  - `AXIS2_PLACEMENT_3D`
+  - `AXIS2_PLACEMENT_2D`
+  - `LINE`
+  - `CIRCLE`
+  - `ELLIPSE`
+  - `TRIMMED_CURVE`
+  - `B_SPLINE_CURVE_WITH_KNOTS`
+  - `SURFACE_CURVE`
+  - `SEAM_CURVE`
+  - `PCURVE`
+  - `PLANE`
+  - `CYLINDRICAL_SURFACE`
+  - `CONICAL_SURFACE`
+  - `TOROIDAL_SURFACE`
+  - `B_SPLINE_SURFACE_WITH_KNOTS`
+  - `VERTEX_POINT`
+  - `EDGE_CURVE`
+  - `ORIENTED_EDGE`
+  - `EDGE_LOOP`
+  - `VERTEX_LOOP`
+  - `FACE_BOUND`
+  - `FACE_OUTER_BOUND`
+  - `FACE_SURFACE`
+  - `ORIENTED_FACE`
+  - `ADVANCED_FACE`
+  - `OPEN_SHELL`
+  - `CLOSED_SHELL`
+  - `MANIFOLD_SOLID_BREP`
+- representation / context / unit：
+  - `REPRESENTATION`
+  - `SHAPE_REPRESENTATION`
+  - `REPRESENTATION_CONTEXT`
+  - `GEOMETRIC_REPRESENTATION_CONTEXT`
+  - `NAMED_UNIT`
+  - `SI_UNIT`
+  - `MEASURE_WITH_UNIT`
+  - `UNCERTAINTY_MEASURE_WITH_UNIT`
+  - `GLOBAL_UNIT_ASSIGNED_CONTEXT`
+  - `GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT`
+- product / assembly：
+  - `APPLICATION_CONTEXT`
+  - `PRODUCT_CONTEXT`
+  - `PRODUCT`
+  - `PRODUCT_DEFINITION_FORMATION`
+  - `PRODUCT_DEFINITION_CONTEXT`
+  - `PRODUCT_DEFINITION`
+  - `PRODUCT_DEFINITION_SHAPE`
+  - `SHAPE_DEFINITION_REPRESENTATION`
+  - `SHAPE_REPRESENTATION_RELATIONSHIP`
+  - `NEXT_ASSEMBLY_USAGE_OCCURRENCE`
+  - `CONTEXT_DEPENDENT_SHAPE_REPRESENTATION`
+  - `ITEM_DEFINED_TRANSFORMATION`
+  - `REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION`
+- metadata / presentation / PMI 最小子集：
+  - `COLOUR_RGB`
+  - `STYLED_ITEM`
+  - `PRESENTATION_STYLE_ASSIGNMENT`
+  - `PRESENTATION_LAYER_ASSIGNMENT`
+  - `ANNOTATION_TEXT_OCCURRENCE`
+  - `DRAUGHTING_CALLOUT`
+  - `MEASURE_REPRESENTATION_ITEM`
+  - `GEOMETRIC_ITEM_SPECIFIC_USAGE`
 
 ## 重要限制
 
-请特别注意，当前支持是**最小实现**，不是通用支持：
+请特别注意，当前支持虽然比最初丰富很多，但仍然是**受控子集**，不是通用工业级支持：
 
-- `AXIS2_PLACEMENT_3D` 目前要求显式提供 `axis` 和 `ref_direction`
-- `ADVANCED_FACE` 语义层目前支持 `PLANE` 和 `CYLINDRICAL_SURFACE`
-- 内部拓扑构建目前支持由 `LINE` 和 `CIRCLE` 支撑的 `EDGE_CURVE`
-- `CIRCLE` 目前支持：
-  - STEP 语义解析
-  - 内部几何对象构建
-  - 作为拓扑边进行构建
-- `CYLINDRICAL_SURFACE` 目前支持：
-  - STEP 语义解析
-  - 内部几何对象构建
-  - 作为 `ADVANCED_FACE` 的语义几何被识别
-  - 但**不支持** `ADVANCED_FACE` 构面与浏览器预览
-- `ORIENTED_EDGE` 当前只支持 `$,$,#edge,.T./.F.` 这种最小形式
-- parser 的错误位置目前是相对于提取出的 `DATA` 段，不是整文件绝对位置
+- `AXIS2_PLACEMENT_3D` / `AXIS2_PLACEMENT_2D` 仍按当前仓库需要的最小形式使用
+- `ADVANCED_FACE` 的 Web 预览已经支持：
+  - 平面面
+  - 一部分圆柱 / 圆锥 / 环面 / B-spline 曲面 patch
+  - 基于 `PCURVE` / `SEAM_CURVE` 的周期面参数域 trimming
+- 但这仍然**不是**完整曲面修剪内核，尤其不代表：
+  - 通用 `PCURVE` / `SEAM_CURVE` 全覆盖
+  - 完整 `B_SPLINE_SURFACE_WITH_KNOTS` 修剪支持
+  - 工业级稳健的 trimmed-surface kernel
+- `B_SPLINE_CURVE_WITH_KNOTS` 与 `B_SPLINE_SURFACE_WITH_KNOTS` 当前重点在解析与预览，不代表完整 CAD 几何内核支持
+- CLI 的 `Build Summary` 和浏览器 `preview` 是两条不同链路：
+  - CLI 更偏内部拓扑构型统计
+  - 浏览器更偏导出的预览三角化
+  - 某些曲面面可能“可预览”但仍不会在 CLI 中当作完整内部 face 构型
+- PMI 当前是最小 presentation / semantic 关联子集，不是完整 AP242 PMI 语义网
+- validation 当前是“原生校验项提取 + 预览几何对比”的最小 report，不是完整 validation property 框架
 
 ## 项目结构
 
@@ -196,24 +266,34 @@ http://127.0.0.1:8080
 
 - 上传 `.step` / `.stp` 文件
 - 直接粘贴 STEP 文本
-- 在页面中切换并加载 `minimal-square` 与 `plate-with-round-hole` 示例
-- 点击模型中的面或边查看基础选中信息
+- 在页面中切换并加载 `examples/` 里的大量手工样例
+- 点击模型中的面、边、装配实例或 PMI 查看信息
+- 查看 `unsupportedFaces` 明细，而不只是一个计数
 
-当前预览范围：
+当前预览范围已经包括：
 
-- 直线和圆弧 `EDGE_CURVE` 线框
-- 平面 `ADVANCED_FACE` 面片
-- 基于当前支持范围的 shell / solid 结构统计
-- 对暂不支持渲染的面返回 `unsupportedFaceCount`
+- 线和圆弧边的采样预览
+- 平面面片
+- 一部分圆柱 / 圆锥 / 环面曲面 patch
+- 一部分基于 `PCURVE` / `SEAM_CURVE` 的周期面 trimming
+- 装配实例树与实例变换
+- 颜色、图层、名称和最小 validation report
+- 最小 presentation PMI 与目标关联
+
+当前 viewer 还额外做了两类抗锯齿优化：
+
+- 更高的参数域三角化密度，减轻曲边 patch 的几何锯齿
+- 前端 FXAA + 缩放自适应超采样，减轻滚轮放大后的屏幕空间锯齿
 
 说明：
 
 - Three.js 已随项目静态资源一起提供，浏览器离线也可以打开页面
-- `CYLINDRICAL_SURFACE` 当前只做到：
-  - 语义解析
-  - 内部几何对象构建
-  - 在 CLI / Web 统计中识别并计入 unsupported face
-- 当前仍然不支持圆柱/圆锥曲面的构面或网格化、NURBS，以及复杂工业级修剪面
+- 浏览器预览现在已经不只是统计 `unsupportedFaceCount`，还会导出 `unsupportedFaces` 明细和 `reason`
+- 当前仍然不支持完整工业级的：
+  - 通用 trimmed surface kernel
+  - 全量 AP242 PMI
+  - 全量 validation property
+  - 拓扑修复 / healing
 
 ## 开发说明
 
