@@ -350,6 +350,17 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportCylindricalFaceExamplePreview() throws IOException {
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/cylindrical-face.step")));
+
+        assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""));
+        assertTrue(json.contains("\"faceCount\":1"));
+        assertTrue(json.contains("\"edgeCount\":3"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":0"));
+        assertTrue(json.contains("\"triangles\":[["));
+    }
+
+    @Test
     void shouldExportFaceSurfaceAndOrientedFacePreview() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;
