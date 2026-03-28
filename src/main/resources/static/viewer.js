@@ -820,19 +820,7 @@ function focusAssemblyInstance(instanceId, button = null) {
         refreshRenderableStyle(selectedObject);
         selectedObject = null;
     }
-    if (selectedAssemblyGroup && selectedAssemblyGroup !== group) {
-        applyAssemblyHighlight(selectedAssemblyGroup, false);
-    }
-    selectedAssemblyGroup = group;
-    applyAssemblyHighlight(group, true);
-
-    if (selectedAssemblyButton) {
-        selectedAssemblyButton.classList.remove('active');
-    }
-    selectedAssemblyButton = button ?? assemblyButtons.get(instanceId) ?? null;
-    if (selectedAssemblyButton) {
-        selectedAssemblyButton.classList.add('active');
-    }
+    activateAssemblyInstance(group, button ?? assemblyButtons.get(instanceId) ?? null);
 
     const box = new THREE.Box3().setFromObject(group);
     if (box.isEmpty()) {
@@ -867,6 +855,25 @@ function focusAssemblyInstance(instanceId, button = null) {
         ['表示', String(group.userData.representationCount ?? 0)],
         ['说明', '已定位并高亮该实例。']
     ]);
+}
+
+function activateAssemblyInstance(group, button = null) {
+    if (!group) {
+        return;
+    }
+    if (selectedAssemblyGroup && selectedAssemblyGroup !== group) {
+        applyAssemblyHighlight(selectedAssemblyGroup, false);
+    }
+    selectedAssemblyGroup = group;
+    applyAssemblyHighlight(group, true);
+
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.remove('active');
+    }
+    selectedAssemblyButton = button ?? assemblyButtons.get(group.userData.instanceId) ?? null;
+    if (selectedAssemblyButton) {
+        selectedAssemblyButton.classList.add('active');
+    }
 }
 
 function formatPoint(point) {
@@ -987,7 +994,10 @@ function selectRenderable(object) {
     }
     selectedObject = object;
     if (selectedObject.userData.instanceId) {
-        focusAssemblyInstance(selectedObject.userData.instanceId, assemblyButtons.get(selectedObject.userData.instanceId));
+        activateAssemblyInstance(
+            assemblyGroups.get(selectedObject.userData.instanceId),
+            assemblyButtons.get(selectedObject.userData.instanceId)
+        );
     }
     selectedObject.userData.objectSelected = true;
     refreshRenderableStyle(selectedObject);
