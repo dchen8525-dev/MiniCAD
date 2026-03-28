@@ -803,8 +803,17 @@ function renderAssemblyTree(instances) {
 function focusAssemblyInstance(instanceId, button = null) {
     const group = assemblyGroups.get(instanceId);
     if (!group) {
+        logJson('focusAssemblyInstance:missing-group', { instanceId });
         return;
     }
+
+    logJson('focusAssemblyInstance:start', {
+        instanceId,
+        triggeredByButton: Boolean(button),
+        cameraPosition: camera.position.toArray(),
+        controlsTarget: controls.target.toArray(),
+        selectedObjectStepId: selectedObject?.userData?.stepId ?? null
+    });
 
     if (selectedObject) {
         selectedObject.userData.objectSelected = false;
@@ -839,6 +848,16 @@ function focusAssemblyInstance(instanceId, button = null) {
     camera.far = Math.max(radius * 40, 100);
     camera.updateProjectionMatrix();
     controls.update();
+
+    logJson('focusAssemblyInstance:done', {
+        instanceId,
+        triggeredByButton: Boolean(button),
+        bounds: boxToLog(box),
+        center: center.toArray(),
+        radius,
+        cameraPosition: camera.position.toArray(),
+        controlsTarget: controls.target.toArray()
+    });
 
     setSelection([
         ['类型', '装配实例'],
@@ -952,8 +971,16 @@ function registerStepObject(stepId, object) {
 
 function selectRenderable(object) {
     if (!object) {
+        logJson('selectRenderable:null-object', {});
         return;
     }
+    logJson('selectRenderable:start', {
+        stepId: object.userData?.stepId ?? null,
+        instanceId: object.userData?.instanceId ?? null,
+        objectType: object.type,
+        cameraPosition: camera.position.toArray(),
+        controlsTarget: controls.target.toArray()
+    });
     if (selectedObject && selectedObject !== object) {
         selectedObject.userData.objectSelected = false;
         refreshRenderableStyle(selectedObject);
@@ -966,6 +993,13 @@ function selectRenderable(object) {
     refreshRenderableStyle(selectedObject);
     setSelection(selectedObject.userData.selection);
     syncPmiTargetHighlight();
+    logJson('selectRenderable:done', {
+        stepId: selectedObject.userData?.stepId ?? null,
+        instanceId: selectedObject.userData?.instanceId ?? null,
+        objectType: selectedObject.type,
+        cameraPosition: camera.position.toArray(),
+        controlsTarget: controls.target.toArray()
+    });
 }
 
 function setGroupVisibility(group, visible) {
@@ -1442,6 +1476,7 @@ fileInput.addEventListener('change', async (event) => {
 
 renderer.domElement.addEventListener('click', (event) => {
     if (interactiveObjects.length === 0) {
+        logJson('canvasClick:no-interactive-objects', {});
         return;
     }
 
@@ -1450,7 +1485,26 @@ renderer.domElement.addEventListener('click', (event) => {
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
 
+    logJson('canvasClick:start', {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        pointer: { x: pointer.x, y: pointer.y },
+        cameraPosition: camera.position.toArray(),
+        controlsTarget: controls.target.toArray(),
+        interactiveObjects: interactiveObjects.length
+    });
+
     const hits = raycaster.intersectObjects(interactiveObjects, false);
+    logJson('canvasClick:hits', {
+        hitCount: hits.length,
+        hits: hits.slice(0, 5).map((hit) => ({
+            distance: hit.distance,
+            point: hit.point.toArray(),
+            objectType: hit.object.type,
+            stepId: hit.object.userData?.stepId ?? null,
+            instanceId: hit.object.userData?.instanceId ?? null
+        }))
+    });
     if (selectedObject) {
         selectedObject.userData.objectSelected = false;
         refreshRenderableStyle(selectedObject);
@@ -1458,6 +1512,10 @@ renderer.domElement.addEventListener('click', (event) => {
     }
 
     if (hits.length === 0) {
+        logJson('canvasClick:no-hit', {
+            cameraPosition: camera.position.toArray(),
+            controlsTarget: controls.target.toArray()
+        });
         setSelection([
             ['类型', '未选中'],
             ['说明', '点击右侧模型中的面或边查看详情。']
@@ -1465,6 +1523,11 @@ renderer.domElement.addEventListener('click', (event) => {
         return;
     }
 
+    logJson('canvasClick:selecting-hit', {
+        stepId: hits[0].object.userData?.stepId ?? null,
+        instanceId: hits[0].object.userData?.instanceId ?? null,
+        objectType: hits[0].object.type
+    });
     selectRenderable(hits[0].object);
     syncPmiTargetHighlight();
 });
