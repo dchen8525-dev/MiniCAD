@@ -1,3 +1,9 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('MiniCAD cylindrical face example'),'2;1');
+FILE_NAME('cylindrical-face.step','2026-03-28T00:00:00',('MiniCAD'),('MiniCAD'),'Codex','MiniCAD','');
+FILE_SCHEMA(('AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF'));
+ENDSEC;
 DATA;
 #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
 #2=DIRECTION('DZ',(0.0,0.0,1.0));
@@ -57,3 +63,4 @@ DATA;
 #82=ADVANCED_FACE('F0',(#81),#5,.T.);
 #83=OPEN_SHELL('OS',(#82));
 ENDSEC;
+END-ISO-10303-21;

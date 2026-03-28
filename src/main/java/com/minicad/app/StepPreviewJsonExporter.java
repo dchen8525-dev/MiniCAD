@@ -780,9 +780,16 @@ public final class StepPreviewJsonExporter {
         }
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        // Start with a much denser grid so small curved patches keep a smoother silhouette.
-        int baseUSegments = Math.max(128, Math.min(256, sampleCount * 5));
-        int baseVSegments = Math.max(48, Math.min(128, sampleCount * 4));
+        // Keep small curved patches denser from the start so zoomed silhouettes stay smoother.
+        int baseUSegments = Math.max(160, Math.min(320, sampleCount * 6));
+        int baseVSegments = Math.max(64, Math.min(160, sampleCount * 5));
+        if (geometry instanceof StepCylindricalSurface) {
+            baseUSegments = Math.max(baseUSegments, 320);
+            baseVSegments = Math.max(baseVSegments, 96);
+        } else if (geometry instanceof StepConicalSurface || geometry instanceof StepToroidalSurface) {
+            baseUSegments = Math.max(baseUSegments, 256);
+            baseVSegments = Math.max(baseVSegments, 96);
+        }
         List<PointPayload> triangles = triangulateParametricFaceAdaptive(
                 mapper,
                 loops,
@@ -1450,15 +1457,19 @@ public final class StepPreviewJsonExporter {
     ) {
         int uSegments = baseUSegments;
         int vSegments = baseVSegments;
+        List<PointPayload> best = List.of();
         for (int attempt = 0; attempt < 4; attempt++) {
             List<PointPayload> triangles = triangulateParametricFace(mapper, loops, bounds, uSegments, vSegments, sameSense);
             if (!triangles.isEmpty()) {
-                return triangles;
+                best = triangles;
             }
-            uSegments = Math.min(uSegments * 2, 288);
-            vSegments = Math.min(vSegments * 2, 192);
+            if (uSegments >= 512 && vSegments >= 256) {
+                break;
+            }
+            uSegments = Math.min(uSegments * 2, 512);
+            vSegments = Math.min(vSegments * 2, 256);
         }
-        return List.of();
+        return best;
     }
 
     private static boolean contains(List<UvPoint> polygon, UvPoint point) {
