@@ -149,6 +149,23 @@ const stepObjects = new Map();
 let pmiLabels = [];
 let pmiVisible = true;
 let lastRenderScale = -1;
+const viewerLogPrefix = '[MiniCAD Viewer]';
+
+function logDebug(message, ...args) {
+    console.debug(viewerLogPrefix, message, ...args);
+}
+
+function logInfo(message, ...args) {
+    console.info(viewerLogPrefix, message, ...args);
+}
+
+function logWarn(message, ...args) {
+    console.warn(viewerLogPrefix, message, ...args);
+}
+
+function logError(message, ...args) {
+    console.error(viewerLogPrefix, message, ...args);
+}
 
 function currentRenderScale() {
     const distance = camera.position.distanceTo(controls.target);
@@ -338,6 +355,12 @@ function selectUnsupportedFace(face, button) {
 }
 
 function clearModel() {
+    logDebug('clearModel', {
+        modelChildren: modelRoot.children.length,
+        pmiChildren: pmiRoot.children.length,
+        interactiveObjects: interactiveObjects.length,
+        pmiLabels: pmiLabels.length
+    });
     while (modelRoot.children.length > 0) {
         const child = modelRoot.children[0];
         modelRoot.remove(child);
@@ -440,6 +463,13 @@ function signedArea(points) {
 }
 
 function buildFaceMesh(face) {
+    logDebug('buildFaceMesh:start', {
+        id: face?.id,
+        name: face?.name,
+        surfaceType: face?.surfaceType,
+        triangleCount: Array.isArray(face?.triangles) ? face.triangles.length : 0,
+        loopCount: Array.isArray(face?.loops) ? face.loops.length : 0
+    });
     const color = Array.isArray(face.color) ? new THREE.Color(face.color[0] / 255, face.color[1] / 255, face.color[2] / 255) : new THREE.Color(0xc87a52);
     if (Array.isArray(face.triangles) && face.triangles.length >= 3) {
         const geometry = new THREE.BufferGeometry();
@@ -455,11 +485,19 @@ function buildFaceMesh(face) {
             metalness: 0.08
         });
 
+        logDebug('buildFaceMesh:triangles', {
+            id: face.id,
+            vertices: face.triangles.length
+        });
         return new THREE.Mesh(geometry, material);
     }
 
     const outerLoop = face.loops.find((loop) => loop.outer);
     if (!outerLoop || outerLoop.points.length < 3) {
+        logWarn('buildFaceMesh:missing-outer-loop', {
+            id: face?.id,
+            outerLoopPoints: outerLoop?.points?.length ?? 0
+        });
         return null;
     }
 
@@ -467,6 +505,11 @@ function buildFaceMesh(face) {
     const outerPoints3D = normalizeLoop(outerLoop.points.map(toVector3));
     const outerProjection = projectFace(outerPoints3D, normal);
     if (!outerProjection) {
+        logWarn('buildFaceMesh:projection-failed', {
+            id: face?.id,
+            outerPoints: outerPoints3D.length,
+            normal: face?.normal
+        });
         return null;
     }
 
@@ -504,6 +547,11 @@ function buildFaceMesh(face) {
     const allVertices3D = contour3D.concat(...holes3D);
     const triangles = THREE.ShapeUtils.triangulateShape(contour2D, holes2D);
     if (triangles.length === 0) {
+        logWarn('buildFaceMesh:triangulation-empty', {
+            id: face?.id,
+            contourPoints: contour2D.length,
+            holeCount: holes2D.length
+        });
         return null;
     }
 
@@ -528,10 +576,19 @@ function buildFaceMesh(face) {
         metalness: 0.08
     });
 
+    logDebug('buildFaceMesh:shape-utils', {
+        id: face.id,
+        triangleCount: triangles.length
+    });
     return new THREE.Mesh(geometry, material);
 }
 
 function buildEdgeObject(edge, edgeIndex) {
+    logDebug('buildEdgeObject', {
+        id: edge?.id,
+        edgeIndex,
+        pointCount: Array.isArray(edge?.points) ? edge.points.length : 0
+    });
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
     const material = new THREE.LineBasicMaterial({ color: 0x9b8578, transparent: true, opacity: 0.62 });
@@ -855,6 +912,7 @@ function applyAssemblyHighlight(group, selected) {
 }
 
 function fitCamera(bounds) {
+    logDebug('fitCamera:start', bounds);
     const min = toVector3(bounds.min);
     const max = toVector3(bounds.max);
     const center = min.clone().add(max).multiplyScalar(0.5);
@@ -867,23 +925,44 @@ function fitCamera(bounds) {
     camera.far = Math.max(radius * 40, 100);
     camera.updateProjectionMatrix();
     controls.update();
+    logInfo('fitCamera:done', {
+        center: center.toArray(),
+        radius,
+        near: camera.near,
+        far: camera.far,
+        position: camera.position.toArray()
+    });
 }
 
 function renderPreview(preview) {
+    logInfo('renderPreview:start', {
+        stats: preview?.stats,
+        faceCount: Array.isArray(preview?.faces) ? preview.faces.length : 0,
+        edgeCount: Array.isArray(preview?.edges) ? preview.edges.length : 0,
+        unsupportedFaceCount: Array.isArray(preview?.unsupportedFaces) ? preview.unsupportedFaces.length : 0,
+        representationCount: Array.isArray(preview?.representations) ? preview.representations.length : 0,
+        instanceCount: Array.isArray(preview?.instances) ? preview.instances.length : 0
+    });
     clearModel();
     renderPmi(preview.pmi);
     updateUnsupportedFaces(preview.unsupportedFaces);
 
     if (Array.isArray(preview.instances) && preview.instances.length > 0
         && Array.isArray(preview.representations) && preview.representations.length > 0) {
+        logInfo('renderPreview:assembly-path');
         renderAssemblyPreview(preview);
         updateStats(preview.stats);
         updateValidation(preview.validation);
         fitCamera(preview.bounds);
         resetSelection();
+        logInfo('renderPreview:assembly-path-done', {
+            modelChildren: modelRoot.children.length,
+            interactiveObjects: interactiveObjects.length
+        });
         return;
     }
 
+    let renderedFaceMeshes = 0;
     for (let index = 0; index < preview.faces.length; index += 1) {
         const face = preview.faces[index];
         const mesh = buildFaceMesh(face);
@@ -911,9 +990,17 @@ function renderPreview(preview) {
             interactiveObjects.push(mesh);
             registerStepObject(face.id, mesh);
             modelRoot.add(mesh);
+            renderedFaceMeshes += 1;
+        } else {
+            logWarn('renderPreview:face-mesh-null', {
+                id: face?.id,
+                name: face?.name,
+                surfaceType: face?.surfaceType
+            });
         }
     }
 
+    let renderedEdges = 0;
     for (let index = 0; index < preview.edges.length; index += 1) {
         const line = buildEdgeObject(preview.edges[index], index);
         line.userData.selection.splice(1, 0, ['STEP', `#${preview.edges[index].id}`]);
@@ -921,6 +1008,7 @@ function renderPreview(preview) {
         interactiveObjects.push(line);
         registerStepObject(preview.edges[index].id, line);
         modelRoot.add(line);
+        renderedEdges += 1;
     }
 
     updateStats(preview.stats);
@@ -928,9 +1016,19 @@ function renderPreview(preview) {
     renderAssemblyTree([]);
     fitCamera(preview.bounds);
     resetSelection();
+    logInfo('renderPreview:done', {
+        renderedFaceMeshes,
+        renderedEdges,
+        modelChildren: modelRoot.children.length,
+        interactiveObjects: interactiveObjects.length
+    });
 }
 
 function renderAssemblyPreview(preview) {
+    logInfo('renderAssemblyPreview:start', {
+        representationCount: preview.representations.length,
+        instanceCount: preview.instances.length
+    });
     const representationsById = new Map(preview.representations.map((representation) => [representation.id, representation]));
     renderAssemblyTree(preview.instances);
 
@@ -945,12 +1043,21 @@ function renderAssemblyPreview(preview) {
         instanceGroup.userData.instanceDepth = instance.depth ?? 0;
         instanceGroup.userData.representationCount = Array.isArray(instance.representationIds) ? instance.representationIds.length : (instance.representationId != null ? 1 : 0);
         assemblyGroups.set(instance.id, instanceGroup);
+        logDebug('renderAssemblyPreview:instance-group', {
+            id: instance.id,
+            label: instance.label,
+            representationIds: instance.representationIds,
+            parentId: instance.parentId
+        });
     }
 
+    let renderedFaceMeshes = 0;
+    let renderedEdges = 0;
     for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
         const instance = preview.instances[instanceIndex];
         const instanceGroup = assemblyGroups.get(instance.id);
         if (!instanceGroup) {
+            logWarn('renderAssemblyPreview:missing-instance-group', instance);
             continue;
         }
 
@@ -967,12 +1074,21 @@ function renderAssemblyPreview(preview) {
         for (const representationId of representationIds) {
             const representation = representationsById.get(representationId);
             if (!representation) {
+                logWarn('renderAssemblyPreview:missing-representation', {
+                    instanceId: instance.id,
+                    representationId
+                });
                 continue;
             }
             for (let faceIndex = 0; faceIndex < representation.faces.length; faceIndex += 1) {
                 const face = representation.faces[faceIndex];
                 const mesh = buildFaceMesh(face);
                 if (!mesh) {
+                    logWarn('renderAssemblyPreview:face-mesh-null', {
+                        instanceId: instance.id,
+                        representationId,
+                        faceId: face?.id
+                    });
                     continue;
                 }
                 if ((!Array.isArray(face.color) || face.color.length === 0) && Array.isArray(representation.color)) {
@@ -1002,6 +1118,7 @@ function renderAssemblyPreview(preview) {
                 interactiveObjects.push(mesh);
                 registerStepObject(face.id, mesh);
                 instanceGroup.add(mesh);
+                renderedFaceMeshes += 1;
             }
 
             for (let edgeIndex = 0; edgeIndex < representation.edges.length; edgeIndex += 1) {
@@ -1029,12 +1146,23 @@ function renderAssemblyPreview(preview) {
                 interactiveObjects.push(line);
                 registerStepObject(representation.edges[edgeIndex].id, line);
                 instanceGroup.add(line);
+                renderedEdges += 1;
             }
         }
     }
+    logInfo('renderAssemblyPreview:done', {
+        renderedFaceMeshes,
+        renderedEdges,
+        rootChildren: modelRoot.children.length,
+        interactiveObjects: interactiveObjects.length
+    });
 }
 
 async function requestPreview(stepText) {
+    logInfo('requestPreview:start', {
+        stepLength: stepText.length,
+        previewRoute: '/api/preview'
+    });
     const response = await fetch('/api/preview', {
         method: 'POST',
         headers: {
@@ -1044,19 +1172,33 @@ async function requestPreview(stepText) {
     });
 
     const text = await response.text();
+    logInfo('requestPreview:response', {
+        ok: response.ok,
+        status: response.status,
+        textLength: text.length
+    });
     if (!response.ok) {
         try {
             const errorPayload = JSON.parse(text);
+            logError('requestPreview:error-payload', errorPayload);
             throw new Error(errorPayload.error || 'STEP 解析失败');
         } catch (error) {
             if (error instanceof SyntaxError) {
+                logError('requestPreview:non-json-error-body', text);
                 throw new Error(text || 'STEP 解析失败');
             }
             throw error;
         }
     }
 
-    return JSON.parse(text);
+    const parsed = JSON.parse(text);
+    logInfo('requestPreview:parsed', {
+        stats: parsed?.stats,
+        faces: Array.isArray(parsed?.faces) ? parsed.faces.length : 0,
+        edges: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,
+        unsupportedFaces: Array.isArray(parsed?.unsupportedFaces) ? parsed.unsupportedFaces.length : 0
+    });
+    return parsed;
 }
 
 async function renderCurrentInput() {
@@ -1075,10 +1217,12 @@ async function renderCurrentInput() {
         const unsupported = preview.stats.unsupportedFaceCount ?? 0;
         const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
         setStatus(`渲染完成：${preview.stats.faceCount} 个面，${preview.stats.edgeCount} 条边${suffix}`);
+        logInfo('renderCurrentInput:success', preview.stats);
     } catch (error) {
         clearModel();
         updateStats();
         setStatus(error.message);
+        logError('renderCurrentInput:failed', error);
     }
 }
 
@@ -1089,14 +1233,20 @@ renderButton.addEventListener('click', () => {
 loadExampleButton.addEventListener('click', async () => {
     setStatus('正在加载示例...');
     try {
+        logInfo('loadExample:start', { example: exampleSelect.value });
         const response = await fetch(`/api/example?name=${encodeURIComponent(exampleSelect.value)}`);
         if (!response.ok) {
             throw new Error('示例文件不可用');
         }
         stepInput.value = await response.text();
         setStatus(`示例 ${exampleSelect.value} 已加载，可以直接渲染。`);
+        logInfo('loadExample:done', {
+            example: exampleSelect.value,
+            length: stepInput.value.length
+        });
     } catch (error) {
         setStatus(error.message);
+        logError('loadExample:failed', error);
     }
 });
 
@@ -1107,6 +1257,11 @@ fileInput.addEventListener('change', async (event) => {
     }
     stepInput.value = await file.text();
     setStatus(`已载入文件：${file.name}`);
+    logInfo('fileInput:loaded', {
+        fileName: file.name,
+        size: file.size,
+        textLength: stepInput.value.length
+    });
 });
 
 renderer.domElement.addEventListener('click', (event) => {
