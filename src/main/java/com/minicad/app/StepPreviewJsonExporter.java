@@ -825,14 +825,14 @@ public final class StepPreviewJsonExporter {
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
         // Keep small curved patches denser from the start so zoomed silhouettes stay smoother.
-        int baseUSegments = Math.max(160, Math.min(320, sampleCount * 6));
-        int baseVSegments = Math.max(64, Math.min(160, sampleCount * 5));
+        int baseUSegments = Math.max(224, Math.min(448, sampleCount * 8));
+        int baseVSegments = Math.max(80, Math.min(192, sampleCount * 6));
         if (geometry instanceof StepCylindricalSurface) {
-            baseUSegments = Math.max(baseUSegments, 320);
-            baseVSegments = Math.max(baseVSegments, 96);
+            baseUSegments = Math.max(baseUSegments, 384);
+            baseVSegments = Math.max(baseVSegments, 112);
         } else if (geometry instanceof StepConicalSurface || geometry instanceof StepToroidalSurface) {
-            baseUSegments = Math.max(baseUSegments, 256);
-            baseVSegments = Math.max(baseVSegments, 96);
+            baseUSegments = Math.max(baseUSegments, 320);
+            baseVSegments = Math.max(baseVSegments, 112);
         }
         List<PointPayload> triangles = triangulateParametricFaceAdaptive(
                 mapper,
@@ -1248,7 +1248,7 @@ public final class StepPreviewJsonExporter {
         com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
         double startParameter = line.parameterOf(startPoint);
         double endParameter = line.parameterOf(endPoint);
-        int segments = Math.max(8, (int) Math.ceil(Math.abs(endParameter - startParameter) * 4.0));
+        int segments = Math.max(12, (int) Math.ceil(Math.abs(endParameter - startParameter) * 6.0));
         List<UvPoint> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             double parameter = startParameter + (endParameter - startParameter) * index / segments;
@@ -1292,7 +1292,7 @@ public final class StepPreviewJsonExporter {
         } else if (delta < -Math.PI) {
             delta += Math.PI * 2.0;
         }
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(delta) * 12.0));
+        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
         List<UvPoint> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             double angle = startAngle + delta * index / segments;
@@ -1315,7 +1315,7 @@ public final class StepPreviewJsonExporter {
         } else if (delta < -Math.PI) {
             delta += Math.PI * 2.0;
         }
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(delta) * 12.0));
+        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
         List<UvPoint> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             double angle = startAngle + delta * index / segments;
@@ -2094,7 +2094,7 @@ public final class StepPreviewJsonExporter {
             return sampleEdge(start, end, surfaceCurve.curve3d(), naturalForward);
         }
         if (curve instanceof BSplineCurve3 splineCurve) {
-            List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(48));
+            List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
             }
@@ -2128,7 +2128,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(8, (int) Math.ceil(Math.abs(delta) / (Math.PI / 12.0)));
+        int segments = Math.max(16, (int) Math.ceil(Math.abs(delta) / (Math.PI / 18.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
@@ -2153,7 +2153,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(delta) / (Math.PI / 18.0)));
+        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) / (Math.PI / 24.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
