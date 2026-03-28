@@ -2972,8 +2972,29 @@ public final class StepPreviewJsonExporter {
     }
 
     private static String quote(String text) {
-        String escaped = text.replace("\\", "\\\\").replace("\"", "\\\"");
-        return "\"" + escaped + "\"";
+        StringBuilder escaped = new StringBuilder(text.length() + 16);
+        escaped.append('"');
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '\\' -> escaped.append("\\\\");
+                case '"' -> escaped.append("\\\"");
+                case '\n' -> escaped.append("\\n");
+                case '\r' -> escaped.append("\\r");
+                case '\t' -> escaped.append("\\t");
+                case '\b' -> escaped.append("\\b");
+                case '\f' -> escaped.append("\\f");
+                default -> {
+                    if (ch < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        escaped.append(ch);
+                    }
+                }
+            }
+        }
+        escaped.append('"');
+        return escaped.toString();
     }
 
     private static String format(double value) {

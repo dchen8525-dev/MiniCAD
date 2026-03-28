@@ -521,6 +521,7 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"faceCount\":15"));
         assertTrue(json.contains("\"unsupportedFaceCount\":0"));
         assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""));
+        assertTrue(containsNoRawControlCharacters(json));
     }
 
     @Test
@@ -2446,5 +2447,14 @@ class StepPreviewJsonExporterTest {
             index += needle.length();
         }
         return count;
+    }
+
+    private static boolean containsNoRawControlCharacters(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) < 0x20) {
+                return false;
+            }
+        }
+        return true;
     }
 }

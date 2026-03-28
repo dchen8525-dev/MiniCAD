@@ -223,7 +223,15 @@ public final class StepViewerApp {
                 case '\n' -> escaped.append("\\n");
                 case '\r' -> escaped.append("\\r");
                 case '\t' -> escaped.append("\\t");
-                default -> escaped.append(ch);
+                case '\b' -> escaped.append("\\b");
+                case '\f' -> escaped.append("\\f");
+                default -> {
+                    if (ch < 0x20) {
+                        escaped.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        escaped.append(ch);
+                    }
+                }
             }
         }
         return escaped.toString();
