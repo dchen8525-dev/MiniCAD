@@ -167,6 +167,14 @@ function logError(message, ...args) {
     console.error(viewerLogPrefix, message, ...args);
 }
 
+function logJson(label, payload) {
+    try {
+        console.info(`${viewerLogPrefix} ${label} ${JSON.stringify(payload)}`);
+    } catch (error) {
+        console.info(`${viewerLogPrefix} ${label}`, payload);
+    }
+}
+
 function currentRenderScale() {
     const distance = camera.position.distanceTo(controls.target);
     if (distance <= 2.5) {
@@ -996,7 +1004,7 @@ function fitCamera(bounds) {
     camera.updateProjectionMatrix();
     controls.update();
     const sceneBox = new THREE.Box3().setFromObject(modelRoot);
-    logInfo('fitCamera:done', {
+    logJson('fitCamera:done', {
         center: center.toArray(),
         radius,
         near: camera.near,
@@ -1130,7 +1138,7 @@ function renderAssemblyPreview(preview) {
         instanceGroup.userData.instanceDepth = instance.depth ?? 0;
         instanceGroup.userData.representationCount = Array.isArray(instance.representationIds) ? instance.representationIds.length : (instance.representationId != null ? 1 : 0);
         assemblyGroups.set(instance.id, instanceGroup);
-        logDebug('renderAssemblyPreview:instance-group', {
+        logJson('renderAssemblyPreview:instance-group', {
             id: instance.id,
             label: instance.label,
             representationIds: instance.representationIds,
@@ -1171,7 +1179,7 @@ function renderAssemblyPreview(preview) {
                 });
                 continue;
             }
-            logDebug('renderAssemblyPreview:representation', {
+            logJson('renderAssemblyPreview:representation', {
                 instanceId: instance.id,
                 representationId,
                 representationName: representation.name,
@@ -1249,13 +1257,13 @@ function renderAssemblyPreview(preview) {
             }
         }
         const instanceBox = new THREE.Box3().setFromObject(instanceGroup);
-        logDebug('renderAssemblyPreview:instance-group-bounds', {
+        logJson('renderAssemblyPreview:instance-group-bounds', {
             instanceId: instance.id,
             bounds: boxToLog(instanceBox)
         });
     }
     const modelBounds = new THREE.Box3().setFromObject(modelRoot);
-    logInfo('renderAssemblyPreview:done', {
+    logJson('renderAssemblyPreview:done', {
         renderedFaceMeshes,
         renderedEdges,
         rootChildren: modelRoot.children.length,
