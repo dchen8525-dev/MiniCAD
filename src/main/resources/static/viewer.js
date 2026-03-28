@@ -395,6 +395,76 @@ function matrixFromRowMajor(elements) {
     );
 }
 
+function matrixToRows(matrixLike) {
+    if (!Array.isArray(matrixLike) || matrixLike.length !== 16) {
+        return matrixLike;
+    }
+    return [
+        matrixLike.slice(0, 4),
+        matrixLike.slice(4, 8),
+        matrixLike.slice(8, 12),
+        matrixLike.slice(12, 16)
+    ];
+}
+
+function boxToLog(box) {
+    if (!box || box.isEmpty()) {
+        return { empty: true };
+    }
+    return {
+        min: box.min.toArray(),
+        max: box.max.toArray(),
+        size: box.getSize(new THREE.Vector3()).toArray(),
+        center: box.getCenter(new THREE.Vector3()).toArray()
+    };
+}
+
+function pointsBounds(points) {
+    if (!Array.isArray(points) || points.length === 0) {
+        return null;
+    }
+    const box = new THREE.Box3();
+    for (const point of points) {
+        if (Array.isArray(point) && point.length >= 3) {
+            box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
+        }
+    }
+    return box;
+}
+
+function representationBounds(representation) {
+    const box = new THREE.Box3();
+    let hasPoint = false;
+
+    for (const face of Array.isArray(representation?.faces) ? representation.faces : []) {
+        for (const triangle of Array.isArray(face?.triangles) ? face.triangles : []) {
+            if (Array.isArray(triangle) && triangle.length >= 3) {
+                box.expandByPoint(new THREE.Vector3(triangle[0], triangle[1], triangle[2]));
+                hasPoint = true;
+            }
+        }
+        for (const loop of Array.isArray(face?.loops) ? face.loops : []) {
+            for (const point of Array.isArray(loop?.points) ? loop.points : []) {
+                if (Array.isArray(point) && point.length >= 3) {
+                    box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
+                    hasPoint = true;
+                }
+            }
+        }
+    }
+
+    for (const edge of Array.isArray(representation?.edges) ? representation.edges : []) {
+        for (const point of Array.isArray(edge?.points) ? edge.points : []) {
+            if (Array.isArray(point) && point.length >= 3) {
+                box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
+                hasPoint = true;
+            }
+        }
+    }
+
+    return hasPoint ? box : null;
+}
+
 function disposeObject(object) {
     object.traverse((node) => {
         if (node.geometry) {
@@ -925,12 +995,18 @@ function fitCamera(bounds) {
     camera.far = Math.max(radius * 40, 100);
     camera.updateProjectionMatrix();
     controls.update();
+    const sceneBox = new THREE.Box3().setFromObject(modelRoot);
     logInfo('fitCamera:done', {
         center: center.toArray(),
         radius,
         near: camera.near,
         far: camera.far,
-        position: camera.position.toArray()
+        position: camera.position.toArray(),
+        previewBounds: {
+            min: bounds.min,
+            max: bounds.max
+        },
+        sceneBounds: boxToLog(sceneBox)
     });
 }
 
@@ -962,6 +1038,21 @@ function renderPreview(preview) {
         return;
     }
 
+    renderLegacyPreview(preview);
+    updateStats(preview.stats);
+    updateValidation(preview.validation);
+    renderAssemblyTree([]);
+    fitCamera(preview.bounds);
+    resetSelection();
+    logInfo('renderPreview:done', {
+        renderedFaceMeshes: modelRoot.children.filter((child) => child.isMesh).length,
+        renderedEdges: modelRoot.children.filter((child) => child.isLine).length,
+        modelChildren: modelRoot.children.length,
+        interactiveObjects: interactiveObjects.length
+    });
+}
+
+function renderLegacyPreview(preview) {
     let renderedFaceMeshes = 0;
     for (let index = 0; index < preview.faces.length; index += 1) {
         const face = preview.faces[index];
@@ -1010,13 +1101,8 @@ function renderPreview(preview) {
         modelRoot.add(line);
         renderedEdges += 1;
     }
-
-    updateStats(preview.stats);
-    updateValidation(preview.validation);
     renderAssemblyTree([]);
-    fitCamera(preview.bounds);
-    resetSelection();
-    logInfo('renderPreview:done', {
+    logInfo('renderLegacyPreview:done', {
         renderedFaceMeshes,
         renderedEdges,
         modelChildren: modelRoot.children.length,
@@ -1035,7 +1121,8 @@ function renderAssemblyPreview(preview) {
     for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
         const instance = preview.instances[instanceIndex];
         const instanceGroup = new THREE.Group();
-        const transform = matrixFromRowMajor(Array.isArray(instance.localMatrix) ? instance.localMatrix : instance.matrix);
+        const selectedMatrix = Array.isArray(instance.localMatrix) ? instance.localMatrix : instance.matrix;
+        const transform = matrixFromRowMajor(selectedMatrix);
         instanceGroup.applyMatrix4(transform);
         instanceGroup.userData.instanceLabel = instance.label || `实例 #${instanceIndex + 1}`;
         instanceGroup.userData.instanceDescription = instance.description || '';
@@ -1047,7 +1134,11 @@ function renderAssemblyPreview(preview) {
             id: instance.id,
             label: instance.label,
             representationIds: instance.representationIds,
-            parentId: instance.parentId
+            parentId: instance.parentId,
+            localMatrixRows: matrixToRows(instance.localMatrix),
+            worldMatrixRows: matrixToRows(instance.matrix),
+            appliedMatrixRows: matrixToRows(selectedMatrix),
+            threeMatrixElements: transform.elements.slice()
         });
     }
 
@@ -1080,6 +1171,14 @@ function renderAssemblyPreview(preview) {
                 });
                 continue;
             }
+            logDebug('renderAssemblyPreview:representation', {
+                instanceId: instance.id,
+                representationId,
+                representationName: representation.name,
+                faceCount: Array.isArray(representation.faces) ? representation.faces.length : 0,
+                edgeCount: Array.isArray(representation.edges) ? representation.edges.length : 0,
+                representationBounds: boxToLog(representationBounds(representation))
+            });
             for (let faceIndex = 0; faceIndex < representation.faces.length; faceIndex += 1) {
                 const face = representation.faces[faceIndex];
                 const mesh = buildFaceMesh(face);
@@ -1149,12 +1248,19 @@ function renderAssemblyPreview(preview) {
                 renderedEdges += 1;
             }
         }
+        const instanceBox = new THREE.Box3().setFromObject(instanceGroup);
+        logDebug('renderAssemblyPreview:instance-group-bounds', {
+            instanceId: instance.id,
+            bounds: boxToLog(instanceBox)
+        });
     }
+    const modelBounds = new THREE.Box3().setFromObject(modelRoot);
     logInfo('renderAssemblyPreview:done', {
         renderedFaceMeshes,
         renderedEdges,
         rootChildren: modelRoot.children.length,
-        interactiveObjects: interactiveObjects.length
+        interactiveObjects: interactiveObjects.length,
+        modelBounds: boxToLog(modelBounds)
     });
 }
 
