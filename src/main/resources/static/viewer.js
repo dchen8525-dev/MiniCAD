@@ -122,12 +122,10 @@ const rimLight = new THREE.DirectionalLight(0xd7eef7, 1.3);
 rimLight.position.set(-4, -2, -5);
 scene.add(rimLight);
 
-const grid = new THREE.GridHelper(10, 10, 0x67767a, 0x9eb2b7);
-grid.material.opacity = 0.55;
-grid.material.transparent = true;
+let grid = createGridHelper(10, 10);
 scene.add(grid);
 
-const axes = new THREE.AxesHelper(1.2);
+let axes = createAxesHelper(1.2);
 scene.add(axes);
 
 const modelRoot = new THREE.Group();
@@ -173,6 +171,69 @@ function logJson(label, payload) {
     } catch (error) {
         console.info(`${viewerLogPrefix} ${label}`, payload);
     }
+}
+
+function createGridHelper(size, divisions) {
+    const helper = new THREE.GridHelper(size, divisions, 0x67767a, 0x9eb2b7);
+    const materials = Array.isArray(helper.material) ? helper.material : [helper.material];
+    for (const material of materials) {
+        material.opacity = 0.55;
+        material.transparent = true;
+    }
+    return helper;
+}
+
+function createAxesHelper(size) {
+    return new THREE.AxesHelper(size);
+}
+
+function niceCeil(value) {
+    const safe = Math.max(value, 1);
+    const magnitude = 10 ** Math.floor(Math.log10(safe));
+    const normalized = safe / magnitude;
+    if (normalized <= 1) {
+        return magnitude;
+    }
+    if (normalized <= 2) {
+        return 2 * magnitude;
+    }
+    if (normalized <= 5) {
+        return 5 * magnitude;
+    }
+    return 10 * magnitude;
+}
+
+function updateReferenceGuides(bounds) {
+    const min = toVector3(bounds.min);
+    const max = toVector3(bounds.max);
+    const size = max.clone().sub(min);
+    const center = min.clone().add(max).multiplyScalar(0.5);
+    const span = Math.max(size.x, size.y, 1);
+    const gridSize = niceCeil(span * 1.4);
+    const axesSize = Math.max(niceCeil(Math.max(size.x, size.y, size.z, 1) * 0.2), 1);
+
+    scene.remove(grid);
+    disposeObject(grid);
+    grid = createGridHelper(gridSize, 10);
+    grid.position.set(center.x, center.y, min.z);
+    scene.add(grid);
+
+    scene.remove(axes);
+    disposeObject(axes);
+    axes = createAxesHelper(axesSize);
+    axes.position.set(min.x, min.y, min.z);
+    scene.add(axes);
+
+    logJson('updateReferenceGuides', {
+        gridSize,
+        axesSize,
+        gridPosition: grid.position.toArray(),
+        axesPosition: axes.position.toArray(),
+        bounds: {
+            min: bounds.min,
+            max: bounds.max
+        }
+    });
 }
 
 function currentRenderScale() {
@@ -991,6 +1052,7 @@ function applyAssemblyHighlight(group, selected) {
 
 function fitCamera(bounds) {
     logDebug('fitCamera:start', bounds);
+    updateReferenceGuides(bounds);
     const min = toVector3(bounds.min);
     const max = toVector3(bounds.max);
     const center = min.clone().add(max).multiplyScalar(0.5);
