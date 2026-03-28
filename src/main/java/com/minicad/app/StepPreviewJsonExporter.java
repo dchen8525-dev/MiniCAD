@@ -55,6 +55,7 @@ import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepSeamCurve;
+import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
@@ -275,14 +276,14 @@ public final class StepPreviewJsonExporter {
         for (AssemblyRepresentation assemblyRepresentation : graph.representations()) {
             StepEntity entity = resolved.get(assemblyRepresentation.representationId());
             if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
-                Set<Integer> shellIds = collectRepresentationShells(representation);
+                Set<Integer> shellIds = collectRepresentationShells(representation, resolved);
                 StepMetadataExtractor.DisplayMetadata representationMetadata = metadata.forItem(representation.id());
                 GeometryCollection geometry = buildGeometryForShells(
                         shellIds,
                         resolved,
                         builder,
                         metadata,
-                        collectInheritedShellMetadata(representation, metadata)
+                        collectInheritedShellMetadata(representation, metadata, resolved)
                 );
                 representations.put(
                         representation.id(),
@@ -318,15 +319,20 @@ public final class StepPreviewJsonExporter {
         return new AssemblyData(List.copyOf(representations.values()), List.copyOf(instances));
     }
 
-    private static Set<Integer> collectRepresentationShells(StepRepresentation representation) {
+    private static Set<Integer> collectRepresentationShells(
+            StepRepresentation representation,
+            Map<Integer, StepEntity> resolved
+    ) {
         Set<Integer> shellIds = new TreeSet<>();
-        for (StepEntity item : representation.items()) {
-            if (item instanceof StepOpenShell openShell) {
-                shellIds.add(openShell.id());
-            } else if (item instanceof StepClosedShell closedShell) {
-                shellIds.add(closedShell.id());
-            } else if (item instanceof StepManifoldSolidBrep solidBrep) {
-                shellIds.add(solidBrep.outer().id());
+        for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
+            for (StepEntity item : candidate.items()) {
+                if (item instanceof StepOpenShell openShell) {
+                    shellIds.add(openShell.id());
+                } else if (item instanceof StepClosedShell closedShell) {
+                    shellIds.add(closedShell.id());
+                } else if (item instanceof StepManifoldSolidBrep solidBrep) {
+                    shellIds.add(solidBrep.outer().id());
+                }
             }
         }
         return shellIds;
@@ -334,21 +340,59 @@ public final class StepPreviewJsonExporter {
 
     private static Map<Integer, StepMetadataExtractor.DisplayMetadata> collectInheritedShellMetadata(
             StepRepresentation representation,
-            StepMetadataExtractor metadata
+            StepMetadataExtractor metadata,
+            Map<Integer, StepEntity> resolved
     ) {
         Map<Integer, StepMetadataExtractor.DisplayMetadata> metadataByShellId = new LinkedHashMap<>();
-        for (StepEntity item : representation.items()) {
-            StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
-            if (item instanceof StepOpenShell openShell) {
-                metadataByShellId.put(openShell.id(), mergeMetadata(metadataByShellId.get(openShell.id()), itemMetadata));
-            } else if (item instanceof StepClosedShell closedShell) {
-                metadataByShellId.put(closedShell.id(), mergeMetadata(metadataByShellId.get(closedShell.id()), itemMetadata));
-            } else if (item instanceof StepManifoldSolidBrep solidBrep) {
-                int shellId = solidBrep.outer().id();
-                metadataByShellId.put(shellId, mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
+        for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
+            for (StepEntity item : candidate.items()) {
+                StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
+                if (item instanceof StepOpenShell openShell) {
+                    metadataByShellId.put(openShell.id(), mergeMetadata(metadataByShellId.get(openShell.id()), itemMetadata));
+                } else if (item instanceof StepClosedShell closedShell) {
+                    metadataByShellId.put(closedShell.id(), mergeMetadata(metadataByShellId.get(closedShell.id()), itemMetadata));
+                } else if (item instanceof StepManifoldSolidBrep solidBrep) {
+                    int shellId = solidBrep.outer().id();
+                    metadataByShellId.put(shellId, mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
+                }
             }
         }
         return Map.copyOf(metadataByShellId);
+    }
+
+    private static List<StepRepresentation> linkedShapeRepresentations(
+            StepRepresentation seed,
+            Map<Integer, StepEntity> resolved
+    ) {
+        List<StepRepresentation> ordered = new ArrayList<>();
+        Set<Integer> visited = new LinkedHashSet<>();
+        collectLinkedShapeRepresentations(seed, resolved, visited, ordered);
+        return List.copyOf(ordered);
+    }
+
+    private static void collectLinkedShapeRepresentations(
+            StepRepresentation current,
+            Map<Integer, StepEntity> resolved,
+            Set<Integer> visited,
+            List<StepRepresentation> ordered
+    ) {
+        if (!visited.add(current.id())) {
+            return;
+        }
+        ordered.add(current);
+        for (StepEntity entity : resolved.values()) {
+            if (!(entity instanceof StepShapeRepresentationRelationship relationship)) {
+                continue;
+            }
+            if (!relationship.rep1().shapeRepresentation() || !relationship.rep2().shapeRepresentation()) {
+                continue;
+            }
+            if (relationship.rep1().id() == current.id()) {
+                collectLinkedShapeRepresentations(relationship.rep2(), resolved, visited, ordered);
+            } else if (relationship.rep2().id() == current.id()) {
+                collectLinkedShapeRepresentations(relationship.rep1(), resolved, visited, ordered);
+            }
+        }
     }
 
     private static StepMetadataExtractor.DisplayMetadata mergeMetadata(

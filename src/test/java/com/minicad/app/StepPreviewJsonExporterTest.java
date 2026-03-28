@@ -522,6 +522,11 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"unsupportedFaceCount\":0"));
         assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""));
         assertTrue(containsNoRawControlCharacters(json));
+        assertTrue(json.contains("\"instances\":[{\"id\":\"pd-527\""));
+        assertTrue(json.contains("\"representationIds\":[525]"));
+        assertTrue(json.contains("\"representations\":[{\"id\":525"));
+        assertTrue(json.contains("\"representations\":[{\"id\":525,\"name\":\"\",\"layers\":[],\"color\":null,\"edges\":[{\"id\":157"));
+        assertTrue(json.contains("\"faces\":[{\"id\":283"));
     }
 
     @Test
