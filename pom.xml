@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.2</junit.version>
         <jetty.version>11.0.24</jetty.version>
+        <exec.mainClass>com.minicad.app.StepDumpApp</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -63,7 +64,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <mainClass>com.minicad.app.StepDumpApp</mainClass>
+                    <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
         </plugins>

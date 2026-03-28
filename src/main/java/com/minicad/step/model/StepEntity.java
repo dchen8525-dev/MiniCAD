@@ -20,7 +20,9 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepFillAreaStyleColour, StepFillAreaStyle, StepSurfaceStyleFillArea, StepSurfaceSideStyle,
         StepSurfaceStyleUsage, StepPresentationStyleAssignment, StepStyledItem, StepPresentationLayerAssignment,
         StepAnnotationTextOccurrence, StepGeometricCurveSet, StepDraughtingCallout, StepMeasureRepresentationItem,
-        StepGeometricItemSpecificUsage, StepPcurve {
+        StepGeometricItemSpecificUsage, StepPcurve, StepDescriptiveRepresentationItem, StepPropertyDefinition,
+        StepPropertyDefinitionRepresentation, StepDerivedUnitElement, StepDerivedUnit,
+        StepApplicationProtocolDefinition, StepProductRelatedProductCategory {
 
     /**
      * Returns the original STEP instance id.

@@ -1,0 +1,16 @@
+package com.minicad.step.model;
+
+/**
+ * Minimal derived unit element.
+ *
+ * @param id STEP instance id
+ * @param unit referenced unit
+ * @param exponent exponent value
+ */
+public record StepDerivedUnitElement(int id, StepEntity unit, double exponent) implements StepEntity {
+
+    @Override
+    public String name() {
+        return "";
+    }
+}

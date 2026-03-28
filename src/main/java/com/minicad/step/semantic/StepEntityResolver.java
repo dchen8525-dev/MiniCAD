@@ -5,6 +5,7 @@ import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepApplicationContext;
+import com.minicad.step.model.StepApplicationProtocolDefinition;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
@@ -16,6 +17,9 @@ import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDirection;
+import com.minicad.step.model.StepDerivedUnit;
+import com.minicad.step.model.StepDerivedUnitElement;
+import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDraughtingCallout;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
@@ -48,6 +52,9 @@ import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionContext;
 import com.minicad.step.model.StepProductDefinitionFormation;
 import com.minicad.step.model.StepProductDefinitionShape;
+import com.minicad.step.model.StepProductRelatedProductCategory;
+import com.minicad.step.model.StepPropertyDefinition;
+import com.minicad.step.model.StepPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepPresentationStyleAssignment;
 import com.minicad.step.model.StepRepresentation;
@@ -626,14 +633,28 @@ public final class StepEntityResolver {
         return new StepApplicationContext(instance.id(), stringValue(instance, definition, 0));
     }
 
-    private StepProductContext resolveProductContext(StepEntityInstance instance) {
-        StepEntityDefinition definition = definition(instance, "PRODUCT_CONTEXT");
-        requireParameterCount(instance, definition, 3);
-        return new StepProductContext(
+    private StepApplicationProtocolDefinition resolveApplicationProtocolDefinition(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "APPLICATION_PROTOCOL_DEFINITION");
+        requireParameterCount(instance, definition, 4);
+        return new StepApplicationProtocolDefinition(
                 instance.id(),
                 stringValue(instance, definition, 0),
                 stringValue(instance, definition, 1),
-                requireEntity(referenceId(instance, definition, 2), StepApplicationContext.class,
+                integerValue(instance, definition, 2),
+                requireEntity(referenceId(instance, definition, 3), StepApplicationContext.class,
+                        "APPLICATION_PROTOCOL_DEFINITION application must reference APPLICATION_CONTEXT")
+        );
+    }
+
+    private StepProductContext resolveProductContext(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "PRODUCT_CONTEXT");
+        requireParameterCount(instance, definition, 3);
+        boolean stepOrder = unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
+        return new StepProductContext(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                stepOrder ? stringValue(instance, definition, 2) : stringValue(instance, definition, 1),
+                requireEntity(referenceId(instance, definition, stepOrder ? 1 : 2), StepApplicationContext.class,
                         "PRODUCT_CONTEXT frame_of_reference must reference APPLICATION_CONTEXT")
         );
     }
@@ -645,9 +666,21 @@ public final class StepEntityResolver {
                 instance.id(),
                 stringValue(instance, definition, 0),
                 stringValue(instance, definition, 1),
-                stringValue(instance, definition, 2),
+                optionalStringValue(instance, definition, 2),
                 referenceList(instance, definition, 3, StepProductContext.class,
                         "PRODUCT frame_of_reference must contain PRODUCT_CONTEXT references")
+        );
+    }
+
+    private StepProductRelatedProductCategory resolveProductRelatedProductCategory(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "PRODUCT_RELATED_PRODUCT_CATEGORY");
+        requireParameterCount(instance, definition, 3);
+        return new StepProductRelatedProductCategory(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                stringValue(instance, definition, 1),
+                referenceList(instance, definition, 2, StepProduct.class,
+                        "PRODUCT_RELATED_PRODUCT_CATEGORY products must contain PRODUCT references")
         );
     }
 
@@ -657,7 +690,7 @@ public final class StepEntityResolver {
         return new StepProductDefinitionFormation(
                 instance.id(),
                 stringValue(instance, definition, 0),
-                stringValue(instance, definition, 1),
+                optionalStringValue(instance, definition, 1),
                 requireEntity(referenceId(instance, definition, 2), StepProduct.class,
                         "PRODUCT_DEFINITION_FORMATION of_product must reference PRODUCT")
         );
@@ -666,11 +699,12 @@ public final class StepEntityResolver {
     private StepProductDefinitionContext resolveProductDefinitionContext(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_CONTEXT");
         requireParameterCount(instance, definition, 3);
+        boolean stepOrder = unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
         return new StepProductDefinitionContext(
                 instance.id(),
                 stringValue(instance, definition, 0),
-                stringValue(instance, definition, 1),
-                requireEntity(referenceId(instance, definition, 2), StepApplicationContext.class,
+                stepOrder ? stringValue(instance, definition, 2) : stringValue(instance, definition, 1),
+                requireEntity(referenceId(instance, definition, stepOrder ? 1 : 2), StepApplicationContext.class,
                         "PRODUCT_DEFINITION_CONTEXT frame_of_reference must reference APPLICATION_CONTEXT")
         );
     }
@@ -695,9 +729,20 @@ public final class StepEntityResolver {
         return new StepProductDefinitionShape(
                 instance.id(),
                 stringValue(instance, definition, 0),
-                stringValue(instance, definition, 1),
+                optionalStringValue(instance, definition, 1),
                 requireEntity(referenceId(instance, definition, 2), StepProductDefinition.class,
                         "PRODUCT_DEFINITION_SHAPE definition must reference PRODUCT_DEFINITION")
+        );
+    }
+
+    private StepPropertyDefinition resolvePropertyDefinition(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "PROPERTY_DEFINITION");
+        requireParameterCount(instance, definition, 3);
+        return new StepPropertyDefinition(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                stringValue(instance, definition, 1),
+                resolve(referenceId(instance, definition, 2))
         );
     }
 
@@ -710,6 +755,18 @@ public final class StepEntityResolver {
                         "SHAPE_DEFINITION_REPRESENTATION definition must reference PRODUCT_DEFINITION_SHAPE"),
                 requireEntity(referenceId(instance, definition, 1), StepRepresentation.class,
                         "SHAPE_DEFINITION_REPRESENTATION used_representation must reference SHAPE_REPRESENTATION")
+        );
+    }
+
+    private StepPropertyDefinitionRepresentation resolvePropertyDefinitionRepresentation(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "PROPERTY_DEFINITION_REPRESENTATION");
+        requireParameterCount(instance, definition, 2);
+        return new StepPropertyDefinitionRepresentation(
+                instance.id(),
+                requireEntity(referenceId(instance, definition, 0), StepPropertyDefinition.class,
+                        "PROPERTY_DEFINITION_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+                requireEntity(referenceId(instance, definition, 1), StepRepresentation.class,
+                        "PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION")
         );
     }
 
@@ -834,6 +891,26 @@ public final class StepEntityResolver {
                 instance.id(),
                 numberValue(instance, definition, 0),
                 resolve(referenceId(instance, definition, 1))
+        );
+    }
+
+    private StepDerivedUnitElement resolveDerivedUnitElement(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "DERIVED_UNIT_ELEMENT");
+        requireParameterCount(instance, definition, 2);
+        return new StepDerivedUnitElement(
+                instance.id(),
+                resolve(referenceId(instance, definition, 0)),
+                numberValue(instance, definition, 1)
+        );
+    }
+
+    private StepDerivedUnit resolveDerivedUnit(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "DERIVED_UNIT");
+        requireParameterCount(instance, definition, 1);
+        return new StepDerivedUnit(
+                instance.id(),
+                referenceList(instance, definition, 0, StepDerivedUnitElement.class,
+                        "DERIVED_UNIT elements must contain DERIVED_UNIT_ELEMENT references")
         );
     }
 
@@ -1069,6 +1146,16 @@ public final class StepEntityResolver {
                 typedValue.typeName(),
                 numberValue.value(),
                 resolve(referenceId(instance, definition, 2))
+        );
+    }
+
+    private StepDescriptiveRepresentationItem resolveDescriptiveRepresentationItem(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "DESCRIPTIVE_REPRESENTATION_ITEM");
+        requireParameterCount(instance, definition, 2);
+        return new StepDescriptiveRepresentationItem(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                stringValue(instance, definition, 1)
         );
     }
 
@@ -1321,6 +1408,9 @@ public final class StepEntityResolver {
                 return candidate;
             }
         }
+        if (instance.hasDefinition("MASS_UNIT")) {
+            return "MASS_UNIT";
+        }
         return "NAMED_UNIT";
     }
 
@@ -1328,15 +1418,24 @@ public final class StepEntityResolver {
         Map<String, EntityFactory> registry = new LinkedHashMap<>();
         registry.put("GEOMETRIC_REPRESENTATION_CONTEXT", StepEntityResolver::resolveGeometricRepresentationContext);
         registry.put("SHAPE_REPRESENTATION", (resolver, instance) -> resolver.resolveRepresentation(instance, true));
+        registry.put("ADVANCED_BREP_SHAPE_REPRESENTATION",
+                (resolver, instance) -> resolver.resolveRepresentation(instance, "ADVANCED_BREP_SHAPE_REPRESENTATION", true));
+        registry.put("MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION",
+                (resolver, instance) -> resolver.resolveRepresentation(instance,
+                        "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION", false));
         registry.put("REPRESENTATION", (resolver, instance) -> resolver.resolveRepresentation(instance, false));
         registry.put("APPLICATION_CONTEXT", StepEntityResolver::resolveApplicationContext);
+        registry.put("APPLICATION_PROTOCOL_DEFINITION", StepEntityResolver::resolveApplicationProtocolDefinition);
         registry.put("PRODUCT_CONTEXT", StepEntityResolver::resolveProductContext);
         registry.put("PRODUCT", StepEntityResolver::resolveProduct);
+        registry.put("PRODUCT_RELATED_PRODUCT_CATEGORY", StepEntityResolver::resolveProductRelatedProductCategory);
         registry.put("PRODUCT_DEFINITION_FORMATION", StepEntityResolver::resolveProductDefinitionFormation);
         registry.put("PRODUCT_DEFINITION_CONTEXT", StepEntityResolver::resolveProductDefinitionContext);
         registry.put("PRODUCT_DEFINITION", StepEntityResolver::resolveProductDefinition);
         registry.put("PRODUCT_DEFINITION_SHAPE", StepEntityResolver::resolveProductDefinitionShape);
+        registry.put("PROPERTY_DEFINITION", StepEntityResolver::resolvePropertyDefinition);
         registry.put("SHAPE_DEFINITION_REPRESENTATION", StepEntityResolver::resolveShapeDefinitionRepresentation);
+        registry.put("PROPERTY_DEFINITION_REPRESENTATION", StepEntityResolver::resolvePropertyDefinitionRepresentation);
         registry.put("ITEM_DEFINED_TRANSFORMATION", StepEntityResolver::resolveItemDefinedTransformation);
         registry.put("REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION",
                 StepEntityResolver::resolveRepresentationRelationshipWithTransformation);
@@ -1347,6 +1446,8 @@ public final class StepEntityResolver {
         registry.put("GLOBAL_UNIT_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUnitAssignedContext);
         registry.put("GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUncertaintyAssignedContext);
         registry.put("MEASURE_WITH_UNIT", StepEntityResolver::resolveMeasureWithUnit);
+        registry.put("DERIVED_UNIT_ELEMENT", StepEntityResolver::resolveDerivedUnitElement);
+        registry.put("DERIVED_UNIT", StepEntityResolver::resolveDerivedUnit);
         registry.put("SI_UNIT", StepEntityResolver::resolveSiUnit);
         registry.put("NAMED_UNIT", StepEntityResolver::resolveNamedUnit);
         registry.put("REPRESENTATION_CONTEXT", StepEntityResolver::resolveRepresentationContext);
@@ -1365,6 +1466,7 @@ public final class StepEntityResolver {
         registry.put("DRAUGHTING_CALLOUT", StepEntityResolver::resolveDraughtingCallout);
         registry.put("GEOMETRIC_ITEM_SPECIFIC_USAGE", StepEntityResolver::resolveGeometricItemSpecificUsage);
         registry.put("MEASURE_REPRESENTATION_ITEM", StepEntityResolver::resolveMeasureRepresentationItem);
+        registry.put("DESCRIPTIVE_REPRESENTATION_ITEM", StepEntityResolver::resolveDescriptiveRepresentationItem);
         registry.put("CARTESIAN_POINT", StepEntityResolver::resolveCartesianPoint);
         registry.put("DIRECTION", StepEntityResolver::resolveDirection);
         registry.put("VECTOR", StepEntityResolver::resolveVector);

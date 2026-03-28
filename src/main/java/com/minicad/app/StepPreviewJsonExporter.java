@@ -2074,7 +2074,9 @@ public final class StepPreviewJsonExporter {
         double startAngle = circle.angleOf(start);
         double endAngle = circle.angleOf(end);
         double delta = endAngle - startAngle;
-        if (naturalForward) {
+        if (start.distanceTo(end) <= Epsilon.EPS) {
+            delta = naturalForward ? Math.PI * 2.0 : -Math.PI * 2.0;
+        } else if (naturalForward) {
             if (delta < 0.0) {
                 delta += Math.PI * 2.0;
             }
@@ -2097,7 +2099,9 @@ public final class StepPreviewJsonExporter {
         double startAngle = ellipse.angleOf(start);
         double endAngle = ellipse.angleOf(end);
         double delta = endAngle - startAngle;
-        if (naturalForward) {
+        if (start.distanceTo(end) <= Epsilon.EPS) {
+            delta = naturalForward ? Math.PI * 2.0 : -Math.PI * 2.0;
+        } else if (naturalForward) {
             if (delta < 0.0) {
                 delta += Math.PI * 2.0;
             }

@@ -514,6 +514,16 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportPreviewForExamplesTestStep() throws IOException {
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/test.step")));
+
+        assertTrue(json.contains("\"solidCount\":1"));
+        assertTrue(json.contains("\"faceCount\":15"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":0"));
+        assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""));
+    }
+
+    @Test
     void shouldExportPmiAndNativeValidationChecks() throws IOException {
         String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/pmi-validation-square.step")));
 

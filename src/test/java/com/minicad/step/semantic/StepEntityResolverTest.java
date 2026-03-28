@@ -17,7 +17,10 @@ import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
+import com.minicad.step.model.StepApplicationProtocolDefinition;
 import com.minicad.step.model.StepAxis2Placement2D;
+import com.minicad.step.model.StepDescriptiveRepresentationItem;
+import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDraughtingCallout;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
@@ -33,6 +36,9 @@ import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepProduct;
 import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionShape;
+import com.minicad.step.model.StepProductRelatedProductCategory;
+import com.minicad.step.model.StepPropertyDefinition;
+import com.minicad.step.model.StepPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
@@ -52,6 +58,9 @@ import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,6 +143,45 @@ class StepEntityResolverTest {
         assertEquals(1, shell.faces().size());
         StepManifoldSolidBrep solid = assertInstanceOf(StepManifoldSolidBrep.class, resolved.get(100));
         assertEquals(90, solid.outer().id());
+    }
+
+    @Test
+    void shouldResolveExamplesTestStepSemanticGraph() throws IOException {
+        String step = Files.readString(Path.of("examples/test.step"));
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation presentation = assertInstanceOf(StepRepresentation.class, resolved.get(10));
+        assertEquals(false, presentation.shapeRepresentation());
+        assertEquals(1, presentation.items().size());
+
+        StepRepresentation brepRepresentation = assertInstanceOf(StepRepresentation.class, resolved.get(12));
+        assertEquals(true, brepRepresentation.shapeRepresentation());
+        assertEquals(1, brepRepresentation.items().size());
+
+        StepDerivedUnit derivedUnit = assertInstanceOf(StepDerivedUnit.class, resolved.get(302));
+        assertEquals(2, derivedUnit.elements().size());
+
+        StepDescriptiveRepresentationItem item = assertInstanceOf(StepDescriptiveRepresentationItem.class, resolved.get(308));
+        assertEquals("\\X2\\94A2\\X0\\", item.name());
+
+        StepPropertyDefinition propertyDefinition = assertInstanceOf(StepPropertyDefinition.class, resolved.get(309));
+        assertEquals(527, propertyDefinition.definition().id());
+
+        StepPropertyDefinitionRepresentation propertyRepresentation = assertInstanceOf(
+                StepPropertyDefinitionRepresentation.class,
+                resolved.get(304)
+        );
+        assertEquals(309, propertyRepresentation.definition().id());
+        assertEquals(306, propertyRepresentation.usedRepresentation().id());
+
+        StepProductRelatedProductCategory category = assertInstanceOf(StepProductRelatedProductCategory.class, resolved.get(529));
+        assertEquals(1, category.products().size());
+        assertEquals(533, category.products().getFirst().id());
+
+        StepApplicationProtocolDefinition protocol = assertInstanceOf(StepApplicationProtocolDefinition.class, resolved.get(530));
+        assertEquals(2009, protocol.year());
+        assertEquals(531, protocol.application().id());
     }
 
     @Test
