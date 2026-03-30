@@ -20,6 +20,7 @@ import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Ellipse3;
 import com.minicad.geometry.Line3;
+import com.minicad.geometry.Plane;
 import com.minicad.geometry.SurfaceCurve3;
 import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.TrimmedCurve3;
@@ -311,6 +312,10 @@ public final class StepPreviewJsonExporter {
         StepEntity geometry = faceGeometry(stepFace);
         if (geometry instanceof StepPlane) {
             try {
+                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+                if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
+                    return trimmed;
+                }
                 return new PreviewFaceResult(
                         toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata),
                         null
@@ -982,20 +987,6 @@ public final class StepPreviewJsonExporter {
                             + ", surfaceType=" + surfaceTypeName(geometry)
                             + ", reason=" + ex.getMessage());
         }
-        boolean hasOuter = normalizedBounds.stream().anyMatch(FaceBound::outer);
-        if (!hasOuter && normalizedBounds.isEmpty()) {
-            hasOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer)
-                    || stepFace.bounds().size() == 1;
-        }
-        if (!hasOuter) {
-            log("parametric_outer_bound_missing",
-                    "faceId=" + stepFace.id()
-                            + ", surfaceType=" + surfaceTypeName(geometry)
-                            + ", semanticBoundCount=" + stepFace.bounds().size()
-                            + ", semanticOuterCount=" + stepFace.bounds().stream().filter(com.minicad.step.model.StepFaceBound::outer).count()
-                            + ", normalizedBoundCount=" + normalizedBounds.size());
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
-        }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
         if (mapper == null) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "no parametric mapper for surface"));
@@ -1010,6 +1001,17 @@ public final class StepPreviewJsonExporter {
         }
         if (loops.isEmpty()) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to build parametric loops"));
+        }
+        loops = normalizeLoopRoles(stepFace, geometry, loops);
+        if (loops.stream().noneMatch(ParametricLoopPayload::outer)) {
+            log("parametric_outer_bound_missing",
+                    "faceId=" + stepFace.id()
+                            + ", surfaceType=" + surfaceTypeName(geometry)
+                            + ", semanticBoundCount=" + stepFace.bounds().size()
+                            + ", semanticOuterCount=" + stepFace.bounds().stream().filter(com.minicad.step.model.StepFaceBound::outer).count()
+                            + ", normalizedBoundCount=" + normalizedBounds.size()
+                            + ", loopCount=" + loops.size());
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         UvBounds uvBounds = boundsOf(loops);
         if (uvBounds == null || uvBounds.uSpan() <= Epsilon.EPS || uvBounds.vSpan() <= Epsilon.EPS) {
@@ -1839,6 +1841,52 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(triangles);
     }
 
+    private static List<ParametricLoopPayload> normalizeLoopRoles(
+            StepFaceEntity stepFace,
+            StepEntity geometry,
+            List<ParametricLoopPayload> loops
+    ) {
+        if (loops.isEmpty() || loops.stream().anyMatch(ParametricLoopPayload::outer)) {
+            return loops;
+        }
+        int outerIndex = -1;
+        double outerArea = Double.NEGATIVE_INFINITY;
+        for (int index = 0; index < loops.size(); index++) {
+            double area = Math.abs(signedArea(loops.get(index).points()));
+            if (area > outerArea + Epsilon.EPS) {
+                outerArea = area;
+                outerIndex = index;
+            }
+        }
+        if (outerIndex < 0) {
+            return loops;
+        }
+        log("parametric_outer_bound_inferred",
+                "faceId=" + stepFace.id()
+                        + ", surfaceType=" + surfaceTypeName(geometry)
+                        + ", loopCount=" + loops.size()
+                        + ", inferredOuterIndex=" + outerIndex
+                        + ", inferredOuterArea=" + outerArea);
+        List<ParametricLoopPayload> normalized = new ArrayList<>(loops.size());
+        for (int index = 0; index < loops.size(); index++) {
+            normalized.add(new ParametricLoopPayload(index == outerIndex, loops.get(index).points()));
+        }
+        return List.copyOf(normalized);
+    }
+
+    private static double signedArea(List<UvPoint> points) {
+        if (points.size() < 3) {
+            return 0.0;
+        }
+        double area = 0.0;
+        for (int index = 0; index + 1 < points.size(); index++) {
+            UvPoint current = points.get(index);
+            UvPoint next = points.get(index + 1);
+            area += current.u() * next.v() - next.u() * current.v();
+        }
+        return area * 0.5;
+    }
+
     private static List<PointPayload> triangulateParametricFaceAdaptive(
             ParametricSurfaceMapper mapper,
             List<ParametricLoopPayload> loops,
@@ -1913,6 +1961,32 @@ public final class StepPreviewJsonExporter {
     }
 
     private static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
+        if (geometry instanceof StepPlane stepPlane) {
+            Axis2Placement3D placement = builder.buildPlacement(stepPlane.position().id());
+            Plane plane = builder.buildPlane(stepPlane.id());
+            Direction3 uDirection = placement.xDirection();
+            Direction3 vDirection = placement.yDirection();
+            CartesianPoint origin = plane.origin();
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    Vector3 offset = point.subtract(origin);
+                    return new UvPoint(offset.dot(uDirection.asVector()), offset.dot(vDirection.asVector()));
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return origin
+                            .add(uDirection.asVector().scale(u))
+                            .add(vDirection.asVector().scale(v));
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return plane.normal().asVector();
+                }
+            };
+        }
         if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return new ParametricSurfaceMapper() {
