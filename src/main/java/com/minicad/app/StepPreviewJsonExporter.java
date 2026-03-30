@@ -976,9 +976,16 @@ public final class StepPreviewJsonExporter {
         }
         boolean hasOuter = normalizedBounds.stream().anyMatch(FaceBound::outer);
         if (!hasOuter && normalizedBounds.isEmpty()) {
-            hasOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
+            hasOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer)
+                    || stepFace.bounds().size() == 1;
         }
         if (!hasOuter) {
+            log("parametric_outer_bound_missing",
+                    "faceId=" + stepFace.id()
+                            + ", surfaceType=" + surfaceTypeName(geometry)
+                            + ", semanticBoundCount=" + stepFace.bounds().size()
+                            + ", semanticOuterCount=" + stepFace.bounds().stream().filter(com.minicad.step.model.StepFaceBound::outer).count()
+                            + ", normalizedBoundCount=" + normalizedBounds.size());
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
@@ -1222,6 +1229,11 @@ public final class StepPreviewJsonExporter {
         List<ParametricLoopPayload> loops = new ArrayList<>();
         for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
             if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop)) {
+                log("parametric_loop_build_failed",
+                        "faceId=" + stepFace.id()
+                                + ", surfaceType=" + surfaceTypeName(geometry)
+                                + ", boundId=" + bound.id()
+                                + ", reason=bound loop is not EDGE_LOOP");
                 return List.of();
             }
             List<UvPoint> loopPoints = new ArrayList<>();
@@ -1229,6 +1241,14 @@ public final class StepPreviewJsonExporter {
             for (com.minicad.step.model.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                 List<UvPoint> edgePoints = sampleParametricOrientedEdge(orientedEdge, geometry, mapper, builder);
                 if (edgePoints == null || edgePoints.size() < 2) {
+                    log("parametric_loop_build_failed",
+                            "faceId=" + stepFace.id()
+                                    + ", surfaceType=" + surfaceTypeName(geometry)
+                                    + ", boundId=" + bound.id()
+                                    + ", edgeId=" + orientedEdge.edgeElement().id()
+                                    + ", orientedEdgeId=" + orientedEdge.id()
+                                    + ", reason=edge sampling returned "
+                                    + (edgePoints == null ? "null" : edgePoints.size() + " points"));
                     return List.of();
                 }
                 int startIndex = firstEdge ? 0 : 1;
@@ -1238,6 +1258,12 @@ public final class StepPreviewJsonExporter {
                 firstEdge = false;
             }
             if (loopPoints.size() < 4) {
+                log("parametric_loop_build_failed",
+                        "faceId=" + stepFace.id()
+                                + ", surfaceType=" + surfaceTypeName(geometry)
+                                + ", boundId=" + bound.id()
+                                + ", reason=loop contains fewer than 4 UV points"
+                                + ", loopPointCount=" + loopPoints.size());
                 return List.of();
             }
             if (!bound.orientation()) {
@@ -1329,17 +1355,26 @@ public final class StepPreviewJsonExporter {
             default -> List.of();
         };
         if (pcurves.isEmpty()) {
+            log("parametric_edge_sampling_failed",
+                    "edgeId=" + orientedEdge.edgeElement().id()
+                            + ", orientedEdgeId=" + orientedEdge.id()
+                            + ", surfaceType=" + surfaceTypeName(faceGeometry)
+                            + ", edgeGeometryType=" + surfaceTypeName(edgeGeometry)
+                            + ", associatedGeometry=" + associatedGeometrySummary(edgeGeometry)
+                            + ", reason=no matching pcurves");
             return null;
         }
         UvPoint projectedStart = mapper.project(pointFromStep(startVertex.point()), null);
         UvPoint projectedEnd = mapper.project(pointFromStep(endVertex.point()), projectedStart);
         List<UvPoint> best = null;
         double bestScore = Double.POSITIVE_INFINITY;
+        int unsupportedPcurveCount = 0;
         for (StepPcurve pcurve : pcurves) {
             Object built;
             try {
                 built = builder.buildPcurve2(pcurve.id());
             } catch (UnsupportedGeometryException ex) {
+                unsupportedPcurveCount++;
                 continue;
             }
             if (built instanceof Line2 line) {
@@ -1397,7 +1432,37 @@ public final class StepPreviewJsonExporter {
                 }
             }
         }
+        if (best == null) {
+            log("parametric_edge_sampling_failed",
+                    "edgeId=" + orientedEdge.edgeElement().id()
+                            + ", orientedEdgeId=" + orientedEdge.id()
+                            + ", surfaceType=" + surfaceTypeName(faceGeometry)
+                            + ", pcurveCount=" + pcurves.size()
+                            + ", unsupportedPcurveCount=" + unsupportedPcurveCount
+                            + ", pcurveBasisSurfaces=" + pcurveBasisSurfaceSummary(pcurves)
+                            + ", reason=no usable pcurve samples");
+        }
         return best;
+    }
+
+    private static String associatedGeometrySummary(StepEntity edgeGeometry) {
+        List<StepEntity> associated = switch (edgeGeometry) {
+            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry();
+            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry();
+            default -> List.of();
+        };
+        if (associated.isEmpty()) {
+            return "[]";
+        }
+        return associated.stream()
+                .map(entity -> surfaceTypeName(entity) + "#" + entity.id())
+                .collect(Collectors.joining("|"));
+    }
+
+    private static String pcurveBasisSurfaceSummary(List<StepPcurve> pcurves) {
+        return pcurves.stream()
+                .map(pcurve -> "#" + pcurve.id() + "->#" + pcurve.basisSurface().id())
+                .collect(Collectors.joining("|"));
     }
 
     private static List<StepPcurve> matchingPcurves(List<StepEntity> associatedGeometry, StepEntity faceGeometry) {
