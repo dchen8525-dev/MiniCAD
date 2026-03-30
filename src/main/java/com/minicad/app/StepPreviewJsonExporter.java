@@ -57,6 +57,8 @@ import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepSurfaceCurve;
+import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
+import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepVertexPoint;
@@ -244,10 +246,17 @@ public final class StepPreviewJsonExporter {
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
             try {
-                return new PreviewFaceResult(toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata), null);
+                FacePayload payload = toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata);
+                if (payload != null) {
+                    return new PreviewFaceResult(payload, null);
+                }
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
             }
+        }
+        if (geometry instanceof StepSurfaceOfLinearExtrusion || geometry instanceof StepSurfaceOfRevolution) {
+            return toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
         }
         if (geometry instanceof StepToroidalSurface toroidalSurface) {
             try {
@@ -800,7 +809,13 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata,
             StepCadBuilder builder
     ) {
-        if (stepFace.bounds().isEmpty() || stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer)) {
+        List<FaceBound> normalizedBounds;
+        try {
+            normalizedBounds = buildFaceBounds(stepFace, builder);
+        } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to derive face bounds"));
+        }
+        if (normalizedBounds.isEmpty() || normalizedBounds.stream().noneMatch(FaceBound::outer)) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
@@ -810,7 +825,7 @@ public final class StepPreviewJsonExporter {
         List<ParametricLoopPayload> loops = buildParametricLoops(stepFace, geometry, mapper, builder);
         if (loops.isEmpty()) {
             try {
-                loops = buildParametricLoops(buildFaceBounds(stepFace, builder), mapper);
+                loops = buildParametricLoops(normalizedBounds, mapper);
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to derive face bounds"));
             }
@@ -1031,6 +1046,8 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         List<ParametricLoopPayload> loops = new ArrayList<>();
+        boolean implicitOuter = stepFace.bounds().size() == 1
+                && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
         for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
             if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop)) {
                 return List.of();
@@ -1058,7 +1075,7 @@ public final class StepPreviewJsonExporter {
             if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
                 loopPoints.add(loopPoints.getFirst());
             }
-            loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(loopPoints)));
+            loops.add(new ParametricLoopPayload(bound.outer() || implicitOuter, List.copyOf(loopPoints)));
         }
         return List.copyOf(loops);
     }
@@ -1649,7 +1666,334 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
+        if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+            return extrusionMapper(extrusionSurface, builder);
+        }
+        if (geometry instanceof StepSurfaceOfRevolution revolutionSurface) {
+            return revolutionMapper(revolutionSurface, builder);
+        }
         return null;
+    }
+
+    private static ParametricSurfaceMapper extrusionMapper(
+            StepSurfaceOfLinearExtrusion extrusionSurface,
+            StepCadBuilder builder
+    ) {
+        CurveEvaluator directrix = curveEvaluator(extrusionSurface.sweptCurve(), builder);
+        if (directrix == null) {
+            return null;
+        }
+        Vector3 extrusionDirection = builder.buildVector(extrusionSurface.extrusionAxis().id()).normalize().asVector();
+        return new ParametricSurfaceMapper() {
+            @Override
+            public UvPoint project(CartesianPoint point, UvPoint previous) {
+                Vector3 offset = point.subtract(directrix.pointAt(directrix.start()));
+                double v = offset.dot(extrusionDirection);
+                CartesianPoint basePoint = point.add(extrusionDirection.scale(-v));
+                double u = closestParameter(directrix, basePoint, previous == null ? null : previous.u());
+                return new UvPoint(u, v);
+            }
+
+            @Override
+            public CartesianPoint pointAt(double u, double v) {
+                return directrix.pointAt(u).add(extrusionDirection.scale(v));
+            }
+
+            @Override
+            public Vector3 normalAt(double u, double v) {
+                Vector3 tangent = directrix.tangentAt(u);
+                Vector3 normal = tangent.cross(extrusionDirection);
+                if (normal.norm() <= Epsilon.EPS) {
+                    normal = fallbackNormal(extrusionDirection);
+                }
+                return normal.normalize().asVector();
+            }
+        };
+    }
+
+    private static ParametricSurfaceMapper revolutionMapper(
+            StepSurfaceOfRevolution revolutionSurface,
+            StepCadBuilder builder
+    ) {
+        CurveEvaluator directrix = curveEvaluator(revolutionSurface.sweptCurve(), builder);
+        if (directrix == null) {
+            return null;
+        }
+        StepCadBuilder.Axis1Placement axisPlacement = builder.buildAxis1Placement(revolutionSurface.axisPosition().id());
+        Direction3 axisDirection = axisPlacement.axis();
+        CartesianPoint axisOrigin = axisPlacement.location();
+        Direction3 radialReference = revolutionReferenceDirection(directrix, axisOrigin, axisDirection);
+        Direction3 tangentialReference = Direction3.from(axisDirection.asVector().cross(radialReference.asVector()));
+        return new ParametricSurfaceMapper() {
+            @Override
+            public UvPoint project(CartesianPoint point, UvPoint previous) {
+                Vector3 offset = point.subtract(axisOrigin);
+                double v = unwrapPeriodic(
+                        Math.atan2(offset.dot(tangentialReference.asVector()), offset.dot(radialReference.asVector())),
+                        previous == null ? null : previous.v(),
+                        Math.PI * 2.0
+                );
+                CartesianPoint meridianPoint = toRevolutionMeridianPoint(point, axisOrigin, axisDirection, radialReference);
+                double u = closestParameter(directrix, meridianPoint, previous == null ? null : previous.u());
+                return new UvPoint(u, v);
+            }
+
+            @Override
+            public CartesianPoint pointAt(double u, double v) {
+                return revolveAroundAxis(directrix.pointAt(u), axisOrigin, axisDirection, radialReference, tangentialReference, v);
+            }
+
+            @Override
+            public Vector3 normalAt(double u, double v) {
+                Vector3 tangentU = tangentAlongRevolutionDirectrix(
+                        directrix,
+                        axisOrigin,
+                        axisDirection,
+                        radialReference,
+                        tangentialReference,
+                        u,
+                        v
+                );
+                Vector3 tangentV = tangentAroundRevolution(
+                        axisOrigin,
+                        axisDirection,
+                        radialReference,
+                        tangentialReference,
+                        directrix.pointAt(u),
+                        v
+                );
+                Vector3 normal = tangentU.cross(tangentV);
+                if (normal.norm() <= Epsilon.EPS) {
+                    normal = fallbackNormal(axisDirection.asVector());
+                }
+                return normal.normalize().asVector();
+            }
+
+            @Override
+            public Double vPeriod() {
+                return Math.PI * 2.0;
+            }
+        };
+    }
+
+    private static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
+        return switch (curve) {
+            case StepLine line -> {
+                Line3 geometry = builder.buildLine(line.id());
+                yield new CurveEvaluator() {
+                    @Override
+                    public double start() {
+                        return -1.0;
+                    }
+
+                    @Override
+                    public double end() {
+                        return 1.0;
+                    }
+
+                    @Override
+                    public CartesianPoint pointAt(double parameter) {
+                        return geometry.pointAt(parameter);
+                    }
+                };
+            }
+            case StepCircle circle -> {
+                Circle geometry = builder.buildCircle(circle.id());
+                yield new CurveEvaluator() {
+                    @Override
+                    public double start() {
+                        return 0.0;
+                    }
+
+                    @Override
+                    public double end() {
+                        return Math.PI * 2.0;
+                    }
+
+                    @Override
+                    public CartesianPoint pointAt(double parameter) {
+                        return geometry.pointAt(parameter);
+                    }
+                };
+            }
+            case StepEllipse ellipse -> {
+                Ellipse3 geometry = builder.buildEllipse(ellipse.id());
+                yield new CurveEvaluator() {
+                    @Override
+                    public double start() {
+                        return 0.0;
+                    }
+
+                    @Override
+                    public double end() {
+                        return Math.PI * 2.0;
+                    }
+
+                    @Override
+                    public CartesianPoint pointAt(double parameter) {
+                        return geometry.pointAt(parameter);
+                    }
+                };
+            }
+            case StepBSplineCurveWithKnots spline -> {
+                BSplineCurve3 geometry = builder.buildBSplineCurve(spline.id());
+                yield new CurveEvaluator() {
+                    @Override
+                    public double start() {
+                        return geometry.startParameter();
+                    }
+
+                    @Override
+                    public double end() {
+                        return geometry.endParameter();
+                    }
+
+                    @Override
+                    public CartesianPoint pointAt(double parameter) {
+                        return geometry.pointAt(parameter);
+                    }
+                };
+            }
+            case StepTrimmedCurve trimmedCurve -> curveEvaluator(trimmedCurve.basisCurve(), builder);
+            case StepSurfaceCurve surfaceCurve -> curveEvaluator(surfaceCurve.curve3d(), builder);
+            default -> null;
+        };
+    }
+
+    private static double closestParameter(CurveEvaluator curve, CartesianPoint point, Double preferred) {
+        int coarseSegments = 160;
+        double start = curve.start();
+        double end = curve.end();
+        double bestParameter = start;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int index = 0; index <= coarseSegments; index++) {
+            double parameter = start + (end - start) * index / coarseSegments;
+            double distance = curve.pointAt(parameter).distanceTo(point);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestParameter = parameter;
+            }
+        }
+        if (preferred != null && preferred >= start && preferred <= end) {
+            double preferredDistance = curve.pointAt(preferred).distanceTo(point);
+            if (preferredDistance <= bestDistance * 1.25) {
+                bestDistance = preferredDistance;
+                bestParameter = preferred;
+            }
+        }
+        double window = Math.max((end - start) / coarseSegments, 1.0e-6);
+        for (int refinement = 0; refinement < 5; refinement++) {
+            double min = Math.max(start, bestParameter - window);
+            double max = Math.min(end, bestParameter + window);
+            for (int index = 0; index <= 12; index++) {
+                double parameter = min + (max - min) * index / 12.0;
+                double distance = curve.pointAt(parameter).distanceTo(point);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestParameter = parameter;
+                }
+            }
+            window *= 0.35;
+        }
+        return bestParameter;
+    }
+
+    private static Direction3 revolutionReferenceDirection(
+            CurveEvaluator directrix,
+            CartesianPoint axisOrigin,
+            Direction3 axisDirection
+    ) {
+        for (CartesianPoint sample : directrix.sample(96)) {
+            Vector3 radial = radialComponent(sample, axisOrigin, axisDirection);
+            if (radial.norm() > Epsilon.EPS) {
+                return Direction3.from(radial);
+            }
+        }
+        Vector3 axis = axisDirection.asVector();
+        Vector3 seed = Math.abs(axis.x()) < 0.9 ? new Vector3(1.0, 0.0, 0.0) : new Vector3(0.0, 0.0, 1.0);
+        Vector3 radial = seed.subtract(axis.scale(seed.dot(axis)));
+        return Direction3.from(radial);
+    }
+
+    private static CartesianPoint toRevolutionMeridianPoint(
+            CartesianPoint point,
+            CartesianPoint axisOrigin,
+            Direction3 axisDirection,
+            Direction3 radialReference
+    ) {
+        Vector3 offset = point.subtract(axisOrigin);
+        double axisCoordinate = offset.dot(axisDirection.asVector());
+        Vector3 radial = radialComponent(point, axisOrigin, axisDirection);
+        double radius = radial.norm();
+        return axisOrigin
+                .add(axisDirection.asVector().scale(axisCoordinate))
+                .add(radialReference.asVector().scale(radius));
+    }
+
+    private static CartesianPoint revolveAroundAxis(
+            CartesianPoint point,
+            CartesianPoint axisOrigin,
+            Direction3 axisDirection,
+            Direction3 radialReference,
+            Direction3 tangentialReference,
+            double angle
+    ) {
+        Vector3 offset = point.subtract(axisOrigin);
+        double axisCoordinate = offset.dot(axisDirection.asVector());
+        double radius = radialComponent(point, axisOrigin, axisDirection).norm();
+        Vector3 rotated = radialReference.asVector().scale(Math.cos(angle) * radius)
+                .add(tangentialReference.asVector().scale(Math.sin(angle) * radius))
+                .add(axisDirection.asVector().scale(axisCoordinate));
+        return axisOrigin.add(rotated);
+    }
+
+    private static Vector3 tangentAlongRevolutionDirectrix(
+            CurveEvaluator directrix,
+            CartesianPoint axisOrigin,
+            Direction3 axisDirection,
+            Direction3 radialReference,
+            Direction3 tangentialReference,
+            double u,
+            double v
+    ) {
+        double span = Math.max(directrix.end() - directrix.start(), 1.0);
+        double step = Math.max(span * 1.0e-4, 1.0e-5);
+        double u0 = Math.max(directrix.start(), u - step);
+        double u1 = Math.min(directrix.end(), u + step);
+        if (u1 - u0 <= Epsilon.EPS) {
+            u0 = Math.max(directrix.start(), u - step * 2.0);
+            u1 = Math.min(directrix.end(), u + step * 2.0);
+        }
+        CartesianPoint p0 = revolveAroundAxis(directrix.pointAt(u0), axisOrigin, axisDirection, radialReference, tangentialReference, v);
+        CartesianPoint p1 = revolveAroundAxis(directrix.pointAt(u1), axisOrigin, axisDirection, radialReference, tangentialReference, v);
+        return p1.subtract(p0);
+    }
+
+    private static Vector3 tangentAroundRevolution(
+            CartesianPoint axisOrigin,
+            Direction3 axisDirection,
+            Direction3 radialReference,
+            Direction3 tangentialReference,
+            CartesianPoint point,
+            double angle
+    ) {
+        CartesianPoint rotated = revolveAroundAxis(point, axisOrigin, axisDirection, radialReference, tangentialReference, angle);
+        Vector3 radial = radialComponent(rotated, axisOrigin, axisDirection);
+        return axisDirection.asVector().cross(radial);
+    }
+
+    private static Vector3 radialComponent(CartesianPoint point, CartesianPoint axisOrigin, Direction3 axisDirection) {
+        Vector3 offset = point.subtract(axisOrigin);
+        return offset.subtract(axisDirection.asVector().scale(offset.dot(axisDirection.asVector())));
+    }
+
+    private static Vector3 fallbackNormal(Vector3 preferredAxis) {
+        Vector3 seed = Math.abs(preferredAxis.x()) < 0.9 ? new Vector3(1.0, 0.0, 0.0) : new Vector3(0.0, 1.0, 0.0);
+        Vector3 normal = preferredAxis.cross(seed);
+        if (normal.norm() <= Epsilon.EPS) {
+            normal = preferredAxis.cross(new Vector3(0.0, 0.0, 1.0));
+        }
+        return normal.norm() <= Epsilon.EPS ? new Vector3(0.0, 0.0, 1.0) : normal;
     }
 
     private static double unwrapPeriodic(double value, Double previous, double period) {
@@ -1936,7 +2280,12 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
-        return stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).toList();
+        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).toList();
+        if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
+            FaceBound bound = bounds.getFirst();
+            return List.of(FaceBound.outer(bound.loop(), bound.orientation()));
+        }
+        return bounds;
     }
 
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {
@@ -1961,6 +2310,12 @@ public final class StepPreviewJsonExporter {
         }
         if (geometry instanceof StepToroidalSurface) {
             return "TOROIDAL_SURFACE";
+        }
+        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
+            return "SURFACE_OF_LINEAR_EXTRUSION";
+        }
+        if (geometry instanceof StepSurfaceOfRevolution) {
+            return "SURFACE_OF_REVOLUTION";
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots) {
             return "B_SPLINE_SURFACE_WITH_KNOTS";
@@ -3179,6 +3534,35 @@ public final class StepPreviewJsonExporter {
 
         default Double vPeriod() {
             return null;
+        }
+    }
+
+    private interface CurveEvaluator {
+        double start();
+
+        double end();
+
+        CartesianPoint pointAt(double parameter);
+
+        default Vector3 tangentAt(double parameter) {
+            double span = Math.max(end() - start(), 1.0);
+            double step = Math.max(span * 1.0e-4, 1.0e-5);
+            double t0 = Math.max(start(), parameter - step);
+            double t1 = Math.min(end(), parameter + step);
+            if (t1 - t0 <= Epsilon.EPS) {
+                t0 = Math.max(start(), parameter - step * 2.0);
+                t1 = Math.min(end(), parameter + step * 2.0);
+            }
+            return pointAt(t1).subtract(pointAt(t0));
+        }
+
+        default List<CartesianPoint> sample(int segments) {
+            List<CartesianPoint> points = new ArrayList<>(segments + 1);
+            for (int index = 0; index <= segments; index++) {
+                double parameter = start() + (end() - start()) * index / (double) segments;
+                points.add(pointAt(parameter));
+            }
+            return List.copyOf(points);
         }
     }
 

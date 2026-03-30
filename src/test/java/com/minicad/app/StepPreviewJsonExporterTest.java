@@ -124,6 +124,18 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportPreviewJsonForFanExample() throws IOException {
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/fan.stp")));
+
+        assertTrue(json.contains("\"representationCount\":1"));
+        assertTrue(json.contains("\"instanceCount\":1"));
+        assertTrue(json.contains("\"faceCount\":194"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":0"));
+        assertTrue(json.contains("\"SURFACE_OF_LINEAR_EXTRUSION\""));
+        assertTrue(json.contains("\"SURFACE_OF_REVOLUTION\""));
+    }
+
+    @Test
     void shouldSkipUnsupportedCylindricalFacesInPreview() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;

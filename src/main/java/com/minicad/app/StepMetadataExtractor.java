@@ -4,6 +4,8 @@ import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFillAreaStyle;
 import com.minicad.step.model.StepFillAreaStyleColour;
+import com.minicad.step.model.StepDraughtingPreDefinedColour;
+import com.minicad.step.model.StepOverRidingStyledItem;
 import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepPresentationStyleAssignment;
 import com.minicad.step.model.StepStyledItem;
@@ -39,6 +41,12 @@ public final class StepMetadataExtractor {
                 if (rgb != null) {
                     metadata.rgb = rgb;
                 }
+            } else if (entity instanceof StepOverRidingStyledItem styledItem) {
+                MutableMetadata metadata = mutableByItemId.computeIfAbsent(styledItem.item().id(), ignored -> new MutableMetadata());
+                int[] rgb = extractRgb(styledItem.styles());
+                if (rgb != null) {
+                    metadata.rgb = rgb;
+                }
             } else if (entity instanceof StepPresentationLayerAssignment layerAssignment) {
                 for (StepEntity assignedItem : layerAssignment.assignedItems()) {
                     MutableMetadata metadata = mutableByItemId.computeIfAbsent(assignedItem.id(), ignored -> new MutableMetadata());
@@ -59,21 +67,48 @@ public final class StepMetadataExtractor {
     }
 
     private static int[] extractRgb(StepStyledItem styledItem) {
-        for (StepPresentationStyleAssignment assignment : styledItem.styles()) {
-            for (StepSurfaceStyleUsage usage : assignment.styles()) {
+        return extractRgb(styledItem.styles());
+    }
+
+    private static int[] extractRgb(List<StepPresentationStyleAssignment> assignments) {
+        for (StepPresentationStyleAssignment assignment : assignments) {
+            for (StepEntity style : assignment.styles()) {
+                if (!(style instanceof StepSurfaceStyleUsage usage)) {
+                    continue;
+                }
                 StepSurfaceSideStyle sideStyle = usage.style();
                 for (StepSurfaceStyleFillArea surfaceFill : sideStyle.styles()) {
                     StepFillAreaStyle fillStyle = surfaceFill.fillStyle();
                     for (StepFillAreaStyleColour fillColour : fillStyle.styles()) {
-                        StepColourRgb colour = fillColour.colour();
-                        return new int[]{
-                                toChannel(colour.red()),
-                                toChannel(colour.green()),
-                                toChannel(colour.blue())
-                        };
+                        int[] rgb = colourToRgb(fillColour.colour());
+                        if (rgb != null) {
+                            return rgb;
+                        }
                     }
                 }
             }
+        }
+        return null;
+    }
+
+    private static int[] colourToRgb(StepEntity colour) {
+        if (colour instanceof StepColourRgb rgb) {
+            return new int[]{
+                    toChannel(rgb.red()),
+                    toChannel(rgb.green()),
+                    toChannel(rgb.blue())
+            };
+        }
+        if (colour instanceof StepDraughtingPreDefinedColour predefined) {
+            return switch (predefined.name().toLowerCase()) {
+                case "blue" -> new int[]{0, 0, 255};
+                case "red" -> new int[]{255, 0, 0};
+                case "green" -> new int[]{0, 128, 0};
+                case "yellow" -> new int[]{255, 255, 0};
+                case "black" -> new int[]{0, 0, 0};
+                case "white" -> new int[]{255, 255, 255};
+                default -> null;
+            };
         }
         return null;
     }

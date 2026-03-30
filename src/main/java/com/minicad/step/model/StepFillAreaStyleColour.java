@@ -7,5 +7,5 @@ package com.minicad.step.model;
  * @param name style name
  * @param colour referenced colour
  */
-public record StepFillAreaStyleColour(int id, String name, StepColourRgb colour) implements StepEntity {
+public record StepFillAreaStyleColour(int id, String name, StepEntity colour) implements StepEntity {
 }

@@ -18,6 +18,7 @@ import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
+import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDerivedUnit;
@@ -47,6 +48,8 @@ import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepSiUnit;
 import com.minicad.step.model.StepSurfaceCurve;
+import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
+import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
@@ -236,7 +239,10 @@ class StepEntityResolverTest {
                 () -> StepEntityResolver.resolveAll(StepParser.parse(step))
         );
 
-        assertEquals("ADVANCED_FACE geometry must be PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, B_SPLINE_SURFACE_WITH_KNOTS or TOROIDAL_SURFACE", exception.getMessage());
+        assertEquals(
+                "ADVANCED_FACE geometry must be PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, SURFACE_OF_LINEAR_EXTRUSION, SURFACE_OF_REVOLUTION, B_SPLINE_SURFACE_WITH_KNOTS or TOROIDAL_SURFACE",
+                exception.getMessage()
+        );
     }
 
     @Test
@@ -258,6 +264,44 @@ class StepEntityResolverTest {
 
         StepCylindricalSurface surface = assertInstanceOf(StepCylindricalSurface.class, resolved.get(5));
         assertEquals(2.0, surface.radius());
+    }
+
+    @Test
+    void shouldResolveExtrusionAndRevolutionSurfaces() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(4.0,1.0,0.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=DIRECTION('DY',(0.0,1.0,0.0));
+                #6=VECTOR('VY',#5,3.0);
+                #7=B_SPLINE_CURVE_WITH_KNOTS('',2,(#1,#2,#3),.UNSPECIFIED.,.F.,.F.,(3,3),(0.0,1.0),.PIECEWISE_BEZIER_KNOTS.);
+                #8=AXIS1_PLACEMENT('',#1,#5);
+                #9=SURFACE_OF_LINEAR_EXTRUSION('',#7,#6);
+                #10=SURFACE_OF_REVOLUTION('',#7,#8);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAxis1Placement axis = assertInstanceOf(StepAxis1Placement.class, resolved.get(8));
+        assertEquals(5, axis.axis().id());
+        StepSurfaceOfLinearExtrusion extrusion = assertInstanceOf(StepSurfaceOfLinearExtrusion.class, resolved.get(9));
+        assertEquals(7, extrusion.sweptCurve().id());
+        StepSurfaceOfRevolution revolution = assertInstanceOf(StepSurfaceOfRevolution.class, resolved.get(10));
+        assertEquals(8, revolution.axisPosition().id());
+    }
+
+    @Test
+    void shouldResolveExamplesFanStepSemanticGraph() throws IOException {
+        String step = Files.readString(Path.of("examples/fan.stp"));
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertInstanceOf(StepSurfaceOfLinearExtrusion.class, resolved.get(71));
+        assertInstanceOf(StepSurfaceOfRevolution.class, resolved.get(6338));
+        assertInstanceOf(StepAxis1Placement.class, resolved.get(6349));
     }
 
     @Test

@@ -29,6 +29,7 @@ import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.geometry2d.Vector2;
 import com.minicad.step.model.StepAdvancedFace;
+import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepCartesianPoint;
@@ -55,6 +56,8 @@ import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSurfaceCurve;
+import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
+import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepVertexLoop;
@@ -239,6 +242,11 @@ public final class StepCadBuilder {
         );
         placements.put(id, built);
         return built;
+    }
+
+    public Axis1Placement buildAxis1Placement(int id) {
+        StepAxis1Placement placement = requireEntity(id, StepAxis1Placement.class, "AXIS1_PLACEMENT");
+        return new Axis1Placement(buildPoint(placement.location().id()), buildDirection(placement.axis().id()));
     }
 
     /**
@@ -774,6 +782,16 @@ public final class StepCadBuilder {
                 buildConicalSurface(conicalSurface.id());
                 throw new UnsupportedGeometryException(faceType + " construction for CONICAL_SURFACE is unsupported");
             }
+            if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+                buildCurve3(extrusionSurface.sweptCurve());
+                buildVector(extrusionSurface.extrusionAxis().id());
+                throw new UnsupportedGeometryException(faceType + " construction for SURFACE_OF_LINEAR_EXTRUSION is unsupported");
+            }
+            if (geometry instanceof StepSurfaceOfRevolution revolutionSurface) {
+                buildCurve3(revolutionSurface.sweptCurve());
+                buildAxis1Placement(revolutionSurface.axisPosition().id());
+                throw new UnsupportedGeometryException(faceType + " construction for SURFACE_OF_REVOLUTION is unsupported");
+            }
             if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
                 buildBSplineSurface(splineSurface.id());
                 throw new UnsupportedGeometryException(faceType + " construction for B_SPLINE_SURFACE_WITH_KNOTS is unsupported");
@@ -785,6 +803,10 @@ public final class StepCadBuilder {
             throw new UnsupportedGeometryException(faceType + " construction requires PLANE geometry");
         }
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();
+        if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
+            FaceBound bound = bounds.getFirst();
+            bounds = List.of(FaceBound.outer(bound.loop(), bound.orientation()));
+        }
         return new Face(buildPlane(plane.id()), bounds, faceSameSense(stepFace));
     }
 
@@ -872,6 +894,21 @@ public final class StepCadBuilder {
         throw new UnsupportedGeometryException("unsupported face subtype");
     }
 
+    private Curve3 buildCurve3(StepEntity curve) {
+        return switch (curve) {
+            case StepLine line -> buildLine(line.id());
+            case StepCircle circle -> buildCircle(circle.id());
+            case StepEllipse ellipse -> buildEllipse(ellipse.id());
+            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
+            case StepSeamCurve seamCurve -> buildSeamCurve(seamCurve.id());
+            case StepTrimmedCurve trimmedCurve -> buildTrimmedCurve(trimmedCurve.id());
+            default -> throw new UnsupportedGeometryException(
+                    "surface directrix requires LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE"
+            );
+        };
+    }
+
     private static void validateTrimPoint(StepEntity trim, Curve3 basis, String slot) {
         if (!(trim instanceof StepCartesianPoint point)) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
@@ -945,5 +982,8 @@ public final class StepCadBuilder {
             return snapTrimPoint2(point, trimmed.basisCurve());
         }
         return point;
+    }
+
+    public record Axis1Placement(CartesianPoint location, Direction3 axis) {
     }
 }
