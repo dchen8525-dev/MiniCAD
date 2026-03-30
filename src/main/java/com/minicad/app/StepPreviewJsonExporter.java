@@ -182,6 +182,11 @@ public final class StepPreviewJsonExporter {
                         + ", faceCount=" + stats.faceCount()
                         + ", edgeCount=" + stats.edgeCount()
                         + ", unsupportedFaceCount=" + stats.unsupportedFaceCount());
+        if (!unsupportedFaces.isEmpty()) {
+            log("unsupported_faces_summary",
+                    "bySurfaceType=" + summarizeUnsupportedFacesBySurfaceType(unsupportedFaces)
+                            + ", byReason=" + summarizeUnsupportedFacesByReason(unsupportedFaces));
+        }
 
         return new PreviewPayload(
                 stats,
@@ -542,6 +547,50 @@ public final class StepPreviewJsonExporter {
             }
         }
         return count;
+    }
+
+    private static String summarizeUnsupportedFacesBySurfaceType(List<UnsupportedFacePayload> unsupportedFaces) {
+        Map<String, Long> counts = unsupportedFaces.stream()
+                .collect(Collectors.groupingBy(
+                        face -> face.surfaceType() == null ? "UNKNOWN" : face.surfaceType(),
+                        LinkedHashMap::new,
+                        Collectors.counting()
+                ));
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining("|"));
+    }
+
+    private static String summarizeUnsupportedFacesByReason(List<UnsupportedFacePayload> unsupportedFaces) {
+        Map<String, Long> counts = unsupportedFaces.stream()
+                .collect(Collectors.groupingBy(
+                        face -> face.reason() == null ? "unknown" : face.reason(),
+                        LinkedHashMap::new,
+                        Collectors.counting()
+                ));
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining("|"));
+    }
+
+    private static String summarizeLoopPointCounts(List<ParametricLoopPayload> loops) {
+        return loops.stream()
+                .map(loop -> (loop.outer() ? "outer" : "inner") + ":" + loop.points().size())
+                .collect(Collectors.joining("|"));
+    }
+
+    private static String formatUvBounds(UvBounds bounds) {
+        return String.format(
+                "(minU=%.6f,minV=%.6f,maxU=%.6f,maxV=%.6f,uSpan=%.6f,vSpan=%.6f)",
+                bounds.minU(),
+                bounds.minV(),
+                bounds.maxU(),
+                bounds.maxV(),
+                bounds.uSpan(),
+                bounds.vSpan()
+        );
     }
 
     private static int countShells(Map<Integer, StepEntity> resolved) {
@@ -925,8 +974,11 @@ public final class StepPreviewJsonExporter {
                             + ", surfaceType=" + surfaceTypeName(geometry)
                             + ", reason=" + ex.getMessage());
         }
-        boolean hasSemanticOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
-        if (!hasSemanticOuter) {
+        boolean hasOuter = normalizedBounds.stream().anyMatch(FaceBound::outer);
+        if (!hasOuter && normalizedBounds.isEmpty()) {
+            hasOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
+        }
+        if (!hasOuter) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
@@ -969,6 +1021,17 @@ public final class StepPreviewJsonExporter {
                 faceSameSense(stepFace)
         );
         if (triangles.isEmpty()) {
+            log("parametric_triangulation_empty",
+                    "faceId=" + stepFace.id()
+                            + ", surfaceType=" + surfaceTypeName(geometry)
+                            + ", loopCount=" + loops.size()
+                            + ", outerLoopCount=" + loops.stream().filter(ParametricLoopPayload::outer).count()
+                            + ", innerLoopCount=" + loops.stream().filter(loop -> !loop.outer()).count()
+                            + ", uvBounds=" + formatUvBounds(uvBounds)
+                            + ", sampleCount=" + sampleCount
+                            + ", baseUSegments=" + baseUSegments
+                            + ", baseVSegments=" + baseVSegments
+                            + ", loopPoints=" + summarizeLoopPointCounts(loops));
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "parametric triangulation produced no cells"));
         }
 

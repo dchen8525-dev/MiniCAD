@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -129,7 +130,7 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"representationCount\":1"));
         assertTrue(json.contains("\"instanceCount\":1"));
-        assertTrue(json.contains("\"unsupportedFaceCount\":150"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":128"));
         assertTrue(json.contains("\"SURFACE_OF_LINEAR_EXTRUSION\""));
         assertTrue(json.contains("\"SURFACE_OF_REVOLUTION\""));
         assertTrue(json.contains("\"unsupportedFaces\":[{\"id\":17"));
@@ -200,7 +201,7 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
-    void shouldSkipCylindricalFaceWithoutOuterBound() {
+    void shouldAvoidMissingOuterBoundForSingleCylindricalFaceBound() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;
                 #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
@@ -267,8 +268,10 @@ class StepPreviewJsonExporterTest {
                 ENDSEC;
                 """);
 
-        assertTrue(json.contains("\"faceCount\":0"));
         assertTrue(json.contains("\"unsupportedFaceCount\":1"));
+        assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""));
+        assertFalse(json.contains("\"reason\":\"missing outer bound\""));
+        assertTrue(json.contains("\"reason\":\"parametric triangulation produced no cells\""));
     }
 
     @Test
@@ -875,13 +878,14 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
-    void shouldMarkConicalSeamFaceWithoutOuterBoundUnsupported() throws IOException {
+    void shouldReportConicalSeamFaceTriangulationFailureWithoutMissingOuterBoundReason() throws IOException {
         String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/conical-seam-missing-outer.step")));
 
         assertTrue(json.contains("\"unsupportedFaceCount\":1"));
         assertTrue(json.contains("\"unsupportedFaces\":[{\"id\":112"));
         assertTrue(json.contains("\"surfaceType\":\"CONICAL_SURFACE\""));
-        assertTrue(json.contains("\"reason\":\"missing outer bound\""));
+        assertFalse(json.contains("\"reason\":\"missing outer bound\""));
+        assertTrue(json.contains("\"reason\":\"parametric triangulation produced no cells\""));
     }
 
     @Test
@@ -943,13 +947,14 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
-    void shouldMarkToroidalSeamFaceWithoutOuterBoundUnsupported() throws IOException {
+    void shouldReportToroidalSeamFaceTriangulationFailureWithoutMissingOuterBoundReason() throws IOException {
         String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/toroidal-seam-missing-outer.step")));
 
         assertTrue(json.contains("\"unsupportedFaceCount\":1"));
         assertTrue(json.contains("\"unsupportedFaces\":[{\"id\":112"));
         assertTrue(json.contains("\"surfaceType\":\"TOROIDAL_SURFACE\""));
-        assertTrue(json.contains("\"reason\":\"missing outer bound\""));
+        assertFalse(json.contains("\"reason\":\"missing outer bound\""));
+        assertTrue(json.contains("\"reason\":\"parametric triangulation produced no cells\""));
     }
 
     @Test

@@ -173,6 +173,23 @@ function logJson(label, payload) {
     }
 }
 
+function summarizeUnsupportedFaces(unsupportedFaces = []) {
+    const summary = {
+        bySurfaceType: {},
+        byReason: {}
+    };
+    if (!Array.isArray(unsupportedFaces)) {
+        return summary;
+    }
+    for (const face of unsupportedFaces) {
+        const surfaceType = face?.surfaceType || 'UNKNOWN';
+        const reason = face?.reason || 'unknown';
+        summary.bySurfaceType[surfaceType] = (summary.bySurfaceType[surfaceType] ?? 0) + 1;
+        summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
+    }
+    return summary;
+}
+
 function createGridHelper(size, divisions) {
     const helper = new THREE.GridHelper(size, divisions, 0x67767a, 0x9eb2b7);
     const materials = Array.isArray(helper.material) ? helper.material : [helper.material];
@@ -1418,6 +1435,7 @@ async function requestPreview(stepText) {
         edges: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,
         unsupportedFaces: Array.isArray(parsed?.unsupportedFaces) ? parsed.unsupportedFaces.length : 0
     });
+    logJson('requestPreview:unsupported-summary', summarizeUnsupportedFaces(parsed?.unsupportedFaces));
     return parsed;
 }
 
