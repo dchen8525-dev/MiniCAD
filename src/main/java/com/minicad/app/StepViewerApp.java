@@ -33,7 +33,7 @@ public final class StepViewerApp {
 
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
-    private static final AtomicLong REQUEST_IDS = new2 AtomicLong();
+    private static final AtomicLong REQUEST_IDS = new AtomicLong();
     private static final ConcurrentHashMap<String, CompletableFuture<String>> IN_FLIGHT_PREVIEWS = new ConcurrentHashMap<>();
 
     private StepViewerApp() {
