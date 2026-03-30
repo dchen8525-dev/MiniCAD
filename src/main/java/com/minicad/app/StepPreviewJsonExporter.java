@@ -130,35 +130,50 @@ public final class StepPreviewJsonExporter {
         long metadataStartedAt = System.nanoTime();
         StepMetadataExtractor metadata = StepMetadataExtractor.fromResolved(resolved);
         log("metadata_done", "elapsedMs=" + elapsedMillis(metadataStartedAt));
-        long legacyStartedAt = System.nanoTime();
-        GeometryCollection legacyGeometry = buildLegacyGeometry(resolved, builder, metadata);
-        log("legacy_geometry_done",
-                "elapsedMs=" + elapsedMillis(legacyStartedAt)
-                        + ", faces=" + legacyGeometry.faces().size()
-                        + ", edges=" + legacyGeometry.edges().size()
-                        + ", unsupportedFaces=" + legacyGeometry.unsupportedFaces().size());
         long assemblyStartedAt = System.nanoTime();
         AssemblyData assembly = buildAssemblyData(resolved, builder, metadata);
         log("assembly_done",
                 "elapsedMs=" + elapsedMillis(assemblyStartedAt)
                         + ", representations=" + assembly.representations().size()
-                        + ", instances=" + assembly.instances().size());
+                        + ", instances=" + assembly.instances().size()
+                        + ", unsupportedFaces=" + assembly.unsupportedFaces().size());
+        boolean assemblyMode = !assembly.instances().isEmpty() && !assembly.representations().isEmpty();
+        GeometryCollection legacyGeometry;
+        if (assemblyMode) {
+            legacyGeometry = new GeometryCollection(List.of(), List.of(), List.of());
+        } else {
+            long legacyStartedAt = System.nanoTime();
+            legacyGeometry = buildLegacyGeometry(resolved, builder, metadata);
+            log("legacy_geometry_done",
+                    "elapsedMs=" + elapsedMillis(legacyStartedAt)
+                            + ", faces=" + legacyGeometry.faces().size()
+                            + ", edges=" + legacyGeometry.edges().size()
+                            + ", unsupportedFaces=" + legacyGeometry.unsupportedFaces().size());
+        }
 
         BoundsAccumulator geometryBounds = new BoundsAccumulator();
-        includeGeometry(geometryBounds, legacyGeometry);
-        includeAssembly(geometryBounds, assembly);
+        if (assemblyMode) {
+            includeAssembly(geometryBounds, assembly);
+        } else {
+            includeGeometry(geometryBounds, legacyGeometry);
+        }
         List<PmiPayload> pmi = buildPmiPayloads(resolved, assembly);
         BoundsAccumulator bounds = copyBounds(geometryBounds);
         includePmi(bounds, pmi);
         ValidationPayload validation = buildValidationPayload(legacyGeometry, assembly, geometryBounds, resolved);
+        List<UnsupportedFacePayload> unsupportedFaces = assemblyMode
+                ? assembly.unsupportedFaces()
+                : legacyGeometry.unsupportedFaces();
+        int faceCount = assemblyMode ? countRenderedFaces(assembly) : legacyGeometry.faces().size();
+        int edgeCount = assemblyMode ? countRenderedEdges(assembly) : legacyGeometry.edges().size();
 
         PreviewStats stats = new PreviewStats(
                 stepFile.entities().size(),
                 countEntities(resolved, StepManifoldSolidBrep.class),
                 countShells(resolved),
-                legacyGeometry.faces().size(),
-                legacyGeometry.edges().size(),
-                legacyGeometry.unsupportedFaces().size()
+                faceCount,
+                edgeCount,
+                unsupportedFaces.size()
         );
         log("stats_done",
                 "entityCount=" + stats.entityCount()
@@ -173,7 +188,7 @@ public final class StepPreviewJsonExporter {
                 bounds.toPayload(),
                 validation,
                 pmi,
-                legacyGeometry.unsupportedFaces(),
+                unsupportedFaces,
                 legacyGeometry.edges(),
                 legacyGeometry.faces(),
                 assembly.representations(),
@@ -355,6 +370,7 @@ public final class StepPreviewJsonExporter {
     ) {
         AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);
         Map<Integer, RepresentationPayload> representations = new LinkedHashMap<>();
+        List<UnsupportedFacePayload> unsupportedFaces = new ArrayList<>();
         for (AssemblyRepresentation assemblyRepresentation : graph.representations()) {
             StepEntity entity = resolved.get(assemblyRepresentation.representationId());
             if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
@@ -367,6 +383,7 @@ public final class StepPreviewJsonExporter {
                         metadata,
                         collectInheritedShellMetadata(representation, metadata, resolved)
                 );
+                unsupportedFaces.addAll(geometry.unsupportedFaces());
                 representations.put(
                         representation.id(),
                         new RepresentationPayload(
@@ -398,7 +415,11 @@ public final class StepPreviewJsonExporter {
                 ));
         }
 
-        return new AssemblyData(List.copyOf(representations.values()), List.copyOf(instances));
+        return new AssemblyData(
+                List.copyOf(representations.values()),
+                List.copyOf(instances),
+                List.copyOf(unsupportedFaces)
+        );
     }
 
     private static Set<Integer> collectRepresentationShells(
@@ -904,10 +925,8 @@ public final class StepPreviewJsonExporter {
                             + ", surfaceType=" + surfaceTypeName(geometry)
                             + ", reason=" + ex.getMessage());
         }
-        boolean hasSemanticOuter = stepFace.bounds().size() == 1
-                || stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
-        boolean hasNormalizedOuter = !normalizedBounds.isEmpty() && normalizedBounds.stream().anyMatch(FaceBound::outer);
-        if (!hasSemanticOuter && !hasNormalizedOuter) {
+        boolean hasSemanticOuter = stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
+        if (!hasSemanticOuter) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
@@ -931,15 +950,15 @@ public final class StepPreviewJsonExporter {
         }
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        // Keep small curved patches denser from the start so zoomed silhouettes stay smoother.
-        int baseUSegments = Math.max(224, Math.min(448, sampleCount * 8));
-        int baseVSegments = Math.max(80, Math.min(192, sampleCount * 6));
+        // Preview meshes should stay light enough for API transport and browser upload.
+        int baseUSegments = Math.max(48, Math.min(128, sampleCount * 4));
+        int baseVSegments = Math.max(24, Math.min(64, sampleCount * 3));
         if (geometry instanceof StepCylindricalSurface) {
-            baseUSegments = Math.max(baseUSegments, 384);
-            baseVSegments = Math.max(baseVSegments, 112);
+            baseUSegments = Math.max(baseUSegments, 96);
+            baseVSegments = Math.max(baseVSegments, 32);
         } else if (geometry instanceof StepConicalSurface || geometry instanceof StepToroidalSurface) {
-            baseUSegments = Math.max(baseUSegments, 320);
-            baseVSegments = Math.max(baseVSegments, 112);
+            baseUSegments = Math.max(baseUSegments, 96);
+            baseVSegments = Math.max(baseVSegments, 32);
         }
         List<PointPayload> triangles = triangulateParametricFaceAdaptive(
                 mapper,
@@ -1138,8 +1157,6 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         List<ParametricLoopPayload> loops = new ArrayList<>();
-        boolean implicitOuter = stepFace.bounds().size() == 1
-                && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
         for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
             if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop)) {
                 return List.of();
@@ -1167,7 +1184,7 @@ public final class StepPreviewJsonExporter {
             if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
                 loopPoints.add(loopPoints.getFirst());
             }
-            loops.add(new ParametricLoopPayload(bound.outer() || implicitOuter, List.copyOf(loopPoints)));
+            loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(loopPoints)));
         }
         return List.copyOf(loops);
     }
@@ -1610,11 +1627,10 @@ public final class StepPreviewJsonExporter {
     ) {
         int uSegments = baseUSegments;
         int vSegments = baseVSegments;
-        List<PointPayload> best = List.of();
         for (int attempt = 0; attempt < 4; attempt++) {
             List<PointPayload> triangles = triangulateParametricFace(mapper, loops, bounds, uSegments, vSegments, sameSense);
             if (!triangles.isEmpty()) {
-                best = triangles;
+                return triangles;
             }
             if (uSegments >= 512 && vSegments >= 256) {
                 break;
@@ -1622,7 +1638,7 @@ public final class StepPreviewJsonExporter {
             uSegments = Math.min(uSegments * 2, 512);
             vSegments = Math.min(vSegments * 2, 256);
         }
-        return best;
+        return List.of();
     }
 
     private static boolean contains(List<UvPoint> polygon, UvPoint point) {
@@ -2816,54 +2832,41 @@ public final class StepPreviewJsonExporter {
                 }
                 faceCount += representation.faces().size();
                 edgeCount += representation.edges().size();
-                area += approximateSurfaceArea(transformedFaces(representation.faces(), instance.worldMatrix()));
-                edgeLength += approximateEdgeLength(transformedEdges(representation.edges(), instance.worldMatrix()));
+                area += approximateSurfaceArea(representation.faces(), instance.worldMatrix());
+                edgeLength += approximateEdgeLength(representation.edges(), instance.worldMatrix());
             }
         }
         return new GeometrySummary(faceCount, edgeCount, area, edgeLength);
     }
 
-    private static List<FacePayload> transformedFaces(List<FacePayload> faces, double[] matrix) {
-        List<FacePayload> transformed = new ArrayList<>(faces.size());
-        for (FacePayload face : faces) {
-            List<LoopPayload> loops = new ArrayList<>(face.loops().size());
-            for (LoopPayload loop : face.loops()) {
-                List<PointPayload> points = new ArrayList<>(loop.points().size());
-                for (PointPayload point : loop.points()) {
-                    points.add(transform(point, matrix));
+    private static int countRenderedFaces(AssemblyData assembly) {
+        Map<Integer, RepresentationPayload> byId = assembly.representations().stream()
+                .collect(Collectors.toMap(RepresentationPayload::id, representation -> representation, (left, right) -> left, LinkedHashMap::new));
+        int faceCount = 0;
+        for (InstancePayload instance : assembly.instances()) {
+            for (Integer representationId : instance.representationIds()) {
+                RepresentationPayload representation = byId.get(representationId);
+                if (representation != null) {
+                    faceCount += representation.faces().size();
                 }
-                loops.add(new LoopPayload(loop.outer(), List.copyOf(points)));
             }
-            List<PointPayload> triangles = new ArrayList<>(face.triangles().size());
-            for (PointPayload point : face.triangles()) {
-                triangles.add(transform(point, matrix));
-            }
-            transformed.add(new FacePayload(
-                    face.stepId(),
-                    face.name(),
-                    face.surfaceType(),
-                    transform(face.origin(), matrix),
-                    face.normal(),
-                    face.sameSense(),
-                    face.color(),
-                    face.layers(),
-                    List.copyOf(loops),
-                    List.copyOf(triangles)
-            ));
         }
-        return List.copyOf(transformed);
+        return faceCount;
     }
 
-    private static List<EdgePayload> transformedEdges(List<EdgePayload> edges, double[] matrix) {
-        List<EdgePayload> transformed = new ArrayList<>(edges.size());
-        for (EdgePayload edge : edges) {
-            List<PointPayload> points = new ArrayList<>(edge.points().size());
-            for (PointPayload point : edge.points()) {
-                points.add(transform(point, matrix));
+    private static int countRenderedEdges(AssemblyData assembly) {
+        Map<Integer, RepresentationPayload> byId = assembly.representations().stream()
+                .collect(Collectors.toMap(RepresentationPayload::id, representation -> representation, (left, right) -> left, LinkedHashMap::new));
+        int edgeCount = 0;
+        for (InstancePayload instance : assembly.instances()) {
+            for (Integer representationId : instance.representationIds()) {
+                RepresentationPayload representation = byId.get(representationId);
+                if (representation != null) {
+                    edgeCount += representation.edges().size();
+                }
             }
-            transformed.add(new EdgePayload(edge.stepId(), List.copyOf(points)));
         }
-        return List.copyOf(transformed);
+        return edgeCount;
     }
 
     private static double approximateSurfaceArea(List<FacePayload> faces) {
@@ -2878,11 +2881,33 @@ public final class StepPreviewJsonExporter {
         return total;
     }
 
+    private static double approximateSurfaceArea(List<FacePayload> faces, double[] matrix) {
+        double total = 0.0;
+        for (FacePayload face : faces) {
+            if (!face.triangles().isEmpty()) {
+                total += triangleArea(face.triangles(), matrix);
+            } else {
+                total += loopArea(face, matrix);
+            }
+        }
+        return total;
+    }
+
     private static double approximateEdgeLength(List<EdgePayload> edges) {
         double total = 0.0;
         for (EdgePayload edge : edges) {
             for (int i = 0; i + 1 < edge.points().size(); i++) {
                 total += distance(edge.points().get(i), edge.points().get(i + 1));
+            }
+        }
+        return total;
+    }
+
+    private static double approximateEdgeLength(List<EdgePayload> edges, double[] matrix) {
+        double total = 0.0;
+        for (EdgePayload edge : edges) {
+            for (int i = 0; i + 1 < edge.points().size(); i++) {
+                total += distance(transform(edge.points().get(i), matrix), transform(edge.points().get(i + 1), matrix));
             }
         }
         return total;
@@ -2908,10 +2933,39 @@ public final class StepPreviewJsonExporter {
         return total;
     }
 
+    private static double triangleArea(List<PointPayload> triangles, double[] matrix) {
+        double total = 0.0;
+        for (int i = 0; i + 2 < triangles.size(); i += 3) {
+            PointPayload a = transform(triangles.get(i), matrix);
+            PointPayload b = transform(triangles.get(i + 1), matrix);
+            PointPayload c = transform(triangles.get(i + 2), matrix);
+            double abx = b.x() - a.x();
+            double aby = b.y() - a.y();
+            double abz = b.z() - a.z();
+            double acx = c.x() - a.x();
+            double acy = c.y() - a.y();
+            double acz = c.z() - a.z();
+            double cx = aby * acz - abz * acy;
+            double cy = abz * acx - abx * acz;
+            double cz = abx * acy - aby * acx;
+            total += 0.5 * Math.sqrt(cx * cx + cy * cy + cz * cz);
+        }
+        return total;
+    }
+
     private static double loopArea(FacePayload face) {
         double total = 0.0;
         for (LoopPayload loop : face.loops()) {
             double area = polygonArea(loop.points(), face.normal());
+            total += loop.outer() ? area : -area;
+        }
+        return Math.abs(total);
+    }
+
+    private static double loopArea(FacePayload face, double[] matrix) {
+        double total = 0.0;
+        for (LoopPayload loop : face.loops()) {
+            double area = polygonArea(loop.points(), face.normal(), matrix);
             total += loop.outer() ? area : -area;
         }
         return Math.abs(total);
@@ -2937,6 +2991,33 @@ public final class StepPreviewJsonExporter {
         for (int i = 0; i < points.size(); i++) {
             PointPayload current = points.get(i);
             PointPayload next = points.get((i + 1) % points.size());
+            areaVectorX += current.y() * next.z() - current.z() * next.y();
+            areaVectorY += current.z() * next.x() - current.x() * next.z();
+            areaVectorZ += current.x() * next.y() - current.y() * next.x();
+        }
+        return Math.abs((areaVectorX * nx + areaVectorY * ny + areaVectorZ * nz) * 0.5);
+    }
+
+    private static double polygonArea(List<PointPayload> points, VectorPayload normal, double[] matrix) {
+        if (points.size() < 3) {
+            return 0.0;
+        }
+        double nx = normal.x();
+        double ny = normal.y();
+        double nz = normal.z();
+        double length = Math.sqrt(nx * nx + ny * ny + nz * nz);
+        if (length <= Epsilon.EPS) {
+            return 0.0;
+        }
+        nx /= length;
+        ny /= length;
+        nz /= length;
+        double areaVectorX = 0.0;
+        double areaVectorY = 0.0;
+        double areaVectorZ = 0.0;
+        for (int i = 0; i < points.size(); i++) {
+            PointPayload current = transform(points.get(i), matrix);
+            PointPayload next = transform(points.get((i + 1) % points.size()), matrix);
             areaVectorX += current.y() * next.z() - current.z() * next.y();
             areaVectorY += current.z() * next.x() - current.x() * next.z();
             areaVectorZ += current.x() * next.y() - current.y() * next.x();
@@ -3583,7 +3664,11 @@ public final class StepPreviewJsonExporter {
     ) {
     }
 
-    private record AssemblyData(List<RepresentationPayload> representations, List<InstancePayload> instances) {
+    private record AssemblyData(
+            List<RepresentationPayload> representations,
+            List<InstancePayload> instances,
+            List<UnsupportedFacePayload> unsupportedFaces
+    ) {
     }
 
     private record GeometryCollection(

@@ -129,10 +129,21 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"representationCount\":1"));
         assertTrue(json.contains("\"instanceCount\":1"));
-        assertTrue(json.contains("\"faceCount\":194"));
-        assertTrue(json.contains("\"unsupportedFaceCount\":0"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":150"));
         assertTrue(json.contains("\"SURFACE_OF_LINEAR_EXTRUSION\""));
         assertTrue(json.contains("\"SURFACE_OF_REVOLUTION\""));
+        assertTrue(json.contains("\"unsupportedFaces\":[{\"id\":17"));
+        assertTrue(json.contains("\"edges\":[],\"faces\":[],\"representations\":["));
+        assertTrue(json.length() < 250_000_000);
+    }
+
+    @Test
+    void shouldOmitDuplicateLegacyGeometryForAssemblyPayloads() throws IOException {
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/two-instance-assembly.step")));
+
+        assertTrue(json.contains("\"representationCount\":2"));
+        assertTrue(json.contains("\"instanceCount\":3"));
+        assertTrue(json.contains("\"unsupportedFaces\":[],\"edges\":[],\"faces\":[],\"representations\":["));
     }
 
     @Test
