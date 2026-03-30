@@ -114,7 +114,8 @@ public record BSplineCurve3(
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        List<CartesianPoint> samples = sample(96);
+        // Increased sampling density to better detect points on the curve
+        List<CartesianPoint> samples = sample(256);
         for (CartesianPoint sample : samples) {
             if (sample.distanceTo(point) <= 1.0e-6) {
                 return true;
