@@ -17,7 +17,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -27,6 +32,7 @@ public final class StepViewerApp {
 
     private static final int DEFAULT_PORT = 8080;
     private static final AtomicLong REQUEST_IDS = new AtomicLong();
+    private static final ConcurrentHashMap<String, CompletableFuture<String>> IN_FLIGHT_PREVIEWS = new ConcurrentHashMap<>();
 
     private StepViewerApp() {
     }
@@ -161,31 +167,71 @@ public final class StepViewerApp {
             long requestId = REQUEST_IDS.incrementAndGet();
             long startedAt = System.nanoTime();
             String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            String requestKey = sha256(stepText);
             logPreview(requestId, "request_received",
                     "remote=" + request.getRemoteAddr()
                             + ", bytes=" + stepText.getBytes(StandardCharsets.UTF_8).length
-                            + ", textLength=" + stepText.length());
+                            + ", textLength=" + stepText.length()
+                            + ", requestKey=" + requestKey);
             if (stepText.isBlank()) {
                 logPreview(requestId, "request_rejected", "reason=blank_body");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
+            CompletableFuture<String> newFuture = new CompletableFuture<>();
+            CompletableFuture<String> existingFuture = IN_FLIGHT_PREVIEWS.putIfAbsent(requestKey, newFuture);
+            boolean owner = existingFuture == null;
+            CompletableFuture<String> activeFuture = owner ? newFuture : existingFuture;
             try {
-                long exportStartedAt = System.nanoTime();
-                logPreview(requestId, "export_start", "textLength=" + stepText.length());
-                String json = StepPreviewJsonExporter.export(stepText);
-                logPreview(requestId, "export_done",
-                        "elapsedMs=" + elapsedMillis(exportStartedAt)
-                                + ", jsonLength=" + json.length());
+                String json;
+                if (owner) {
+                    long exportStartedAt = System.nanoTime();
+                    logPreview(requestId, "export_start", "textLength=" + stepText.length() + ", requestKey=" + requestKey);
+                    json = StepPreviewJsonExporter.export(stepText);
+                    newFuture.complete(json);
+                    logPreview(requestId, "export_done",
+                            "elapsedMs=" + elapsedMillis(exportStartedAt)
+                                    + ", jsonLength=" + json.length()
+                                    + ", requestKey=" + requestKey);
+                } else {
+                    logPreview(requestId, "join_inflight", "requestKey=" + requestKey);
+                    json = activeFuture.get();
+                    logPreview(requestId, "join_inflight_done",
+                            "elapsedMs=" + elapsedMillis(startedAt)
+                                    + ", jsonLength=" + json.length()
+                                    + ", requestKey=" + requestKey);
+                }
                 send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
                 logPreview(requestId, "response_sent",
                         "status=200, totalElapsedMs=" + elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
+                if (owner) {
+                    newFuture.completeExceptionally(ex);
+                }
                 logPreview(requestId, "export_failed",
                         "elapsedMs=" + elapsedMillis(startedAt)
                                 + ", errorType=" + ex.getClass().getSimpleName()
                                 + ", message=" + ex.getMessage());
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                if (owner) {
+                    newFuture.completeExceptionally(ex);
+                }
+                logPreview(requestId, "export_interrupted", "elapsedMs=" + elapsedMillis(startedAt));
+                sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "preview export interrupted");
+            } catch (ExecutionException ex) {
+                Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+                logPreview(requestId, "join_inflight_failed",
+                        "elapsedMs=" + elapsedMillis(startedAt)
+                                + ", errorType=" + cause.getClass().getSimpleName()
+                                + ", message=" + cause.getMessage());
+                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
+                        cause.getMessage() == null ? "preview export failed" : cause.getMessage());
+            } finally {
+                if (owner) {
+                    IN_FLIGHT_PREVIEWS.remove(requestKey, newFuture);
+                }
             }
         }
 
@@ -279,5 +325,20 @@ public final class StepViewerApp {
 
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
+    }
+
+    private static String sha256(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder(bytes.length * 2);
+            for (byte value : bytes) {
+                hex.append(Character.forDigit((value >> 4) & 0xF, 16));
+                hex.append(Character.forDigit(value & 0xF, 16));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalStateException("SHA-256 unavailable", ex);
+        }
     }
 }

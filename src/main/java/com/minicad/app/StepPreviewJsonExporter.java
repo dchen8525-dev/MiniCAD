@@ -158,7 +158,7 @@ public final class StepPreviewJsonExporter {
                 countShells(resolved),
                 legacyGeometry.faces().size(),
                 legacyGeometry.edges().size(),
-                countUnsupportedFaces(resolved, builder)
+                legacyGeometry.unsupportedFaces().size()
         );
         log("stats_done",
                 "entityCount=" + stats.entityCount()
@@ -810,7 +810,6 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
-        BSplineSurface3 surface = builder.buildBSplineSurface(stepSurface.id());
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
         if (bounds.size() != 1 || !bounds.getFirst().outer()) {
             return null;
@@ -823,6 +822,7 @@ public final class StepPreviewJsonExporter {
         if (patch == null) {
             return null;
         }
+        BSplineSurface3 surface = builder.buildBSplineSurface(stepSurface.id());
         int uSegments = Math.max(patch.uSegments(), 10);
         int vSegments = Math.max(patch.vSegments(), 10);
         List<PointPayload> triangles = triangulateSurfaceGrid(
@@ -895,13 +895,19 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata,
             StepCadBuilder builder
     ) {
-        List<FaceBound> normalizedBounds;
+        List<FaceBound> normalizedBounds = List.of();
         try {
             normalizedBounds = buildFaceBounds(stepFace, builder);
         } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "failed to derive face bounds"));
+            log("parametric_bounds_fallback",
+                    "faceId=" + stepFace.id()
+                            + ", surfaceType=" + surfaceTypeName(geometry)
+                            + ", reason=" + ex.getMessage());
         }
-        if (normalizedBounds.isEmpty() || normalizedBounds.stream().noneMatch(FaceBound::outer)) {
+        boolean hasSemanticOuter = stepFace.bounds().size() == 1
+                || stepFace.bounds().stream().anyMatch(com.minicad.step.model.StepFaceBound::outer);
+        boolean hasNormalizedOuter = !normalizedBounds.isEmpty() && normalizedBounds.stream().anyMatch(FaceBound::outer);
+        if (!hasSemanticOuter && !hasNormalizedOuter) {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
         ParametricSurfaceMapper mapper = mapperForSurface(geometry, builder);
@@ -1752,6 +1758,25 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
+        if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+            BSplineSurface3 surface = builder.buildBSplineSurface(splineSurface.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    return nearestUvOnBSplineSurface(surface, point, previous);
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return surface.pointAt(u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return surface.normalAt(u, v);
+                }
+            };
+        }
         if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
             return extrusionMapper(extrusionSurface, builder);
         }
@@ -1759,6 +1784,65 @@ public final class StepPreviewJsonExporter {
             return revolutionMapper(revolutionSurface, builder);
         }
         return null;
+    }
+
+    private static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
+        double uStart = surface.uStart();
+        double uEnd = surface.uEnd();
+        double vStart = surface.vStart();
+        double vEnd = surface.vEnd();
+
+        double bestU = previous == null ? uStart : clamp(previous.u(), uStart, uEnd);
+        double bestV = previous == null ? vStart : clamp(previous.v(), vStart, vEnd);
+        double bestDistance = surface.pointAt(bestU, bestV).distanceTo(point);
+
+        int uSamples = previous == null ? 20 : 8;
+        int vSamples = previous == null ? 20 : 8;
+        double coarseMinU = previous == null ? uStart : Math.max(uStart, bestU - (uEnd - uStart) * 0.15);
+        double coarseMaxU = previous == null ? uEnd : Math.min(uEnd, bestU + (uEnd - uStart) * 0.15);
+        double coarseMinV = previous == null ? vStart : Math.max(vStart, bestV - (vEnd - vStart) * 0.15);
+        double coarseMaxV = previous == null ? vEnd : Math.min(vEnd, bestV + (vEnd - vStart) * 0.15);
+
+        for (int ui = 0; ui <= uSamples; ui++) {
+            double u = coarseMinU + (coarseMaxU - coarseMinU) * ui / (double) uSamples;
+            for (int vi = 0; vi <= vSamples; vi++) {
+                double v = coarseMinV + (coarseMaxV - coarseMinV) * vi / (double) vSamples;
+                double distance = surface.pointAt(u, v).distanceTo(point);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestU = u;
+                    bestV = v;
+                }
+            }
+        }
+
+        double windowU = Math.max((uEnd - uStart) * 0.08, 1.0e-5);
+        double windowV = Math.max((vEnd - vStart) * 0.08, 1.0e-5);
+        for (int refinement = 0; refinement < 6; refinement++) {
+            double minU = Math.max(uStart, bestU - windowU);
+            double maxU = Math.min(uEnd, bestU + windowU);
+            double minV = Math.max(vStart, bestV - windowV);
+            double maxV = Math.min(vEnd, bestV + windowV);
+            for (int ui = 0; ui <= 8; ui++) {
+                double u = minU + (maxU - minU) * ui / 8.0;
+                for (int vi = 0; vi <= 8; vi++) {
+                    double v = minV + (maxV - minV) * vi / 8.0;
+                    double distance = surface.pointAt(u, v).distanceTo(point);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestU = u;
+                        bestV = v;
+                    }
+                }
+            }
+            windowU *= 0.45;
+            windowV *= 0.45;
+        }
+        return new UvPoint(bestU, bestV);
+    }
+
+    private static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     private static ParametricSurfaceMapper extrusionMapper(
