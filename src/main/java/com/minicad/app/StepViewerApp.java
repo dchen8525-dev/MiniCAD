@@ -19,12 +19,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Lightweight local web app for viewing supported STEP topology in the browser.
@@ -33,8 +27,6 @@ public final class StepViewerApp {
 
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
-    private static final AtomicLong REQUEST_IDS = new AtomicLong();
-    private static final ConcurrentHashMap<String, CompletableFuture<String>> IN_FLIGHT_PREVIEWS = new ConcurrentHashMap<>();
 
     private StepViewerApp() {
     }
@@ -166,67 +158,32 @@ public final class StepViewerApp {
     private static final class PreviewServlet extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            long requestId = REQUEST_IDS.incrementAndGet();
-            long startedAt = System.nanoTime();
             String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            String requestKey = sha256(stepText);
-            log.info("requestId={} stage={} remote={}, bytes={}, textLength={}, requestKey={}",
-                    requestId, "request_received", request.getRemoteAddr(),
-                    stepText.getBytes(StandardCharsets.UTF_8).length, stepText.length(), requestKey);
+            log.info("requestId=1 stage={} remote={}, bytes={}, textLength={}",
+                    "request_received", request.getRemoteAddr(),
+                    stepText.getBytes(StandardCharsets.UTF_8).length, stepText.length());
             if (stepText.isBlank()) {
-                log.info("requestId={} stage={} reason=blank_body", requestId, "request_rejected");
+                log.info("requestId=1 stage={} reason=blank_body", "request_rejected");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
-            CompletableFuture<String> newFuture = new CompletableFuture<>();
-            CompletableFuture<String> existingFuture = IN_FLIGHT_PREVIEWS.putIfAbsent(requestKey, newFuture);
-            boolean owner = existingFuture == null;
-            CompletableFuture<String> activeFuture = owner ? newFuture : existingFuture;
+
+            long startedAt = System.nanoTime();
+            long exportStartedAt = System.nanoTime();
+            log.info("requestId=1 stage={} textLength={}",
+                    "export_start", stepText.length());
             try {
-                String json;
-                if (owner) {
-                    long exportStartedAt = System.nanoTime();
-                    log.info("requestId={} stage={} textLength={}, requestKey={}",
-                            requestId, "export_start", stepText.length(), requestKey);
-                    json = StepPreviewJsonExporter.export(stepText);
-                    newFuture.complete(json);
-                    log.info("requestId={} stage={} elapsedMs={}, jsonLength={}, requestKey={}",
-                            requestId, "export_done", elapsedMillis(exportStartedAt), json.length(), requestKey);
-                } else {
-                    log.info("requestId={} stage={} requestKey={}", requestId, "join_inflight", requestKey);
-                    json = activeFuture.get();
-                    log.info("requestId={} stage={} elapsedMs={}, jsonLength={}, requestKey={}",
-                            requestId, "join_inflight_done", elapsedMillis(startedAt), json.length(), requestKey);
-                }
+                String json = StepPreviewJsonExporter.export(stepText);
+                log.info("requestId=1 stage={} elapsedMs={}, jsonLength={}",
+                        "export_done", elapsedMillis(exportStartedAt), json.length());
                 send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
-                log.info("requestId={} stage={} status=200, totalElapsedMs={}",
-                        requestId, "response_sent", elapsedMillis(startedAt));
+                log.info("requestId=1 stage={} status=200, totalElapsedMs={}",
+                        "response_sent", elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-                if (owner) {
-                    newFuture.completeExceptionally(ex);
-                }
-                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
-                        requestId, "export_failed", elapsedMillis(startedAt),
+                log.info("requestId=1 stage={} elapsedMs={}, errorType={}, message={}",
+                        "export_failed", elapsedMillis(startedAt),
                         ex.getClass().getSimpleName(), ex.getMessage());
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                if (owner) {
-                    newFuture.completeExceptionally(ex);
-                }
-                log.info("requestId={} stage={} elapsedMs={}", requestId, "export_interrupted", elapsedMillis(startedAt));
-                sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "preview export interrupted");
-            } catch (ExecutionException ex) {
-                Throwable cause = ex.getCause() == null ? ex : ex.getCause();
-                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
-                        requestId, "join_inflight_failed", elapsedMillis(startedAt),
-                        cause.getClass().getSimpleName(), cause.getMessage());
-                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
-                        cause.getMessage() == null ? "preview export failed" : cause.getMessage());
-            } finally {
-                if (owner) {
-                    IN_FLIGHT_PREVIEWS.remove(requestKey, newFuture);
-                }
             }
         }
 
@@ -313,20 +270,5 @@ public final class StepViewerApp {
 
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
-    }
-
-    private static String sha256(String text) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] bytes = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder(bytes.length * 2);
-            for (byte value : bytes) {
-                hex.append(Character.forDigit((value >> 4) & 0xF, 16));
-                hex.append(Character.forDigit(value & 0xF, 16));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("SHA-256 unavailable", ex);
-        }
     }
 }
