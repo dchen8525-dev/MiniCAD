@@ -1025,6 +1025,16 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepBSplineSurfaceWithKnots) {
             baseUSegments = Math.max(18, Math.min(36, sampleCount * 2));
             baseVSegments = Math.max(12, Math.min(24, sampleCount * 2));
+        } else if (geometry instanceof StepPlane) {
+            int planeSegments = Math.max(96, Math.min(192, sampleCount * 5));
+            if (loops.size() > 1) {
+                planeSegments = Math.max(planeSegments, 160);
+            }
+            double dominantSpan = Math.max(uvBounds.uSpan(), uvBounds.vSpan());
+            double uRatio = dominantSpan <= Epsilon.EPS ? 1.0 : uvBounds.uSpan() / dominantSpan;
+            double vRatio = dominantSpan <= Epsilon.EPS ? 1.0 : uvBounds.vSpan() / dominantSpan;
+            baseUSegments = Math.max(baseUSegments, Math.max(96, (int) Math.ceil(planeSegments * uRatio)));
+            baseVSegments = Math.max(baseVSegments, Math.max(96, (int) Math.ceil(planeSegments * vRatio)));
         } else if (geometry instanceof StepCylindricalSurface) {
             baseUSegments = Math.max(baseUSegments, 96);
             baseVSegments = Math.max(baseVSegments, 32);
