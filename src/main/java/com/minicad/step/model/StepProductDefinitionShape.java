@@ -6,12 +6,12 @@ package com.minicad.step.model;
  * @param id STEP instance id
  * @param name shape name
  * @param description optional description
- * @param definition referenced product definition
+ * @param definition referenced product definition or product definition relationship
  */
 public record StepProductDefinitionShape(
         int id,
         String name,
         String description,
-        StepProductDefinition definition
+        StepEntity definition
 ) implements StepEntity {
 }

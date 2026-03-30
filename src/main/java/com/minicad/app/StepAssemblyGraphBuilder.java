@@ -8,6 +8,7 @@ import com.minicad.step.model.StepItemDefinedTransformation;
 import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
 import com.minicad.step.model.StepProduct;
 import com.minicad.step.model.StepProductDefinition;
+import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
@@ -47,8 +48,12 @@ public final class StepAssemblyGraphBuilder {
         Map<Integer, List<Integer>> repIdsByProductDefinition = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepShapeDefinitionRepresentation link) {
+                Integer productDefinitionId = productDefinitionIdFor(link.definition().definition());
+                if (productDefinitionId == null) {
+                    continue;
+                }
                 repIdsByProductDefinition
-                        .computeIfAbsent(link.definition().definition().id(), ignored -> new ArrayList<>())
+                        .computeIfAbsent(productDefinitionId, ignored -> new ArrayList<>())
                         .add(link.usedRepresentation().id());
             }
         }
@@ -59,7 +64,10 @@ public final class StepAssemblyGraphBuilder {
         Map<Integer, StepContextDependentShapeRepresentation> contextByOccurrence = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepContextDependentShapeRepresentation contextDependent) {
-                contextByOccurrence.put(contextDependent.representedProductRelation().id(), contextDependent);
+                Integer occurrenceId = occurrenceIdFor(contextDependent.representedProductRelation());
+                if (occurrenceId != null) {
+                    contextByOccurrence.put(occurrenceId, contextDependent);
+                }
             }
         }
 
@@ -114,6 +122,27 @@ public final class StepAssemblyGraphBuilder {
         }
 
         return new AssemblyGraph(List.copyOf(representations), List.copyOf(nodes));
+    }
+
+    private static Integer productDefinitionIdFor(StepEntity definition) {
+        if (definition instanceof StepProductDefinition productDefinition) {
+            return productDefinition.id();
+        }
+        if (definition instanceof StepNextAssemblyUsageOccurrence occurrence) {
+            return occurrence.relatedProductDefinition().id();
+        }
+        return null;
+    }
+
+    private static Integer occurrenceIdFor(StepEntity relation) {
+        if (relation instanceof StepNextAssemblyUsageOccurrence occurrence) {
+            return occurrence.id();
+        }
+        if (relation instanceof StepProductDefinitionShape shape
+                && shape.definition() instanceof StepNextAssemblyUsageOccurrence occurrence) {
+            return occurrence.id();
+        }
+        return null;
     }
 
     private static void addNode(

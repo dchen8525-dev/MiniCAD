@@ -202,7 +202,7 @@ public final class StepViewerApp {
                 return;
             }
 
-            String text = Files.readString(examplePath);
+            String text = StepTextReader.read(examplePath);
             send(response, HttpServletResponse.SC_OK, "text/plain; charset=utf-8", text);
         }
 

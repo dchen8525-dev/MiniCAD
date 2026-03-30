@@ -6,7 +6,7 @@ package com.minicad.step.model;
 public sealed interface StepEntity permits StepCartesianPoint, StepDirection, StepVector,
         StepAxis1Placement, StepAxis2Placement2D, StepAxis2Placement3D, StepLine, StepPlane, StepCircle, StepEllipse,
         StepSurfaceCurve, StepSeamCurve, StepBSplineCurveWithKnots, StepBSplineSurfaceWithKnots, StepCylindricalSurface,
-        StepConicalSurface, StepToroidalSurface, StepSurfaceOfLinearExtrusion, StepSurfaceOfRevolution,
+        StepConicalSurface, StepToroidalSurface, StepSphericalSurface, StepSurfaceOfLinearExtrusion, StepSurfaceOfRevolution,
         StepTrimmedCurve, StepVertexPoint, StepEdgeCurve,
         StepOrientedEdge, StepLoop, StepFaceBound, StepFaceEntity, StepOpenShell,
         StepClosedShell, StepManifoldSolidBrep, StepRepresentationContext, StepGeometricRepresentationContext,

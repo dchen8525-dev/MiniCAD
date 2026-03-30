@@ -315,7 +315,7 @@ public final class StepPreviewJsonExporter {
                         toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata),
                         null
                 );
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
         }
@@ -325,7 +325,7 @@ public final class StepPreviewJsonExporter {
                 if (payload != null) {
                     return new PreviewFaceResult(payload, null);
                 }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
         }
         if (geometry instanceof StepConicalSurface conicalSurface) {
@@ -334,7 +334,7 @@ public final class StepPreviewJsonExporter {
                 if (payload != null) {
                     return new PreviewFaceResult(payload, null);
                 }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
@@ -348,7 +348,7 @@ public final class StepPreviewJsonExporter {
                     return new PreviewFaceResult(payload, null);
                 }
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
                 log.debug("stage={} faceId={}, surfaceId={}, reason={}", "bspline_surface_preview_exception",
                         stepFace.id(), splineSurface.id(), ex.getMessage());
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
@@ -363,7 +363,7 @@ public final class StepPreviewJsonExporter {
                 if (payload != null) {
                     return new PreviewFaceResult(payload, null);
                 }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
         }
         if (geometry instanceof StepCylindricalSurface

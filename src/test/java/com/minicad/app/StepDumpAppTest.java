@@ -76,7 +76,7 @@ class StepDumpAppTest {
     }
 
     @Test
-    void shouldFailClearlyOnInvalidTopologyBuild() throws IOException {
+    void shouldTreatInvalidTopologyBuildAsUnsupportedFace() throws IOException {
         Path file = Files.createTempFile("minicad-circle-edge", ".step");
         Files.writeString(file, """
                 DATA;
@@ -107,8 +107,10 @@ class StepDumpAppTest {
                 sink(stderr)
         );
 
-        assertEquals(1, exitCode);
-        assertTrue(stderr.toString().contains("start vertex must lie on edge curve"));
+        String output = stdout.toString();
+        assertEquals(0, exitCode);
+        assertTrue(output.contains("openShell #60: faces=0, unsupportedFaces=1"));
+        assertTrue(output.contains("unsupportedFaces=1"));
     }
 
     @Test
@@ -164,6 +166,58 @@ class StepDumpAppTest {
         String output = stdout.toString();
         assertEquals(0, exitCode);
         assertTrue(output.contains("openShell #155: faces=0, unsupportedFaces=1"));
+        assertTrue(output.contains("unsupportedFaces=1"));
+    }
+
+    @Test
+    void shouldTreatInvalidPlanarFaceAsUnsupportedDuringSummary() throws IOException {
+        Path file = Files.createTempFile("minicad-invalid-planar-face", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(0.0,1.0,1.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(-1.0,1.0,1.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(0.0,-1.0,-1.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #40=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #41=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #42=EDGE_CURVE('E3',#22,#20,#38,.T.);
+                #50=ORIENTED_EDGE('OE1',$,$,#40,.T.);
+                #51=ORIENTED_EDGE('OE2',$,$,#41,.T.);
+                #52=ORIENTED_EDGE('OE3',$,$,#42,.T.);
+                #60=EDGE_LOOP('LOOP',(#50,#51,#52));
+                #61=FACE_OUTER_BOUND('FOB',#60,.T.);
+                #70=ADVANCED_FACE('F0',(#61),#13,.T.);
+                #80=OPEN_SHELL('OS',(#70));
+                ENDSEC;
+                """);
+
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+        int exitCode = StepDumpApp.run(
+                new String[]{file.toString()},
+                sink(stdout),
+                sink(stderr)
+        );
+
+        String output = stdout.toString();
+        assertEquals(0, exitCode);
+        assertTrue(output.contains("openShell #80: faces=0, unsupportedFaces=1"));
         assertTrue(output.contains("unsupportedFaces=1"));
     }
 

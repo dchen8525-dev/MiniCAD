@@ -72,6 +72,7 @@ import com.minicad.step.model.StepSiUnit;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepSurfaceSideStyle;
 import com.minicad.step.model.StepSurfaceStyleFillArea;
 import com.minicad.step.model.StepSurfaceStyleUsage;
@@ -309,6 +310,18 @@ public final class StepEntityResolver {
         );
     }
 
+    private StepSphericalSurface resolveSphericalSurface(StepEntityInstance instance) {
+        StepEntityDefinition definition = definition(instance, "SPHERICAL_SURFACE");
+        requireParameterCount(instance, definition, 3);
+        return new StepSphericalSurface(
+                instance.id(),
+                stringValue(instance, definition, 0),
+                requireEntity(referenceId(instance, definition, 1), StepAxis2Placement3D.class,
+                        "SPHERICAL_SURFACE position must reference AXIS2_PLACEMENT_3D"),
+                numberValue(instance, definition, 2)
+        );
+    }
+
     private StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
         requireParameterCount(instance, definition, 3);
@@ -466,16 +479,17 @@ public final class StepEntityResolver {
         if (instance.hasDefinition("B_SPLINE_CURVE")) {
             requireParameterCount(instance, spline, 3);
             StepEntityDefinition base = definition(instance, "B_SPLINE_CURVE");
-            requireParameterCount(instance, base, 6);
+            requireParameterCountIn(instance, base, 5, 6);
+            boolean hasName = base.parameters().size() == 6;
             return new StepBSplineCurveWithKnots(
                     instance.id(),
-                    stringValue(instance, base, 0),
-                    integerValue(instance, base, 1),
-                    referenceList(instance, base, 2, StepCartesianPoint.class,
+                    hasName ? stringValue(instance, base, 0) : "",
+                    integerValue(instance, base, hasName ? 1 : 0),
+                    referenceList(instance, base, hasName ? 2 : 1, StepCartesianPoint.class,
                             "B_SPLINE_CURVE control points must reference CARTESIAN_POINT"),
-                    enumValue(instance, base, 3),
-                    booleanValue(instance, base, 4),
-                    booleanValue(instance, base, 5),
+                    enumValue(instance, base, hasName ? 3 : 2),
+                    booleanValue(instance, base, hasName ? 4 : 3),
+                    booleanValue(instance, base, hasName ? 5 : 4),
                     integerList(instance, spline, 0),
                     numberList(instance, spline, 1),
                     enumValue(instance, spline, 2)
@@ -631,6 +645,7 @@ public final class StepEntityResolver {
         if (!(faceGeometry instanceof StepPlane)
                 && !(faceGeometry instanceof StepCylindricalSurface)
                 && !(faceGeometry instanceof StepConicalSurface)
+                && !(faceGeometry instanceof StepSphericalSurface)
                 && !(faceGeometry instanceof StepSurfaceOfLinearExtrusion)
                 && !(faceGeometry instanceof StepSurfaceOfRevolution)
                 && !(faceGeometry instanceof StepBSplineSurfaceWithKnots)
@@ -656,6 +671,7 @@ public final class StepEntityResolver {
         if (!(faceGeometry instanceof StepPlane)
                 && !(faceGeometry instanceof StepCylindricalSurface)
                 && !(faceGeometry instanceof StepConicalSurface)
+                && !(faceGeometry instanceof StepSphericalSurface)
                 && !(faceGeometry instanceof StepSurfaceOfLinearExtrusion)
                 && !(faceGeometry instanceof StepSurfaceOfRevolution)
                 && !(faceGeometry instanceof StepBSplineSurfaceWithKnots)
@@ -791,8 +807,14 @@ public final class StepEntityResolver {
     }
 
     private StepProductDefinitionFormation resolveProductDefinitionFormation(StepEntityInstance instance) {
-        StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_FORMATION");
-        requireParameterCount(instance, definition, 3);
+        StepEntityDefinition definition;
+        if (instance.hasDefinition("PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE")) {
+            definition = definition(instance, "PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE");
+            requireParameterCount(instance, definition, 4);
+        } else {
+            definition = definition(instance, "PRODUCT_DEFINITION_FORMATION");
+            requireParameterCount(instance, definition, 3);
+        }
         return new StepProductDefinitionFormation(
                 instance.id(),
                 stringValue(instance, definition, 0),
@@ -832,12 +854,19 @@ public final class StepEntityResolver {
     private StepProductDefinitionShape resolveProductDefinitionShape(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_SHAPE");
         requireParameterCount(instance, definition, 3);
+        StepEntity resolvedDefinition = resolve(referenceId(instance, definition, 2));
+        if (!(resolvedDefinition instanceof StepProductDefinition)
+                && !(resolvedDefinition instanceof StepNextAssemblyUsageOccurrence)) {
+            throw new StepResolutionException(
+                    "PRODUCT_DEFINITION_SHAPE definition must reference PRODUCT_DEFINITION or NEXT_ASSEMBLY_USAGE_OCCURRENCE"
+                            + " but got " + resolvedDefinition.getClass().getSimpleName()
+            );
+        }
         return new StepProductDefinitionShape(
                 instance.id(),
                 stringValue(instance, definition, 0),
                 optionalStringValue(instance, definition, 1),
-                requireEntity(referenceId(instance, definition, 2), StepProductDefinition.class,
-                        "PRODUCT_DEFINITION_SHAPE definition must reference PRODUCT_DEFINITION")
+                resolvedDefinition
         );
     }
 
@@ -958,7 +987,7 @@ public final class StepEntityResolver {
 
     private StepNextAssemblyUsageOccurrence resolveNextAssemblyUsageOccurrence(StepEntityInstance instance) {
         StepEntityDefinition definition = definition(instance, "NEXT_ASSEMBLY_USAGE_OCCURRENCE");
-        requireParameterCount(instance, definition, 5);
+        requireParameterCountIn(instance, definition, 5, 6);
         return new StepNextAssemblyUsageOccurrence(
                 instance.id(),
                 stringValue(instance, definition, 0),
@@ -967,7 +996,8 @@ public final class StepEntityResolver {
                 requireEntity(referenceId(instance, definition, 3), StepProductDefinition.class,
                         "NEXT_ASSEMBLY_USAGE_OCCURRENCE relating_product_definition must reference PRODUCT_DEFINITION"),
                 requireEntity(referenceId(instance, definition, 4), StepProductDefinition.class,
-                        "NEXT_ASSEMBLY_USAGE_OCCURRENCE related_product_definition must reference PRODUCT_DEFINITION")
+                        "NEXT_ASSEMBLY_USAGE_OCCURRENCE related_product_definition must reference PRODUCT_DEFINITION"),
+                definition.parameters().size() > 5 ? optionalStringValue(instance, definition, 5) : null
         );
     }
 
@@ -982,11 +1012,19 @@ public final class StepEntityResolver {
                             + " but got " + relationship.getClass().getSimpleName()
             );
         }
+        StepEntity representedProductRelation = resolve(referenceId(instance, definition, 1));
+        if (!(representedProductRelation instanceof StepNextAssemblyUsageOccurrence)
+                && !(representedProductRelation instanceof StepProductDefinitionShape)) {
+            throw new StepResolutionException(
+                    "CONTEXT_DEPENDENT_SHAPE_REPRESENTATION represented_product_relation must reference"
+                            + " NEXT_ASSEMBLY_USAGE_OCCURRENCE or PRODUCT_DEFINITION_SHAPE but got "
+                            + representedProductRelation.getClass().getSimpleName()
+            );
+        }
         return new StepContextDependentShapeRepresentation(
                 instance.id(),
                 relationship,
-                requireEntity(referenceId(instance, definition, 1), StepNextAssemblyUsageOccurrence.class,
-                        "CONTEXT_DEPENDENT_SHAPE_REPRESENTATION represented_product_relation must reference NEXT_ASSEMBLY_USAGE_OCCURRENCE")
+                representedProductRelation
         );
     }
 
@@ -1349,6 +1387,26 @@ public final class StepEntityResolver {
         }
     }
 
+    private static void requireParameterCountIn(StepEntityInstance instance, StepEntityDefinition definition, int... expectedCounts) {
+        int actual = definition.parameters().size();
+        for (int expected : expectedCounts) {
+            if (actual == expected) {
+                return;
+            }
+        }
+        StringBuilder expectedText = new StringBuilder();
+        for (int i = 0; i < expectedCounts.length; i++) {
+            if (i > 0) {
+                expectedText.append(i == expectedCounts.length - 1 ? " or " : ", ");
+            }
+            expectedText.append(expectedCounts[i]);
+        }
+        throw new StepResolutionException(
+                definition.name() + " expects " + expectedText + " parameters but got " + actual
+                        + " in entity #" + instance.id()
+        );
+    }
+
     private String stringValue(StepEntityInstance instance, StepEntityDefinition definition, int index) {
         StepValue value = unwrapTyped(definition.parameters().get(index));
         if (value instanceof StepValue.StringValue stringValue) {
@@ -1585,6 +1643,7 @@ public final class StepEntityResolver {
         registry.put("PRODUCT", StepEntityResolver::resolveProduct);
         registry.put("PRODUCT_RELATED_PRODUCT_CATEGORY", StepEntityResolver::resolveProductRelatedProductCategory);
         registry.put("PRODUCT_DEFINITION_FORMATION", StepEntityResolver::resolveProductDefinitionFormation);
+        registry.put("PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE", StepEntityResolver::resolveProductDefinitionFormation);
         registry.put("PRODUCT_DEFINITION_CONTEXT", StepEntityResolver::resolveProductDefinitionContext);
         registry.put("PRODUCT_DEFINITION", StepEntityResolver::resolveProductDefinition);
         registry.put("PRODUCT_DEFINITION_SHAPE", StepEntityResolver::resolveProductDefinitionShape);
@@ -1644,6 +1703,7 @@ public final class StepEntityResolver {
         registry.put("CYLINDRICAL_SURFACE", StepEntityResolver::resolveCylindricalSurface);
         registry.put("CONICAL_SURFACE", StepEntityResolver::resolveConicalSurface);
         registry.put("TOROIDAL_SURFACE", StepEntityResolver::resolveToroidalSurface);
+        registry.put("SPHERICAL_SURFACE", StepEntityResolver::resolveSphericalSurface);
         registry.put("SURFACE_OF_LINEAR_EXTRUSION", StepEntityResolver::resolveSurfaceOfLinearExtrusion);
         registry.put("SURFACE_OF_REVOLUTION", StepEntityResolver::resolveSurfaceOfRevolution);
         registry.put("TRIMMED_CURVE", StepEntityResolver::resolveTrimmedCurve);

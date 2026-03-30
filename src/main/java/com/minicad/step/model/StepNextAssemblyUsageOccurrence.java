@@ -9,6 +9,7 @@ package com.minicad.step.model;
  * @param description optional description
  * @param relatingProductDefinition assembly product definition
  * @param relatedProductDefinition component product definition
+ * @param referenceDesignator optional occurrence reference designator
  */
 public record StepNextAssemblyUsageOccurrence(
         int id,
@@ -16,6 +17,7 @@ public record StepNextAssemblyUsageOccurrence(
         String name,
         String description,
         StepProductDefinition relatingProductDefinition,
-        StepProductDefinition relatedProductDefinition
+        StepProductDefinition relatedProductDefinition,
+        String referenceDesignator
 ) implements StepEntity {
 }

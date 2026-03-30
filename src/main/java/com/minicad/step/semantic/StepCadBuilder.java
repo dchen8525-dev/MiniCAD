@@ -58,6 +58,7 @@ import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepVertexLoop;
@@ -781,6 +782,10 @@ public final class StepCadBuilder {
             if (geometry instanceof StepConicalSurface conicalSurface) {
                 buildConicalSurface(conicalSurface.id());
                 throw new UnsupportedGeometryException(faceType + " construction for CONICAL_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepSphericalSurface sphericalSurface) {
+                buildPlacement(sphericalSurface.position().id());
+                throw new UnsupportedGeometryException(faceType + " construction for SPHERICAL_SURFACE is unsupported");
             }
             if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
                 buildCurve3(extrusionSurface.sweptCurve());

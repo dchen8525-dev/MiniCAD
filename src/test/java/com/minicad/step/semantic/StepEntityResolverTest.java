@@ -18,6 +18,7 @@ import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
+import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
@@ -36,6 +37,7 @@ import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepProduct;
 import com.minicad.step.model.StepProductDefinition;
+import com.minicad.step.model.StepProductDefinitionFormation;
 import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepProductRelatedProductCategory;
 import com.minicad.step.model.StepPropertyDefinition;
@@ -47,6 +49,7 @@ import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepSiUnit;
+import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
@@ -399,6 +402,28 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveComplexBsplineCurveWithoutNameParameter() {
+        String step = """
+                DATA;
+                #10=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #11=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #12=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #13=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #20=(BOUNDED_CURVE()
+                     B_SPLINE_CURVE(3,(#10,#11,#12,#13),.UNSPECIFIED.,.F.,.F.)
+                     B_SPLINE_CURVE_WITH_KNOTS((4,4),(0.0,1.0),.UNSPECIFIED.));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepBSplineCurveWithKnots spline = assertInstanceOf(StepBSplineCurveWithKnots.class, resolved.get(20));
+        assertEquals("", spline.name());
+        assertEquals(3, spline.degree());
+        assertEquals(4, spline.controlPoints().size());
+    }
+
+    @Test
     void shouldResolvePcurveAndDefinitionalRepresentation() {
         String step = """
                 DATA;
@@ -538,6 +563,29 @@ class StepEntityResolverTest {
         assertEquals(1.0, torus.minorRadius());
         assertEquals(13, surfaceCurve.curve3d().id());
         assertEquals(14, trimmedCurve.basisCurve().id());
+    }
+
+    @Test
+    void shouldResolveSphericalSurfaceAdvancedFaceGeometry() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=SPHERICAL_SURFACE('SPH',#4,2.0);
+                #6=EDGE_LOOP('L0',());
+                #7=FACE_OUTER_BOUND('B0',#6,.T.);
+                #8=ADVANCED_FACE('F0',(#7),#5,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSphericalSurface sphere = assertInstanceOf(StepSphericalSurface.class, resolved.get(5));
+        StepAdvancedFace face = assertInstanceOf(StepAdvancedFace.class, resolved.get(8));
+        assertEquals(2.0, sphere.radius());
+        assertEquals(5, face.faceGeometry().id());
     }
 
     @Test
@@ -767,6 +815,34 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveProductDefinitionShapeLinkedToAssemblyOccurrence() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('ASM','assembly','',(#2));
+                #4=PRODUCT('PRT','part','',(#2));
+                #5=PRODUCT_DEFINITION_FORMATION('asm-v1','first',#3);
+                #6=PRODUCT_DEFINITION_FORMATION('prt-v1','first',#4);
+                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #8=PRODUCT_DEFINITION('asm-def','assembly def',#5,#7);
+                #9=PRODUCT_DEFINITION('prt-def','part def',#6,#7);
+                #10=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9);
+                #11=PRODUCT_DEFINITION_SHAPE('shape','occurrence shape',#10);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProductDefinitionShape shape = assertInstanceOf(StepProductDefinitionShape.class, resolved.get(11));
+        StepNextAssemblyUsageOccurrence occurrence = assertInstanceOf(
+                StepNextAssemblyUsageOccurrence.class,
+                shape.definition()
+        );
+        assertEquals(10, occurrence.id());
+    }
+
+    @Test
     void shouldResolveShapeRepresentationRelationship() {
         String step = """
                 DATA;
@@ -821,6 +897,7 @@ class StepEntityResolverTest {
         );
         assertEquals(8, occurrence.relatingProductDefinition().id());
         assertEquals(9, occurrence.relatedProductDefinition().id());
+        assertEquals(null, occurrence.referenceDesignator());
 
         StepContextDependentShapeRepresentation contextRepresentation = assertInstanceOf(
                 StepContextDependentShapeRepresentation.class,
@@ -828,6 +905,68 @@ class StepEntityResolverTest {
         );
         assertEquals(15, contextRepresentation.representationRelationship().id());
         assertEquals(16, contextRepresentation.representedProductRelation().id());
+    }
+
+    @Test
+    void shouldResolveNextAssemblyUsageOccurrenceWithReferenceDesignator() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('ASM','assembly','',(#2));
+                #4=PRODUCT('PRT','part','',(#2));
+                #5=PRODUCT_DEFINITION_FORMATION('asm-v1','first',#3);
+                #6=PRODUCT_DEFINITION_FORMATION('prt-v1','first',#4);
+                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #8=PRODUCT_DEFINITION('asm-def','assembly def',#5,#7);
+                #9=PRODUCT_DEFINITION('prt-def','part def',#6,#7);
+                #10=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9,'A-01');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepNextAssemblyUsageOccurrence occurrence = assertInstanceOf(
+                StepNextAssemblyUsageOccurrence.class,
+                resolved.get(10)
+        );
+        assertEquals("A-01", occurrence.referenceDesignator());
+    }
+
+    @Test
+    void shouldResolveContextDependentShapeRepresentationViaProductDefinitionShape() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('ASM','assembly','',(#2));
+                #4=PRODUCT('PRT','part','',(#2));
+                #5=PRODUCT_DEFINITION_FORMATION('asm-v1','first',#3);
+                #6=PRODUCT_DEFINITION_FORMATION('prt-v1','first',#4);
+                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #8=PRODUCT_DEFINITION('asm-def','assembly def',#5,#7);
+                #9=PRODUCT_DEFINITION('prt-def','part def',#6,#7);
+                #10=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9);
+                #11=PRODUCT_DEFINITION_SHAPE('shape','occurrence shape',#10);
+                #12=SHAPE_REPRESENTATION_RELATIONSHIP('rr','shape link',#13,#14);
+                #13=SHAPE_REPRESENTATION('ASM',(),#15);
+                #14=SHAPE_REPRESENTATION('PRT',(),#15);
+                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #16=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#12,#11);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepContextDependentShapeRepresentation representation = assertInstanceOf(
+                StepContextDependentShapeRepresentation.class,
+                resolved.get(16)
+        );
+        StepProductDefinitionShape shape = assertInstanceOf(
+                StepProductDefinitionShape.class,
+                representation.representedProductRelation()
+        );
+        assertEquals(11, shape.id());
     }
 
     @Test
@@ -863,6 +1002,24 @@ class StepEntityResolverTest {
         StepGlobalUncertaintyAssignedContext uncertainties = context.globalUncertaintyAssignedContext();
         assertInstanceOf(StepGlobalUncertaintyAssignedContext.class, uncertainties);
         assertEquals(1, uncertainties.uncertainties().size());
+    }
+
+    @Test
+    void shouldResolveProductDefinitionFormationWithSpecifiedSource() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE('v1','first release',#3,.NOT_KNOWN.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProductDefinitionFormation formation = assertInstanceOf(StepProductDefinitionFormation.class, resolved.get(4));
+        assertEquals("v1", formation.name());
+        assertEquals(3, formation.ofProduct().id());
     }
 
     @Test

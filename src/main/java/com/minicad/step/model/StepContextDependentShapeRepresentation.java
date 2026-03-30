@@ -5,12 +5,12 @@ package com.minicad.step.model;
  *
  * @param id STEP instance id
  * @param representationRelationship linked representation relationship entity
- * @param representedProductRelation linked next assembly usage occurrence
+ * @param representedProductRelation linked product definition relationship or shape
  */
 public record StepContextDependentShapeRepresentation(
         int id,
         StepEntity representationRelationship,
-        StepNextAssemblyUsageOccurrence representedProductRelation
+        StepEntity representedProductRelation
 ) implements StepEntity {
 
     @Override

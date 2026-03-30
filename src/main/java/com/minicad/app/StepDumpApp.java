@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,7 @@ public final class StepDumpApp {
         }
 
         Path path = Path.of(args[0]);
-        String text = Files.readString(path);
+        String text = StepTextReader.read(path);
 
         try {
             StepFile stepFile = StepParser.parse(text);
@@ -138,7 +137,7 @@ public final class StepDumpApp {
             try {
                 builder.buildFace(face.id());
                 supported++;
-            } catch (UnsupportedGeometryException ex) {
+            } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
                 unsupported++;
             }
         }
