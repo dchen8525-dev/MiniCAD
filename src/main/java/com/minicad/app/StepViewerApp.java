@@ -33,7 +33,7 @@ public final class StepViewerApp {
 
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
-    private static final AtomicLong REQUEST_IDS = new AtomicLong();
+    private static final AtomicLong REQUEST_IDS = new2 AtomicLong();
     private static final ConcurrentHashMap<String, CompletableFuture<String>> IN_FLIGHT_PREVIEWS = new ConcurrentHashMap<>();
 
     private StepViewerApp() {
@@ -170,13 +170,11 @@ public final class StepViewerApp {
             long startedAt = System.nanoTime();
             String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             String requestKey = sha256(stepText);
-            logPreview(requestId, "request_received",
-                    "remote=" + request.getRemoteAddr()
-                            + ", bytes=" + stepText.getBytes(StandardCharsets.UTF_8).length
-                            + ", textLength=" + stepText.length()
-                            + ", requestKey=" + requestKey);
+            log.info("requestId={} stage={} remote={}, bytes={}, textLength={}, requestKey={}",
+                    requestId, "request_received", request.getRemoteAddr(),
+                    stepText.getBytes(StandardCharsets.UTF_8).length, stepText.length(), requestKey);
             if (stepText.isBlank()) {
-                logPreview(requestId, "request_rejected", "reason=blank_body");
+                log.info("requestId={} stage={} reason=blank_body", requestId, "request_rejected");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
@@ -188,46 +186,41 @@ public final class StepViewerApp {
                 String json;
                 if (owner) {
                     long exportStartedAt = System.nanoTime();
-                    logPreview(requestId, "export_start", "textLength=" + stepText.length() + ", requestKey=" + requestKey);
+                    log.info("requestId={} stage={} textLength={}, requestKey={}",
+                            requestId, "export_start", stepText.length(), requestKey);
                     json = StepPreviewJsonExporter.export(stepText);
                     newFuture.complete(json);
-                    logPreview(requestId, "export_done",
-                            "elapsedMs=" + elapsedMillis(exportStartedAt)
-                                    + ", jsonLength=" + json.length()
-                                    + ", requestKey=" + requestKey);
+                    log.info("requestId={} stage={} elapsedMs={}, jsonLength={}, requestKey={}",
+                            requestId, "export_done", elapsedMillis(exportStartedAt), json.length(), requestKey);
                 } else {
-                    logPreview(requestId, "join_inflight", "requestKey=" + requestKey);
+                    log.info("requestId={} stage={} requestKey={}", requestId, "join_inflight", requestKey);
                     json = activeFuture.get();
-                    logPreview(requestId, "join_inflight_done",
-                            "elapsedMs=" + elapsedMillis(startedAt)
-                                    + ", jsonLength=" + json.length()
-                                    + ", requestKey=" + requestKey);
+                    log.info("requestId={} stage={} elapsedMs={}, jsonLength={}, requestKey={}",
+                            requestId, "join_inflight_done", elapsedMillis(startedAt), json.length(), requestKey);
                 }
                 send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
-                logPreview(requestId, "response_sent",
-                        "status=200, totalElapsedMs=" + elapsedMillis(startedAt));
+                log.info("requestId={} stage={} status=200, totalElapsedMs={}",
+                        requestId, "response_sent", elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
                 if (owner) {
                     newFuture.completeExceptionally(ex);
                 }
-                logPreview(requestId, "export_failed",
-                        "elapsedMs=" + elapsedMillis(startedAt)
-                                + ", errorType=" + ex.getClass().getSimpleName()
-                                + ", message=" + ex.getMessage());
+                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
+                        requestId, "export_failed", elapsedMillis(startedAt),
+                        ex.getClass().getSimpleName(), ex.getMessage());
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 if (owner) {
                     newFuture.completeExceptionally(ex);
                 }
-                logPreview(requestId, "export_interrupted", "elapsedMs=" + elapsedMillis(startedAt));
+                log.info("requestId={} stage={} elapsedMs={}", requestId, "export_interrupted", elapsedMillis(startedAt));
                 sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "preview export interrupted");
             } catch (ExecutionException ex) {
                 Throwable cause = ex.getCause() == null ? ex : ex.getCause();
-                logPreview(requestId, "join_inflight_failed",
-                        "elapsedMs=" + elapsedMillis(startedAt)
-                                + ", errorType=" + cause.getClass().getSimpleName()
-                                + ", message=" + cause.getMessage());
+                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
+                        requestId, "join_inflight_failed", elapsedMillis(startedAt),
+                        cause.getClass().getSimpleName(), cause.getMessage());
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
                         cause.getMessage() == null ? "preview export failed" : cause.getMessage());
             } finally {
@@ -316,10 +309,6 @@ public final class StepViewerApp {
         response.setHeader("Cache-Control", "no-store");
         response.setContentLength(body.length);
         response.getOutputStream().write(body);
-    }
-
-    private static void logPreview(long requestId, String stage, String detail) {
-        log.info("requestId={} stage={} {}", requestId, stage, detail);
     }
 
     private static long elapsedMillis(long startedAt) {
