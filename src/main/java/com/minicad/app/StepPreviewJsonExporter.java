@@ -1227,6 +1227,8 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         List<ParametricLoopPayload> loops = new ArrayList<>();
+        boolean promoteSingleOuter = stepFace.bounds().size() == 1
+                && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
         for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
             if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop)) {
                 log("parametric_loop_build_failed",
@@ -1273,7 +1275,7 @@ public final class StepPreviewJsonExporter {
             if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
                 loopPoints.add(loopPoints.getFirst());
             }
-            loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(loopPoints)));
+            loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
         }
         return List.copyOf(loops);
     }
@@ -1355,6 +1357,18 @@ public final class StepPreviewJsonExporter {
             default -> List.of();
         };
         if (pcurves.isEmpty()) {
+            if (shouldFallbackToProjectedEdge(edgeGeometry)) {
+            List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
+            if (fallback != null) {
+                log("parametric_edge_sampling_fallback",
+                        "edgeId=" + orientedEdge.edgeElement().id()
+                                + ", orientedEdgeId=" + orientedEdge.id()
+                                + ", surfaceType=" + surfaceTypeName(faceGeometry)
+                                + ", edgeGeometryType=" + surfaceTypeName(edgeGeometry)
+                                + ", reason=projected sampled 3d edge because no pcurves");
+                return fallback;
+            }
+            }
             log("parametric_edge_sampling_failed",
                     "edgeId=" + orientedEdge.edgeElement().id()
                             + ", orientedEdgeId=" + orientedEdge.id()
@@ -1433,6 +1447,18 @@ public final class StepPreviewJsonExporter {
             }
         }
         if (best == null) {
+            List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
+            if (fallback != null) {
+                log("parametric_edge_sampling_fallback",
+                        "edgeId=" + orientedEdge.edgeElement().id()
+                                + ", orientedEdgeId=" + orientedEdge.id()
+                                + ", surfaceType=" + surfaceTypeName(faceGeometry)
+                                + ", edgeGeometryType=" + surfaceTypeName(edgeGeometry)
+                                + ", pcurveCount=" + pcurves.size()
+                                + ", unsupportedPcurveCount=" + unsupportedPcurveCount
+                                + ", reason=projected sampled 3d edge after unusable pcurves");
+                return fallback;
+            }
             log("parametric_edge_sampling_failed",
                     "edgeId=" + orientedEdge.edgeElement().id()
                             + ", orientedEdgeId=" + orientedEdge.id()
@@ -1443,6 +1469,63 @@ public final class StepPreviewJsonExporter {
                             + ", reason=no usable pcurve samples");
         }
         return best;
+    }
+
+    private static List<UvPoint> projectSampledEdge(
+            com.minicad.step.model.StepOrientedEdge orientedEdge,
+            ParametricSurfaceMapper mapper,
+            StepCadBuilder builder
+    ) {
+        List<CartesianPoint> sampled = sampleStepOrientedEdge(orientedEdge, builder);
+        if (sampled.size() < 2) {
+            return null;
+        }
+        List<UvPoint> points = new ArrayList<>(sampled.size());
+        UvPoint previous = null;
+        for (CartesianPoint point : sampled) {
+            UvPoint uv = mapper.project(point, previous);
+            if (uv == null) {
+                return null;
+            }
+            points.add(uv);
+            previous = uv;
+        }
+        return List.copyOf(points);
+    }
+
+    private static boolean shouldFallbackToProjectedEdge(StepEntity edgeGeometry) {
+        return switch (edgeGeometry) {
+            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry().isEmpty();
+            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry().isEmpty();
+            default -> true;
+        };
+    }
+
+    private static List<CartesianPoint> sampleStepOrientedEdge(
+            com.minicad.step.model.StepOrientedEdge orientedEdge,
+            StepCadBuilder builder
+    ) {
+        StepEdgeCurve edge = orientedEdge.edgeElement();
+        CartesianPoint start = pointFromStep(orientedEdge.orientation() ? edge.start().point() : edge.end().point());
+        CartesianPoint end = pointFromStep(orientedEdge.orientation() ? edge.end().point() : edge.start().point());
+        boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
+        Curve3 curve = switch (edge.edgeGeometry()) {
+            case StepLine line -> builder.buildLine(line.id());
+            case StepCircle circle -> builder.buildCircle(circle.id());
+            case StepEllipse ellipse -> builder.buildEllipse(ellipse.id());
+            case StepBSplineCurveWithKnots spline -> builder.buildBSplineCurve(spline.id());
+            case StepSurfaceCurve surfaceCurve -> builder.buildSurfaceCurve(surfaceCurve.id());
+            case StepTrimmedCurve trimmedCurve -> builder.buildTrimmedCurve(trimmedCurve.id());
+            default -> null;
+        };
+        if (curve == null) {
+            return List.of();
+        }
+        try {
+            return sampleEdge(start, end, curve, naturalForward);
+        } catch (GeometryException ex) {
+            return List.of(start, end);
+        }
     }
 
     private static String associatedGeometrySummary(StepEntity edgeGeometry) {
