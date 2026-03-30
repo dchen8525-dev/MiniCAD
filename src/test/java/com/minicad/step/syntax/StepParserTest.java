@@ -73,6 +73,27 @@ class StepParserTest {
     }
 
     @Test
+    void shouldNotTreatEndsecInsideStringAsSectionTerminator() {
+        String step = """
+                ISO-10303-21;
+                HEADER;
+                FILE_DESCRIPTION(('contains ENDSEC; in header'),'1');
+                ENDSEC;
+                DATA;
+                #1=EXAMPLE('contains ENDSEC; in data');
+                #2=EXAMPLE('still parsing');
+                ENDSEC;
+                END-ISO-10303-21;
+                """;
+
+        StepFile file = StepParser.parse(step);
+
+        assertEquals(1, file.headerEntries().size());
+        assertEquals(2, file.entities().size());
+        assertEquals("contains ENDSEC; in data", ((StepValue.StringValue) file.entities().getFirst().parameters().getFirst()).value());
+    }
+
+    @Test
     void shouldRejectMissingSemicolon() {
         String step = """
                 DATA;
