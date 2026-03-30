@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Lightweight local web app for viewing supported STEP topology in the browser.
@@ -24,6 +26,7 @@ import java.nio.file.Path;
 public final class StepViewerApp {
 
     private static final int DEFAULT_PORT = 8080;
+    private static final AtomicLong REQUEST_IDS = new AtomicLong();
 
     private StepViewerApp() {
     }
@@ -155,15 +158,33 @@ public final class StepViewerApp {
     private static final class PreviewServlet extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            long requestId = REQUEST_IDS.incrementAndGet();
+            long startedAt = System.nanoTime();
             String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            logPreview(requestId, "request_received",
+                    "remote=" + request.getRemoteAddr()
+                            + ", bytes=" + stepText.getBytes(StandardCharsets.UTF_8).length
+                            + ", textLength=" + stepText.length());
             if (stepText.isBlank()) {
+                logPreview(requestId, "request_rejected", "reason=blank_body");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
             try {
+                long exportStartedAt = System.nanoTime();
+                logPreview(requestId, "export_start", "textLength=" + stepText.length());
                 String json = StepPreviewJsonExporter.export(stepText);
+                logPreview(requestId, "export_done",
+                        "elapsedMs=" + elapsedMillis(exportStartedAt)
+                                + ", jsonLength=" + json.length());
                 send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
+                logPreview(requestId, "response_sent",
+                        "status=200, totalElapsedMs=" + elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
+                logPreview(requestId, "export_failed",
+                        "elapsedMs=" + elapsedMillis(startedAt)
+                                + ", errorType=" + ex.getClass().getSimpleName()
+                                + ", message=" + ex.getMessage());
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
             }
         }
@@ -247,5 +268,16 @@ public final class StepViewerApp {
         response.setHeader("Cache-Control", "no-store");
         response.setContentLength(body.length);
         response.getOutputStream().write(body);
+    }
+
+    private static void logPreview(long requestId, String stage, String detail) {
+        System.err.println("[MiniCAD Preview API] ts=" + Instant.now()
+                + " requestId=" + requestId
+                + " stage=" + stage
+                + " " + detail);
+    }
+
+    private static long elapsedMillis(long startedAt) {
+        return (System.nanoTime() - startedAt) / 1_000_000L;
     }
 }

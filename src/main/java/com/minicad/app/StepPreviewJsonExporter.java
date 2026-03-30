@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 /**
@@ -88,16 +89,37 @@ import java.util.stream.Collectors;
  */
 public final class StepPreviewJsonExporter {
 
+    private static final int FACE_PROGRESS_INTERVAL = 25;
+    private static final int EDGE_PROGRESS_INTERVAL = 100;
+
     private StepPreviewJsonExporter() {
     }
 
     public static String export(String stepText) {
+        long startedAt = System.nanoTime();
+        log("export_start", "textLength=" + stepText.length());
+        long parseStartedAt = System.nanoTime();
         StepFile stepFile = StepParser.parse(stepText);
+        log("parse_done", "elapsedMs=" + elapsedMillis(parseStartedAt) + ", entityCount=" + stepFile.entities().size());
+        long resolveStartedAt = System.nanoTime();
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+        log("resolve_done", "elapsedMs=" + elapsedMillis(resolveStartedAt) + ", resolvedCount=" + resolved.size());
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
+        long payloadStartedAt = System.nanoTime();
         PreviewPayload payload = buildPayload(stepFile, resolved, builder);
-        return toJson(payload);
+        log("payload_done",
+                "elapsedMs=" + elapsedMillis(payloadStartedAt)
+                        + ", faces=" + payload.faces().size()
+                        + ", edges=" + payload.edges().size()
+                        + ", unsupportedFaces=" + payload.unsupportedFaces().size()
+                        + ", representations=" + payload.representations().size()
+                        + ", instances=" + payload.instances().size());
+        long jsonStartedAt = System.nanoTime();
+        String json = toJson(payload);
+        log("json_done", "elapsedMs=" + elapsedMillis(jsonStartedAt) + ", jsonLength=" + json.length());
+        log("export_done", "totalElapsedMs=" + elapsedMillis(startedAt));
+        return json;
     }
 
     private static PreviewPayload buildPayload(
@@ -105,9 +127,22 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
+        long metadataStartedAt = System.nanoTime();
         StepMetadataExtractor metadata = StepMetadataExtractor.fromResolved(resolved);
+        log("metadata_done", "elapsedMs=" + elapsedMillis(metadataStartedAt));
+        long legacyStartedAt = System.nanoTime();
         GeometryCollection legacyGeometry = buildLegacyGeometry(resolved, builder, metadata);
+        log("legacy_geometry_done",
+                "elapsedMs=" + elapsedMillis(legacyStartedAt)
+                        + ", faces=" + legacyGeometry.faces().size()
+                        + ", edges=" + legacyGeometry.edges().size()
+                        + ", unsupportedFaces=" + legacyGeometry.unsupportedFaces().size());
+        long assemblyStartedAt = System.nanoTime();
         AssemblyData assembly = buildAssemblyData(resolved, builder, metadata);
+        log("assembly_done",
+                "elapsedMs=" + elapsedMillis(assemblyStartedAt)
+                        + ", representations=" + assembly.representations().size()
+                        + ", instances=" + assembly.instances().size());
 
         BoundsAccumulator geometryBounds = new BoundsAccumulator();
         includeGeometry(geometryBounds, legacyGeometry);
@@ -125,6 +160,13 @@ public final class StepPreviewJsonExporter {
                 legacyGeometry.edges().size(),
                 countUnsupportedFaces(resolved, builder)
         );
+        log("stats_done",
+                "entityCount=" + stats.entityCount()
+                        + ", solidCount=" + stats.solidCount()
+                        + ", shellCount=" + stats.shellCount()
+                        + ", faceCount=" + stats.faceCount()
+                        + ", edgeCount=" + stats.edgeCount()
+                        + ", unsupportedFaceCount=" + stats.unsupportedFaceCount());
 
         return new PreviewPayload(
                 stats,
@@ -164,22 +206,41 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor metadata,
             Map<Integer, StepMetadataExtractor.DisplayMetadata> inheritedShellMetadata
     ) {
+        log("geometry_shells_start", "shellCount=" + shellIds.size());
         List<FacePayload> faces = new ArrayList<>();
         List<UnsupportedFacePayload> unsupportedFaces = new ArrayList<>();
         Set<Integer> uniqueEdgeIds = new LinkedHashSet<>();
+        int processedFaces = 0;
 
         for (Integer shellId : shellIds) {
-            for (StepFaceEntity stepFace : shellFaces(resolved.get(shellId))) {
+            List<StepFaceEntity> shellFaces = shellFaces(resolved.get(shellId));
+            log("geometry_shell_start", "shellId=" + shellId + ", shellFaceCount=" + shellFaces.size());
+            for (StepFaceEntity stepFace : shellFaces) {
                 PreviewFaceResult previewFace = buildPreviewFaceResult(
                         stepFace,
                         builder,
                         mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
                 );
+                processedFaces++;
                 if (previewFace.face() == null) {
                     unsupportedFaces.add(previewFace.unsupportedFace());
+                    if (unsupportedFaces.size() <= 10 || unsupportedFaces.size() % FACE_PROGRESS_INTERVAL == 0) {
+                        log("geometry_face_unsupported",
+                                "faceId=" + stepFace.id()
+                                        + ", processedFaces=" + processedFaces
+                                        + ", unsupportedFaces=" + unsupportedFaces.size()
+                                        + ", reason=" + (previewFace.unsupportedFace() == null ? "null" : previewFace.unsupportedFace().reason()));
+                    }
                     continue;
                 }
                 faces.add(previewFace.face());
+                if (processedFaces % FACE_PROGRESS_INTERVAL == 0) {
+                    log("geometry_face_progress",
+                            "processedFaces=" + processedFaces
+                                    + ", supportedFaces=" + faces.size()
+                                    + ", unsupportedFaces=" + unsupportedFaces.size()
+                                    + ", uniqueEdges=" + uniqueEdgeIds.size());
+                }
                 for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
                     if (bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop) {
                         uniqueEdgeIds.addAll(edgeLoop.edges().stream().map(edge -> edge.edgeElement().id()).toList());
@@ -189,10 +250,22 @@ public final class StepPreviewJsonExporter {
         }
 
         List<EdgePayload> edges = new ArrayList<>();
+        int processedEdges = 0;
         for (Integer edgeId : uniqueEdgeIds) {
             List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
             edges.add(new EdgePayload(edgeId, toPointPayloads(polyline)));
+            processedEdges++;
+            if (processedEdges % EDGE_PROGRESS_INTERVAL == 0) {
+                log("geometry_edge_progress",
+                        "processedEdges=" + processedEdges + ", totalUniqueEdges=" + uniqueEdgeIds.size());
+            }
         }
+        log("geometry_shells_done",
+                "shellCount=" + shellIds.size()
+                        + ", processedFaces=" + processedFaces
+                        + ", supportedFaces=" + faces.size()
+                        + ", unsupportedFaces=" + unsupportedFaces.size()
+                        + ", edges=" + edges.size());
         return new GeometryCollection(List.copyOf(edges), List.copyOf(faces), List.copyOf(unsupportedFaces));
     }
 
@@ -461,13 +534,26 @@ public final class StepPreviewJsonExporter {
     }
 
     private static int countUnsupportedFaces(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        long startedAt = System.nanoTime();
         int unsupported = 0;
+        int processed = 0;
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepFaceEntity stepFace
                     && buildPreviewFaceResult(stepFace, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
                 unsupported++;
             }
+            if (entity instanceof StepFaceEntity) {
+                processed++;
+                if (processed % FACE_PROGRESS_INTERVAL == 0) {
+                    log("count_unsupported_faces_progress",
+                            "processedFaces=" + processed + ", unsupportedFaces=" + unsupported);
+                }
+            }
         }
+        log("count_unsupported_faces_done",
+                "elapsedMs=" + elapsedMillis(startedAt)
+                        + ", processedFaces=" + processed
+                        + ", unsupportedFaces=" + unsupported);
         return unsupported;
     }
 
@@ -3731,5 +3817,13 @@ public final class StepPreviewJsonExporter {
             }
             return new BoundsPayload(new PointPayload(minX, minY, minZ), new PointPayload(maxX, maxY, maxZ));
         }
+    }
+
+    private static void log(String stage, String detail) {
+        System.err.println("[MiniCAD Preview Exporter] ts=" + Instant.now() + " stage=" + stage + " " + detail);
+    }
+
+    private static long elapsedMillis(long startedAt) {
+        return (System.nanoTime() - startedAt) / 1_000_000L;
     }
 }
