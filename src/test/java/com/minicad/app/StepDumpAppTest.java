@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -63,8 +63,8 @@ class StepDumpAppTest {
 
         int exitCode = StepDumpApp.run(
                 new String[]{file.toString()},
-                new PrintStream(stdout),
-                new PrintStream(stderr)
+                sink(stdout),
+                sink(stderr)
         );
 
         String output = stdout.toString();
@@ -103,8 +103,8 @@ class StepDumpAppTest {
 
         int exitCode = StepDumpApp.run(
                 new String[]{file.toString()},
-                new PrintStream(stdout),
-                new PrintStream(stderr)
+                sink(stdout),
+                sink(stderr)
         );
 
         assertEquals(1, exitCode);
@@ -140,8 +140,8 @@ class StepDumpAppTest {
 
         int exitCode = StepDumpApp.run(
                 new String[]{file.toString()},
-                new PrintStream(stdout),
-                new PrintStream(stderr)
+                sink(stdout),
+                sink(stderr)
         );
 
         String output = stdout.toString();
@@ -157,13 +157,23 @@ class StepDumpAppTest {
 
         int exitCode = StepDumpApp.run(
                 new String[]{"examples/toroidal-trimmed-loops-with-hole.step"},
-                new PrintStream(stdout),
-                new PrintStream(stderr)
+                sink(stdout),
+                sink(stderr)
         );
 
         String output = stdout.toString();
         assertEquals(0, exitCode);
         assertTrue(output.contains("openShell #155: faces=0, unsupportedFaces=1"));
         assertTrue(output.contains("unsupportedFaces=1"));
+    }
+
+    private static Consumer<String> sink(ByteArrayOutputStream output) {
+        return line -> {
+            try {
+                output.write((line + System.lineSeparator()).getBytes());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        };
     }
 }

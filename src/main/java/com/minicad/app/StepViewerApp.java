@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class StepViewerApp {
 
+    private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
     private static final AtomicLong REQUEST_IDS = new AtomicLong();
     private static final ConcurrentHashMap<String, CompletableFuture<String>> IN_FLIGHT_PREVIEWS = new ConcurrentHashMap<>();
@@ -93,14 +95,14 @@ public final class StepViewerApp {
     }
 
     private static void printStartupInfo(int port) {
-        System.out.println("MiniCAD STEP viewer is running.");
-        System.out.println("URL: http://127.0.0.1:" + port);
-        System.out.println("Routes:");
-        System.out.println("  GET  /");
-        System.out.println("  GET  /api/example?name=minimal-square");
-        System.out.println("  GET  /api/example?name=plate-with-round-hole");
-        System.out.println("  POST /api/preview");
-        System.out.println("Press Ctrl+C to stop.");
+        log.info("MiniCAD STEP viewer is running.");
+        log.info("URL: http://127.0.0.1:{}", port);
+        log.info("Routes:");
+        log.info("  GET  /");
+        log.info("  GET  /api/example?name=minimal-square");
+        log.info("  GET  /api/example?name=plate-with-round-hole");
+        log.info("  POST /api/preview");
+        log.info("Press Ctrl+C to stop.");
     }
 
     private static final class StaticServlet extends HttpServlet {
@@ -317,10 +319,7 @@ public final class StepViewerApp {
     }
 
     private static void logPreview(long requestId, String stage, String detail) {
-        System.err.println("[MiniCAD Preview API] ts=" + Instant.now()
-                + " requestId=" + requestId
-                + " stage=" + stage
-                + " " + detail);
+        log.info("requestId={} stage={} {}", requestId, stage, detail);
     }
 
     private static long elapsedMillis(long startedAt) {

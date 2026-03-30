@@ -14,18 +14,23 @@ import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 /**
  * Minimal CLI demo that reads a STEP file and prints a structural summary.
  */
 public final class StepDumpApp {
+    private static final Logger log = LoggerFactory.getLogger(StepDumpApp.class);
 
     private StepDumpApp() {
     }
@@ -37,15 +42,15 @@ public final class StepDumpApp {
      * @throws IOException if reading the file fails
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = run(args, System.out, System.err);
+        int exitCode = run(args, log::info, log::error);
         if (exitCode != 0) {
             System.exit(exitCode);
         }
     }
 
-    static int run(String[] args, PrintStream out, PrintStream err) throws IOException {
+    static int run(String[] args, Consumer<String> out, Consumer<String> err) throws IOException {
         if (args.length != 1) {
-            err.println("Usage: StepDumpApp <step-file>");
+            err.accept("Usage: StepDumpApp <step-file>");
             return 2;
         }
 
@@ -57,42 +62,44 @@ public final class StepDumpApp {
             Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
             StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
-            out.println("File: " + path);
-            out.println();
-            printSyntaxSummary(stepFile, out);
-            out.println();
-            printSemanticSummary(resolved, out);
-            out.println();
-            printBuildSummary(resolved, builder, out);
+            List<String> lines = new ArrayList<>();
+            lines.add("File: " + path);
+            lines.add("");
+            appendSyntaxSummary(stepFile, lines);
+            lines.add("");
+            appendSemanticSummary(resolved, lines);
+            lines.add("");
+            appendBuildSummary(resolved, builder, lines);
+            lines.forEach(out);
             return 0;
         } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-            err.println("STEP processing failed: " + ex.getMessage());
+            err.accept("STEP processing failed: " + ex.getMessage());
             return 1;
         }
     }
 
-    private static void printSyntaxSummary(StepFile file, PrintStream out) {
-        out.println("Syntax Summary");
-        out.println("  entityCount: " + file.entities().size());
+    private static void appendSyntaxSummary(StepFile file, List<String> lines) {
+        lines.add("Syntax Summary");
+        lines.add("  entityCount: " + file.entities().size());
         if (!file.entities().isEmpty()) {
-            out.println("  firstId: #" + file.entities().getFirst().id());
-            out.println("  lastId: #" + file.entities().getLast().id());
+            lines.add("  firstId: #" + file.entities().getFirst().id());
+            lines.add("  lastId: #" + file.entities().getLast().id());
         }
     }
 
-    private static void printSemanticSummary(Map<Integer, StepEntity> resolved, PrintStream out) {
-        out.println("Semantic Summary");
+    private static void appendSemanticSummary(Map<Integer, StepEntity> resolved, List<String> lines) {
+        lines.add("Semantic Summary");
         Map<String, Integer> counts = new TreeMap<>();
         for (StepEntity entity : resolved.values()) {
             counts.merge(entity.getClass().getSimpleName(), 1, Integer::sum);
         }
         for (Map.Entry<String, Integer> entry : counts.entrySet()) {
-            out.println("  " + entry.getKey() + ": " + entry.getValue());
+            lines.add("  " + entry.getKey() + ": " + entry.getValue());
         }
     }
 
-    private static void printBuildSummary(Map<Integer, StepEntity> resolved, StepCadBuilder builder, PrintStream out) {
-        out.println("Build Summary");
+    private static void appendBuildSummary(Map<Integer, StepEntity> resolved, StepCadBuilder builder, List<String> lines) {
+        lines.add("Build Summary");
 
         int openShells = 0;
         int closedShells = 0;
@@ -102,25 +109,25 @@ public final class StepDumpApp {
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepOpenShell openShell) {
                 FaceBuildCounts counts = summarizeShell(openShell.faces(), builder);
-                out.println("  openShell #" + openShell.id() + ": faces=" + counts.supportedFaces()
+                lines.add("  openShell #" + openShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
                 openShells++;
                 unsupportedFaces += counts.unsupportedFaces();
             } else if (entity instanceof StepClosedShell closedShell) {
                 FaceBuildCounts counts = summarizeShell(closedShell.faces(), builder);
-                out.println("  closedShell #" + closedShell.id() + ": faces=" + counts.supportedFaces()
+                lines.add("  closedShell #" + closedShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
                 closedShells++;
                 unsupportedFaces += counts.unsupportedFaces();
             } else if (entity instanceof StepManifoldSolidBrep solidBrep) {
                 FaceBuildCounts counts = summarizeShell(solidBrep.outer().faces(), builder);
-                out.println("  solid #" + solidBrep.id() + ": shellFaces=" + counts.supportedFaces()
+                lines.add("  solid #" + solidBrep.id() + ": shellFaces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
                 solids++;
             }
         }
 
-        out.println("  totals: openShells=" + openShells + ", closedShells=" + closedShells
+        lines.add("  totals: openShells=" + openShells + ", closedShells=" + closedShells
                 + ", solids=" + solids + ", unsupportedFaces=" + unsupportedFaces);
     }
 
