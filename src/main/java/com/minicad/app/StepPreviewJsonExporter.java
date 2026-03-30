@@ -339,12 +339,20 @@ public final class StepPreviewJsonExporter {
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
             try {
+                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, splineSurface, metadata, builder);
+                if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
+                    return trimmed;
+                }
                 FacePayload payload = toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata);
                 if (payload != null) {
                     return new PreviewFaceResult(payload, null);
                 }
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+                log("bspline_surface_preview_exception",
+                        "faceId=" + stepFace.id()
+                                + ", surfaceId=" + splineSurface.id()
+                                + ", reason=" + ex.getMessage());
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
             }
         }
@@ -1012,7 +1020,10 @@ public final class StepPreviewJsonExporter {
         // Preview meshes should stay light enough for API transport and browser upload.
         int baseUSegments = Math.max(48, Math.min(128, sampleCount * 4));
         int baseVSegments = Math.max(24, Math.min(64, sampleCount * 3));
-        if (geometry instanceof StepCylindricalSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnots) {
+            baseUSegments = Math.max(18, Math.min(36, sampleCount * 2));
+            baseVSegments = Math.max(12, Math.min(24, sampleCount * 2));
+        } else if (geometry instanceof StepCylindricalSurface) {
             baseUSegments = Math.max(baseUSegments, 96);
             baseVSegments = Math.max(baseVSegments, 32);
         } else if (geometry instanceof StepConicalSurface || geometry instanceof StepToroidalSurface) {

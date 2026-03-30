@@ -130,9 +130,9 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"representationCount\":1"));
         assertTrue(json.contains("\"instanceCount\":1"));
-        assertTrue(json.contains("\"unsupportedFaceCount\":104"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":3"));
         assertTrue(json.contains("\"B_SPLINE_SURFACE_WITH_KNOTS\""));
-        assertFalse(json.contains("\"reason\":\"failed to build parametric loops\""));
+        assertFalse(json.contains("\"reason\":\"b-spline surface preview failed\""));
         assertTrue(json.contains("\"edges\":[],\"faces\":[],\"representations\":["));
         assertTrue(json.length() < 250_000_000);
     }
