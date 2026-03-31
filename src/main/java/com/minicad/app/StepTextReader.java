@@ -27,7 +27,10 @@ final class StepTextReader {
     }
 
     static String read(Path path) throws IOException {
-        byte[] bytes = Files.readAllBytes(path);
+        return read(Files.readAllBytes(path));
+    }
+
+    static String read(byte[] bytes) throws IOException {
         CharacterCodingException lastFailure = null;
         for (Charset charset : CHARSET_FALLBACKS) {
             try {
@@ -39,7 +42,7 @@ final class StepTextReader {
         if (lastFailure != null) {
             throw lastFailure;
         }
-        throw new IOException("failed to decode STEP file: " + path);
+        throw new IOException("failed to decode STEP bytes");
     }
 
     private static String decode(byte[] bytes, Charset charset) throws CharacterCodingException {

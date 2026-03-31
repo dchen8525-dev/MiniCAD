@@ -158,10 +158,11 @@ public final class StepViewerApp {
     private static final class PreviewServlet extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            String stepText = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            byte[] requestBody = request.getInputStream().readAllBytes();
+            String stepText = StepTextReader.read(requestBody);
             log.info("requestId=1 stage={} remote={}, bytes={}, textLength={}",
                     "request_received", request.getRemoteAddr(),
-                    stepText.getBytes(StandardCharsets.UTF_8).length, stepText.length());
+                    requestBody.length, stepText.length());
             if (stepText.isBlank()) {
                 log.info("requestId=1 stage={} reason=blank_body", "request_rejected");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");

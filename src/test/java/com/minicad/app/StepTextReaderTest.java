@@ -15,19 +15,17 @@ class StepTextReaderTest {
     @Test
     void shouldReadUtf8StepFiles() throws IOException {
         Path file = Files.createTempFile("minicad-utf8", ".step");
-        Files.writeString(file, """
+        String expected = """
                 DATA;
                 #1=EXAMPLE('UTF-8 name');
                 ENDSEC;
-                """, StandardCharsets.UTF_8);
+                """;
+        Files.writeString(file, expected, StandardCharsets.UTF_8);
 
         String text = StepTextReader.read(file);
 
-        assertEquals("""
-                DATA;
-                #1=EXAMPLE('UTF-8 name');
-                ENDSEC;
-                """, text);
+        assertEquals(expected, text);
+        assertEquals(expected, StepTextReader.read(expected.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -43,6 +41,7 @@ class StepTextReaderTest {
         String text = StepTextReader.read(file);
 
         assertEquals(expected, text);
+        assertEquals(expected, StepTextReader.read(expected.getBytes(Charset.forName("GB18030"))));
     }
 
     @Test
@@ -58,5 +57,6 @@ class StepTextReaderTest {
         String text = StepTextReader.read(file);
 
         assertEquals(expected, text);
+        assertEquals(expected, StepTextReader.read(expected.getBytes(StandardCharsets.ISO_8859_1)));
     }
 }
