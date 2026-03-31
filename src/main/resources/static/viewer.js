@@ -1092,7 +1092,9 @@ function refreshRenderableStyle(object) {
             : object.userData.baseColor;
     object.material.color.setHex(color);
     if (object.isMesh) {
-        object.material.opacity = object.userData.objectSelected ? 0.9 : object.userData.instanceHighlighted ? 0.78 : 0.62;
+        object.material.opacity = object.userData.objectSelected ? 1.0 : object.userData.instanceHighlighted ? 0.94 : 0.98;
+        object.material.transparent = object.material.opacity < 0.999;
+        object.material.depthWrite = true;
     }
 }
 
@@ -1327,6 +1329,12 @@ function renderGlbPreview(result) {
         }
         if (node.isLine) {
             modelHasEdgeLines = true;
+        }
+        if (node.isMesh && node.material) {
+            node.material.transparent = false;
+            node.material.opacity = 0.98;
+            node.material.depthWrite = true;
+            node.material.needsUpdate = true;
         }
         if (Array.isArray(node.userData?.selection)) {
             if (node.material?.color) {
@@ -1781,7 +1789,7 @@ renderer.domElement.addEventListener('click', (event) => {
         interactiveObjects: interactiveObjects.length
     });
 
-    const hits = raycaster.intersectObjects(interactiveObjects, false);
+    const hits = raycaster.intersectObjects(interactiveObjects.filter((object) => object.visible), false);
     logJson('canvasClick:hits', {
         hitCount: hits.length,
         hits: hits.slice(0, 5).map((hit) => ({
