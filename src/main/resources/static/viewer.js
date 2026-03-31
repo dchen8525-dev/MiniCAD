@@ -16,6 +16,7 @@ const assemblyTree = document.querySelector('#assembly-tree');
 const pmiOverlay = document.querySelector('#pmi-overlay');
 const isolateSelectionButton = document.querySelector('#isolate-selection');
 const showAllButton = document.querySelector('#show-all');
+const toggleEdgesButton = document.querySelector('#toggle-edges');
 const togglePmiButton = document.querySelector('#toggle-pmi');
 const statElements = new Map(
     Array.from(document.querySelectorAll('[data-stat]')).map((element) => [element.dataset.stat, element])
@@ -148,6 +149,8 @@ const assemblyButtons = new Map();
 const stepObjects = new Map();
 let pmiLabels = [];
 let pmiVisible = true;
+let edgeLinesVisible = false;
+let modelHasEdgeLines = false;
 let lastRenderScale = -1;
 let uploadedFileBytes = null;
 let uploadedFileName = null;
@@ -471,6 +474,9 @@ function clearModel() {
     updateValidation();
     updateUnsupportedFaces();
     renderAssemblyTree([]);
+    edgeLinesVisible = false;
+    modelHasEdgeLines = false;
+    updateEdgeToggleButton();
     if (togglePmiButton) {
         togglePmiButton.textContent = '隐藏 PMI';
     }
@@ -1061,6 +1067,23 @@ function applyPmiVisibility() {
     }
 }
 
+function updateEdgeToggleButton() {
+    if (!toggleEdgesButton) {
+        return;
+    }
+    toggleEdgesButton.disabled = !modelHasEdgeLines;
+    toggleEdgesButton.textContent = edgeLinesVisible ? '隐藏边线' : '显示边线';
+}
+
+function applyEdgeVisibility() {
+    modelRoot.traverse((node) => {
+        if (node.isLine) {
+            node.visible = edgeLinesVisible;
+        }
+    });
+    updateEdgeToggleButton();
+}
+
 function refreshRenderableStyle(object) {
     const color = object.userData.objectSelected
         ? object.userData.selectedColor
@@ -1293,6 +1316,7 @@ function renderGlbPreview(result) {
     renderAssemblyTree(Array.isArray(preview.instances) ? preview.instances : []);
 
     modelRoot.add(result.scene);
+    modelHasEdgeLines = false;
     result.scene.traverse((node) => {
         if (node.userData?.kind === 'instance' && node.userData?.instanceId) {
             assemblyGroups.set(node.userData.instanceId, node);
@@ -1300,6 +1324,9 @@ function renderGlbPreview(result) {
         }
         if (!(node.isMesh || node.isLine)) {
             return;
+        }
+        if (node.isLine) {
+            modelHasEdgeLines = true;
         }
         if (Array.isArray(node.userData?.selection)) {
             if (node.material?.color) {
@@ -1315,6 +1342,8 @@ function renderGlbPreview(result) {
             registerStepObject(node.userData.stepId, node);
         }
     });
+    edgeLinesVisible = false;
+    applyEdgeVisibility();
 
     fitCamera(preview.bounds);
     resetSelection();
@@ -1819,4 +1848,15 @@ if (togglePmiButton) {
         pmiVisible = !pmiVisible;
         applyPmiVisibility();
     });
+}
+
+if (toggleEdgesButton) {
+    toggleEdgesButton.addEventListener('click', () => {
+        if (!modelHasEdgeLines) {
+            return;
+        }
+        edgeLinesVisible = !edgeLinesVisible;
+        applyEdgeVisibility();
+    });
+    updateEdgeToggleButton();
 }
