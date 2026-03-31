@@ -82,7 +82,7 @@
         }
 
         button,
-        input[type="file"]::file-selector-button {
+        .file-trigger {
             border: none;
             border-radius: 999px;
             padding: 0.7rem 1rem;
@@ -90,6 +90,10 @@
             color: white;
             cursor: pointer;
             transition: transform 120ms ease, background 120ms ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
         }
 
         button.secondary {
@@ -97,20 +101,21 @@
         }
 
         button:hover,
-        input[type="file"]::file-selector-button:hover {
+        .file-trigger:hover {
             transform: translateY(-1px);
             background: var(--accent-dark);
         }
 
         input[type="file"] {
-            display: block;
-            width: 100%;
-            margin-bottom: 0.85rem;
-            color: var(--muted);
-        }
-
-        input[type="file"]::file-selector-button {
-            margin-right: 0.75rem;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         select {
@@ -442,7 +447,7 @@
         </header>
 
         <section class="controls">
-            <label for="file-input">选择文件并渲染</label>
+            <label for="file-input" class="file-trigger">选择文件并渲染</label>
             <input id="file-input" type="file" accept=".step,.stp,.txt">
         </section>
 
