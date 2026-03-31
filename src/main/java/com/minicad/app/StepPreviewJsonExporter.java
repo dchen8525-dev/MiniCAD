@@ -360,8 +360,7 @@ public final class StepPreviewJsonExporter {
         List<EdgePayload> edges = new ArrayList<>();
         int processedEdges = 0;
         for (Integer edgeId : uniqueEdgeIds) {
-            List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
-            edges.add(new EdgePayload(edgeId, toPointPayloads(polyline)));
+            edges.add(buildEdgePayload(edgeId, resolved, builder));
             processedEdges++;
             if (processedEdges % EDGE_PROGRESS_INTERVAL == 0) {
                 log.debug("stage={} processedEdges={}, totalUniqueEdges={}", "geometry_edge_progress",
@@ -2995,6 +2994,81 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    private static EdgePayload buildEdgePayload(
+            int edgeId,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder
+    ) {
+        List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
+        StepEdgeCurve edge = (StepEdgeCurve) resolved.get(edgeId);
+        CartesianPoint start = pointFromStep(edge.start().point());
+        CartesianPoint end = pointFromStep(edge.end().point());
+        return new EdgePayload(
+                edgeId,
+                toPointPayloads(polyline),
+                edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder)
+        );
+    }
+
+    private static EdgeCurvePayload edgeCurvePayload(
+            StepEntity edgeGeometry,
+            CartesianPoint start,
+            CartesianPoint end,
+            boolean naturalForward,
+            StepCadBuilder builder
+    ) {
+        try {
+            if (edgeGeometry instanceof StepCircle circle) {
+                Circle geometry = builder.buildCircle(circle.id());
+                Axis2Placement3D placement = geometry.position();
+                double startAngle = geometry.angleOf(start);
+                double endAngle = geometry.angleOf(end);
+                return new EdgeCurvePayload(
+                        "circle_arc",
+                        List.of(placement.location().x(), placement.location().y(), placement.location().z()),
+                        List.of(placement.axis().x(), placement.axis().y(), placement.axis().z()),
+                        List.of(placement.xDirection().x(), placement.xDirection().y(), placement.xDirection().z()),
+                        geometry.radius(),
+                        null,
+                        null,
+                        startAngle,
+                        arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
+                );
+            }
+            if (edgeGeometry instanceof StepEllipse ellipse) {
+                Ellipse3 geometry = builder.buildEllipse(ellipse.id());
+                Axis2Placement3D placement = geometry.position();
+                double startAngle = geometry.angleOf(start);
+                double endAngle = geometry.angleOf(end);
+                return new EdgeCurvePayload(
+                        "ellipse_arc",
+                        List.of(placement.location().x(), placement.location().y(), placement.location().z()),
+                        List.of(placement.axis().x(), placement.axis().y(), placement.axis().z()),
+                        List.of(placement.xDirection().x(), placement.xDirection().y(), placement.xDirection().z()),
+                        null,
+                        geometry.semiAxis1(),
+                        geometry.semiAxis2(),
+                        startAngle,
+                        arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
+                );
+            }
+        } catch (GeometryException | TopologyException ex) {
+            log.debug("stage={} edgeGeometryId={}, reason={}", "edge_curve_payload_skipped", edgeGeometry.id(), ex.getMessage());
+        }
+        return null;
+    }
+
+    private static double arcSweep(double startAngle, double endAngle, boolean closed, boolean naturalForward) {
+        double delta = endAngle - startAngle;
+        if (closed) {
+            return naturalForward ? Math.PI * 2.0 : -Math.PI * 2.0;
+        }
+        if (naturalForward) {
+            return delta < 0.0 ? delta + Math.PI * 2.0 : delta;
+        }
+        return delta > 0.0 ? delta - Math.PI * 2.0 : delta;
+    }
+
     private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
         if (curve instanceof TrimmedCurve3 trimmedCurve) {
             return sampleEdge(start, end, trimmedCurve.basisCurve(), naturalForward);
@@ -3037,7 +3111,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(32, (int) Math.ceil(Math.abs(delta) / (Math.PI / 36.0)));
+        int segments = Math.max(64, (int) Math.ceil(Math.abs(delta) / (Math.PI / 72.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
@@ -3062,7 +3136,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(36, (int) Math.ceil(Math.abs(delta) / (Math.PI / 48.0)));
+        int segments = Math.max(72, (int) Math.ceil(Math.abs(delta) / (Math.PI / 96.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
@@ -4833,7 +4907,20 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    private record EdgePayload(int stepId, List<PointPayload> points) {
+    private record EdgePayload(int stepId, List<PointPayload> points, EdgeCurvePayload curve) {
+    }
+
+    private record EdgeCurvePayload(
+            String type,
+            List<Double> center,
+            List<Double> axis,
+            List<Double> xDirection,
+            Double radius,
+            Double semiAxis1,
+            Double semiAxis2,
+            double startAngle,
+            double sweepAngle
+    ) {
     }
 
     private record FacePayload(
@@ -5377,6 +5464,9 @@ public final class StepPreviewJsonExporter {
             Map<String, Object> extras = new LinkedHashMap<>();
             extras.put("kind", "edge");
             extras.put("stepId", edge.stepId());
+            if (edge.curve() != null) {
+                extras.put("curve", edgeCurveValue(edge.curve()));
+            }
             extras.put("selection", List.of(
                     List.of("类型", "边"),
                     List.of("STEP", "#" + edge.stepId()),
@@ -5417,6 +5507,26 @@ public final class StepPreviewJsonExporter {
 
         private String formatLayersValue(List<String> layers) {
             return layers == null || layers.isEmpty() ? "未指定" : String.join(", ", layers);
+        }
+
+        private Map<String, Object> edgeCurveValue(EdgeCurvePayload curve) {
+            Map<String, Object> value = new LinkedHashMap<>();
+            value.put("type", curve.type());
+            value.put("center", curve.center());
+            value.put("axis", curve.axis());
+            value.put("xDirection", curve.xDirection());
+            value.put("startAngle", curve.startAngle());
+            value.put("sweepAngle", curve.sweepAngle());
+            if (curve.radius() != null) {
+                value.put("radius", curve.radius());
+            }
+            if (curve.semiAxis1() != null) {
+                value.put("semiAxis1", curve.semiAxis1());
+            }
+            if (curve.semiAxis2() != null) {
+                value.put("semiAxis2", curve.semiAxis2());
+            }
+            return value;
         }
 
         private FloatArrayData floatArray(List<PointPayload> points) {

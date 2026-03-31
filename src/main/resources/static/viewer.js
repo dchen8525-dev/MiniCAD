@@ -27,7 +27,7 @@ const camera = new THREE.PerspectiveCamera(55, 1, 0.01, 5000);
 camera.position.set(3.5, 2.8, 3.5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-const basePixelRatio = Math.min(window.devicePixelRatio, 3);
+const basePixelRatio = Math.min(window.devicePixelRatio, 4);
 renderer.setPixelRatio(basePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.domElement.style.width = '100%';
@@ -259,15 +259,15 @@ function updateReferenceGuides(bounds) {
 function currentRenderScale() {
     const distance = camera.position.distanceTo(controls.target);
     if (distance <= 2.5) {
-        return 2.8;
+        return 3.4;
     }
     if (distance <= 4.5) {
-        return 2.2;
+        return 2.8;
     }
     if (distance <= 8.0) {
-        return 1.7;
+        return 2.1;
     }
-    return 1.25;
+    return 1.5;
 }
 
 function updateRenderResolution(force = false) {
@@ -678,6 +678,55 @@ function formatLayers(layers) {
     return Array.isArray(layers) && layers.length > 0 ? layers.join(', ') : '未指定';
 }
 
+function vectorFromArray(values) {
+    return new THREE.Vector3(values[0], values[1], values[2]);
+}
+
+function orthonormalY(axis, xDirection) {
+    return axis.clone().cross(xDirection).normalize();
+}
+
+function rebuildCurveEdgeGeometry(node) {
+    const curve = node.userData?.curve;
+    if (!curve || !node.geometry) {
+        return;
+    }
+    const axis = vectorFromArray(curve.axis).normalize();
+    const xDirection = vectorFromArray(curve.xDirection).normalize();
+    const yDirection = orthonormalY(axis, xDirection);
+    const center = vectorFromArray(curve.center);
+    const sweep = Math.abs(curve.sweepAngle ?? 0);
+    let segments = 0;
+    const positions = [];
+
+    if (curve.type === 'circle_arc' && Number.isFinite(curve.radius)) {
+        segments = Math.max(128, Math.ceil(sweep / (Math.PI / 180.0)));
+        for (let index = 0; index <= segments; index += 1) {
+            const angle = curve.startAngle + curve.sweepAngle * index / segments;
+            const point = center.clone()
+                .addScaledVector(xDirection, Math.cos(angle) * curve.radius)
+                .addScaledVector(yDirection, Math.sin(angle) * curve.radius);
+            positions.push(point.x, point.y, point.z);
+        }
+    } else if (curve.type === 'ellipse_arc' && Number.isFinite(curve.semiAxis1) && Number.isFinite(curve.semiAxis2)) {
+        segments = Math.max(160, Math.ceil(sweep / (Math.PI / 240.0)));
+        for (let index = 0; index <= segments; index += 1) {
+            const angle = curve.startAngle + curve.sweepAngle * index / segments;
+            const point = center.clone()
+                .addScaledVector(xDirection, Math.cos(angle) * curve.semiAxis1)
+                .addScaledVector(yDirection, Math.sin(angle) * curve.semiAxis2);
+            positions.push(point.x, point.y, point.z);
+        }
+    }
+
+    if (positions.length >= 6) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        node.geometry.dispose();
+        node.geometry = geometry;
+    }
+}
+
 function renderPmi(pmi) {
     if (!Array.isArray(pmi) || pmi.length === 0) {
         return;
@@ -967,6 +1016,9 @@ function renderGlbPreview(result) {
                 roughness: 0.52,
                 side: THREE.DoubleSide
             });
+        }
+        if (isEdgeRenderable(node) && node.userData?.curve) {
+            rebuildCurveEdgeGeometry(node);
         }
         if (Array.isArray(node.userData?.selection)) {
             if (node.material?.color) {

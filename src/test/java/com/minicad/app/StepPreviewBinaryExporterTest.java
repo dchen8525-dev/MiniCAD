@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,5 +79,19 @@ class StepPreviewBinaryExporterTest {
         assertTrue(metadata.contains("\"edgeCount\":4"));
         assertTrue(metadata.contains("\"meshes\":["));
         assertTrue(metadata.contains("\"materials\":["));
+    }
+
+    @Test
+    void shouldEmbedParametricCircleMetadataForRoundEdges() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/plate-with-round-hole.step")));
+
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
+
+        assertTrue(metadata.contains("\"curve\":{\"type\":\"circle_arc\""));
+        assertTrue(metadata.contains("\"radius\":"));
+        assertTrue(metadata.contains("\"sweepAngle\":"));
+        assertTrue(metadata.contains("\"xDirection\":"));
     }
 }
