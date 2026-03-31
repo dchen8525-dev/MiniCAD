@@ -152,8 +152,7 @@ let pmiVisible = true;
 let edgeLinesVisible = false;
 let modelHasEdgeLines = false;
 let lastRenderScale = -1;
-let uploadedFileBytes = null;
-let uploadedFileName = null;
+let uploadedFile = null;
 const viewerLogPrefix = '[MiniCAD Viewer]';
 
 function logDebug(message, ...args) {
@@ -528,93 +527,6 @@ function pointsBounds(points) {
     return box;
 }
 
-function pointBufferSlice(pointBuffer, pointOffset, pointCount) {
-    if (!(pointBuffer instanceof Float32Array) || !Number.isInteger(pointOffset) || !Number.isInteger(pointCount) || pointCount <= 0) {
-        return null;
-    }
-    return pointBuffer.subarray(pointOffset * 3, (pointOffset + pointCount) * 3);
-}
-
-function pointFromBuffer(pointBuffer, pointOffset, index = 0) {
-    const base = (pointOffset + index) * 3;
-    return [pointBuffer[base], pointBuffer[base + 1], pointBuffer[base + 2]];
-}
-
-function pointCountOfEdge(edge) {
-    return Number.isInteger(edge?.pointCount) ? edge.pointCount : (Array.isArray(edge?.points) ? edge.points.length : 0);
-}
-
-function pointCountOfLoop(loop) {
-    return Number.isInteger(loop?.pointCount) ? loop.pointCount : (Array.isArray(loop?.points) ? loop.points.length : 0);
-}
-
-function pointCountOfFaceTriangles(face) {
-    return Number.isInteger(face?.triangleCount) ? face.triangleCount : (Array.isArray(face?.triangles) ? face.triangles.length : 0);
-}
-
-function loopPointsToVector3(loop, pointBuffer) {
-    if (Number.isInteger(loop?.pointOffset) && Number.isInteger(loop?.pointCount)) {
-        const slice = pointBufferSlice(pointBuffer, loop.pointOffset, loop.pointCount);
-        const points = [];
-        for (let i = 0; i < slice.length; i += 3) {
-            points.push(new THREE.Vector3(slice[i], slice[i + 1], slice[i + 2]));
-        }
-        return points;
-    }
-    return Array.isArray(loop?.points) ? loop.points.map(toVector3) : [];
-}
-
-function representationBounds(representation, pointBuffer = null) {
-    const box = new THREE.Box3();
-    let hasPoint = false;
-
-    for (const face of Array.isArray(representation?.faces) ? representation.faces : []) {
-        const triangleSlice = pointBufferSlice(pointBuffer, face?.triangleOffset, face?.triangleCount);
-        if (triangleSlice) {
-            for (let i = 0; i < triangleSlice.length; i += 3) {
-                box.expandByPoint(new THREE.Vector3(triangleSlice[i], triangleSlice[i + 1], triangleSlice[i + 2]));
-                hasPoint = true;
-            }
-        }
-        for (const loop of Array.isArray(face?.loops) ? face.loops : []) {
-            const points = Number.isInteger(loop?.pointOffset) ? loopPointsToVector3(loop, pointBuffer) : (Array.isArray(loop?.points) ? loop.points : []);
-            for (const point of points) {
-                if (Array.isArray(point) && point.length >= 3) {
-                    box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
-                    hasPoint = true;
-                } else if (point?.isVector3) {
-                    box.expandByPoint(point);
-                    hasPoint = true;
-                }
-            }
-        }
-    }
-
-    for (const edge of Array.isArray(representation?.edges) ? representation.edges : []) {
-        const points = Number.isInteger(edge?.pointOffset)
-            ? (() => {
-                const slice = pointBufferSlice(pointBuffer, edge.pointOffset, edge.pointCount);
-                const list = [];
-                for (let i = 0; i < slice.length; i += 3) {
-                    list.push(new THREE.Vector3(slice[i], slice[i + 1], slice[i + 2]));
-                }
-                return list;
-            })()
-            : (Array.isArray(edge?.points) ? edge.points : []);
-        for (const point of points) {
-            if (Array.isArray(point) && point.length >= 3) {
-                box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
-                hasPoint = true;
-            } else if (point?.isVector3) {
-                box.expandByPoint(point);
-                hasPoint = true;
-            }
-        }
-    }
-
-    return hasPoint ? box : null;
-}
-
 function disposeObject(object) {
     object.traverse((node) => {
         if (node.geometry) {
@@ -630,246 +542,6 @@ function disposeObject(object) {
 
 function toVector3(point) {
     return new THREE.Vector3(point[0], point[1], point[2]);
-}
-
-function normalizeLoop(loop) {
-    if (loop.length > 1) {
-        const first = loop[0];
-        const last = loop[loop.length - 1];
-        if (first.distanceToSquared(last) < 1e-12) {
-            return loop.slice(0, -1);
-        }
-    }
-    return loop;
-}
-
-function projectFace(points3D, normal) {
-    const origin = points3D[0];
-    let xAxis = null;
-
-    for (let i = 1; i < points3D.length; i += 1) {
-        const candidate = points3D[i].clone().sub(origin);
-        if (candidate.lengthSq() > 1e-12) {
-            xAxis = candidate.normalize();
-            break;
-        }
-    }
-
-    if (!xAxis) {
-        return null;
-    }
-
-    const yAxis = new THREE.Vector3().crossVectors(normal, xAxis).normalize();
-    if (yAxis.lengthSq() < 1e-12) {
-        return null;
-    }
-
-    const projected = points3D.map((point) => {
-        const offset = point.clone().sub(origin);
-        return new THREE.Vector2(offset.dot(xAxis), offset.dot(yAxis));
-    });
-
-    return { origin, xAxis, yAxis, projected };
-}
-
-function signedArea(points) {
-    let area = 0;
-    for (let i = 0; i < points.length; i += 1) {
-        const current = points[i];
-        const next = points[(i + 1) % points.length];
-        area += current.x * next.y - next.x * current.y;
-    }
-    return area * 0.5;
-}
-
-function buildFaceMesh(face, pointBuffer = null) {
-    logDebug('buildFaceMesh:start', {
-        id: face?.id,
-        name: face?.name,
-        surfaceType: face?.surfaceType,
-        triangleCount: pointCountOfFaceTriangles(face),
-        loopCount: Array.isArray(face?.loops) ? face.loops.length : 0
-    });
-    const color = Array.isArray(face.color) ? new THREE.Color(face.color[0] / 255, face.color[1] / 255, face.color[2] / 255) : new THREE.Color(0xc87a52);
-    const triangleSlice = pointBufferSlice(pointBuffer, face?.triangleOffset, face?.triangleCount);
-    if (triangleSlice && face.triangleCount >= 3) {
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(triangleSlice, 3));
-        geometry.computeVertexNormals();
-
-        const material = new THREE.MeshStandardMaterial({
-            color,
-            transparent: true,
-            opacity: 0.62,
-            side: THREE.DoubleSide,
-            roughness: 0.48,
-            metalness: 0.08
-        });
-
-        logDebug('buildFaceMesh:binary-triangles', {
-            id: face.id,
-            vertices: face.triangleCount
-        });
-        return new THREE.Mesh(geometry, material);
-    }
-    if (Array.isArray(face.triangles) && face.triangles.length >= 3) {
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(face.triangles.flat(), 3));
-        geometry.computeVertexNormals();
-
-        const material = new THREE.MeshStandardMaterial({
-            color,
-            transparent: true,
-            opacity: 0.62,
-            side: THREE.DoubleSide,
-            roughness: 0.48,
-            metalness: 0.08
-        });
-
-        logDebug('buildFaceMesh:triangles', {
-            id: face.id,
-            vertices: face.triangles.length
-        });
-        return new THREE.Mesh(geometry, material);
-    }
-
-    const outerLoop = face.loops.find((loop) => loop.outer);
-    const outerLoopPointCount = pointCountOfLoop(outerLoop);
-    if (!outerLoop || outerLoopPointCount < 3) {
-        logWarn('buildFaceMesh:missing-outer-loop', {
-            id: face?.id,
-            outerLoopPoints: outerLoopPointCount
-        });
-        return null;
-    }
-
-    const normal = toVector3(face.normal).normalize();
-    const outerPoints3D = normalizeLoop(loopPointsToVector3(outerLoop, pointBuffer));
-    const outerProjection = projectFace(outerPoints3D, normal);
-    if (!outerProjection) {
-        logWarn('buildFaceMesh:projection-failed', {
-            id: face?.id,
-            outerPoints: outerPoints3D.length,
-            normal: face?.normal
-        });
-        return null;
-    }
-
-    let contour2D = outerProjection.projected;
-    let contour3D = outerPoints3D;
-
-    if (signedArea(contour2D) < 0) {
-        contour2D = contour2D.slice().reverse();
-        contour3D = contour3D.slice().reverse();
-    }
-
-    const holes2D = [];
-    const holes3D = [];
-
-    for (const loop of face.loops.filter((entry) => !entry.outer)) {
-        const loopPoints3D = normalizeLoop(loopPointsToVector3(loop, pointBuffer));
-        if (loopPoints3D.length < 3) {
-            continue;
-        }
-        const projected = loopPoints3D.map((point) => {
-            const offset = point.clone().sub(outerProjection.origin);
-            return new THREE.Vector2(
-                offset.dot(outerProjection.xAxis),
-                offset.dot(outerProjection.yAxis)
-            );
-        });
-        if (signedArea(projected) > 0) {
-            projected.reverse();
-            loopPoints3D.reverse();
-        }
-        holes2D.push(projected);
-        holes3D.push(loopPoints3D);
-    }
-
-    const allVertices3D = contour3D.concat(...holes3D);
-    const triangles = THREE.ShapeUtils.triangulateShape(contour2D, holes2D);
-    if (triangles.length === 0) {
-        logWarn('buildFaceMesh:triangulation-empty', {
-            id: face?.id,
-            contourPoints: contour2D.length,
-            holeCount: holes2D.length
-        });
-        return null;
-    }
-
-    const positions = [];
-    for (const triangle of triangles) {
-        for (const index of triangle) {
-            const point = allVertices3D[index];
-            positions.push(point.x, point.y, point.z);
-        }
-    }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.computeVertexNormals();
-
-    const material = new THREE.MeshStandardMaterial({
-        color,
-        transparent: true,
-        opacity: 0.62,
-        side: THREE.DoubleSide,
-        roughness: 0.48,
-        metalness: 0.08
-    });
-
-    logDebug('buildFaceMesh:shape-utils', {
-        id: face.id,
-        triangleCount: triangles.length
-    });
-    return new THREE.Mesh(geometry, material);
-}
-
-function buildEdgeObject(edge, edgeIndex, pointBuffer = null) {
-    logDebug('buildEdgeObject', {
-        id: edge?.id,
-        edgeIndex,
-        pointCount: pointCountOfEdge(edge)
-    });
-    const geometry = new THREE.BufferGeometry();
-    const compactSlice = pointBufferSlice(pointBuffer, edge?.pointOffset, edge?.pointCount);
-    if (compactSlice) {
-        geometry.setAttribute('position', new THREE.BufferAttribute(compactSlice, 3));
-    } else {
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
-    }
-    const material = new THREE.LineBasicMaterial({ color: 0x9b8578, transparent: true, opacity: 0.62 });
-    const object = new THREE.Line(geometry, material);
-    const firstPoint = compactSlice ? pointFromBuffer(pointBuffer, edge.pointOffset, 0) : edge.points[0];
-    const lastPoint = compactSlice ? pointFromBuffer(pointBuffer, edge.pointOffset, edge.pointCount - 1) : edge.points[edge.points.length - 1];
-    const pointCount = pointCountOfEdge(edge);
-    object.userData.selection = [
-        ['类型', `边 #${edgeIndex + 1}`],
-        ['采样点', String(pointCount)],
-        ['线段数', String(Math.max(0, pointCount - 1))],
-        ['起点', formatPoint(firstPoint)],
-        ['终点', formatPoint(lastPoint)]
-    ];
-    object.userData.baseColor = 0x9b8578;
-    object.userData.selectedColor = 0xf06d3a;
-    object.userData.instanceSelectedColor = 0x537983;
-    object.userData.objectSelected = false;
-    object.userData.instanceHighlighted = false;
-    return object;
-}
-
-function buildEdgeObjectForInstance(edge, label, pointBuffer = null) {
-    const line = buildEdgeObject(edge, 0, pointBuffer);
-    const firstPoint = Number.isInteger(edge?.pointOffset) ? pointFromBuffer(pointBuffer, edge.pointOffset, 0) : edge.points[0];
-    const lastPoint = Number.isInteger(edge?.pointOffset) ? pointFromBuffer(pointBuffer, edge.pointOffset, edge.pointCount - 1) : edge.points[edge.points.length - 1];
-    line.userData.selection = [
-        ['类型', label],
-        ['采样点', String(pointCountOfEdge(edge))],
-        ['线段数', String(Math.max(0, pointCountOfEdge(edge) - 1))],
-        ['起点', formatPoint(firstPoint)],
-        ['终点', formatPoint(lastPoint)]
-    ];
-    return line;
 }
 
 function renderAssemblyTree(instances) {
@@ -1257,52 +929,6 @@ function fitCamera(bounds) {
     });
 }
 
-function renderPreview(preview) {
-    if (preview?.scene?.isObject3D) {
-        renderGlbPreview(preview);
-        return;
-    }
-    logInfo('renderPreview:start', {
-        stats: preview?.stats,
-        faceCount: Array.isArray(preview?.faces) ? preview.faces.length : 0,
-        edgeCount: Array.isArray(preview?.edges) ? preview.edges.length : 0,
-        unsupportedFaceCount: Array.isArray(preview?.unsupportedFaces) ? preview.unsupportedFaces.length : 0,
-        representationCount: Array.isArray(preview?.representations) ? preview.representations.length : 0,
-        instanceCount: Array.isArray(preview?.instances) ? preview.instances.length : 0
-    });
-    clearModel();
-    renderPmi(preview.pmi);
-    updateUnsupportedFaces(preview.unsupportedFaces);
-
-    if (Array.isArray(preview.instances) && preview.instances.length > 0
-        && Array.isArray(preview.representations) && preview.representations.length > 0) {
-        logInfo('renderPreview:assembly-path');
-        renderAssemblyPreview(preview);
-        updateStats(preview.stats);
-        updateValidation(preview.validation);
-        fitCamera(preview.bounds);
-        resetSelection();
-        logInfo('renderPreview:assembly-path-done', {
-            modelChildren: modelRoot.children.length,
-            interactiveObjects: interactiveObjects.length
-        });
-        return;
-    }
-
-    renderLegacyPreview(preview);
-    updateStats(preview.stats);
-    updateValidation(preview.validation);
-    renderAssemblyTree([]);
-    fitCamera(preview.bounds);
-    resetSelection();
-    logInfo('renderPreview:done', {
-        renderedFaceMeshes: modelRoot.children.filter((child) => child.isMesh).length,
-        renderedEdges: modelRoot.children.filter((child) => child.isLine).length,
-        modelChildren: modelRoot.children.length,
-        interactiveObjects: interactiveObjects.length
-    });
-}
-
 function renderGlbPreview(result) {
     const preview = result.preview ?? {};
     logInfo('renderGlbPreview:start', {
@@ -1400,248 +1026,6 @@ function renderGlbPreview(result) {
     });
 }
 
-function renderLegacyPreview(preview) {
-    const pointBuffer = preview?.pointBuffer ?? null;
-    let renderedFaceMeshes = 0;
-    for (let index = 0; index < preview.faces.length; index += 1) {
-        const face = preview.faces[index];
-        const mesh = buildFaceMesh(face, pointBuffer);
-        if (mesh) {
-            const innerLoopCount = face.loops.filter((loop) => !loop.outer).length;
-            const outerLoop = face.loops.find((loop) => loop.outer);
-            mesh.userData.selection = [
-                ['类型', `面 #${index + 1}`],
-                ['STEP', `#${face.id}`],
-                ['名称', face.name || ''],
-                ['曲面', face.surfaceType || 'PLANE'],
-                ['颜色', formatColor(face.color)],
-                ['图层', formatLayers(face.layers)],
-                ['边界环', String(face.loops.length)],
-                ['内环', String(innerLoopCount)],
-                ['外环采样点', String(pointCountOfLoop(outerLoop))],
-                ['法向', formatPoint(face.normal)]
-            ];
-            mesh.userData.baseColor = mesh.material.color.getHex();
-            mesh.userData.selectedColor = 0xf0b15a;
-            mesh.userData.instanceSelectedColor = 0xe2a46f;
-            mesh.userData.objectSelected = false;
-            mesh.userData.instanceHighlighted = false;
-            mesh.userData.stepId = face.id;
-            interactiveObjects.push(mesh);
-            registerStepObject(face.id, mesh);
-            modelRoot.add(mesh);
-            renderedFaceMeshes += 1;
-        } else {
-            logWarn('renderPreview:face-mesh-null', {
-                id: face?.id,
-                name: face?.name,
-                surfaceType: face?.surfaceType
-            });
-        }
-    }
-
-    let renderedEdges = 0;
-    for (let index = 0; index < preview.edges.length; index += 1) {
-        const line = buildEdgeObject(preview.edges[index], index, pointBuffer);
-        line.userData.selection.splice(1, 0, ['STEP', `#${preview.edges[index].id}`]);
-        line.userData.stepId = preview.edges[index].id;
-        interactiveObjects.push(line);
-        registerStepObject(preview.edges[index].id, line);
-        modelRoot.add(line);
-        renderedEdges += 1;
-    }
-    renderAssemblyTree([]);
-    logInfo('renderLegacyPreview:done', {
-        renderedFaceMeshes,
-        renderedEdges,
-        modelChildren: modelRoot.children.length,
-        interactiveObjects: interactiveObjects.length
-    });
-}
-
-function renderAssemblyPreview(preview) {
-    const pointBuffer = preview?.pointBuffer ?? null;
-    logInfo('renderAssemblyPreview:start', {
-        representationCount: preview.representations.length,
-        instanceCount: preview.instances.length
-    });
-    const representationsById = new Map(preview.representations.map((representation) => [representation.id, representation]));
-    renderAssemblyTree(preview.instances);
-
-    for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
-        const instance = preview.instances[instanceIndex];
-        const instanceGroup = new THREE.Group();
-        const selectedMatrix = Array.isArray(instance.localMatrix) ? instance.localMatrix : instance.matrix;
-        const transform = matrixFromRowMajor(selectedMatrix);
-        instanceGroup.applyMatrix4(transform);
-        instanceGroup.userData.instanceLabel = instance.label || `实例 #${instanceIndex + 1}`;
-        instanceGroup.userData.instanceDescription = instance.description || '';
-        instanceGroup.userData.instanceId = instance.id;
-        instanceGroup.userData.instanceDepth = instance.depth ?? 0;
-        instanceGroup.userData.representationCount = Array.isArray(instance.representationIds) ? instance.representationIds.length : (instance.representationId != null ? 1 : 0);
-        assemblyGroups.set(instance.id, instanceGroup);
-        logJson('renderAssemblyPreview:instance-group', {
-            id: instance.id,
-            label: instance.label,
-            representationIds: instance.representationIds,
-            parentId: instance.parentId,
-            localMatrixRows: matrixToRows(instance.localMatrix),
-            worldMatrixRows: matrixToRows(instance.matrix),
-            appliedMatrixRows: matrixToRows(selectedMatrix),
-            threeMatrixElements: transform.elements.slice()
-        });
-    }
-
-    let renderedFaceMeshes = 0;
-    let renderedEdges = 0;
-    for (let instanceIndex = 0; instanceIndex < preview.instances.length; instanceIndex += 1) {
-        const instance = preview.instances[instanceIndex];
-        const instanceGroup = assemblyGroups.get(instance.id);
-        if (!instanceGroup) {
-            logWarn('renderAssemblyPreview:missing-instance-group', instance);
-            continue;
-        }
-
-        if (instance.parentId && assemblyGroups.has(instance.parentId)) {
-            assemblyGroups.get(instance.parentId).add(instanceGroup);
-        } else {
-            modelRoot.add(instanceGroup);
-        }
-
-        const representationIds = Array.isArray(instance.representationIds) && instance.representationIds.length > 0
-            ? instance.representationIds
-            : (instance.representationId != null ? [instance.representationId] : []);
-
-        for (const representationId of representationIds) {
-            const representation = representationsById.get(representationId);
-            if (!representation) {
-                logWarn('renderAssemblyPreview:missing-representation', {
-                    instanceId: instance.id,
-                    representationId
-                });
-                continue;
-            }
-            logJson('renderAssemblyPreview:representation', {
-                instanceId: instance.id,
-                representationId,
-                representationName: representation.name,
-                faceCount: Array.isArray(representation.faces) ? representation.faces.length : 0,
-                edgeCount: Array.isArray(representation.edges) ? representation.edges.length : 0,
-                representationBounds: boxToLog(representationBounds(representation, pointBuffer))
-            });
-            for (let faceIndex = 0; faceIndex < representation.faces.length; faceIndex += 1) {
-                const face = representation.faces[faceIndex];
-                const mesh = buildFaceMesh(face, pointBuffer);
-                if (!mesh) {
-                    logWarn('renderAssemblyPreview:face-mesh-null', {
-                        instanceId: instance.id,
-                        representationId,
-                        faceId: face?.id
-                    });
-                    continue;
-                }
-                if ((!Array.isArray(face.color) || face.color.length === 0) && Array.isArray(representation.color)) {
-                    mesh.material.color.setRGB(representation.color[0] / 255, representation.color[1] / 255, representation.color[2] / 255);
-                }
-                const innerLoopCount = face.loops.filter((loop) => !loop.outer).length;
-                mesh.userData.selection = [
-                    ['类型', `${instanceGroup.userData.instanceLabel} / 面 #${faceIndex + 1}`],
-                    ['STEP', `#${face.id}`],
-                    ['名称', face.name || ''],
-                    ['曲面', face.surfaceType || 'PLANE'],
-                    ['表示', representation.name || `#${representation.id}`],
-                    ['实例', instance.id],
-                    ['颜色', formatColor(face.color || representation.color)],
-                    ['图层', formatLayers((face.layers && face.layers.length > 0) ? face.layers : representation.layers)],
-                    ['边界环', String(face.loops.length)],
-                    ['内环', String(innerLoopCount)],
-                    ['法向', formatPoint(face.normal)]
-                ];
-                mesh.userData.baseColor = mesh.material.color.getHex();
-                mesh.userData.selectedColor = 0xf0b15a;
-                mesh.userData.instanceSelectedColor = 0xe2a46f;
-                mesh.userData.instanceId = instance.id;
-                mesh.userData.objectSelected = false;
-                mesh.userData.instanceHighlighted = false;
-                mesh.userData.stepId = face.id;
-                interactiveObjects.push(mesh);
-                registerStepObject(face.id, mesh);
-                instanceGroup.add(mesh);
-                renderedFaceMeshes += 1;
-            }
-
-            for (let edgeIndex = 0; edgeIndex < representation.edges.length; edgeIndex += 1) {
-                const line = buildEdgeObjectForInstance(
-                    representation.edges[edgeIndex],
-                    `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`,
-                    pointBuffer
-                );
-                line.userData.selection = [
-                    ['类型', `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`],
-                    ['STEP', `#${representation.edges[edgeIndex].id}`],
-                    ['表示', representation.name || `#${representation.id}`],
-                    ['实例', instance.id],
-                    ['图层', formatLayers(representation.layers)],
-                    ['颜色', formatColor(representation.color)],
-                    ['采样点', String(pointCountOfEdge(representation.edges[edgeIndex]))],
-                    ['线段数', String(Math.max(0, pointCountOfEdge(representation.edges[edgeIndex]) - 1))],
-                    ['起点', formatPoint(Number.isInteger(representation.edges[edgeIndex].pointOffset)
-                        ? pointFromBuffer(pointBuffer, representation.edges[edgeIndex].pointOffset, 0)
-                        : representation.edges[edgeIndex].points[0])],
-                    ['终点', formatPoint(Number.isInteger(representation.edges[edgeIndex].pointOffset)
-                        ? pointFromBuffer(pointBuffer, representation.edges[edgeIndex].pointOffset, representation.edges[edgeIndex].pointCount - 1)
-                        : representation.edges[edgeIndex].points[representation.edges[edgeIndex].points.length - 1])]
-                ];
-                line.userData.instanceSelectedColor = 0x537983;
-                line.userData.instanceId = instance.id;
-                line.userData.objectSelected = false;
-                line.userData.instanceHighlighted = false;
-                line.userData.stepId = representation.edges[edgeIndex].id;
-                interactiveObjects.push(line);
-                registerStepObject(representation.edges[edgeIndex].id, line);
-                instanceGroup.add(line);
-                renderedEdges += 1;
-            }
-        }
-        const instanceBox = new THREE.Box3().setFromObject(instanceGroup);
-        logJson('renderAssemblyPreview:instance-group-bounds', {
-            instanceId: instance.id,
-            bounds: boxToLog(instanceBox)
-        });
-    }
-    const modelBounds = new THREE.Box3().setFromObject(modelRoot);
-    logJson('renderAssemblyPreview:done', {
-        renderedFaceMeshes,
-        renderedEdges,
-        rootChildren: modelRoot.children.length,
-        interactiveObjects: interactiveObjects.length,
-        modelBounds: boxToLog(modelBounds)
-    });
-}
-
-function parsePreviewBinary(arrayBuffer) {
-    const view = new DataView(arrayBuffer);
-    const magic = String.fromCharCode(
-        view.getUint8(0),
-        view.getUint8(1),
-        view.getUint8(2),
-        view.getUint8(3)
-    );
-    if (magic !== 'MCPB') {
-        throw new Error('未知的预览二进制格式');
-    }
-    const version = view.getUint32(4, true);
-    if (version !== 1) {
-        throw new Error(`不支持的预览格式版本: ${version}`);
-    }
-    const metadataLength = view.getUint32(8, true);
-    const geometryOffset = view.getUint32(12, true);
-    const metadataBytes = new Uint8Array(arrayBuffer, 16, metadataLength);
-    const metadata = JSON.parse(new TextDecoder().decode(metadataBytes));
-    metadata.pointBuffer = new Float32Array(arrayBuffer, geometryOffset);
-    return metadata;
-}
-
 function parsePreviewGlb(arrayBuffer) {
     return new Promise((resolve, reject) => {
         gltfLoader.parse(arrayBuffer, '', (gltf) => {
@@ -1654,23 +1038,33 @@ function parsePreviewGlb(arrayBuffer) {
 }
 
 async function requestPreview(payload, metadata = {}) {
-    const body = typeof payload === 'string' ? payload : payload;
-    const contentType = typeof payload === 'string'
-        ? 'text/plain; charset=utf-8'
-        : 'application/octet-stream';
+    let body;
+    let contentType = null;
+    if (typeof payload === 'string') {
+        body = payload;
+        contentType = 'text/plain; charset=utf-8';
+    } else if (payload instanceof File) {
+        const formData = new FormData();
+        formData.append('file', payload, payload.name);
+        body = formData;
+    } else {
+        throw new Error('不支持的预览请求载荷');
+    }
     logInfo('requestPreview:start', {
         previewRoute: '/api/preview',
-        contentType,
+        contentType: contentType ?? 'multipart/form-data',
         source: metadata.source ?? 'unknown',
         fileName: metadata.fileName ?? null,
         stepLength: typeof payload === 'string' ? payload.length : null,
-        byteLength: typeof payload === 'string' ? null : payload.byteLength
+        byteLength: payload instanceof File ? payload.size : null
     });
+    const headers = {};
+    if (contentType) {
+        headers['Content-Type'] = contentType;
+    }
     const response = await fetch('/api/preview', {
         method: 'POST',
-        headers: {
-            'Content-Type': contentType
-        },
+        headers,
         body
     });
 
@@ -1697,7 +1091,8 @@ async function requestPreview(payload, metadata = {}) {
     logInfo('requestPreview:response', {
         ok: response.ok,
         status: response.status,
-        textLength: text.length
+        textLength: text.length,
+        contentType: responseType
     });
     if (!response.ok) {
         try {
@@ -1712,21 +1107,12 @@ async function requestPreview(payload, metadata = {}) {
             throw error;
         }
     }
-
-    const parsed = JSON.parse(text);
-    logInfo('requestPreview:parsed', {
-        stats: parsed?.stats,
-        faces: Array.isArray(parsed?.faces) ? parsed.faces.length : 0,
-        edges: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,
-        unsupportedFaces: Array.isArray(parsed?.unsupportedFaces) ? parsed.unsupportedFaces.length : 0
-    });
-    logJson('requestPreview:unsupported-summary', summarizeUnsupportedFaces(parsed?.unsupportedFaces));
-    return parsed;
+    throw new Error(`预览接口仅支持 GLB 响应，实际收到: ${responseType || 'unknown'}`);
 }
 
 async function renderCurrentInput() {
     const stepText = stepInput.value.trim();
-    if (!stepText && !uploadedFileBytes) {
+    if (!stepText && !uploadedFile) {
         setStatus('请先提供 STEP 内容。');
         updateStats();
         clearModel();
@@ -1735,16 +1121,16 @@ async function renderCurrentInput() {
 
     setStatus('正在解析 STEP 并生成预览...');
     try {
-        const preview = uploadedFileBytes
-            ? await requestPreview(uploadedFileBytes, {
-                source: 'file-bytes',
-                fileName: uploadedFileName
+        const preview = uploadedFile
+            ? await requestPreview(uploadedFile, {
+                source: 'file-form',
+                fileName: uploadedFile.name
             })
             : await requestPreview(stepText, {
                 source: 'textarea'
             });
-        renderPreview(preview);
-        const previewData = preview?.preview ?? preview;
+        renderGlbPreview(preview);
+        const previewData = preview?.preview ?? {};
         const unsupported = previewData?.stats?.unsupportedFaceCount ?? 0;
         const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
         setStatus(`渲染完成：${previewData?.stats?.faceCount ?? 0} 个面，${previewData?.stats?.edgeCount ?? 0} 条边${suffix}`);
@@ -1762,8 +1148,7 @@ renderButton.addEventListener('click', () => {
 });
 
 stepInput.addEventListener('input', () => {
-    uploadedFileBytes = null;
-    uploadedFileName = null;
+    uploadedFile = null;
 });
 
 loadExampleButton.addEventListener('click', async () => {
@@ -1774,8 +1159,7 @@ loadExampleButton.addEventListener('click', async () => {
         if (!response.ok) {
             throw new Error('示例文件不可用');
         }
-        uploadedFileBytes = null;
-        uploadedFileName = null;
+        uploadedFile = null;
         stepInput.value = await response.text();
         setStatus(`示例 ${exampleSelect.value} 已加载，可以直接渲染。`);
         logInfo('loadExample:done', {
@@ -1793,17 +1177,16 @@ fileInput.addEventListener('change', async (event) => {
     if (!file) {
         return;
     }
-    const arrayBuffer = await file.arrayBuffer();
-    uploadedFileBytes = new Uint8Array(arrayBuffer);
-    uploadedFileName = file.name;
-    stepInput.value = await file.text();
-    setStatus(`已载入文件：${file.name}`);
+    uploadedFile = file;
+    stepInput.value = '';
+    setStatus(`已选择文件：${file.name}，点击“解析并渲染”开始预览。`);
+    const prefixBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     logInfo('fileInput:loaded', {
         fileName: file.name,
         size: file.size,
-        textLength: stepInput.value.length,
-        byteLength: uploadedFileBytes.byteLength,
-        bodyPrefixHex: Array.from(uploadedFileBytes.slice(0, 16)).map((value) => value.toString(16).padStart(2, '0')).join(' ')
+        textLength: 0,
+        byteLength: file.size,
+        bodyPrefixHex: Array.from(prefixBytes).map((value) => value.toString(16).padStart(2, '0')).join(' ')
     });
 });
 

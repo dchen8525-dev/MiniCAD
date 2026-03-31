@@ -5,6 +5,9 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -161,10 +164,11 @@ public final class StepViewerApp {
         return "application/octet-stream";
     }
 
+    @MultipartConfig
     private static final class PreviewServlet extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            byte[] requestBody = request.getInputStream().readAllBytes();
+            byte[] requestBody = readPreviewRequestBody(request);
             StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
             String stepText = decodedStepText.text();
             log.info("requestId=1 stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
@@ -223,6 +227,24 @@ public final class StepViewerApp {
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
             sendJsonError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "use POST /api/preview");
+        }
+
+        private static byte[] readPreviewRequestBody(HttpServletRequest request) throws IOException {
+            String contentType = request.getContentType();
+            if (contentType != null && contentType.startsWith("multipart/form-data")) {
+                try {
+                    Part filePart = request.getPart("file");
+                    if (filePart == null) {
+                        return new byte[0];
+                    }
+                    try (InputStream inputStream = filePart.getInputStream()) {
+                        return inputStream.readAllBytes();
+                    }
+                } catch (ServletException ex) {
+                    throw new IOException("failed to read uploaded STEP file", ex);
+                }
+            }
+            return request.getInputStream().readAllBytes();
         }
     }
 
