@@ -1669,10 +1669,11 @@ async function renderCurrentInput() {
                 source: 'textarea'
             });
         renderPreview(preview);
-        const unsupported = preview.stats.unsupportedFaceCount ?? 0;
+        const previewData = preview?.preview ?? preview;
+        const unsupported = previewData?.stats?.unsupportedFaceCount ?? 0;
         const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
-        setStatus(`渲染完成：${preview.stats.faceCount} 个面，${preview.stats.edgeCount} 条边${suffix}`);
-        logInfo('renderCurrentInput:success', preview.stats);
+        setStatus(`渲染完成：${previewData?.stats?.faceCount ?? 0} 个面，${previewData?.stats?.edgeCount ?? 0} 条边${suffix}`);
+        logInfo('renderCurrentInput:success', previewData?.stats);
     } catch (error) {
         clearModel();
         updateStats();
