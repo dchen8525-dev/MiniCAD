@@ -97,7 +97,7 @@ public final class StepPreviewJsonExporter {
 
     private static final int FACE_PROGRESS_INTERVAL = 25;
     private static final int EDGE_PROGRESS_INTERVAL = 100;
-    private static final int MAX_TOTAL_TRIANGLE_POINTS = 1_500_000;
+    private static final int MAX_TOTAL_TRIANGLE_POINTS = 6_000_000;
     private static final int MAX_TOTAL_LOOP_POINTS = 250_000;
 
     private StepPreviewJsonExporter() {
@@ -3818,7 +3818,7 @@ public final class StepPreviewJsonExporter {
         byte[] paddedJson = padChunk(jsonBytes);
         byte[] binaryChunk = builder.binaryChunk();
         byte[] paddedBinary = padChunk(binaryChunk);
-        log.info("stage={} faceMeshCount={}, edgeMeshCount={}, nodeCount={}, materialCount={}, accessorCount={}, bufferViewCount={}, jsonChunkLength={}, binaryChunkLength={}",
+        log.info("stage={} faceMeshCount={}, edgeMeshCount={}, nodeCount={}, materialCount={}, accessorCount={}, bufferViewCount={}, faceVertexCount={}, faceIndexCount={}, lineVertexCount={}, maxFaceVertexCount={}, maxFaceIndexCount={}, jsonChunkLength={}, binaryChunkLength={}",
                 "glb_builder_summary",
                 builder.faceMeshCount(),
                 builder.edgeMeshCount(),
@@ -3826,6 +3826,11 @@ public final class StepPreviewJsonExporter {
                 builder.materialCount(),
                 builder.accessorCount(),
                 builder.bufferViewCount(),
+                builder.faceVertexCount(),
+                builder.faceIndexCount(),
+                builder.lineVertexCount(),
+                builder.maxFaceVertexCount(),
+                builder.maxFaceIndexCount(),
                 jsonBytes.length,
                 binaryChunk.length);
 
@@ -5003,6 +5008,11 @@ public final class StepPreviewJsonExporter {
         private final Map<String, Integer> materialCache = new LinkedHashMap<>();
         private int faceMeshCount;
         private int edgeMeshCount;
+        private long faceVertexCount;
+        private long faceIndexCount;
+        private long lineVertexCount;
+        private int maxFaceVertexCount;
+        private int maxFaceIndexCount;
 
         String buildJson(PreviewPayload payload) {
             boolean assemblyMode = !payload.instances().isEmpty() && !payload.representations().isEmpty();
@@ -5132,6 +5142,26 @@ public final class StepPreviewJsonExporter {
             return bufferViews.size();
         }
 
+        long faceVertexCount() {
+            return faceVertexCount;
+        }
+
+        long faceIndexCount() {
+            return faceIndexCount;
+        }
+
+        long lineVertexCount() {
+            return lineVertexCount;
+        }
+
+        int maxFaceVertexCount() {
+            return maxFaceVertexCount;
+        }
+
+        int maxFaceIndexCount() {
+            return maxFaceIndexCount;
+        }
+
         private RepresentationMeshes buildRepresentationMeshes(RepresentationPayload representation) {
             List<FaceNode> faces = new ArrayList<>();
             for (FacePayload face : representation.faces()) {
@@ -5153,21 +5183,26 @@ public final class StepPreviewJsonExporter {
         }
 
         private int addFaceMesh(FacePayload face, ColorPayload color) {
-            FloatArrayData positions = floatArray(face.triangles());
-            FloatArrayData normals = triangleNormals(face.triangles());
-            int positionAccessor = addAccessor(positions, true);
-            int normalAccessor = addAccessor(normals, false);
+            IndexedTriangleMesh meshData = indexedTriangleMesh(face.triangles());
+            int positionAccessor = addAccessor(meshData.positions(), true);
+            int normalAccessor = addAccessor(meshData.normals(), false);
+            int indexAccessor = addIndexAccessor(meshData.indices());
             int materialIndex = materialIndex(color == null ? DEFAULT_FACE_COLOR : color, false);
             Map<String, Object> primitive = new LinkedHashMap<>();
             primitive.put("attributes", Map.of(
                     "POSITION", positionAccessor,
                     "NORMAL", normalAccessor
             ));
+            primitive.put("indices", indexAccessor);
             primitive.put("material", materialIndex);
             Map<String, Object> mesh = new LinkedHashMap<>();
             mesh.put("primitives", List.of(primitive));
             meshes.add(mesh);
             faceMeshCount += 1;
+            faceVertexCount += meshData.positions().count();
+            faceIndexCount += meshData.indices().count();
+            maxFaceVertexCount = Math.max(maxFaceVertexCount, meshData.positions().count());
+            maxFaceIndexCount = Math.max(maxFaceIndexCount, meshData.indices().count());
             return meshes.size() - 1;
         }
 
@@ -5183,6 +5218,7 @@ public final class StepPreviewJsonExporter {
             mesh.put("primitives", List.of(primitive));
             meshes.add(mesh);
             edgeMeshCount += 1;
+            lineVertexCount += positions.count();
             return meshes.size() - 1;
         }
 
@@ -5207,6 +5243,27 @@ public final class StepPreviewJsonExporter {
                 accessor.put("min", List.of((double) data.min()[0], (double) data.min()[1], (double) data.min()[2]));
                 accessor.put("max", List.of((double) data.max()[0], (double) data.max()[1], (double) data.max()[2]));
             }
+            accessors.add(accessor);
+            return accessors.size() - 1;
+        }
+
+        private int addIndexAccessor(IntArrayData data) {
+            int byteOffset = binary.size();
+            for (int value : data.values()) {
+                writeIntLE(binary, value);
+            }
+            Map<String, Object> bufferView = new LinkedHashMap<>();
+            bufferView.put("buffer", 0);
+            bufferView.put("byteOffset", byteOffset);
+            bufferView.put("byteLength", data.values().length * Integer.BYTES);
+            bufferView.put("target", 34963);
+            bufferViews.add(bufferView);
+
+            Map<String, Object> accessor = new LinkedHashMap<>();
+            accessor.put("bufferView", bufferViews.size() - 1);
+            accessor.put("componentType", 5125);
+            accessor.put("count", data.count());
+            accessor.put("type", "SCALAR");
             accessors.add(accessor);
             return accessors.size() - 1;
         }
@@ -5398,6 +5455,82 @@ public final class StepPreviewJsonExporter {
             }
             return new FloatArrayData(values, triangles.size(), null, null);
         }
+
+        private IndexedTriangleMesh indexedTriangleMesh(List<PointPayload> triangles) {
+            Map<PointPayload, Integer> indexByPoint = new LinkedHashMap<>();
+            List<PointPayload> uniquePoints = new ArrayList<>();
+            List<Integer> indices = new ArrayList<>(triangles.size());
+            List<double[]> normalSums = new ArrayList<>();
+
+            for (int i = 0; i + 2 < triangles.size(); i += 3) {
+                PointPayload a = triangles.get(i);
+                PointPayload b = triangles.get(i + 1);
+                PointPayload c = triangles.get(i + 2);
+                double abx = b.x() - a.x();
+                double aby = b.y() - a.y();
+                double abz = b.z() - a.z();
+                double acx = c.x() - a.x();
+                double acy = c.y() - a.y();
+                double acz = c.z() - a.z();
+                double nx = aby * acz - abz * acy;
+                double ny = abz * acx - abx * acz;
+                double nz = abx * acy - aby * acx;
+                double norm = Math.sqrt(nx * nx + ny * ny + nz * nz);
+                if (norm <= Epsilon.EPS) {
+                    nx = 0.0;
+                    ny = 0.0;
+                    nz = 1.0;
+                } else {
+                    nx /= norm;
+                    ny /= norm;
+                    nz /= norm;
+                }
+
+                for (PointPayload point : List.of(a, b, c)) {
+                    Integer existing = indexByPoint.get(point);
+                    int index;
+                    if (existing == null) {
+                        index = uniquePoints.size();
+                        indexByPoint.put(point, index);
+                        uniquePoints.add(point);
+                        normalSums.add(new double[]{0.0, 0.0, 0.0});
+                    } else {
+                        index = existing;
+                    }
+                    double[] normal = normalSums.get(index);
+                    normal[0] += nx;
+                    normal[1] += ny;
+                    normal[2] += nz;
+                    indices.add(index);
+                }
+            }
+
+            float[] normalValues = new float[uniquePoints.size() * 3];
+            for (int index = 0; index < uniquePoints.size(); index++) {
+                double[] normal = normalSums.get(index);
+                double norm = Math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+                int base = index * 3;
+                if (norm <= Epsilon.EPS) {
+                    normalValues[base] = 0.0f;
+                    normalValues[base + 1] = 0.0f;
+                    normalValues[base + 2] = 1.0f;
+                } else {
+                    normalValues[base] = (float) (normal[0] / norm);
+                    normalValues[base + 1] = (float) (normal[1] / norm);
+                    normalValues[base + 2] = (float) (normal[2] / norm);
+                }
+            }
+
+            int[] indexValues = new int[indices.size()];
+            for (int index = 0; index < indices.size(); index++) {
+                indexValues[index] = indices.get(index);
+            }
+            return new IndexedTriangleMesh(
+                    floatArray(uniquePoints),
+                    new FloatArrayData(normalValues, uniquePoints.size(), null, null),
+                    new IntArrayData(indexValues, indexValues.length)
+            );
+        }
     }
 
     private record RepresentationMeshes(String name, List<FaceNode> faces, List<EdgeNode> edges) {
@@ -5410,5 +5543,11 @@ public final class StepPreviewJsonExporter {
     }
 
     private record FloatArrayData(float[] values, int count, float[] min, float[] max) {
+    }
+
+    private record IntArrayData(int[] values, int count) {
+    }
+
+    private record IndexedTriangleMesh(FloatArrayData positions, FloatArrayData normals, IntArrayData indices) {
     }
 }
