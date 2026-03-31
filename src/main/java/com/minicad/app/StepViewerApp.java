@@ -32,7 +32,7 @@ public final class StepViewerApp {
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
     private static final Pattern POSITION_PATTERN = Pattern.compile("position (\\d+)");
-    private static final Path PREVIEW_CACHE_DIR = Path.of(".minicad-cache", "preview-binary-v1");
+    private static final Path PREVIEW_CACHE_DIR = Path.of(".minicad-cache", "preview-glb-v1");
 
     private StepViewerApp() {
     }
@@ -193,7 +193,7 @@ public final class StepViewerApp {
                     log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
                             "export_cache_hit", cachePath, previewBinary.length);
                 } else {
-                    previewBinary = StepPreviewJsonExporter.exportBinary(stepText);
+                    previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
                     Files.createDirectories(cachePath.getParent());
                     Files.write(cachePath, previewBinary);
                     cacheStatus = "miss";
@@ -204,8 +204,8 @@ public final class StepViewerApp {
                         "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
                 response.setHeader("X-MiniCAD-Cache", cacheStatus);
                 response.setHeader("X-MiniCAD-Cache-Path", cachePath.toString());
-                response.setHeader("X-MiniCAD-Preview-Format", "binary-preview-v1");
-                send(response, HttpServletResponse.SC_OK, "application/vnd.minicad.preview+bin", previewBinary);
+                response.setHeader("X-MiniCAD-Preview-Format", "glb-v1");
+                send(response, HttpServletResponse.SC_OK, "model/gltf-binary", previewBinary);
                 log.info("requestId=1 stage={} status=200, totalElapsedMs={}",
                         "response_sent", elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
@@ -307,7 +307,7 @@ public final class StepViewerApp {
 
     private static Path previewCachePath(String stepText) throws IOException {
         String digest = sha256Hex(stepText.getBytes(StandardCharsets.UTF_8));
-        return PREVIEW_CACHE_DIR.resolve(digest + ".bin");
+        return PREVIEW_CACHE_DIR.resolve(digest + ".glb");
     }
 
     private static String sha256Hex(byte[] bytes) throws IOException {

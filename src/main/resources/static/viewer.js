@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const stepInput = document.querySelector('#step-input');
 const fileInput = document.querySelector('#file-input');
@@ -108,6 +109,7 @@ const postMaterial = new THREE.ShaderMaterial({
 postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial));
 
 const controls = new OrbitControls(camera, renderer.domElement);
+const gltfLoader = new GLTFLoader();
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.target.set(0, 0, 0);
@@ -1230,6 +1232,10 @@ function fitCamera(bounds) {
 }
 
 function renderPreview(preview) {
+    if (preview?.scene?.isObject3D) {
+        renderGlbPreview(preview);
+        return;
+    }
     logInfo('renderPreview:start', {
         stats: preview?.stats,
         faceCount: Array.isArray(preview?.faces) ? preview.faces.length : 0,
@@ -1268,6 +1274,54 @@ function renderPreview(preview) {
         renderedEdges: modelRoot.children.filter((child) => child.isLine).length,
         modelChildren: modelRoot.children.length,
         interactiveObjects: interactiveObjects.length
+    });
+}
+
+function renderGlbPreview(result) {
+    const preview = result.preview ?? {};
+    logInfo('renderGlbPreview:start', {
+        stats: preview?.stats,
+        unsupportedFaceCount: Array.isArray(preview?.unsupportedFaces) ? preview.unsupportedFaces.length : 0,
+        instanceCount: Array.isArray(preview?.instances) ? preview.instances.length : 0,
+        rootChildren: result.scene.children.length
+    });
+    clearModel();
+    renderPmi(preview.pmi);
+    updateUnsupportedFaces(preview.unsupportedFaces);
+    updateStats(preview.stats);
+    updateValidation(preview.validation);
+    renderAssemblyTree(Array.isArray(preview.instances) ? preview.instances : []);
+
+    modelRoot.add(result.scene);
+    result.scene.traverse((node) => {
+        if (node.userData?.kind === 'instance' && node.userData?.instanceId) {
+            assemblyGroups.set(node.userData.instanceId, node);
+            return;
+        }
+        if (!(node.isMesh || node.isLine)) {
+            return;
+        }
+        if (Array.isArray(node.userData?.selection)) {
+            if (node.material?.color) {
+                node.userData.baseColor = node.material.color.getHex();
+            }
+            node.userData.selectedColor = node.isLine ? 0xf06d3a : 0xf0b15a;
+            node.userData.instanceSelectedColor = node.isLine ? 0x537983 : 0xe2a46f;
+            node.userData.objectSelected = false;
+            node.userData.instanceHighlighted = false;
+            interactiveObjects.push(node);
+        }
+        if (node.userData?.stepId != null) {
+            registerStepObject(node.userData.stepId, node);
+        }
+    });
+
+    fitCamera(preview.bounds);
+    resetSelection();
+    logInfo('renderGlbPreview:done', {
+        modelChildren: modelRoot.children.length,
+        interactiveObjects: interactiveObjects.length,
+        assemblyGroups: assemblyGroups.size
     });
 }
 
@@ -1513,6 +1567,17 @@ function parsePreviewBinary(arrayBuffer) {
     return metadata;
 }
 
+function parsePreviewGlb(arrayBuffer) {
+    return new Promise((resolve, reject) => {
+        gltfLoader.parse(arrayBuffer, '', (gltf) => {
+            resolve({
+                scene: gltf.scene,
+                preview: gltf.scene?.userData?.preview ?? {}
+            });
+        }, reject);
+    });
+}
+
 async function requestPreview(payload, metadata = {}) {
     const body = typeof payload === 'string' ? payload : payload;
     const contentType = typeof payload === 'string'
@@ -1535,22 +1600,21 @@ async function requestPreview(payload, metadata = {}) {
     });
 
     const responseType = response.headers.get('Content-Type') || '';
-    if (response.ok && responseType.startsWith('application/vnd.minicad.preview+bin')) {
+    if (response.ok && responseType.startsWith('model/gltf-binary')) {
         const arrayBuffer = await response.arrayBuffer();
-        const parsed = parsePreviewBinary(arrayBuffer);
-        logInfo('requestPreview:binary-response', {
+        const parsed = await parsePreviewGlb(arrayBuffer);
+        logInfo('requestPreview:glb-response', {
             ok: response.ok,
             status: response.status,
             previewFormat: response.headers.get('X-MiniCAD-Preview-Format'),
             cache: response.headers.get('X-MiniCAD-Cache'),
             cachePath: response.headers.get('X-MiniCAD-Cache-Path'),
             binaryLength: arrayBuffer.byteLength,
-            faceCount: Array.isArray(parsed?.faces) ? parsed.faces.length : 0,
-            edgeCount: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,
-            representationCount: Array.isArray(parsed?.representations) ? parsed.representations.length : 0,
-            instanceCount: Array.isArray(parsed?.instances) ? parsed.instances.length : 0
+            faceCount: parsed?.preview?.stats?.faceCount ?? null,
+            edgeCount: parsed?.preview?.stats?.edgeCount ?? null,
+            instanceCount: Array.isArray(parsed?.preview?.instances) ? parsed.preview.instances.length : 0
         });
-        logJson('requestPreview:unsupported-summary', summarizeUnsupportedFaces(parsed?.unsupportedFaces));
+        logJson('requestPreview:unsupported-summary', summarizeUnsupportedFaces(parsed?.preview?.unsupportedFaces));
         return parsed;
     }
 

@@ -173,6 +173,41 @@ public final class StepPreviewJsonExporter {
         return binary;
     }
 
+    public static byte[] exportGlb(String stepText) {
+        long startedAt = System.nanoTime();
+        log.info("stage={} textLength={}", "glb_export_start", stepText.length());
+        long parseStartedAt = System.nanoTime();
+        StepFile stepFile = StepParser.parse(stepText);
+        log.info("stage={} elapsedMs={}, entityCount={}", "glb_parse_done", elapsedMillis(parseStartedAt), stepFile.entities().size());
+        long resolveStartedAt = System.nanoTime();
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+        log.info("stage={} elapsedMs={}, resolvedCount={}", "glb_resolve_done", elapsedMillis(resolveStartedAt), resolved.size());
+        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+
+        long payloadStartedAt = System.nanoTime();
+        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
+                "glb_payload_geometry_summary",
+                countTrianglePoints(payload),
+                countLoopPoints(payload),
+                countEdgePoints(payload),
+                countPmiPoints(payload),
+                payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
+                payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
+        log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "glb_payload_done",
+                elapsedMillis(payloadStartedAt),
+                payload.faces().size(),
+                payload.edges().size(),
+                payload.unsupportedFaces().size(),
+                payload.representations().size(),
+                payload.instances().size());
+        long glbStartedAt = System.nanoTime();
+        byte[] glb = toGlb(payload);
+        log.info("stage={} elapsedMs={}, glbLength={}", "glb_encode_done", elapsedMillis(glbStartedAt), glb.length);
+        log.info("stage={} totalElapsedMs={}", "glb_export_done", elapsedMillis(startedAt));
+        return glb;
+    }
+
     private static PreviewPayload buildPayload(
             StepFile stepFile,
             Map<Integer, StepEntity> resolved,
@@ -3777,6 +3812,39 @@ public final class StepPreviewJsonExporter {
         return output.toByteArray();
     }
 
+    private static byte[] toGlb(PreviewPayload payload) {
+        GlbSceneBuilder builder = new GlbSceneBuilder();
+        byte[] jsonBytes = builder.buildJson(payload).getBytes(StandardCharsets.UTF_8);
+        byte[] paddedJson = padChunk(jsonBytes);
+        byte[] binaryChunk = builder.binaryChunk();
+        byte[] paddedBinary = padChunk(binaryChunk);
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream(12 + 8 + paddedJson.length + 8 + paddedBinary.length);
+        writeIntLE(output, 0x46546C67);
+        writeIntLE(output, 2);
+        writeIntLE(output, 12 + 8 + paddedJson.length + 8 + paddedBinary.length);
+        writeIntLE(output, paddedJson.length);
+        writeIntLE(output, 0x4E4F534A);
+        output.writeBytes(paddedJson);
+        writeIntLE(output, paddedBinary.length);
+        writeIntLE(output, 0x004E4942);
+        output.writeBytes(paddedBinary);
+        return output.toByteArray();
+    }
+
+    private static byte[] padChunk(byte[] bytes) {
+        int paddedLength = alignTo4(bytes.length);
+        if (paddedLength == bytes.length) {
+            return bytes;
+        }
+        byte[] padded = new byte[paddedLength];
+        System.arraycopy(bytes, 0, padded, 0, bytes.length);
+        for (int i = bytes.length; i < padded.length; i++) {
+            padded[i] = 0x20;
+        }
+        return padded;
+    }
+
     private static BinaryPreviewPayload toBinaryPayload(PreviewPayload payload, BinaryGeometryBuffer geometry) {
         return new BinaryPreviewPayload(
                 payload.stats(),
@@ -3952,6 +4020,190 @@ public final class StepPreviewJsonExporter {
 
     private static void writeFloatLE(ByteArrayOutputStream output, float value) {
         writeIntLE(output, Float.floatToRawIntBits(value));
+    }
+
+    private static void appendJsonValue(StringBuilder json, Object value) {
+        if (value == null) {
+            json.append("null");
+            return;
+        }
+        if (value instanceof String text) {
+            json.append(quote(text));
+            return;
+        }
+        if (value instanceof Boolean || value instanceof Integer || value instanceof Long) {
+            json.append(value);
+            return;
+        }
+        if (value instanceof Float || value instanceof Double) {
+            json.append(format(((Number) value).doubleValue()));
+            return;
+        }
+        if (value instanceof Map<?, ?> map) {
+            json.append('{');
+            boolean first = true;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (!first) {
+                    json.append(',');
+                }
+                first = false;
+                json.append(quote(String.valueOf(entry.getKey()))).append(':');
+                appendJsonValue(json, entry.getValue());
+            }
+            json.append('}');
+            return;
+        }
+        if (value instanceof List<?> list) {
+            json.append('[');
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) {
+                    json.append(',');
+                }
+                appendJsonValue(json, list.get(i));
+            }
+            json.append(']');
+            return;
+        }
+        throw new IllegalArgumentException("unsupported json value: " + value.getClass().getName());
+    }
+
+    private static Map<String, Object> previewMetadata(PreviewPayload payload) {
+        Map<String, Object> preview = new LinkedHashMap<>();
+        preview.put("stats", previewStatsMap(payload.stats()));
+        preview.put("bounds", boundsMap(payload.bounds()));
+        preview.put("validation", validationMap(payload.validation()));
+        preview.put("pmi", pmiMaps(payload.pmi()));
+        preview.put("unsupportedFaces", unsupportedFaceMaps(payload.unsupportedFaces()));
+        preview.put("instances", instanceMaps(payload.instances()));
+        return preview;
+    }
+
+    private static Map<String, Object> previewStatsMap(PreviewStats stats) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("entityCount", stats.entityCount());
+        map.put("solidCount", stats.solidCount());
+        map.put("shellCount", stats.shellCount());
+        map.put("faceCount", stats.faceCount());
+        map.put("edgeCount", stats.edgeCount());
+        map.put("unsupportedFaceCount", stats.unsupportedFaceCount());
+        return map;
+    }
+
+    private static Map<String, Object> boundsMap(BoundsPayload bounds) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("min", pointList(bounds.min()));
+        map.put("max", pointList(bounds.max()));
+        return map;
+    }
+
+    private static Map<String, Object> validationMap(ValidationPayload validation) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("representationCount", validation.representationCount());
+        map.put("instanceCount", validation.instanceCount());
+        map.put("renderedFaceCount", validation.renderedFaceCount());
+        map.put("renderedEdgeCount", validation.renderedEdgeCount());
+        map.put("approxSurfaceArea", validation.approxSurfaceArea());
+        map.put("approxEdgeLength", validation.approxEdgeLength());
+        map.put("center", pointList(validation.center()));
+        map.put("report", validationReportMap(validation.report()));
+        map.put("nativeChecks", validationChecks(validation.report().checks()));
+        return map;
+    }
+
+    private static Map<String, Object> validationReportMap(ValidationReportPayload report) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("status", report.status());
+        map.put("okCount", report.okCount());
+        map.put("warnCount", report.warnCount());
+        map.put("checks", validationChecks(report.checks()));
+        return map;
+    }
+
+    private static List<Map<String, Object>> validationChecks(List<ValidationCheckPayload> checks) {
+        List<Map<String, Object>> list = new ArrayList<>(checks.size());
+        for (ValidationCheckPayload check : checks) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("propertyId", check.propertyId());
+            map.put("name", check.name());
+            map.put("measureType", check.measureType());
+            map.put("expected", check.expected());
+            map.put("actual", check.actual());
+            map.put("delta", check.delta());
+            map.put("status", check.status());
+            map.put("matches", check.matches());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
+    private static List<Map<String, Object>> pmiMaps(List<PmiPayload> pmi) {
+        List<Map<String, Object>> list = new ArrayList<>(pmi.size());
+        for (PmiPayload item : pmi) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("name", item.name());
+            map.put("text", item.text());
+            map.put("position", pointList(item.position()));
+            map.put("leader", item.leader().stream().map(StepPreviewJsonExporter::pointList).toList());
+            map.put("targetIds", item.targetIds());
+            map.put("targets", item.targets().stream().map(target -> {
+                Map<String, Object> targetMap = new LinkedHashMap<>();
+                targetMap.put("id", target.id());
+                targetMap.put("type", target.type());
+                targetMap.put("name", target.name());
+                targetMap.put("instanceIds", target.instanceIds());
+                return targetMap;
+            }).toList());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
+    private static List<Map<String, Object>> unsupportedFaceMaps(List<UnsupportedFacePayload> unsupportedFaces) {
+        List<Map<String, Object>> list = new ArrayList<>(unsupportedFaces.size());
+        for (UnsupportedFacePayload face : unsupportedFaces) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", face.stepId());
+            map.put("name", face.name());
+            map.put("surfaceType", face.surfaceType());
+            map.put("reason", face.reason());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
+    private static List<Map<String, Object>> instanceMaps(List<InstancePayload> instances) {
+        List<Map<String, Object>> list = new ArrayList<>(instances.size());
+        for (InstancePayload instance : instances) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", instance.id());
+            map.put("parentId", instance.parentId());
+            map.put("productDefinitionId", instance.productDefinitionId());
+            map.put("occurrenceId", instance.occurrenceId());
+            map.put("representationId", instance.representationId());
+            map.put("representationIds", instance.representationIds());
+            map.put("label", instance.label());
+            map.put("description", instance.description());
+            map.put("depth", instance.depth());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
+    private static List<Double> pointList(PointPayload point) {
+        return List.of(point.x(), point.y(), point.z());
+    }
+
+    private static List<Double> vectorList(VectorPayload vector) {
+        return List.of(vector.x(), vector.y(), vector.z());
+    }
+
+    private static List<Double> gltfMatrix(double[] rowMajorMatrix) {
+        return List.of(
+                rowMajorMatrix[0], rowMajorMatrix[4], rowMajorMatrix[8], rowMajorMatrix[12],
+                rowMajorMatrix[1], rowMajorMatrix[5], rowMajorMatrix[9], rowMajorMatrix[13],
+                rowMajorMatrix[2], rowMajorMatrix[6], rowMajorMatrix[10], rowMajorMatrix[14],
+                rowMajorMatrix[3], rowMajorMatrix[7], rowMajorMatrix[11], rowMajorMatrix[15]
+        );
     }
 
     private static void appendStats(StringBuilder json, PreviewStats stats) {
@@ -4726,5 +4978,399 @@ public final class StepPreviewJsonExporter {
         byte[] toByteArray() {
             return output.toByteArray();
         }
+    }
+
+    private static final class GlbSceneBuilder {
+        private static final ColorPayload DEFAULT_FACE_COLOR = new ColorPayload(200, 122, 82);
+        private static final ColorPayload DEFAULT_EDGE_COLOR = new ColorPayload(155, 133, 120);
+
+        private final ByteArrayOutputStream binary = new ByteArrayOutputStream();
+        private final List<Map<String, Object>> bufferViews = new ArrayList<>();
+        private final List<Map<String, Object>> accessors = new ArrayList<>();
+        private final List<Map<String, Object>> materials = new ArrayList<>();
+        private final List<Map<String, Object>> meshes = new ArrayList<>();
+        private final List<Map<String, Object>> nodes = new ArrayList<>();
+        private final Map<String, Integer> materialCache = new LinkedHashMap<>();
+
+        String buildJson(PreviewPayload payload) {
+            boolean assemblyMode = !payload.instances().isEmpty() && !payload.representations().isEmpty();
+            int rootNode = addNode("MiniCADPreview", null, List.of(), Map.of("kind", "root"), null);
+
+            if (assemblyMode) {
+                Map<Integer, RepresentationMeshes> representationMeshes = new LinkedHashMap<>();
+                for (RepresentationPayload representation : payload.representations()) {
+                    representationMeshes.put(representation.id(), buildRepresentationMeshes(representation));
+                }
+                Map<String, Integer> instanceNodes = new LinkedHashMap<>();
+                for (InstancePayload instance : payload.instances()) {
+                    Map<String, Object> extras = new LinkedHashMap<>();
+                    extras.put("kind", "instance");
+                    extras.put("instanceId", instance.id());
+                    extras.put("label", instance.label());
+                    extras.put("description", instance.description());
+                    extras.put("depth", instance.depth());
+                    extras.put("representationCount", instance.representationIds().size());
+                    int instanceNode = addNode(
+                            instance.label() == null || instance.label().isBlank() ? instance.id() : instance.label(),
+                            null,
+                            new ArrayList<>(),
+                            extras,
+                            gltfMatrix(instance.localMatrix())
+                    );
+                    instanceNodes.put(instance.id(), instanceNode);
+                }
+                for (InstancePayload instance : payload.instances()) {
+                    int parent = instance.parentId() != null && instanceNodes.containsKey(instance.parentId())
+                            ? instanceNodes.get(instance.parentId())
+                            : rootNode;
+                    childList(nodes.get(parent)).add(instanceNodes.get(instance.id()));
+                    for (Integer representationId : instance.representationIds()) {
+                        RepresentationMeshes representation = representationMeshes.get(representationId);
+                        if (representation == null) {
+                            continue;
+                        }
+                        for (FaceNode faceNode : representation.faces()) {
+                            childList(nodes.get(instanceNodes.get(instance.id()))).add(addNode(
+                                    faceNode.name(),
+                                    faceNode.meshIndex(),
+                                    List.of(),
+                                    instanceFaceExtras(faceNode.face(), instance, representation.name()),
+                                    null
+                            ));
+                        }
+                        for (EdgeNode edgeNode : representation.edges()) {
+                            childList(nodes.get(instanceNodes.get(instance.id()))).add(addNode(
+                                    edgeNode.name(),
+                                    edgeNode.meshIndex(),
+                                    List.of(),
+                                    instanceEdgeExtras(edgeNode.edge(), instance, representation.name()),
+                                    null
+                            ));
+                        }
+                    }
+                }
+            } else {
+                for (FacePayload face : payload.faces()) {
+                    int meshIndex = addFaceMesh(face, face.color());
+                    childList(nodes.get(rootNode)).add(addNode(
+                            face.name(),
+                            meshIndex,
+                            List.of(),
+                            legacyFaceExtras(face),
+                            null
+                    ));
+                }
+                for (EdgePayload edge : payload.edges()) {
+                    int meshIndex = addEdgeMesh(edge, null);
+                    childList(nodes.get(rootNode)).add(addNode(
+                            "Edge #" + edge.stepId(),
+                            meshIndex,
+                            List.of(),
+                            legacyEdgeExtras(edge),
+                            null
+                    ));
+                }
+            }
+
+            Map<String, Object> scene = new LinkedHashMap<>();
+            scene.put("nodes", List.of(rootNode));
+            scene.put("extras", Map.of("preview", previewMetadata(payload)));
+
+            Map<String, Object> document = new LinkedHashMap<>();
+            document.put("asset", Map.of("version", "2.0", "generator", "MiniCAD"));
+            document.put("scene", 0);
+            document.put("scenes", List.of(scene));
+            document.put("nodes", nodes);
+            document.put("meshes", meshes);
+            document.put("materials", materials);
+            document.put("bufferViews", bufferViews);
+            document.put("accessors", accessors);
+            document.put("buffers", List.of(Map.of("byteLength", binary.size())));
+
+            StringBuilder json = new StringBuilder(4096);
+            appendJsonValue(json, document);
+            return json.toString();
+        }
+
+        byte[] binaryChunk() {
+            return binary.toByteArray();
+        }
+
+        private RepresentationMeshes buildRepresentationMeshes(RepresentationPayload representation) {
+            List<FaceNode> faces = new ArrayList<>();
+            for (FacePayload face : representation.faces()) {
+                faces.add(new FaceNode(
+                        face,
+                        addFaceMesh(face, face.color() == null ? representation.color() : face.color()),
+                        face.name() == null || face.name().isBlank() ? "Face #" + face.stepId() : face.name()
+                ));
+            }
+            List<EdgeNode> edges = new ArrayList<>();
+            for (EdgePayload edge : representation.edges()) {
+                edges.add(new EdgeNode(
+                        edge,
+                        addEdgeMesh(edge, representation.color()),
+                        "Edge #" + edge.stepId()
+                ));
+            }
+            return new RepresentationMeshes(representation.name(), List.copyOf(faces), List.copyOf(edges));
+        }
+
+        private int addFaceMesh(FacePayload face, ColorPayload color) {
+            FloatArrayData positions = floatArray(face.triangles());
+            FloatArrayData normals = triangleNormals(face.triangles());
+            int positionAccessor = addAccessor(positions, true);
+            int normalAccessor = addAccessor(normals, false);
+            int materialIndex = materialIndex(color == null ? DEFAULT_FACE_COLOR : color, false);
+            Map<String, Object> primitive = new LinkedHashMap<>();
+            primitive.put("attributes", Map.of(
+                    "POSITION", positionAccessor,
+                    "NORMAL", normalAccessor
+            ));
+            primitive.put("material", materialIndex);
+            Map<String, Object> mesh = new LinkedHashMap<>();
+            mesh.put("primitives", List.of(primitive));
+            meshes.add(mesh);
+            return meshes.size() - 1;
+        }
+
+        private int addEdgeMesh(EdgePayload edge, ColorPayload color) {
+            FloatArrayData positions = floatArray(edge.points());
+            int positionAccessor = addAccessor(positions, true);
+            int materialIndex = materialIndex(color == null ? DEFAULT_EDGE_COLOR : color, true);
+            Map<String, Object> primitive = new LinkedHashMap<>();
+            primitive.put("attributes", Map.of("POSITION", positionAccessor));
+            primitive.put("material", materialIndex);
+            primitive.put("mode", 3);
+            Map<String, Object> mesh = new LinkedHashMap<>();
+            mesh.put("primitives", List.of(primitive));
+            meshes.add(mesh);
+            return meshes.size() - 1;
+        }
+
+        private int addAccessor(FloatArrayData data, boolean includeBounds) {
+            int byteOffset = binary.size();
+            for (float value : data.values()) {
+                writeFloatLE(binary, value);
+            }
+            Map<String, Object> bufferView = new LinkedHashMap<>();
+            bufferView.put("buffer", 0);
+            bufferView.put("byteOffset", byteOffset);
+            bufferView.put("byteLength", data.values().length * Float.BYTES);
+            bufferView.put("target", 34962);
+            bufferViews.add(bufferView);
+
+            Map<String, Object> accessor = new LinkedHashMap<>();
+            accessor.put("bufferView", bufferViews.size() - 1);
+            accessor.put("componentType", 5126);
+            accessor.put("count", data.count());
+            accessor.put("type", "VEC3");
+            if (includeBounds && data.min() != null && data.max() != null) {
+                accessor.put("min", List.of((double) data.min()[0], (double) data.min()[1], (double) data.min()[2]));
+                accessor.put("max", List.of((double) data.max()[0], (double) data.max()[1], (double) data.max()[2]));
+            }
+            accessors.add(accessor);
+            return accessors.size() - 1;
+        }
+
+        private int materialIndex(ColorPayload color, boolean line) {
+            String key = (line ? "line:" : "face:") + color.red() + "," + color.green() + "," + color.blue();
+            Integer existing = materialCache.get(key);
+            if (existing != null) {
+                return existing;
+            }
+            Map<String, Object> pbr = new LinkedHashMap<>();
+            pbr.put("baseColorFactor", List.of(
+                    color.red() / 255.0,
+                    color.green() / 255.0,
+                    color.blue() / 255.0,
+                    line ? 0.72 : 0.62
+            ));
+            pbr.put("metallicFactor", 0.08);
+            pbr.put("roughnessFactor", 0.48);
+            Map<String, Object> material = new LinkedHashMap<>();
+            material.put("pbrMetallicRoughness", pbr);
+            material.put("doubleSided", !line);
+            material.put("alphaMode", "BLEND");
+            materials.add(material);
+            int index = materials.size() - 1;
+            materialCache.put(key, index);
+            return index;
+        }
+
+        private int addNode(String name, Integer mesh, List<Integer> children, Map<String, Object> extras, List<Double> matrix) {
+            Map<String, Object> node = new LinkedHashMap<>();
+            if (name != null && !name.isBlank()) {
+                node.put("name", name);
+            }
+            if (mesh != null) {
+                node.put("mesh", mesh);
+            }
+            if (!children.isEmpty()) {
+                node.put("children", new ArrayList<>(children));
+            }
+            if (!extras.isEmpty()) {
+                node.put("extras", extras);
+            }
+            if (matrix != null) {
+                node.put("matrix", matrix);
+            }
+            nodes.add(node);
+            return nodes.size() - 1;
+        }
+
+        @SuppressWarnings("unchecked")
+        private List<Integer> childList(Map<String, Object> node) {
+            return (List<Integer>) node.computeIfAbsent("children", ignored -> new ArrayList<Integer>());
+        }
+
+        private Map<String, Object> legacyFaceExtras(FacePayload face) {
+            Map<String, Object> extras = new LinkedHashMap<>();
+            extras.put("kind", "face");
+            extras.put("stepId", face.stepId());
+            extras.put("selection", List.of(
+                    List.of("类型", "面"),
+                    List.of("STEP", "#" + face.stepId()),
+                    List.of("名称", face.name() == null ? "" : face.name()),
+                    List.of("曲面", face.surfaceType() == null ? "PLANE" : face.surfaceType()),
+                    List.of("颜色", formatColorValue(face.color())),
+                    List.of("图层", formatLayersValue(face.layers())),
+                    List.of("边界环", String.valueOf(face.loops().size())),
+                    List.of("内环", String.valueOf(face.loops().stream().filter(loop -> !loop.outer()).count())),
+                    List.of("法向", formatPointValue(vectorList(face.normal())))
+            ));
+            return extras;
+        }
+
+        private Map<String, Object> instanceFaceExtras(FacePayload face, InstancePayload instance, String representationName) {
+            Map<String, Object> extras = legacyFaceExtras(face);
+            extras.put("instanceId", instance.id());
+            extras.put("selection", List.of(
+                    List.of("类型", (instance.label() == null || instance.label().isBlank() ? instance.id() : instance.label()) + " / 面"),
+                    List.of("STEP", "#" + face.stepId()),
+                    List.of("名称", face.name() == null ? "" : face.name()),
+                    List.of("曲面", face.surfaceType() == null ? "PLANE" : face.surfaceType()),
+                    List.of("表示", representationName == null ? "" : representationName),
+                    List.of("实例", instance.id()),
+                    List.of("颜色", formatColorValue(face.color())),
+                    List.of("图层", formatLayersValue(face.layers())),
+                    List.of("边界环", String.valueOf(face.loops().size())),
+                    List.of("内环", String.valueOf(face.loops().stream().filter(loop -> !loop.outer()).count())),
+                    List.of("法向", formatPointValue(vectorList(face.normal())))
+            ));
+            return extras;
+        }
+
+        private Map<String, Object> legacyEdgeExtras(EdgePayload edge) {
+            Map<String, Object> extras = new LinkedHashMap<>();
+            extras.put("kind", "edge");
+            extras.put("stepId", edge.stepId());
+            extras.put("selection", List.of(
+                    List.of("类型", "边"),
+                    List.of("STEP", "#" + edge.stepId()),
+                    List.of("采样点", String.valueOf(edge.points().size())),
+                    List.of("线段数", String.valueOf(Math.max(0, edge.points().size() - 1))),
+                    List.of("起点", formatPointValue(pointList(edge.points().getFirst()))),
+                    List.of("终点", formatPointValue(pointList(edge.points().getLast())))
+            ));
+            return extras;
+        }
+
+        private Map<String, Object> instanceEdgeExtras(EdgePayload edge, InstancePayload instance, String representationName) {
+            Map<String, Object> extras = legacyEdgeExtras(edge);
+            extras.put("instanceId", instance.id());
+            extras.put("selection", List.of(
+                    List.of("类型", (instance.label() == null || instance.label().isBlank() ? instance.id() : instance.label()) + " / 边"),
+                    List.of("STEP", "#" + edge.stepId()),
+                    List.of("表示", representationName == null ? "" : representationName),
+                    List.of("实例", instance.id()),
+                    List.of("采样点", String.valueOf(edge.points().size())),
+                    List.of("线段数", String.valueOf(Math.max(0, edge.points().size() - 1))),
+                    List.of("起点", formatPointValue(pointList(edge.points().getFirst()))),
+                    List.of("终点", formatPointValue(pointList(edge.points().getLast())))
+            ));
+            return extras;
+        }
+
+        private String formatPointValue(List<Double> point) {
+            return point.stream().map(value -> String.format("%.3f", value)).collect(Collectors.joining(", "));
+        }
+
+        private String formatColorValue(ColorPayload color) {
+            if (color == null) {
+                return "未指定";
+            }
+            return "rgb(" + color.red() + ", " + color.green() + ", " + color.blue() + ")";
+        }
+
+        private String formatLayersValue(List<String> layers) {
+            return layers == null || layers.isEmpty() ? "未指定" : String.join(", ", layers);
+        }
+
+        private FloatArrayData floatArray(List<PointPayload> points) {
+            float[] values = new float[points.size() * 3];
+            float[] min = new float[]{Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY};
+            float[] max = new float[]{Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY};
+            int index = 0;
+            for (PointPayload point : points) {
+                values[index++] = (float) point.x();
+                values[index++] = (float) point.y();
+                values[index++] = (float) point.z();
+                min[0] = Math.min(min[0], (float) point.x());
+                min[1] = Math.min(min[1], (float) point.y());
+                min[2] = Math.min(min[2], (float) point.z());
+                max[0] = Math.max(max[0], (float) point.x());
+                max[1] = Math.max(max[1], (float) point.y());
+                max[2] = Math.max(max[2], (float) point.z());
+            }
+            return new FloatArrayData(values, points.size(), min, max);
+        }
+
+        private FloatArrayData triangleNormals(List<PointPayload> triangles) {
+            float[] values = new float[triangles.size() * 3];
+            for (int i = 0; i + 2 < triangles.size(); i += 3) {
+                PointPayload a = triangles.get(i);
+                PointPayload b = triangles.get(i + 1);
+                PointPayload c = triangles.get(i + 2);
+                double abx = b.x() - a.x();
+                double aby = b.y() - a.y();
+                double abz = b.z() - a.z();
+                double acx = c.x() - a.x();
+                double acy = c.y() - a.y();
+                double acz = c.z() - a.z();
+                double nx = aby * acz - abz * acy;
+                double ny = abz * acx - abx * acz;
+                double nz = abx * acy - aby * acx;
+                double norm = Math.sqrt(nx * nx + ny * ny + nz * nz);
+                if (norm <= Epsilon.EPS) {
+                    nx = 0.0;
+                    ny = 0.0;
+                    nz = 1.0;
+                } else {
+                    nx /= norm;
+                    ny /= norm;
+                    nz /= norm;
+                }
+                for (int vertex = 0; vertex < 3; vertex++) {
+                    int base = (i + vertex) * 3;
+                    values[base] = (float) nx;
+                    values[base + 1] = (float) ny;
+                    values[base + 2] = (float) nz;
+                }
+            }
+            return new FloatArrayData(values, triangles.size(), null, null);
+        }
+    }
+
+    private record RepresentationMeshes(String name, List<FaceNode> faces, List<EdgeNode> edges) {
+    }
+
+    private record FaceNode(FacePayload face, int meshIndex, String name) {
+    }
+
+    private record EdgeNode(EdgePayload edge, int meshIndex, String name) {
+    }
+
+    private record FloatArrayData(float[] values, int count, float[] min, float[] max) {
     }
 }

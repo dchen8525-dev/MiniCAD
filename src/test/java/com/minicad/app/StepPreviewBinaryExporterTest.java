@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class StepPreviewBinaryExporterTest {
 
     @Test
-    void shouldExportBinaryPreviewPacketForMinimalSquare() {
-        byte[] binary = StepPreviewJsonExporter.exportBinary("""
+    void shouldExportGlbPreviewPacketForMinimalSquare() {
+        byte[] binary = StepPreviewJsonExporter.exportGlb("""
                 DATA;
                 #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
                 #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
@@ -56,22 +56,26 @@ class StepPreviewBinaryExporterTest {
                 """);
 
         assertTrue(binary.length > 16);
-        assertEquals('M', binary[0]);
-        assertEquals('C', binary[1]);
-        assertEquals('P', binary[2]);
-        assertEquals('B', binary[3]);
+        assertEquals('g', binary[0]);
+        assertEquals('l', binary[1]);
+        assertEquals('T', binary[2]);
+        assertEquals('F', binary[3]);
 
         ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
-        assertEquals(1, header.getInt(4));
-        int metadataLength = header.getInt(8);
-        int geometryOffset = header.getInt(12);
-        String metadata = new String(binary, 16, metadataLength, StandardCharsets.UTF_8);
+        assertEquals(2, header.getInt(4));
+        int totalLength = header.getInt(8);
+        int jsonChunkLength = header.getInt(12);
+        int jsonChunkType = header.getInt(16);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
 
-        assertTrue(geometryOffset >= 16 + metadataLength);
-        assertTrue(metadata.contains("\"format\":\"binary-preview-v1\""));
+        assertEquals(binary.length, totalLength);
+        assertEquals(0x4E4F534A, jsonChunkType);
+        assertTrue(metadata.contains("\"asset\":{\"version\":\"2.0\""));
+        assertTrue(metadata.contains("\"scenes\":["));
+        assertTrue(metadata.contains("\"preview\":{"));
         assertTrue(metadata.contains("\"faceCount\":1"));
         assertTrue(metadata.contains("\"edgeCount\":4"));
-        assertTrue(metadata.contains("\"triangleCount\":"));
-        assertTrue(metadata.contains("\"pointOffset\":"));
+        assertTrue(metadata.contains("\"meshes\":["));
+        assertTrue(metadata.contains("\"materials\":["));
     }
 }

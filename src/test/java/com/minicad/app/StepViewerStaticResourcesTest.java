@@ -24,5 +24,9 @@ class StepViewerStaticResourcesTest {
                 StepViewerApp.class.getResource("/static/vendor/three/examples/jsm/controls/OrbitControls.js"),
                 "OrbitControls.js should be available on the classpath"
         );
+        assertNotNull(
+                StepViewerApp.class.getResource("/static/vendor/three/examples/jsm/loaders/GLTFLoader.js"),
+                "GLTFLoader.js should be available on the classpath"
+        );
     }
 }
