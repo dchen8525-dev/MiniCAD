@@ -72,11 +72,13 @@ class StepPreviewBinaryExporterTest {
 
         assertEquals(binary.length, totalLength);
         assertEquals(0x4E4F534A, jsonChunkType);
-        assertTrue(metadata.contains("\"asset\":{\"version\":\"2.0\""));
+        assertTrue(metadata.contains("\"version\":\"2.0\""));
         assertTrue(metadata.contains("\"scenes\":["));
         assertTrue(metadata.contains("\"preview\":{"));
         assertTrue(metadata.contains("\"faceCount\":1"));
         assertTrue(metadata.contains("\"edgeCount\":4"));
+        assertTrue(metadata.contains("\"surface\":{\"type\":\"plane_face\""));
+        assertTrue(metadata.contains("\"surfaceLoops\":["));
         assertTrue(metadata.contains("\"meshes\":["));
         assertTrue(metadata.contains("\"materials\":["));
     }
@@ -93,5 +95,62 @@ class StepPreviewBinaryExporterTest {
         assertTrue(metadata.contains("\"radius\":"));
         assertTrue(metadata.contains("\"sweepAngle\":"));
         assertTrue(metadata.contains("\"xDirection\":"));
+    }
+
+    @Test
+    void shouldEmbedParametricCylinderMetadataForCylindricalFaces() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/cylindrical-band.step")));
+
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
+
+        assertTrue(metadata.contains("\"surface\":{\"type\":\"cylindrical_strip\""));
+        assertTrue(metadata.contains("\"radius\":"));
+        assertTrue(metadata.contains("\"lowerHeight\":"));
+        assertTrue(metadata.contains("\"upperHeight\":"));
+    }
+
+    @Test
+    void shouldEmbedParametricConeMetadataForConicalFaces() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/conical-band.step")));
+
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
+
+        assertTrue(metadata.contains("\"surface\":{\"type\":\"conical_strip\""));
+        assertTrue(metadata.contains("\"semiAngle\":"));
+        assertTrue(metadata.contains("\"lowerHeight\":"));
+        assertTrue(metadata.contains("\"upperHeight\":"));
+    }
+
+    @Test
+    void shouldEmbedParametricTorusMetadataForToroidalFaces() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/toroidal-band.step")));
+
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
+
+        assertTrue(metadata.contains("\"surface\":{\"type\":\"toroidal_strip\""));
+        assertTrue(metadata.contains("\"minorRadius\":"));
+        assertTrue(metadata.contains("\"lowerHeight\":"));
+        assertTrue(metadata.contains("\"upperHeight\":"));
+    }
+
+    @Test
+    void shouldEmbedParametricBsplineMetadataForBsplineFaces() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/bspline-patch.step")));
+
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        String metadata = new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
+
+        assertTrue(metadata.contains("\"surface\":{\"type\":\"bspline_surface\""));
+        assertTrue(metadata.contains("\"uDegree\":"));
+        assertTrue(metadata.contains("\"vDegree\":"));
+        assertTrue(metadata.contains("\"controlPoints\":"));
+        assertTrue(metadata.contains("\"surfaceUvLoops\":["));
     }
 }

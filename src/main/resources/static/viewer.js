@@ -686,6 +686,94 @@ function orthonormalY(axis, xDirection) {
     return axis.clone().cross(xDirection).normalize();
 }
 
+function expandedKnots(knots, multiplicities) {
+    const expanded = [];
+    for (let index = 0; index < knots.length; index += 1) {
+        for (let repeat = 0; repeat < multiplicities[index]; repeat += 1) {
+            expanded.push(knots[index]);
+        }
+    }
+    return expanded;
+}
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+}
+
+function basisValue(i, degree, parameter, knots) {
+    if (degree === 0) {
+        const last = knots[knots.length - 1];
+        if ((parameter >= knots[i] && parameter < knots[i + 1]) || (Math.abs(parameter - last) < 1.0e-9 && Math.abs(parameter - knots[i + 1]) < 1.0e-9)) {
+            return 1;
+        }
+        return 0;
+    }
+    const leftDenominator = knots[i + degree] - knots[i];
+    const rightDenominator = knots[i + degree + 1] - knots[i + 1];
+    const left = Math.abs(leftDenominator) < 1.0e-9
+        ? 0
+        : (parameter - knots[i]) / leftDenominator * basisValue(i, degree - 1, parameter, knots);
+    const right = Math.abs(rightDenominator) < 1.0e-9
+        ? 0
+        : (knots[i + degree + 1] - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
+    return left + right;
+}
+
+function findSpan(n, degree, parameter, knots) {
+    if (parameter >= knots[n + 1]) {
+        return n;
+    }
+    let low = degree;
+    let high = n + 1;
+    let mid = Math.floor((low + high) / 2);
+    while (parameter < knots[mid] || parameter >= knots[mid + 1]) {
+        if (parameter < knots[mid]) {
+            high = mid;
+        } else {
+            low = mid;
+        }
+        mid = Math.floor((low + high) / 2);
+    }
+    return mid;
+}
+
+function bsplineSurfacePoint(surface, u, v) {
+    const controlPoints = surface.controlPoints;
+    const uExpanded = expandedKnots(surface.uKnots, surface.uMultiplicities);
+    const vExpanded = expandedKnots(surface.vKnots, surface.vMultiplicities);
+    const clampedU = clamp(u, uExpanded[surface.uDegree], uExpanded[controlPoints.length]);
+    const clampedV = clamp(v, vExpanded[surface.vDegree], vExpanded[controlPoints[0].length]);
+    const uSpan = findSpan(controlPoints.length - 1, surface.uDegree, clampedU, uExpanded);
+    const vSpan = findSpan(controlPoints[0].length - 1, surface.vDegree, clampedV, vExpanded);
+    const point = new THREE.Vector3();
+    for (let i = 0; i <= surface.uDegree; i += 1) {
+        const ui = uSpan - surface.uDegree + i;
+        const nu = basisValue(ui, surface.uDegree, clampedU, uExpanded);
+        for (let j = 0; j <= surface.vDegree; j += 1) {
+            const vj = vSpan - surface.vDegree + j;
+            const nv = basisValue(vj, surface.vDegree, clampedV, vExpanded);
+            const control = surface.controlPoints[ui][vj];
+            point.x += control[0] * nu * nv;
+            point.y += control[1] * nu * nv;
+            point.z += control[2] * nu * nv;
+        }
+    }
+    return point;
+}
+
+function bsplineSurfaceNormal(surface, u, v) {
+    const du = Math.max((surface.upperHeight - surface.lowerHeight) / 200.0, 1.0e-4);
+    const dv = Math.max((surface.sweepAngle - surface.startAngle) / 200.0, 1.0e-4);
+    const p = bsplineSurfacePoint(surface, u, v);
+    const pu = bsplineSurfacePoint(surface, clamp(u + du, surface.lowerHeight, surface.upperHeight), v);
+    const pv = bsplineSurfacePoint(surface, u, clamp(v + dv, surface.startAngle, surface.sweepAngle));
+    const normal = pu.clone().sub(p).cross(pv.clone().sub(p));
+    if (normal.lengthSq() < 1.0e-12) {
+        return new THREE.Vector3(0, 0, 1);
+    }
+    return normal.normalize();
+}
+
 function rebuildCurveEdgeGeometry(node) {
     const curve = node.userData?.curve;
     if (!curve || !node.geometry) {
@@ -725,6 +813,181 @@ function rebuildCurveEdgeGeometry(node) {
         node.geometry.dispose();
         node.geometry = geometry;
     }
+}
+
+function rebuildParametricFaceGeometry(node) {
+    const surface = node.userData?.surface;
+    if (!surface || !node.isMesh) {
+        return;
+    }
+    if (surface.type === 'bspline_surface' && Array.isArray(node.userData?.surfaceUvLoops) && node.userData.surfaceUvLoops.length > 0) {
+        const outerLoop = node.userData.surfaceUvLoops.find((loop) => loop.outer);
+        if (!outerLoop || !Array.isArray(outerLoop.points) || outerLoop.points.length < 3) {
+            return;
+        }
+        const outerPoints = outerLoop.points.slice(0, -1).map((point) => new THREE.Vector2(point[0], point[1]));
+        const shapePoints = THREE.ShapeUtils.isClockWise(outerPoints) ? outerPoints.slice().reverse() : outerPoints;
+        const shape = new THREE.Shape(shapePoints);
+        for (const loop of node.userData.surfaceUvLoops) {
+            if (loop.outer || !Array.isArray(loop.points) || loop.points.length < 3) {
+                continue;
+            }
+            const holePoints = loop.points.slice(0, -1).map((point) => new THREE.Vector2(point[0], point[1]));
+            const normalizedHole = THREE.ShapeUtils.isClockWise(holePoints) ? holePoints : holePoints.slice().reverse();
+            shape.holes.push(new THREE.Path(normalizedHole));
+        }
+        const geometry2d = new THREE.ShapeGeometry(shape, 48);
+        const positions = geometry2d.attributes.position;
+        const normals = new Float32Array(positions.count * 3);
+        const sameSense = node.userData?.sameSense !== false;
+        for (let index = 0; index < positions.count; index += 1) {
+            const u = positions.getX(index);
+            const v = positions.getY(index);
+            const point = bsplineSurfacePoint(surface, u, v);
+            const normal = bsplineSurfaceNormal(surface, u, v);
+            if (!sameSense) {
+                normal.multiplyScalar(-1);
+            }
+            positions.setXYZ(index, point.x, point.y, point.z);
+            normals[index * 3] = normal.x;
+            normals[index * 3 + 1] = normal.y;
+            normals[index * 3 + 2] = normal.z;
+        }
+        geometry2d.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        node.geometry.dispose();
+        node.geometry = geometry2d;
+        return;
+    }
+    if (surface.type === 'plane_face' && Array.isArray(node.userData?.surfaceLoops) && node.userData.surfaceLoops.length > 0) {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = vectorFromArray(surface.xDirection).normalize();
+        const yDirection = orthonormalY(axis, xDirection);
+        const center = vectorFromArray(surface.center);
+        const toPlanePoint = (point) => {
+            const value = vectorFromArray(point).sub(center);
+            return new THREE.Vector2(value.dot(xDirection), value.dot(yDirection));
+        };
+        const outerLoop = node.userData.surfaceLoops.find((loop) => loop.outer);
+        if (!outerLoop || !Array.isArray(outerLoop.points) || outerLoop.points.length < 3) {
+            return;
+        }
+        const outerPoints = outerLoop.points.slice(0, -1).map(toPlanePoint);
+        const shapePoints = THREE.ShapeUtils.isClockWise(outerPoints) ? outerPoints.slice().reverse() : outerPoints;
+        const shape = new THREE.Shape(shapePoints);
+        for (const loop of node.userData.surfaceLoops) {
+            if (loop.outer || !Array.isArray(loop.points) || loop.points.length < 3) {
+                continue;
+            }
+            const holePoints = loop.points.slice(0, -1).map(toPlanePoint);
+            const normalizedHole = THREE.ShapeUtils.isClockWise(holePoints) ? holePoints : holePoints.slice().reverse();
+            shape.holes.push(new THREE.Path(normalizedHole));
+        }
+        const geometry2d = new THREE.ShapeGeometry(shape);
+        const positions = geometry2d.attributes.position;
+        const normals = new Float32Array(positions.count * 3);
+        const sameSense = node.userData?.sameSense !== false;
+        const planeNormal = sameSense ? axis : axis.clone().multiplyScalar(-1);
+        for (let index = 0; index < positions.count; index += 1) {
+            const u = positions.getX(index);
+            const v = positions.getY(index);
+            const point = center.clone()
+                .addScaledVector(xDirection, u)
+                .addScaledVector(yDirection, v);
+            positions.setXYZ(index, point.x, point.y, point.z);
+            normals[index * 3] = planeNormal.x;
+            normals[index * 3 + 1] = planeNormal.y;
+            normals[index * 3 + 2] = planeNormal.z;
+        }
+        geometry2d.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        node.geometry.dispose();
+        node.geometry = geometry2d;
+        return;
+    }
+    if (!Number.isFinite(surface.radius)) {
+        return;
+    }
+
+    const axis = vectorFromArray(surface.axis).normalize();
+    const xDirection = vectorFromArray(surface.xDirection).normalize();
+    const yDirection = orthonormalY(axis, xDirection);
+    const center = vectorFromArray(surface.center);
+    const sweep = surface.sweepAngle ?? 0;
+    const heightSpan = (surface.upperHeight ?? 0) - (surface.lowerHeight ?? 0);
+    const radialSegments = Math.max(192, Math.ceil(Math.abs(sweep) / (Math.PI / 360.0)));
+    const heightSegments = Math.max(12, Math.min(96, Math.ceil(Math.abs(heightSpan) / Math.max(surface.radius * 0.08, 1.0))));
+    const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+    const positions = new Float32Array(vertexCount * 3);
+    const normals = new Float32Array(vertexCount * 3);
+    const indices = [];
+    const sameSense = node.userData?.sameSense !== false;
+
+    for (let v = 0; v <= heightSegments; v += 1) {
+        const height = surface.lowerHeight + heightSpan * v / heightSegments;
+        for (let u = 0; u <= radialSegments; u += 1) {
+            const angle = surface.startAngle + sweep * u / radialSegments;
+            const radial = xDirection.clone().multiplyScalar(Math.cos(angle))
+                .addScaledVector(yDirection, Math.sin(angle));
+            let point;
+            let normal;
+
+            if (surface.type === 'cylindrical_strip') {
+                point = center.clone()
+                    .addScaledVector(radial, surface.radius)
+                    .addScaledVector(axis, height);
+                normal = sameSense ? radial : radial.multiplyScalar(-1);
+            } else if (surface.type === 'conical_strip' && Number.isFinite(surface.semiAngle)) {
+                const radius = surface.radius + height * Math.tan(surface.semiAngle);
+                point = center.clone()
+                    .addScaledVector(radial, radius)
+                    .addScaledVector(axis, height);
+                const baseNormal = radial.clone().addScaledVector(axis, -Math.tan(surface.semiAngle)).normalize();
+                normal = sameSense ? baseNormal : baseNormal.multiplyScalar(-1);
+            } else if (surface.type === 'toroidal_strip' && Number.isFinite(surface.minorRadius)) {
+                const minorAngle = height;
+                const ringRadius = surface.radius + surface.minorRadius * Math.cos(minorAngle);
+                point = center.clone()
+                    .addScaledVector(xDirection, Math.cos(angle) * ringRadius)
+                    .addScaledVector(yDirection, Math.sin(angle) * ringRadius)
+                    .addScaledVector(axis, surface.minorRadius * Math.sin(minorAngle));
+                const baseNormal = xDirection.clone().multiplyScalar(Math.cos(angle) * Math.cos(minorAngle))
+                    .addScaledVector(yDirection, Math.sin(angle) * Math.cos(minorAngle))
+                    .addScaledVector(axis, Math.sin(minorAngle))
+                    .normalize();
+                normal = sameSense ? baseNormal : baseNormal.multiplyScalar(-1);
+            } else {
+                return;
+            }
+
+            const offset = (v * (radialSegments + 1) + u) * 3;
+            positions[offset] = point.x;
+            positions[offset + 1] = point.y;
+            positions[offset + 2] = point.z;
+            normals[offset] = normal.x;
+            normals[offset + 1] = normal.y;
+            normals[offset + 2] = normal.z;
+        }
+    }
+
+    for (let v = 0; v < heightSegments; v += 1) {
+        for (let u = 0; u < radialSegments; u += 1) {
+            const a = v * (radialSegments + 1) + u;
+            const b = a + 1;
+            const c = a + radialSegments + 1;
+            const d = c + 1;
+            if (sameSense) {
+                indices.push(a, c, d, a, d, b);
+            } else {
+                indices.push(a, d, c, a, b, d);
+            }
+        }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    geometry.setIndex(indices);
+    node.geometry.dispose();
+    node.geometry = geometry;
 }
 
 function renderPmi(pmi) {
@@ -1017,6 +1280,9 @@ function renderGlbPreview(result) {
                 side: THREE.DoubleSide
             });
         }
+        if (node.isMesh && node.userData?.surface) {
+            rebuildParametricFaceGeometry(node);
+        }
         if (isEdgeRenderable(node) && node.userData?.curve) {
             rebuildCurveEdgeGeometry(node);
         }
@@ -1045,7 +1311,9 @@ function renderGlbPreview(result) {
         visibleMeshes: 0,
         visibleLines: 0,
         triangleVertices: 0,
-        lineVertices: 0
+        lineVertices: 0,
+        parametricFaceTypes: {},
+        parametricEdgeTypes: {}
     };
     result.scene.traverse((node) => {
         if (node.isMesh) {
@@ -1057,6 +1325,10 @@ function renderGlbPreview(result) {
             if (position) {
                 sceneSummary.triangleVertices += position.count;
             }
+            const surfaceType = node.userData?.surface?.type;
+            if (surfaceType) {
+                sceneSummary.parametricFaceTypes[surfaceType] = (sceneSummary.parametricFaceTypes[surfaceType] ?? 0) + 1;
+            }
             return;
         }
         if (isEdgeRenderable(node)) {
@@ -1067,6 +1339,10 @@ function renderGlbPreview(result) {
             const position = node.geometry?.getAttribute?.('position');
             if (position) {
                 sceneSummary.lineVertices += position.count;
+            }
+            const curveType = node.userData?.curve?.type;
+            if (curveType) {
+                sceneSummary.parametricEdgeTypes[curveType] = (sceneSummary.parametricEdgeTypes[curveType] ?? 0) + 1;
             }
         }
     });

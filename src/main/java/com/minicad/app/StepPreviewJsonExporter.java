@@ -754,7 +754,28 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 loops,
-                List.of()
+                List.of(),
+                new FaceSurfacePayload(
+                        "plane_face",
+                        List.of(face.surface().origin().x(), face.surface().origin().y(), face.surface().origin().z()),
+                        List.of(normal.x(), normal.y(), normal.z()),
+                        basisDirectionForNormal(normal),
+                        0.0,
+                        null,
+                        null,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                null
         );
     }
 
@@ -824,7 +845,28 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
-                triangles
+                triangles,
+                new FaceSurfacePayload(
+                        "cylindrical_strip",
+                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
+                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
+                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
+                        surface.radius(),
+                        null,
+                        null,
+                        lowerHeight,
+                        upperHeight,
+                        angles.getFirst(),
+                        angles.getLast() - angles.getFirst(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                null
         );
     }
 
@@ -890,7 +932,28 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
-                triangles
+                triangles,
+                new FaceSurfacePayload(
+                        "conical_strip",
+                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
+                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
+                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
+                        surface.radius(),
+                        null,
+                        surface.semiAngle(),
+                        lowerHeight,
+                        upperHeight,
+                        angles.getFirst(),
+                        angles.getLast() - angles.getFirst(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                null
         );
     }
 
@@ -966,7 +1029,28 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
-                triangles
+                triangles,
+                new FaceSurfacePayload(
+                        "toroidal_strip",
+                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
+                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
+                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
+                        surface.majorRadius(),
+                        surface.minorRadius(),
+                        null,
+                        lowerV,
+                        upperV,
+                        uValues.getFirst(),
+                        uValues.getLast() - uValues.getFirst(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                null
         );
     }
 
@@ -1012,7 +1096,9 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
-                triangles
+                triangles,
+                null,
+                null
         );
     }
 
@@ -1051,7 +1137,9 @@ public final class StepPreviewJsonExporter {
                 toColorPayload(metadata.rgb()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
-                triangles
+                triangles,
+                null,
+                null
         );
     }
 
@@ -1160,7 +1248,9 @@ public final class StepPreviewJsonExporter {
                         toColorPayload(metadata.rgb()),
                         metadata.layers(),
                         toParametricLoopPayloads(loops, mapper),
-                        triangles
+                        triangles,
+                        faceSurfacePayload(geometry, uvBounds, builder),
+                        loops
                 ),
                 null
         );
@@ -1427,6 +1517,75 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         return new UvBounds(minU, minV, maxU, maxV);
+    }
+
+    private static FaceSurfacePayload faceSurfacePayload(
+            StepEntity geometry,
+            UvBounds uvBounds,
+            StepCadBuilder builder
+    ) {
+        if (geometry instanceof StepPlane stepPlane) {
+            Plane plane = builder.buildPlane(stepPlane.id());
+            Direction3 normal = plane.normal();
+            return new FaceSurfacePayload(
+                    "plane_face",
+                    List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
+                    List.of(normal.x(), normal.y(), normal.z()),
+                    basisDirectionForNormal(normal),
+                    0.0,
+                    null,
+                    null,
+                    uvBounds.minU(),
+                    uvBounds.maxU(),
+                    uvBounds.minV(),
+                    uvBounds.maxV(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+        if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+            BSplineSurface3 surface = builder.buildBSplineSurface(splineSurface.id());
+            List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
+                    .map(row -> row.stream()
+                            .map(point -> List.of(point.x(), point.y(), point.z()))
+                            .toList())
+                    .toList();
+            return new FaceSurfacePayload(
+                    "bspline_surface",
+                    null,
+                    null,
+                    null,
+                    0.0,
+                    null,
+                    null,
+                    surface.uStart(),
+                    surface.uEnd(),
+                    surface.vStart(),
+                    surface.vEnd(),
+                    surface.uDegree(),
+                    surface.vDegree(),
+                    controlPoints,
+                    surface.uMultiplicities(),
+                    surface.vMultiplicities(),
+                    surface.uKnots(),
+                    surface.vKnots()
+            );
+        }
+        return null;
+    }
+
+    private static List<Double> basisDirectionForNormal(Direction3 normal) {
+        Vector3 axis = normal.asVector();
+        Vector3 reference = Math.abs(axis.x()) < 0.9
+                ? new Vector3(1.0, 0.0, 0.0)
+                : new Vector3(0.0, 1.0, 0.0);
+        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize();
+        return List.of(xDirection.x(), xDirection.y(), xDirection.z());
     }
 
     private static List<UvPoint> sampleParametricOrientedEdge(
@@ -2907,7 +3066,9 @@ public final class StepPreviewJsonExporter {
                 base.color(),
                 base.layers(),
                 base.loops(),
-                List.copyOf(reversedTriangles)
+                List.copyOf(reversedTriangles),
+                base.surface(),
+                base.uvLoops()
         );
     }
 
@@ -3222,7 +3383,9 @@ public final class StepPreviewJsonExporter {
                 face.color(),
                 face.layers(),
                 reduceLoopPoints(face.loops(), loopFactor),
-                reduceTrianglePoints(face.triangles(), triangleFactor)
+                reduceTrianglePoints(face.triangles(), triangleFactor),
+                face.surface(),
+                face.uvLoops()
         );
     }
 
@@ -3909,7 +4072,7 @@ public final class StepPreviewJsonExporter {
         byte[] paddedJson = padChunk(jsonBytes);
         byte[] binaryChunk = builder.binaryChunk();
         byte[] paddedBinary = padChunk(binaryChunk);
-        log.info("stage={} faceMeshCount={}, edgeMeshCount={}, nodeCount={}, materialCount={}, accessorCount={}, bufferViewCount={}, faceVertexCount={}, faceIndexCount={}, lineVertexCount={}, maxFaceVertexCount={}, maxFaceIndexCount={}, jsonChunkLength={}, binaryChunkLength={}",
+        log.info("stage={} faceMeshCount={}, edgeMeshCount={}, nodeCount={}, materialCount={}, accessorCount={}, bufferViewCount={}, faceVertexCount={}, faceIndexCount={}, lineVertexCount={}, maxFaceVertexCount={}, maxFaceIndexCount={}, parametricFaceCount={}, uvLoopFaceCount={}, jsonChunkLength={}, binaryChunkLength={}",
                 "glb_builder_summary",
                 builder.faceMeshCount(),
                 builder.edgeMeshCount(),
@@ -3922,6 +4085,8 @@ public final class StepPreviewJsonExporter {
                 builder.lineVertexCount(),
                 builder.maxFaceVertexCount(),
                 builder.maxFaceIndexCount(),
+                builder.parametricFaceCount(),
+                builder.uvLoopFaceCount(),
                 jsonBytes.length,
                 binaryChunk.length);
 
@@ -4923,6 +5088,28 @@ public final class StepPreviewJsonExporter {
     ) {
     }
 
+    private record FaceSurfacePayload(
+            String type,
+            List<Double> center,
+            List<Double> axis,
+            List<Double> xDirection,
+            double radius,
+            Double minorRadius,
+            Double semiAngle,
+            double lowerHeight,
+            double upperHeight,
+            double startAngle,
+            double sweepAngle,
+            Integer uDegree,
+            Integer vDegree,
+            List<List<List<Double>>> controlPoints,
+            List<Integer> uMultiplicities,
+            List<Integer> vMultiplicities,
+            List<Double> uKnots,
+            List<Double> vKnots
+    ) {
+    }
+
     private record FacePayload(
             int stepId,
             String name,
@@ -4933,7 +5120,9 @@ public final class StepPreviewJsonExporter {
             ColorPayload color,
             List<String> layers,
             List<LoopPayload> loops,
-            List<PointPayload> triangles
+            List<PointPayload> triangles,
+            FaceSurfacePayload surface,
+            List<ParametricLoopPayload> uvLoops
     ) {
     }
 
@@ -5117,6 +5306,8 @@ public final class StepPreviewJsonExporter {
         private long lineVertexCount;
         private int maxFaceVertexCount;
         private int maxFaceIndexCount;
+        private int parametricFaceCount;
+        private int uvLoopFaceCount;
 
         String buildJson(PreviewPayload payload) {
             boolean assemblyMode = !payload.instances().isEmpty() && !payload.representations().isEmpty();
@@ -5228,6 +5419,14 @@ public final class StepPreviewJsonExporter {
 
         int edgeMeshCount() {
             return edgeMeshCount;
+        }
+
+        int parametricFaceCount() {
+            return parametricFaceCount;
+        }
+
+        int uvLoopFaceCount() {
+            return uvLoopFaceCount;
         }
 
         int nodeCount() {
@@ -5427,6 +5626,18 @@ public final class StepPreviewJsonExporter {
             Map<String, Object> extras = new LinkedHashMap<>();
             extras.put("kind", "face");
             extras.put("stepId", face.stepId());
+            extras.put("sameSense", face.sameSense());
+            if (face.surface() != null) {
+                parametricFaceCount += 1;
+                extras.put("surface", faceSurfaceValue(face.surface()));
+                if ("plane_face".equals(face.surface().type())) {
+                    extras.put("surfaceLoops", loopValues(face.loops()));
+                }
+            }
+            if (face.uvLoops() != null && !face.uvLoops().isEmpty()) {
+                uvLoopFaceCount += 1;
+                extras.put("surfaceUvLoops", uvLoopValues(face.uvLoops()));
+            }
             extras.put("selection", List.of(
                     List.of("类型", "面"),
                     List.of("STEP", "#" + face.stepId()),
@@ -5507,6 +5718,77 @@ public final class StepPreviewJsonExporter {
 
         private String formatLayersValue(List<String> layers) {
             return layers == null || layers.isEmpty() ? "未指定" : String.join(", ", layers);
+        }
+
+        private List<Map<String, Object>> loopValues(List<LoopPayload> loops) {
+            List<Map<String, Object>> values = new ArrayList<>(loops.size());
+            for (LoopPayload loop : loops) {
+                values.add(Map.of(
+                        "outer", loop.outer(),
+                        "points", loop.points().stream().map(StepPreviewJsonExporter::pointList).toList()
+                ));
+            }
+            return values;
+        }
+
+        private Map<String, Object> faceSurfaceValue(FaceSurfacePayload surface) {
+            Map<String, Object> value = new LinkedHashMap<>();
+            value.put("type", surface.type());
+            if (surface.center() != null) {
+                value.put("center", surface.center());
+            }
+            if (surface.axis() != null) {
+                value.put("axis", surface.axis());
+            }
+            if (surface.xDirection() != null) {
+                value.put("xDirection", surface.xDirection());
+            }
+            value.put("radius", surface.radius());
+            if (surface.minorRadius() != null) {
+                value.put("minorRadius", surface.minorRadius());
+            }
+            if (surface.semiAngle() != null) {
+                value.put("semiAngle", surface.semiAngle());
+            }
+            value.put("lowerHeight", surface.lowerHeight());
+            value.put("upperHeight", surface.upperHeight());
+            value.put("startAngle", surface.startAngle());
+            value.put("sweepAngle", surface.sweepAngle());
+            if (surface.uDegree() != null) {
+                value.put("uDegree", surface.uDegree());
+            }
+            if (surface.vDegree() != null) {
+                value.put("vDegree", surface.vDegree());
+            }
+            if (surface.controlPoints() != null) {
+                value.put("controlPoints", surface.controlPoints());
+            }
+            if (surface.uMultiplicities() != null) {
+                value.put("uMultiplicities", surface.uMultiplicities());
+            }
+            if (surface.vMultiplicities() != null) {
+                value.put("vMultiplicities", surface.vMultiplicities());
+            }
+            if (surface.uKnots() != null) {
+                value.put("uKnots", surface.uKnots());
+            }
+            if (surface.vKnots() != null) {
+                value.put("vKnots", surface.vKnots());
+            }
+            return value;
+        }
+
+        private List<Map<String, Object>> uvLoopValues(List<ParametricLoopPayload> loops) {
+            List<Map<String, Object>> values = new ArrayList<>(loops.size());
+            for (ParametricLoopPayload loop : loops) {
+                values.add(Map.of(
+                        "outer", loop.outer(),
+                        "points", loop.points().stream()
+                                .map(point -> List.of(point.u(), point.v()))
+                                .toList()
+                ));
+            }
+            return values;
         }
 
         private Map<String, Object> edgeCurveValue(EdgeCurvePayload curve) {
