@@ -1541,6 +1541,9 @@ async function requestPreview(payload, metadata = {}) {
         logInfo('requestPreview:binary-response', {
             ok: response.ok,
             status: response.status,
+            previewFormat: response.headers.get('X-MiniCAD-Preview-Format'),
+            cache: response.headers.get('X-MiniCAD-Cache'),
+            cachePath: response.headers.get('X-MiniCAD-Cache-Path'),
             binaryLength: arrayBuffer.byteLength,
             faceCount: Array.isArray(parsed?.faces) ? parsed.faces.length : 0,
             edgeCount: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,

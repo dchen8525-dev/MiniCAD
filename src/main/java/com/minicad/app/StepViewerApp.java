@@ -186,19 +186,25 @@ public final class StepViewerApp {
             try {
                 Path cachePath = previewCachePath(stepText);
                 byte[] previewBinary;
+                String cacheStatus;
                 if (Files.exists(cachePath)) {
                     previewBinary = Files.readAllBytes(cachePath);
+                    cacheStatus = "hit";
                     log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
                             "export_cache_hit", cachePath, previewBinary.length);
                 } else {
                     previewBinary = StepPreviewJsonExporter.exportBinary(stepText);
                     Files.createDirectories(cachePath.getParent());
                     Files.write(cachePath, previewBinary);
+                    cacheStatus = "miss";
                     log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
                             "export_cache_miss_written", cachePath, previewBinary.length);
                 }
                 log.info("requestId=1 stage={} elapsedMs={}, binaryLength={}",
                         "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
+                response.setHeader("X-MiniCAD-Cache", cacheStatus);
+                response.setHeader("X-MiniCAD-Cache-Path", cachePath.toString());
+                response.setHeader("X-MiniCAD-Preview-Format", "binary-preview-v1");
                 send(response, HttpServletResponse.SC_OK, "application/vnd.minicad.preview+bin", previewBinary);
                 log.info("requestId=1 stage={} status=200, totalElapsedMs={}",
                         "response_sent", elapsedMillis(startedAt));
