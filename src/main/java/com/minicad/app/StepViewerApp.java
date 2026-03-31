@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,7 @@ public final class StepViewerApp {
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
     private static final Pattern POSITION_PATTERN = Pattern.compile("position (\\d+)");
+    private static final Path PREVIEW_CACHE_DIR = Path.of(".minicad-cache", "preview-binary-v1");
 
     private StepViewerApp() {
     }
@@ -181,10 +184,22 @@ public final class StepViewerApp {
             log.info("requestId=1 stage={} textLength={}",
                     "export_start", stepText.length());
             try {
-                String json = StepPreviewJsonExporter.export(stepText);
-                log.info("requestId=1 stage={} elapsedMs={}, jsonLength={}",
-                        "export_done", elapsedMillis(exportStartedAt), json.length());
-                send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8", json);
+                Path cachePath = previewCachePath(stepText);
+                byte[] previewBinary;
+                if (Files.exists(cachePath)) {
+                    previewBinary = Files.readAllBytes(cachePath);
+                    log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
+                            "export_cache_hit", cachePath, previewBinary.length);
+                } else {
+                    previewBinary = StepPreviewJsonExporter.exportBinary(stepText);
+                    Files.createDirectories(cachePath.getParent());
+                    Files.write(cachePath, previewBinary);
+                    log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
+                            "export_cache_miss_written", cachePath, previewBinary.length);
+                }
+                log.info("requestId=1 stage={} elapsedMs={}, binaryLength={}",
+                        "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
+                send(response, HttpServletResponse.SC_OK, "application/vnd.minicad.preview+bin", previewBinary);
                 log.info("requestId=1 stage={} status=200, totalElapsedMs={}",
                         "response_sent", elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
@@ -282,6 +297,25 @@ public final class StepViewerApp {
 
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
+    }
+
+    private static Path previewCachePath(String stepText) throws IOException {
+        String digest = sha256Hex(stepText.getBytes(StandardCharsets.UTF_8));
+        return PREVIEW_CACHE_DIR.resolve(digest + ".bin");
+    }
+
+    private static String sha256Hex(byte[] bytes) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(bytes);
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+            for (byte value : hash) {
+                hex.append(String.format("%02x", value));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("SHA-256 unavailable", ex);
+        }
     }
 
     private static String diagnosticContext(String text, String message) {

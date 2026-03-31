@@ -78,6 +78,7 @@ import com.minicad.topology.VertexLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -85,6 +86,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 /**
@@ -113,7 +115,7 @@ public final class StepPreviewJsonExporter {
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
         long payloadStartedAt = System.nanoTime();
-        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        PreviewPayload payload = buildPayload(stepFile, resolved, builder);
         log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
                 "payload_geometry_summary",
                 countTrianglePoints(payload),
@@ -134,6 +136,41 @@ public final class StepPreviewJsonExporter {
         log.info("stage={} elapsedMs={}, jsonLength={}", "json_done", elapsedMillis(jsonStartedAt), json.length());
         log.info("stage={} totalElapsedMs={}", "export_done", elapsedMillis(startedAt));
         return json;
+    }
+
+    public static byte[] exportBinary(String stepText) {
+        long startedAt = System.nanoTime();
+        log.info("stage={} textLength={}", "binary_export_start", stepText.length());
+        long parseStartedAt = System.nanoTime();
+        StepFile stepFile = StepParser.parse(stepText);
+        log.info("stage={} elapsedMs={}, entityCount={}", "binary_parse_done", elapsedMillis(parseStartedAt), stepFile.entities().size());
+        long resolveStartedAt = System.nanoTime();
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+        log.info("stage={} elapsedMs={}, resolvedCount={}", "binary_resolve_done", elapsedMillis(resolveStartedAt), resolved.size());
+        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+
+        long payloadStartedAt = System.nanoTime();
+        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
+                "binary_payload_geometry_summary",
+                countTrianglePoints(payload),
+                countLoopPoints(payload),
+                countEdgePoints(payload),
+                countPmiPoints(payload),
+                payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
+                payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
+        log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "binary_payload_done",
+                elapsedMillis(payloadStartedAt),
+                payload.faces().size(),
+                payload.edges().size(),
+                payload.unsupportedFaces().size(),
+                payload.representations().size(),
+                payload.instances().size());
+        long binaryStartedAt = System.nanoTime();
+        byte[] binary = toBinary(payload);
+        log.info("stage={} elapsedMs={}, binaryLength={}", "binary_encode_done", elapsedMillis(binaryStartedAt), binary.length);
+        log.info("stage={} totalElapsedMs={}", "binary_export_done", elapsedMillis(startedAt));
+        return binary;
     }
 
     private static PreviewPayload buildPayload(
@@ -3722,6 +3759,201 @@ public final class StepPreviewJsonExporter {
         return json.toString();
     }
 
+    private static byte[] toBinary(PreviewPayload payload) {
+        BinaryGeometryBuffer geometry = new BinaryGeometryBuffer();
+        BinaryPreviewPayload binaryPayload = toBinaryPayload(payload, geometry);
+        byte[] metadata = toBinaryMetadataJson(binaryPayload).getBytes(StandardCharsets.UTF_8);
+        int geometryOffset = alignTo4(16 + metadata.length);
+        ByteArrayOutputStream output = new ByteArrayOutputStream(geometryOffset + geometry.size());
+        output.writeBytes(new byte[]{'M', 'C', 'P', 'B'});
+        writeIntLE(output, 1);
+        writeIntLE(output, metadata.length);
+        writeIntLE(output, geometryOffset);
+        output.writeBytes(metadata);
+        while (output.size() < geometryOffset) {
+            output.write(0);
+        }
+        output.writeBytes(geometry.toByteArray());
+        return output.toByteArray();
+    }
+
+    private static BinaryPreviewPayload toBinaryPayload(PreviewPayload payload, BinaryGeometryBuffer geometry) {
+        return new BinaryPreviewPayload(
+                payload.stats(),
+                payload.bounds(),
+                payload.validation(),
+                payload.pmi(),
+                payload.unsupportedFaces(),
+                payload.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
+                payload.faces().stream().map(face -> toBinaryFace(face, geometry)).toList(),
+                payload.representations().stream().map(representation -> new BinaryRepresentationPayload(
+                        representation.id(),
+                        representation.name(),
+                        representation.layers(),
+                        representation.color(),
+                        representation.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
+                        representation.faces().stream().map(face -> toBinaryFace(face, geometry)).toList()
+                )).toList(),
+                payload.instances()
+        );
+    }
+
+    private static BinaryEdgePayload toBinaryEdge(EdgePayload edge, BinaryGeometryBuffer geometry) {
+        PointRange range = geometry.append(edge.points());
+        return new BinaryEdgePayload(edge.stepId(), range.offset(), range.count());
+    }
+
+    private static BinaryFacePayload toBinaryFace(FacePayload face, BinaryGeometryBuffer geometry) {
+        PointRange triangles = geometry.append(face.triangles());
+        List<BinaryLoopPayload> loops = face.loops().stream()
+                .map(loop -> {
+                    PointRange range = geometry.append(loop.points());
+                    return new BinaryLoopPayload(loop.outer(), range.offset(), range.count());
+                })
+                .toList();
+        return new BinaryFacePayload(
+                face.stepId(),
+                face.name(),
+                face.surfaceType(),
+                face.origin(),
+                face.normal(),
+                face.sameSense(),
+                face.color(),
+                face.layers(),
+                loops,
+                triangles.offset(),
+                triangles.count()
+        );
+    }
+
+    private static String toBinaryMetadataJson(BinaryPreviewPayload payload) {
+        StringBuilder json = new StringBuilder(4096);
+        json.append('{');
+        json.append("\"format\":\"binary-preview-v1\"");
+        json.append(",\"pointEncoding\":\"float32-le\"");
+        json.append(",\"pointStride\":3");
+        json.append(",\"stats\":");
+        appendStats(json, payload.stats());
+        json.append(",\"bounds\":");
+        appendBounds(json, payload.bounds());
+        json.append(",\"validation\":");
+        appendValidation(json, payload.validation());
+        json.append(",\"pmi\":");
+        appendPmi(json, payload.pmi());
+        json.append(",\"unsupportedFaces\":");
+        appendUnsupportedFaces(json, payload.unsupportedFaces());
+        json.append(",\"edges\":");
+        appendBinaryEdges(json, payload.edges());
+        json.append(",\"faces\":");
+        appendBinaryFaces(json, payload.faces());
+        json.append(",\"representations\":");
+        appendBinaryRepresentations(json, payload.representations());
+        json.append(",\"instances\":");
+        appendInstances(json, payload.instances());
+        json.append('}');
+        return json.toString();
+    }
+
+    private static void appendBinaryEdges(StringBuilder json, List<BinaryEdgePayload> edges) {
+        json.append('[');
+        for (int i = 0; i < edges.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            BinaryEdgePayload edge = edges.get(i);
+            json.append('{');
+            json.append("\"id\":").append(edge.stepId());
+            json.append(",\"pointOffset\":").append(edge.pointOffset());
+            json.append(",\"pointCount\":").append(edge.pointCount());
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static void appendBinaryFaces(StringBuilder json, List<BinaryFacePayload> faces) {
+        json.append('[');
+        for (int i = 0; i < faces.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            BinaryFacePayload face = faces.get(i);
+            json.append('{');
+            json.append("\"id\":").append(face.stepId());
+            json.append(",\"name\":").append(quote(face.name()));
+            json.append(",\"surfaceType\":").append(quote(face.surfaceType()));
+            json.append(",\"origin\":");
+            appendPoint(json, face.origin());
+            json.append(",\"normal\":");
+            appendVector(json, face.normal());
+            json.append(",\"sameSense\":").append(face.sameSense());
+            json.append(",\"color\":");
+            appendColor(json, face.color());
+            json.append(",\"layers\":");
+            appendStringList(json, face.layers());
+            json.append(",\"loops\":");
+            appendBinaryLoops(json, face.loops());
+            json.append(",\"triangleOffset\":").append(face.triangleOffset());
+            json.append(",\"triangleCount\":").append(face.triangleCount());
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static void appendBinaryLoops(StringBuilder json, List<BinaryLoopPayload> loops) {
+        json.append('[');
+        for (int i = 0; i < loops.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            BinaryLoopPayload loop = loops.get(i);
+            json.append('{');
+            json.append("\"outer\":").append(loop.outer());
+            json.append(",\"pointOffset\":").append(loop.pointOffset());
+            json.append(",\"pointCount\":").append(loop.pointCount());
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static void appendBinaryRepresentations(StringBuilder json, List<BinaryRepresentationPayload> representations) {
+        json.append('[');
+        for (int i = 0; i < representations.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            BinaryRepresentationPayload representation = representations.get(i);
+            json.append('{');
+            json.append("\"id\":").append(representation.id());
+            json.append(",\"name\":").append(quote(representation.name()));
+            json.append(",\"layers\":");
+            appendStringList(json, representation.layers());
+            json.append(",\"color\":");
+            appendColor(json, representation.color());
+            json.append(",\"edges\":");
+            appendBinaryEdges(json, representation.edges());
+            json.append(",\"faces\":");
+            appendBinaryFaces(json, representation.faces());
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static int alignTo4(int value) {
+        int remainder = value % 4;
+        return remainder == 0 ? value : value + (4 - remainder);
+    }
+
+    private static void writeIntLE(ByteArrayOutputStream output, int value) {
+        output.write(value & 0xFF);
+        output.write((value >>> 8) & 0xFF);
+        output.write((value >>> 16) & 0xFF);
+        output.write((value >>> 24) & 0xFF);
+    }
+
+    private static void writeFloatLE(ByteArrayOutputStream output, float value) {
+        writeIntLE(output, Float.floatToRawIntBits(value));
+    }
+
     private static void appendStats(StringBuilder json, PreviewStats stats) {
         json.append('{');
         json.append("\"entityCount\":").append(stats.entityCount());
@@ -4209,6 +4441,53 @@ public final class StepPreviewJsonExporter {
     ) {
     }
 
+    private record BinaryPreviewPayload(
+            PreviewStats stats,
+            BoundsPayload bounds,
+            ValidationPayload validation,
+            List<PmiPayload> pmi,
+            List<UnsupportedFacePayload> unsupportedFaces,
+            List<BinaryEdgePayload> edges,
+            List<BinaryFacePayload> faces,
+            List<BinaryRepresentationPayload> representations,
+            List<InstancePayload> instances
+    ) {
+    }
+
+    private record BinaryRepresentationPayload(
+            int id,
+            String name,
+            List<String> layers,
+            ColorPayload color,
+            List<BinaryEdgePayload> edges,
+            List<BinaryFacePayload> faces
+    ) {
+    }
+
+    private record BinaryEdgePayload(int stepId, int pointOffset, int pointCount) {
+    }
+
+    private record BinaryFacePayload(
+            int stepId,
+            String name,
+            String surfaceType,
+            PointPayload origin,
+            VectorPayload normal,
+            boolean sameSense,
+            ColorPayload color,
+            List<String> layers,
+            List<BinaryLoopPayload> loops,
+            int triangleOffset,
+            int triangleCount
+    ) {
+    }
+
+    private record BinaryLoopPayload(boolean outer, int pointOffset, int pointCount) {
+    }
+
+    private record PointRange(int offset, int count) {
+    }
+
     private interface ParametricSurfaceMapper {
         UvPoint project(CartesianPoint point, UvPoint previous);
 
@@ -4423,5 +4702,29 @@ public final class StepPreviewJsonExporter {
 
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
+    }
+
+    private static final class BinaryGeometryBuffer {
+        private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        private int pointCount;
+
+        PointRange append(List<PointPayload> points) {
+            int offset = pointCount;
+            for (PointPayload point : points) {
+                writeFloatLE(output, (float) point.x());
+                writeFloatLE(output, (float) point.y());
+                writeFloatLE(output, (float) point.z());
+                pointCount++;
+            }
+            return new PointRange(offset, points.size());
+        }
+
+        int size() {
+            return output.size();
+        }
+
+        byte[] toByteArray() {
+            return output.toByteArray();
+        }
     }
 }

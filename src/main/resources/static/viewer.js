@@ -520,21 +520,62 @@ function pointsBounds(points) {
     return box;
 }
 
-function representationBounds(representation) {
+function pointBufferSlice(pointBuffer, pointOffset, pointCount) {
+    if (!(pointBuffer instanceof Float32Array) || !Number.isInteger(pointOffset) || !Number.isInteger(pointCount) || pointCount <= 0) {
+        return null;
+    }
+    return pointBuffer.subarray(pointOffset * 3, (pointOffset + pointCount) * 3);
+}
+
+function pointFromBuffer(pointBuffer, pointOffset, index = 0) {
+    const base = (pointOffset + index) * 3;
+    return [pointBuffer[base], pointBuffer[base + 1], pointBuffer[base + 2]];
+}
+
+function pointCountOfEdge(edge) {
+    return Number.isInteger(edge?.pointCount) ? edge.pointCount : (Array.isArray(edge?.points) ? edge.points.length : 0);
+}
+
+function pointCountOfLoop(loop) {
+    return Number.isInteger(loop?.pointCount) ? loop.pointCount : (Array.isArray(loop?.points) ? loop.points.length : 0);
+}
+
+function pointCountOfFaceTriangles(face) {
+    return Number.isInteger(face?.triangleCount) ? face.triangleCount : (Array.isArray(face?.triangles) ? face.triangles.length : 0);
+}
+
+function loopPointsToVector3(loop, pointBuffer) {
+    if (Number.isInteger(loop?.pointOffset) && Number.isInteger(loop?.pointCount)) {
+        const slice = pointBufferSlice(pointBuffer, loop.pointOffset, loop.pointCount);
+        const points = [];
+        for (let i = 0; i < slice.length; i += 3) {
+            points.push(new THREE.Vector3(slice[i], slice[i + 1], slice[i + 2]));
+        }
+        return points;
+    }
+    return Array.isArray(loop?.points) ? loop.points.map(toVector3) : [];
+}
+
+function representationBounds(representation, pointBuffer = null) {
     const box = new THREE.Box3();
     let hasPoint = false;
 
     for (const face of Array.isArray(representation?.faces) ? representation.faces : []) {
-        for (const triangle of Array.isArray(face?.triangles) ? face.triangles : []) {
-            if (Array.isArray(triangle) && triangle.length >= 3) {
-                box.expandByPoint(new THREE.Vector3(triangle[0], triangle[1], triangle[2]));
+        const triangleSlice = pointBufferSlice(pointBuffer, face?.triangleOffset, face?.triangleCount);
+        if (triangleSlice) {
+            for (let i = 0; i < triangleSlice.length; i += 3) {
+                box.expandByPoint(new THREE.Vector3(triangleSlice[i], triangleSlice[i + 1], triangleSlice[i + 2]));
                 hasPoint = true;
             }
         }
         for (const loop of Array.isArray(face?.loops) ? face.loops : []) {
-            for (const point of Array.isArray(loop?.points) ? loop.points : []) {
+            const points = Number.isInteger(loop?.pointOffset) ? loopPointsToVector3(loop, pointBuffer) : (Array.isArray(loop?.points) ? loop.points : []);
+            for (const point of points) {
                 if (Array.isArray(point) && point.length >= 3) {
                     box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
+                    hasPoint = true;
+                } else if (point?.isVector3) {
+                    box.expandByPoint(point);
                     hasPoint = true;
                 }
             }
@@ -542,9 +583,22 @@ function representationBounds(representation) {
     }
 
     for (const edge of Array.isArray(representation?.edges) ? representation.edges : []) {
-        for (const point of Array.isArray(edge?.points) ? edge.points : []) {
+        const points = Number.isInteger(edge?.pointOffset)
+            ? (() => {
+                const slice = pointBufferSlice(pointBuffer, edge.pointOffset, edge.pointCount);
+                const list = [];
+                for (let i = 0; i < slice.length; i += 3) {
+                    list.push(new THREE.Vector3(slice[i], slice[i + 1], slice[i + 2]));
+                }
+                return list;
+            })()
+            : (Array.isArray(edge?.points) ? edge.points : []);
+        for (const point of points) {
             if (Array.isArray(point) && point.length >= 3) {
                 box.expandByPoint(new THREE.Vector3(point[0], point[1], point[2]));
+                hasPoint = true;
+            } else if (point?.isVector3) {
+                box.expandByPoint(point);
                 hasPoint = true;
             }
         }
@@ -620,15 +674,36 @@ function signedArea(points) {
     return area * 0.5;
 }
 
-function buildFaceMesh(face) {
+function buildFaceMesh(face, pointBuffer = null) {
     logDebug('buildFaceMesh:start', {
         id: face?.id,
         name: face?.name,
         surfaceType: face?.surfaceType,
-        triangleCount: Array.isArray(face?.triangles) ? face.triangles.length : 0,
+        triangleCount: pointCountOfFaceTriangles(face),
         loopCount: Array.isArray(face?.loops) ? face.loops.length : 0
     });
     const color = Array.isArray(face.color) ? new THREE.Color(face.color[0] / 255, face.color[1] / 255, face.color[2] / 255) : new THREE.Color(0xc87a52);
+    const triangleSlice = pointBufferSlice(pointBuffer, face?.triangleOffset, face?.triangleCount);
+    if (triangleSlice && face.triangleCount >= 3) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(triangleSlice, 3));
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshStandardMaterial({
+            color,
+            transparent: true,
+            opacity: 0.62,
+            side: THREE.DoubleSide,
+            roughness: 0.48,
+            metalness: 0.08
+        });
+
+        logDebug('buildFaceMesh:binary-triangles', {
+            id: face.id,
+            vertices: face.triangleCount
+        });
+        return new THREE.Mesh(geometry, material);
+    }
     if (Array.isArray(face.triangles) && face.triangles.length >= 3) {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(face.triangles.flat(), 3));
@@ -651,16 +726,17 @@ function buildFaceMesh(face) {
     }
 
     const outerLoop = face.loops.find((loop) => loop.outer);
-    if (!outerLoop || outerLoop.points.length < 3) {
+    const outerLoopPointCount = pointCountOfLoop(outerLoop);
+    if (!outerLoop || outerLoopPointCount < 3) {
         logWarn('buildFaceMesh:missing-outer-loop', {
             id: face?.id,
-            outerLoopPoints: outerLoop?.points?.length ?? 0
+            outerLoopPoints: outerLoopPointCount
         });
         return null;
     }
 
     const normal = toVector3(face.normal).normalize();
-    const outerPoints3D = normalizeLoop(outerLoop.points.map(toVector3));
+    const outerPoints3D = normalizeLoop(loopPointsToVector3(outerLoop, pointBuffer));
     const outerProjection = projectFace(outerPoints3D, normal);
     if (!outerProjection) {
         logWarn('buildFaceMesh:projection-failed', {
@@ -683,7 +759,7 @@ function buildFaceMesh(face) {
     const holes3D = [];
 
     for (const loop of face.loops.filter((entry) => !entry.outer)) {
-        const loopPoints3D = normalizeLoop(loop.points.map(toVector3));
+        const loopPoints3D = normalizeLoop(loopPointsToVector3(loop, pointBuffer));
         if (loopPoints3D.length < 3) {
             continue;
         }
@@ -741,22 +817,30 @@ function buildFaceMesh(face) {
     return new THREE.Mesh(geometry, material);
 }
 
-function buildEdgeObject(edge, edgeIndex) {
+function buildEdgeObject(edge, edgeIndex, pointBuffer = null) {
     logDebug('buildEdgeObject', {
         id: edge?.id,
         edgeIndex,
-        pointCount: Array.isArray(edge?.points) ? edge.points.length : 0
+        pointCount: pointCountOfEdge(edge)
     });
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
+    const compactSlice = pointBufferSlice(pointBuffer, edge?.pointOffset, edge?.pointCount);
+    if (compactSlice) {
+        geometry.setAttribute('position', new THREE.BufferAttribute(compactSlice, 3));
+    } else {
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(edge.points.flat(), 3));
+    }
     const material = new THREE.LineBasicMaterial({ color: 0x9b8578, transparent: true, opacity: 0.62 });
     const object = new THREE.Line(geometry, material);
+    const firstPoint = compactSlice ? pointFromBuffer(pointBuffer, edge.pointOffset, 0) : edge.points[0];
+    const lastPoint = compactSlice ? pointFromBuffer(pointBuffer, edge.pointOffset, edge.pointCount - 1) : edge.points[edge.points.length - 1];
+    const pointCount = pointCountOfEdge(edge);
     object.userData.selection = [
         ['类型', `边 #${edgeIndex + 1}`],
-        ['采样点', String(edge.points.length)],
-        ['线段数', String(Math.max(0, edge.points.length - 1))],
-        ['起点', formatPoint(edge.points[0])],
-        ['终点', formatPoint(edge.points[edge.points.length - 1])]
+        ['采样点', String(pointCount)],
+        ['线段数', String(Math.max(0, pointCount - 1))],
+        ['起点', formatPoint(firstPoint)],
+        ['终点', formatPoint(lastPoint)]
     ];
     object.userData.baseColor = 0x9b8578;
     object.userData.selectedColor = 0xf06d3a;
@@ -766,14 +850,16 @@ function buildEdgeObject(edge, edgeIndex) {
     return object;
 }
 
-function buildEdgeObjectForInstance(edge, label) {
-    const line = buildEdgeObject(edge, 0);
+function buildEdgeObjectForInstance(edge, label, pointBuffer = null) {
+    const line = buildEdgeObject(edge, 0, pointBuffer);
+    const firstPoint = Number.isInteger(edge?.pointOffset) ? pointFromBuffer(pointBuffer, edge.pointOffset, 0) : edge.points[0];
+    const lastPoint = Number.isInteger(edge?.pointOffset) ? pointFromBuffer(pointBuffer, edge.pointOffset, edge.pointCount - 1) : edge.points[edge.points.length - 1];
     line.userData.selection = [
         ['类型', label],
-        ['采样点', String(edge.points.length)],
-        ['线段数', String(Math.max(0, edge.points.length - 1))],
-        ['起点', formatPoint(edge.points[0])],
-        ['终点', formatPoint(edge.points[edge.points.length - 1])]
+        ['采样点', String(pointCountOfEdge(edge))],
+        ['线段数', String(Math.max(0, pointCountOfEdge(edge) - 1))],
+        ['起点', formatPoint(firstPoint)],
+        ['终点', formatPoint(lastPoint)]
     ];
     return line;
 }
@@ -1186,10 +1272,11 @@ function renderPreview(preview) {
 }
 
 function renderLegacyPreview(preview) {
+    const pointBuffer = preview?.pointBuffer ?? null;
     let renderedFaceMeshes = 0;
     for (let index = 0; index < preview.faces.length; index += 1) {
         const face = preview.faces[index];
-        const mesh = buildFaceMesh(face);
+        const mesh = buildFaceMesh(face, pointBuffer);
         if (mesh) {
             const innerLoopCount = face.loops.filter((loop) => !loop.outer).length;
             const outerLoop = face.loops.find((loop) => loop.outer);
@@ -1202,7 +1289,7 @@ function renderLegacyPreview(preview) {
                 ['图层', formatLayers(face.layers)],
                 ['边界环', String(face.loops.length)],
                 ['内环', String(innerLoopCount)],
-                ['外环采样点', String(outerLoop ? outerLoop.points.length : 0)],
+                ['外环采样点', String(pointCountOfLoop(outerLoop))],
                 ['法向', formatPoint(face.normal)]
             ];
             mesh.userData.baseColor = mesh.material.color.getHex();
@@ -1226,7 +1313,7 @@ function renderLegacyPreview(preview) {
 
     let renderedEdges = 0;
     for (let index = 0; index < preview.edges.length; index += 1) {
-        const line = buildEdgeObject(preview.edges[index], index);
+        const line = buildEdgeObject(preview.edges[index], index, pointBuffer);
         line.userData.selection.splice(1, 0, ['STEP', `#${preview.edges[index].id}`]);
         line.userData.stepId = preview.edges[index].id;
         interactiveObjects.push(line);
@@ -1244,6 +1331,7 @@ function renderLegacyPreview(preview) {
 }
 
 function renderAssemblyPreview(preview) {
+    const pointBuffer = preview?.pointBuffer ?? null;
     logInfo('renderAssemblyPreview:start', {
         representationCount: preview.representations.length,
         instanceCount: preview.instances.length
@@ -1310,11 +1398,11 @@ function renderAssemblyPreview(preview) {
                 representationName: representation.name,
                 faceCount: Array.isArray(representation.faces) ? representation.faces.length : 0,
                 edgeCount: Array.isArray(representation.edges) ? representation.edges.length : 0,
-                representationBounds: boxToLog(representationBounds(representation))
+                representationBounds: boxToLog(representationBounds(representation, pointBuffer))
             });
             for (let faceIndex = 0; faceIndex < representation.faces.length; faceIndex += 1) {
                 const face = representation.faces[faceIndex];
-                const mesh = buildFaceMesh(face);
+                const mesh = buildFaceMesh(face, pointBuffer);
                 if (!mesh) {
                     logWarn('renderAssemblyPreview:face-mesh-null', {
                         instanceId: instance.id,
@@ -1356,7 +1444,8 @@ function renderAssemblyPreview(preview) {
             for (let edgeIndex = 0; edgeIndex < representation.edges.length; edgeIndex += 1) {
                 const line = buildEdgeObjectForInstance(
                     representation.edges[edgeIndex],
-                    `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`
+                    `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`,
+                    pointBuffer
                 );
                 line.userData.selection = [
                     ['类型', `${instanceGroup.userData.instanceLabel} / 边 #${edgeIndex + 1}`],
@@ -1365,10 +1454,14 @@ function renderAssemblyPreview(preview) {
                     ['实例', instance.id],
                     ['图层', formatLayers(representation.layers)],
                     ['颜色', formatColor(representation.color)],
-                    ['采样点', String(representation.edges[edgeIndex].points.length)],
-                    ['线段数', String(Math.max(0, representation.edges[edgeIndex].points.length - 1))],
-                    ['起点', formatPoint(representation.edges[edgeIndex].points[0])],
-                    ['终点', formatPoint(representation.edges[edgeIndex].points[representation.edges[edgeIndex].points.length - 1])]
+                    ['采样点', String(pointCountOfEdge(representation.edges[edgeIndex]))],
+                    ['线段数', String(Math.max(0, pointCountOfEdge(representation.edges[edgeIndex]) - 1))],
+                    ['起点', formatPoint(Number.isInteger(representation.edges[edgeIndex].pointOffset)
+                        ? pointFromBuffer(pointBuffer, representation.edges[edgeIndex].pointOffset, 0)
+                        : representation.edges[edgeIndex].points[0])],
+                    ['终点', formatPoint(Number.isInteger(representation.edges[edgeIndex].pointOffset)
+                        ? pointFromBuffer(pointBuffer, representation.edges[edgeIndex].pointOffset, representation.edges[edgeIndex].pointCount - 1)
+                        : representation.edges[edgeIndex].points[representation.edges[edgeIndex].points.length - 1])]
                 ];
                 line.userData.instanceSelectedColor = 0x537983;
                 line.userData.instanceId = instance.id;
@@ -1397,6 +1490,29 @@ function renderAssemblyPreview(preview) {
     });
 }
 
+function parsePreviewBinary(arrayBuffer) {
+    const view = new DataView(arrayBuffer);
+    const magic = String.fromCharCode(
+        view.getUint8(0),
+        view.getUint8(1),
+        view.getUint8(2),
+        view.getUint8(3)
+    );
+    if (magic !== 'MCPB') {
+        throw new Error('未知的预览二进制格式');
+    }
+    const version = view.getUint32(4, true);
+    if (version !== 1) {
+        throw new Error(`不支持的预览格式版本: ${version}`);
+    }
+    const metadataLength = view.getUint32(8, true);
+    const geometryOffset = view.getUint32(12, true);
+    const metadataBytes = new Uint8Array(arrayBuffer, 16, metadataLength);
+    const metadata = JSON.parse(new TextDecoder().decode(metadataBytes));
+    metadata.pointBuffer = new Float32Array(arrayBuffer, geometryOffset);
+    return metadata;
+}
+
 async function requestPreview(payload, metadata = {}) {
     const body = typeof payload === 'string' ? payload : payload;
     const contentType = typeof payload === 'string'
@@ -1417,6 +1533,23 @@ async function requestPreview(payload, metadata = {}) {
         },
         body
     });
+
+    const responseType = response.headers.get('Content-Type') || '';
+    if (response.ok && responseType.startsWith('application/vnd.minicad.preview+bin')) {
+        const arrayBuffer = await response.arrayBuffer();
+        const parsed = parsePreviewBinary(arrayBuffer);
+        logInfo('requestPreview:binary-response', {
+            ok: response.ok,
+            status: response.status,
+            binaryLength: arrayBuffer.byteLength,
+            faceCount: Array.isArray(parsed?.faces) ? parsed.faces.length : 0,
+            edgeCount: Array.isArray(parsed?.edges) ? parsed.edges.length : 0,
+            representationCount: Array.isArray(parsed?.representations) ? parsed.representations.length : 0,
+            instanceCount: Array.isArray(parsed?.instances) ? parsed.instances.length : 0
+        });
+        logJson('requestPreview:unsupported-summary', summarizeUnsupportedFaces(parsed?.unsupportedFaces));
+        return parsed;
+    }
 
     const text = await response.text();
     logInfo('requestPreview:response', {
@@ -1498,6 +1631,8 @@ loadExampleButton.addEventListener('click', async () => {
         if (!response.ok) {
             throw new Error('示例文件不可用');
         }
+        uploadedFileBytes = null;
+        uploadedFileName = null;
         stepInput.value = await response.text();
         setStatus(`示例 ${exampleSelect.value} 已加载，可以直接渲染。`);
         logInfo('loadExample:done', {
