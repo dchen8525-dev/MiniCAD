@@ -125,6 +125,9 @@ public final class StepViewerApp {
                 }
                 byte[] body = input.readAllBytes();
                 String contentType = contentTypeFor(resourcePath);
+                response.setHeader("Cache-Control", "no-store");
+                response.setHeader("Pragma", "no-cache");
+                response.setDateHeader("Expires", 0);
                 send(response, HttpServletResponse.SC_OK, contentType, body);
             }
         }

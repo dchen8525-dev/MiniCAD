@@ -7,8 +7,6 @@ import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 
 const fileInput = document.querySelector('#file-input');
 const renderButton = document.querySelector('#render-button');
-const loadExampleButton = document.querySelector('#load-example');
-const exampleSelect = document.querySelector('#example-select');
 const statusText = document.querySelector('#status-text');
 const validationDetails = document.querySelector('#validation-details');
 const validationReport = document.querySelector('#validation-report');
@@ -155,7 +153,6 @@ let edgeLinesVisible = false;
 let modelHasEdgeLines = false;
 let lastRenderScale = -1;
 let uploadedFile = null;
-let loadedExampleText = '';
 const viewerLogPrefix = '[MiniCAD Viewer]';
 
 function logDebug(message, ...args) {
@@ -1189,9 +1186,8 @@ async function requestPreview(payload, metadata = {}) {
 }
 
 async function renderCurrentInput() {
-    const stepText = loadedExampleText.trim();
-    if (!stepText && !uploadedFile) {
-        setStatus('请先选择 STEP 文件，或加载一个示例。');
+    if (!uploadedFile) {
+        setStatus('请先选择 STEP 文件。');
         updateStats();
         clearModel();
         return;
@@ -1199,14 +1195,10 @@ async function renderCurrentInput() {
 
     setStatus('正在解析 STEP 并生成预览...');
     try {
-        const preview = uploadedFile
-            ? await requestPreview(uploadedFile, {
-                source: 'file-form',
-                fileName: uploadedFile.name
-            })
-            : await requestPreview(stepText, {
-                source: 'textarea'
-            });
+        const preview = await requestPreview(uploadedFile, {
+            source: 'file-form',
+            fileName: uploadedFile.name
+        });
         renderGlbPreview(preview);
         const previewData = preview?.preview ?? {};
         const unsupported = previewData?.stats?.unsupportedFaceCount ?? 0;
@@ -1225,35 +1217,12 @@ renderButton.addEventListener('click', () => {
     void renderCurrentInput();
 });
 
-loadExampleButton.addEventListener('click', async () => {
-    setStatus('正在加载示例...');
-    try {
-        logInfo('loadExample:start', { example: exampleSelect.value });
-        const response = await fetch(`/api/example?name=${encodeURIComponent(exampleSelect.value)}`);
-        if (!response.ok) {
-            throw new Error('示例文件不可用');
-        }
-        uploadedFile = null;
-        loadedExampleText = await response.text();
-        setStatus(`示例 ${exampleSelect.value} 已加载，正在生成预览...`);
-        logInfo('loadExample:done', {
-            example: exampleSelect.value,
-            length: loadedExampleText.length
-        });
-        await renderCurrentInput();
-    } catch (error) {
-        setStatus(error.message);
-        logError('loadExample:failed', error);
-    }
-});
-
 fileInput.addEventListener('change', async (event) => {
     const [file] = event.target.files;
     if (!file) {
         return;
     }
     uploadedFile = file;
-    loadedExampleText = '';
     setStatus(`已选择文件：${file.name}，点击“解析并渲染”开始预览。`);
     const prefixBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     logInfo('fileInput:loaded', {
@@ -1263,6 +1232,7 @@ fileInput.addEventListener('change', async (event) => {
         byteLength: file.size,
         bodyPrefixHex: Array.from(prefixBytes).map((value) => value.toString(16).padStart(2, '0')).join(' ')
     });
+    void renderCurrentInput();
 });
 
 renderer.domElement.addEventListener('click', (event) => {
