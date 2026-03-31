@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const stepInput = document.querySelector('#step-input');
 const fileInput = document.querySelector('#file-input');
 const renderButton = document.querySelector('#render-button');
 const loadExampleButton = document.querySelector('#load-example');
@@ -153,6 +152,7 @@ let edgeLinesVisible = false;
 let modelHasEdgeLines = false;
 let lastRenderScale = -1;
 let uploadedFile = null;
+let loadedExampleText = '';
 const viewerLogPrefix = '[MiniCAD Viewer]';
 
 function logDebug(message, ...args) {
@@ -1111,9 +1111,9 @@ async function requestPreview(payload, metadata = {}) {
 }
 
 async function renderCurrentInput() {
-    const stepText = stepInput.value.trim();
+    const stepText = loadedExampleText.trim();
     if (!stepText && !uploadedFile) {
-        setStatus('请先提供 STEP 内容。');
+        setStatus('请先选择 STEP 文件，或加载一个示例。');
         updateStats();
         clearModel();
         return;
@@ -1147,10 +1147,6 @@ renderButton.addEventListener('click', () => {
     void renderCurrentInput();
 });
 
-stepInput.addEventListener('input', () => {
-    uploadedFile = null;
-});
-
 loadExampleButton.addEventListener('click', async () => {
     setStatus('正在加载示例...');
     try {
@@ -1160,12 +1156,13 @@ loadExampleButton.addEventListener('click', async () => {
             throw new Error('示例文件不可用');
         }
         uploadedFile = null;
-        stepInput.value = await response.text();
-        setStatus(`示例 ${exampleSelect.value} 已加载，可以直接渲染。`);
+        loadedExampleText = await response.text();
+        setStatus(`示例 ${exampleSelect.value} 已加载，正在生成预览...`);
         logInfo('loadExample:done', {
             example: exampleSelect.value,
-            length: stepInput.value.length
+            length: loadedExampleText.length
         });
+        await renderCurrentInput();
     } catch (error) {
         setStatus(error.message);
         logError('loadExample:failed', error);
@@ -1178,7 +1175,7 @@ fileInput.addEventListener('change', async (event) => {
         return;
     }
     uploadedFile = file;
-    stepInput.value = '';
+    loadedExampleText = '';
     setStatus(`已选择文件：${file.name}，点击“解析并渲染”开始预览。`);
     const prefixBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     logInfo('fileInput:loaded', {

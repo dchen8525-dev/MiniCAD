@@ -5,6 +5,7 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Part;
@@ -53,7 +54,9 @@ public final class StepViewerApp {
         context.addServlet(new ServletHolder(new StaticServlet()), "/");
         context.addServlet(new ServletHolder(new StaticServlet()), "/viewer.js");
         context.addServlet(new ServletHolder(new StaticServlet()), "/vendor/*");
-        context.addServlet(new ServletHolder(new PreviewServlet()), "/api/preview");
+        ServletHolder previewHolder = new ServletHolder(new PreviewServlet());
+        previewHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(System.getProperty("java.io.tmpdir")));
+        context.addServlet(previewHolder, "/api/preview");
         context.addServlet(new ServletHolder(new ExampleServlet()), "/api/example");
         server.setHandler(context);
         server.start();
