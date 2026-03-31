@@ -42,6 +42,10 @@ class StepTextReaderTest {
 
         assertEquals(expected, text);
         assertEquals(expected, StepTextReader.read(expected.getBytes(Charset.forName("GB18030"))));
+        assertEquals(
+                "GB18030",
+                StepTextReader.readDecoded(expected.getBytes(Charset.forName("GB18030"))).charset().name()
+        );
     }
 
     @Test
@@ -58,5 +62,9 @@ class StepTextReaderTest {
 
         assertEquals(expected, text);
         assertEquals(expected, StepTextReader.read(expected.getBytes(StandardCharsets.ISO_8859_1)));
+        assertEquals(
+                StandardCharsets.ISO_8859_1,
+                StepTextReader.readDecoded(expected.getBytes(StandardCharsets.ISO_8859_1)).charset()
+        );
     }
 }

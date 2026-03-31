@@ -27,14 +27,18 @@ final class StepTextReader {
     }
 
     static String read(Path path) throws IOException {
-        return read(Files.readAllBytes(path));
+        return readDecoded(Files.readAllBytes(path)).text();
     }
 
     static String read(byte[] bytes) throws IOException {
+        return readDecoded(bytes).text();
+    }
+
+    static DecodedStepText readDecoded(byte[] bytes) throws IOException {
         CharacterCodingException lastFailure = null;
         for (Charset charset : CHARSET_FALLBACKS) {
             try {
-                return decode(bytes, charset);
+                return new DecodedStepText(decode(bytes, charset), charset);
             } catch (CharacterCodingException ex) {
                 lastFailure = ex;
             }
@@ -51,5 +55,8 @@ final class StepTextReader {
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
         CharBuffer decoded = decoder.decode(ByteBuffer.wrap(bytes));
         return decoded.toString();
+    }
+
+    record DecodedStepText(String text, Charset charset) {
     }
 }

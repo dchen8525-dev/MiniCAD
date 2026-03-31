@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Lightweight local web app for viewing supported STEP topology in the browser.
@@ -27,6 +29,7 @@ public final class StepViewerApp {
 
     private static final Logger log = LoggerFactory.getLogger(StepViewerApp.class);
     private static final int DEFAULT_PORT = 8080;
+    private static final Pattern POSITION_PATTERN = Pattern.compile("position (\\d+)");
 
     private StepViewerApp() {
     }
@@ -159,10 +162,14 @@ public final class StepViewerApp {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
             byte[] requestBody = request.getInputStream().readAllBytes();
-            String stepText = StepTextReader.read(requestBody);
-            log.info("requestId=1 stage={} remote={}, bytes={}, textLength={}",
+            StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
+            String stepText = decodedStepText.text();
+            log.info("requestId=1 stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
                     "request_received", request.getRemoteAddr(),
-                    requestBody.length, stepText.length());
+                    request.getContentType(),
+                    requestBody.length, stepText.length(),
+                    decodedStepText.charset().name(),
+                    hexPrefix(requestBody, 16));
             if (stepText.isBlank()) {
                 log.info("requestId=1 stage={} reason=blank_body", "request_rejected");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
@@ -184,6 +191,10 @@ public final class StepViewerApp {
                 log.info("requestId=1 stage={} elapsedMs={}, errorType={}, message={}",
                         "export_failed", elapsedMillis(startedAt),
                         ex.getClass().getSimpleName(), ex.getMessage());
+                if (ex instanceof StepParseException parseException) {
+                    log.info("requestId=1 stage={} context={}",
+                            "export_failed_context", diagnosticContext(stepText, parseException.getMessage()));
+                }
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
             }
         }
@@ -271,5 +282,43 @@ public final class StepViewerApp {
 
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
+    }
+
+    private static String diagnosticContext(String text, String message) {
+        Matcher matcher = POSITION_PATTERN.matcher(message);
+        if (!matcher.find()) {
+            return "unavailable";
+        }
+        int position;
+        try {
+            position = Integer.parseInt(matcher.group(1));
+        } catch (NumberFormatException ex) {
+            return "unavailable";
+        }
+        if (position < 0 || position > text.length()) {
+            return "position_out_of_range";
+        }
+        int start = Math.max(0, position - 80);
+        int end = Math.min(text.length(), position + 80);
+        String excerpt = text.substring(start, end)
+                .replace("\\", "\\\\")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
+        return "position=" + position
+                + ", windowStart=" + start
+                + ", windowEnd=" + end
+                + ", excerpt=\"" + excerpt + "\"";
+    }
+
+    private static String hexPrefix(byte[] bytes, int maxLength) {
+        int limit = Math.min(bytes.length, maxLength);
+        StringBuilder builder = new StringBuilder(limit * 3);
+        for (int i = 0; i < limit; i++) {
+            if (i > 0) {
+                builder.append(' ');
+            }
+            builder.append(String.format("%02X", bytes[i]));
+        }
+        return builder.toString();
     }
 }

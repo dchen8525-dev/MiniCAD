@@ -147,6 +147,8 @@ const stepObjects = new Map();
 let pmiLabels = [];
 let pmiVisible = true;
 let lastRenderScale = -1;
+let uploadedFileBytes = null;
+let uploadedFileName = null;
 const viewerLogPrefix = '[MiniCAD Viewer]';
 
 function logDebug(message, ...args) {
@@ -1395,17 +1397,25 @@ function renderAssemblyPreview(preview) {
     });
 }
 
-async function requestPreview(stepText) {
+async function requestPreview(payload, metadata = {}) {
+    const body = typeof payload === 'string' ? payload : payload;
+    const contentType = typeof payload === 'string'
+        ? 'text/plain; charset=utf-8'
+        : 'application/octet-stream';
     logInfo('requestPreview:start', {
-        stepLength: stepText.length,
-        previewRoute: '/api/preview'
+        previewRoute: '/api/preview',
+        contentType,
+        source: metadata.source ?? 'unknown',
+        fileName: metadata.fileName ?? null,
+        stepLength: typeof payload === 'string' ? payload.length : null,
+        byteLength: typeof payload === 'string' ? null : payload.byteLength
     });
     const response = await fetch('/api/preview', {
         method: 'POST',
         headers: {
-            'Content-Type': 'text/plain; charset=utf-8'
+            'Content-Type': contentType
         },
-        body: stepText
+        body
     });
 
     const text = await response.text();
@@ -1441,7 +1451,7 @@ async function requestPreview(stepText) {
 
 async function renderCurrentInput() {
     const stepText = stepInput.value.trim();
-    if (!stepText) {
+    if (!stepText && !uploadedFileBytes) {
         setStatus('请先提供 STEP 内容。');
         updateStats();
         clearModel();
@@ -1450,7 +1460,14 @@ async function renderCurrentInput() {
 
     setStatus('正在解析 STEP 并生成预览...');
     try {
-        const preview = await requestPreview(stepText);
+        const preview = uploadedFileBytes
+            ? await requestPreview(uploadedFileBytes, {
+                source: 'file-bytes',
+                fileName: uploadedFileName
+            })
+            : await requestPreview(stepText, {
+                source: 'textarea'
+            });
         renderPreview(preview);
         const unsupported = preview.stats.unsupportedFaceCount ?? 0;
         const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
@@ -1466,6 +1483,11 @@ async function renderCurrentInput() {
 
 renderButton.addEventListener('click', () => {
     void renderCurrentInput();
+});
+
+stepInput.addEventListener('input', () => {
+    uploadedFileBytes = null;
+    uploadedFileName = null;
 });
 
 loadExampleButton.addEventListener('click', async () => {
@@ -1493,12 +1515,17 @@ fileInput.addEventListener('change', async (event) => {
     if (!file) {
         return;
     }
+    const arrayBuffer = await file.arrayBuffer();
+    uploadedFileBytes = new Uint8Array(arrayBuffer);
+    uploadedFileName = file.name;
     stepInput.value = await file.text();
     setStatus(`已载入文件：${file.name}`);
     logInfo('fileInput:loaded', {
         fileName: file.name,
         size: file.size,
-        textLength: stepInput.value.length
+        textLength: stepInput.value.length,
+        byteLength: uploadedFileBytes.byteLength,
+        bodyPrefixHex: Array.from(uploadedFileBytes.slice(0, 16)).map((value) => value.toString(16).padStart(2, '0')).join(' ')
     });
 });
 
