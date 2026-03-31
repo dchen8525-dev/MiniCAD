@@ -1095,27 +1095,27 @@ public final class StepPreviewJsonExporter {
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
         // Preview meshes should stay light enough for API transport and browser upload.
-        int baseUSegments = Math.max(48, Math.min(128, sampleCount * 4));
-        int baseVSegments = Math.max(24, Math.min(64, sampleCount * 3));
+        int baseUSegments = Math.max(12, Math.min(32, sampleCount * 2));
+        int baseVSegments = Math.max(8, Math.min(24, sampleCount * 2));
         if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            baseUSegments = Math.max(18, Math.min(36, sampleCount * 2));
-            baseVSegments = Math.max(12, Math.min(24, sampleCount * 2));
+            baseUSegments = Math.max(12, Math.min(24, sampleCount * 2));
+            baseVSegments = Math.max(8, Math.min(18, sampleCount * 2));
         } else if (geometry instanceof StepPlane) {
-            int planeSegments = Math.max(96, Math.min(192, sampleCount * 5));
+            int planeSegments = Math.max(16, Math.min(32, sampleCount * 2));
             if (loops.size() > 1) {
-                planeSegments = Math.max(planeSegments, 160);
+                planeSegments = Math.max(planeSegments, 40);
             }
             double dominantSpan = Math.max(uvBounds.uSpan(), uvBounds.vSpan());
             double uRatio = dominantSpan <= Epsilon.EPS ? 1.0 : uvBounds.uSpan() / dominantSpan;
             double vRatio = dominantSpan <= Epsilon.EPS ? 1.0 : uvBounds.vSpan() / dominantSpan;
-            baseUSegments = Math.max(baseUSegments, Math.max(96, (int) Math.ceil(planeSegments * uRatio)));
-            baseVSegments = Math.max(baseVSegments, Math.max(96, (int) Math.ceil(planeSegments * vRatio)));
+            baseUSegments = Math.max(baseUSegments, Math.max(16, (int) Math.ceil(planeSegments * uRatio)));
+            baseVSegments = Math.max(baseVSegments, Math.max(16, (int) Math.ceil(planeSegments * vRatio)));
         } else if (geometry instanceof StepCylindricalSurface) {
-            baseUSegments = Math.max(baseUSegments, 96);
-            baseVSegments = Math.max(baseVSegments, 32);
+            baseUSegments = Math.max(baseUSegments, 28);
+            baseVSegments = Math.max(baseVSegments, 16);
         } else if (geometry instanceof StepConicalSurface || geometry instanceof StepToroidalSurface) {
-            baseUSegments = Math.max(baseUSegments, 96);
-            baseVSegments = Math.max(baseVSegments, 32);
+            baseUSegments = Math.max(baseUSegments, 28);
+            baseVSegments = Math.max(baseVSegments, 16);
         }
         List<PointPayload> triangles = triangulateParametricFaceAdaptive(
                 mapper,
