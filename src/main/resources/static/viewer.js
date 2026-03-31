@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Line2 } from 'three/addons/lines/Line2.js';
-import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
-import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 
 const fileInput = document.querySelector('#file-input');
 const renderButton = document.querySelector('#render-button');
@@ -290,19 +287,6 @@ function updateRenderResolution(force = false) {
     postMaterial.uniforms.resolution.value.set(scaledWidth, scaledHeight);
 }
 
-function updateLineMaterialResolution(root = scene) {
-    const width = Math.max(1, sceneHost.clientWidth);
-    const height = Math.max(1, sceneHost.clientHeight);
-    root.traverse((node) => {
-        const materials = Array.isArray(node.material) ? node.material : [node.material];
-        for (const material of materials) {
-            if (material?.isLineMaterial) {
-                material.resolution.set(width, height);
-            }
-        }
-    });
-}
-
 function resize() {
     const width = sceneHost.clientWidth;
     const height = sceneHost.clientHeight;
@@ -313,7 +297,6 @@ function resize() {
     updateRenderResolution(true);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    updateLineMaterialResolution();
 }
 
 window.addEventListener('resize', resize);
@@ -695,59 +678,16 @@ function formatLayers(layers) {
     return Array.isArray(layers) && layers.length > 0 ? layers.join(', ') : '未指定';
 }
 
-function lineColorHex(node, fallback = 0x9b8578) {
-    if (node?.material?.color) {
-        return node.material.color.getHex();
-    }
-    return fallback;
-}
-
-function createAntialiasedLine(node, colorHex, opacity = 0.72, lineWidth = 1.6) {
-    const positions = node.geometry?.getAttribute?.('position');
-    if (!positions || positions.count < 2) {
-        return node;
-    }
-    const geometry = new LineGeometry();
-    geometry.setPositions(Array.from(positions.array));
-    const material = new LineMaterial({
-        color: colorHex,
-        linewidth: lineWidth,
-        transparent: opacity < 0.999,
-        opacity,
-        worldUnits: false,
-        alphaToCoverage: true
-    });
-    material.resolution.set(Math.max(1, sceneHost.clientWidth), Math.max(1, sceneHost.clientHeight));
-    const line = new Line2(geometry, material);
-    line.computeLineDistances();
-    line.position.copy(node.position);
-    line.quaternion.copy(node.quaternion);
-    line.scale.copy(node.scale);
-    line.visible = node.visible;
-    line.name = node.name;
-    line.userData = { ...node.userData };
-    return line;
-}
-
 function renderPmi(pmi) {
     if (!Array.isArray(pmi) || pmi.length === 0) {
         return;
     }
     for (const item of pmi) {
         if (Array.isArray(item.leader) && item.leader.length >= 2) {
-            const geometry = new LineGeometry();
-            geometry.setPositions(item.leader.flat());
-            const material = new LineMaterial({
-                color: 0x4a423d,
-                linewidth: 1.4,
-                transparent: false,
-                worldUnits: false,
-                alphaToCoverage: true
-            });
-            material.resolution.set(Math.max(1, sceneHost.clientWidth), Math.max(1, sceneHost.clientHeight));
-            const line = new Line2(geometry, material);
-            line.computeLineDistances();
-            pmiRoot.add(line);
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(item.leader.flat(), 3));
+            const material = new THREE.LineBasicMaterial({ color: 0x4a423d });
+            pmiRoot.add(new THREE.Line(geometry, material));
         }
         const label = document.createElement('div');
         label.className = 'pmi-label';
@@ -806,8 +746,7 @@ function updateEdgeToggleButton() {
 
 function isEdgeRenderable(node) {
     return node?.userData?.kind === 'edge'
-        || node?.isLine
-        || node?.material?.isLineMaterial === true;
+        || node?.isLine;
 }
 
 function applyEdgeVisibility() {
@@ -830,9 +769,6 @@ function refreshRenderableStyle(object) {
         object.material.opacity = 1.0;
         object.material.transparent = false;
         object.material.depthWrite = true;
-        object.material.needsUpdate = true;
-    } else if (object.material?.isLineMaterial) {
-        object.material.opacity = object.userData.objectSelected ? 0.98 : object.userData.instanceHighlighted ? 0.9 : 0.78;
         object.material.needsUpdate = true;
     }
 }
@@ -1032,13 +968,6 @@ function renderGlbPreview(result) {
                 side: THREE.DoubleSide
             });
         }
-        if (node.isLine && node.parent) {
-            const antialiasedLine = createAntialiasedLine(node, lineColorHex(node));
-            node.parent.add(antialiasedLine);
-            node.parent.remove(node);
-            disposeObject(node);
-            node = antialiasedLine;
-        }
         if (Array.isArray(node.userData?.selection)) {
             if (node.material?.color) {
                 node.userData.baseColor = node.material.color.getHex();
@@ -1055,8 +984,6 @@ function renderGlbPreview(result) {
     });
     edgeLinesVisible = false;
     applyEdgeVisibility();
-    updateLineMaterialResolution(modelRoot);
-    updateLineMaterialResolution(pmiRoot);
 
     fitCamera(preview.bounds);
     resetSelection();
