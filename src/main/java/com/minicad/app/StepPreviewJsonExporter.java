@@ -98,6 +98,7 @@ public final class StepPreviewJsonExporter {
     private static final int FACE_PROGRESS_INTERVAL = 25;
     private static final int EDGE_PROGRESS_INTERVAL = 100;
     private static final int MAX_TOTAL_TRIANGLE_POINTS = 6_000_000;
+    private static final int GLB_MAX_TOTAL_TRIANGLE_POINTS = 12_000_000;
     private static final int MAX_TOTAL_LOOP_POINTS = 250_000;
 
     private StepPreviewJsonExporter() {
@@ -185,7 +186,12 @@ public final class StepPreviewJsonExporter {
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
         long payloadStartedAt = System.nanoTime();
-        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        PreviewPayload payload = reducePayloadGeometry(
+                buildPayload(stepFile, resolved, builder),
+                GLB_MAX_TOTAL_TRIANGLE_POINTS,
+                MAX_TOTAL_LOOP_POINTS,
+                "glb_payload_geometry_reduced"
+        );
         log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
                 "glb_payload_geometry_summary",
                 countTrianglePoints(payload),
@@ -3076,10 +3082,19 @@ public final class StepPreviewJsonExporter {
     }
 
     private static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
+        return reducePayloadGeometry(payload, MAX_TOTAL_TRIANGLE_POINTS, MAX_TOTAL_LOOP_POINTS, "payload_geometry_reduced");
+    }
+
+    private static PreviewPayload reducePayloadGeometry(
+            PreviewPayload payload,
+            int maxTrianglePoints,
+            int maxLoopPoints,
+            String reductionStage
+    ) {
         int trianglePoints = countTrianglePoints(payload);
         int loopPoints = countLoopPoints(payload);
-        int triangleFactor = Math.max(1, (int) Math.ceil(trianglePoints / (double) MAX_TOTAL_TRIANGLE_POINTS));
-        int loopFactor = Math.max(1, (int) Math.ceil(loopPoints / (double) MAX_TOTAL_LOOP_POINTS));
+        int triangleFactor = Math.max(1, (int) Math.ceil(trianglePoints / (double) maxTrianglePoints));
+        int loopFactor = Math.max(1, (int) Math.ceil(loopPoints / (double) maxLoopPoints));
         if (triangleFactor == 1 && loopFactor == 1) {
             return payload;
         }
@@ -3109,14 +3124,16 @@ public final class StepPreviewJsonExporter {
                 representations,
                 payload.instances()
         );
-        log.info("stage={} originalTrianglePoints={}, reducedTrianglePoints={}, originalLoopPoints={}, reducedLoopPoints={}, triangleFactor={}, loopFactor={}",
-                "payload_geometry_reduced",
+        log.info("stage={} originalTrianglePoints={}, reducedTrianglePoints={}, originalLoopPoints={}, reducedLoopPoints={}, triangleFactor={}, loopFactor={}, maxTrianglePoints={}, maxLoopPoints={}",
+                reductionStage,
                 trianglePoints,
                 countTrianglePoints(reduced),
                 loopPoints,
                 countLoopPoints(reduced),
                 triangleFactor,
-                loopFactor);
+                loopFactor,
+                maxTrianglePoints,
+                maxLoopPoints);
         return reduced;
     }
 
