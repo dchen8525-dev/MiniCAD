@@ -388,7 +388,9 @@ public final class StepPreviewJsonExporter {
             if (orientedFace.orientation()) {
                 return new PreviewFaceResult(base.face(), null);
             }
-            return new PreviewFaceResult(reverseFacePayload(base.face()), null);
+            FacePayload reversed = reverseFacePayload(base.face());
+            logPreviewFacePayload("face_payload_built", reversed);
+            return new PreviewFaceResult(reversed, null);
         }
 
         StepEntity geometry = faceGeometry(stepFace);
@@ -396,12 +398,14 @@ public final class StepPreviewJsonExporter {
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
                 if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
+                    if (trimmed.face() != null) {
+                        logPreviewFacePayload("face_payload_built", trimmed.face());
+                    }
                     return trimmed;
                 }
-                return new PreviewFaceResult(
-                        toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata),
-                        null
-                );
+                FacePayload payload = toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
+                logPreviewFacePayload("face_payload_built", payload);
+                return new PreviewFaceResult(payload, null);
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
@@ -410,6 +414,7 @@ public final class StepPreviewJsonExporter {
             try {
                 FacePayload payload = toCylindricalFacePayload(stepFace, cylindricalSurface, builder, metadata);
                 if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
@@ -419,6 +424,7 @@ public final class StepPreviewJsonExporter {
             try {
                 FacePayload payload = toConicalFacePayload(stepFace, conicalSurface, builder, metadata);
                 if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
@@ -428,10 +434,14 @@ public final class StepPreviewJsonExporter {
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, splineSurface, metadata, builder);
                 if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
+                    if (trimmed.face() != null) {
+                        logPreviewFacePayload("face_payload_built", trimmed.face());
+                    }
                     return trimmed;
                 }
                 FacePayload payload = toBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata);
                 if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
@@ -442,12 +452,17 @@ public final class StepPreviewJsonExporter {
             }
         }
         if (geometry instanceof StepSurfaceOfLinearExtrusion || geometry instanceof StepSurfaceOfRevolution) {
-            return toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            if (trimmed.face() != null) {
+                logPreviewFacePayload("face_payload_built", trimmed.face());
+            }
+            return trimmed;
         }
         if (geometry instanceof StepToroidalSurface toroidalSurface) {
             try {
                 FacePayload payload = toToroidalFacePayload(stepFace, toroidalSurface, builder, metadata);
                 if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
@@ -456,9 +471,31 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepCylindricalSurface
                 || geometry instanceof StepConicalSurface
                 || geometry instanceof StepToroidalSurface) {
-            return toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            if (trimmed.face() != null) {
+                logPreviewFacePayload("face_payload_built", trimmed.face());
+            }
+            return trimmed;
         }
         return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface type not previewable"));
+    }
+
+    private static void logPreviewFacePayload(String stage, FacePayload face) {
+        int loopCount = face.loops() == null ? 0 : face.loops().size();
+        int innerLoopCount = face.loops() == null ? 0 : (int) face.loops().stream().filter(loop -> !loop.outer()).count();
+        int triangleCount = face.triangles() == null ? 0 : face.triangles().size() / 3;
+        int uvLoopCount = face.uvLoops() == null ? 0 : face.uvLoops().size();
+        String parametricType = face.surface() == null ? "none" : face.surface().type();
+        log.info("stage={} faceId={}, surfaceType={}, parametricType={}, loopCount={}, innerLoopCount={}, triangleCount={}, uvLoopCount={}, sameSense={}",
+                stage,
+                face.stepId(),
+                face.surfaceType(),
+                parametricType,
+                loopCount,
+                innerLoopCount,
+                triangleCount,
+                uvLoopCount,
+                face.sameSense());
     }
 
     private static AssemblyData buildAssemblyData(

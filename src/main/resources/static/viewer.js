@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const fileInput = document.querySelector('#file-input');
-const renderButton = document.querySelector('#render-button');
 const statusText = document.querySelector('#status-text');
 const validationDetails = document.querySelector('#validation-details');
 const validationReport = document.querySelector('#validation-report');
@@ -820,9 +819,20 @@ function rebuildParametricFaceGeometry(node) {
     if (!surface || !node.isMesh) {
         return;
     }
+    const faceLog = {
+        stepId: node.userData?.stepId ?? null,
+        instanceId: node.userData?.instanceId ?? null,
+        surfaceType: node.userData?.selection?.find?.((entry) => entry[0] === '曲面')?.[1] ?? null,
+        parametricType: surface.type,
+        sameSense: node.userData?.sameSense ?? null,
+        hasSurfaceLoops: Array.isArray(node.userData?.surfaceLoops),
+        hasSurfaceUvLoops: Array.isArray(node.userData?.surfaceUvLoops),
+        originalVertexCount: node.geometry?.getAttribute?.('position')?.count ?? 0
+    };
     if (surface.type === 'bspline_surface' && Array.isArray(node.userData?.surfaceUvLoops) && node.userData.surfaceUvLoops.length > 0) {
         const outerLoop = node.userData.surfaceUvLoops.find((loop) => loop.outer);
         if (!outerLoop || !Array.isArray(outerLoop.points) || outerLoop.points.length < 3) {
+            logJson('parametricFace:skip', { ...faceLog, reason: 'missing-bspline-outer-loop' });
             return;
         }
         const outerPoints = outerLoop.points.slice(0, -1).map((point) => new THREE.Vector2(point[0], point[1]));
@@ -856,6 +866,12 @@ function rebuildParametricFaceGeometry(node) {
         geometry2d.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
         node.geometry.dispose();
         node.geometry = geometry2d;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            uvLoopCount: node.userData.surfaceUvLoops.length,
+            rebuiltVertexCount: positions.count,
+            rebuiltIndexCount: geometry2d.index?.count ?? 0
+        });
         return;
     }
     if (surface.type === 'plane_face' && Array.isArray(node.userData?.surfaceLoops) && node.userData.surfaceLoops.length > 0) {
@@ -869,6 +885,7 @@ function rebuildParametricFaceGeometry(node) {
         };
         const outerLoop = node.userData.surfaceLoops.find((loop) => loop.outer);
         if (!outerLoop || !Array.isArray(outerLoop.points) || outerLoop.points.length < 3) {
+            logJson('parametricFace:skip', { ...faceLog, reason: 'missing-plane-outer-loop' });
             return;
         }
         const outerPoints = outerLoop.points.slice(0, -1).map(toPlanePoint);
@@ -901,9 +918,16 @@ function rebuildParametricFaceGeometry(node) {
         geometry2d.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
         node.geometry.dispose();
         node.geometry = geometry2d;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            loopCount: node.userData.surfaceLoops.length,
+            rebuiltVertexCount: positions.count,
+            rebuiltIndexCount: geometry2d.index?.count ?? 0
+        });
         return;
     }
     if (!Number.isFinite(surface.radius)) {
+        logJson('parametricFace:skip', { ...faceLog, reason: 'missing-radius' });
         return;
     }
 
@@ -955,6 +979,7 @@ function rebuildParametricFaceGeometry(node) {
                     .normalize();
                 normal = sameSense ? baseNormal : baseNormal.multiplyScalar(-1);
             } else {
+                logJson('parametricFace:skip', { ...faceLog, reason: 'unsupported-parametric-type' });
                 return;
             }
 
@@ -988,6 +1013,13 @@ function rebuildParametricFaceGeometry(node) {
     geometry.setIndex(indices);
     node.geometry.dispose();
     node.geometry = geometry;
+    logJson('parametricFace:rebuilt', {
+        ...faceLog,
+        radialSegments,
+        heightSegments,
+        rebuiltVertexCount: vertexCount,
+        rebuiltIndexCount: indices.length
+    });
 }
 
 function renderPmi(pmi) {
@@ -1468,17 +1500,13 @@ async function renderCurrentInput() {
     }
 }
 
-renderButton.addEventListener('click', () => {
-    void renderCurrentInput();
-});
-
 fileInput.addEventListener('change', async (event) => {
     const [file] = event.target.files;
     if (!file) {
         return;
     }
     uploadedFile = file;
-    setStatus(`已选择文件：${file.name}，点击“解析并渲染”开始预览。`);
+    setStatus(`已选择文件：${file.name}，正在生成预览。`);
     const prefixBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     logInfo('fileInput:loaded', {
         fileName: file.name,
