@@ -29,7 +29,7 @@ const camera = new THREE.PerspectiveCamera(55, 1, 0.01, 5000);
 camera.position.set(3.5, 2.8, 3.5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-const basePixelRatio = Math.min(window.devicePixelRatio, 2.5);
+const basePixelRatio = Math.min(window.devicePixelRatio, 3);
 renderer.setPixelRatio(basePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.domElement.style.width = '100%';
@@ -262,15 +262,15 @@ function updateReferenceGuides(bounds) {
 function currentRenderScale() {
     const distance = camera.position.distanceTo(controls.target);
     if (distance <= 2.5) {
-        return 2.2;
+        return 2.8;
     }
     if (distance <= 4.5) {
-        return 1.8;
+        return 2.2;
     }
     if (distance <= 8.0) {
-        return 1.4;
+        return 1.7;
     }
-    return 1.0;
+    return 1.25;
 }
 
 function updateRenderResolution(force = false) {

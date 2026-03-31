@@ -3037,7 +3037,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(16, (int) Math.ceil(Math.abs(delta) / (Math.PI / 18.0)));
+        int segments = Math.max(32, (int) Math.ceil(Math.abs(delta) / (Math.PI / 36.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
@@ -3062,7 +3062,7 @@ public final class StepPreviewJsonExporter {
             delta -= Math.PI * 2.0;
         }
 
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) / (Math.PI / 24.0)));
+        int segments = Math.max(36, (int) Math.ceil(Math.abs(delta) / (Math.PI / 48.0)));
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = startAngle + delta * i / segments;
