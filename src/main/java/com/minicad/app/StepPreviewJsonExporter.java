@@ -95,6 +95,8 @@ public final class StepPreviewJsonExporter {
 
     private static final int FACE_PROGRESS_INTERVAL = 25;
     private static final int EDGE_PROGRESS_INTERVAL = 100;
+    private static final int MAX_TOTAL_TRIANGLE_POINTS = 1_500_000;
+    private static final int MAX_TOTAL_LOOP_POINTS = 250_000;
 
     private StepPreviewJsonExporter() {
     }
@@ -111,7 +113,15 @@ public final class StepPreviewJsonExporter {
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
         long payloadStartedAt = System.nanoTime();
-        PreviewPayload payload = buildPayload(stepFile, resolved, builder);
+        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
+                "payload_geometry_summary",
+                countTrianglePoints(payload),
+                countLoopPoints(payload),
+                countEdgePoints(payload),
+                countPmiPoints(payload),
+                payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
+                payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
         log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "payload_done",
                 elapsedMillis(payloadStartedAt),
                         payload.faces().size(),
@@ -2991,6 +3001,139 @@ public final class StepPreviewJsonExporter {
 
     private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
         return points.stream().map(StepPreviewJsonExporter::toPointPayload).toList();
+    }
+
+    private static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
+        int trianglePoints = countTrianglePoints(payload);
+        int loopPoints = countLoopPoints(payload);
+        int triangleFactor = Math.max(1, (int) Math.ceil(trianglePoints / (double) MAX_TOTAL_TRIANGLE_POINTS));
+        int loopFactor = Math.max(1, (int) Math.ceil(loopPoints / (double) MAX_TOTAL_LOOP_POINTS));
+        if (triangleFactor == 1 && loopFactor == 1) {
+            return payload;
+        }
+        List<FacePayload> faces = payload.faces().stream()
+                .map(face -> reduceFacePayload(face, triangleFactor, loopFactor))
+                .toList();
+        List<RepresentationPayload> representations = payload.representations().stream()
+                .map(representation -> new RepresentationPayload(
+                        representation.id(),
+                        representation.name(),
+                        representation.layers(),
+                        representation.color(),
+                        representation.edges(),
+                        representation.faces().stream()
+                                .map(face -> reduceFacePayload(face, triangleFactor, loopFactor))
+                                .toList()
+                ))
+                .toList();
+        PreviewPayload reduced = new PreviewPayload(
+                payload.stats(),
+                payload.bounds(),
+                payload.validation(),
+                payload.pmi(),
+                payload.unsupportedFaces(),
+                payload.edges(),
+                faces,
+                representations,
+                payload.instances()
+        );
+        log.info("stage={} originalTrianglePoints={}, reducedTrianglePoints={}, originalLoopPoints={}, reducedLoopPoints={}, triangleFactor={}, loopFactor={}",
+                "payload_geometry_reduced",
+                trianglePoints,
+                countTrianglePoints(reduced),
+                loopPoints,
+                countLoopPoints(reduced),
+                triangleFactor,
+                loopFactor);
+        return reduced;
+    }
+
+    private static FacePayload reduceFacePayload(FacePayload face, int triangleFactor, int loopFactor) {
+        return new FacePayload(
+                face.stepId(),
+                face.name(),
+                face.surfaceType(),
+                face.origin(),
+                face.normal(),
+                face.sameSense(),
+                face.color(),
+                face.layers(),
+                reduceLoopPoints(face.loops(), loopFactor),
+                reduceTrianglePoints(face.triangles(), triangleFactor)
+        );
+    }
+
+    private static List<PointPayload> reduceTrianglePoints(List<PointPayload> triangles, int factor) {
+        if (factor <= 1 || triangles.size() <= 3) {
+            return triangles;
+        }
+        int triangleCount = triangles.size() / 3;
+        List<PointPayload> reduced = new ArrayList<>(Math.max(3, triangles.size() / factor));
+        for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex += factor) {
+            int base = triangleIndex * 3;
+            reduced.add(triangles.get(base));
+            reduced.add(triangles.get(base + 1));
+            reduced.add(triangles.get(base + 2));
+        }
+        return List.copyOf(reduced);
+    }
+
+    private static List<LoopPayload> reduceLoopPoints(List<LoopPayload> loops, int factor) {
+        if (factor <= 1) {
+            return loops;
+        }
+        List<LoopPayload> reduced = new ArrayList<>(loops.size());
+        for (LoopPayload loop : loops) {
+            if (loop.points().size() <= 2) {
+                reduced.add(loop);
+                continue;
+            }
+            List<PointPayload> points = new ArrayList<>(Math.max(2, loop.points().size() / factor));
+            for (int index = 0; index < loop.points().size(); index += factor) {
+                points.add(loop.points().get(index));
+            }
+            PointPayload last = loop.points().getLast();
+            if (!points.getLast().equals(last)) {
+                points.add(last);
+            }
+            reduced.add(new LoopPayload(loop.outer(), List.copyOf(points)));
+        }
+        return List.copyOf(reduced);
+    }
+
+    private static int countTrianglePoints(PreviewPayload payload) {
+        int count = payload.faces().stream().mapToInt(face -> face.triangles().size()).sum();
+        count += payload.representations().stream()
+                .flatMap(representation -> representation.faces().stream())
+                .mapToInt(face -> face.triangles().size())
+                .sum();
+        return count;
+    }
+
+    private static int countLoopPoints(PreviewPayload payload) {
+        int count = payload.faces().stream()
+                .flatMap(face -> face.loops().stream())
+                .mapToInt(loop -> loop.points().size())
+                .sum();
+        count += payload.representations().stream()
+                .flatMap(representation -> representation.faces().stream())
+                .flatMap(face -> face.loops().stream())
+                .mapToInt(loop -> loop.points().size())
+                .sum();
+        return count;
+    }
+
+    private static int countEdgePoints(PreviewPayload payload) {
+        int count = payload.edges().stream().mapToInt(edge -> edge.points().size()).sum();
+        count += payload.representations().stream()
+                .flatMap(representation -> representation.edges().stream())
+                .mapToInt(edge -> edge.points().size())
+                .sum();
+        return count;
+    }
+
+    private static int countPmiPoints(PreviewPayload payload) {
+        return payload.pmi().stream().mapToInt(item -> item.leader().size() + 1).sum();
     }
 
     private static void includeGeometry(BoundsAccumulator bounds, GeometryCollection geometry) {
