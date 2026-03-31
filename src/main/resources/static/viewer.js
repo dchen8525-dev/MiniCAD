@@ -1092,9 +1092,10 @@ function refreshRenderableStyle(object) {
             : object.userData.baseColor;
     object.material.color.setHex(color);
     if (object.isMesh) {
-        object.material.opacity = object.userData.objectSelected ? 1.0 : object.userData.instanceHighlighted ? 0.94 : 0.98;
-        object.material.transparent = object.material.opacity < 0.999;
+        object.material.opacity = 1.0;
+        object.material.transparent = false;
         object.material.depthWrite = true;
+        object.material.needsUpdate = true;
     }
 }
 
@@ -1331,10 +1332,13 @@ function renderGlbPreview(result) {
             modelHasEdgeLines = true;
         }
         if (node.isMesh && node.material) {
-            node.material.transparent = false;
-            node.material.opacity = 0.98;
-            node.material.depthWrite = true;
-            node.material.needsUpdate = true;
+            const baseColor = node.material.color?.clone() ?? new THREE.Color(0xc87a52);
+            node.material = new THREE.MeshStandardMaterial({
+                color: baseColor,
+                metalness: 0.08,
+                roughness: 0.52,
+                side: THREE.DoubleSide
+            });
         }
         if (Array.isArray(node.userData?.selection)) {
             if (node.material?.color) {
@@ -1355,10 +1359,44 @@ function renderGlbPreview(result) {
 
     fitCamera(preview.bounds);
     resetSelection();
+    const sceneSummary = {
+        meshObjects: 0,
+        lineObjects: 0,
+        visibleMeshes: 0,
+        visibleLines: 0,
+        triangleVertices: 0,
+        lineVertices: 0
+    };
+    result.scene.traverse((node) => {
+        if (node.isMesh) {
+            sceneSummary.meshObjects += 1;
+            if (node.visible) {
+                sceneSummary.visibleMeshes += 1;
+            }
+            const position = node.geometry?.getAttribute?.('position');
+            if (position) {
+                sceneSummary.triangleVertices += position.count;
+            }
+            return;
+        }
+        if (node.isLine) {
+            sceneSummary.lineObjects += 1;
+            if (node.visible) {
+                sceneSummary.visibleLines += 1;
+            }
+            const position = node.geometry?.getAttribute?.('position');
+            if (position) {
+                sceneSummary.lineVertices += position.count;
+            }
+        }
+    });
+    logJson('renderGlbPreview:scene-summary', sceneSummary);
     logInfo('renderGlbPreview:done', {
         modelChildren: modelRoot.children.length,
         interactiveObjects: interactiveObjects.length,
-        assemblyGroups: assemblyGroups.size
+        assemblyGroups: assemblyGroups.size,
+        meshObjects: interactiveObjects.filter((object) => object.isMesh).length,
+        lineObjects: interactiveObjects.filter((object) => object.isLine).length
     });
 }
 

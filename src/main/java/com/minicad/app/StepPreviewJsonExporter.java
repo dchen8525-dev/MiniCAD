@@ -3818,6 +3818,16 @@ public final class StepPreviewJsonExporter {
         byte[] paddedJson = padChunk(jsonBytes);
         byte[] binaryChunk = builder.binaryChunk();
         byte[] paddedBinary = padChunk(binaryChunk);
+        log.info("stage={} faceMeshCount={}, edgeMeshCount={}, nodeCount={}, materialCount={}, accessorCount={}, bufferViewCount={}, jsonChunkLength={}, binaryChunkLength={}",
+                "glb_builder_summary",
+                builder.faceMeshCount(),
+                builder.edgeMeshCount(),
+                builder.nodeCount(),
+                builder.materialCount(),
+                builder.accessorCount(),
+                builder.bufferViewCount(),
+                jsonBytes.length,
+                binaryChunk.length);
 
         ByteArrayOutputStream output = new ByteArrayOutputStream(12 + 8 + paddedJson.length + 8 + paddedBinary.length);
         writeIntLE(output, 0x46546C67);
@@ -4991,6 +5001,8 @@ public final class StepPreviewJsonExporter {
         private final List<Map<String, Object>> meshes = new ArrayList<>();
         private final List<Map<String, Object>> nodes = new ArrayList<>();
         private final Map<String, Integer> materialCache = new LinkedHashMap<>();
+        private int faceMeshCount;
+        private int edgeMeshCount;
 
         String buildJson(PreviewPayload payload) {
             boolean assemblyMode = !payload.instances().isEmpty() && !payload.representations().isEmpty();
@@ -5096,6 +5108,30 @@ public final class StepPreviewJsonExporter {
             return binary.toByteArray();
         }
 
+        int faceMeshCount() {
+            return faceMeshCount;
+        }
+
+        int edgeMeshCount() {
+            return edgeMeshCount;
+        }
+
+        int nodeCount() {
+            return nodes.size();
+        }
+
+        int materialCount() {
+            return materials.size();
+        }
+
+        int accessorCount() {
+            return accessors.size();
+        }
+
+        int bufferViewCount() {
+            return bufferViews.size();
+        }
+
         private RepresentationMeshes buildRepresentationMeshes(RepresentationPayload representation) {
             List<FaceNode> faces = new ArrayList<>();
             for (FacePayload face : representation.faces()) {
@@ -5131,6 +5167,7 @@ public final class StepPreviewJsonExporter {
             Map<String, Object> mesh = new LinkedHashMap<>();
             mesh.put("primitives", List.of(primitive));
             meshes.add(mesh);
+            faceMeshCount += 1;
             return meshes.size() - 1;
         }
 
@@ -5145,6 +5182,7 @@ public final class StepPreviewJsonExporter {
             Map<String, Object> mesh = new LinkedHashMap<>();
             mesh.put("primitives", List.of(primitive));
             meshes.add(mesh);
+            edgeMeshCount += 1;
             return meshes.size() - 1;
         }
 
