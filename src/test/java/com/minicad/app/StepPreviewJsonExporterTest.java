@@ -148,6 +148,27 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportPolylineRepresentationEdgePreview() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=POLYLINE('PL0',(#1,#2,#3));
+                #5=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #6=SHAPE_REPRESENTATION('WIRE',(#4),#5);
+                ENDSEC;
+                """);
+
+        assertTrue(json.contains("\"representationCount\":1"));
+        assertTrue(json.contains("\"faceCount\":0"));
+        assertTrue(json.contains("\"edgeCount\":0"));
+        assertTrue(json.contains("\"representations\":[{\"id\":6"));
+        assertTrue(json.contains("\"edges\":[{\"id\":4"));
+        assertTrue(json.contains("\"points\":[[0.0,0.0,0.0],[1.0,0.0,0.0],[1.0,1.0,0.0]]"));
+    }
+
+    @Test
     void shouldSkipUnsupportedCylindricalFacesInPreview() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;
@@ -198,6 +219,38 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"faceCount\":0"));
         assertTrue(json.contains("\"unsupportedFaceCount\":1"));
+    }
+
+    @Test
+    void shouldReportUnsupportedBooleanResultsInPreviewMetadata() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=VECTOR('VX',#2,1.0);
+                #4=LINE('L0',#1,#3);
+                #5=VERTEX_POINT('V0',#1);
+                #6=EDGE_CURVE('E0',#5,#5,#4,.T.);
+                #7=ORIENTED_EDGE('OE0',$,$,#6,.T.);
+                #8=EDGE_LOOP('LOOP',(#7));
+                #9=PLANE('PL',#10);
+                #10=AXIS2_PLACEMENT_3D('AX',#1,#11,#12);
+                #11=DIRECTION('DZ',(0.0,0.0,1.0));
+                #12=DIRECTION('DX2',(1.0,0.0,0.0));
+                #13=FACE_SURFACE('F',(#14),#9,.T.);
+                #14=FACE_BOUND('B',#8,.T.);
+                #15=CLOSED_SHELL('CS0',(#13));
+                #16=CLOSED_SHELL('CS1',(#13));
+                #17=FACETED_BREP('FB0',#15);
+                #18=FACETED_BREP('FB1',#16);
+                #19=(BOOLEAN_RESULT(.UNION.,#17,#18) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));
+                ENDSEC;
+                """);
+
+        assertTrue(json.contains("\"unsupportedBooleanCount\":1"));
+        assertTrue(json.contains("\"unsupportedBooleans\":[{\"id\":19"));
+        assertTrue(json.contains("\"type\":\"BOOLEAN_RESULT\""));
+        assertTrue(json.contains("\"reason\":\"preview export does not support boolean results\""));
     }
 
     @Test
@@ -483,6 +536,30 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"edgeCount\":0"));
         assertTrue(json.contains("\"points\":[[0.0,0.0,0.0]]"));
         assertTrue(json.contains("\"unsupportedFaceCount\":0"));
+    }
+
+    @Test
+    void shouldReportPolyLoopFaceAsUnsupportedInPreview() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=PLANE('PL0',#4);
+                #8=POLY_LOOP('PL0',(#1,#2,#3));
+                #9=FACE_OUTER_BOUND('B0',#8,.T.);
+                #10=FACE_SURFACE('FS0',(#9),#7,.T.);
+                #11=OPEN_SHELL('OS',(#10));
+                ENDSEC;
+                """);
+
+        assertTrue(json.contains("\"faceCount\":0"));
+        assertTrue(json.contains("\"unsupportedFaceCount\":1"));
+        assertTrue(json.contains("\"unsupportedFaces\":[{\"id\":10"));
+        assertTrue(json.contains("\"reason\":\"FACE_BOUND construction for POLY_LOOP is unsupported\""));
     }
 
     @Test

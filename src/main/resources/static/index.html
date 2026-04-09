@@ -277,6 +277,28 @@
             margin-top: 0.12rem;
         }
 
+        .unsupported-list li.summary button {
+            cursor: default;
+            background: rgba(232, 195, 168, 0.14);
+            border-style: dashed;
+        }
+
+        .unsupported-list li.summary button:hover {
+            border-color: rgba(63, 58, 46, 0.08);
+            background: rgba(232, 195, 168, 0.14);
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+        }
+
         .selection-card h2 {
             margin: 0 0 0.55rem;
             font-size: 1rem;
@@ -458,6 +480,7 @@
             <div><span class="stat-label">Faces</span><span class="stat-value" data-stat="faceCount">0</span></div>
             <div><span class="stat-label">Edges</span><span class="stat-value" data-stat="edgeCount">0</span></div>
             <div><span class="stat-label">Unsupported</span><span class="stat-value" data-stat="unsupportedFaceCount">0</span></div>
+            <div><span class="stat-label">Unsupported Bool</span><span class="stat-value" data-stat="unsupportedBooleanCount">0</span></div>
         </section>
 
         <section class="status-card">
@@ -483,9 +506,21 @@
         </section>
 
         <section class="validation-report-card">
-            <h2>Unsupported Faces</h2>
+            <div class="panel-heading">
+                <h2>Unsupported Faces</h2>
+                <button id="toggle-unsupported-view" type="button" class="secondary">只看汇总</button>
+            </div>
             <ul id="unsupported-faces" class="unsupported-list">
                 <li><strong>无</strong><span>当前预览没有被跳过的面。</span></li>
+            </ul>
+        </section>
+
+        <section class="validation-report-card">
+            <div class="panel-heading">
+                <h2>Unsupported Booleans</h2>
+            </div>
+            <ul id="unsupported-booleans" class="unsupported-list">
+                <li><strong>无</strong><span>当前预览没有被跳过的布尔结果。</span></li>
             </ul>
         </section>
 

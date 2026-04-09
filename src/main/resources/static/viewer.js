@@ -7,6 +7,8 @@ const statusText = document.querySelector('#status-text');
 const validationDetails = document.querySelector('#validation-details');
 const validationReport = document.querySelector('#validation-report');
 const unsupportedFacesList = document.querySelector('#unsupported-faces');
+const unsupportedBooleansList = document.querySelector('#unsupported-booleans');
+const toggleUnsupportedViewButton = document.querySelector('#toggle-unsupported-view');
 const selectionDetails = document.querySelector('#selection-details');
 const assemblyTree = document.querySelector('#assembly-tree');
 const pmiOverlay = document.querySelector('#pmi-overlay');
@@ -105,11 +107,23 @@ const postMaterial = new THREE.ShaderMaterial({
 });
 postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial));
 
+let unsupportedViewMode = 'details';
+let currentUnsupportedFaces = [];
+let currentUnsupportedBooleans = [];
+
 const controls = new OrbitControls(camera, renderer.domElement);
 const gltfLoader = new GLTFLoader();
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.target.set(0, 0, 0);
+
+if (toggleUnsupportedViewButton) {
+    toggleUnsupportedViewButton.addEventListener('click', () => {
+        unsupportedViewMode = unsupportedViewMode === 'summary' ? 'details' : 'summary';
+        applyUnsupportedViewMode();
+    });
+    applyUnsupportedViewMode();
+}
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.6));
 
@@ -190,6 +204,35 @@ function summarizeUnsupportedFaces(unsupportedFaces = []) {
         summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
     }
     return summary;
+}
+
+function summarizeUnsupportedBooleans(unsupportedBooleans = []) {
+    const summary = {
+        byType: {},
+        byReason: {}
+    };
+    if (!Array.isArray(unsupportedBooleans)) {
+        return summary;
+    }
+    for (const item of unsupportedBooleans) {
+        const type = item?.type || 'UNKNOWN';
+        const reason = item?.reason || 'unknown';
+        summary.byType[type] = (summary.byType[type] ?? 0) + 1;
+        summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
+    }
+    return summary;
+}
+
+function summarizeEntries(summaryMap = {}) {
+    return Object.entries(summaryMap)
+        .sort((left, right) => {
+            if (right[1] !== left[1]) {
+                return right[1] - left[1];
+            }
+            return String(left[0]).localeCompare(String(right[0]), 'zh-Hans-CN');
+        })
+        .map(([key, count]) => `${key}:${count}`)
+        .join(' | ');
 }
 
 function createGridHelper(size, divisions) {
@@ -365,11 +408,20 @@ function updateValidationReport(report = {}) {
 }
 
 function updateUnsupportedFaces(unsupportedFaces = []) {
+    currentUnsupportedFaces = Array.isArray(unsupportedFaces) ? unsupportedFaces : [];
     if (!Array.isArray(unsupportedFaces) || unsupportedFaces.length === 0) {
         unsupportedFacesList.innerHTML = '<li><button type="button" disabled><strong>无</strong><span>当前预览没有被跳过的面。</span></button></li>';
         return;
     }
     unsupportedFacesList.innerHTML = '';
+    const summary = summarizeUnsupportedFaces(unsupportedFaces);
+    const summaryItem = document.createElement('li');
+    summaryItem.className = 'summary';
+    summaryItem.innerHTML = `<button type="button" disabled><strong>汇总</strong><span>${summarizeEntries(summary.bySurfaceType)}</span><span>${summarizeEntries(summary.byReason)}</span></button>`;
+    unsupportedFacesList.appendChild(summaryItem);
+    if (unsupportedViewMode === 'summary') {
+        return;
+    }
     for (const face of unsupportedFaces) {
         const item = document.createElement('li');
         const button = document.createElement('button');
@@ -382,6 +434,43 @@ function updateUnsupportedFaces(unsupportedFaces = []) {
         item.appendChild(button);
         unsupportedFacesList.appendChild(item);
     }
+}
+
+function updateUnsupportedBooleans(unsupportedBooleans = []) {
+    currentUnsupportedBooleans = Array.isArray(unsupportedBooleans) ? unsupportedBooleans : [];
+    if (!Array.isArray(unsupportedBooleans) || unsupportedBooleans.length === 0) {
+        unsupportedBooleansList.innerHTML = '<li><button type="button" disabled><strong>无</strong><span>当前预览没有被跳过的布尔结果。</span></button></li>';
+        return;
+    }
+    unsupportedBooleansList.innerHTML = '';
+    const summary = summarizeUnsupportedBooleans(unsupportedBooleans);
+    const summaryItem = document.createElement('li');
+    summaryItem.className = 'summary';
+    summaryItem.innerHTML = `<button type="button" disabled><strong>汇总</strong><span>${summarizeEntries(summary.byType)}</span><span>${summarizeEntries(summary.byReason)}</span></button>`;
+    unsupportedBooleansList.appendChild(summaryItem);
+    if (unsupportedViewMode === 'summary') {
+        return;
+    }
+    for (const itemData of unsupportedBooleans) {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.disabled = true;
+        const name = itemData.name || `${itemData.type || 'BOOLEAN'} #${itemData.id}`;
+        const type = itemData.type || 'UNKNOWN';
+        const reason = itemData.reason || '当前导出器已识别该布尔结果，但本轮预览仍将其跳过。';
+        button.innerHTML = `<strong>#${itemData.id} ${name}</strong><span>${type}</span><span>${reason}</span>`;
+        item.appendChild(button);
+        unsupportedBooleansList.appendChild(item);
+    }
+}
+
+function applyUnsupportedViewMode() {
+    if (toggleUnsupportedViewButton) {
+        toggleUnsupportedViewButton.textContent = unsupportedViewMode === 'summary' ? '展开详情' : '只看汇总';
+    }
+    updateUnsupportedFaces(currentUnsupportedFaces);
+    updateUnsupportedBooleans(currentUnsupportedBooleans);
 }
 
 function setSelection(entries) {
@@ -1280,12 +1369,14 @@ function renderGlbPreview(result) {
     logInfo('renderGlbPreview:start', {
         stats: preview?.stats,
         unsupportedFaceCount: Array.isArray(preview?.unsupportedFaces) ? preview.unsupportedFaces.length : 0,
+        unsupportedBooleanCount: Array.isArray(preview?.unsupportedBooleans) ? preview.unsupportedBooleans.length : 0,
         instanceCount: Array.isArray(preview?.instances) ? preview.instances.length : 0,
         rootChildren: result.scene.children.length
     });
     clearModel();
     renderPmi(preview.pmi);
     updateUnsupportedFaces(preview.unsupportedFaces);
+    updateUnsupportedBooleans(preview.unsupportedBooleans);
     updateStats(preview.stats);
     updateValidation(preview.validation);
     renderAssemblyTree(Array.isArray(preview.instances) ? preview.instances : []);
@@ -1489,7 +1580,15 @@ async function renderCurrentInput() {
         renderGlbPreview(preview);
         const previewData = preview?.preview ?? {};
         const unsupported = previewData?.stats?.unsupportedFaceCount ?? 0;
-        const suffix = unsupported > 0 ? `，跳过 ${unsupported} 个暂不支持的面。` : '。';
+        const unsupportedBooleans = previewData?.stats?.unsupportedBooleanCount ?? 0;
+        const suffixParts = [];
+        if (unsupported > 0) {
+            suffixParts.push(`跳过 ${unsupported} 个暂不支持的面`);
+        }
+        if (unsupportedBooleans > 0) {
+            suffixParts.push(`跳过 ${unsupportedBooleans} 个暂不支持的布尔结果`);
+        }
+        const suffix = suffixParts.length > 0 ? `，${suffixParts.join('，')}。` : '。';
         setStatus(`渲染完成：${previewData?.stats?.faceCount ?? 0} 个面，${previewData?.stats?.edgeCount ?? 0} 条边${suffix}`);
         logInfo('renderCurrentInput:success', previewData?.stats);
     } catch (error) {

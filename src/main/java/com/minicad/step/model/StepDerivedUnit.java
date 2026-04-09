@@ -7,8 +7,10 @@ import java.util.List;
  *
  * @param id STEP instance id
  * @param elements unit elements
+ * @param unitKind derived unit kind such as FORCE_UNIT
  */
-public record StepDerivedUnit(int id, List<StepDerivedUnitElement> elements) implements StepEntity {
+public record StepDerivedUnit(int id, List<StepDerivedUnitElement> elements, String unitKind)
+    implements StepEntity {
 
     public StepDerivedUnit {
         elements = List.copyOf(elements);

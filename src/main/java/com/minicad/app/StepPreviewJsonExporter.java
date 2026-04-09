@@ -31,6 +31,8 @@ import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepAdvancedFace;
+import com.minicad.step.model.StepBooleanClippingResult;
+import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepClosedShell;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepCartesianPoint;
@@ -50,17 +52,21 @@ import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepOpenShell;
+import com.minicad.step.model.StepOrientedClosedShell;
+import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedEdge;
 import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepLine;
+import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSurfacedOpenShell;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepVertexPoint;
@@ -256,6 +262,7 @@ public final class StepPreviewJsonExporter {
         List<UnsupportedFacePayload> unsupportedFaces = assemblyMode
                 ? assembly.unsupportedFaces()
                 : legacyGeometry.unsupportedFaces();
+        List<UnsupportedBooleanPayload> unsupportedBooleans = collectUnsupportedBooleans(resolved);
         int faceCount = assemblyMode ? assembly.summary().faceCount() : legacyGeometry.faces().size();
         int edgeCount = assemblyMode ? assembly.summary().edgeCount() : legacyGeometry.edges().size();
 
@@ -265,19 +272,26 @@ public final class StepPreviewJsonExporter {
                 countShells(resolved),
                 faceCount,
                 edgeCount,
-                unsupportedFaces.size()
+                unsupportedFaces.size(),
+                unsupportedBooleans.size()
         );
-        log.info("stage={} entityCount={}, solidCount={}, shellCount={}, faceCount={}, edgeCount={}, unsupportedFaceCount={}", "stats_done",
+        log.info("stage={} entityCount={}, solidCount={}, shellCount={}, faceCount={}, edgeCount={}, unsupportedFaceCount={}, unsupportedBooleanCount={}", "stats_done",
                 stats.entityCount(),
                         stats.solidCount(),
                         stats.shellCount(),
                         stats.faceCount(),
                         stats.edgeCount(),
-                        stats.unsupportedFaceCount());
+                        stats.unsupportedFaceCount(),
+                        stats.unsupportedBooleanCount());
         if (!unsupportedFaces.isEmpty()) {
             log.debug("stage={} bySurfaceType={}, byReason={}", "unsupported_faces_summary",
                     summarizeUnsupportedFacesBySurfaceType(unsupportedFaces),
                             summarizeUnsupportedFacesByReason(unsupportedFaces));
+        }
+        if (!unsupportedBooleans.isEmpty()) {
+            log.debug("stage={} byType={}, byReason={}", "unsupported_booleans_summary",
+                    summarizeUnsupportedBooleansByType(unsupportedBooleans),
+                    summarizeUnsupportedBooleansByReason(unsupportedBooleans));
         }
 
         return new PreviewPayload(
@@ -285,12 +299,35 @@ public final class StepPreviewJsonExporter {
                 bounds.toPayload(),
                 validation,
                 pmi,
+                unsupportedBooleans,
                 unsupportedFaces,
                 legacyGeometry.edges(),
                 legacyGeometry.faces(),
                 assembly.representations(),
                 assembly.instances()
         );
+    }
+
+    private static List<UnsupportedBooleanPayload> collectUnsupportedBooleans(Map<Integer, StepEntity> resolved) {
+        List<UnsupportedBooleanPayload> list = new ArrayList<>();
+        for (StepEntity entity : resolved.values()) {
+            if (entity instanceof StepBooleanClippingResult clippingResult) {
+                list.add(new UnsupportedBooleanPayload(
+                        clippingResult.id(),
+                        clippingResult.name(),
+                        "BOOLEAN_CLIPPING_RESULT",
+                        "preview export does not support boolean clipping results"
+                ));
+            } else if (entity instanceof StepBooleanResult booleanResult) {
+                list.add(new UnsupportedBooleanPayload(
+                        booleanResult.id(),
+                        booleanResult.name(),
+                        "BOOLEAN_RESULT",
+                        "preview export does not support boolean results"
+                ));
+            }
+        }
+        return List.copyOf(list);
     }
 
     private static GeometryCollection buildLegacyGeometry(
@@ -300,10 +337,8 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<Integer> shellIds = new TreeSet<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepOpenShell openShell) {
-                shellIds.add(openShell.id());
-            } else if (entity instanceof StepClosedShell closedShell) {
-                shellIds.add(closedShell.id());
+            if (isShellEntity(entity)) {
+                shellIds.add(entity.id());
             } else if (entity instanceof StepManifoldSolidBrep solidBrep) {
                 shellIds.add(solidBrep.outer().id());
             }
@@ -397,16 +432,18 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepPlane) {
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-                if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
-                    if (trimmed.face() != null) {
-                        logPreviewFacePayload("face_payload_built", trimmed.face());
-                    }
+                if (trimmed.face() != null) {
+                    logPreviewFacePayload("face_payload_built", trimmed.face());
                     return trimmed;
                 }
                 FacePayload payload = toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
                 logPreviewFacePayload("face_payload_built", payload);
                 return new PreviewFaceResult(payload, null);
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                String reason = ex.getMessage();
+                if (reason != null && !reason.isBlank() && reason.contains("POLY_LOOP")) {
+                    return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, reason));
+                }
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
         }
@@ -509,27 +546,34 @@ public final class StepPreviewJsonExporter {
         for (AssemblyRepresentation assemblyRepresentation : graph.representations()) {
             StepEntity entity = resolved.get(assemblyRepresentation.representationId());
             if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
-                Set<Integer> shellIds = collectRepresentationShells(representation, resolved);
-                StepMetadataExtractor.DisplayMetadata representationMetadata = metadata.forItem(representation.id());
-                GeometryCollection geometry = buildGeometryForShells(
-                        shellIds,
+                RepresentationBuildResult result = buildRepresentationPayload(
+                        representation,
+                        assemblyRepresentation.name(),
                         resolved,
                         builder,
-                        metadata,
-                        collectInheritedShellMetadata(representation, metadata, resolved)
+                        metadata
                 );
-                unsupportedFaces.addAll(geometry.unsupportedFaces());
-                representations.put(
-                        representation.id(),
-                        new RepresentationPayload(
-                                representation.id(),
-                                assemblyRepresentation.name(),
-                                representationMetadata.layers(),
-                                toColorPayload(representationMetadata.rgb()),
-                                geometry.edges(),
-                                geometry.faces()
-                        )
-                );
+                unsupportedFaces.addAll(result.unsupportedFaces());
+                representations.put(representation.id(), result.payload());
+            }
+        }
+
+        if (representations.isEmpty()) {
+            for (StepEntity entity : resolved.values()) {
+                if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
+                    RepresentationBuildResult result = buildRepresentationPayload(
+                            representation,
+                            representation.name(),
+                            resolved,
+                            builder,
+                            metadata
+                    );
+                    unsupportedFaces.addAll(result.unsupportedFaces());
+                    representations.putIfAbsent(
+                            representation.id(),
+                            result.payload()
+                    );
+                }
             }
         }
 
@@ -562,6 +606,37 @@ public final class StepPreviewJsonExporter {
         );
     }
 
+    private static RepresentationBuildResult buildRepresentationPayload(
+            StepRepresentation representation,
+            String displayName,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder,
+            StepMetadataExtractor metadata
+    ) {
+        Set<Integer> shellIds = collectRepresentationShells(representation, resolved);
+        StepMetadataExtractor.DisplayMetadata representationMetadata = metadata.forItem(representation.id());
+        GeometryCollection geometry = buildGeometryForShells(
+                shellIds,
+                resolved,
+                builder,
+                metadata,
+                collectInheritedShellMetadata(representation, metadata, resolved)
+        );
+        List<EdgePayload> representationEdges = new ArrayList<>(geometry.edges());
+        representationEdges.addAll(collectRepresentationPolylineEdges(representation, resolved));
+        return new RepresentationBuildResult(
+                new RepresentationPayload(
+                        representation.id(),
+                        displayName,
+                        representationMetadata.layers(),
+                        toColorPayload(representationMetadata.rgb()),
+                        List.copyOf(representationEdges),
+                        geometry.faces()
+                ),
+                geometry.unsupportedFaces()
+        );
+    }
+
     private static Set<Integer> collectRepresentationShells(
             StepRepresentation representation,
             Map<Integer, StepEntity> resolved
@@ -569,16 +644,29 @@ public final class StepPreviewJsonExporter {
         Set<Integer> shellIds = new TreeSet<>();
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
-                if (item instanceof StepOpenShell openShell) {
-                    shellIds.add(openShell.id());
-                } else if (item instanceof StepClosedShell closedShell) {
-                    shellIds.add(closedShell.id());
+                if (isShellEntity(item)) {
+                    shellIds.add(item.id());
                 } else if (item instanceof StepManifoldSolidBrep solidBrep) {
                     shellIds.add(solidBrep.outer().id());
                 }
             }
         }
         return shellIds;
+    }
+
+    private static List<EdgePayload> collectRepresentationPolylineEdges(
+            StepRepresentation representation,
+            Map<Integer, StepEntity> resolved
+    ) {
+        Map<Integer, EdgePayload> edges = new LinkedHashMap<>();
+        for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
+            for (StepEntity item : candidate.items()) {
+                if (item instanceof StepPolyline polyline) {
+                    edges.putIfAbsent(polyline.id(), toPolylineEdgePayload(polyline));
+                }
+            }
+        }
+        return List.copyOf(edges.values());
     }
 
     private static Map<Integer, StepMetadataExtractor.DisplayMetadata> collectInheritedShellMetadata(
@@ -590,10 +678,9 @@ public final class StepPreviewJsonExporter {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
-                if (item instanceof StepOpenShell openShell) {
-                    metadataByShellId.put(openShell.id(), mergeMetadata(metadataByShellId.get(openShell.id()), itemMetadata));
-                } else if (item instanceof StepClosedShell closedShell) {
-                    metadataByShellId.put(closedShell.id(), mergeMetadata(metadataByShellId.get(closedShell.id()), itemMetadata));
+                if (isShellEntity(item)) {
+                    int shellId = item.id();
+                    metadataByShellId.put(shellId, mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
                 } else if (item instanceof StepManifoldSolidBrep solidBrep) {
                     int shellId = solidBrep.outer().id();
                     metadataByShellId.put(shellId, mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
@@ -710,6 +797,32 @@ public final class StepPreviewJsonExporter {
                 .collect(Collectors.joining("|"));
     }
 
+    private static String summarizeUnsupportedBooleansByType(List<UnsupportedBooleanPayload> unsupportedBooleans) {
+        Map<String, Long> counts = unsupportedBooleans.stream()
+                .collect(Collectors.groupingBy(
+                        UnsupportedBooleanPayload::type,
+                        LinkedHashMap::new,
+                        Collectors.counting()
+                ));
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining("|"));
+    }
+
+    private static String summarizeUnsupportedBooleansByReason(List<UnsupportedBooleanPayload> unsupportedBooleans) {
+        Map<String, Long> counts = unsupportedBooleans.stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.reason() == null ? "unknown" : item.reason(),
+                        LinkedHashMap::new,
+                        Collectors.counting()
+                ));
+        return counts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining("|"));
+    }
+
     private static String summarizeLoopPointCounts(List<ParametricLoopPayload> loops) {
         return loops.stream()
                 .map(loop -> (loop.outer() ? "outer" : "inner") + ":" + loop.points().size())
@@ -731,7 +844,7 @@ public final class StepPreviewJsonExporter {
     private static int countShells(Map<Integer, StepEntity> resolved) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepOpenShell || entity instanceof StepClosedShell) {
+            if (isShellEntity(entity)) {
                 count++;
             }
         }
@@ -764,10 +877,28 @@ public final class StepPreviewJsonExporter {
         if (entity instanceof StepOpenShell openShell) {
             return openShell.faces();
         }
+        if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+            return surfacedOpenShell.faces();
+        }
+        if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+            return orientedOpenShell.faces();
+        }
         if (entity instanceof StepClosedShell closedShell) {
             return closedShell.faces();
         }
-        throw new UnsupportedGeometryException("preview export requires OPEN_SHELL or CLOSED_SHELL");
+        if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+            return orientedClosedShell.faces();
+        }
+        throw new UnsupportedGeometryException(
+                "preview export requires OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
+    }
+
+    private static boolean isShellEntity(StepEntity entity) {
+        return entity instanceof StepOpenShell
+                || entity instanceof StepSurfacedOpenShell
+                || entity instanceof StepOrientedOpenShell
+                || entity instanceof StepClosedShell
+                || entity instanceof StepOrientedClosedShell;
     }
 
     private static FacePayload toPlanarFacePayload(
@@ -3051,6 +3182,9 @@ public final class StepPreviewJsonExporter {
     }
 
     private static String surfaceTypeName(StepEntity geometry) {
+        if (geometry instanceof StepPlane) {
+            return "PLANE";
+        }
         if (geometry instanceof StepCylindricalSurface) {
             return "CYLINDRICAL_SURFACE";
         }
@@ -3206,6 +3340,13 @@ public final class StepPreviewJsonExporter {
                 toPointPayloads(polyline),
                 edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder)
         );
+    }
+
+    private static EdgePayload toPolylineEdgePayload(StepPolyline polyline) {
+        List<CartesianPoint> points = polyline.points().stream()
+                .map(StepPreviewJsonExporter::pointFromStep)
+                .toList();
+        return new EdgePayload(polyline.id(), toPointPayloads(points), null);
     }
 
     private static EdgeCurvePayload edgeCurvePayload(
@@ -3390,6 +3531,7 @@ public final class StepPreviewJsonExporter {
                 payload.bounds(),
                 payload.validation(),
                 payload.pmi(),
+                payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
                 payload.edges(),
                 faces,
@@ -4071,6 +4213,8 @@ public final class StepPreviewJsonExporter {
         appendValidation(json, payload.validation());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
+        json.append(",\"unsupportedBooleans\":");
+        appendUnsupportedBooleans(json, payload.unsupportedBooleans());
         json.append(",\"unsupportedFaces\":");
         appendUnsupportedFaces(json, payload.unsupportedFaces());
         json.append(",\"edges\":");
@@ -4159,6 +4303,7 @@ public final class StepPreviewJsonExporter {
                 payload.bounds(),
                 payload.validation(),
                 payload.pmi(),
+                payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
                 payload.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
                 payload.faces().stream().map(face -> toBinaryFace(face, geometry)).toList(),
@@ -4216,6 +4361,8 @@ public final class StepPreviewJsonExporter {
         appendValidation(json, payload.validation());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
+        json.append(",\"unsupportedBooleans\":");
+        appendUnsupportedBooleans(json, payload.unsupportedBooleans());
         json.append(",\"unsupportedFaces\":");
         appendUnsupportedFaces(json, payload.unsupportedFaces());
         json.append(",\"edges\":");
@@ -4381,6 +4528,7 @@ public final class StepPreviewJsonExporter {
         preview.put("bounds", boundsMap(payload.bounds()));
         preview.put("validation", validationMap(payload.validation()));
         preview.put("pmi", pmiMaps(payload.pmi()));
+        preview.put("unsupportedBooleans", unsupportedBooleanMaps(payload.unsupportedBooleans()));
         preview.put("unsupportedFaces", unsupportedFaceMaps(payload.unsupportedFaces()));
         preview.put("instances", instanceMaps(payload.instances()));
         return preview;
@@ -4394,6 +4542,7 @@ public final class StepPreviewJsonExporter {
         map.put("faceCount", stats.faceCount());
         map.put("edgeCount", stats.edgeCount());
         map.put("unsupportedFaceCount", stats.unsupportedFaceCount());
+        map.put("unsupportedBooleanCount", stats.unsupportedBooleanCount());
         return map;
     }
 
@@ -4479,6 +4628,19 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(list);
     }
 
+    private static List<Map<String, Object>> unsupportedBooleanMaps(List<UnsupportedBooleanPayload> unsupportedBooleans) {
+        List<Map<String, Object>> list = new ArrayList<>(unsupportedBooleans.size());
+        for (UnsupportedBooleanPayload item : unsupportedBooleans) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", item.stepId());
+            map.put("name", item.name());
+            map.put("type", item.type());
+            map.put("reason", item.reason());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
     private static List<Map<String, Object>> instanceMaps(List<InstancePayload> instances) {
         List<Map<String, Object>> list = new ArrayList<>(instances.size());
         for (InstancePayload instance : instances) {
@@ -4522,6 +4684,7 @@ public final class StepPreviewJsonExporter {
         json.append(",\"faceCount\":").append(stats.faceCount());
         json.append(",\"edgeCount\":").append(stats.edgeCount());
         json.append(",\"unsupportedFaceCount\":").append(stats.unsupportedFaceCount());
+        json.append(",\"unsupportedBooleanCount\":").append(stats.unsupportedBooleanCount());
         json.append('}');
     }
 
@@ -4618,6 +4781,23 @@ public final class StepPreviewJsonExporter {
             json.append(",\"name\":").append(quote(face.name()));
             json.append(",\"surfaceType\":").append(quote(face.surfaceType()));
             json.append(",\"reason\":").append(quote(face.reason()));
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static void appendUnsupportedBooleans(StringBuilder json, List<UnsupportedBooleanPayload> unsupportedBooleans) {
+        json.append('[');
+        for (int i = 0; i < unsupportedBooleans.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            UnsupportedBooleanPayload item = unsupportedBooleans.get(i);
+            json.append('{');
+            json.append("\"id\":").append(item.stepId());
+            json.append(",\"name\":").append(quote(item.name()));
+            json.append(",\"type\":").append(quote(item.type()));
+            json.append(",\"reason\":").append(quote(item.reason()));
             json.append('}');
         }
         json.append(']');
@@ -4873,6 +5053,7 @@ public final class StepPreviewJsonExporter {
             BoundsPayload bounds,
             ValidationPayload validation,
             List<PmiPayload> pmi,
+            List<UnsupportedBooleanPayload> unsupportedBooleans,
             List<UnsupportedFacePayload> unsupportedFaces,
             List<EdgePayload> edges,
             List<FacePayload> faces,
@@ -4903,13 +5084,20 @@ public final class StepPreviewJsonExporter {
     ) {
     }
 
+    private record RepresentationBuildResult(
+            RepresentationPayload payload,
+            List<UnsupportedFacePayload> unsupportedFaces
+    ) {
+    }
+
     private record PreviewStats(
             int entityCount,
             int solidCount,
             int shellCount,
             int faceCount,
             int edgeCount,
-            int unsupportedFaceCount
+            int unsupportedFaceCount,
+            int unsupportedBooleanCount
     ) {
     }
 
@@ -5006,6 +5194,7 @@ public final class StepPreviewJsonExporter {
             BoundsPayload bounds,
             ValidationPayload validation,
             List<PmiPayload> pmi,
+            List<UnsupportedBooleanPayload> unsupportedBooleans,
             List<UnsupportedFacePayload> unsupportedFaces,
             List<BinaryEdgePayload> edges,
             List<BinaryFacePayload> faces,
@@ -5167,6 +5356,14 @@ public final class StepPreviewJsonExporter {
             int stepId,
             String name,
             String surfaceType,
+            String reason
+    ) {
+    }
+
+    private record UnsupportedBooleanPayload(
+            int stepId,
+            String name,
+            String type,
             String reason
     ) {
     }

@@ -50,6 +50,8 @@ import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepOpenShell;
+import com.minicad.step.model.StepOrientedClosedShell;
+import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedEdge;
 import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepPlane;
@@ -58,6 +60,7 @@ import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSurfacedOpenShell;
 import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepToroidalSurface;
@@ -732,7 +735,11 @@ public final class StepCadBuilder {
         Loop builtLoop = switch (stepFaceBound.loop()) {
             case StepEdgeLoop edgeLoop -> buildEdgeLoop(edgeLoop.id());
             case StepVertexLoop vertexLoop -> buildVertexLoop(vertexLoop.id());
-            default -> throw new UnsupportedGeometryException("FACE_BOUND construction requires EDGE_LOOP or VERTEX_LOOP");
+            case com.minicad.step.model.StepPolyLoop polyLoop ->
+                    throw new UnsupportedGeometryException(
+                            "FACE_BOUND construction for POLY_LOOP is unsupported");
+            default -> throw new UnsupportedGeometryException(
+                    "FACE_BOUND construction requires EDGE_LOOP or VERTEX_LOOP");
         };
         FaceBound built = stepFaceBound.outer()
                 ? FaceBound.outer(builtLoop, stepFaceBound.orientation())
@@ -816,7 +823,7 @@ public final class StepCadBuilder {
     }
 
     /**
-     * Builds a shell from OPEN_SHELL or CLOSED_SHELL.
+     * Builds a shell from OPEN_SHELL, SURFACED_OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL.
      *
      * @param id STEP entity id
      * @return built shell
@@ -830,10 +837,16 @@ public final class StepCadBuilder {
         Shell built;
         if (entity instanceof StepOpenShell openShell) {
             built = new Shell(openShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
+        } else if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+            built = new Shell(surfacedOpenShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
+        } else if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+            built = new Shell(orientedOpenShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
         } else if (entity instanceof StepClosedShell closedShell) {
             built = new Shell(closedShell.faces().stream().map(face -> buildFace(face.id())).toList(), true);
+        } else if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+            built = new Shell(orientedClosedShell.faces().stream().map(face -> buildFace(face.id())).toList(), true);
         } else {
-            throw new StepResolutionException("entity #" + id + " is not an OPEN_SHELL or CLOSED_SHELL");
+            throw new StepResolutionException("entity #" + id + " is not an OPEN_SHELL, SURFACED_OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
         }
         shells.put(id, built);
         return built;

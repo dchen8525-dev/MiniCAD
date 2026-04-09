@@ -125,6 +125,113 @@ class StepCadBuilderTest {
     }
 
     @Test
+    void shouldBuildOrientedShellsAndSolid() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #32=LINE('L1',#1,#24);
+                #24=VECTOR('VE1',#25,1.0);
+                #25=DIRECTION('D1',(1.0,0.0,0.0));
+                #35=LINE('L2',#2,#34);
+                #34=VECTOR('VE2',#33,1.0);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #38=LINE('L3',#3,#37);
+                #37=VECTOR('VE3',#36,1.0);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #41=LINE('L4',#4,#40);
+                #40=VECTOR('VE4',#39,1.0);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
+                #90=OPEN_SHELL('OS',(#80));
+                #91=CLOSED_SHELL('CS',(#80));
+                #92=ORIENTED_OPEN_SHELL('OOS',#90,.F.);
+                #93=ORIENTED_CLOSED_SHELL('OCS',#91,.F.);
+                #100=MANIFOLD_SOLID_BREP('S0',#93);
+                ENDSEC;
+                """);
+
+        Shell openShell = builder.buildShell(92);
+        Shell closedShell = builder.buildShell(93);
+        Solid solid = builder.buildSolid(100);
+
+        assertEquals(false, openShell.closed());
+        assertEquals(true, closedShell.closed());
+        assertEquals(1, openShell.faces().size());
+        assertEquals(1, closedShell.faces().size());
+        assertEquals(true, solid.outerShell().closed());
+    }
+
+    @Test
+    void shouldBuildSurfacedOpenShell() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #32=LINE('L1',#1,#24);
+                #24=VECTOR('VE1',#25,1.0);
+                #25=DIRECTION('D1',(1.0,0.0,0.0));
+                #35=LINE('L2',#2,#34);
+                #34=VECTOR('VE2',#33,1.0);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #38=LINE('L3',#3,#37);
+                #37=VECTOR('VE3',#36,1.0);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #41=LINE('L4',#4,#40);
+                #40=VECTOR('VE4',#39,1.0);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=FACE_SURFACE('F0',(#71),#13,.T.);
+                #90=SURFACED_OPEN_SHELL('SOS',(#80));
+                ENDSEC;
+                """);
+
+        Shell shell = builder.buildShell(90);
+
+        assertEquals(false, shell.closed());
+        assertEquals(1, shell.faces().size());
+    }
+
+    @Test
     void shouldBuildCircularEdgeTopology() {
         StepCadBuilder builder = builder("""
                 DATA;
@@ -267,6 +374,31 @@ class StepCadBuilderTest {
 
         assertEquals(1, face.bounds().size());
         assertEquals(true, face.bounds().getFirst().loop() instanceof com.minicad.topology.VertexLoop);
+    }
+
+    @Test
+    void shouldRejectPolyLoopFaceConstruction() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=PLANE('PL0',#4);
+                #8=POLY_LOOP('PL0',(#1,#2,#3));
+                #9=FACE_OUTER_BOUND('B0',#8,.T.);
+                #10=FACE_SURFACE('FS0',(#9),#7,.T.);
+                ENDSEC;
+                """);
+
+        UnsupportedGeometryException exception = assertThrows(
+                UnsupportedGeometryException.class,
+                () -> builder.buildFace(10)
+        );
+
+        assertEquals("FACE_BOUND construction for POLY_LOOP is unsupported", exception.getMessage());
     }
 
     @Test

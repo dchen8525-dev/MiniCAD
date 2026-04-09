@@ -10,6 +10,7 @@ import com.minicad.step.model.StepProduct;
 import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepRepresentation;
+import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
@@ -223,7 +224,8 @@ public final class StepAssemblyGraphBuilder {
         if (relation instanceof StepRepresentationRelationshipWithTransformation withTransformation) {
             return matrixFor(withTransformation.transformationOperator());
         }
-        if (relation instanceof StepShapeRepresentationRelationship) {
+        if (relation instanceof StepShapeRepresentationRelationship
+                || relation instanceof StepRepresentationRelationship) {
             return identityMatrix();
         }
         return identityMatrix();
