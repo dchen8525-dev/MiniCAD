@@ -23,10 +23,15 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepFillAreaStyleColour, StepFillAreaStyle, StepSurfaceStyleFillArea, StepSurfaceStyleBoundary, StepSurfaceStyleControlGrid, StepSurfaceStyleSegmentationCurve, StepSurfaceStyleSilhouette, StepSurfaceStyleTransparent, StepSurfaceStyleReflectanceAmbient, StepSurfaceStyleReflectanceAmbientDiffuse, StepSurfaceStyleReflectanceAmbientDiffuseSpecular, StepSurfaceStyleParameterLine, StepSurfaceSideStyle,
         StepSurfaceStyleUsage, StepPresentationStyleAssignment, StepStyledItem, StepOverRidingStyledItem,
         StepPresentationLayerAssignment,
-        StepAnnotationFillArea, StepAnnotationFillAreaOccurrence, StepAnnotationPlaceholderOccurrence, StepAnnotationPlane, StepAnnotationPointOccurrence, StepAnnotationCurveOccurrence, StepAnnotationSymbol, StepAnnotationSymbolOccurrence, StepTerminatorSymbol, StepAnnotationOccurrenceRelationship, StepLeaderCurve, StepProjectionCurve, StepDimensionCurve, StepAnnotationText, StepAnnotationTextCharacter, StepAnnotationTextOccurrence, StepGeometricCurveSet, StepDraughtingCallout, StepMeasureRepresentationItem, StepValueRepresentationItem,
-        StepGeometricItemSpecificUsage, StepPcurve, StepDegeneratePcurve, StepRepresentationItem, StepGeometricRepresentationItem,
+        StepAnnotationFillArea, StepAnnotationFillAreaOccurrence, StepAnnotationPlaceholderOccurrence, StepAnnotationPlane, StepAnnotationPointOccurrence, StepAnnotationCurveOccurrence, StepAnnotationSymbol, StepAnnotationSymbolOccurrence, StepAnnotationSubfigureOccurrence, StepDraughtingAnnotationOccurrence, StepTerminatorSymbol, StepAnnotationOccurrenceRelationship, StepLeaderCurve, StepProjectionCurve, StepDimensionCurve, StepAnnotationText, StepAnnotationTextCharacter, StepAnnotationTextOccurrence, StepGeometricCurveSet, StepDraughtingCallout, StepDraughtingCalloutRelationship, StepMeasureRepresentationItem, StepValueRepresentationItem,
+        StepItemIdentifiedRepresentationUsage, StepChainBasedItemIdentifiedRepresentationUsage, StepChainBasedGeometricItemSpecificUsage, StepPmiRequirementItemAssociation, StepMechanicalDesignRequirementItemAssociation, StepPlacedTarget, StepDraughtingModelItemAssociation, StepDraughtingModelItemAssociationWithPlaceholder, StepGeometricItemSpecificUsage, StepPcurve, StepDegeneratePcurve, StepRepresentationItem, StepGeometricRepresentationItem,
         StepDescriptiveRepresentationItem, StepPropertyDefinition,
-        StepPropertyDefinitionRepresentation, StepDerivedUnitElement, StepDerivedUnit,
+        StepPropertyDefinitionRepresentation, StepAbstractVariable, StepRowVariable, StepScalarVariable,
+        StepAttributeAssertion, StepForwardChainingRulePremise, StepBackChainingRuleBody, StepActionPropertyRepresentation,
+        StepContactRatioRepresentation, StepKinematicPropertyDefinitionRepresentation,
+        StepKinematicPropertyMechanismRepresentation, StepKinematicPropertyRepresentationRelation,
+        StepKinematicPropertyTopologyRepresentation, StepPlacedDatumTargetFeature,
+        StepResourcePropertyRepresentation, StepDerivedUnitElement, StepDerivedUnit,
         StepApplicationProtocolDefinition, StepProductRelatedProductCategory {
 
     /**

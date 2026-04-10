@@ -10,16 +10,21 @@ import com.minicad.step.model.StepAnnotationPlane;
 import com.minicad.step.model.StepAnnotationPlaceholderOccurrence;
 import com.minicad.step.model.StepAnnotationPointOccurrence;
 import com.minicad.step.model.StepAnnotationOccurrenceRelationship;
+import com.minicad.step.model.StepAnnotationSubfigureOccurrence;
 import com.minicad.step.model.StepAnnotationSymbol;
 import com.minicad.step.model.StepAnnotationSymbolOccurrence;
 import com.minicad.step.model.StepAnnotationText;
 import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
+import com.minicad.step.model.StepAbstractVariable;
+import com.minicad.step.model.StepActionPropertyRepresentation;
 import com.minicad.step.model.StepApplicationContext;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
+import com.minicad.step.model.StepAttributeAssertion;
 import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
+import com.minicad.step.model.StepBackChainingRuleBody;
 import com.minicad.step.model.StepBoundedCurve;
 import com.minicad.step.model.StepBoundedSurface;
 import com.minicad.step.model.StepBezierCurve;
@@ -29,6 +34,8 @@ import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepChainBasedGeometricItemSpecificUsage;
+import com.minicad.step.model.StepChainBasedItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.StepCharacterGlyphStyleOutline;
 import com.minicad.step.model.StepCharacterGlyphStyleOutlineWithCharacteristics;
 import com.minicad.step.model.StepCharacterGlyphStyleStroke;
@@ -52,6 +59,7 @@ import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepConversionBasedUnit;
 import com.minicad.step.model.StepConversionBasedUnitWithOffset;
 import com.minicad.step.model.StepContextDependentUnit;
+import com.minicad.step.model.StepContactRatioRepresentation;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepCurveStyle;
 import com.minicad.step.model.StepDegeneratePcurve;
@@ -60,10 +68,14 @@ import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDerivedUnitElement;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
+import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
+import com.minicad.step.model.StepDraughtingModelItemAssociation;
+import com.minicad.step.model.StepDraughtingModelItemAssociationWithPlaceholder;
 import com.minicad.step.model.StepDraughtingPreDefinedColour;
 import com.minicad.step.model.StepDraughtingPreDefinedCurveFont;
 import com.minicad.step.model.StepDraughtingPreDefinedTextFont;
 import com.minicad.step.model.StepDraughtingCallout;
+import com.minicad.step.model.StepDraughtingCalloutRelationship;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
 import com.minicad.step.model.StepEdgeLoop;
@@ -74,18 +86,25 @@ import com.minicad.step.model.StepFaceBasedSurfaceModel;
 import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepFillAreaStyle;
 import com.minicad.step.model.StepFillAreaStyleColour;
+import com.minicad.step.model.StepForwardChainingRulePremise;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
 import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
 import com.minicad.step.model.StepGlobalUnitAssignedContext;
+import com.minicad.step.model.StepItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.StepItemDefinedTransformation;
+import com.minicad.step.model.StepKinematicPropertyDefinitionRepresentation;
+import com.minicad.step.model.StepKinematicPropertyMechanismRepresentation;
+import com.minicad.step.model.StepKinematicPropertyRepresentationRelation;
+import com.minicad.step.model.StepKinematicPropertyTopologyRepresentation;
 import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepMeasureRepresentationItem;
+import com.minicad.step.model.StepMechanicalDesignRequirementItemAssociation;
 import com.minicad.step.model.StepNamedUnit;
 import com.minicad.step.model.StepOpenShell;
 import com.minicad.step.model.StepOpenPath;
@@ -97,6 +116,8 @@ import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedPath;
 import com.minicad.step.model.StepPath;
 import com.minicad.step.model.StepPlane;
+import com.minicad.step.model.StepPlacedDatumTargetFeature;
+import com.minicad.step.model.StepPlacedTarget;
 import com.minicad.step.model.StepPolyLoop;
 import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
@@ -129,12 +150,16 @@ import com.minicad.step.model.StepPreDefinedSurfaceSideStyle;
 import com.minicad.step.model.StepPreDefinedSymbol;
 import com.minicad.step.model.StepPreDefinedTerminatorSymbol;
 import com.minicad.step.model.StepPreDefinedTextFont;
+import com.minicad.step.model.StepPmiRequirementItemAssociation;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.model.StepRepresentationMap;
 import com.minicad.step.model.StepRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepRepresentationContext;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
+import com.minicad.step.model.StepResourcePropertyRepresentation;
+import com.minicad.step.model.StepRowVariable;
+import com.minicad.step.model.StepScalarVariable;
 import com.minicad.step.model.StepCurve;
 import com.minicad.step.model.StepGeometricRepresentationItem;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
@@ -1875,6 +1900,229 @@ public final class StepEntityResolver {
             "PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
   }
 
+  private StepAbstractVariable resolveAbstractVariable(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ABSTRACT_VARIABLE");
+    requireParameterCount(instance, definition, 2);
+    return new StepAbstractVariable(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "ABSTRACT_VARIABLE definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "ABSTRACT_VARIABLE used_representation must reference REPRESENTATION"));
+  }
+
+  private StepRowVariable resolveRowVariable(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ROW_VARIABLE");
+    requireParameterCount(instance, definition, 2);
+    return new StepRowVariable(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "ROW_VARIABLE definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "ROW_VARIABLE used_representation must reference REPRESENTATION"));
+  }
+
+  private StepScalarVariable resolveScalarVariable(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SCALAR_VARIABLE");
+    requireParameterCount(instance, definition, 2);
+    return new StepScalarVariable(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "SCALAR_VARIABLE definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "SCALAR_VARIABLE used_representation must reference REPRESENTATION"));
+  }
+
+  private StepAttributeAssertion resolveAttributeAssertion(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ATTRIBUTE_ASSERTION");
+    requireParameterCount(instance, definition, 2);
+    return new StepAttributeAssertion(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "ATTRIBUTE_ASSERTION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "ATTRIBUTE_ASSERTION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepForwardChainingRulePremise resolveForwardChainingRulePremise(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FORWARD_CHAINING_RULE_PREMISE");
+    requireParameterCount(instance, definition, 2);
+    return new StepForwardChainingRulePremise(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "FORWARD_CHAINING_RULE_PREMISE definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "FORWARD_CHAINING_RULE_PREMISE used_representation must reference REPRESENTATION"));
+  }
+
+  private StepBackChainingRuleBody resolveBackChainingRuleBody(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BACK_CHAINING_RULE_BODY");
+    requireParameterCount(instance, definition, 2);
+    return new StepBackChainingRuleBody(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "BACK_CHAINING_RULE_BODY definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "BACK_CHAINING_RULE_BODY used_representation must reference REPRESENTATION"));
+  }
+
+  private StepActionPropertyRepresentation resolveActionPropertyRepresentation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ACTION_PROPERTY_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepActionPropertyRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "ACTION_PROPERTY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "ACTION_PROPERTY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepContactRatioRepresentation resolveContactRatioRepresentation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CONTACT_RATIO_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepContactRatioRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "CONTACT_RATIO_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "CONTACT_RATIO_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepKinematicPropertyDefinitionRepresentation
+      resolveKinematicPropertyDefinitionRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyDefinitionRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepKinematicPropertyMechanismRepresentation
+      resolveKinematicPropertyMechanismRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyMechanismRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepKinematicPropertyRepresentationRelation
+      resolveKinematicPropertyRepresentationRelation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "KINEMATIC_PROPERTY_REPRESENTATION_RELATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyRepresentationRelation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepKinematicPropertyTopologyRepresentation
+      resolveKinematicPropertyTopologyRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyTopologyRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  private StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PLACED_DATUM_TARGET_FEATURE");
+    requireParameterCount(instance, definition, 2);
+    return new StepPlacedDatumTargetFeature(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "PLACED_DATUM_TARGET_FEATURE definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "PLACED_DATUM_TARGET_FEATURE used_representation must reference REPRESENTATION"));
+  }
+
+  private StepResourcePropertyRepresentation resolveResourcePropertyRepresentation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RESOURCE_PROPERTY_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepResourcePropertyRepresentation(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "RESOURCE_PROPERTY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "RESOURCE_PROPERTY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
   private StepRepresentationMap resolveRepresentationMap(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "REPRESENTATION_MAP");
     requireParameterCount(instance, definition, 2);
@@ -2015,7 +2263,12 @@ public final class StepEntityResolver {
 
   private StepRepresentationRelationship resolveRepresentationRelationship(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REPRESENTATION_RELATIONSHIP");
+    return resolveRepresentationRelationship(instance, "REPRESENTATION_RELATIONSHIP");
+  }
+
+  private StepRepresentationRelationship resolveRepresentationRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 4);
     return new StepRepresentationRelationship(
         instance.id(),
@@ -2024,11 +2277,11 @@ public final class StepEntityResolver {
         requireEntity(
             referenceId(instance, definition, 2),
             StepRepresentation.class,
-            "REPRESENTATION_RELATIONSHIP rep_1 must reference REPRESENTATION"),
+            entityName + " rep_1 must reference REPRESENTATION"),
         requireEntity(
             referenceId(instance, definition, 3),
             StepRepresentation.class,
-            "REPRESENTATION_RELATIONSHIP rep_2 must reference REPRESENTATION"));
+            entityName + " rep_2 must reference REPRESENTATION"));
   }
 
   private StepShapeRepresentationRelationship resolveShapeRepresentationRelationship(
@@ -3108,6 +3361,41 @@ public final class StepEntityResolver {
             "ANNOTATION_SYMBOL_OCCURRENCE item must reference ANNOTATION_SYMBOL"));
   }
 
+  private StepAnnotationSubfigureOccurrence resolveAnnotationSubfigureOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_SUBFIGURE_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepAnnotationSubfigureOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_SUBFIGURE_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAnnotationSymbol.class,
+            "ANNOTATION_SUBFIGURE_OCCURRENCE item must reference ANNOTATION_SYMBOL"));
+  }
+
+  private StepDraughtingAnnotationOccurrence resolveDraughtingAnnotationOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DRAUGHTING_ANNOTATION_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepDraughtingAnnotationOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "DRAUGHTING_ANNOTATION_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
   private StepTerminatorSymbol resolveTerminatorSymbol(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "TERMINATOR_SYMBOL");
@@ -3138,13 +3426,18 @@ public final class StepEntityResolver {
 
   private StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_OCCURRENCE_RELATIONSHIP");
+    return resolveAnnotationOccurrenceRelationship(instance, "ANNOTATION_OCCURRENCE_RELATIONSHIP");
+  }
+
+  private StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 4);
     StepEntity relating = resolve(referenceId(instance, definition, 2));
     StepEntity related = resolve(referenceId(instance, definition, 3));
     if (!isAnnotationOccurrence(relating) || !isAnnotationOccurrence(related)) {
       throw new UnsupportedStepEntityException(
-          "ANNOTATION_OCCURRENCE_RELATIONSHIP occurrences must reference supported annotation occurrence entities");
+          entityName + " occurrences must reference supported annotation occurrence entities");
     }
     return new StepAnnotationOccurrenceRelationship(
         instance.id(),
@@ -3461,19 +3754,53 @@ public final class StepEntityResolver {
   }
 
   private StepDraughtingCallout resolveDraughtingCallout(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_CALLOUT");
+    return resolveDraughtingCallout(instance, "DRAUGHTING_CALLOUT");
+  }
+
+  private StepDraughtingCallout resolveDraughtingCallout(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     List<StepEntity> contents =
         entityReferenceList(
-            instance, definition, 1, "DRAUGHTING_CALLOUT contents must contain entity references");
+            instance, definition, 1, entityName + " contents must contain entity references");
     for (StepEntity content : contents) {
       if (!(content instanceof StepAnnotationTextOccurrence)
-          && !(content instanceof StepGeometricCurveSet)) {
+          && !(content instanceof StepGeometricCurveSet)
+          && !(content instanceof StepAnnotationSymbolOccurrence)
+          && !(content instanceof StepAnnotationFillAreaOccurrence)
+          && !(content instanceof StepAnnotationCurveOccurrence)
+          && !(content instanceof StepAnnotationPointOccurrence)
+          && !(content instanceof StepTerminatorSymbol)) {
         throw new UnsupportedStepEntityException(
-            "DRAUGHTING_CALLOUT contents must reference ANNOTATION_TEXT_OCCURRENCE or GEOMETRIC_CURVE_SET");
+            entityName
+                + " contents must reference supported annotation occurrences, TERMINATOR_SYMBOL or GEOMETRIC_CURVE_SET");
       }
     }
     return new StepDraughtingCallout(instance.id(), stringValue(instance, definition, 0), contents);
+  }
+
+  private StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(
+      StepEntityInstance instance) {
+    return resolveDraughtingCalloutRelationship(instance, "DRAUGHTING_CALLOUT_RELATIONSHIP");
+  }
+
+  private StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    return new StepDraughtingCalloutRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepDraughtingCallout.class,
+            entityName + " relating_callout must reference DRAUGHTING_CALLOUT"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepDraughtingCallout.class,
+            entityName + " related_callout must reference DRAUGHTING_CALLOUT"));
   }
 
   private StepMeasureRepresentationItem resolveMeasureRepresentationItem(
@@ -3520,6 +3847,201 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         typedValue.typeName(),
         literalText(typedValue.value()));
+  }
+
+  private StepItemIdentifiedRepresentationUsage resolveItemIdentifiedRepresentationUsage(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ITEM_IDENTIFIED_REPRESENTATION_USAGE");
+    requireParameterCount(instance, definition, 5);
+    return new StepItemIdentifiedRepresentationUsage(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "ITEM_IDENTIFIED_REPRESENTATION_USAGE used_representation must reference REPRESENTATION"),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepChainBasedItemIdentifiedRepresentationUsage
+      resolveChainBasedItemIdentifiedRepresentationUsage(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE");
+    requireParameterCount(instance, definition, 6);
+    List<StepRepresentation> nodes =
+        referenceList(
+            instance,
+            definition,
+            3,
+            StepRepresentation.class,
+            "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE nodes must contain REPRESENTATION references");
+    if (nodes.size() < 2) {
+      throw new StepResolutionException(
+          "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE nodes must contain at least 2 representations");
+    }
+    List<StepRepresentationRelationship> undirectedLinks =
+        referenceList(
+            instance,
+            definition,
+            4,
+            StepRepresentationRelationship.class,
+            "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE undirected_link must contain REPRESENTATION_RELATIONSHIP references");
+    if (undirectedLinks.isEmpty()) {
+      throw new StepResolutionException(
+          "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE undirected_link must not be empty");
+    }
+    return new StepChainBasedItemIdentifiedRepresentationUsage(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        nodes,
+        undirectedLinks,
+        resolve(referenceId(instance, definition, 5)));
+  }
+
+  private StepChainBasedGeometricItemSpecificUsage resolveChainBasedGeometricItemSpecificUsage(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE");
+    requireParameterCount(instance, definition, 6);
+    StepEntity usage = resolve(referenceId(instance, definition, 2));
+    if (!(usage instanceof StepDraughtingCallout)
+        && !(usage instanceof StepAnnotationTextOccurrence)) {
+      throw new UnsupportedStepEntityException(
+          "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE definition must reference DRAUGHTING_CALLOUT or ANNOTATION_TEXT_OCCURRENCE");
+    }
+    List<StepRepresentation> nodes =
+        referenceList(
+            instance,
+            definition,
+            3,
+            StepRepresentation.class,
+            "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE nodes must contain REPRESENTATION references");
+    if (nodes.size() < 2) {
+      throw new StepResolutionException(
+          "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE nodes must contain at least 2 representations");
+    }
+    List<StepRepresentationRelationship> undirectedLinks =
+        referenceList(
+            instance,
+            definition,
+            4,
+            StepRepresentationRelationship.class,
+            "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE undirected_link must contain REPRESENTATION_RELATIONSHIP references");
+    if (undirectedLinks.isEmpty()) {
+      throw new StepResolutionException(
+          "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE undirected_link must not be empty");
+    }
+    StepEntity identifiedItem = resolve(referenceId(instance, definition, 5));
+    if (!(identifiedItem instanceof StepFaceEntity)
+        && !(identifiedItem instanceof StepEdgeCurve)
+        && !(identifiedItem instanceof StepRepresentation)) {
+      throw new UnsupportedStepEntityException(
+          "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE identified item must reference FACE, EDGE_CURVE or REPRESENTATION");
+    }
+    return new StepChainBasedGeometricItemSpecificUsage(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        usage,
+        nodes,
+        undirectedLinks,
+        identifiedItem);
+  }
+
+  private StepPmiRequirementItemAssociation resolvePmiRequirementItemAssociation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PMI_REQUIREMENT_ITEM_ASSOCIATION");
+    requireParameterCount(instance, definition, 6);
+    return new StepPmiRequirementItemAssociation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "PMI_REQUIREMENT_ITEM_ASSOCIATION used_representation must reference REPRESENTATION"),
+        resolve(referenceId(instance, definition, 4)),
+        resolve(referenceId(instance, definition, 5)));
+  }
+
+  private StepMechanicalDesignRequirementItemAssociation
+      resolveMechanicalDesignRequirementItemAssociation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION");
+    requireParameterCount(instance, definition, 6);
+    return new StepMechanicalDesignRequirementItemAssociation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION used_representation must reference REPRESENTATION"),
+        resolve(referenceId(instance, definition, 4)),
+        resolve(referenceId(instance, definition, 5)));
+  }
+
+  private StepPlacedTarget resolvePlacedTarget(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PLACED_TARGET");
+    requireParameterCount(instance, definition, 5);
+    return new StepPlacedTarget(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "PLACED_TARGET used_representation must reference REPRESENTATION"),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepDraughtingModelItemAssociation resolveDraughtingModelItemAssociation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DRAUGHTING_MODEL_ITEM_ASSOCIATION");
+    requireParameterCount(instance, definition, 5);
+    return new StepDraughtingModelItemAssociation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "DRAUGHTING_MODEL_ITEM_ASSOCIATION used_representation must reference REPRESENTATION"),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepDraughtingModelItemAssociationWithPlaceholder
+      resolveDraughtingModelItemAssociationWithPlaceholder(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER");
+    requireParameterCount(instance, definition, 6);
+    StepEntity identifiedItem = resolve(referenceId(instance, definition, 4));
+    if (!(identifiedItem instanceof StepDraughtingCallout)) {
+      throw new StepResolutionException(
+          "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER identified_item must reference DRAUGHTING_CALLOUT");
+    }
+    return new StepDraughtingModelItemAssociationWithPlaceholder(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepRepresentation.class,
+            "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER used_representation must reference REPRESENTATION"),
+        identifiedItem,
+        requireEntity(
+            referenceId(instance, definition, 5),
+            StepAnnotationPlaceholderOccurrence.class,
+            "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER annotation_placeholder must reference ANNOTATION_PLACEHOLDER_OCCURRENCE"));
   }
 
   private StepGeometricItemSpecificUsage resolveGeometricItemSpecificUsage(
@@ -3854,7 +4376,9 @@ public final class StepEntityResolver {
         || entity instanceof StepAnnotationFillAreaOccurrence
         || entity instanceof StepAnnotationPlaceholderOccurrence
         || entity instanceof StepAnnotationPlane
-        || entity instanceof StepAnnotationSymbolOccurrence;
+        || entity instanceof StepAnnotationSymbolOccurrence
+        || entity instanceof StepAnnotationSubfigureOccurrence
+        || entity instanceof StepDraughtingAnnotationOccurrence;
   }
 
   private <T extends StepEntity> List<T> referenceList(
@@ -4234,6 +4758,19 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "PROCEDURAL_REPRESENTATION", false));
     registry.put(
+        "CLOSED_CURVE_STYLE_PARAMETERS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CLOSED_CURVE_STYLE_PARAMETERS", false));
+    registry.put(
+        "CURVE_STYLE_PARAMETERS_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "CURVE_STYLE_PARAMETERS_REPRESENTATION", false));
+    registry.put(
+        "CURVE_STYLE_PARAMETERS_WITH_ENDS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CURVE_STYLE_PARAMETERS_WITH_ENDS", false));
+    registry.put(
         "CONSTRUCTIVE_GEOMETRY_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "CONSTRUCTIVE_GEOMETRY_REPRESENTATION", false));
@@ -4332,6 +4869,13 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(
                 instance, "CONNECTED_EDGE_WITH_LENGTH_SET_REPRESENTATION", false));
+    registry.put(
+        "EDGE_BASED_TOPOLOGICAL_REPRESENTATION_WITH_LENGTH_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance,
+                "EDGE_BASED_TOPOLOGICAL_REPRESENTATION_WITH_LENGTH_CONSTRAINT",
+                false));
     registry.put(
         "DATA_EQUIVALENCE_CRITERIA_REPRESENTATION",
         (resolver, instance) ->
@@ -4523,6 +5067,10 @@ public final class StepEntityResolver {
             resolver.resolveRepresentation(
                 instance, "CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION", false));
     registry.put(
+        "EVALUATED_CHARACTERISTIC",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "EVALUATED_CHARACTERISTIC", false));
+    registry.put(
         "EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT",
         (resolver, instance) ->
             resolver.resolveRepresentation(
@@ -4608,6 +5156,38 @@ public final class StepEntityResolver {
     registry.put(
         "SHAPE_DEFINITION_REPRESENTATION",
         StepEntityResolver::resolveShapeDefinitionRepresentation);
+    registry.put("ROW_VARIABLE", StepEntityResolver::resolveRowVariable);
+    registry.put("SCALAR_VARIABLE", StepEntityResolver::resolveScalarVariable);
+    registry.put("ABSTRACT_VARIABLE", StepEntityResolver::resolveAbstractVariable);
+    registry.put("ATTRIBUTE_ASSERTION", StepEntityResolver::resolveAttributeAssertion);
+    registry.put("BACK_CHAINING_RULE_BODY", StepEntityResolver::resolveBackChainingRuleBody);
+    registry.put(
+        "FORWARD_CHAINING_RULE_PREMISE",
+        StepEntityResolver::resolveForwardChainingRulePremise);
+    registry.put(
+        "ACTION_PROPERTY_REPRESENTATION",
+        StepEntityResolver::resolveActionPropertyRepresentation);
+    registry.put(
+        "CONTACT_RATIO_REPRESENTATION",
+        StepEntityResolver::resolveContactRatioRepresentation);
+    registry.put(
+        "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION",
+        StepEntityResolver::resolveKinematicPropertyDefinitionRepresentation);
+    registry.put(
+        "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION",
+        StepEntityResolver::resolveKinematicPropertyMechanismRepresentation);
+    registry.put(
+        "KINEMATIC_PROPERTY_REPRESENTATION_RELATION",
+        StepEntityResolver::resolveKinematicPropertyRepresentationRelation);
+    registry.put(
+        "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION",
+        StepEntityResolver::resolveKinematicPropertyTopologyRepresentation);
+    registry.put(
+        "PLACED_DATUM_TARGET_FEATURE",
+        StepEntityResolver::resolvePlacedDatumTargetFeature);
+    registry.put(
+        "RESOURCE_PROPERTY_REPRESENTATION",
+        StepEntityResolver::resolveResourcePropertyRepresentation);
     registry.put(
         "PROPERTY_DEFINITION_REPRESENTATION",
         StepEntityResolver::resolvePropertyDefinitionRepresentation);
@@ -4625,6 +5205,151 @@ public final class StepEntityResolver {
         StepEntityResolver::resolveRepresentationRelationshipWithTransformation);
     registry.put(
         "REPRESENTATION_RELATIONSHIP", StepEntityResolver::resolveRepresentationRelationship);
+    registry.put(
+        "CONSTRUCTIVE_GEOMETRY_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "CONSTRUCTIVE_GEOMETRY_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "DATA_EQUIVALENCE_DEFINITION_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "DATA_EQUIVALENCE_DEFINITION_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "DATA_QUALITY_DEFINITION_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "DATA_QUALITY_DEFINITION_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "DEFINITIONAL_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "DEFINITIONAL_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "DEFINITIONAL_REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "DEFINITIONAL_REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT"));
+    registry.put(
+        "DRAWING_SHEET_REVISION_SEQUENCE",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "DRAWING_SHEET_REVISION_SEQUENCE"));
+    registry.put(
+        "EXPLICIT_PROCEDURAL_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "EXPLICIT_PROCEDURAL_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "EXPLICIT_PROCEDURAL_SHAPE_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "EXPLICIT_PROCEDURAL_SHAPE_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "FACE_SHAPE_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "FACE_SHAPE_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "FLAT_PATTERN_PLY_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "FLAT_PATTERN_PLY_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "MECHANICAL_DESIGN_AND_DRAUGHTING_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "MECHANICAL_DESIGN_AND_DRAUGHTING_RELATIONSHIP"));
+    registry.put(
+        "PAIR_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "PAIR_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "REPRESENTATION_RELATIONSHIP_WITH_CLASS",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "REPRESENTATION_RELATIONSHIP_WITH_CLASS"));
+    registry.put(
+        "SHAPE_DATA_QUALITY_INSPECTED_SHAPE_AND_RESULT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "SHAPE_DATA_QUALITY_INSPECTED_SHAPE_AND_RESULT_RELATIONSHIP"));
+    registry.put(
+        "SHAPE_REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "SHAPE_REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION"));
+    registry.put(
+        "TOPOLOGY_TO_GEOMETRY_MODEL_ASSOCIATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "TOPOLOGY_TO_GEOMETRY_MODEL_ASSOCIATION"));
+    registry.put(
+        "GEOMETRY_TO_TOPOLOGY_MODEL_ASSOCIATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "GEOMETRY_TO_TOPOLOGY_MODEL_ASSOCIATION"));
+    registry.put(
+        "VARIATIONAL_CURRENT_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "VARIATIONAL_CURRENT_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "COAXIAL_ASSEMBLY_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "COAXIAL_ASSEMBLY_CONSTRAINT"));
+    registry.put(
+        "PARALLEL_ASSEMBLY_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "PARALLEL_ASSEMBLY_CONSTRAINT"));
+    registry.put(
+        "PERPENDICULAR_ASSEMBLY_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "PERPENDICULAR_ASSEMBLY_CONSTRAINT"));
+    registry.put(
+        "INCIDENCE_ASSEMBLY_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "INCIDENCE_ASSEMBLY_CONSTRAINT"));
+    registry.put(
+        "TANGENT_ASSEMBLY_CONSTRAINT",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "TANGENT_ASSEMBLY_CONSTRAINT"));
+    registry.put(
+        "COAXIAL_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "COAXIAL_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+    registry.put(
+        "PARALLEL_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "PARALLEL_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+    registry.put(
+        "PERPENDICULAR_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "PERPENDICULAR_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+    registry.put(
+        "INCIDENCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "INCIDENCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+    registry.put(
+        "SURFACE_DISTANCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "SURFACE_DISTANCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+    registry.put(
+        "ANGULARITY_TOLERANCE_WITH_MODIFIERS",
+        (resolver, instance) ->
+            resolver.resolveRepresentationRelationship(
+                instance, "ANGULARITY_TOLERANCE_WITH_MODIFIERS"));
     registry.put(
         "SHAPE_REPRESENTATION_RELATIONSHIP",
         StepEntityResolver::resolveShapeRepresentationRelationship);
@@ -4980,6 +5705,12 @@ public final class StepEntityResolver {
     registry.put("LEADER_CURVE", StepEntityResolver::resolveLeaderCurve);
     registry.put("PROJECTION_CURVE", StepEntityResolver::resolveProjectionCurve);
     registry.put("DIMENSION_CURVE", StepEntityResolver::resolveDimensionCurve);
+    registry.put(
+        "ANNOTATION_SUBFIGURE_OCCURRENCE",
+        StepEntityResolver::resolveAnnotationSubfigureOccurrence);
+    registry.put(
+        "DRAUGHTING_ANNOTATION_OCCURRENCE",
+        StepEntityResolver::resolveDraughtingAnnotationOccurrence);
     registry.put("ANNOTATION_CURVE_OCCURRENCE", StepEntityResolver::resolveAnnotationCurveOccurrence);
     registry.put(
         "GEOMETRIC_REPRESENTATION_ITEM",
@@ -5086,13 +5817,82 @@ public final class StepEntityResolver {
     registry.put(
         "ANNOTATION_OCCURRENCE_RELATIONSHIP",
         StepEntityResolver::resolveAnnotationOccurrenceRelationship);
+    registry.put(
+        "ANNOTATION_OCCURRENCE_ASSOCIATIVITY",
+        (resolver, instance) ->
+            resolver.resolveAnnotationOccurrenceRelationship(instance, "ANNOTATION_OCCURRENCE_ASSOCIATIVITY"));
+    registry.put(
+        "DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY",
+        (resolver, instance) ->
+            resolver.resolveAnnotationOccurrenceRelationship(
+                instance, "DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY"));
     registry.put("ANNOTATION_TEXT_OCCURRENCE", StepEntityResolver::resolveAnnotationTextOccurrence);
     registry.put("GEOMETRIC_CURVE_SET", StepEntityResolver::resolveGeometricCurveSet);
     registry.put("GEOMETRIC_SET", StepEntityResolver::resolveGeometricSet);
     registry.put("POINT_SET", StepEntityResolver::resolvePointSet);
+    registry.put(
+        "LEADER_DIRECTED_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "LEADER_DIRECTED_CALLOUT"));
+    registry.put(
+        "PROJECTION_DIRECTED_CALLOUT",
+        (resolver, instance) ->
+            resolver.resolveDraughtingCallout(instance, "PROJECTION_DIRECTED_CALLOUT"));
+    registry.put(
+        "DIMENSION_CURVE_DIRECTED_CALLOUT",
+        (resolver, instance) ->
+            resolver.resolveDraughtingCallout(instance, "DIMENSION_CURVE_DIRECTED_CALLOUT"));
+    registry.put(
+        "DIMENSION_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "DIMENSION_CALLOUT"));
+    registry.put(
+        "DATUM_FEATURE_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "DATUM_FEATURE_CALLOUT"));
+    registry.put(
+        "DATUM_TARGET_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "DATUM_TARGET_CALLOUT"));
+    registry.put(
+        "GEOMETRICAL_TOLERANCE_CALLOUT",
+        (resolver, instance) ->
+            resolver.resolveDraughtingCallout(instance, "GEOMETRICAL_TOLERANCE_CALLOUT"));
+    registry.put(
+        "ROUGHNESS_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "ROUGHNESS_CALLOUT"));
+    registry.put(
+        "STRUCTURED_DIMENSION_CALLOUT",
+        (resolver, instance) ->
+            resolver.resolveDraughtingCallout(instance, "STRUCTURED_DIMENSION_CALLOUT"));
+    registry.put(
+        "SURFACE_CONDITION_CALLOUT",
+        (resolver, instance) ->
+            resolver.resolveDraughtingCallout(instance, "SURFACE_CONDITION_CALLOUT"));
     registry.put("DRAUGHTING_CALLOUT", StepEntityResolver::resolveDraughtingCallout);
     registry.put(
+        "DRAUGHTING_CALLOUT_RELATIONSHIP",
+        StepEntityResolver::resolveDraughtingCalloutRelationship);
+    registry.put(
+        "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE",
+        StepEntityResolver::resolveChainBasedGeometricItemSpecificUsage);
+    registry.put(
+        "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE",
+        StepEntityResolver::resolveChainBasedItemIdentifiedRepresentationUsage);
+    registry.put(
+        "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION",
+        StepEntityResolver::resolveMechanicalDesignRequirementItemAssociation);
+    registry.put(
+        "PMI_REQUIREMENT_ITEM_ASSOCIATION",
+        StepEntityResolver::resolvePmiRequirementItemAssociation);
+    registry.put("PLACED_TARGET", StepEntityResolver::resolvePlacedTarget);
+    registry.put(
+        "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER",
+        StepEntityResolver::resolveDraughtingModelItemAssociationWithPlaceholder);
+    registry.put(
         "GEOMETRIC_ITEM_SPECIFIC_USAGE", StepEntityResolver::resolveGeometricItemSpecificUsage);
+    registry.put(
+        "DRAUGHTING_MODEL_ITEM_ASSOCIATION",
+        StepEntityResolver::resolveDraughtingModelItemAssociation);
+    registry.put(
+        "ITEM_IDENTIFIED_REPRESENTATION_USAGE",
+        StepEntityResolver::resolveItemIdentifiedRepresentationUsage);
     registry.put(
         "MEASURE_REPRESENTATION_ITEM", StepEntityResolver::resolveMeasureRepresentationItem);
     registry.put(
