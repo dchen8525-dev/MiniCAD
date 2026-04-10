@@ -3749,6 +3749,62 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveAdvancedShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=CURVE_SWEPT_SOLID_SHAPE_REPRESENTATION('CSSR',(#1),#2);
+                #4=MANIFOLD_SUBSURFACE_SHAPE_REPRESENTATION('MSSR',(#1),#2);
+                #5=SCAN_DATA_SHAPE_REPRESENTATION('SDSR',(#1),#2);
+                #6=TESSELLATED_SHAPE_REPRESENTATION_WITH_ACCURACY_PARAMETERS('TSAP',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation curveSwept = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation manifoldSubsurface =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation scanData = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation tessellatedAcc =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("CSSR", curveSwept.name());
+        assertEquals("MSSR", manifoldSubsurface.name());
+        assertEquals("SDSR", scanData.name());
+        assertEquals("TSAP", tessellatedAcc.name());
+        assertEquals(true, curveSwept.shapeRepresentation());
+        assertEquals(true, manifoldSubsurface.shapeRepresentation());
+        assertEquals(true, scanData.shapeRepresentation());
+        assertEquals(true, tessellatedAcc.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveSheetAndParameterizedShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=BEVELED_SHEET_REPRESENTATION('BSHEET',(#1),#2);
+                #4=COMPOSITE_SHEET_REPRESENTATION('CSHEET',(#1),#2);
+                #5=SHAPE_REPRESENTATION_WITH_PARAMETERS('SRWP',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation beveled = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation composite = assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation parameterized = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        assertEquals("BSHEET", beveled.name());
+        assertEquals("CSHEET", composite.name());
+        assertEquals("SRWP", parameterized.name());
+        assertEquals(true, beveled.shapeRepresentation());
+        assertEquals(true, composite.shapeRepresentation());
+        assertEquals(true, parameterized.shapeRepresentation());
+    }
+
+    @Test
     void shouldResolvePathShapeRepresentation() {
         String step = """
                 DATA;
@@ -3831,6 +3887,755 @@ class StepEntityResolverTest {
         StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(3));
         assertEquals("DM", representation.name());
         assertEquals(false, representation.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveAdditionalRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=DRAUGHTING_SUBFIGURE_REPRESENTATION('DSF',(#1),#2);
+                #4=DRAUGHTING_SYMBOL_REPRESENTATION('DSR',(#1),#2);
+                #5=MECHANICAL_DESIGN_SHADED_PRESENTATION_REPRESENTATION('MSPR',(#1),#2);
+                #6=VISUAL_APPEARANCE_REPRESENTATION('VAR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation draughtingSubfigure =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation draughtingSymbol =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation shaded =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation visual =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("DSF", draughtingSubfigure.name());
+        assertEquals("DSR", draughtingSymbol.name());
+        assertEquals("MSPR", shaded.name());
+        assertEquals("VAR", visual.name());
+        assertEquals(false, draughtingSubfigure.shapeRepresentation());
+        assertEquals(false, draughtingSymbol.shapeRepresentation());
+        assertEquals(false, shaded.shapeRepresentation());
+        assertEquals(false, visual.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveMorePresentationRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=MECHANICAL_DESIGN_PRESENTATION_REPRESENTATION_WITH_DRAUGHTING('MDPRD',(#1),#2);
+                #4=PRESENTATION_AREA('PA',(#1),#2);
+                #5=PRESENTATION_VIEW('PV',(#1),#2);
+                #6=PICTURE_REPRESENTATION('PIC',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation mdpr =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation area =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation view =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation picture =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("MDPRD", mdpr.name());
+        assertEquals("PA", area.name());
+        assertEquals("PV", view.name());
+        assertEquals("PIC", picture.name());
+        assertEquals(false, mdpr.shapeRepresentation());
+        assertEquals(false, area.shapeRepresentation());
+        assertEquals(false, view.shapeRepresentation());
+        assertEquals(false, picture.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveTextAndSymbolRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=SYMBOL_REPRESENTATION('SR',(#1),#2);
+                #4=TEXT_STRING_REPRESENTATION('TSR',(#1),#2);
+                #5=STRUCTURED_TEXT_REPRESENTATION('STR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation symbol =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation textString =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation structuredText =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        assertEquals("SR", symbol.name());
+        assertEquals("TSR", textString.name());
+        assertEquals("STR", structuredText.name());
+        assertEquals(false, symbol.shapeRepresentation());
+        assertEquals(false, textString.shapeRepresentation());
+        assertEquals(false, structuredText.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveDrawingAndPathRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=DRAWING_SHEET_LAYOUT('DSL',(#1),#2);
+                #4=DRAWING_SHEET_REVISION('DSR2',(#1),#2);
+                #5=PATH_PARAMETER_REPRESENTATION('PPR',(#1),#2);
+                #6=PRESCRIBED_PATH('PPATH',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation sheetLayout =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation sheetRevision =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation pathParameter =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation prescribedPath =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("DSL", sheetLayout.name());
+        assertEquals("DSR2", sheetRevision.name());
+        assertEquals("PPR", pathParameter.name());
+        assertEquals("PPATH", prescribedPath.name());
+        assertEquals(false, sheetLayout.shapeRepresentation());
+        assertEquals(false, sheetRevision.shapeRepresentation());
+        assertEquals(false, pathParameter.shapeRepresentation());
+        assertEquals(false, prescribedPath.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveResultingPathAndCharacterGlyphRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=RESULTING_PATH('RPATH',(#1),#2);
+                #4=CHARACTER_GLYPH_SYMBOL('CGS',(#1),#2);
+                #5=CHARACTER_GLYPH_SYMBOL_OUTLINE('CGSO',(#1),#2);
+                #6=CHARACTER_GLYPH_SYMBOL_STROKE('CGSS',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation resultingPath =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation glyphSymbol =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation glyphOutline =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation glyphStroke =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("RPATH", resultingPath.name());
+        assertEquals("CGS", glyphSymbol.name());
+        assertEquals("CGSO", glyphOutline.name());
+        assertEquals("CGSS", glyphStroke.name());
+        assertEquals(false, resultingPath.shapeRepresentation());
+        assertEquals(false, glyphSymbol.shapeRepresentation());
+        assertEquals(false, glyphOutline.shapeRepresentation());
+        assertEquals(false, glyphStroke.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolvePresentationAreaAndGenericGlyphRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_AREA('MDGPA',(#1),#2);
+                #4=MECHANICAL_DESIGN_SHADED_PRESENTATION_AREA('MDSPA',(#1),#2);
+                #5=GENERIC_CHARACTER_GLYPH_SYMBOL('GCGS',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation geometricArea =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation shadedArea =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation genericGlyph =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        assertEquals("MDGPA", geometricArea.name());
+        assertEquals("MDSPA", shadedArea.name());
+        assertEquals("GCGS", genericGlyph.name());
+        assertEquals(false, geometricArea.shapeRepresentation());
+        assertEquals(false, shadedArea.shapeRepresentation());
+        assertEquals(false, genericGlyph.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveMorePresentationRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION('MDGPR',(#1),#2);
+                #4=AREA_DEPENDENT_ANNOTATION_REPRESENTATION('ADAR',(#1),#2);
+                #5=SURFACE_TEXTURE_REPRESENTATION('STRX',(#1),#2);
+                #6=TACTILE_APPEARANCE_REPRESENTATION('TAR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation geometricPresentation =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation areaDependent =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation surfaceTexture =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation tactileAppearance =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("MDGPR", geometricPresentation.name());
+        assertEquals("ADAR", areaDependent.name());
+        assertEquals("STRX", surfaceTexture.name());
+        assertEquals("TAR", tactileAppearance.name());
+        assertEquals(false, geometricPresentation.shapeRepresentation());
+        assertEquals(false, areaDependent.shapeRepresentation());
+        assertEquals(false, surfaceTexture.shapeRepresentation());
+        assertEquals(false, tactileAppearance.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveProceduralAndVariationalRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=PROCEDURAL_REPRESENTATION('PROC',(#1),#2);
+                #4=CONSTRUCTIVE_GEOMETRY_REPRESENTATION('CGR',(#1),#2);
+                #5=PRESENTATION_SIZE('PSIZE',(#1),#2);
+                #6=VARIATIONAL_REPRESENTATION('VREP',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation procedural =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation constructiveGeometry =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation presentationSize =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation variational =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("PROC", procedural.name());
+        assertEquals("CGR", constructiveGeometry.name());
+        assertEquals("PSIZE", presentationSize.name());
+        assertEquals("VREP", variational.name());
+        assertEquals(false, procedural.shapeRepresentation());
+        assertEquals(false, constructiveGeometry.shapeRepresentation());
+        assertEquals(false, presentationSize.shapeRepresentation());
+        assertEquals(false, variational.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveCharacteristicAndUncertaintyRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=RANGE_CHARACTERISTIC('RCHAR',(#1),#2);
+                #4=PLY_ANGLE_REPRESENTATION('PLY',(#1),#2);
+                #5=MOMENTS_OF_INERTIA_REPRESENTATION('MOI',(#1),#2);
+                #6=UNCERTAINTY_ASSIGNED_REPRESENTATION('UAR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation rangeCharacteristic =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation plyAngle =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation momentsOfInertia =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation uncertaintyAssigned =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("RCHAR", rangeCharacteristic.name());
+        assertEquals("PLY", plyAngle.name());
+        assertEquals("MOI", momentsOfInertia.name());
+        assertEquals("UAR", uncertaintyAssigned.name());
+        assertEquals(false, rangeCharacteristic.shapeRepresentation());
+        assertEquals(false, plyAngle.shapeRepresentation());
+        assertEquals(false, momentsOfInertia.shapeRepresentation());
+        assertEquals(false, uncertaintyAssigned.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveInterpolatedAndKinematicRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=INTERPOLATED_CONFIGURATION_REPRESENTATION('ICR',(#1),#2);
+                #4=KINEMATIC_FRAME_BACKGROUND_REPRESENTATION('KFBR',(#1),#2);
+                #5=KINEMATIC_GROUND_REPRESENTATION('KGR',(#1),#2);
+                #6=KINEMATIC_LINK_REPRESENTATION('KLR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation interpolated =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation frameBackground =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation ground =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation link =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("ICR", interpolated.name());
+        assertEquals("KFBR", frameBackground.name());
+        assertEquals("KGR", ground.name());
+        assertEquals("KLR", link.name());
+        assertEquals(false, interpolated.shapeRepresentation());
+        assertEquals(false, frameBackground.shapeRepresentation());
+        assertEquals(false, ground.shapeRepresentation());
+        assertEquals(false, link.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveKinematicTopologyRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=KINEMATIC_TOPOLOGY_DIRECTED_STRUCTURE('KTDS',(#1),#2);
+                #4=KINEMATIC_TOPOLOGY_NETWORK_STRUCTURE('KTNS',(#1),#2);
+                #5=KINEMATIC_TOPOLOGY_STRUCTURE('KTS',(#1),#2);
+                #6=KINEMATIC_TOPOLOGY_SUBSTRUCTURE('KTSS',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation directed =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation network =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation structure =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation substructure =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("KTDS", directed.name());
+        assertEquals("KTNS", network.name());
+        assertEquals("KTS", structure.name());
+        assertEquals("KTSS", substructure.name());
+        assertEquals(false, directed.shapeRepresentation());
+        assertEquals(false, network.shapeRepresentation());
+        assertEquals(false, structure.shapeRepresentation());
+        assertEquals(false, substructure.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveMechanismAndLinkRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=KINEMATIC_TOPOLOGY_TREE_STRUCTURE('KTTS',(#1),#2);
+                #4=LINEAR_FLEXIBLE_LINK_REPRESENTATION('LFLR',(#1),#2);
+                #5=RIGID_LINK_REPRESENTATION('RLR',(#1),#2);
+                #6=MECHANISM_REPRESENTATION('MR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation tree =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation flexibleLink =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation rigidLink =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation mechanism =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("KTTS", tree.name());
+        assertEquals("LFLR", flexibleLink.name());
+        assertEquals("RLR", rigidLink.name());
+        assertEquals("MR", mechanism.name());
+        assertEquals(false, tree.shapeRepresentation());
+        assertEquals(false, flexibleLink.shapeRepresentation());
+        assertEquals(false, rigidLink.shapeRepresentation());
+        assertEquals(false, mechanism.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveAdditionalMotionAndOrientationRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=MECHANISM_STATE_REPRESENTATION('MSR',(#1),#2);
+                #4=LINK_MOTION_REPRESENTATION_ALONG_PATH('LMRAP',(#1),#2);
+                #5=REINFORCEMENT_ORIENTATION_BASIS('ROB',(#1),#2);
+                #6=CONNECTED_EDGE_WITH_LENGTH_SET_REPRESENTATION('CEWLSR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation mechanismState =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation linkMotion =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation reinforcementBasis =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation connectedEdgeLengthSet =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("MSR", mechanismState.name());
+        assertEquals("LMRAP", linkMotion.name());
+        assertEquals("ROB", reinforcementBasis.name());
+        assertEquals("CEWLSR", connectedEdgeLengthSet.name());
+        assertEquals(false, mechanismState.shapeRepresentation());
+        assertEquals(false, linkMotion.shapeRepresentation());
+        assertEquals(false, reinforcementBasis.shapeRepresentation());
+        assertEquals(false, connectedEdgeLengthSet.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveDataQualityRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=DATA_EQUIVALENCE_CRITERIA_REPRESENTATION('DECR',(#1),#2);
+                #4=DATA_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION('DEIR',(#1),#2);
+                #5=DATA_QUALITY_CRITERIA_REPRESENTATION('DQCR',(#1),#2);
+                #6=DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION('DQIR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation equivalenceCriteria =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation equivalenceResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation qualityCriteria =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation qualityResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("DECR", equivalenceCriteria.name());
+        assertEquals("DEIR", equivalenceResult.name());
+        assertEquals("DQCR", qualityCriteria.name());
+        assertEquals("DQIR", qualityResult.name());
+        assertEquals(false, equivalenceCriteria.shapeRepresentation());
+        assertEquals(false, equivalenceResult.shapeRepresentation());
+        assertEquals(false, qualityCriteria.shapeRepresentation());
+        assertEquals(false, qualityResult.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveExternallyConditionedAndA3mRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=EXTERNALLY_CONDITIONED_DATA_QUALITY_CRITERIA_REPRESENTATION('ECDQCR',(#1),#2);
+                #4=EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION('ECDQIR',(#1),#2);
+                #5=A3M_EQUIVALENCE_CRITERIA_REPRESENTATION('A3MECR',(#1),#2);
+                #6=A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION('A3MEIR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation externallyConditionedCriteria =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation externallyConditionedResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation a3mCriteria =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation a3mResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("ECDQCR", externallyConditionedCriteria.name());
+        assertEquals("ECDQIR", externallyConditionedResult.name());
+        assertEquals("A3MECR", a3mCriteria.name());
+        assertEquals("A3MEIR", a3mResult.name());
+        assertEquals(false, externallyConditionedCriteria.shapeRepresentation());
+        assertEquals(false, externallyConditionedResult.shapeRepresentation());
+        assertEquals(false, a3mCriteria.shapeRepresentation());
+        assertEquals(false, a3mResult.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveA3mAssemblyAndShapeDataQualityRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','QUALITY');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','QUALITY'));
+                #3=A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_ASSEMBLY('A3MIRA',(#1),#2);
+                #4=A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_SHAPE('A3MIRS',(#1),#2);
+                #5=SHAPE_DATA_QUALITY_CRITERIA_REPRESENTATION('SDQCR',(#1),#2);
+                #6=SHAPE_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION('SDQIR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation a3mAssemblyResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation a3mShapeResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation shapeQualityCriteria =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation shapeQualityResult =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("A3MIRA", a3mAssemblyResult.name());
+        assertEquals("A3MIRS", a3mShapeResult.name());
+        assertEquals("SDQCR", shapeQualityCriteria.name());
+        assertEquals("SDQIR", shapeQualityResult.name());
+        assertEquals(false, a3mAssemblyResult.shapeRepresentation());
+        assertEquals(false, a3mShapeResult.shapeRepresentation());
+        assertEquals(false, shapeQualityCriteria.shapeRepresentation());
+        assertEquals(false, shapeQualityResult.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveExternallyDefinedAndAccuracyRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','EXT');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','EXTREP'));
+                #3=EXTERNALLY_DEFINED_REPRESENTATION('EDR',(#1),#2);
+                #4=EXTERNALLY_DEFINED_REPRESENTATION_WITH_PARAMETERS('EDRP',(#1),#2);
+                #5=SHAPE_CRITERIA_REPRESENTATION_WITH_ACCURACY('SCRA',(#1),#2);
+                #6=SHAPE_INSPECTION_RESULT_REPRESENTATION_WITH_ACCURACY('SIRA',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation externallyDefined =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation externallyDefinedWithParameters =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation shapeCriteriaWithAccuracy =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation shapeInspectionWithAccuracy =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("EDR", externallyDefined.name());
+        assertEquals("EDRP", externallyDefinedWithParameters.name());
+        assertEquals("SCRA", shapeCriteriaWithAccuracy.name());
+        assertEquals("SIRA", shapeInspectionWithAccuracy.name());
+        assertEquals(false, externallyDefined.shapeRepresentation());
+        assertEquals(false, externallyDefinedWithParameters.shapeRepresentation());
+        assertEquals(false, shapeCriteriaWithAccuracy.shapeRepresentation());
+        assertEquals(false, shapeInspectionWithAccuracy.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveAdditionalGeneralRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','GEN');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','GENERAL'));
+                #3=ANALYSIS_MODEL('AM',(#1),#2);
+                #4=LANGUAGE_ASSIGNMENT('LANG',(#1),#2);
+                #5=MESSAGE_CONTENTS_ASSIGNMENT('MSG',(#1),#2);
+                #6=MACHINING_TOOL_DIRECTION_REPRESENTATION('MTDR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation analysisModel =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation languageAssignment =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation messageContents =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation machiningToolDirection =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("AM", analysisModel.name());
+        assertEquals("LANG", languageAssignment.name());
+        assertEquals("MSG", messageContents.name());
+        assertEquals("MTDR", machiningToolDirection.name());
+        assertEquals(false, analysisModel.shapeRepresentation());
+        assertEquals(false, languageAssignment.shapeRepresentation());
+        assertEquals(false, messageContents.shapeRepresentation());
+        assertEquals(false, machiningToolDirection.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveFoundedPathAndSimplifiedHoleRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','HOLE');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','HOLEDEF'));
+                #3=FOUNDED_KINEMATIC_PATH('FKP',(#1),#2);
+                #4=SIMPLIFIED_COUNTERBORE_HOLE_DEFINITION('SCBH',(#1),#2);
+                #5=SIMPLIFIED_COUNTERDRILL_HOLE_DEFINITION('SCDH',(#1),#2);
+                #6=SIMPLIFIED_COUNTERSINK_HOLE_DEFINITION('SCSH',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation foundedPath =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation counterbore =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation counterdrill =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation countersink =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("FKP", foundedPath.name());
+        assertEquals("SCBH", counterbore.name());
+        assertEquals("SCDH", counterdrill.name());
+        assertEquals("SCSH", countersink.name());
+        assertEquals(false, foundedPath.shapeRepresentation());
+        assertEquals(false, counterbore.shapeRepresentation());
+        assertEquals(false, counterdrill.shapeRepresentation());
+        assertEquals(false, countersink.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveMachiningRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','MACH');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MACHINING'));
+                #3=MACHINING_CUTTING_CORNER_REPRESENTATION('MCCR',(#1),#2);
+                #4=MACHINING_DWELL_TIME_REPRESENTATION('MDTR',(#1),#2);
+                #5=MACHINING_FEED_SPEED_REPRESENTATION('MFSR',(#1),#2);
+                #6=MACHINING_OFFSET_VECTOR_REPRESENTATION('MOVR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation cuttingCorner =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation dwellTime =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation feedSpeed =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation offsetVector =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("MCCR", cuttingCorner.name());
+        assertEquals("MDTR", dwellTime.name());
+        assertEquals("MFSR", feedSpeed.name());
+        assertEquals("MOVR", offsetVector.name());
+        assertEquals(false, cuttingCorner.shapeRepresentation());
+        assertEquals(false, dwellTime.shapeRepresentation());
+        assertEquals(false, feedSpeed.shapeRepresentation());
+        assertEquals(false, offsetVector.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveAdditionalMachiningRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TOOL');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TOOLING'));
+                #3=MACHINING_SPINDLE_SPEED_REPRESENTATION('MSSR',(#1),#2);
+                #4=MACHINING_TOOL_BODY_REPRESENTATION('MTBR',(#1),#2);
+                #5=MACHINING_TOOL_DIMENSION_REPRESENTATION('MTDR2',(#1),#2);
+                #6=MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION('MTSPR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation spindleSpeed =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation toolBody =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation toolDimension =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation toolpathSpeedProfile =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("MSSR", spindleSpeed.name());
+        assertEquals("MTBR", toolBody.name());
+        assertEquals("MTDR2", toolDimension.name());
+        assertEquals("MTSPR", toolpathSpeedProfile.name());
+        assertEquals(false, spindleSpeed.shapeRepresentation());
+        assertEquals(false, toolBody.shapeRepresentation());
+        assertEquals(false, toolDimension.shapeRepresentation());
+        assertEquals(false, toolpathSpeedProfile.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveToleranceAndTableRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TABLE');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TOL'));
+                #3=FREEFORM_MILLING_TOLERANCE_REPRESENTATION('FMTR',(#1),#2);
+                #4=HARDNESS_REPRESENTATION('HR',(#1),#2);
+                #5=DEFAULT_TOLERANCE_TABLE('DTT',(#1),#2);
+                #6=OTHER_LIST_TABLE_REPRESENTATION('OLTR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation freeformTolerance =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation hardness =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation defaultTolerance =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation otherListTable =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("FMTR", freeformTolerance.name());
+        assertEquals("HR", hardness.name());
+        assertEquals("DTT", defaultTolerance.name());
+        assertEquals("OLTR", otherListTable.name());
+        assertEquals(false, freeformTolerance.shapeRepresentation());
+        assertEquals(false, hardness.shapeRepresentation());
+        assertEquals(false, defaultTolerance.shapeRepresentation());
+        assertEquals(false, otherListTable.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveCharacterizedAndEvaluatedRepresentationFamilies() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','CHAR');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CHARREP'));
+                #3=CHARACTERIZED_REPRESENTATION('CR',(#1),#2);
+                #4=CHARACTERIZED_ITEM_WITHIN_REPRESENTATION('CIWR',(#1),#2);
+                #5=CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION('CCBIWR',(#1),#2);
+                #6=EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT('ECPITR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation characterized =
+                assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation characterizedItem =
+                assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation characterizedChainBasedItem =
+                assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation evaluatedCharacteristic =
+                assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("CR", characterized.name());
+        assertEquals("CIWR", characterizedItem.name());
+        assertEquals("CCBIWR", characterizedChainBasedItem.name());
+        assertEquals("ECPITR", evaluatedCharacteristic.name());
+        assertEquals(false, characterized.shapeRepresentation());
+        assertEquals(false, characterizedItem.shapeRepresentation());
+        assertEquals(false, characterizedChainBasedItem.shapeRepresentation());
+        assertEquals(false, evaluatedCharacteristic.shapeRepresentation());
     }
 
     @Test

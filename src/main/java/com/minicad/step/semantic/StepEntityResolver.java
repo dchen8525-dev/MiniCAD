@@ -4000,9 +4000,17 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "ADVANCED_BREP_SHAPE_REPRESENTATION", true));
     registry.put(
+        "BEVELED_SHEET_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "BEVELED_SHEET_REPRESENTATION", true));
+    registry.put(
         "ELEMENTARY_BREP_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "ELEMENTARY_BREP_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "COMPOSITE_SHEET_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "COMPOSITE_SHEET_REPRESENTATION", true));
     registry.put(
         "FACETED_BREP_SHAPE_REPRESENTATION",
         (resolver, instance) ->
@@ -4029,6 +4037,11 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(
                 instance, "SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "CURVE_SWEPT_SOLID_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "CURVE_SWEPT_SOLID_SHAPE_REPRESENTATION", true));
     registry.put(
         "CYLINDRICAL_SHAPE_REPRESENTATION",
         (resolver, instance) ->
@@ -4069,6 +4082,11 @@ public final class StepEntityResolver {
             resolver.resolveRepresentation(
                 instance, "MANIFOLD_SURFACE_SHAPE_REPRESENTATION", true));
     registry.put(
+        "MANIFOLD_SUBSURFACE_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MANIFOLD_SUBSURFACE_SHAPE_REPRESENTATION", true));
+    registry.put(
         "SURFACE_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "SURFACE_SHAPE_REPRESENTATION", true));
@@ -4095,6 +4113,10 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "SHAPE_DIMENSION_REPRESENTATION", true));
     registry.put(
+        "SHAPE_REPRESENTATION_WITH_PARAMETERS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "SHAPE_REPRESENTATION_WITH_PARAMETERS", true));
+    registry.put(
         "LOCATION_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "LOCATION_SHAPE_REPRESENTATION", true));
@@ -4116,9 +4138,18 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "TESSELLATED_SHAPE_REPRESENTATION", true));
     registry.put(
+        "TESSELLATED_SHAPE_REPRESENTATION_WITH_ACCURACY_PARAMETERS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "TESSELLATED_SHAPE_REPRESENTATION_WITH_ACCURACY_PARAMETERS", true));
+    registry.put(
         "NGON_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "NGON_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "SCAN_DATA_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "SCAN_DATA_SHAPE_REPRESENTATION", true));
     registry.put(
         "PATH_SHAPE_REPRESENTATION",
         (resolver, instance) ->
@@ -4142,15 +4173,420 @@ public final class StepEntityResolver {
             resolver.resolveRepresentation(
                 instance, "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION", false));
     registry.put(
+        "MECHANICAL_DESIGN_SHADED_PRESENTATION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MECHANICAL_DESIGN_SHADED_PRESENTATION_REPRESENTATION", false));
+    registry.put(
+        "MECHANICAL_DESIGN_PRESENTATION_REPRESENTATION_WITH_DRAUGHTING",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MECHANICAL_DESIGN_PRESENTATION_REPRESENTATION_WITH_DRAUGHTING", false));
+    registry.put(
+        "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_AREA",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_AREA", false));
+    registry.put(
+        "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION", false));
+    registry.put(
+        "MECHANICAL_DESIGN_SHADED_PRESENTATION_AREA",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MECHANICAL_DESIGN_SHADED_PRESENTATION_AREA", false));
+    registry.put(
+        "VISUAL_APPEARANCE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "VISUAL_APPEARANCE_REPRESENTATION", false));
+    registry.put(
+        "PRESENTATION_AREA",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PRESENTATION_AREA", false));
+    registry.put(
+        "PRESENTATION_VIEW",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PRESENTATION_VIEW", false));
+    registry.put(
+        "SYMBOL_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "SYMBOL_REPRESENTATION", false));
+    registry.put(
         "PRESENTATION_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "PRESENTATION_REPRESENTATION", false));
+    registry.put(
+        "PICTURE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PICTURE_REPRESENTATION", false));
+    registry.put(
+        "TEXT_STRING_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "TEXT_STRING_REPRESENTATION", false));
+    registry.put(
+        "STRUCTURED_TEXT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "STRUCTURED_TEXT_REPRESENTATION", false));
+    registry.put(
+        "PROCEDURAL_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PROCEDURAL_REPRESENTATION", false));
+    registry.put(
+        "CONSTRUCTIVE_GEOMETRY_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CONSTRUCTIVE_GEOMETRY_REPRESENTATION", false));
+    registry.put(
+        "AREA_DEPENDENT_ANNOTATION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "AREA_DEPENDENT_ANNOTATION_REPRESENTATION", false));
+    registry.put(
+        "PRESENTATION_SIZE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PRESENTATION_SIZE", false));
+    registry.put(
+        "VARIATIONAL_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "VARIATIONAL_REPRESENTATION", false));
+    registry.put(
+        "RANGE_CHARACTERISTIC",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "RANGE_CHARACTERISTIC", false));
+    registry.put(
+        "PLY_ANGLE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PLY_ANGLE_REPRESENTATION", false));
+    registry.put(
+        "MOMENTS_OF_INERTIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "MOMENTS_OF_INERTIA_REPRESENTATION", false));
+    registry.put(
+        "UNCERTAINTY_ASSIGNED_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "UNCERTAINTY_ASSIGNED_REPRESENTATION", false));
+    registry.put(
+        "INTERPOLATED_CONFIGURATION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "INTERPOLATED_CONFIGURATION_REPRESENTATION", false));
+    registry.put(
+        "KINEMATIC_FRAME_BACKGROUND_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "KINEMATIC_FRAME_BACKGROUND_REPRESENTATION", false));
+    registry.put(
+        "KINEMATIC_GROUND_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_GROUND_REPRESENTATION", false));
+    registry.put(
+        "KINEMATIC_LINK_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_LINK_REPRESENTATION", false));
+    registry.put(
+        "KINEMATIC_TOPOLOGY_DIRECTED_STRUCTURE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_TOPOLOGY_DIRECTED_STRUCTURE", false));
+    registry.put(
+        "KINEMATIC_TOPOLOGY_NETWORK_STRUCTURE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_TOPOLOGY_NETWORK_STRUCTURE", false));
+    registry.put(
+        "KINEMATIC_TOPOLOGY_STRUCTURE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_TOPOLOGY_STRUCTURE", false));
+    registry.put(
+        "KINEMATIC_TOPOLOGY_SUBSTRUCTURE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_TOPOLOGY_SUBSTRUCTURE", false));
+    registry.put(
+        "KINEMATIC_TOPOLOGY_TREE_STRUCTURE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "KINEMATIC_TOPOLOGY_TREE_STRUCTURE", false));
+    registry.put(
+        "LINEAR_FLEXIBLE_LINK_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "LINEAR_FLEXIBLE_LINK_REPRESENTATION", false));
+    registry.put(
+        "RIGID_LINK_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "RIGID_LINK_REPRESENTATION", false));
+    registry.put(
+        "MECHANISM_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "MECHANISM_REPRESENTATION", false));
+    registry.put(
+        "MECHANISM_STATE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "MECHANISM_STATE_REPRESENTATION", false));
+    registry.put(
+        "LINK_MOTION_REPRESENTATION_ALONG_PATH",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "LINK_MOTION_REPRESENTATION_ALONG_PATH", false));
+    registry.put(
+        "REINFORCEMENT_ORIENTATION_BASIS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "REINFORCEMENT_ORIENTATION_BASIS", false));
+    registry.put(
+        "CONNECTED_EDGE_WITH_LENGTH_SET_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "CONNECTED_EDGE_WITH_LENGTH_SET_REPRESENTATION", false));
+    registry.put(
+        "DATA_EQUIVALENCE_CRITERIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "DATA_EQUIVALENCE_CRITERIA_REPRESENTATION", false));
+    registry.put(
+        "DATA_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "DATA_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION", false));
+    registry.put(
+        "DATA_QUALITY_CRITERIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "DATA_QUALITY_CRITERIA_REPRESENTATION", false));
+    registry.put(
+        "DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION", false));
+    registry.put(
+        "EXTERNALLY_CONDITIONED_DATA_QUALITY_CRITERIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance,
+                "EXTERNALLY_CONDITIONED_DATA_QUALITY_CRITERIA_REPRESENTATION",
+                false));
+    registry.put(
+        "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance,
+                "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION",
+                false));
+    registry.put(
+        "A3M_EQUIVALENCE_CRITERIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "A3M_EQUIVALENCE_CRITERIA_REPRESENTATION", false));
+    registry.put(
+        "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION", false));
+    registry.put(
+        "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_ASSEMBLY",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_ASSEMBLY", false));
+    registry.put(
+        "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_SHAPE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_SHAPE", false));
+    registry.put(
+        "SHAPE_DATA_QUALITY_CRITERIA_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SHAPE_DATA_QUALITY_CRITERIA_REPRESENTATION", false));
+    registry.put(
+        "SHAPE_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SHAPE_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION", false));
+    registry.put(
+        "EXTERNALLY_DEFINED_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "EXTERNALLY_DEFINED_REPRESENTATION", false));
+    registry.put(
+        "EXTERNALLY_DEFINED_REPRESENTATION_WITH_PARAMETERS",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "EXTERNALLY_DEFINED_REPRESENTATION_WITH_PARAMETERS", false));
+    registry.put(
+        "SHAPE_CRITERIA_REPRESENTATION_WITH_ACCURACY",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SHAPE_CRITERIA_REPRESENTATION_WITH_ACCURACY", false));
+    registry.put(
+        "SHAPE_INSPECTION_RESULT_REPRESENTATION_WITH_ACCURACY",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SHAPE_INSPECTION_RESULT_REPRESENTATION_WITH_ACCURACY", false));
+    registry.put(
+        "ANALYSIS_MODEL",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "ANALYSIS_MODEL", false));
+    registry.put(
+        "LANGUAGE_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "LANGUAGE_ASSIGNMENT", false));
+    registry.put(
+        "MESSAGE_CONTENTS_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "MESSAGE_CONTENTS_ASSIGNMENT", false));
+    registry.put(
+        "MACHINING_TOOL_DIRECTION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_TOOL_DIRECTION_REPRESENTATION", false));
+    registry.put(
+        "FOUNDED_KINEMATIC_PATH",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "FOUNDED_KINEMATIC_PATH", false));
+    registry.put(
+        "SIMPLIFIED_COUNTERBORE_HOLE_DEFINITION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SIMPLIFIED_COUNTERBORE_HOLE_DEFINITION", false));
+    registry.put(
+        "SIMPLIFIED_COUNTERDRILL_HOLE_DEFINITION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SIMPLIFIED_COUNTERDRILL_HOLE_DEFINITION", false));
+    registry.put(
+        "SIMPLIFIED_COUNTERSINK_HOLE_DEFINITION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SIMPLIFIED_COUNTERSINK_HOLE_DEFINITION", false));
+    registry.put(
+        "MACHINING_CUTTING_CORNER_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_CUTTING_CORNER_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_DWELL_TIME_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_DWELL_TIME_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_FEED_SPEED_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_FEED_SPEED_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_OFFSET_VECTOR_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_OFFSET_VECTOR_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_SPINDLE_SPEED_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_SPINDLE_SPEED_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_TOOL_BODY_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_TOOL_BODY_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_TOOL_DIMENSION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_TOOL_DIMENSION_REPRESENTATION", false));
+    registry.put(
+        "MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION", false));
+    registry.put(
+        "FREEFORM_MILLING_TOLERANCE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "FREEFORM_MILLING_TOLERANCE_REPRESENTATION", false));
+    registry.put(
+        "HARDNESS_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "HARDNESS_REPRESENTATION", false));
+    registry.put(
+        "DEFAULT_TOLERANCE_TABLE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DEFAULT_TOLERANCE_TABLE", false));
+    registry.put(
+        "OTHER_LIST_TABLE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "OTHER_LIST_TABLE_REPRESENTATION", false));
+    registry.put(
+        "CHARACTERIZED_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CHARACTERIZED_REPRESENTATION", false));
+    registry.put(
+        "CHARACTERIZED_ITEM_WITHIN_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "CHARACTERIZED_ITEM_WITHIN_REPRESENTATION", false));
+    registry.put(
+        "CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION", false));
+    registry.put(
+        "EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance,
+                "EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT",
+                false));
     registry.put(
         "DRAUGHTING_MODEL",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "DRAUGHTING_MODEL", false));
     registry.put(
+        "DRAUGHTING_SUBFIGURE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DRAUGHTING_SUBFIGURE_REPRESENTATION", false));
+    registry.put(
+        "DRAUGHTING_SYMBOL_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DRAUGHTING_SYMBOL_REPRESENTATION", false));
+    registry.put(
+        "DRAWING_SHEET_LAYOUT",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DRAWING_SHEET_LAYOUT", false));
+    registry.put(
+        "DRAWING_SHEET_REVISION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DRAWING_SHEET_REVISION", false));
+    registry.put(
         "REPRESENTATION", (resolver, instance) -> resolver.resolveRepresentation(instance, false));
+    registry.put(
+        "PATH_PARAMETER_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PATH_PARAMETER_REPRESENTATION", false));
+    registry.put(
+        "PRESCRIBED_PATH",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PRESCRIBED_PATH", false));
+    registry.put(
+        "RESULTING_PATH",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "RESULTING_PATH", false));
+    registry.put(
+        "CHARACTER_GLYPH_SYMBOL",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CHARACTER_GLYPH_SYMBOL", false));
+    registry.put(
+        "GENERIC_CHARACTER_GLYPH_SYMBOL",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "GENERIC_CHARACTER_GLYPH_SYMBOL", false));
+    registry.put(
+        "CHARACTER_GLYPH_SYMBOL_OUTLINE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CHARACTER_GLYPH_SYMBOL_OUTLINE", false));
+    registry.put(
+        "CHARACTER_GLYPH_SYMBOL_STROKE",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CHARACTER_GLYPH_SYMBOL_STROKE", false));
+    registry.put(
+        "SURFACE_TEXTURE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "SURFACE_TEXTURE_REPRESENTATION", false));
+    registry.put(
+        "TACTILE_APPEARANCE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "TACTILE_APPEARANCE_REPRESENTATION", false));
     registry.put("APPLICATION_CONTEXT", StepEntityResolver::resolveApplicationContext);
     registry.put(
         "APPLICATION_PROTOCOL_DEFINITION",
