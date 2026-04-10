@@ -77,7 +77,10 @@ public final class StepMetadataExtractor {
                     continue;
                 }
                 StepSurfaceSideStyle sideStyle = usage.style();
-                for (StepSurfaceStyleFillArea surfaceFill : sideStyle.styles()) {
+                for (StepEntity sideComponent : sideStyle.styles()) {
+                    if (!(sideComponent instanceof StepSurfaceStyleFillArea surfaceFill)) {
+                        continue;
+                    }
                     StepFillAreaStyle fillStyle = surfaceFill.fillStyle();
                     for (StepFillAreaStyleColour fillColour : fillStyle.styles()) {
                         int[] rgb = colourToRgb(fillColour.colour());

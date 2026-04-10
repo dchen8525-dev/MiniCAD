@@ -4,7 +4,12 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepCharacterGlyphStyleOutline;
+import com.minicad.step.model.StepCharacterGlyphStyleOutlineWithCharacteristics;
+import com.minicad.step.model.StepCharacterGlyphStyleStroke;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepColour;
+import com.minicad.step.model.StepColourSpecification;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepConnectedEdgeSet;
@@ -47,14 +52,32 @@ import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepSubedge;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
+import com.minicad.step.model.StepAnnotationCurveOccurrence;
+import com.minicad.step.model.StepAnnotationFillArea;
+import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
+import com.minicad.step.model.StepAnnotationPlane;
+import com.minicad.step.model.StepAnnotationPlaceholderOccurrence;
+import com.minicad.step.model.StepAnnotationPointOccurrence;
+import com.minicad.step.model.StepAnnotationOccurrenceRelationship;
+import com.minicad.step.model.StepAnnotationSymbol;
+import com.minicad.step.model.StepAnnotationSymbolOccurrence;
+import com.minicad.step.model.StepTerminatorSymbol;
+import com.minicad.step.model.StepAnnotationText;
+import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDegeneratePcurve;
+import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDraughtingCallout;
+import com.minicad.step.model.StepDraughtingPreDefinedColour;
+import com.minicad.step.model.StepDraughtingPreDefinedCurveFont;
+import com.minicad.step.model.StepDraughtingPreDefinedTextFont;
+import com.minicad.step.model.StepCurveStyle;
+import com.minicad.step.model.StepFillAreaStyleColour;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
@@ -62,6 +85,7 @@ import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
 import com.minicad.step.model.StepGlobalUnitAssignedContext;
 import com.minicad.step.model.StepItemDefinedTransformation;
+import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepNamedUnit;
@@ -70,12 +94,25 @@ import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedPath;
 import com.minicad.step.model.StepPlane;
+import com.minicad.step.model.StepPreDefinedColour;
+import com.minicad.step.model.StepPreDefinedCurveFont;
+import com.minicad.step.model.StepPreDefinedDimensionSymbol;
+import com.minicad.step.model.StepPreDefinedGeometricalToleranceSymbol;
+import com.minicad.step.model.StepPreDefinedItem;
+import com.minicad.step.model.StepPreDefinedMarker;
+import com.minicad.step.model.StepPreDefinedPointMarkerSymbol;
+import com.minicad.step.model.StepPreDefinedSurfaceSideStyle;
+import com.minicad.step.model.StepPreDefinedSymbol;
+import com.minicad.step.model.StepPreDefinedTerminatorSymbol;
+import com.minicad.step.model.StepPreDefinedTextFont;
 import com.minicad.step.model.StepPolyLoop;
 import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepPoint;
 import com.minicad.step.model.StepPointSet;
+import com.minicad.step.model.StepPointStyle;
 import com.minicad.step.model.StepProduct;
+import com.minicad.step.model.StepProjectionCurve;
 import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionFormation;
 import com.minicad.step.model.StepProductDefinitionShape;
@@ -83,6 +120,7 @@ import com.minicad.step.model.StepProductRelatedProductCategory;
 import com.minicad.step.model.StepPropertyDefinition;
 import com.minicad.step.model.StepPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepRepresentation;
+import com.minicad.step.model.StepRepresentationMap;
 import com.minicad.step.model.StepRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepCurve;
@@ -101,11 +139,35 @@ import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbient;
+import com.minicad.step.model.StepSurfaceStyleBoundary;
+import com.minicad.step.model.StepSurfaceStyleControlGrid;
+import com.minicad.step.model.StepSurfaceStyleParameterLine;
+import com.minicad.step.model.StepSurfaceStyleSegmentationCurve;
+import com.minicad.step.model.StepSurfaceStyleSilhouette;
+import com.minicad.step.model.StepSurfaceSideStyle;
+import com.minicad.step.model.StepSurfaceStyleFillArea;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuse;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuseSpecular;
+import com.minicad.step.model.StepSurfaceStyleTransparent;
+import com.minicad.step.model.StepSurfaceStyleUsage;
+import com.minicad.step.model.StepSymbolColour;
+import com.minicad.step.model.StepSymbolRepresentationMap;
+import com.minicad.step.model.StepSymbolStyle;
 import com.minicad.step.model.StepSurfacedOpenShell;
+import com.minicad.step.model.StepTextStyle;
+import com.minicad.step.model.StepTextStyleWithBoxCharacteristics;
+import com.minicad.step.model.StepTextStyleForDefinedFont;
+import com.minicad.step.model.StepTextStyleWithJustification;
+import com.minicad.step.model.StepTextStyleWithMirror;
+import com.minicad.step.model.StepTextStyleWithSpacing;
 import com.minicad.step.model.StepTopologicalRepresentationItem;
 import com.minicad.step.model.StepToroidalSurface;
 import com.minicad.step.model.StepTrimmedCurve;
 import com.minicad.step.model.StepTypedMeasureWithUnit;
+import com.minicad.step.model.StepUserDefinedCurveFont;
+import com.minicad.step.model.StepUserDefinedMarker;
+import com.minicad.step.model.StepUserDefinedTerminatorSymbol;
 import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
 import com.minicad.step.model.StepOffsetCurve3D;
 import com.minicad.step.model.StepOffsetSurface;
@@ -130,6 +192,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1529,6 +1592,534 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveSurfaceStyleTransparentWithinSurfaceSideStyle() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Terracotta',0.8,0.4,0.2);
+                #2=FILL_AREA_STYLE_COLOUR('',#1);
+                #3=FILL_AREA_STYLE('',(#2));
+                #4=SURFACE_STYLE_FILL_AREA(#3);
+                #5=SURFACE_STYLE_TRANSPARENT(0.35);
+                #6=SURFACE_SIDE_STYLE('',(#4,#5));
+                #7=SURFACE_STYLE_USAGE(.BOTH.,#6);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSurfaceStyleTransparent transparent =
+                assertInstanceOf(StepSurfaceStyleTransparent.class, resolved.get(5));
+        StepSurfaceSideStyle sideStyle = assertInstanceOf(StepSurfaceSideStyle.class, resolved.get(6));
+        StepSurfaceStyleUsage usage = assertInstanceOf(StepSurfaceStyleUsage.class, resolved.get(7));
+        assertEquals(0.35, transparent.transparency());
+        assertEquals(2, sideStyle.styles().size());
+        assertInstanceOf(StepSurfaceStyleFillArea.class, sideStyle.styles().get(0));
+        assertInstanceOf(StepSurfaceStyleTransparent.class, sideStyle.styles().get(1));
+        assertEquals(6, usage.style().id());
+    }
+
+    @Test
+    void shouldResolveSurfaceStyleReflectanceAmbientWithinSurfaceSideStyle() {
+        String step = """
+                DATA;
+                #1=SURFACE_STYLE_REFLECTANCE_AMBIENT(0.2);
+                #2=SURFACE_STYLE_TRANSPARENT(0.35);
+                #3=SURFACE_SIDE_STYLE('',(#1,#2));
+                #4=SURFACE_STYLE_USAGE(.BOTH.,#3);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSurfaceStyleReflectanceAmbient ambient =
+                assertInstanceOf(StepSurfaceStyleReflectanceAmbient.class, resolved.get(1));
+        StepSurfaceStyleTransparent transparent =
+                assertInstanceOf(StepSurfaceStyleTransparent.class, resolved.get(2));
+        StepSurfaceSideStyle sideStyle = assertInstanceOf(StepSurfaceSideStyle.class, resolved.get(3));
+        StepSurfaceStyleUsage usage = assertInstanceOf(StepSurfaceStyleUsage.class, resolved.get(4));
+        assertEquals(0.2, ambient.ambientReflectance());
+        assertEquals(0.35, transparent.transparency());
+        assertEquals(2, sideStyle.styles().size());
+        assertInstanceOf(StepSurfaceStyleReflectanceAmbient.class, sideStyle.styles().get(0));
+        assertInstanceOf(StepSurfaceStyleTransparent.class, sideStyle.styles().get(1));
+        assertEquals(3, usage.style().id());
+    }
+
+    @Test
+    void shouldResolveSurfaceStyleParameterLineWithinSurfaceSideStyle() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_CURVE_FONT('solid');
+                #2=PRE_DEFINED_COLOUR('black');
+                #3=CURVE_STYLE('C0',#1,0.25,#2);
+                #4=SURFACE_STYLE_PARAMETER_LINE(#3);
+                #5=SURFACE_SIDE_STYLE('',(#4));
+                #6=SURFACE_STYLE_USAGE(.BOTH.,#5);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCurveStyle curveStyle = assertInstanceOf(StepCurveStyle.class, resolved.get(3));
+        StepSurfaceStyleParameterLine parameterLine =
+                assertInstanceOf(StepSurfaceStyleParameterLine.class, resolved.get(4));
+        StepSurfaceSideStyle sideStyle = assertInstanceOf(StepSurfaceSideStyle.class, resolved.get(5));
+        StepSurfaceStyleUsage usage = assertInstanceOf(StepSurfaceStyleUsage.class, resolved.get(6));
+        assertEquals(3, parameterLine.style().id());
+        assertEquals(0.25, curveStyle.curveWidth());
+        assertEquals(1, sideStyle.styles().size());
+        assertInstanceOf(StepSurfaceStyleParameterLine.class, sideStyle.styles().get(0));
+        assertEquals(5, usage.style().id());
+    }
+
+    @Test
+    void shouldResolveAdditionalSurfaceCurveStylesWithinSurfaceSideStyle() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_CURVE_FONT('solid');
+                #2=PRE_DEFINED_COLOUR('black');
+                #3=CURVE_STYLE('C0',#1,0.25,#2);
+                #4=SURFACE_STYLE_BOUNDARY(#3);
+                #5=SURFACE_STYLE_CONTROL_GRID(#3);
+                #6=SURFACE_STYLE_SEGMENTATION_CURVE(#3);
+                #7=SURFACE_STYLE_SILHOUETTE(#3);
+                #8=SURFACE_SIDE_STYLE('',(#4,#5,#6,#7));
+                #9=SURFACE_STYLE_USAGE(.BOTH.,#8);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertInstanceOf(StepSurfaceStyleBoundary.class, resolved.get(4));
+        assertInstanceOf(StepSurfaceStyleControlGrid.class, resolved.get(5));
+        assertInstanceOf(StepSurfaceStyleSegmentationCurve.class, resolved.get(6));
+        assertInstanceOf(StepSurfaceStyleSilhouette.class, resolved.get(7));
+        StepSurfaceSideStyle sideStyle = assertInstanceOf(StepSurfaceSideStyle.class, resolved.get(8));
+        StepSurfaceStyleUsage usage = assertInstanceOf(StepSurfaceStyleUsage.class, resolved.get(9));
+        assertEquals(4, sideStyle.styles().size());
+        assertInstanceOf(StepSurfaceStyleBoundary.class, sideStyle.styles().get(0));
+        assertInstanceOf(StepSurfaceStyleControlGrid.class, sideStyle.styles().get(1));
+        assertInstanceOf(StepSurfaceStyleSegmentationCurve.class, sideStyle.styles().get(2));
+        assertInstanceOf(StepSurfaceStyleSilhouette.class, sideStyle.styles().get(3));
+        assertEquals(8, usage.style().id());
+    }
+
+    @Test
+    void shouldResolveSurfaceReflectanceVariantsWithinSurfaceSideStyle() {
+        String step = """
+                DATA;
+                #1=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE(0.2,0.6);
+                #2=COLOUR_RGB('Specular',1.0,1.0,1.0);
+                #3=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR(0.2,0.6,0.4,32.0,#2);
+                #4=SURFACE_SIDE_STYLE('',(#1,#3));
+                #5=SURFACE_STYLE_USAGE(.BOTH.,#4);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSurfaceStyleReflectanceAmbientDiffuse diffuse =
+                assertInstanceOf(StepSurfaceStyleReflectanceAmbientDiffuse.class, resolved.get(1));
+        StepSurfaceStyleReflectanceAmbientDiffuseSpecular specular =
+                assertInstanceOf(StepSurfaceStyleReflectanceAmbientDiffuseSpecular.class, resolved.get(3));
+        StepSurfaceSideStyle sideStyle = assertInstanceOf(StepSurfaceSideStyle.class, resolved.get(4));
+        StepSurfaceStyleUsage usage = assertInstanceOf(StepSurfaceStyleUsage.class, resolved.get(5));
+        assertEquals(0.2, diffuse.ambientReflectance());
+        assertEquals(0.6, diffuse.diffuseReflectance());
+        assertEquals(0.4, specular.specularReflectance());
+        assertEquals(32.0, specular.specularExponent());
+        assertEquals(2, specular.specularColour().id());
+        assertEquals(2, sideStyle.styles().size());
+        assertInstanceOf(StepSurfaceStyleReflectanceAmbientDiffuse.class, sideStyle.styles().get(0));
+        assertInstanceOf(
+                StepSurfaceStyleReflectanceAmbientDiffuseSpecular.class,
+                sideStyle.styles().get(1));
+        assertEquals(4, usage.style().id());
+    }
+
+    @Test
+    void shouldResolvePointStyle() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_POINT_MARKER_SYMBOL('dot');
+                #2=COLOUR_RGB('Red',1.0,0.0,0.0);
+                #3=POINT_STYLE('Pts',#1,2.5,#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPointStyle pointStyle = assertInstanceOf(StepPointStyle.class, resolved.get(3));
+        assertEquals("Pts", pointStyle.name());
+        assertEquals(1, pointStyle.marker().id());
+        assertEquals(2.5, pointStyle.markerSize());
+        assertEquals(2, pointStyle.colour().id());
+    }
+
+    @Test
+    void shouldResolveTextStyleForDefinedFontAndTextStyle() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #2=TEXT_STYLE_FOR_DEFINED_FONT(#1);
+                #3=TEXT_STYLE('TS0',#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTextStyleForDefinedFont definedFont =
+                assertInstanceOf(StepTextStyleForDefinedFont.class, resolved.get(2));
+        StepTextStyle textStyle = assertInstanceOf(StepTextStyle.class, resolved.get(3));
+        assertEquals(1, definedFont.textColour().id());
+        assertEquals("TS0", textStyle.name());
+        assertEquals(2, textStyle.characterAppearance().id());
+    }
+
+    @Test
+    void shouldResolveTextStyleWithSpacing() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #2=TEXT_STYLE_FOR_DEFINED_FONT(#1);
+                #3=TEXT_STYLE_WITH_SPACING('TS1',#2,0.15);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTextStyleWithSpacing textStyle =
+                assertInstanceOf(StepTextStyleWithSpacing.class, resolved.get(3));
+        assertEquals("TS1", textStyle.name());
+        assertEquals(2, textStyle.characterAppearance().id());
+        assertEquals(0.15, textStyle.characterSpacing());
+    }
+
+    @Test
+    void shouldResolveTextStyleWithJustification() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #2=TEXT_STYLE_FOR_DEFINED_FONT(#1);
+                #3=TEXT_STYLE_WITH_JUSTIFICATION('TS2',#2,.LEFT.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTextStyleWithJustification textStyle =
+                assertInstanceOf(StepTextStyleWithJustification.class, resolved.get(3));
+        assertEquals("TS2", textStyle.name());
+        assertEquals(2, textStyle.characterAppearance().id());
+        assertEquals("LEFT", textStyle.justification());
+    }
+
+    @Test
+    void shouldResolveTextStyleWithMirror() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #2=TEXT_STYLE_FOR_DEFINED_FONT(#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('M',#3,#4);
+                #6=TEXT_STYLE_WITH_MIRROR('TS3',#2,#5);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTextStyleWithMirror textStyle =
+                assertInstanceOf(StepTextStyleWithMirror.class, resolved.get(6));
+        assertEquals("TS3", textStyle.name());
+        assertEquals(2, textStyle.characterAppearance().id());
+        assertEquals(5, textStyle.mirrorPlacement().id());
+    }
+
+    @Test
+    void shouldResolveTextStyleWithBoxCharacteristics() {
+        String step = """
+                DATA;
+                #1=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #2=TEXT_STYLE_FOR_DEFINED_FONT(#1);
+                #3=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS4',#2,(BOX_HEIGHT(1.2),BOX_WIDTH(0.8)));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTextStyleWithBoxCharacteristics textStyle =
+                assertInstanceOf(StepTextStyleWithBoxCharacteristics.class, resolved.get(3));
+        assertEquals("TS4", textStyle.name());
+        assertEquals(2, textStyle.characterAppearance().id());
+        assertEquals(List.of("BOX_HEIGHT(1.2)", "BOX_WIDTH(0.8)"), textStyle.boxCharacteristics());
+    }
+
+    @Test
+    void shouldResolveCharacterGlyphStyles() {
+        String step = """
+                DATA;
+                #1=DRAUGHTING_PRE_DEFINED_CURVE_FONT('continuous');
+                #2=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #3=CURVE_STYLE('GlyphStroke',#1,0.2,#2);
+                #4=FILL_AREA_STYLE_COLOUR('',#2);
+                #5=FILL_AREA_STYLE('',(#4));
+                #6=CHARACTER_GLYPH_STYLE_STROKE(#3);
+                #7=CHARACTER_GLYPH_STYLE_OUTLINE(#3);
+                #8=CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS(#3,#5);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCharacterGlyphStyleStroke stroke =
+                assertInstanceOf(StepCharacterGlyphStyleStroke.class, resolved.get(6));
+        StepCharacterGlyphStyleOutline outline =
+                assertInstanceOf(StepCharacterGlyphStyleOutline.class, resolved.get(7));
+        StepCharacterGlyphStyleOutlineWithCharacteristics outlineWithCharacteristics =
+                assertInstanceOf(StepCharacterGlyphStyleOutlineWithCharacteristics.class, resolved.get(8));
+        assertEquals(3, stroke.strokeStyle().id());
+        assertEquals(3, outline.outlineStyle().id());
+        assertEquals(3, outlineWithCharacteristics.outlineStyle().id());
+        assertEquals(5, outlineWithCharacteristics.characteristics().id());
+    }
+
+    @Test
+    void shouldResolveSymbolColourAndSymbolStyle() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_COLOUR('yellow');
+                #2=SYMBOL_COLOUR(#1);
+                #3=SYMBOL_STYLE('SS0',#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSymbolColour symbolColour = assertInstanceOf(StepSymbolColour.class, resolved.get(2));
+        StepSymbolStyle symbolStyle = assertInstanceOf(StepSymbolStyle.class, resolved.get(3));
+        assertEquals(1, symbolColour.colour().id());
+        assertEquals("SS0", symbolStyle.name());
+        assertEquals(2, symbolStyle.styleOfSymbol().id());
+    }
+
+    @Test
+    void shouldResolveColourAndColourSpecification() {
+        String step = """
+                DATA;
+                #1=COLOUR();
+                #2=COLOUR_SPECIFICATION('amber');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertInstanceOf(StepColour.class, resolved.get(1));
+        StepColourSpecification specification =
+                assertInstanceOf(StepColourSpecification.class, resolved.get(2));
+        assertEquals("amber", specification.name());
+    }
+
+    @Test
+    void shouldPreferColourRgbOverColourAndColourSpecification() {
+        String step = """
+                DATA;
+                #1=(COLOUR_RGB('Amber',1.0,0.75,0.0)
+                    COLOUR_SPECIFICATION('Amber')
+                    COLOUR());
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertSame(StepColourRgb.class, resolved.get(1).getClass());
+    }
+
+    @Test
+    void shouldResolveCurveStyleWithColourSpecification() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_CURVE_FONT('solid');
+                #2=COLOUR_SPECIFICATION('amber');
+                #3=CURVE_STYLE('C0',#1,0.25,#2);
+                #4=FILL_AREA_STYLE_COLOUR('',#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCurveStyle style = assertInstanceOf(StepCurveStyle.class, resolved.get(3));
+        StepFillAreaStyleColour fill = assertInstanceOf(StepFillAreaStyleColour.class, resolved.get(4));
+        assertEquals(2, style.colour().id());
+        assertEquals(2, fill.colour().id());
+    }
+
+    @Test
+    void shouldResolvePreDefinedColourAndCurveFont() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_COLOUR('black');
+                #2=PRE_DEFINED_CURVE_FONT('solid');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPreDefinedColour colour = assertInstanceOf(StepPreDefinedColour.class, resolved.get(1));
+        StepPreDefinedCurveFont font = assertInstanceOf(StepPreDefinedCurveFont.class, resolved.get(2));
+        assertEquals("black", colour.name());
+        assertEquals("solid", font.name());
+    }
+
+    @Test
+    void shouldPreferPreDefinedColourOverColourSpecificationAndColour() {
+        String step = """
+                DATA;
+                #1=(PRE_DEFINED_COLOUR('black')
+                    COLOUR_SPECIFICATION('black')
+                    COLOUR());
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertSame(StepPreDefinedColour.class, resolved.get(1).getClass());
+    }
+
+    @Test
+    void shouldPreferDraughtingPreDefinedSubtypeOverGenericBase() {
+        String step = """
+                DATA;
+                #1=(DRAUGHTING_PRE_DEFINED_COLOUR('black') PRE_DEFINED_COLOUR('black'));
+                #2=(DRAUGHTING_PRE_DEFINED_CURVE_FONT('solid') PRE_DEFINED_CURVE_FONT('solid'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertSame(StepDraughtingPreDefinedColour.class, resolved.get(1).getClass());
+        assertSame(StepDraughtingPreDefinedCurveFont.class, resolved.get(2).getClass());
+    }
+
+    @Test
+    void shouldResolveCurveStyleWithGenericPreDefinedEntities() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_CURVE_FONT('solid');
+                #2=PRE_DEFINED_COLOUR('black');
+                #3=CURVE_STYLE('C0',#1,0.25,#2);
+                #4=FILL_AREA_STYLE_COLOUR('',#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCurveStyle style = assertInstanceOf(StepCurveStyle.class, resolved.get(3));
+        StepFillAreaStyleColour fill = assertInstanceOf(StepFillAreaStyleColour.class, resolved.get(4));
+        assertEquals("C0", style.name());
+        assertEquals(1, style.curveFont().id());
+        assertEquals(2, style.colour().id());
+        assertEquals(2, fill.colour().id());
+    }
+
+    @Test
+    void shouldResolvePreDefinedTextFont() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_TEXT_FONT('iso_3098');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPreDefinedTextFont font = assertInstanceOf(StepPreDefinedTextFont.class, resolved.get(1));
+        assertEquals("iso_3098", font.name());
+    }
+
+    @Test
+    void shouldPreferDraughtingPreDefinedTextFontSubtypeOverGenericBase() {
+        String step = """
+                DATA;
+                #1=(DRAUGHTING_PRE_DEFINED_TEXT_FONT('iso_3098') PRE_DEFINED_TEXT_FONT('iso_3098'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertSame(StepDraughtingPreDefinedTextFont.class, resolved.get(1).getClass());
+    }
+
+    @Test
+    void shouldResolvePreDefinedSymbolAndMarkerFamily() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_MARKER('dot');
+                #2=PRE_DEFINED_SYMBOL('diameter');
+                #3=PRE_DEFINED_SURFACE_SIDE_STYLE('both');
+                #4=PRE_DEFINED_DIMENSION_SYMBOL('diameter');
+                #5=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('position');
+                #6=PRE_DEFINED_TERMINATOR_SYMBOL('filled_arrow');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals("dot", assertInstanceOf(StepPreDefinedMarker.class, resolved.get(1)).name());
+        assertEquals("diameter", assertInstanceOf(StepPreDefinedSymbol.class, resolved.get(2)).name());
+        assertEquals("both", assertInstanceOf(StepPreDefinedSurfaceSideStyle.class, resolved.get(3)).name());
+        assertEquals("diameter", assertInstanceOf(StepPreDefinedDimensionSymbol.class, resolved.get(4)).name());
+        assertEquals("position", assertInstanceOf(StepPreDefinedGeometricalToleranceSymbol.class, resolved.get(5)).name());
+        assertEquals("filled_arrow", assertInstanceOf(StepPreDefinedTerminatorSymbol.class, resolved.get(6)).name());
+    }
+
+    @Test
+    void shouldPreferPreDefinedPointMarkerSymbolOverBaseMarkerAndSymbol() {
+        String step = """
+                DATA;
+                #1=(PRE_DEFINED_POINT_MARKER_SYMBOL('dot')
+                    PRE_DEFINED_MARKER('dot')
+                    PRE_DEFINED_SYMBOL('dot'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPreDefinedPointMarkerSymbol symbol =
+                assertInstanceOf(StepPreDefinedPointMarkerSymbol.class, resolved.get(1));
+        assertEquals("dot", symbol.name());
+    }
+
+    @Test
+    void shouldResolvePreDefinedItem() {
+        String step = """
+                DATA;
+                #1=PRE_DEFINED_ITEM('generic-item');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPreDefinedItem item = assertInstanceOf(StepPreDefinedItem.class, resolved.get(1));
+        assertEquals("generic-item", item.name());
+    }
+
+    @Test
+    void shouldPreferSpecificPreDefinedSubtypeOverPreDefinedItem() {
+        String step = """
+                DATA;
+                #1=(PRE_DEFINED_POINT_MARKER_SYMBOL('dot')
+                    PRE_DEFINED_MARKER('dot')
+                    PRE_DEFINED_SYMBOL('dot')
+                    PRE_DEFINED_ITEM('dot'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertSame(StepPreDefinedPointMarkerSymbol.class, resolved.get(1).getClass());
+    }
+
+    @Test
     void shouldResolvePmiAndMeasureRepresentationItems() {
         String step = """
                 DATA;
@@ -1562,6 +2153,237 @@ class StepEntityResolverTest {
         assertEquals(2.0, measure.value());
         assertEquals(5, usage.usage().id());
         assertEquals(6, usage.identifiedItem().id());
+    }
+
+    @Test
+    void shouldResolveRepresentationMapAndAnnotationTextFamily() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','TEXT'));
+                #2=REPRESENTATION('TXT',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(10.0,20.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_TEXT('AT0',#6,#9);
+                #11=ANNOTATION_TEXT_CHARACTER('ATC0',#6,#9);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentationMap representationMap =
+                assertInstanceOf(StepRepresentationMap.class, resolved.get(6));
+        StepAnnotationText annotationText =
+                assertInstanceOf(StepAnnotationText.class, resolved.get(10));
+        StepAnnotationTextCharacter annotationTextCharacter =
+                assertInstanceOf(StepAnnotationTextCharacter.class, resolved.get(11));
+        assertEquals(5, representationMap.mappedOrigin().id());
+        assertEquals(2, representationMap.mappedRepresentation().id());
+        assertEquals("AT0", annotationText.name());
+        assertEquals(6, annotationText.mappingSource().id());
+        assertEquals(9, annotationText.mappingTarget().id());
+        assertEquals("ATC0", annotationTextCharacter.name());
+        assertEquals(6, annotationTextCharacter.mappingSource().id());
+        assertEquals(9, annotationTextCharacter.mappingTarget().id());
+    }
+
+    @Test
+    void shouldResolveSymbolRepresentationMapAndAnnotationSymbol() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
+                #2=REPRESENTATION('SYM',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(30.0,40.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_SYMBOL('AS0',#6,#9);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSymbolRepresentationMap symbolRepresentationMap =
+                assertInstanceOf(StepSymbolRepresentationMap.class, resolved.get(6));
+        StepAnnotationSymbol annotationSymbol =
+                assertInstanceOf(StepAnnotationSymbol.class, resolved.get(10));
+        assertEquals(5, symbolRepresentationMap.mappedOrigin().id());
+        assertEquals(2, symbolRepresentationMap.mappedRepresentation().id());
+        assertEquals("AS0", annotationSymbol.name());
+        assertEquals(6, annotationSymbol.mappingSource().id());
+        assertEquals(9, annotationSymbol.mappingTarget().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationSymbolOccurrence() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
+                #2=REPRESENTATION('SYM',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(30.0,40.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_SYMBOL('AS0',#6,#9);
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationSymbolOccurrence occurrence =
+                assertInstanceOf(StepAnnotationSymbolOccurrence.class, resolved.get(12));
+        assertEquals("ASO0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(10, occurrence.item().id());
+    }
+
+    @Test
+    void shouldResolveTerminatorSymbol() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
+                #2=REPRESENTATION('SYM',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(30.0,40.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_SYMBOL('AS0',#6,#9);
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);
+                #13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #14=DIRECTION('DX3',(1.0,0.0,0.0));
+                #15=VECTOR('V0',#14,1.0);
+                #16=LINE('L0',#13,#15);
+                #17=PRESENTATION_STYLE_ASSIGNMENT(());
+                #18=(LEADER_CURVE('LC0',(#17),#16)
+                    ANNOTATION_CURVE_OCCURRENCE('LC0',(#17),#16)
+                    STYLED_ITEM('LC0',(#17),#16)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('LC0'));
+                #19=TERMINATOR_SYMBOL('TS0',(#11),#10,#18);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTerminatorSymbol terminatorSymbol =
+                assertInstanceOf(StepTerminatorSymbol.class, resolved.get(19));
+        assertEquals("TS0", terminatorSymbol.name());
+        assertEquals(1, terminatorSymbol.styles().size());
+        assertEquals(10, terminatorSymbol.item().id());
+        assertEquals(18, terminatorSymbol.annotatedCurve().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationOccurrenceRelationship() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=PRESENTATION_STYLE_ASSIGNMENT(());
+                #3=(ANNOTATION_POINT_OCCURRENCE('PO0',(#2),#1)
+                    STYLED_ITEM('PO0',(#2),#1)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PO0'));
+                #4=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
+                #5=REPRESENTATION('SYM',(),#4);
+                #6=CARTESIAN_POINT('O',(0.0,0.0));
+                #7=DIRECTION('X',(1.0,0.0));
+                #8=AXIS2_PLACEMENT_2D('MAP',#6,#7);
+                #9=SYMBOL_REPRESENTATION_MAP(#8,#5);
+                #10=CARTESIAN_POINT('P',(30.0,40.0));
+                #11=DIRECTION('DX',(1.0,0.0));
+                #12=AXIS2_PLACEMENT_2D('TGT',#10,#11);
+                #13=ANNOTATION_SYMBOL('AS0',#9,#12);
+                #14=PRESENTATION_STYLE_ASSIGNMENT(());
+                #15=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);
+                #16=ANNOTATION_OCCURRENCE_RELATIONSHIP('rel','links point to symbol',#3,#15);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationOccurrenceRelationship relationship =
+                assertInstanceOf(StepAnnotationOccurrenceRelationship.class, resolved.get(16));
+        assertEquals("rel", relationship.name());
+        assertEquals("links point to symbol", relationship.description());
+        assertEquals(3, relationship.relatingAnnotationOccurrence().id());
+        assertEquals(15, relationship.relatedAnnotationOccurrence().id());
+    }
+
+    @Test
+    void shouldResolveUserDefinedMarkerAndCurveFont() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));
+                #2=REPRESENTATION('MAP_REP',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(1.0,1.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=USER_DEFINED_MARKER('UM0',#6,#9);
+                #11=USER_DEFINED_CURVE_FONT('UF0',#6,#9);
+                #12=COLOUR_RGB('Black',0.0,0.0,0.0);
+                #13=POINT_STYLE('PS0',#10,1.5,#12);
+                #14=CURVE_STYLE('CS0',#11,0.25,#12);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepUserDefinedMarker marker = assertInstanceOf(StepUserDefinedMarker.class, resolved.get(10));
+        StepUserDefinedCurveFont font = assertInstanceOf(StepUserDefinedCurveFont.class, resolved.get(11));
+        StepPointStyle pointStyle = assertInstanceOf(StepPointStyle.class, resolved.get(13));
+        StepCurveStyle curveStyle = assertInstanceOf(StepCurveStyle.class, resolved.get(14));
+        assertEquals(6, marker.mappingSource().id());
+        assertEquals(9, marker.mappingTarget().id());
+        assertEquals(6, font.mappingSource().id());
+        assertEquals(9, font.mappingTarget().id());
+        assertEquals(10, pointStyle.marker().id());
+        assertEquals(11, curveStyle.curveFont().id());
+    }
+
+    @Test
+    void shouldResolveUserDefinedTerminatorSymbol() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));
+                #2=REPRESENTATION('MAP_REP',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(5.0,6.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=USER_DEFINED_TERMINATOR_SYMBOL('UT0',#6,#9);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepUserDefinedTerminatorSymbol symbol =
+                assertInstanceOf(StepUserDefinedTerminatorSymbol.class, resolved.get(10));
+        assertEquals("UT0", symbol.name());
+        assertEquals(6, symbol.mappingSource().id());
+        assertEquals(9, symbol.mappingTarget().id());
     }
 
     @Test
@@ -2157,6 +2979,237 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveAnnotationPointOccurrence() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,0.0));
+                #2=PRESENTATION_STYLE_ASSIGNMENT(());
+                #3=(ANNOTATION_POINT_OCCURRENCE('AP0',(#2),#1)
+                    STYLED_ITEM('AP0',(#2),#1)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPointOccurrence occurrence =
+                assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(3));
+        assertEquals("AP0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(1, occurrence.item().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationCurveOccurrence() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=VECTOR('V0',#2,1.0);
+                #4=LINE('L0',#1,#3);
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=(ANNOTATION_CURVE_OCCURRENCE('AC0',(#5),#4)
+                    STYLED_ITEM('AC0',(#5),#4)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AC0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationCurveOccurrence occurrence =
+                assertInstanceOf(StepAnnotationCurveOccurrence.class, resolved.get(6));
+        assertEquals("AC0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(4, occurrence.item().id());
+    }
+
+    @Test
+    void shouldResolveLeaderCurve() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=VECTOR('V0',#2,1.0);
+                #4=LINE('L0',#1,#3);
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=(LEADER_CURVE('LC0',(#5),#4)
+                    ANNOTATION_CURVE_OCCURRENCE('LC0',(#5),#4)
+                    STYLED_ITEM('LC0',(#5),#4)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('LC0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepLeaderCurve leaderCurve = assertInstanceOf(StepLeaderCurve.class, resolved.get(6));
+        assertEquals("LC0", leaderCurve.name());
+        assertEquals(1, leaderCurve.styles().size());
+        assertEquals(4, leaderCurve.item().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationFillArea() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=POLYLINE('B0',(#1,#2,#3,#4,#1));
+                #6=(ANNOTATION_FILL_AREA('FA0',(#5))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationFillArea fillArea = assertInstanceOf(StepAnnotationFillArea.class, resolved.get(6));
+        assertEquals("FA0", fillArea.name());
+        assertEquals(1, fillArea.boundaries().size());
+        assertEquals(5, fillArea.boundaries().get(0).id());
+    }
+
+    @Test
+    void shouldResolveAnnotationFillAreaOccurrence() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=POLYLINE('B0',(#1,#2,#3,#4,#1));
+                #6=(ANNOTATION_FILL_AREA('FA0',(#5))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #7=PRESENTATION_STYLE_ASSIGNMENT(());
+                #8=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#7),#6,#1)
+                    STYLED_ITEM('FAO0',(#7),#6)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationFillAreaOccurrence occurrence =
+                assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(8));
+        assertEquals("FAO0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(6, occurrence.item().id());
+        assertEquals(1, occurrence.fillStyleTarget().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPlaceholderOccurrence() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=GEOMETRIC_SET('GS0',(#1));
+                #3=PRESENTATION_STYLE_ASSIGNMENT(());
+                #4=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH0',(#3),#2,.ANNOTATION_TEXT.,2.5)
+                    STYLED_ITEM('PH0',(#3),#2)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPlaceholderOccurrence occurrence =
+                assertInstanceOf(StepAnnotationPlaceholderOccurrence.class, resolved.get(4));
+        assertEquals("PH0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(2, occurrence.item().id());
+        assertEquals("ANNOTATION_TEXT", occurrence.role());
+        assertEquals(2.5, occurrence.lineSpacing());
+    }
+
+    @Test
+    void shouldResolveAnnotationPlane() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('N',(0.0,0.0,1.0));
+                #3=DIRECTION('X',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('AP',#4);
+                #6=CARTESIAN_POINT('P0',(1.0,2.0,0.0));
+                #7=PRESENTATION_STYLE_ASSIGNMENT(());
+                #8=(ANNOTATION_PLANE((#6))
+                    STYLED_ITEM('AP',(#7),#5)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPlane annotationPlane =
+                assertInstanceOf(StepAnnotationPlane.class, resolved.get(8));
+        assertEquals("AP", annotationPlane.name());
+        assertEquals(1, annotationPlane.styles().size());
+        assertEquals(5, annotationPlane.item().id());
+        assertEquals(1, annotationPlane.elements().size());
+        assertEquals(6, annotationPlane.elements().get(0).id());
+    }
+
+    @Test
+    void shouldResolveProjectionCurve() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=VECTOR('V0',#2,1.0);
+                #4=LINE('L0',#1,#3);
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=(PROJECTION_CURVE('PC0',(#5),#4)
+                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)
+                    STYLED_ITEM('PC0',(#5),#4)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PC0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProjectionCurve projectionCurve =
+                assertInstanceOf(StepProjectionCurve.class, resolved.get(6));
+        assertEquals("PC0", projectionCurve.name());
+        assertEquals(1, projectionCurve.styles().size());
+        assertEquals(4, projectionCurve.item().id());
+    }
+
+    @Test
+    void shouldResolveDimensionCurve() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=VECTOR('V0',#2,1.0);
+                #4=LINE('L0',#1,#3);
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=(DIMENSION_CURVE('DC0',(#5),#4)
+                    ANNOTATION_CURVE_OCCURRENCE('DC0',(#5),#4)
+                    STYLED_ITEM('DC0',(#5),#4)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('DC0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDimensionCurve dimensionCurve =
+                assertInstanceOf(StepDimensionCurve.class, resolved.get(6));
+        assertEquals("DC0", dimensionCurve.name());
+        assertEquals(1, dimensionCurve.styles().size());
+        assertEquals(4, dimensionCurve.item().id());
+    }
+
+    @Test
     void shouldPreferGeometricRepresentationItemOverRepresentationItemForComplexEntity() {
         String step = """
                 DATA;
@@ -2580,6 +3633,122 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveAdditionalShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=COMPOUND_SHAPE_REPRESENTATION('CSR',(#1),#2);
+                #4=PLANAR_SHAPE_REPRESENTATION('PLSR',(#1),#2);
+                #5=POINT_PLACEMENT_SHAPE_REPRESENTATION('PPSR',(#1),#2);
+                #6=SHAPE_DIMENSION_REPRESENTATION('SDR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation compound = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation planar = assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation pointPlacement = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation shapeDimension = assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("CSR", compound.name());
+        assertEquals("PLSR", planar.name());
+        assertEquals("PPSR", pointPlacement.name());
+        assertEquals("SDR", shapeDimension.name());
+        assertEquals(true, compound.shapeRepresentation());
+        assertEquals(true, planar.shapeRepresentation());
+        assertEquals(true, pointPlacement.shapeRepresentation());
+        assertEquals(true, shapeDimension.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveMoreShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=LOCATION_SHAPE_REPRESENTATION('LSR',(#1),#2);
+                #4=REPRESENTATIVE_SHAPE_REPRESENTATION('RSR',(#1),#2);
+                #5=NEUTRAL_SKETCH_REPRESENTATION('NSR',(#1),#2);
+                #6=PROCEDURAL_SHAPE_REPRESENTATION('PSR2',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation location = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation representative = assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation neutralSketch = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation procedural = assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("LSR", location.name());
+        assertEquals("RSR", representative.name());
+        assertEquals("NSR", neutralSketch.name());
+        assertEquals("PSR2", procedural.name());
+        assertEquals(true, location.shapeRepresentation());
+        assertEquals(true, representative.shapeRepresentation());
+        assertEquals(true, neutralSketch.shapeRepresentation());
+        assertEquals(true, procedural.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveEvenMoreShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=BLOCK_SHAPE_REPRESENTATION('BSR',(#1),#2);
+                #4=CYLINDRICAL_SHAPE_REPRESENTATION('CSR2',(#1),#2);
+                #5=DIRECTION_SHAPE_REPRESENTATION('DSR',(#1),#2);
+                #6=TESSELLATED_SHAPE_REPRESENTATION('TSR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation block = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation cylindrical = assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation direction = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation tessellated = assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("BSR", block.name());
+        assertEquals("CSR2", cylindrical.name());
+        assertEquals("DSR", direction.name());
+        assertEquals("TSR", tessellated.name());
+        assertEquals(true, block.shapeRepresentation());
+        assertEquals(true, cylindrical.shapeRepresentation());
+        assertEquals(true, direction.shapeRepresentation());
+        assertEquals(true, tessellated.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveCsg2dAndNgonShapeRepresentationSubtypes() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=CSG_2D_SHAPE_REPRESENTATION('C2D',(#1),#2);
+                #4=SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION('SA2D',(#1),#2);
+                #5=SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION('SB2D',(#1),#2);
+                #6=NGON_SHAPE_REPRESENTATION('NGON',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation csg2d = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        StepRepresentation singleArea = assertInstanceOf(StepRepresentation.class, resolved.get(4));
+        StepRepresentation singleBoundary = assertInstanceOf(StepRepresentation.class, resolved.get(5));
+        StepRepresentation ngon = assertInstanceOf(StepRepresentation.class, resolved.get(6));
+        assertEquals("C2D", csg2d.name());
+        assertEquals("SA2D", singleArea.name());
+        assertEquals("SB2D", singleBoundary.name());
+        assertEquals("NGON", ngon.name());
+        assertEquals(true, csg2d.shapeRepresentation());
+        assertEquals(true, singleArea.shapeRepresentation());
+        assertEquals(true, singleBoundary.shapeRepresentation());
+        assertEquals(true, ngon.shapeRepresentation());
+    }
+
+    @Test
     void shouldResolvePathShapeRepresentation() {
         String step = """
                 DATA;
@@ -2628,6 +3797,40 @@ class StepEntityResolverTest {
         StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(3));
         assertEquals("FSR", representation.name());
         assertEquals(true, representation.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolvePresentationRepresentation() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));
+                #3=PRESENTATION_REPRESENTATION('PR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        assertEquals("PR", representation.name());
+        assertEquals(false, representation.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveDraughtingModel() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','DRAWING'));
+                #3=DRAUGHTING_MODEL('DM',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(3));
+        assertEquals("DM", representation.name());
+        assertEquals(false, representation.shapeRepresentation());
     }
 
     @Test

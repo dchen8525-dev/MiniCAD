@@ -3,6 +3,17 @@ package com.minicad.step.semantic;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.StepAdvancedFace;
+import com.minicad.step.model.StepAnnotationCurveOccurrence;
+import com.minicad.step.model.StepAnnotationFillArea;
+import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
+import com.minicad.step.model.StepAnnotationPlane;
+import com.minicad.step.model.StepAnnotationPlaceholderOccurrence;
+import com.minicad.step.model.StepAnnotationPointOccurrence;
+import com.minicad.step.model.StepAnnotationOccurrenceRelationship;
+import com.minicad.step.model.StepAnnotationSymbol;
+import com.minicad.step.model.StepAnnotationSymbolOccurrence;
+import com.minicad.step.model.StepAnnotationText;
+import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepApplicationContext;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
@@ -18,6 +29,9 @@ import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepCharacterGlyphStyleOutline;
+import com.minicad.step.model.StepCharacterGlyphStyleOutlineWithCharacteristics;
+import com.minicad.step.model.StepCharacterGlyphStyleStroke;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
 import com.minicad.step.model.StepBSplineSurface;
 import com.minicad.step.model.StepBSplineSurfaceWithKnots;
@@ -25,6 +39,8 @@ import com.minicad.step.model.StepRationalBSplineCurve;
 import com.minicad.step.model.StepRationalBSplineSurface;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepColour;
+import com.minicad.step.model.StepColourSpecification;
 import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepConnectedEdgeSet;
 import com.minicad.step.model.StepConnectedFaceSet;
@@ -40,11 +56,13 @@ import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepCurveStyle;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDirection;
+import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDerivedUnitElement;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDraughtingPreDefinedColour;
 import com.minicad.step.model.StepDraughtingPreDefinedCurveFont;
+import com.minicad.step.model.StepDraughtingPreDefinedTextFont;
 import com.minicad.step.model.StepDraughtingCallout;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
@@ -63,6 +81,7 @@ import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
 import com.minicad.step.model.StepGlobalUnitAssignedContext;
 import com.minicad.step.model.StepItemDefinedTransformation;
+import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepMeasureWithUnit;
@@ -83,6 +102,7 @@ import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepProduct;
+import com.minicad.step.model.StepProjectionCurve;
 import com.minicad.step.model.StepProductContext;
 import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionContext;
@@ -97,7 +117,20 @@ import com.minicad.step.model.StepPoint;
 import com.minicad.step.model.StepPointSet;
 import com.minicad.step.model.StepPiecewiseBezierCurve;
 import com.minicad.step.model.StepPiecewiseBezierSurface;
+import com.minicad.step.model.StepPointStyle;
+import com.minicad.step.model.StepPreDefinedColour;
+import com.minicad.step.model.StepPreDefinedCurveFont;
+import com.minicad.step.model.StepPreDefinedDimensionSymbol;
+import com.minicad.step.model.StepPreDefinedGeometricalToleranceSymbol;
+import com.minicad.step.model.StepPreDefinedItem;
+import com.minicad.step.model.StepPreDefinedMarker;
+import com.minicad.step.model.StepPreDefinedPointMarkerSymbol;
+import com.minicad.step.model.StepPreDefinedSurfaceSideStyle;
+import com.minicad.step.model.StepPreDefinedSymbol;
+import com.minicad.step.model.StepPreDefinedTerminatorSymbol;
+import com.minicad.step.model.StepPreDefinedTextFont;
 import com.minicad.step.model.StepRepresentation;
+import com.minicad.step.model.StepRepresentationMap;
 import com.minicad.step.model.StepRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepRepresentationContext;
@@ -119,10 +152,29 @@ import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepSurfaceSideStyle;
 import com.minicad.step.model.StepSurfaceStyleFillArea;
+import com.minicad.step.model.StepSurfaceStyleBoundary;
+import com.minicad.step.model.StepSurfaceStyleControlGrid;
+import com.minicad.step.model.StepSurfaceStyleParameterLine;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbient;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuse;
+import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuseSpecular;
+import com.minicad.step.model.StepSurfaceStyleSegmentationCurve;
+import com.minicad.step.model.StepSurfaceStyleSilhouette;
+import com.minicad.step.model.StepSurfaceStyleTransparent;
 import com.minicad.step.model.StepSurfaceStyleUsage;
+import com.minicad.step.model.StepSymbolColour;
+import com.minicad.step.model.StepSymbolRepresentationMap;
+import com.minicad.step.model.StepSymbolStyle;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepSubedge;
 import com.minicad.step.model.StepSubpath;
+import com.minicad.step.model.StepTextStyle;
+import com.minicad.step.model.StepTextStyleWithBoxCharacteristics;
+import com.minicad.step.model.StepTextStyleForDefinedFont;
+import com.minicad.step.model.StepTextStyleWithJustification;
+import com.minicad.step.model.StepTextStyleWithMirror;
+import com.minicad.step.model.StepTextStyleWithSpacing;
+import com.minicad.step.model.StepTerminatorSymbol;
 import com.minicad.step.model.StepTypedMeasureWithUnit;
 import com.minicad.step.model.StepTopologicalRepresentationItem;
 import com.minicad.step.model.StepTrimmedCurve;
@@ -145,6 +197,9 @@ import com.minicad.step.model.StepVertexLoop;
 import com.minicad.step.model.StepVertexPoint;
 import com.minicad.step.model.StepVertexShell;
 import com.minicad.step.model.StepValueRepresentationItem;
+import com.minicad.step.model.StepUserDefinedCurveFont;
+import com.minicad.step.model.StepUserDefinedMarker;
+import com.minicad.step.model.StepUserDefinedTerminatorSymbol;
 import com.minicad.step.model.StepWireShell;
 import com.minicad.step.model.StepShellBasedWireframeModel;
 import com.minicad.step.syntax.StepEntityDefinition;
@@ -1820,6 +1875,101 @@ public final class StepEntityResolver {
             "PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
   }
 
+  private StepRepresentationMap resolveRepresentationMap(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "REPRESENTATION_MAP");
+    requireParameterCount(instance, definition, 2);
+    StepEntity mappedOrigin = resolve(referenceId(instance, definition, 0));
+    if (!(mappedOrigin instanceof StepAxis2Placement2D)
+        && !(mappedOrigin instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "REPRESENTATION_MAP mapped_origin must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepRepresentationMap(
+        instance.id(),
+        mappedOrigin,
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "REPRESENTATION_MAP mapped_representation must reference REPRESENTATION"));
+  }
+
+  private StepSymbolRepresentationMap resolveSymbolRepresentationMap(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SYMBOL_REPRESENTATION_MAP");
+    requireParameterCount(instance, definition, 2);
+    StepEntity mappedOrigin = resolve(referenceId(instance, definition, 0));
+    if (!(mappedOrigin instanceof StepAxis2Placement2D)
+        && !(mappedOrigin instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "SYMBOL_REPRESENTATION_MAP mapped_origin must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepSymbolRepresentationMap(
+        instance.id(),
+        mappedOrigin,
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "SYMBOL_REPRESENTATION_MAP mapped_representation must reference REPRESENTATION"));
+  }
+
+  private StepUserDefinedMarker resolveUserDefinedMarker(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "USER_DEFINED_MARKER");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "USER_DEFINED_MARKER mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepUserDefinedMarker(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentationMap.class,
+            "USER_DEFINED_MARKER mapping_source must reference REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
+  private StepUserDefinedCurveFont resolveUserDefinedCurveFont(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "USER_DEFINED_CURVE_FONT");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "USER_DEFINED_CURVE_FONT mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepUserDefinedCurveFont(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentationMap.class,
+            "USER_DEFINED_CURVE_FONT mapping_source must reference REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
+  private StepUserDefinedTerminatorSymbol resolveUserDefinedTerminatorSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "USER_DEFINED_TERMINATOR_SYMBOL");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "USER_DEFINED_TERMINATOR_SYMBOL mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepUserDefinedTerminatorSymbol(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentationMap.class,
+            "USER_DEFINED_TERMINATOR_SYMBOL mapping_source must reference REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
   private StepItemDefinedTransformation resolveItemDefinedTransformation(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "ITEM_DEFINED_TRANSFORMATION");
@@ -2290,12 +2440,98 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
+  private StepColour resolveColour(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COLOUR");
+    requireParameterCount(instance, definition, 0);
+    return new StepColour(instance.id());
+  }
+
+  private StepColourSpecification resolveColourSpecification(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COLOUR_SPECIFICATION");
+    requireParameterCount(instance, definition, 1);
+    return new StepColourSpecification(instance.id(), stringValue(instance, definition, 0));
+  }
+
   private StepDraughtingPreDefinedCurveFont resolveDraughtingPreDefinedCurveFont(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_CURVE_FONT");
     requireParameterCount(instance, definition, 1);
     return new StepDraughtingPreDefinedCurveFont(
         instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedCurveFont resolvePreDefinedCurveFont(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_CURVE_FONT");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedCurveFont(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedItem resolvePreDefinedItem(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_ITEM");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedItem(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedMarker resolvePreDefinedMarker(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_MARKER");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedMarker(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedSymbol resolvePreDefinedSymbol(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_SYMBOL");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedSymbol(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedPointMarkerSymbol resolvePreDefinedPointMarkerSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_POINT_MARKER_SYMBOL");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedPointMarkerSymbol(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedDimensionSymbol resolvePreDefinedDimensionSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_DIMENSION_SYMBOL");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedDimensionSymbol(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedGeometricalToleranceSymbol resolvePreDefinedGeometricalToleranceSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedGeometricalToleranceSymbol(
+        instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedTerminatorSymbol resolvePreDefinedTerminatorSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_TERMINATOR_SYMBOL");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedTerminatorSymbol(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_SURFACE_SIDE_STYLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedSurfaceSideStyle(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepDraughtingPreDefinedTextFont resolveDraughtingPreDefinedTextFont(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_TEXT_FONT");
+    requireParameterCount(instance, definition, 1);
+    return new StepDraughtingPreDefinedTextFont(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPreDefinedTextFont resolvePreDefinedTextFont(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_TEXT_FONT");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedTextFont(instance.id(), stringValue(instance, definition, 0));
   }
 
   private StepDraughtingPreDefinedColour resolveDraughtingPreDefinedColour(
@@ -2305,18 +2541,30 @@ public final class StepEntityResolver {
     return new StepDraughtingPreDefinedColour(instance.id(), stringValue(instance, definition, 0));
   }
 
+  private StepPreDefinedColour resolvePreDefinedColour(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_COLOUR");
+    requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedColour(instance.id(), stringValue(instance, definition, 0));
+  }
+
   private StepCurveStyle resolveCurveStyle(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CURVE_STYLE");
     requireParameterCount(instance, definition, 4);
     StepEntity font = resolve(referenceId(instance, definition, 1));
-    if (!(font instanceof StepDraughtingPreDefinedCurveFont)) {
+    if (!(font instanceof StepDraughtingPreDefinedCurveFont)
+        && !(font instanceof StepPreDefinedCurveFont)
+        && !(font instanceof StepUserDefinedCurveFont)) {
       throw new UnsupportedStepEntityException(
-          "CURVE_STYLE font must reference DRAUGHTING_PRE_DEFINED_CURVE_FONT");
+          "CURVE_STYLE font must reference PRE_DEFINED_CURVE_FONT, DRAUGHTING_PRE_DEFINED_CURVE_FONT or USER_DEFINED_CURVE_FONT");
     }
     StepEntity colour = resolve(referenceId(instance, definition, 3));
-    if (!(colour instanceof StepColourRgb) && !(colour instanceof StepDraughtingPreDefinedColour)) {
+    if (!(colour instanceof StepColourRgb)
+        && !(colour instanceof StepColourSpecification)
+        && !(colour instanceof StepColour)
+        && !(colour instanceof StepDraughtingPreDefinedColour)
+        && !(colour instanceof StepPreDefinedColour)) {
       throw new UnsupportedStepEntityException(
-          "CURVE_STYLE colour must reference COLOUR_RGB or DRAUGHTING_PRE_DEFINED_COLOUR");
+          "CURVE_STYLE colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
     }
     return new StepCurveStyle(
         instance.id(),
@@ -2326,13 +2574,215 @@ public final class StepEntityResolver {
         colour);
   }
 
+  private StepPointStyle resolvePointStyle(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "POINT_STYLE");
+    requireParameterCount(instance, definition, 4);
+    StepEntity marker = resolve(referenceId(instance, definition, 1));
+    if (!(marker instanceof StepPreDefinedPointMarkerSymbol)
+        && !(marker instanceof StepPreDefinedMarker)
+        && !(marker instanceof StepUserDefinedMarker)) {
+      throw new UnsupportedStepEntityException(
+          "POINT_STYLE marker must reference PRE_DEFINED_POINT_MARKER_SYMBOL, PRE_DEFINED_MARKER or USER_DEFINED_MARKER");
+    }
+    StepEntity colour = resolve(referenceId(instance, definition, 3));
+    if (!(colour instanceof StepColourRgb)
+        && !(colour instanceof StepColourSpecification)
+        && !(colour instanceof StepColour)
+        && !(colour instanceof StepDraughtingPreDefinedColour)
+        && !(colour instanceof StepPreDefinedColour)) {
+      throw new UnsupportedStepEntityException(
+          "POINT_STYLE colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
+    }
+    return new StepPointStyle(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        marker,
+        numberValue(instance, definition, 2),
+        colour);
+  }
+
+  private StepCharacterGlyphStyleStroke resolveCharacterGlyphStyleStroke(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_STYLE_STROKE");
+    requireParameterCount(instance, definition, 1);
+    return new StepCharacterGlyphStyleStroke(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCurveStyle.class,
+            "CHARACTER_GLYPH_STYLE_STROKE stroke_style must reference CURVE_STYLE"));
+  }
+
+  private StepCharacterGlyphStyleOutline resolveCharacterGlyphStyleOutline(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_STYLE_OUTLINE");
+    requireParameterCount(instance, definition, 1);
+    return new StepCharacterGlyphStyleOutline(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCurveStyle.class,
+            "CHARACTER_GLYPH_STYLE_OUTLINE outline_style must reference CURVE_STYLE"));
+  }
+
+  private StepCharacterGlyphStyleOutlineWithCharacteristics
+      resolveCharacterGlyphStyleOutlineWithCharacteristics(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS");
+    requireParameterCount(instance, definition, 2);
+    return new StepCharacterGlyphStyleOutlineWithCharacteristics(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCurveStyle.class,
+            "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS outline_style must reference CURVE_STYLE"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepFillAreaStyle.class,
+            "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS characteristics must reference FILL_AREA_STYLE"));
+  }
+
+  private StepTextStyleForDefinedFont resolveTextStyleForDefinedFont(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_FOR_DEFINED_FONT");
+    requireParameterCount(instance, definition, 1);
+    StepEntity colour = resolve(referenceId(instance, definition, 0));
+    if (!(colour instanceof StepColourRgb)
+        && !(colour instanceof StepColourSpecification)
+        && !(colour instanceof StepColour)
+        && !(colour instanceof StepDraughtingPreDefinedColour)
+        && !(colour instanceof StepPreDefinedColour)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_FOR_DEFINED_FONT colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
+    }
+    return new StepTextStyleForDefinedFont(instance.id(), colour);
+  }
+
+  private StepTextStyle resolveTextStyle(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE");
+    requireParameterCount(instance, definition, 2);
+    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
+    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
+    }
+    return new StepTextStyle(
+        instance.id(), stringValue(instance, definition, 0), characterAppearance);
+  }
+
+  private StepTextStyleWithSpacing resolveTextStyleWithSpacing(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_SPACING");
+    requireParameterCount(instance, definition, 3);
+    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
+    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_WITH_SPACING character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
+    }
+    return new StepTextStyleWithSpacing(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        characterAppearance,
+        numberValue(instance, definition, 2));
+  }
+
+  private StepTextStyleWithJustification resolveTextStyleWithJustification(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_JUSTIFICATION");
+    requireParameterCount(instance, definition, 3);
+    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
+    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_WITH_JUSTIFICATION character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
+    }
+    return new StepTextStyleWithJustification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        characterAppearance,
+        enumValue(instance, definition, 2));
+  }
+
+  private StepTextStyleWithMirror resolveTextStyleWithMirror(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_MIRROR");
+    requireParameterCount(instance, definition, 3);
+    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
+    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_WITH_MIRROR character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
+    }
+    StepEntity mirrorPlacement = resolve(referenceId(instance, definition, 2));
+    if (!(mirrorPlacement instanceof StepAxis2Placement2D)
+        && !(mirrorPlacement instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_WITH_MIRROR mirror_placement must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepTextStyleWithMirror(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        characterAppearance,
+        mirrorPlacement);
+  }
+
+  private StepTextStyleWithBoxCharacteristics resolveTextStyleWithBoxCharacteristics(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_BOX_CHARACTERISTICS");
+    requireParameterCount(instance, definition, 3);
+    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
+    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
+      throw new UnsupportedStepEntityException(
+          "TEXT_STYLE_WITH_BOX_CHARACTERISTICS character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
+    }
+    List<String> boxCharacteristics = literalList(instance, definition, 2);
+    if (boxCharacteristics.isEmpty()) {
+      throw new StepResolutionException(
+          "TEXT_STYLE_WITH_BOX_CHARACTERISTICS box_characteristics must not be empty");
+    }
+    if (new LinkedHashSet<>(boxCharacteristics).size() != boxCharacteristics.size()) {
+      throw new StepResolutionException(
+          "TEXT_STYLE_WITH_BOX_CHARACTERISTICS box_characteristics must not contain duplicate entries");
+    }
+    return new StepTextStyleWithBoxCharacteristics(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        characterAppearance,
+        boxCharacteristics);
+  }
+
+  private StepSymbolColour resolveSymbolColour(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SYMBOL_COLOUR");
+    requireParameterCount(instance, definition, 1);
+    StepEntity colour = resolve(referenceId(instance, definition, 0));
+    if (!(colour instanceof StepColourRgb)
+        && !(colour instanceof StepColourSpecification)
+        && !(colour instanceof StepColour)
+        && !(colour instanceof StepDraughtingPreDefinedColour)
+        && !(colour instanceof StepPreDefinedColour)) {
+      throw new UnsupportedStepEntityException(
+          "SYMBOL_COLOUR colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
+    }
+    return new StepSymbolColour(instance.id(), colour);
+  }
+
+  private StepSymbolStyle resolveSymbolStyle(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SYMBOL_STYLE");
+    requireParameterCount(instance, definition, 2);
+    StepEntity styleOfSymbol = resolve(referenceId(instance, definition, 1));
+    if (!(styleOfSymbol instanceof StepSymbolColour)) {
+      throw new UnsupportedStepEntityException(
+          "SYMBOL_STYLE style_of_symbol must reference SYMBOL_COLOUR");
+    }
+    return new StepSymbolStyle(instance.id(), stringValue(instance, definition, 0), styleOfSymbol);
+  }
+
   private StepFillAreaStyleColour resolveFillAreaStyleColour(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_COLOUR");
     requireParameterCount(instance, definition, 2);
     StepEntity colour = resolve(referenceId(instance, definition, 1));
-    if (!(colour instanceof StepColourRgb) && !(colour instanceof StepDraughtingPreDefinedColour)) {
+    if (!(colour instanceof StepColourRgb)
+        && !(colour instanceof StepColourSpecification)
+        && !(colour instanceof StepColour)
+        && !(colour instanceof StepDraughtingPreDefinedColour)
+        && !(colour instanceof StepPreDefinedColour)) {
       throw new UnsupportedStepEntityException(
-          "FILL_AREA_STYLE_COLOUR colour must reference COLOUR_RGB or DRAUGHTING_PRE_DEFINED_COLOUR");
+          "FILL_AREA_STYLE_COLOUR colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
     }
     return new StepFillAreaStyleColour(
         instance.id(), optionalStringValue(instance, definition, 0), colour);
@@ -2363,18 +2813,134 @@ public final class StepEntityResolver {
             "SURFACE_STYLE_FILL_AREA fill style must reference FILL_AREA_STYLE"));
   }
 
+  private StepCurveStyle requireCurveStyleReference(
+      StepEntityInstance instance, StepEntityDefinition definition, String entityName) {
+    return requireEntity(
+        referenceId(instance, definition, 0),
+        StepCurveStyle.class,
+        entityName + " style must reference CURVE_STYLE");
+  }
+
+  private StepSurfaceStyleBoundary resolveSurfaceStyleBoundary(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_BOUNDARY");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleBoundary(
+        instance.id(), requireCurveStyleReference(instance, definition, "SURFACE_STYLE_BOUNDARY"));
+  }
+
+  private StepSurfaceStyleControlGrid resolveSurfaceStyleControlGrid(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_CONTROL_GRID");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleControlGrid(
+        instance.id(),
+        requireCurveStyleReference(instance, definition, "SURFACE_STYLE_CONTROL_GRID"));
+  }
+
+  private StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_SEGMENTATION_CURVE");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleSegmentationCurve(
+        instance.id(),
+        requireCurveStyleReference(instance, definition, "SURFACE_STYLE_SEGMENTATION_CURVE"));
+  }
+
+  private StepSurfaceStyleSilhouette resolveSurfaceStyleSilhouette(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_SILHOUETTE");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleSilhouette(
+        instance.id(), requireCurveStyleReference(instance, definition, "SURFACE_STYLE_SILHOUETTE"));
+  }
+
+  private StepSurfaceStyleTransparent resolveSurfaceStyleTransparent(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_TRANSPARENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleTransparent(instance.id(), numberValue(instance, definition, 0));
+  }
+
+  private StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleReflectanceAmbient(instance.id(), numberValue(instance, definition, 0));
+  }
+
+  private StepSurfaceStyleReflectanceAmbientDiffuse resolveSurfaceStyleReflectanceAmbientDiffuse(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE");
+    requireParameterCount(instance, definition, 2);
+    return new StepSurfaceStyleReflectanceAmbientDiffuse(
+        instance.id(),
+        numberValue(instance, definition, 0),
+        numberValue(instance, definition, 1));
+  }
+
+  private StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+      resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR");
+    requireParameterCount(instance, definition, 5);
+    StepEntity specularColour = resolve(referenceId(instance, definition, 4));
+    if (!(specularColour instanceof StepColour)
+        && !(specularColour instanceof StepColourSpecification)
+        && !(specularColour instanceof StepColourRgb)
+        && !(specularColour instanceof StepDraughtingPreDefinedColour)
+        && !(specularColour instanceof StepPreDefinedColour)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR specular_colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
+    }
+    return new StepSurfaceStyleReflectanceAmbientDiffuseSpecular(
+        instance.id(),
+        numberValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        specularColour);
+  }
+
+  private StepSurfaceStyleParameterLine resolveSurfaceStyleParameterLine(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_PARAMETER_LINE");
+    requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleParameterLine(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCurveStyle.class,
+            "SURFACE_STYLE_PARAMETER_LINE style must reference CURVE_STYLE"));
+  }
+
   private StepSurfaceSideStyle resolveSurfaceSideStyle(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SURFACE_SIDE_STYLE");
     requireParameterCount(instance, definition, 2);
     return new StepSurfaceSideStyle(
         instance.id(),
         optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepSurfaceStyleFillArea.class,
-            "SURFACE_SIDE_STYLE styles must contain SURFACE_STYLE_FILL_AREA references"));
+        entityReferenceList(
+                instance,
+                definition,
+                1,
+                "SURFACE_SIDE_STYLE styles must contain SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR or SURFACE_STYLE_PARAMETER_LINE references")
+                .stream()
+                .map(
+                        style -> {
+                            if (!(style instanceof StepSurfaceStyleFillArea)
+                                    && !(style instanceof StepSurfaceStyleBoundary)
+                                    && !(style instanceof StepSurfaceStyleControlGrid)
+                                    && !(style instanceof StepSurfaceStyleSegmentationCurve)
+                                    && !(style instanceof StepSurfaceStyleSilhouette)
+                                    && !(style instanceof StepSurfaceStyleTransparent)
+                                    && !(style instanceof StepSurfaceStyleReflectanceAmbient)
+                                    && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuse)
+                                    && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular)
+                                    && !(style instanceof StepSurfaceStyleParameterLine)) {
+                                throw new StepResolutionException(
+                                        "SURFACE_SIDE_STYLE styles must reference SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR or SURFACE_STYLE_PARAMETER_LINE");
+                            }
+                            return style;
+                        })
+                .toList());
   }
 
   private StepSurfaceStyleUsage resolveSurfaceStyleUsage(StepEntityInstance instance) {
@@ -2463,6 +3029,368 @@ public final class StepEntityResolver {
             referenceId(instance, definition, 2),
             StepCartesianPoint.class,
             "ANNOTATION_TEXT_OCCURRENCE position must reference CARTESIAN_POINT"));
+  }
+
+  private StepAnnotationText resolveAnnotationText(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_TEXT");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "ANNOTATION_TEXT mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepAnnotationText(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentationMap.class,
+            "ANNOTATION_TEXT mapping_source must reference REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
+  private StepAnnotationTextCharacter resolveAnnotationTextCharacter(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_TEXT_CHARACTER");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "ANNOTATION_TEXT_CHARACTER mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepAnnotationTextCharacter(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepRepresentationMap.class,
+            "ANNOTATION_TEXT_CHARACTER mapping_source must reference REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
+  private StepAnnotationSymbol resolveAnnotationSymbol(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_SYMBOL");
+    requireParameterCount(instance, definition, 3);
+    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
+    if (!(mappingTarget instanceof StepAxis2Placement2D)
+        && !(mappingTarget instanceof StepAxis2Placement3D)) {
+      throw new UnsupportedStepEntityException(
+          "ANNOTATION_SYMBOL mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+    }
+    return new StepAnnotationSymbol(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepSymbolRepresentationMap.class,
+            "ANNOTATION_SYMBOL mapping_source must reference SYMBOL_REPRESENTATION_MAP"),
+        mappingTarget);
+  }
+
+  private StepAnnotationSymbolOccurrence resolveAnnotationSymbolOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_SYMBOL_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepAnnotationSymbolOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_SYMBOL_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAnnotationSymbol.class,
+            "ANNOTATION_SYMBOL_OCCURRENCE item must reference ANNOTATION_SYMBOL"));
+  }
+
+  private StepTerminatorSymbol resolveTerminatorSymbol(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TERMINATOR_SYMBOL");
+    requireParameterCount(instance, definition, 4);
+    StepEntity annotatedCurve = resolve(referenceId(instance, definition, 3));
+    if (!(annotatedCurve instanceof StepAnnotationCurveOccurrence)
+        && !(annotatedCurve instanceof StepLeaderCurve)
+        && !(annotatedCurve instanceof StepProjectionCurve)
+        && !(annotatedCurve instanceof StepDimensionCurve)) {
+      throw new StepResolutionException(
+          "TERMINATOR_SYMBOL annotated_curve must reference supported annotation curve occurrence");
+    }
+    return new StepTerminatorSymbol(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "TERMINATOR_SYMBOL styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAnnotationSymbol.class,
+            "TERMINATOR_SYMBOL item must reference ANNOTATION_SYMBOL"),
+        annotatedCurve);
+  }
+
+  private StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_OCCURRENCE_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    StepEntity relating = resolve(referenceId(instance, definition, 2));
+    StepEntity related = resolve(referenceId(instance, definition, 3));
+    if (!isAnnotationOccurrence(relating) || !isAnnotationOccurrence(related)) {
+      throw new UnsupportedStepEntityException(
+          "ANNOTATION_OCCURRENCE_RELATIONSHIP occurrences must reference supported annotation occurrence entities");
+    }
+    return new StepAnnotationOccurrenceRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        relating,
+        related);
+  }
+
+  private StepAnnotationPointOccurrence resolveAnnotationPointOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_POINT_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity item = resolve(referenceId(instance, definition, 2));
+    if (!(item instanceof StepCartesianPoint) && !(item instanceof StepPoint)) {
+      throw new StepResolutionException(
+          "ANNOTATION_POINT_OCCURRENCE item must reference POINT or CARTESIAN_POINT");
+    }
+    return new StepAnnotationPointOccurrence(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_POINT_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        item);
+  }
+
+  private StepAnnotationCurveOccurrence resolveAnnotationCurveOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_CURVE_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity item = resolve(referenceId(instance, definition, 2));
+    if (!(item instanceof StepLine)
+        && !(item instanceof StepCircle)
+        && !(item instanceof StepEllipse)
+        && !(item instanceof StepPolyline)
+        && !(item instanceof StepTrimmedCurve)
+        && !(item instanceof StepCompositeCurve)
+        && !(item instanceof StepCurve)
+        && !(item instanceof StepBoundedCurve)
+        && !(item instanceof StepGeometricCurveSet)) {
+      throw new StepResolutionException(
+          "ANNOTATION_CURVE_OCCURRENCE item must reference a supported curve or GEOMETRIC_CURVE_SET");
+    }
+    return new StepAnnotationCurveOccurrence(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_CURVE_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        item);
+  }
+
+  private StepLeaderCurve resolveLeaderCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LEADER_CURVE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity item = resolve(referenceId(instance, definition, 2));
+    if (!(item instanceof StepLine)
+        && !(item instanceof StepCircle)
+        && !(item instanceof StepEllipse)
+        && !(item instanceof StepPolyline)
+        && !(item instanceof StepTrimmedCurve)
+        && !(item instanceof StepCompositeCurve)
+        && !(item instanceof StepCurve)
+        && !(item instanceof StepBoundedCurve)
+        && !(item instanceof StepGeometricCurveSet)) {
+      throw new StepResolutionException(
+          "LEADER_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
+    }
+    return new StepLeaderCurve(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "LEADER_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        item);
+  }
+
+  private StepProjectionCurve resolveProjectionCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PROJECTION_CURVE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity item = resolve(referenceId(instance, definition, 2));
+    if (!(item instanceof StepLine)
+        && !(item instanceof StepCircle)
+        && !(item instanceof StepEllipse)
+        && !(item instanceof StepPolyline)
+        && !(item instanceof StepTrimmedCurve)
+        && !(item instanceof StepCompositeCurve)
+        && !(item instanceof StepCurve)
+        && !(item instanceof StepBoundedCurve)
+        && !(item instanceof StepGeometricCurveSet)) {
+      throw new StepResolutionException(
+          "PROJECTION_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
+    }
+    return new StepProjectionCurve(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "PROJECTION_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        item);
+  }
+
+  private StepDimensionCurve resolveDimensionCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DIMENSION_CURVE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity item = resolve(referenceId(instance, definition, 2));
+    if (!(item instanceof StepLine)
+        && !(item instanceof StepCircle)
+        && !(item instanceof StepEllipse)
+        && !(item instanceof StepPolyline)
+        && !(item instanceof StepTrimmedCurve)
+        && !(item instanceof StepCompositeCurve)
+        && !(item instanceof StepCurve)
+        && !(item instanceof StepBoundedCurve)
+        && !(item instanceof StepGeometricCurveSet)) {
+      throw new StepResolutionException(
+          "DIMENSION_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
+    }
+    return new StepDimensionCurve(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "DIMENSION_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        item);
+  }
+
+  private StepAnnotationFillArea resolveAnnotationFillArea(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_FILL_AREA");
+    requireParameterCount(instance, definition, 2);
+    List<StepEntity> boundaries =
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "ANNOTATION_FILL_AREA boundaries must contain curve references");
+    for (StepEntity boundary : boundaries) {
+      if (!(boundary instanceof StepLine)
+          && !(boundary instanceof StepCircle)
+          && !(boundary instanceof StepEllipse)
+          && !(boundary instanceof StepPolyline)
+          && !(boundary instanceof StepTrimmedCurve)
+          && !(boundary instanceof StepCompositeCurve)
+          && !(boundary instanceof StepCurve)
+          && !(boundary instanceof StepBoundedCurve)) {
+        throw new StepResolutionException(
+            "ANNOTATION_FILL_AREA boundaries must reference supported curves");
+      }
+    }
+    return new StepAnnotationFillArea(
+        instance.id(), stringValue(instance, definition, 0), boundaries);
+  }
+
+  private StepAnnotationFillAreaOccurrence resolveAnnotationFillAreaOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_FILL_AREA_OCCURRENCE");
+    requireParameterCount(instance, definition, 4);
+    StepEntity fillStyleTarget = resolve(referenceId(instance, definition, 3));
+    if (!(fillStyleTarget instanceof StepCartesianPoint) && !(fillStyleTarget instanceof StepPoint)) {
+      throw new StepResolutionException(
+          "ANNOTATION_FILL_AREA_OCCURRENCE fill_style_target must reference POINT or CARTESIAN_POINT");
+    }
+    return new StepAnnotationFillAreaOccurrence(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_FILL_AREA_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAnnotationFillArea.class,
+            "ANNOTATION_FILL_AREA_OCCURRENCE item must reference ANNOTATION_FILL_AREA"),
+        fillStyleTarget);
+  }
+
+  private StepAnnotationPlaceholderOccurrence resolveAnnotationPlaceholderOccurrence(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_PLACEHOLDER_OCCURRENCE");
+    requireParameterCount(instance, definition, 5);
+    double lineSpacing = numberValue(instance, definition, 4);
+    if (!(lineSpacing > 0.0)) {
+      throw new StepResolutionException(
+          "ANNOTATION_PLACEHOLDER_OCCURRENCE line_spacing must be positive");
+    }
+    return new StepAnnotationPlaceholderOccurrence(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_PLACEHOLDER_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepGeometricSet.class,
+            "ANNOTATION_PLACEHOLDER_OCCURRENCE item must reference GEOMETRIC_SET"),
+        enumValue(instance, definition, 3),
+        lineSpacing);
+  }
+
+  private StepAnnotationPlane resolveAnnotationPlane(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ANNOTATION_PLANE");
+    requireParameterCount(instance, definition, 1);
+    List<StepEntity> elements = List.of();
+    if (!isUnset(definition.parameters().get(0))) {
+      elements =
+          entityReferenceList(
+              instance,
+              definition,
+              0,
+              "ANNOTATION_PLANE elements must contain entity references");
+    }
+    return new StepAnnotationPlane(
+        instance.id(),
+        inheritedRepresentationItemName(instance),
+        referenceList(
+            instance,
+            definition(instance, "STYLED_ITEM"),
+            1,
+            StepPresentationStyleAssignment.class,
+            "ANNOTATION_PLANE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
+        requireEntity(
+            inheritedStyledItemTargetId(instance),
+            StepPlane.class,
+            "ANNOTATION_PLANE item must reference PLANE"),
+        elements);
   }
 
   private StepGeometricCurveSet resolveGeometricCurveSet(StepEntityInstance instance) {
@@ -2783,6 +3711,20 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
+  private List<String> literalList(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = unwrapTyped(definition.parameters().get(index));
+    if (!(value instanceof StepValue.ListValue listValue)) {
+      throw new StepResolutionException(
+          definition.name() + " parameter " + index + " must be a list");
+    }
+    List<String> result = new ArrayList<>(listValue.elements().size());
+    for (StepValue element : listValue.elements()) {
+      result.add(literalText(element));
+    }
+    return List.copyOf(result);
+  }
+
   private List<List<Double>> numberGrid(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
@@ -2900,6 +3842,19 @@ public final class StepEntityResolver {
       throw new StepResolutionException(message + " but got " + entity.getClass().getSimpleName());
     }
     return entity;
+  }
+
+  private boolean isAnnotationOccurrence(StepEntity entity) {
+    return entity instanceof StepAnnotationTextOccurrence
+        || entity instanceof StepAnnotationPointOccurrence
+        || entity instanceof StepAnnotationCurveOccurrence
+        || entity instanceof StepLeaderCurve
+        || entity instanceof StepProjectionCurve
+        || entity instanceof StepDimensionCurve
+        || entity instanceof StepAnnotationFillAreaOccurrence
+        || entity instanceof StepAnnotationPlaceholderOccurrence
+        || entity instanceof StepAnnotationPlane
+        || entity instanceof StepAnnotationSymbolOccurrence;
   }
 
   private <T extends StepEntity> List<T> referenceList(
@@ -3020,6 +3975,15 @@ public final class StepEntityResolver {
         : inheritedRepresentationItemName(instance);
   }
 
+  private int inheritedStyledItemTargetId(StepEntityInstance instance) {
+    if (!instance.hasDefinition("STYLED_ITEM")) {
+      throw new StepResolutionException("complex entity is missing STYLED_ITEM definition");
+    }
+    StepEntityDefinition definition = definition(instance, "STYLED_ITEM");
+    requireParameterCount(instance, definition, 3);
+    return referenceId(instance, definition, 2);
+  }
+
   private static Map<String, EntityFactory> createRegistry() {
     // Resolution order matters for complex entities such as
     // (LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(...)).
@@ -3044,9 +4008,35 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "FACETED_BREP_SHAPE_REPRESENTATION", true));
     registry.put(
+        "BLOCK_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "BLOCK_SHAPE_REPRESENTATION", true));
+    registry.put(
         "CSG_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "CSG_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "CSG_2D_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CSG_2D_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "CYLINDRICAL_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "CYLINDRICAL_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "DIRECTION_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DIRECTION_SHAPE_REPRESENTATION", true));
     registry.put("BOOLEAN_CLIPPING_RESULT", StepEntityResolver::resolveBooleanClippingResult);
     registry.put("BOOLEAN_RESULT", StepEntityResolver::resolveBooleanResult);
     registry.put(
@@ -3088,6 +4078,48 @@ public final class StepEntityResolver {
             resolver.resolveRepresentation(
                 instance, "GEOMETRICALLY_BOUNDED_SURFACE_SHAPE_REPRESENTATION", true));
     registry.put(
+        "COMPOUND_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "COMPOUND_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "PLANAR_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PLANAR_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "POINT_PLACEMENT_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "POINT_PLACEMENT_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "SHAPE_DIMENSION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "SHAPE_DIMENSION_REPRESENTATION", true));
+    registry.put(
+        "LOCATION_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "LOCATION_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "REPRESENTATIVE_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(
+                instance, "REPRESENTATIVE_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "NEUTRAL_SKETCH_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "NEUTRAL_SKETCH_REPRESENTATION", true));
+    registry.put(
+        "PROCEDURAL_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PROCEDURAL_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "TESSELLATED_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "TESSELLATED_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "NGON_SHAPE_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "NGON_SHAPE_REPRESENTATION", true));
+    registry.put(
         "PATH_SHAPE_REPRESENTATION",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "PATH_SHAPE_REPRESENTATION", true));
@@ -3109,6 +4141,14 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(
                 instance, "MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION", false));
+    registry.put(
+        "PRESENTATION_REPRESENTATION",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "PRESENTATION_REPRESENTATION", false));
+    registry.put(
+        "DRAUGHTING_MODEL",
+        (resolver, instance) ->
+            resolver.resolveRepresentation(instance, "DRAUGHTING_MODEL", false));
     registry.put(
         "REPRESENTATION", (resolver, instance) -> resolver.resolveRepresentation(instance, false));
     registry.put("APPLICATION_CONTEXT", StepEntityResolver::resolveApplicationContext);
@@ -3135,6 +4175,13 @@ public final class StepEntityResolver {
     registry.put(
         "PROPERTY_DEFINITION_REPRESENTATION",
         StepEntityResolver::resolvePropertyDefinitionRepresentation);
+    registry.put("REPRESENTATION_MAP", StepEntityResolver::resolveRepresentationMap);
+    registry.put("SYMBOL_REPRESENTATION_MAP", StepEntityResolver::resolveSymbolRepresentationMap);
+    registry.put("USER_DEFINED_CURVE_FONT", StepEntityResolver::resolveUserDefinedCurveFont);
+    registry.put("USER_DEFINED_MARKER", StepEntityResolver::resolveUserDefinedMarker);
+    registry.put(
+        "USER_DEFINED_TERMINATOR_SYMBOL",
+        StepEntityResolver::resolveUserDefinedTerminatorSymbol);
     registry.put(
         "ITEM_DEFINED_TRANSFORMATION", StepEntityResolver::resolveItemDefinedTransformation);
     registry.put(
@@ -3485,6 +4532,19 @@ public final class StepEntityResolver {
     registry.put("FACE", StepEntityResolver::resolveFace);
     registry.put("MANIFOLD_SOLID_BREP", StepEntityResolver::resolveManifoldSolidBrep);
     registry.put("SOLID_MODEL", StepEntityResolver::resolveSolidModel);
+    registry.put("ANNOTATION_FILL_AREA", StepEntityResolver::resolveAnnotationFillArea);
+    registry.put(
+        "ANNOTATION_FILL_AREA_OCCURRENCE",
+        StepEntityResolver::resolveAnnotationFillAreaOccurrence);
+    registry.put(
+        "ANNOTATION_PLACEHOLDER_OCCURRENCE",
+        StepEntityResolver::resolveAnnotationPlaceholderOccurrence);
+    registry.put("ANNOTATION_PLANE", StepEntityResolver::resolveAnnotationPlane);
+    registry.put("ANNOTATION_POINT_OCCURRENCE", StepEntityResolver::resolveAnnotationPointOccurrence);
+    registry.put("LEADER_CURVE", StepEntityResolver::resolveLeaderCurve);
+    registry.put("PROJECTION_CURVE", StepEntityResolver::resolveProjectionCurve);
+    registry.put("DIMENSION_CURVE", StepEntityResolver::resolveDimensionCurve);
+    registry.put("ANNOTATION_CURVE_OCCURRENCE", StepEntityResolver::resolveAnnotationCurveOccurrence);
     registry.put(
         "GEOMETRIC_REPRESENTATION_ITEM",
         StepEntityResolver::resolveGeometricRepresentationItem);
@@ -3502,11 +4562,78 @@ public final class StepEntityResolver {
         "DRAUGHTING_PRE_DEFINED_CURVE_FONT",
         StepEntityResolver::resolveDraughtingPreDefinedCurveFont);
     registry.put(
+        "PRE_DEFINED_POINT_MARKER_SYMBOL",
+        StepEntityResolver::resolvePreDefinedPointMarkerSymbol);
+    registry.put(
+        "PRE_DEFINED_DIMENSION_SYMBOL",
+        StepEntityResolver::resolvePreDefinedDimensionSymbol);
+    registry.put(
+        "PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL",
+        StepEntityResolver::resolvePreDefinedGeometricalToleranceSymbol);
+    registry.put(
+        "PRE_DEFINED_TERMINATOR_SYMBOL",
+        StepEntityResolver::resolvePreDefinedTerminatorSymbol);
+    registry.put(
+        "PRE_DEFINED_SURFACE_SIDE_STYLE",
+        StepEntityResolver::resolvePreDefinedSurfaceSideStyle);
+    registry.put(
+        "DRAUGHTING_PRE_DEFINED_TEXT_FONT",
+        StepEntityResolver::resolveDraughtingPreDefinedTextFont);
+    registry.put("PRE_DEFINED_TEXT_FONT", StepEntityResolver::resolvePreDefinedTextFont);
+    registry.put("PRE_DEFINED_ITEM", StepEntityResolver::resolvePreDefinedItem);
+    registry.put("PRE_DEFINED_MARKER", StepEntityResolver::resolvePreDefinedMarker);
+    registry.put("PRE_DEFINED_SYMBOL", StepEntityResolver::resolvePreDefinedSymbol);
+    registry.put("PRE_DEFINED_CURVE_FONT", StepEntityResolver::resolvePreDefinedCurveFont);
+    registry.put(
         "DRAUGHTING_PRE_DEFINED_COLOUR", StepEntityResolver::resolveDraughtingPreDefinedColour);
+    registry.put("PRE_DEFINED_COLOUR", StepEntityResolver::resolvePreDefinedColour);
+    registry.put("COLOUR_SPECIFICATION", StepEntityResolver::resolveColourSpecification);
+    registry.put("COLOUR", StepEntityResolver::resolveColour);
     registry.put("CURVE_STYLE", StepEntityResolver::resolveCurveStyle);
+    registry.put("POINT_STYLE", StepEntityResolver::resolvePointStyle);
+    registry.put(
+        "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS",
+        StepEntityResolver::resolveCharacterGlyphStyleOutlineWithCharacteristics);
+    registry.put(
+        "CHARACTER_GLYPH_STYLE_OUTLINE",
+        StepEntityResolver::resolveCharacterGlyphStyleOutline);
+    registry.put(
+        "CHARACTER_GLYPH_STYLE_STROKE",
+        StepEntityResolver::resolveCharacterGlyphStyleStroke);
+    registry.put("TEXT_STYLE_FOR_DEFINED_FONT", StepEntityResolver::resolveTextStyleForDefinedFont);
+    registry.put("TEXT_STYLE_WITH_SPACING", StepEntityResolver::resolveTextStyleWithSpacing);
+    registry.put(
+        "TEXT_STYLE_WITH_JUSTIFICATION",
+        StepEntityResolver::resolveTextStyleWithJustification);
+    registry.put("TEXT_STYLE_WITH_MIRROR", StepEntityResolver::resolveTextStyleWithMirror);
+    registry.put(
+        "TEXT_STYLE_WITH_BOX_CHARACTERISTICS",
+        StepEntityResolver::resolveTextStyleWithBoxCharacteristics);
+    registry.put("TEXT_STYLE", StepEntityResolver::resolveTextStyle);
+    registry.put("SYMBOL_COLOUR", StepEntityResolver::resolveSymbolColour);
+    registry.put("SYMBOL_STYLE", StepEntityResolver::resolveSymbolStyle);
     registry.put("FILL_AREA_STYLE_COLOUR", StepEntityResolver::resolveFillAreaStyleColour);
     registry.put("FILL_AREA_STYLE", StepEntityResolver::resolveFillAreaStyle);
     registry.put("SURFACE_STYLE_FILL_AREA", StepEntityResolver::resolveSurfaceStyleFillArea);
+    registry.put("SURFACE_STYLE_BOUNDARY", StepEntityResolver::resolveSurfaceStyleBoundary);
+    registry.put("SURFACE_STYLE_CONTROL_GRID", StepEntityResolver::resolveSurfaceStyleControlGrid);
+    registry.put(
+        "SURFACE_STYLE_SEGMENTATION_CURVE",
+        StepEntityResolver::resolveSurfaceStyleSegmentationCurve);
+    registry.put("SURFACE_STYLE_SILHOUETTE", StepEntityResolver::resolveSurfaceStyleSilhouette);
+    registry.put("SURFACE_STYLE_TRANSPARENT", StepEntityResolver::resolveSurfaceStyleTransparent);
+    registry.put(
+        "SURFACE_STYLE_REFLECTANCE_AMBIENT",
+        StepEntityResolver::resolveSurfaceStyleReflectanceAmbient);
+    registry.put(
+        "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE",
+        StepEntityResolver::resolveSurfaceStyleReflectanceAmbientDiffuse);
+    registry.put(
+        "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR",
+        StepEntityResolver::resolveSurfaceStyleReflectanceAmbientDiffuseSpecular);
+    registry.put(
+        "SURFACE_STYLE_PARAMETER_LINE",
+        StepEntityResolver::resolveSurfaceStyleParameterLine);
     registry.put("SURFACE_SIDE_STYLE", StepEntityResolver::resolveSurfaceSideStyle);
     registry.put("SURFACE_STYLE_USAGE", StepEntityResolver::resolveSurfaceStyleUsage);
     registry.put(
@@ -3515,6 +4642,14 @@ public final class StepEntityResolver {
     registry.put("OVER_RIDING_STYLED_ITEM", StepEntityResolver::resolveOverRidingStyledItem);
     registry.put(
         "PRESENTATION_LAYER_ASSIGNMENT", StepEntityResolver::resolvePresentationLayerAssignment);
+    registry.put("ANNOTATION_TEXT", StepEntityResolver::resolveAnnotationText);
+    registry.put("ANNOTATION_TEXT_CHARACTER", StepEntityResolver::resolveAnnotationTextCharacter);
+    registry.put("ANNOTATION_SYMBOL", StepEntityResolver::resolveAnnotationSymbol);
+    registry.put("ANNOTATION_SYMBOL_OCCURRENCE", StepEntityResolver::resolveAnnotationSymbolOccurrence);
+    registry.put("TERMINATOR_SYMBOL", StepEntityResolver::resolveTerminatorSymbol);
+    registry.put(
+        "ANNOTATION_OCCURRENCE_RELATIONSHIP",
+        StepEntityResolver::resolveAnnotationOccurrenceRelationship);
     registry.put("ANNOTATION_TEXT_OCCURRENCE", StepEntityResolver::resolveAnnotationTextOccurrence);
     registry.put("GEOMETRIC_CURVE_SET", StepEntityResolver::resolveGeometricCurveSet);
     registry.put("GEOMETRIC_SET", StepEntityResolver::resolveGeometricSet);

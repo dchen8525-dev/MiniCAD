@@ -9,7 +9,7 @@ import java.util.List;
  * @param name style name
  * @param styles supported surface style components
  */
-public record StepSurfaceSideStyle(int id, String name, List<StepSurfaceStyleFillArea> styles) implements StepEntity {
+public record StepSurfaceSideStyle(int id, String name, List<StepEntity> styles) implements StepEntity {
 
     public StepSurfaceSideStyle {
         styles = List.copyOf(styles);
