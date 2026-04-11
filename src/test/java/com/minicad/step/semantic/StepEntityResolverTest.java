@@ -23,9 +23,16 @@ import com.minicad.step.model.StepConversionBasedUnit;
 import com.minicad.step.model.StepConversionBasedUnitWithOffset;
 import com.minicad.step.model.StepContextDependentUnit;
 import com.minicad.step.model.StepContactRatioRepresentation;
+import com.minicad.step.model.StepCoordinatedUniversalTimeOffset;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
+import com.minicad.step.model.StepEffectivity;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepEffectivityRelationship;
+import com.minicad.step.model.StepExternalSource;
+import com.minicad.step.model.StepExternalIdentificationAssignment;
+import com.minicad.step.model.StepExternalSourceRelationship;
+import com.minicad.step.model.StepExternallyDefinedItem;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
 import com.minicad.step.model.StepBSplineSurface;
@@ -39,6 +46,8 @@ import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepChainBasedGeometricItemSpecificUsage;
 import com.minicad.step.model.StepChainBasedItemIdentifiedRepresentationUsage;
+import com.minicad.step.model.StepCalendarDate;
+import com.minicad.step.model.StepCharacterizedObject;
 import com.minicad.step.model.StepPiecewiseBezierCurve;
 import com.minicad.step.model.StepPiecewiseBezierSurface;
 import com.minicad.step.model.StepRationalBSplineCurve;
@@ -70,15 +79,53 @@ import com.minicad.step.model.StepAnnotationText;
 import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepAbstractVariable;
 import com.minicad.step.model.StepActionPropertyRepresentation;
+import com.minicad.step.model.StepAddress;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
+import com.minicad.step.model.StepAppliedApprovalAssignment;
+import com.minicad.step.model.StepAppliedClassificationAssignment;
+import com.minicad.step.model.StepAppliedCertificationAssignment;
+import com.minicad.step.model.StepAppliedContractAssignment;
+import com.minicad.step.model.StepAppliedDateAssignment;
+import com.minicad.step.model.StepAppliedDateTimeAssignment;
+import com.minicad.step.model.StepAppliedDocumentReference;
+import com.minicad.step.model.StepAppliedExternalIdentificationAssignment;
+import com.minicad.step.model.StepAppliedIdentificationAssignment;
+import com.minicad.step.model.StepAppliedLanguageAssignment;
+import com.minicad.step.model.StepAppliedNameAssignment;
+import com.minicad.step.model.StepAppliedOrganizationAssignment;
+import com.minicad.step.model.StepAppliedGroupAssignment;
+import com.minicad.step.model.StepAppliedPersonAndOrganizationAssignment;
+import com.minicad.step.model.StepAppliedSecurityClassificationAssignment;
+import com.minicad.step.model.StepApproval;
+import com.minicad.step.model.StepApprovalAssignment;
+import com.minicad.step.model.StepApprovalDateTime;
+import com.minicad.step.model.StepApprovalPersonOrganization;
+import com.minicad.step.model.StepApprovalRole;
+import com.minicad.step.model.StepApprovalStatus;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAttributeAssertion;
 import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepBackChainingRuleBody;
+import com.minicad.step.model.StepCertification;
+import com.minicad.step.model.StepCertificationAssignment;
+import com.minicad.step.model.StepCertificationType;
+import com.minicad.step.model.StepClassificationAssignment;
+import com.minicad.step.model.StepClassificationRole;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
+import com.minicad.step.model.StepDescriptionAttribute;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDimensionCurve;
+import com.minicad.step.model.StepDateAndTime;
+import com.minicad.step.model.StepDateAssignment;
+import com.minicad.step.model.StepDateRole;
+import com.minicad.step.model.StepDateTimeAssignment;
+import com.minicad.step.model.StepDateTimeRole;
+import com.minicad.step.model.StepDocument;
+import com.minicad.step.model.StepDocumentReference;
+import com.minicad.step.model.StepDocumentRelationship;
+import com.minicad.step.model.StepDocumentType;
+import com.minicad.step.model.StepDocumentUsageConstraint;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepDraughtingCallout;
@@ -89,11 +136,22 @@ import com.minicad.step.model.StepDraughtingPreDefinedColour;
 import com.minicad.step.model.StepDraughtingPreDefinedCurveFont;
 import com.minicad.step.model.StepDraughtingPreDefinedTextFont;
 import com.minicad.step.model.StepCurveStyle;
+import com.minicad.step.model.StepContract;
+import com.minicad.step.model.StepContractAssignment;
+import com.minicad.step.model.StepContractType;
 import com.minicad.step.model.StepFillAreaStyleColour;
 import com.minicad.step.model.StepForwardChainingRulePremise;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
+import com.minicad.step.model.StepGeneralProperty;
+import com.minicad.step.model.StepGeneralPropertyRelationship;
+import com.minicad.step.model.StepGroup;
+import com.minicad.step.model.StepGroupAssignment;
+import com.minicad.step.model.StepGroupRelationship;
+import com.minicad.step.model.StepIdAttribute;
+import com.minicad.step.model.StepIdentificationAssignment;
+import com.minicad.step.model.StepIdentificationRole;
 import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepMechanicalDesignRequirementItemAssociation;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
@@ -104,10 +162,19 @@ import com.minicad.step.model.StepKinematicPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepKinematicPropertyMechanismRepresentation;
 import com.minicad.step.model.StepKinematicPropertyRepresentationRelation;
 import com.minicad.step.model.StepKinematicPropertyTopologyRepresentation;
+import com.minicad.step.model.StepLanguage;
+import com.minicad.step.model.StepLanguageAssignment;
 import com.minicad.step.model.StepLeaderCurve;
+import com.minicad.step.model.StepLocalTime;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepNamedUnit;
+import com.minicad.step.model.StepNameAssignment;
+import com.minicad.step.model.StepNameAttribute;
+import com.minicad.step.model.StepOrganization;
+import com.minicad.step.model.StepOrganizationAssignment;
+import com.minicad.step.model.StepOrganizationRelationship;
+import com.minicad.step.model.StepOrganizationRole;
 import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
@@ -130,16 +197,28 @@ import com.minicad.step.model.StepPmiRequirementItemAssociation;
 import com.minicad.step.model.StepPolyLoop;
 import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
+import com.minicad.step.model.StepPerson;
+import com.minicad.step.model.StepPersonAndOrganization;
+import com.minicad.step.model.StepPersonAndOrganizationAssignment;
+import com.minicad.step.model.StepPersonAndOrganizationRole;
 import com.minicad.step.model.StepPoint;
 import com.minicad.step.model.StepPointSet;
 import com.minicad.step.model.StepPointStyle;
 import com.minicad.step.model.StepProduct;
+import com.minicad.step.model.StepProductCategory;
+import com.minicad.step.model.StepProductCategoryRelationship;
 import com.minicad.step.model.StepProjectionCurve;
 import com.minicad.step.model.StepProductDefinition;
+import com.minicad.step.model.StepProductDefinitionEffectivity;
 import com.minicad.step.model.StepProductDefinitionFormation;
+import com.minicad.step.model.StepProductDefinitionFormationRelationship;
+import com.minicad.step.model.StepProductDefinitionRelationship;
+import com.minicad.step.model.StepProductDefinitionRelationshipRelationship;
 import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepProductRelatedProductCategory;
+import com.minicad.step.model.StepProductRelationship;
 import com.minicad.step.model.StepPropertyDefinition;
+import com.minicad.step.model.StepPropertyDefinitionRelationship;
 import com.minicad.step.model.StepPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.model.StepRepresentationMap;
@@ -153,6 +232,12 @@ import com.minicad.step.model.StepGeometricRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
 import com.minicad.step.model.StepScalarVariable;
 import com.minicad.step.model.StepSeamCurve;
+import com.minicad.step.model.StepSecurityClassification;
+import com.minicad.step.model.StepSecurityClassificationAssignment;
+import com.minicad.step.model.StepSecurityClassificationLevel;
+import com.minicad.step.model.StepShapeAspect;
+import com.minicad.step.model.StepShapeAspectOccurrence;
+import com.minicad.step.model.StepShapeAspectRelationship;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepShellBasedSurfaceModel;
@@ -5586,6 +5671,792 @@ class StepEntityResolverTest {
         StepProductDefinitionFormation formation = assertInstanceOf(StepProductDefinitionFormation.class, resolved.get(4));
         assertEquals("v1", formation.name());
         assertEquals(3, formation.ofProduct().id());
+    }
+
+    @Test
+    void shouldResolveProductRelationship() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('ASM','assembly','',(#2));
+                #4=PRODUCT('PRT','part','machined part',(#2));
+                #5=PRODUCT_RELATIONSHIP('PR','contains','assembly contains part',#3,#4);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProductRelationship relationship =
+                assertInstanceOf(StepProductRelationship.class, resolved.get(5));
+        assertEquals("PR", relationship.identifier());
+        assertEquals("contains", relationship.name());
+        assertEquals("assembly contains part", relationship.description());
+        assertEquals(3, relationship.relatingProduct().id());
+        assertEquals(4, relationship.relatedProduct().id());
+        assertEquals("PRODUCT_RELATIONSHIP", relationship.entityName());
+    }
+
+    @Test
+    void shouldResolveProductDefinitionRelationshipFamilyEntities() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('ASM','assembly','',(#2));
+                #4=PRODUCT('PRT','part','',(#2));
+                #5=PRODUCT_DEFINITION_FORMATION('a1','assembly version',#3);
+                #6=PRODUCT_DEFINITION_FORMATION('p1','part version',#4);
+                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #8=PRODUCT_DEFINITION('asm def','assembly definition',#5,#7);
+                #9=PRODUCT_DEFINITION('part def','part definition',#6,#7);
+                #10=PRODUCT_DEFINITION_RELATIONSHIP('PDR','base','base relationship',#8,#9);
+                #11=PRODUCT_DEFINITION_USAGE('PDU','usage','usage relationship',#8,#9);
+                #12=BREAKDOWN_CONTEXT('BC','breakdown context','context',#8,#9);
+                #13=BREAKDOWN_ELEMENT_USAGE('BEU','breakdown usage','usage',#8,#9);
+                #14=BREAKDOWN_OF('BO','breakdown of','breakdown',#8,#9);
+                #15=SUPPLIED_PART_RELATIONSHIP('SPR','supplied','supplied relation',#8,#9);
+                #16=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','relationship relation','links pdrs',#10,#11);
+                #17=PRODUCT_DEFINITION_USAGE_RELATIONSHIP('PDUR','usage relation','links usages',#11,#13);
+                #18=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PDFR','formation relation','links formations',#5,#6);
+                #19=PROPERTY_DEFINITION('prop-a','property a',#8);
+                #20=PROPERTY_DEFINITION('prop-b','property b',#9);
+                #21=PROPERTY_DEFINITION_RELATIONSHIP('PDRP','property relation',#19,#20);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        for (int id = 10; id <= 15; id++) {
+            StepProductDefinitionRelationship relationship =
+                    assertInstanceOf(StepProductDefinitionRelationship.class, resolved.get(id));
+            assertEquals(8, relationship.relatingProductDefinition().id());
+            assertEquals(9, relationship.relatedProductDefinition().id());
+        }
+        assertEquals("PRODUCT_DEFINITION_RELATIONSHIP",
+                ((StepProductDefinitionRelationship) resolved.get(10)).entityName());
+        assertEquals("PRODUCT_DEFINITION_USAGE",
+                ((StepProductDefinitionRelationship) resolved.get(11)).entityName());
+        assertEquals("SUPPLIED_PART_RELATIONSHIP",
+                ((StepProductDefinitionRelationship) resolved.get(15)).entityName());
+        StepProductDefinitionRelationshipRelationship relationshipRelationship =
+                assertInstanceOf(StepProductDefinitionRelationshipRelationship.class, resolved.get(16));
+        assertEquals(10, relationshipRelationship.relating().id());
+        assertEquals(11, relationshipRelationship.related().id());
+        assertEquals("PRODUCT_DEFINITION_USAGE_RELATIONSHIP",
+                ((StepProductDefinitionRelationshipRelationship) resolved.get(17)).entityName());
+        StepProductDefinitionFormationRelationship formationRelationship =
+                assertInstanceOf(StepProductDefinitionFormationRelationship.class, resolved.get(18));
+        assertEquals(5, formationRelationship.relatingFormation().id());
+        assertEquals(6, formationRelationship.relatedFormation().id());
+        StepPropertyDefinitionRelationship propertyRelationship =
+                assertInstanceOf(StepPropertyDefinitionRelationship.class, resolved.get(21));
+        assertEquals(19, propertyRelationship.relatingPropertyDefinition().id());
+        assertEquals(20, propertyRelationship.relatedPropertyDefinition().id());
+    }
+
+    @Test
+    void shouldResolveGroupAndGroupRelationship() {
+        String step = """
+                DATA;
+                #1=GROUP('inspection group','group description');
+                #2=GROUP('child group',$);
+                #3=GROUP_RELATIONSHIP('group rel','relates groups',#1,#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGroup group = assertInstanceOf(StepGroup.class, resolved.get(1));
+        StepGroup child = assertInstanceOf(StepGroup.class, resolved.get(2));
+        StepGroupRelationship relationship =
+                assertInstanceOf(StepGroupRelationship.class, resolved.get(3));
+        assertEquals("GROUP", group.entityName());
+        assertEquals("", child.description());
+        assertEquals(1, relationship.relatingGroup().id());
+        assertEquals(2, relationship.relatedGroup().id());
+    }
+
+    @Test
+    void shouldResolveDocumentPersonAndOrganizationMetadata() {
+        String step = """
+                DATA;
+                #1=DOCUMENT_TYPE('drawing');
+                #2=DOCUMENT('DOC-1','Spec','primary spec',#1);
+                #3=DOCUMENT('DOC-2','Spec child',$,#1);
+                #4=DOCUMENT_RELATIONSHIP('doc rel','revision link',#2,#3);
+                #5=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));
+                #6=PERSON('p-2',$,$,$,$,$);
+                #7=ORGANIZATION('org-1','Acme','engineering');
+                #8=ORGANIZATION('org-2','Supplier',$);
+                #9=PERSON_AND_ORGANIZATION(#5,#7);
+                #10=ORGANIZATION_RELATIONSHIP('org rel','supplier link',#7,#8);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDocumentType type = assertInstanceOf(StepDocumentType.class, resolved.get(1));
+        StepDocument document = assertInstanceOf(StepDocument.class, resolved.get(2));
+        StepDocument child = assertInstanceOf(StepDocument.class, resolved.get(3));
+        StepDocumentRelationship documentRelationship =
+                assertInstanceOf(StepDocumentRelationship.class, resolved.get(4));
+        StepPerson person = assertInstanceOf(StepPerson.class, resolved.get(5));
+        StepPerson sparsePerson = assertInstanceOf(StepPerson.class, resolved.get(6));
+        StepOrganization organization = assertInstanceOf(StepOrganization.class, resolved.get(7));
+        StepPersonAndOrganization personAndOrganization =
+                assertInstanceOf(StepPersonAndOrganization.class, resolved.get(9));
+        StepOrganizationRelationship organizationRelationship =
+                assertInstanceOf(StepOrganizationRelationship.class, resolved.get(10));
+
+        assertEquals("drawing", type.productDataType());
+        assertEquals(1, document.kind().id());
+        assertEquals("", child.description());
+        assertEquals(2, documentRelationship.relatingDocument().id());
+        assertEquals(3, documentRelationship.relatedDocument().id());
+        assertEquals("Jane Doe", person.name());
+        assertEquals(List.of("Q"), person.middleNames());
+        assertEquals(List.of("Dr."), person.prefixTitles());
+        assertEquals(List.of("PE"), person.suffixTitles());
+        assertEquals("", sparsePerson.name());
+        assertEquals(List.of(), sparsePerson.middleNames());
+        assertEquals("Acme", organization.name());
+        assertEquals(5, personAndOrganization.person().id());
+        assertEquals(7, personAndOrganization.organization().id());
+        assertEquals(7, organizationRelationship.relatingOrganization().id());
+        assertEquals(8, organizationRelationship.relatedOrganization().id());
+    }
+
+    @Test
+    void shouldResolveApprovalDateTimeAndSecurityMetadata() {
+        String step = """
+                DATA;
+                #1=PERSON('p-1','Doe','Jane',$,$,$);
+                #2=ORGANIZATION('org-1','Acme','engineering');
+                #3=PERSON_AND_ORGANIZATION(#1,#2);
+                #4=PERSON_AND_ORGANIZATION_ROLE('creator');
+                #5=CALENDAR_DATE(2026,11,4);
+                #6=COORDINATED_UNIVERSAL_TIME_OFFSET(8,$,.AHEAD.);
+                #7=LOCAL_TIME(9,15,30.5,#6);
+                #8=DATE_AND_TIME(#5,#7);
+                #9=DATE_TIME_ROLE('creation date');
+                #10=DATE_TIME_ASSIGNMENT(#8,#9);
+                #11=APPROVAL_STATUS('approved');
+                #12=APPROVAL(#11,'design');
+                #13=APPROVAL_ROLE('approver');
+                #14=APPROVAL_PERSON_ORGANIZATION(#3,#12,#13);
+                #15=APPROVAL_DATE_TIME(#8,#12);
+                #16=SECURITY_CLASSIFICATION_LEVEL('unclassified');
+                #17=SECURITY_CLASSIFICATION('sec','export control',#16);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPersonAndOrganizationRole personRole =
+                assertInstanceOf(StepPersonAndOrganizationRole.class, resolved.get(4));
+        StepCalendarDate date = assertInstanceOf(StepCalendarDate.class, resolved.get(5));
+        StepCoordinatedUniversalTimeOffset offset =
+                assertInstanceOf(StepCoordinatedUniversalTimeOffset.class, resolved.get(6));
+        StepLocalTime time = assertInstanceOf(StepLocalTime.class, resolved.get(7));
+        StepDateAndTime dateAndTime = assertInstanceOf(StepDateAndTime.class, resolved.get(8));
+        StepDateTimeRole dateTimeRole = assertInstanceOf(StepDateTimeRole.class, resolved.get(9));
+        StepDateTimeAssignment dateTimeAssignment =
+                assertInstanceOf(StepDateTimeAssignment.class, resolved.get(10));
+        StepApprovalStatus status = assertInstanceOf(StepApprovalStatus.class, resolved.get(11));
+        StepApproval approval = assertInstanceOf(StepApproval.class, resolved.get(12));
+        StepApprovalRole approvalRole = assertInstanceOf(StepApprovalRole.class, resolved.get(13));
+        StepApprovalPersonOrganization approvalPersonOrganization =
+                assertInstanceOf(StepApprovalPersonOrganization.class, resolved.get(14));
+        StepApprovalDateTime approvalDateTime =
+                assertInstanceOf(StepApprovalDateTime.class, resolved.get(15));
+        StepSecurityClassificationLevel securityLevel =
+                assertInstanceOf(StepSecurityClassificationLevel.class, resolved.get(16));
+        StepSecurityClassification security =
+                assertInstanceOf(StepSecurityClassification.class, resolved.get(17));
+
+        assertEquals("creator", personRole.name());
+        assertEquals("2026-04-11", date.name());
+        assertEquals(8, offset.hourOffset());
+        assertEquals(null, offset.minuteOffset());
+        assertEquals("AHEAD", offset.sense());
+        assertEquals(30.5, time.secondComponent());
+        assertEquals("2026-04-11 09:15:30.5", dateAndTime.name());
+        assertEquals("creation date", dateTimeRole.name());
+        assertEquals(8, dateTimeAssignment.assignedDateAndTime().id());
+        assertEquals("approved", status.name());
+        assertEquals(11, approval.status().id());
+        assertEquals("design", approval.level());
+        assertEquals("approver", approvalRole.name());
+        assertEquals(3, approvalPersonOrganization.personOrganization().id());
+        assertEquals(12, approvalPersonOrganization.authorizedApproval().id());
+        assertEquals(8, approvalDateTime.dateTime().id());
+        assertEquals("unclassified", securityLevel.name());
+        assertEquals(16, security.securityLevel().id());
+    }
+
+    @Test
+    void shouldResolveAppliedMetadataAssignments() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PERSON('p-1','Doe','Jane',$,$,$);
+                #5=ORGANIZATION('org-1','Acme','engineering');
+                #6=PERSON_AND_ORGANIZATION(#4,#5);
+                #7=PERSON_AND_ORGANIZATION_ROLE('creator');
+                #8=PERSON_AND_ORGANIZATION_ASSIGNMENT(#6,#7);
+                #9=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#6,#7,(#3));
+                #10=CALENDAR_DATE(2026,11,4);
+                #11=COORDINATED_UNIVERSAL_TIME_OFFSET(8,30,.AHEAD.);
+                #12=LOCAL_TIME(9,15,$,#11);
+                #13=DATE_AND_TIME(#10,#12);
+                #14=DATE_TIME_ROLE('created');
+                #15=APPLIED_DATE_AND_TIME_ASSIGNMENT(#13,#14,(#3,#6));
+                #16=APPROVAL_STATUS('approved');
+                #17=APPROVAL(#16,'design');
+                #18=APPROVAL_ASSIGNMENT(#17);
+                #19=APPLIED_APPROVAL_ASSIGNMENT(#17,(#3));
+                #20=SECURITY_CLASSIFICATION_LEVEL('unclassified');
+                #21=SECURITY_CLASSIFICATION('sec','export control',#20);
+                #22=SECURITY_CLASSIFICATION_ASSIGNMENT(#21);
+                #23=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#21,(#3));
+                #24=DOCUMENT_TYPE('specification');
+                #25=DOCUMENT('DOC-1','Spec','primary spec',#24);
+                #26=DOCUMENT_REFERENCE(#25,'internal');
+                #27=APPLIED_DOCUMENT_REFERENCE(#25,'internal',(#3));
+                #28=CONTRACT_TYPE('purchase');
+                #29=CONTRACT('C-1','supply',#28);
+                #30=CONTRACT_ASSIGNMENT(#29);
+                #31=APPLIED_CONTRACT_ASSIGNMENT(#29,(#3));
+                #32=CERTIFICATION_TYPE('material');
+                #33=CERTIFICATION('CERT-1','compliance',#32);
+                #34=CERTIFICATION_ASSIGNMENT(#33);
+                #35=APPLIED_CERTIFICATION_ASSIGNMENT(#33,(#3));
+                #36=DATE_ROLE('release');
+                #37=DATE_ASSIGNMENT(#10,#36);
+                #38=APPLIED_DATE_ASSIGNMENT(#10,#36,(#3));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPersonAndOrganizationAssignment personAssignment =
+                assertInstanceOf(StepPersonAndOrganizationAssignment.class, resolved.get(8));
+        StepAppliedPersonAndOrganizationAssignment appliedPersonAssignment =
+                assertInstanceOf(StepAppliedPersonAndOrganizationAssignment.class, resolved.get(9));
+        StepAppliedDateTimeAssignment appliedDateTime =
+                assertInstanceOf(StepAppliedDateTimeAssignment.class, resolved.get(15));
+        StepApprovalAssignment approvalAssignment =
+                assertInstanceOf(StepApprovalAssignment.class, resolved.get(18));
+        StepAppliedApprovalAssignment appliedApproval =
+                assertInstanceOf(StepAppliedApprovalAssignment.class, resolved.get(19));
+        StepSecurityClassificationAssignment securityAssignment =
+                assertInstanceOf(StepSecurityClassificationAssignment.class, resolved.get(22));
+        StepAppliedSecurityClassificationAssignment appliedSecurity =
+                assertInstanceOf(StepAppliedSecurityClassificationAssignment.class, resolved.get(23));
+        StepDocumentReference documentReference =
+                assertInstanceOf(StepDocumentReference.class, resolved.get(26));
+        StepAppliedDocumentReference appliedDocument =
+                assertInstanceOf(StepAppliedDocumentReference.class, resolved.get(27));
+        StepContractType contractType = assertInstanceOf(StepContractType.class, resolved.get(28));
+        StepContract contract = assertInstanceOf(StepContract.class, resolved.get(29));
+        StepContractAssignment contractAssignment =
+                assertInstanceOf(StepContractAssignment.class, resolved.get(30));
+        StepAppliedContractAssignment appliedContract =
+                assertInstanceOf(StepAppliedContractAssignment.class, resolved.get(31));
+        StepCertificationType certificationType =
+                assertInstanceOf(StepCertificationType.class, resolved.get(32));
+        StepCertification certification = assertInstanceOf(StepCertification.class, resolved.get(33));
+        StepCertificationAssignment certificationAssignment =
+                assertInstanceOf(StepCertificationAssignment.class, resolved.get(34));
+        StepAppliedCertificationAssignment appliedCertification =
+                assertInstanceOf(StepAppliedCertificationAssignment.class, resolved.get(35));
+        StepDateRole dateRole = assertInstanceOf(StepDateRole.class, resolved.get(36));
+        StepDateAssignment dateAssignment =
+                assertInstanceOf(StepDateAssignment.class, resolved.get(37));
+        StepAppliedDateAssignment appliedDate =
+                assertInstanceOf(StepAppliedDateAssignment.class, resolved.get(38));
+
+        assertEquals(6, personAssignment.assignedPersonAndOrganization().id());
+        assertEquals(7, personAssignment.role().id());
+        assertEquals(1, appliedPersonAssignment.items().size());
+        assertEquals(3, appliedPersonAssignment.items().getFirst().id());
+        assertEquals(2, appliedDateTime.items().size());
+        assertEquals(13, appliedDateTime.assignedDateAndTime().id());
+        assertEquals(17, approvalAssignment.assignedApproval().id());
+        assertEquals(3, appliedApproval.items().getFirst().id());
+        assertEquals(21, securityAssignment.assignedSecurityClassification().id());
+        assertEquals(3, appliedSecurity.items().getFirst().id());
+        assertEquals(25, documentReference.assignedDocument().id());
+        assertEquals("internal", appliedDocument.source());
+        assertEquals(3, appliedDocument.items().getFirst().id());
+        assertEquals("purchase", contractType.description());
+        assertEquals(28, contract.kind().id());
+        assertEquals(29, contractAssignment.assignedContract().id());
+        assertEquals(3, appliedContract.items().getFirst().id());
+        assertEquals("material", certificationType.description());
+        assertEquals(32, certification.kind().id());
+        assertEquals(33, certificationAssignment.assignedCertification().id());
+        assertEquals(3, appliedCertification.items().getFirst().id());
+        assertEquals("release", dateRole.name());
+        assertEquals(10, dateAssignment.assignedDate().id());
+        assertEquals(36, dateAssignment.role().id());
+        assertEquals(3, appliedDate.items().getFirst().id());
+    }
+
+    @Test
+    void shouldResolveEffectivityMetadata() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);
+                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #6=PRODUCT_DEFINITION('def','part def',#4,#5);
+                #7=EFFECTIVITY('E-1');
+                #8=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#6);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepEffectivity effectivity = assertInstanceOf(StepEffectivity.class, resolved.get(7));
+        StepProductDefinitionEffectivity productDefinitionEffectivity =
+                assertInstanceOf(StepProductDefinitionEffectivity.class, resolved.get(8));
+        assertEquals("E-1", effectivity.effectivityId());
+        assertEquals("PDE-1", productDefinitionEffectivity.effectivityId());
+        assertEquals("serial usage", productDefinitionEffectivity.usage());
+        assertEquals(6, productDefinitionEffectivity.productDefinition().id());
+    }
+
+    @Test
+    void shouldResolveClassificationIdentificationAndExternalMetadata() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=GROUP('fasteners','hardware classification');
+                #5=CLASSIFICATION_ROLE('part family');
+                #6=CLASSIFICATION_ASSIGNMENT(#4,#5);
+                #7=APPLIED_CLASSIFICATION_ASSIGNMENT(#4,#5,(#3));
+                #8=IDENTIFICATION_ROLE('erp id');
+                #9=IDENTIFICATION_ASSIGNMENT('ERP-42',#8);
+                #10=APPLIED_IDENTIFICATION_ASSIGNMENT('ERP-42',#8,(#3));
+                #11=NAME_ASSIGNMENT('display name');
+                #12=APPLIED_NAME_ASSIGNMENT('display name',(#3));
+                #13=DESCRIPTION_ATTRIBUTE('attribute description',#3);
+                #14=NAME_ATTRIBUTE('attribute name',#3);
+                #15=ID_ATTRIBUTE('attribute-id',#3);
+                #16=EXTERNAL_SOURCE('supplier-catalog');
+                #17=EXTERNALLY_DEFINED_ITEM('item-1',#16);
+                #18=EXTERNALLY_DEFINED_CLASS('class-1',#16);
+                #19=EXTERNALLY_DEFINED_GENERAL_PROPERTY('property-1',#16);
+                #20=GROUP_ASSIGNMENT(#4);
+                #21=APPLIED_GROUP_ASSIGNMENT(#4,(#3));
+                #22=ORGANIZATION('org-1','Acme','supplier');
+                #23=ORGANIZATION_ROLE('supplier');
+                #24=ORGANIZATION_ASSIGNMENT(#22,#23);
+                #25=APPLIED_ORGANIZATION_ASSIGNMENT(#22,#23,(#3));
+                #26=ADDRESS('HQ','42','Market St',$,'Shanghai','Shanghai','200000','CN',$,'+86','cad@example.com',$);
+                #27=GENERAL_PROPERTY('gp-1','material','material property');
+                #28=GENERAL_PROPERTY('gp-2','finish','finish property');
+                #29=GENERAL_PROPERTY_RELATIONSHIP('property rel','linked property',#27,#28);
+                #30=LANGUAGE('en-US');
+                #31=LANGUAGE_ASSIGNMENT(#30);
+                #32=APPLIED_LANGUAGE_ASSIGNMENT(#30,(#3));
+                #33=EXTERNAL_SOURCE('erp');
+                #34=EXTERNAL_SOURCE_RELATIONSHIP('source rel','catalog to erp',#16,#33);
+                #35=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#33);
+                #36=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#33,(#3));
+                #37=PRODUCT_CATEGORY('hardware','hardware parts');
+                #38=PRODUCT_CATEGORY('fastener','fastener parts');
+                #39=PRODUCT_CATEGORY_RELATIONSHIP('category rel','parent child',#37,#38);
+                #40=DOCUMENT_TYPE('spec');
+                #41=DOCUMENT('DOC-1','datasheet','supplier document',#40);
+                #42=DOCUMENT_USAGE_CONSTRAINT(#41,'scope','assembly only');
+                #43=EFFECTIVITY('E-2');
+                #44=EFFECTIVITY('E-3');
+                #45=EFFECTIVITY_RELATIONSHIP('effectivity rel','range chain',#43,#44);
+                #46=EXTERNALLY_DEFINED_CURVE_FONT('font-1',#16);
+                #47=EXTERNALLY_DEFINED_HATCH_STYLE('hatch-1',#16);
+                #48=EXTERNALLY_DEFINED_MARKER('marker-1',#16);
+                #49=EXTERNALLY_DEFINED_SYMBOL('symbol-1',#16);
+                #50=EXTERNALLY_DEFINED_TEXT_FONT('text-font-1',#16);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepClassificationRole classificationRole =
+                assertInstanceOf(StepClassificationRole.class, resolved.get(5));
+        StepClassificationAssignment classificationAssignment =
+                assertInstanceOf(StepClassificationAssignment.class, resolved.get(6));
+        StepAppliedClassificationAssignment appliedClassification =
+                assertInstanceOf(StepAppliedClassificationAssignment.class, resolved.get(7));
+        StepIdentificationRole identificationRole =
+                assertInstanceOf(StepIdentificationRole.class, resolved.get(8));
+        StepIdentificationAssignment identificationAssignment =
+                assertInstanceOf(StepIdentificationAssignment.class, resolved.get(9));
+        StepAppliedIdentificationAssignment appliedIdentification =
+                assertInstanceOf(StepAppliedIdentificationAssignment.class, resolved.get(10));
+        StepNameAssignment nameAssignment =
+                assertInstanceOf(StepNameAssignment.class, resolved.get(11));
+        StepAppliedNameAssignment appliedName =
+                assertInstanceOf(StepAppliedNameAssignment.class, resolved.get(12));
+        StepDescriptionAttribute descriptionAttribute =
+                assertInstanceOf(StepDescriptionAttribute.class, resolved.get(13));
+        StepNameAttribute nameAttribute = assertInstanceOf(StepNameAttribute.class, resolved.get(14));
+        StepIdAttribute idAttribute = assertInstanceOf(StepIdAttribute.class, resolved.get(15));
+        StepExternalSource externalSource =
+                assertInstanceOf(StepExternalSource.class, resolved.get(16));
+        StepExternallyDefinedItem externallyDefinedItem =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(17));
+        StepExternallyDefinedItem externallyDefinedClass =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(18));
+        StepExternallyDefinedItem externallyDefinedGeneralProperty =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(19));
+        StepGroupAssignment groupAssignment =
+                assertInstanceOf(StepGroupAssignment.class, resolved.get(20));
+        StepAppliedGroupAssignment appliedGroup =
+                assertInstanceOf(StepAppliedGroupAssignment.class, resolved.get(21));
+        StepOrganizationRole organizationRole =
+                assertInstanceOf(StepOrganizationRole.class, resolved.get(23));
+        StepOrganizationAssignment organizationAssignment =
+                assertInstanceOf(StepOrganizationAssignment.class, resolved.get(24));
+        StepAppliedOrganizationAssignment appliedOrganization =
+                assertInstanceOf(StepAppliedOrganizationAssignment.class, resolved.get(25));
+        StepAddress address = assertInstanceOf(StepAddress.class, resolved.get(26));
+        StepGeneralProperty generalProperty =
+                assertInstanceOf(StepGeneralProperty.class, resolved.get(27));
+        StepGeneralPropertyRelationship generalPropertyRelationship =
+                assertInstanceOf(StepGeneralPropertyRelationship.class, resolved.get(29));
+        StepLanguage language = assertInstanceOf(StepLanguage.class, resolved.get(30));
+        StepLanguageAssignment languageAssignment =
+                assertInstanceOf(StepLanguageAssignment.class, resolved.get(31));
+        StepAppliedLanguageAssignment appliedLanguage =
+                assertInstanceOf(StepAppliedLanguageAssignment.class, resolved.get(32));
+        StepExternalSourceRelationship externalSourceRelationship =
+                assertInstanceOf(StepExternalSourceRelationship.class, resolved.get(34));
+        StepExternalIdentificationAssignment externalIdentification =
+                assertInstanceOf(StepExternalIdentificationAssignment.class, resolved.get(35));
+        StepAppliedExternalIdentificationAssignment appliedExternalIdentification =
+                assertInstanceOf(StepAppliedExternalIdentificationAssignment.class, resolved.get(36));
+        StepProductCategory productCategory =
+                assertInstanceOf(StepProductCategory.class, resolved.get(37));
+        StepProductCategoryRelationship productCategoryRelationship =
+                assertInstanceOf(StepProductCategoryRelationship.class, resolved.get(39));
+        StepDocumentUsageConstraint documentUsageConstraint =
+                assertInstanceOf(StepDocumentUsageConstraint.class, resolved.get(42));
+        StepEffectivityRelationship effectivityRelationship =
+                assertInstanceOf(StepEffectivityRelationship.class, resolved.get(45));
+        StepExternallyDefinedItem externallyDefinedCurveFont =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(46));
+        StepExternallyDefinedItem externallyDefinedHatchStyle =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(47));
+        StepExternallyDefinedItem externallyDefinedMarker =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(48));
+        StepExternallyDefinedItem externallyDefinedSymbol =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(49));
+        StepExternallyDefinedItem externallyDefinedTextFont =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(50));
+
+        assertEquals("part family", classificationRole.name());
+        assertEquals(4, classificationAssignment.assignedClass().id());
+        assertEquals(5, classificationAssignment.role().id());
+        assertEquals(3, appliedClassification.items().getFirst().id());
+        assertEquals("erp id", identificationRole.name());
+        assertEquals("ERP-42", identificationAssignment.assignedId());
+        assertEquals(3, appliedIdentification.items().getFirst().id());
+        assertEquals("display name", nameAssignment.assignedName());
+        assertEquals(3, appliedName.items().getFirst().id());
+        assertEquals(3, descriptionAttribute.describedItem().id());
+        assertEquals(3, nameAttribute.namedItem().id());
+        assertEquals(3, idAttribute.identifiedItem().id());
+        assertEquals("supplier-catalog", externalSource.sourceId());
+        assertEquals("EXTERNALLY_DEFINED_ITEM", externallyDefinedItem.entityName());
+        assertEquals("EXTERNALLY_DEFINED_CLASS", externallyDefinedClass.entityName());
+        assertEquals("EXTERNALLY_DEFINED_GENERAL_PROPERTY",
+                externallyDefinedGeneralProperty.entityName());
+        assertEquals(16, externallyDefinedGeneralProperty.source().id());
+        assertEquals(4, groupAssignment.assignedGroup().id());
+        assertEquals(3, appliedGroup.items().getFirst().id());
+        assertEquals("supplier", organizationRole.name());
+        assertEquals(22, organizationAssignment.assignedOrganization().id());
+        assertEquals(23, organizationAssignment.role().id());
+        assertEquals(3, appliedOrganization.items().getFirst().id());
+        assertEquals("Shanghai", address.town());
+        assertEquals("cad@example.com", address.electronicMailAddress());
+        assertEquals("material", generalProperty.name());
+        assertEquals(27, generalPropertyRelationship.relatingGeneralProperty().id());
+        assertEquals(28, generalPropertyRelationship.relatedGeneralProperty().id());
+        assertEquals("en-US", language.name());
+        assertEquals(30, languageAssignment.assignedLanguage().id());
+        assertEquals(3, appliedLanguage.items().getFirst().id());
+        assertEquals(16, externalSourceRelationship.relatingSource().id());
+        assertEquals(33, externalSourceRelationship.relatedSource().id());
+        assertEquals("EXT-42", externalIdentification.assignedId());
+        assertEquals(33, externalIdentification.source().id());
+        assertEquals(3, appliedExternalIdentification.items().getFirst().id());
+        assertEquals("hardware", productCategory.name());
+        assertEquals(37, productCategoryRelationship.category().id());
+        assertEquals(38, productCategoryRelationship.subCategory().id());
+        assertEquals(41, documentUsageConstraint.source().id());
+        assertEquals("assembly only", documentUsageConstraint.subjectElementValue());
+        assertEquals(43, effectivityRelationship.relatingEffectivity().id());
+        assertEquals(44, effectivityRelationship.relatedEffectivity().id());
+        assertEquals("EXTERNALLY_DEFINED_CURVE_FONT", externallyDefinedCurveFont.entityName());
+        assertEquals("EXTERNALLY_DEFINED_HATCH_STYLE", externallyDefinedHatchStyle.entityName());
+        assertEquals("EXTERNALLY_DEFINED_MARKER", externallyDefinedMarker.entityName());
+        assertEquals("EXTERNALLY_DEFINED_SYMBOL", externallyDefinedSymbol.entityName());
+        assertEquals("EXTERNALLY_DEFINED_TEXT_FONT", externallyDefinedTextFont.entityName());
+    }
+
+    @Test
+    void shouldResolveShapeAspectFamilyEntities() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);
+                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #6=PRODUCT_DEFINITION('def','part def',#4,#5);
+                #7=PRODUCT_DEFINITION_SHAPE('shape','primary shape',#6);
+                #8=SHAPE_ASPECT('SA','base',#7,.T.);
+                #9=APEX('AP','apex',#7,.F.);
+                #10=CENTRE_OF_SYMMETRY('COS','centre',#7,.U.);
+                #11=COMPONENT_FEATURE('CF','component',#7,.T.);
+                #12=COMPOSITE_SHAPE_ASPECT('CSA','composite',#7,.T.);
+                #13=DATUM('D','datum',#7,.T.);
+                #14=DATUM_FEATURE('DF','datum feature',#7,.T.);
+                #15=DATUM_TARGET('DT','datum target',#7,.T.);
+                #16=GEOMETRIC_ALIGNMENT('GA','align',#7,.T.);
+                #17=GEOMETRIC_CONTACT('GC','contact',#7,.T.);
+                #18=GROUP_SHAPE_ASPECT('GSA','group',#7,.T.);
+                #19=INSTANCED_FEATURE('IF','instanced feature',#7,.T.);
+                #20=INSTANCED_SHAPE_ASPECT('ISA','instanced aspect',#7,.T.);
+                #21=SINGULAR_SHAPE_ASPECT('SSA','singular',#7,.T.);
+                #22=SYMMETRIC_SHAPE_ASPECT('SYSA','symmetric',#7,.T.);
+                #23=ALL_AROUND_SHAPE_ASPECT('AASA','all around',#7,.T.);
+                #24=BETWEEN_SHAPE_ASPECT('BSA','between',#7,.T.);
+                #25=CHAMFER('CH','chamfer',#7,.T.);
+                #26=CHAMFER_OFFSET('CHO','chamfer offset',#7,.T.);
+                #27=COMPOSITE_GROUP_SHAPE_ASPECT('CGSA','composite group',#7,.T.);
+                #28=COMPOSITE_UNIT_SHAPE_ASPECT('CUSA','composite unit',#7,.T.);
+                #29=CONTINUOUS_SHAPE_ASPECT('CONSA','continuous',#7,.T.);
+                #30=EDGE_ROUND('ER','edge round',#7,.T.);
+                #31=EXTENSION('EXT','extension',#7,.T.);
+                #32=FILLET('FIL','fillet',#7,.T.);
+                #33=GEOMETRIC_INTERSECTION('GI','intersection',#7,.T.);
+                #34=PARALLEL_OFFSET('PO','parallel offset',#7,.T.);
+                #35=PERPENDICULAR_TO('PT','perpendicular',#7,.T.);
+                #36=TANGENT('TAN','tangent',#7,.T.);
+                #37=SHAPE_ASPECT_RELATIONSHIP('SAR','base rel',#8,#9);
+                #38=COMPOSITE_SHAPE_ASPECT_RELATIONSHIP('CSAR','composite rel',#12,#8);
+                #39=DIMENSIONAL_LOCATION('DL','location',#8,#10);
+                #40=DIMENSIONAL_SIZE('DS','size',#8,#11);
+                #41=FEATURE_COMPONENT_RELATIONSHIP('FCR','feature',#11,#12);
+                #42=GEOMETRIC_ALIGNMENT_RELATIONSHIP('GAR','align rel',#16,#8);
+                #43=GEOMETRIC_CONTACT_RELATIONSHIP('GCR','contact rel',#17,#8);
+                #44=SHAPE_ASPECT_ASSOCIATIVITY('SAA','assoc',#18,#8);
+                #45=SHAPE_ASPECT_DERIVING_RELATIONSHIP('SADR','derive',#22,#8);
+                #46=ANGULAR_LOCATION('AL','angular',#8,#9);
+                #47=DIRECTED_DIMENSIONAL_LOCATION('DDL','directed',#8,#9);
+                #48=FEATURE_FOR_DATUM_TARGET_RELATIONSHIP('FFDTR','feature target',#14,#15);
+                #49=MAKE_FROM_FEATURE_RELATIONSHIP('MFFR','make from',#11,#12);
+                #50=PATTERN_OFFSET_MEMBERSHIP('POM','offset',#18,#8);
+                #51=PATTERN_OMIT_MEMBERSHIP('POMIT','omit',#18,#8);
+                #52=SHAPE_ASPECT_TRANSITION('SAT','transition',#8,#9);
+                #53=SHAPE_DEFINING_RELATIONSHIP('SDR','shape defining',#8,#9);
+                #54=SHAPE_FEATURE_FIT_RELATIONSHIP('SFFR','fit',#11,#12);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        for (int id = 8; id <= 36; id++) {
+            StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, resolved.get(id));
+            assertEquals(7, aspect.ofShape().id());
+        }
+        assertEquals("SHAPE_ASPECT", ((StepShapeAspect) resolved.get(8)).entityName());
+        assertEquals("APEX", ((StepShapeAspect) resolved.get(9)).entityName());
+        assertEquals("CENTRE_OF_SYMMETRY", ((StepShapeAspect) resolved.get(10)).entityName());
+        assertEquals("T", ((StepShapeAspect) resolved.get(8)).productDefinitional());
+        assertEquals("F", ((StepShapeAspect) resolved.get(9)).productDefinitional());
+        assertEquals("U", ((StepShapeAspect) resolved.get(10)).productDefinitional());
+        assertEquals("TANGENT", ((StepShapeAspect) resolved.get(36)).entityName());
+        for (int id = 37; id <= 54; id++) {
+            StepShapeAspectRelationship relationship =
+                    assertInstanceOf(StepShapeAspectRelationship.class, resolved.get(id));
+            assertEquals(StepShapeAspect.class, relationship.relatingShapeAspect().getClass());
+            assertEquals(StepShapeAspect.class, relationship.relatedShapeAspect().getClass());
+        }
+        assertEquals("SHAPE_ASPECT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(37)).entityName());
+        assertEquals("DIMENSIONAL_LOCATION", ((StepShapeAspectRelationship) resolved.get(39)).entityName());
+        assertEquals("SHAPE_ASPECT_DERIVING_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(45)).entityName());
+        assertEquals("SHAPE_FEATURE_FIT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(54)).entityName());
+    }
+
+    @Test
+    void shouldResolveAdditionalShapeAspectAliases() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=PRODUCT_CONTEXT('part','',#1);
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);
+                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #6=PRODUCT_DEFINITION('def','part def',#4,#5);
+                #7=PRODUCT_DEFINITION_SHAPE('shape','primary shape',#6);
+                #8=APPLIED_AREA('AA','applied area',#7,.T.);
+                #9=BASIC_ROUND_HOLE_OCCURRENCE('BRHO','basic round hole',#7,.T.,#50);
+                #10=BEAD_END('BE','bead end',#7,.T.);
+                #11=BOSS_TOP('BT','boss top',#7,.T.);
+                #12=CIRCULAR_CLOSED_PROFILE('CCP','circular profile',#7,.T.);
+                #13=COMPONENT_TERMINAL('CT','component terminal',#7,.T.);
+                #14=CONSTITUENT_SHAPE_ASPECT('CSA2','constituent',#7,.T.);
+                #15=CONTACTING_FEATURE('CF2','contacting',#7,.T.);
+                #16=COUNTERBORE_HOLE_OCCURRENCE('CBHO','counterbore',#7,.T.,#51);
+                #17=COUNTERDRILL_HOLE_OCCURRENCE('CDHO','counterdrill',#7,.T.,#52);
+                #18=COUNTERSINK_HOLE_OCCURRENCE('CSHO','countersink',#7,.T.,#53);
+                #19=DATUM_REFERENCE_ELEMENT('DRE','datum ref',#7,.T.);
+                #20=DATUM_SYSTEM('DSYS','datum system',#7,.T.);
+                #21=DEFAULT_MODEL_GEOMETRIC_VIEW('DMGV','default view',#7,.T.);
+                #22=GENERAL_DATUM_REFERENCE('GDR','general datum',#7,.T.);
+                #23=GEOMETRIC_TOLERANCE_WITH_MODIFIERS('GTWM','tolerance modifiers',#7,.T.);
+                #24=LAYOUT_SPACING_CONTEXTUAL_AREA('LSCA','layout area',#7,.T.);
+                #25=MATED_PART_RELATIONSHIP('MPR','mated part',#7,.T.);
+                #26=MOUNTING_RESTRICTION_AREA('MRA','mounting area',#7,.T.);
+                #27=MOUNTING_RESTRICTION_VOLUME('MRV','mounting volume',#7,.T.);
+                #28=PATH_FEATURE_COMPONENT('PFC','path feature',#7,.T.);
+                #29=PHYSICAL_COMPONENT_FEATURE('PCF','physical feature',#7,.T.);
+                #30=PHYSICAL_COMPONENT_TERMINAL('PCT','physical terminal',#7,.T.);
+                #31=PROJECTED_ZONE_DEFINITION('PZD','projected zone',#7,.T.);
+                #32=REFERENCE_GRAPHIC_REGISTRATION_MARK('RGRM','registration mark',#7,.T.);
+                #33=SEATING_PLANE('SP','seating plane',#7,.T.);
+                #34=TERMINAL_FEATURE('TF','terminal feature',#7,.T.);
+                #35=TERMINAL_LOCATION_GROUP('TLG','terminal location',#7,.T.);
+                #36=TOLERANCE_ZONE_DEFINITION('TZD','tolerance zone',#7,.T.);
+                #37=ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP('ASCIR','constraint item',#8,#10);
+                #38=ASSEMBLY_SHAPE_JOINT_ITEM_RELATIONSHIP('ASJIR','joint item',#8,#10);
+                #39=COMPONENT_FEATURE_JOINT('CFJ','joint',#13,#29);
+                #40=COMPONENT_FEATURE_RELATIONSHIP_WITH_TRANSFORMATION('CFRWT','transform',#13,#29);
+                #41=COMPONENT_MATING_CONSTRAINT_CONDITION('CMCC','mating',#8,#10);
+                #42=COMPONENT_PATH_SHAPE_ASPECT_RELATIONSHIP('CPSAR','component path',#28,#29);
+                #43=CONNECTION_ZONE_INTERFACE_PLANE_RELATIONSHIP('CZIPR','interface plane',#8,#10);
+                #44=CONNECTIVITY_DEFINITION_ITEM_RELATIONSHIP('CDIR','connectivity',#8,#10);
+                #45=CONTACT_FEATURE_FIT_RELATIONSHIP('CFFR','contact fit',#15,#29);
+                #46=DIMENSIONAL_LOCATION_WITH_DATUM_FEATURE('DLWDF','datum location',#19,#8);
+                #47=DIMENSIONAL_LOCATION_WITH_PATH('DLWP','path location',#8,#28);
+                #48=POSITIONED_SKETCH_TO_PART_ASSOCIATION('PSTPA','sketch part',#8,#10);
+                #49=SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP('SFDERR','definition element',#8,#10);
+                #50=BASIC_ROUND_HOLE('BRH','round hole definition');
+                #51=COUNTERBORE_HOLE_DEFINITION('CBHD','counterbore definition');
+                #52=COUNTERDRILL_HOLE_DEFINITION('CDHD','counterdrill definition');
+                #53=COUNTERSINK_HOLE_DEFINITION('CSHD','countersink definition');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        for (int id = 8; id <= 36; id++) {
+            StepEntity entity = resolved.get(id);
+            if (entity instanceof StepShapeAspectOccurrence occurrence) {
+                assertEquals(7, occurrence.ofShape().id());
+            } else {
+                StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, entity);
+                assertEquals(7, aspect.ofShape().id());
+            }
+        }
+        assertEquals("APPLIED_AREA", ((StepShapeAspect) resolved.get(8)).entityName());
+        assertEquals("BASIC_ROUND_HOLE_OCCURRENCE",
+                ((StepShapeAspectOccurrence) resolved.get(9)).entityName());
+        assertEquals(50, ((StepShapeAspectOccurrence) resolved.get(9)).definition().id());
+        assertEquals("TOLERANCE_ZONE_DEFINITION", ((StepShapeAspect) resolved.get(36)).entityName());
+        for (int id = 37; id <= 49; id++) {
+            StepShapeAspectRelationship relationship =
+                    assertInstanceOf(StepShapeAspectRelationship.class, resolved.get(id));
+            assertEquals(StepShapeAspect.class, relationship.relatingShapeAspect().getClass());
+            assertEquals(StepShapeAspect.class, relationship.relatedShapeAspect().getClass());
+        }
+        assertEquals("ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP",
+                ((StepShapeAspectRelationship) resolved.get(37)).entityName());
+        assertEquals("SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP",
+                ((StepShapeAspectRelationship) resolved.get(49)).entityName());
+        for (int id = 50; id <= 53; id++) {
+            StepCharacterizedObject definition =
+                    assertInstanceOf(StepCharacterizedObject.class, resolved.get(id));
+            assertEquals(id, definition.id());
+        }
+    }
+
+    @Test
+    void shouldResolveFeatureDefinitionAliases() {
+        String step = """
+                DATA;
+                #1=CHARACTERIZED_OBJECT('CO','base characterized object');
+                #2=FEATURE_DEFINITION('FD','feature definition');
+                #3=ADDITIVE_MANUFACTURING_FEATURE('AMF','additive feature');
+                #4=BARRING_HOLE('BH','barring hole');
+                #5=BEAD('BEAD','bead');
+                #6=BOSS('BOSS','boss');
+                #7=CIRCULAR_PATTERN('CP','circular pattern');
+                #8=COMPOUND_FEATURE('CF','compound feature');
+                #9=COMPOSITE_HOLE('CH','composite hole');
+                #10=CONTACT_FEATURE_DEFINITION('CFD','contact feature');
+                #11=EXPLICIT_COMPOSITE_HOLE('ECH','explicit composite hole');
+                #12=EXPLICIT_ROUND_HOLE('ERH','explicit round hole');
+                #13=EXTERNALLY_DEFINED_FEATURE_DEFINITION('EDFD','external feature');
+                #14=FEATURE_DEFINITION_WITH_CONNECTION_AREA('FDWCA','connection area');
+                #15=FEATURE_IN_PANEL('FIP','feature in panel');
+                #16=FEATURE_PATTERN('FP','feature pattern');
+                #17=FLAT_FACE('FF','flat face');
+                #18=GEAR('GEAR','gear');
+                #19=GENERAL_FEATURE('GF','general feature');
+                #20=HOLE_IN_PANEL('HIP','hole in panel');
+                #21=JOGGLE('JOG','joggle');
+                #22=LOCATOR('LOC','locator');
+                #23=MARKING('MRK','marking');
+                #24=OUTER_ROUND('OR','outer round');
+                #25=OUTSIDE_PROFILE('OP','outside profile');
+                #26=POCKET('POC','pocket');
+                #27=PROTRUSION('PRO','protrusion');
+                #28=RECTANGULAR_PATTERN('RP','rectangular pattern');
+                #29=REMOVAL_VOLUME('RV','removal volume');
+                #30=REPLICATE_FEATURE('RF','replicate feature');
+                #31=REVOLVED_PROFILE('RVP','revolved profile');
+                #32=RIB('RIB','rib');
+                #33=RIB_TOP('RT','rib top');
+                #34=ROUND_HOLE('RH','round hole');
+                #35=ROUNDED_END('RE','rounded end');
+                #36=SHAPE_FEATURE_DEFINITION('SFD','shape feature');
+                #37=BASIC_ROUND_HOLE('BRH','round hole');
+                #38=COUNTERBORE_HOLE_DEFINITION('CBHD','counterbore');
+                #39=COUNTERDRILL_HOLE_DEFINITION('CDHD','counterdrill');
+                #40=COUNTERSINK_HOLE_DEFINITION('CSHD','countersink');
+                #41=SLOT('SLOT','slot');
+                #42=SPHERICAL_CAP('SC','spherical cap');
+                #43=SPOTFACE_DEFINITION('SD','spotface');
+                #44=SPOTFACE_HOLE_DEFINITION('SHD','spotface hole');
+                #45=THREAD('TH','thread');
+                #46=TURNED_KNURL('TK','turned knurl');
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        for (int id = 1; id <= 46; id++) {
+            StepCharacterizedObject object =
+                    assertInstanceOf(StepCharacterizedObject.class, resolved.get(id));
+            assertEquals(id, object.id());
+        }
+        assertEquals("CHARACTERIZED_OBJECT", ((StepCharacterizedObject) resolved.get(1)).entityName());
+        assertEquals("FEATURE_DEFINITION", ((StepCharacterizedObject) resolved.get(2)).entityName());
+        assertEquals("TURNED_KNURL", ((StepCharacterizedObject) resolved.get(46)).entityName());
     }
 
     @Test

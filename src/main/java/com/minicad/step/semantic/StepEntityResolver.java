@@ -18,8 +18,29 @@ import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepAbstractVariable;
 import com.minicad.step.model.StepActionPropertyRepresentation;
+import com.minicad.step.model.StepAddress;
 import com.minicad.step.model.StepApplicationContext;
 import com.minicad.step.model.StepApplicationProtocolDefinition;
+import com.minicad.step.model.StepAppliedApprovalAssignment;
+import com.minicad.step.model.StepAppliedCertificationAssignment;
+import com.minicad.step.model.StepAppliedContractAssignment;
+import com.minicad.step.model.StepAppliedDateTimeAssignment;
+import com.minicad.step.model.StepAppliedDocumentReference;
+import com.minicad.step.model.StepAppliedClassificationAssignment;
+import com.minicad.step.model.StepAppliedExternalIdentificationAssignment;
+import com.minicad.step.model.StepAppliedIdentificationAssignment;
+import com.minicad.step.model.StepAppliedLanguageAssignment;
+import com.minicad.step.model.StepAppliedNameAssignment;
+import com.minicad.step.model.StepAppliedOrganizationAssignment;
+import com.minicad.step.model.StepAppliedGroupAssignment;
+import com.minicad.step.model.StepAppliedPersonAndOrganizationAssignment;
+import com.minicad.step.model.StepAppliedSecurityClassificationAssignment;
+import com.minicad.step.model.StepApproval;
+import com.minicad.step.model.StepApprovalAssignment;
+import com.minicad.step.model.StepApprovalDateTime;
+import com.minicad.step.model.StepApprovalPersonOrganization;
+import com.minicad.step.model.StepApprovalRole;
+import com.minicad.step.model.StepApprovalStatus;
 import com.minicad.step.model.StepAttributeAssertion;
 import com.minicad.step.model.StepAxis1Placement;
 import com.minicad.step.model.StepAxis2Placement2D;
@@ -34,16 +55,23 @@ import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepCertification;
+import com.minicad.step.model.StepCertificationAssignment;
+import com.minicad.step.model.StepCertificationType;
 import com.minicad.step.model.StepChainBasedGeometricItemSpecificUsage;
 import com.minicad.step.model.StepChainBasedItemIdentifiedRepresentationUsage;
+import com.minicad.step.model.StepCharacterizedObject;
 import com.minicad.step.model.StepCharacterGlyphStyleOutline;
 import com.minicad.step.model.StepCharacterGlyphStyleOutlineWithCharacteristics;
 import com.minicad.step.model.StepCharacterGlyphStyleStroke;
+import com.minicad.step.model.StepClassificationAssignment;
+import com.minicad.step.model.StepClassificationRole;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
 import com.minicad.step.model.StepBSplineSurface;
 import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepRationalBSplineCurve;
 import com.minicad.step.model.StepRationalBSplineSurface;
+import com.minicad.step.model.StepCalendarDate;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
 import com.minicad.step.model.StepColour;
@@ -56,18 +84,34 @@ import com.minicad.step.model.StepCompositeCurve;
 import com.minicad.step.model.StepCompositeCurveOnSurface;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepConicalSurface;
+import com.minicad.step.model.StepContract;
+import com.minicad.step.model.StepContractAssignment;
+import com.minicad.step.model.StepContractType;
 import com.minicad.step.model.StepConversionBasedUnit;
 import com.minicad.step.model.StepConversionBasedUnitWithOffset;
 import com.minicad.step.model.StepContextDependentUnit;
 import com.minicad.step.model.StepContactRatioRepresentation;
+import com.minicad.step.model.StepCoordinatedUniversalTimeOffset;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepCurveStyle;
+import com.minicad.step.model.StepDateAssignment;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepDimensionCurve;
+import com.minicad.step.model.StepDateAndTime;
+import com.minicad.step.model.StepDateTimeAssignment;
+import com.minicad.step.model.StepDateTimeRole;
+import com.minicad.step.model.StepDateRole;
+import com.minicad.step.model.StepAppliedDateAssignment;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDerivedUnitElement;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
+import com.minicad.step.model.StepDescriptionAttribute;
+import com.minicad.step.model.StepDocument;
+import com.minicad.step.model.StepDocumentReference;
+import com.minicad.step.model.StepDocumentRelationship;
+import com.minicad.step.model.StepDocumentType;
+import com.minicad.step.model.StepDocumentUsageConstraint;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepDraughtingModelItemAssociation;
 import com.minicad.step.model.StepDraughtingModelItemAssociationWithPlaceholder;
@@ -79,7 +123,13 @@ import com.minicad.step.model.StepDraughtingCalloutRelationship;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
 import com.minicad.step.model.StepEdgeLoop;
+import com.minicad.step.model.StepEffectivity;
+import com.minicad.step.model.StepEffectivityRelationship;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepExternalSource;
+import com.minicad.step.model.StepExternalIdentificationAssignment;
+import com.minicad.step.model.StepExternalSourceRelationship;
+import com.minicad.step.model.StepExternallyDefinedItem;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.StepFaceBound;
 import com.minicad.step.model.StepFaceBasedSurfaceModel;
@@ -91,22 +141,39 @@ import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
 import com.minicad.step.model.StepGeometricRepresentationContext;
+import com.minicad.step.model.StepGeneralProperty;
+import com.minicad.step.model.StepGeneralPropertyRelationship;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
 import com.minicad.step.model.StepGlobalUnitAssignedContext;
+import com.minicad.step.model.StepGroup;
+import com.minicad.step.model.StepGroupAssignment;
+import com.minicad.step.model.StepGroupRelationship;
+import com.minicad.step.model.StepIdAttribute;
+import com.minicad.step.model.StepIdentificationAssignment;
+import com.minicad.step.model.StepIdentificationRole;
 import com.minicad.step.model.StepItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.StepItemDefinedTransformation;
 import com.minicad.step.model.StepKinematicPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepKinematicPropertyMechanismRepresentation;
 import com.minicad.step.model.StepKinematicPropertyRepresentationRelation;
 import com.minicad.step.model.StepKinematicPropertyTopologyRepresentation;
+import com.minicad.step.model.StepLanguage;
+import com.minicad.step.model.StepLanguageAssignment;
 import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepLine;
+import com.minicad.step.model.StepLocalTime;
 import com.minicad.step.model.StepManifoldSolidBrep;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepMechanicalDesignRequirementItemAssociation;
 import com.minicad.step.model.StepNamedUnit;
+import com.minicad.step.model.StepNameAssignment;
+import com.minicad.step.model.StepNameAttribute;
 import com.minicad.step.model.StepOpenShell;
+import com.minicad.step.model.StepOrganization;
+import com.minicad.step.model.StepOrganizationAssignment;
+import com.minicad.step.model.StepOrganizationRelationship;
+import com.minicad.step.model.StepOrganizationRole;
 import com.minicad.step.model.StepOpenPath;
 import com.minicad.step.model.StepOverRidingStyledItem;
 import com.minicad.step.model.StepOrientedEdge;
@@ -115,6 +182,10 @@ import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedPath;
 import com.minicad.step.model.StepPath;
+import com.minicad.step.model.StepPerson;
+import com.minicad.step.model.StepPersonAndOrganization;
+import com.minicad.step.model.StepPersonAndOrganizationAssignment;
+import com.minicad.step.model.StepPersonAndOrganizationRole;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepPlacedDatumTargetFeature;
 import com.minicad.step.model.StepPlacedTarget;
@@ -123,14 +194,22 @@ import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepProduct;
+import com.minicad.step.model.StepProductCategory;
+import com.minicad.step.model.StepProductCategoryRelationship;
 import com.minicad.step.model.StepProjectionCurve;
 import com.minicad.step.model.StepProductContext;
 import com.minicad.step.model.StepProductDefinition;
 import com.minicad.step.model.StepProductDefinitionContext;
+import com.minicad.step.model.StepProductDefinitionEffectivity;
 import com.minicad.step.model.StepProductDefinitionFormation;
+import com.minicad.step.model.StepProductDefinitionFormationRelationship;
+import com.minicad.step.model.StepProductDefinitionRelationship;
+import com.minicad.step.model.StepProductDefinitionRelationshipRelationship;
 import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepProductRelatedProductCategory;
+import com.minicad.step.model.StepProductRelationship;
 import com.minicad.step.model.StepPropertyDefinition;
+import com.minicad.step.model.StepPropertyDefinitionRelationship;
 import com.minicad.step.model.StepPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepPresentationLayerAssignment;
 import com.minicad.step.model.StepPresentationStyleAssignment;
@@ -162,6 +241,12 @@ import com.minicad.step.model.StepRowVariable;
 import com.minicad.step.model.StepScalarVariable;
 import com.minicad.step.model.StepCurve;
 import com.minicad.step.model.StepGeometricRepresentationItem;
+import com.minicad.step.model.StepSecurityClassification;
+import com.minicad.step.model.StepSecurityClassificationAssignment;
+import com.minicad.step.model.StepSecurityClassificationLevel;
+import com.minicad.step.model.StepShapeAspect;
+import com.minicad.step.model.StepShapeAspectOccurrence;
+import com.minicad.step.model.StepShapeAspectRelationship;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepShellBasedSurfaceModel;
@@ -1787,6 +1872,57 @@ public final class StepEntityResolver {
             "PRODUCT_RELATED_PRODUCT_CATEGORY products must contain PRODUCT references"));
   }
 
+  private StepProductCategory resolveProductCategory(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRODUCT_CATEGORY");
+    requireParameterCount(instance, definition, 2);
+    return new StepProductCategory(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1));
+  }
+
+  private StepProductCategoryRelationship resolveProductCategoryRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRODUCT_CATEGORY_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepProductCategoryRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepProductCategory.class,
+            "PRODUCT_CATEGORY_RELATIONSHIP category must reference PRODUCT_CATEGORY"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepProductCategory.class,
+            "PRODUCT_CATEGORY_RELATIONSHIP sub_category must reference PRODUCT_CATEGORY"));
+  }
+
+  private StepProductRelationship resolveProductRelationship(StepEntityInstance instance) {
+    return resolveProductRelationship(instance, "PRODUCT_RELATIONSHIP");
+  }
+
+  private StepProductRelationship resolveProductRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    return new StepProductRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepProduct.class,
+            entityName + " relating_product must reference PRODUCT"),
+        requireEntity(
+            referenceId(instance, definition, 4),
+            StepProduct.class,
+            entityName + " related_product must reference PRODUCT"),
+        entityName);
+  }
+
   private StepProductDefinitionFormation resolveProductDefinitionFormation(
       StepEntityInstance instance) {
     StepEntityDefinition definition;
@@ -1805,6 +1941,25 @@ public final class StepEntityResolver {
             referenceId(instance, definition, 2),
             StepProduct.class,
             "PRODUCT_DEFINITION_FORMATION of_product must reference PRODUCT"));
+  }
+
+  private StepProductDefinitionFormationRelationship
+      resolveProductDefinitionFormationRelationship(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP");
+    requireParameterCount(instance, definition, 5);
+    return new StepProductDefinitionFormationRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepProductDefinitionFormation.class,
+            "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP relating_product_definition_formation must reference PRODUCT_DEFINITION_FORMATION"),
+        requireEntity(
+            referenceId(instance, definition, 4),
+            StepProductDefinitionFormation.class,
+            "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP related_product_definition_formation must reference PRODUCT_DEFINITION_FORMATION"));
   }
 
   private StepProductDefinitionContext resolveProductDefinitionContext(
@@ -1840,6 +1995,57 @@ public final class StepEntityResolver {
             "PRODUCT_DEFINITION frame_of_reference must reference PRODUCT_DEFINITION_CONTEXT"));
   }
 
+  private StepProductDefinitionRelationship resolveProductDefinitionRelationship(
+      StepEntityInstance instance) {
+    return resolveProductDefinitionRelationship(instance, "PRODUCT_DEFINITION_RELATIONSHIP");
+  }
+
+  private StepProductDefinitionRelationship resolveProductDefinitionRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    return new StepProductDefinitionRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepProductDefinition.class,
+            entityName + " relating_product_definition must reference PRODUCT_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 4),
+            StepProductDefinition.class,
+            entityName + " related_product_definition must reference PRODUCT_DEFINITION"),
+        entityName);
+  }
+
+  private StepProductDefinitionRelationshipRelationship
+      resolveProductDefinitionRelationshipRelationship(StepEntityInstance instance) {
+    return resolveProductDefinitionRelationshipRelationship(
+        instance, "PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP");
+  }
+
+  private StepProductDefinitionRelationshipRelationship resolveProductDefinitionRelationshipRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    return new StepProductDefinitionRelationshipRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepProductDefinitionRelationship.class,
+            entityName + " relating_product_definition_relationship must reference PRODUCT_DEFINITION_RELATIONSHIP"),
+        requireEntity(
+            referenceId(instance, definition, 4),
+            StepProductDefinitionRelationship.class,
+            entityName + " related_product_definition_relationship must reference PRODUCT_DEFINITION_RELATIONSHIP"),
+        entityName);
+  }
+
   private StepProductDefinitionShape resolveProductDefinitionShape(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_SHAPE");
     requireParameterCount(instance, definition, 3);
@@ -1866,6 +2072,1095 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         stringValue(instance, definition, 1),
         resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(
+      StepEntityInstance instance) {
+    return resolvePropertyDefinitionRelationship(instance, "PROPERTY_DEFINITION_RELATIONSHIP");
+  }
+
+  private StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    return new StepPropertyDefinitionRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepPropertyDefinition.class,
+            entityName + " relating_property_definition must reference PROPERTY_DEFINITION"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepPropertyDefinition.class,
+            entityName + " related_property_definition must reference PROPERTY_DEFINITION"),
+        entityName);
+  }
+
+  private StepGeneralProperty resolveGeneralProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GENERAL_PROPERTY");
+    requireParameterCount(instance, definition, 3);
+    return new StepGeneralProperty(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2));
+  }
+
+  private StepGeneralPropertyRelationship resolveGeneralPropertyRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GENERAL_PROPERTY_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepGeneralPropertyRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepGeneralProperty.class,
+            "GENERAL_PROPERTY_RELATIONSHIP relating_general_property must reference GENERAL_PROPERTY"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepGeneralProperty.class,
+            "GENERAL_PROPERTY_RELATIONSHIP related_general_property must reference GENERAL_PROPERTY"));
+  }
+
+  private StepGroup resolveGroup(StepEntityInstance instance) {
+    return resolveGroup(instance, "GROUP");
+  }
+
+  private StepGroup resolveGroup(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGroup(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        entityName);
+  }
+
+  private StepGroupRelationship resolveGroupRelationship(StepEntityInstance instance) {
+    return resolveGroupRelationship(instance, "GROUP_RELATIONSHIP");
+  }
+
+  private StepGroupRelationship resolveGroupRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    return new StepGroupRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepGroup.class,
+            entityName + " relating_group must reference GROUP"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepGroup.class,
+            entityName + " related_group must reference GROUP"),
+        entityName);
+  }
+
+  private StepGroupAssignment resolveGroupAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GROUP_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepGroupAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepGroup.class,
+            "GROUP_ASSIGNMENT assigned_group must reference GROUP"));
+  }
+
+  private StepAppliedGroupAssignment resolveAppliedGroupAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_GROUP_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedGroupAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepGroup.class,
+            "APPLIED_GROUP_ASSIGNMENT assigned_group must reference GROUP"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_GROUP_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepAddress resolveAddress(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ADDRESS");
+    requireParameterCount(instance, definition, 12);
+    return new StepAddress(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        optionalStringValue(instance, definition, 3),
+        optionalStringValue(instance, definition, 4),
+        optionalStringValue(instance, definition, 5),
+        optionalStringValue(instance, definition, 6),
+        optionalStringValue(instance, definition, 7),
+        optionalStringValue(instance, definition, 8),
+        optionalStringValue(instance, definition, 9),
+        optionalStringValue(instance, definition, 10),
+        optionalStringValue(instance, definition, 11));
+  }
+
+  private StepDocumentType resolveDocumentType(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DOCUMENT_TYPE");
+    requireParameterCount(instance, definition, 1);
+    return new StepDocumentType(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepDocument resolveDocument(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DOCUMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepDocument(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepDocumentType.class,
+            "DOCUMENT kind must reference DOCUMENT_TYPE"));
+  }
+
+  private StepDocumentRelationship resolveDocumentRelationship(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DOCUMENT_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepDocumentRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepDocument.class,
+            "DOCUMENT_RELATIONSHIP relating_document must reference DOCUMENT"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepDocument.class,
+            "DOCUMENT_RELATIONSHIP related_document must reference DOCUMENT"));
+  }
+
+  private StepDocumentUsageConstraint resolveDocumentUsageConstraint(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DOCUMENT_USAGE_CONSTRAINT");
+    requireParameterCount(instance, definition, 3);
+    return new StepDocumentUsageConstraint(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDocument.class,
+            "DOCUMENT_USAGE_CONSTRAINT source must reference DOCUMENT"),
+        stringValue(instance, definition, 1),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepDocumentReference resolveDocumentReference(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DOCUMENT_REFERENCE");
+    requireParameterCount(instance, definition, 2);
+    return new StepDocumentReference(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDocument.class,
+            "DOCUMENT_REFERENCE assigned_document must reference DOCUMENT"),
+        optionalStringValue(instance, definition, 1));
+  }
+
+  private StepAppliedDocumentReference resolveAppliedDocumentReference(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_DOCUMENT_REFERENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedDocumentReference(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDocument.class,
+            "APPLIED_DOCUMENT_REFERENCE assigned_document must reference DOCUMENT"),
+        optionalStringValue(instance, definition, 1),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_DOCUMENT_REFERENCE items must contain entity references"));
+  }
+
+  private StepPerson resolvePerson(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PERSON");
+    requireParameterCount(instance, definition, 6);
+    return new StepPerson(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        optionalStringListValue(instance, definition, 3),
+        optionalStringListValue(instance, definition, 4),
+        optionalStringListValue(instance, definition, 5));
+  }
+
+  private StepOrganization resolveOrganization(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORGANIZATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepOrganization(
+        instance.id(),
+        optionalStringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2));
+  }
+
+  private StepPersonAndOrganization resolvePersonAndOrganization(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepPersonAndOrganization(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPerson.class,
+            "PERSON_AND_ORGANIZATION person must reference PERSON"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepOrganization.class,
+            "PERSON_AND_ORGANIZATION organization must reference ORGANIZATION"));
+  }
+
+  private StepOrganizationRelationship resolveOrganizationRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORGANIZATION_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepOrganizationRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepOrganization.class,
+            "ORGANIZATION_RELATIONSHIP relating_organization must reference ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepOrganization.class,
+            "ORGANIZATION_RELATIONSHIP related_organization must reference ORGANIZATION"));
+  }
+
+  private StepOrganizationRole resolveOrganizationRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORGANIZATION_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepOrganizationRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepOrganizationAssignment resolveOrganizationAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORGANIZATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepOrganizationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepOrganization.class,
+            "ORGANIZATION_ASSIGNMENT assigned_organization must reference ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepOrganizationRole.class,
+            "ORGANIZATION_ASSIGNMENT role must reference ORGANIZATION_ROLE"));
+  }
+
+  private StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_ORGANIZATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedOrganizationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepOrganization.class,
+            "APPLIED_ORGANIZATION_ASSIGNMENT assigned_organization must reference ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepOrganizationRole.class,
+            "APPLIED_ORGANIZATION_ASSIGNMENT role must reference ORGANIZATION_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_ORGANIZATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepLanguage resolveLanguage(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LANGUAGE");
+    requireParameterCount(instance, definition, 1);
+    return new StepLanguage(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepEntity resolveLanguageAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LANGUAGE_ASSIGNMENT");
+    if (definition.parameters().size() == 3) {
+      return resolveRepresentation(instance, "LANGUAGE_ASSIGNMENT", false);
+    }
+    requireParameterCount(instance, definition, 1);
+    return new StepLanguageAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepLanguage.class,
+            "LANGUAGE_ASSIGNMENT assigned_language must reference LANGUAGE"));
+  }
+
+  private StepAppliedLanguageAssignment resolveAppliedLanguageAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_LANGUAGE_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedLanguageAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepLanguage.class,
+            "APPLIED_LANGUAGE_ASSIGNMENT assigned_language must reference LANGUAGE"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_LANGUAGE_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepPersonAndOrganizationRole resolvePersonAndOrganizationRole(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepPersonAndOrganizationRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepPersonAndOrganizationAssignment resolvePersonAndOrganizationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepPersonAndOrganizationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPersonAndOrganization.class,
+            "PERSON_AND_ORGANIZATION_ASSIGNMENT assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepPersonAndOrganizationRole.class,
+            "PERSON_AND_ORGANIZATION_ASSIGNMENT role must reference PERSON_AND_ORGANIZATION_ROLE"));
+  }
+
+  private StepAppliedPersonAndOrganizationAssignment
+      resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedPersonAndOrganizationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPersonAndOrganization.class,
+            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepPersonAndOrganizationRole.class,
+            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT role must reference PERSON_AND_ORGANIZATION_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepCalendarDate resolveCalendarDate(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CALENDAR_DATE");
+    requireParameterCount(instance, definition, 3);
+    return new StepCalendarDate(
+        instance.id(),
+        integerValue(instance, definition, 0),
+        integerValue(instance, definition, 1),
+        integerValue(instance, definition, 2));
+  }
+
+  private StepCoordinatedUniversalTimeOffset resolveCoordinatedUniversalTimeOffset(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COORDINATED_UNIVERSAL_TIME_OFFSET");
+    requireParameterCount(instance, definition, 3);
+    return new StepCoordinatedUniversalTimeOffset(
+        instance.id(),
+        integerValue(instance, definition, 0),
+        optionalIntegerValue(instance, definition, 1),
+        enumValue(instance, definition, 2));
+  }
+
+  private StepLocalTime resolveLocalTime(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LOCAL_TIME");
+    requireParameterCount(instance, definition, 4);
+    return new StepLocalTime(
+        instance.id(),
+        integerValue(instance, definition, 0),
+        integerValue(instance, definition, 1),
+        optionalNumberValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepCoordinatedUniversalTimeOffset.class,
+            "LOCAL_TIME zone must reference COORDINATED_UNIVERSAL_TIME_OFFSET"));
+  }
+
+  private StepDateAndTime resolveDateAndTime(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATE_AND_TIME");
+    requireParameterCount(instance, definition, 2);
+    return new StepDateAndTime(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCalendarDate.class,
+            "DATE_AND_TIME date_component must reference CALENDAR_DATE"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepLocalTime.class,
+            "DATE_AND_TIME time_component must reference LOCAL_TIME"));
+  }
+
+  private StepDateRole resolveDateRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATE_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepDateRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepDateAssignment resolveDateAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATE_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepDateAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCalendarDate.class,
+            "DATE_ASSIGNMENT assigned_date must reference CALENDAR_DATE"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepDateRole.class,
+            "DATE_ASSIGNMENT role must reference DATE_ROLE"));
+  }
+
+  private StepAppliedDateAssignment resolveAppliedDateAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_DATE_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedDateAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCalendarDate.class,
+            "APPLIED_DATE_ASSIGNMENT assigned_date must reference CALENDAR_DATE"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepDateRole.class,
+            "APPLIED_DATE_ASSIGNMENT role must reference DATE_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_DATE_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepDateTimeRole resolveDateTimeRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATE_TIME_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepDateTimeRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepDateTimeAssignment resolveDateTimeAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATE_TIME_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepDateTimeAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDateAndTime.class,
+            "DATE_TIME_ASSIGNMENT assigned_date_and_time must reference DATE_AND_TIME"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepDateTimeRole.class,
+            "DATE_TIME_ASSIGNMENT role must reference DATE_TIME_ROLE"));
+  }
+
+  private StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_DATE_AND_TIME_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedDateTimeAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDateAndTime.class,
+            "APPLIED_DATE_AND_TIME_ASSIGNMENT assigned_date_and_time must reference DATE_AND_TIME"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepDateTimeRole.class,
+            "APPLIED_DATE_AND_TIME_ASSIGNMENT role must reference DATE_TIME_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_DATE_AND_TIME_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepApprovalStatus resolveApprovalStatus(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL_STATUS");
+    requireParameterCount(instance, definition, 1);
+    return new StepApprovalStatus(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepApproval resolveApproval(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL");
+    requireParameterCount(instance, definition, 2);
+    return new StepApproval(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepApprovalStatus.class,
+            "APPROVAL status must reference APPROVAL_STATUS"),
+        optionalStringValue(instance, definition, 1));
+  }
+
+  private StepApprovalRole resolveApprovalRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepApprovalRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepApprovalAssignment resolveApprovalAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepApprovalAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepApproval.class,
+            "APPROVAL_ASSIGNMENT assigned_approval must reference APPROVAL"));
+  }
+
+  private StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_APPROVAL_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedApprovalAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepApproval.class,
+            "APPLIED_APPROVAL_ASSIGNMENT assigned_approval must reference APPROVAL"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_APPROVAL_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepApprovalPersonOrganization resolveApprovalPersonOrganization(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL_PERSON_ORGANIZATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepApprovalPersonOrganization(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepPersonAndOrganization.class,
+            "APPROVAL_PERSON_ORGANIZATION person_organization must reference PERSON_AND_ORGANIZATION"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepApproval.class,
+            "APPROVAL_PERSON_ORGANIZATION authorized_approval must reference APPROVAL"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepApprovalRole.class,
+            "APPROVAL_PERSON_ORGANIZATION role must reference APPROVAL_ROLE"));
+  }
+
+  private StepApprovalDateTime resolveApprovalDateTime(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPROVAL_DATE_TIME");
+    requireParameterCount(instance, definition, 2);
+    return new StepApprovalDateTime(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepDateAndTime.class,
+            "APPROVAL_DATE_TIME date_time must reference DATE_AND_TIME"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepApproval.class,
+            "APPROVAL_DATE_TIME dated_approval must reference APPROVAL"));
+  }
+
+  private StepSecurityClassificationLevel resolveSecurityClassificationLevel(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION_LEVEL");
+    requireParameterCount(instance, definition, 1);
+    return new StepSecurityClassificationLevel(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepSecurityClassification resolveSecurityClassification(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepSecurityClassification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepSecurityClassificationLevel.class,
+            "SECURITY_CLASSIFICATION security_level must reference SECURITY_CLASSIFICATION_LEVEL"));
+  }
+
+  private StepSecurityClassificationAssignment resolveSecurityClassificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepSecurityClassificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepSecurityClassification.class,
+            "SECURITY_CLASSIFICATION_ASSIGNMENT assigned_security_classification must reference SECURITY_CLASSIFICATION"));
+  }
+
+  private StepAppliedSecurityClassificationAssignment
+      resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedSecurityClassificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepSecurityClassification.class,
+            "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT assigned_security_classification must reference SECURITY_CLASSIFICATION"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepContractType resolveContractType(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CONTRACT_TYPE");
+    requireParameterCount(instance, definition, 1);
+    return new StepContractType(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepContract resolveContract(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CONTRACT");
+    requireParameterCount(instance, definition, 3);
+    return new StepContract(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepContractType.class,
+            "CONTRACT kind must reference CONTRACT_TYPE"));
+  }
+
+  private StepContractAssignment resolveContractAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CONTRACT_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepContractAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepContract.class,
+            "CONTRACT_ASSIGNMENT assigned_contract must reference CONTRACT"));
+  }
+
+  private StepAppliedContractAssignment resolveAppliedContractAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_CONTRACT_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedContractAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepContract.class,
+            "APPLIED_CONTRACT_ASSIGNMENT assigned_contract must reference CONTRACT"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_CONTRACT_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepCertificationType resolveCertificationType(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CERTIFICATION_TYPE");
+    requireParameterCount(instance, definition, 1);
+    return new StepCertificationType(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepCertification resolveCertification(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CERTIFICATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepCertification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepCertificationType.class,
+            "CERTIFICATION kind must reference CERTIFICATION_TYPE"));
+  }
+
+  private StepCertificationAssignment resolveCertificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CERTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepCertificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCertification.class,
+            "CERTIFICATION_ASSIGNMENT assigned_certification must reference CERTIFICATION"));
+  }
+
+  private StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_CERTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedCertificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCertification.class,
+            "APPLIED_CERTIFICATION_ASSIGNMENT assigned_certification must reference CERTIFICATION"),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_CERTIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepEffectivity resolveEffectivity(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EFFECTIVITY");
+    requireParameterCount(instance, definition, 1);
+    return new StepEffectivity(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepProductDefinitionEffectivity resolveProductDefinitionEffectivity(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_EFFECTIVITY");
+    requireParameterCount(instance, definition, 3);
+    return new StepProductDefinitionEffectivity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepProductDefinition.class,
+            "PRODUCT_DEFINITION_EFFECTIVITY product_definition must reference PRODUCT_DEFINITION"));
+  }
+
+  private StepEffectivityRelationship resolveEffectivityRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EFFECTIVITY_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepEffectivityRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepEffectivity.class,
+            "EFFECTIVITY_RELATIONSHIP relating_effectivity must reference EFFECTIVITY"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepEffectivity.class,
+            "EFFECTIVITY_RELATIONSHIP related_effectivity must reference EFFECTIVITY"));
+  }
+
+  private StepClassificationRole resolveClassificationRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CLASSIFICATION_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepClassificationRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepClassificationAssignment resolveClassificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CLASSIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepClassificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepGroup.class,
+            "CLASSIFICATION_ASSIGNMENT assigned_class must reference GROUP"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepClassificationRole.class,
+            "CLASSIFICATION_ASSIGNMENT role must reference CLASSIFICATION_ROLE"));
+  }
+
+  private StepAppliedClassificationAssignment resolveAppliedClassificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_CLASSIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedClassificationAssignment(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepGroup.class,
+            "APPLIED_CLASSIFICATION_ASSIGNMENT assigned_class must reference GROUP"),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepClassificationRole.class,
+            "APPLIED_CLASSIFICATION_ASSIGNMENT role must reference CLASSIFICATION_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_CLASSIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepIdentificationRole resolveIdentificationRole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "IDENTIFICATION_ROLE");
+    requireParameterCount(instance, definition, 1);
+    return new StepIdentificationRole(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepIdentificationAssignment resolveIdentificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "IDENTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepIdentificationAssignment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepIdentificationRole.class,
+            "IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"));
+  }
+
+  private StepAppliedIdentificationAssignment resolveAppliedIdentificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_IDENTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedIdentificationAssignment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepIdentificationRole.class,
+            "APPLIED_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "APPLIED_IDENTIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepExternalIdentificationAssignment resolveExternalIdentificationAssignment(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EXTERNAL_IDENTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepExternalIdentificationAssignment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepIdentificationRole.class,
+            "EXTERNAL_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepExternalSource.class,
+            "EXTERNAL_IDENTIFICATION_ASSIGNMENT source must reference EXTERNAL_SOURCE"));
+  }
+
+  private StepAppliedExternalIdentificationAssignment
+      resolveAppliedExternalIdentificationAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        definition(instance, "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepAppliedExternalIdentificationAssignment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepIdentificationRole.class,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepExternalSource.class,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT source must reference EXTERNAL_SOURCE"),
+        entityReferenceList(
+            instance,
+            definition,
+            3,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepNameAssignment resolveNameAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "NAME_ASSIGNMENT");
+    requireParameterCount(instance, definition, 1);
+    return new StepNameAssignment(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepAppliedNameAssignment resolveAppliedNameAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_NAME_ASSIGNMENT");
+    requireParameterCount(instance, definition, 2);
+    return new StepAppliedNameAssignment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(
+            instance,
+            definition,
+            1,
+            "APPLIED_NAME_ASSIGNMENT items must contain entity references"));
+  }
+
+  private StepDescriptionAttribute resolveDescriptionAttribute(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DESCRIPTION_ATTRIBUTE");
+    requireParameterCount(instance, definition, 2);
+    return new StepDescriptionAttribute(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepNameAttribute resolveNameAttribute(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "NAME_ATTRIBUTE");
+    requireParameterCount(instance, definition, 2);
+    return new StepNameAttribute(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepIdAttribute resolveIdAttribute(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ID_ATTRIBUTE");
+    requireParameterCount(instance, definition, 2);
+    return new StepIdAttribute(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepExternalSource resolveExternalSource(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EXTERNAL_SOURCE");
+    requireParameterCount(instance, definition, 1);
+    return new StepExternalSource(instance.id(), stringValue(instance, definition, 0));
+  }
+
+  private StepExternalSourceRelationship resolveExternalSourceRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EXTERNAL_SOURCE_RELATIONSHIP");
+    requireParameterCount(instance, definition, 4);
+    return new StepExternalSourceRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepExternalSource.class,
+            "EXTERNAL_SOURCE_RELATIONSHIP relating_source must reference EXTERNAL_SOURCE"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepExternalSource.class,
+            "EXTERNAL_SOURCE_RELATIONSHIP related_source must reference EXTERNAL_SOURCE"));
+  }
+
+  private StepExternallyDefinedItem resolveExternallyDefinedItem(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepExternallyDefinedItem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepExternalSource.class,
+            entityName + " source must reference EXTERNAL_SOURCE"),
+        entityName);
+  }
+
+  private StepCharacterizedObject resolveCharacterizedObject(StepEntityInstance instance) {
+    return resolveCharacterizedObject(instance, "CHARACTERIZED_OBJECT");
+  }
+
+  private StepCharacterizedObject resolveCharacterizedObject(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepCharacterizedObject(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        entityName);
+  }
+
+  private StepShapeAspect resolveShapeAspect(StepEntityInstance instance) {
+    return resolveShapeAspect(instance, "SHAPE_ASPECT");
+  }
+
+  private StepShapeAspect resolveShapeAspect(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    String productDefinitional = enumValue(instance, definition, 3);
+    if (!List.of("T", "F", "U").contains(productDefinitional)) {
+      throw new StepResolutionException(
+          entityName + " product_definitional must be .T., .F. or .U.");
+    }
+    return new StepShapeAspect(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepProductDefinitionShape.class,
+            entityName + " of_shape must reference PRODUCT_DEFINITION_SHAPE"),
+        productDefinitional,
+        entityName);
+  }
+
+  private StepShapeAspectOccurrence resolveShapeAspectOccurrence(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    String productDefinitional = enumValue(instance, definition, 3);
+    if (!List.of("T", "F", "U").contains(productDefinitional)) {
+      throw new StepResolutionException(
+          entityName + " product_definitional must be .T., .F. or .U.");
+    }
+    return new StepShapeAspectOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepProductDefinitionShape.class,
+            entityName + " of_shape must reference PRODUCT_DEFINITION_SHAPE"),
+        productDefinitional,
+        resolve(referenceId(instance, definition, 4)),
+        entityName);
+  }
+
+  private StepShapeAspectRelationship resolveShapeAspectRelationship(StepEntityInstance instance) {
+    return resolveShapeAspectRelationship(instance, "SHAPE_ASPECT_RELATIONSHIP");
+  }
+
+  private StepShapeAspectRelationship resolveShapeAspectRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    return new StepShapeAspectRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepShapeAspect.class,
+            entityName + " relating_shape_aspect must reference SHAPE_ASPECT"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepShapeAspect.class,
+            entityName + " related_shape_aspect must reference SHAPE_ASPECT"),
+        entityName);
   }
 
   private StepShapeDefinitionRepresentation resolveShapeDefinitionRepresentation(
@@ -4131,6 +5426,29 @@ public final class StepEntityResolver {
     return stringValue(instance, definition, index);
   }
 
+  private List<String> optionalStringListValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return List.of();
+    }
+    StepValue unwrapped = unwrapTyped(value);
+    if (!(unwrapped instanceof StepValue.ListValue listValue)) {
+      throw new StepResolutionException(
+          definition.name() + " parameter " + index + " must be a string list");
+    }
+    List<String> result = new ArrayList<>(listValue.elements().size());
+    for (StepValue element : listValue.elements()) {
+      StepValue unwrappedElement = unwrapTyped(element);
+      if (!(unwrappedElement instanceof StepValue.StringValue stringValue)) {
+        throw new StepResolutionException(
+            definition.name() + " string list must contain only strings");
+      }
+      result.add(stringValue.value());
+    }
+    return List.copyOf(result);
+  }
+
   private double numberValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
@@ -4149,6 +5467,24 @@ public final class StepEntityResolver {
           definition.name() + " parameter " + index + " must be an integer");
     }
     return (int) value;
+  }
+
+  private Integer optionalIntegerValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return null;
+    }
+    return integerValue(instance, definition, index);
+  }
+
+  private Double optionalNumberValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return null;
+    }
+    return numberValue(instance, definition, index);
   }
 
   private String enumValue(
@@ -4506,6 +5842,61 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "STYLED_ITEM");
     requireParameterCount(instance, definition, 3);
     return referenceId(instance, definition, 2);
+  }
+
+  private static void registerShapeAspectAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName, (resolver, instance) -> resolver.resolveShapeAspect(instance, entityName));
+    }
+  }
+
+  private static void registerShapeAspectOccurrenceAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) -> resolver.resolveShapeAspectOccurrence(instance, entityName));
+    }
+  }
+
+  private static void registerCharacterizedObjectAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) -> resolver.resolveCharacterizedObject(instance, entityName));
+    }
+  }
+
+  private static void registerExternallyDefinedItemAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, entityName));
+    }
+  }
+
+  private static void registerProductDefinitionRelationshipAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationship(instance, entityName));
+    }
+  }
+
+  private static void registerShapeAspectRelationshipAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) ->
+              resolver.resolveShapeAspectRelationship(instance, entityName));
+    }
   }
 
   private static Map<String, EntityFactory> createRegistry() {
@@ -4964,10 +6355,6 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "ANALYSIS_MODEL", false));
     registry.put(
-        "LANGUAGE_ASSIGNMENT",
-        (resolver, instance) ->
-            resolver.resolveRepresentation(instance, "LANGUAGE_ASSIGNMENT", false));
-    registry.put(
         "MESSAGE_CONTENTS_ASSIGNMENT",
         (resolver, instance) ->
             resolver.resolveRepresentation(instance, "MESSAGE_CONTENTS_ASSIGNMENT", false));
@@ -5141,18 +6528,445 @@ public final class StepEntityResolver {
         StepEntityResolver::resolveApplicationProtocolDefinition);
     registry.put("PRODUCT_CONTEXT", StepEntityResolver::resolveProductContext);
     registry.put("PRODUCT", StepEntityResolver::resolveProduct);
+    registry.put("PRODUCT_CATEGORY", StepEntityResolver::resolveProductCategory);
+    registry.put(
+        "PRODUCT_CATEGORY_RELATIONSHIP",
+        StepEntityResolver::resolveProductCategoryRelationship);
     registry.put(
         "PRODUCT_RELATED_PRODUCT_CATEGORY",
         StepEntityResolver::resolveProductRelatedProductCategory);
+    registry.put("PRODUCT_RELATIONSHIP", StepEntityResolver::resolveProductRelationship);
     registry.put(
         "PRODUCT_DEFINITION_FORMATION", StepEntityResolver::resolveProductDefinitionFormation);
     registry.put(
         "PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE",
         StepEntityResolver::resolveProductDefinitionFormation);
+    registry.put(
+        "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP",
+        StepEntityResolver::resolveProductDefinitionFormationRelationship);
     registry.put("PRODUCT_DEFINITION_CONTEXT", StepEntityResolver::resolveProductDefinitionContext);
     registry.put("PRODUCT_DEFINITION", StepEntityResolver::resolveProductDefinition);
+    registry.put(
+        "PRODUCT_DEFINITION_RELATIONSHIP",
+        StepEntityResolver::resolveProductDefinitionRelationship);
+    registerProductDefinitionRelationshipAliases(
+        registry,
+        "BREAKDOWN_CONTEXT",
+        "BREAKDOWN_ELEMENT_USAGE",
+        "BREAKDOWN_OF",
+        "PRODUCT_DEFINITION_USAGE",
+        "SUPPLIED_PART_RELATIONSHIP");
+    registry.put(
+        "PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP",
+        StepEntityResolver::resolveProductDefinitionRelationshipRelationship);
+    registry.put(
+        "PRODUCT_DEFINITION_USAGE_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveProductDefinitionRelationshipRelationship(
+                instance, "PRODUCT_DEFINITION_USAGE_RELATIONSHIP"));
     registry.put("PRODUCT_DEFINITION_SHAPE", StepEntityResolver::resolveProductDefinitionShape);
     registry.put("PROPERTY_DEFINITION", StepEntityResolver::resolvePropertyDefinition);
+    registry.put(
+        "PROPERTY_DEFINITION_RELATIONSHIP",
+        StepEntityResolver::resolvePropertyDefinitionRelationship);
+    registry.put("GENERAL_PROPERTY", StepEntityResolver::resolveGeneralProperty);
+    registry.put(
+        "GENERAL_PROPERTY_RELATIONSHIP",
+        StepEntityResolver::resolveGeneralPropertyRelationship);
+    registry.put("GROUP", StepEntityResolver::resolveGroup);
+    registry.put("GROUP_RELATIONSHIP", StepEntityResolver::resolveGroupRelationship);
+    registry.put("GROUP_ASSIGNMENT", StepEntityResolver::resolveGroupAssignment);
+    registry.put("APPLIED_GROUP_ASSIGNMENT", StepEntityResolver::resolveAppliedGroupAssignment);
+    registry.put("ADDRESS", StepEntityResolver::resolveAddress);
+    registry.put("DOCUMENT_TYPE", StepEntityResolver::resolveDocumentType);
+    registry.put("DOCUMENT", StepEntityResolver::resolveDocument);
+    registry.put("DOCUMENT_RELATIONSHIP", StepEntityResolver::resolveDocumentRelationship);
+    registry.put(
+        "DOCUMENT_USAGE_CONSTRAINT", StepEntityResolver::resolveDocumentUsageConstraint);
+    registry.put("DOCUMENT_REFERENCE", StepEntityResolver::resolveDocumentReference);
+    registry.put(
+        "APPLIED_DOCUMENT_REFERENCE", StepEntityResolver::resolveAppliedDocumentReference);
+    registry.put("PERSON", StepEntityResolver::resolvePerson);
+    registry.put("ORGANIZATION", StepEntityResolver::resolveOrganization);
+    registry.put(
+        "PERSON_AND_ORGANIZATION", StepEntityResolver::resolvePersonAndOrganization);
+    registry.put(
+        "ORGANIZATION_RELATIONSHIP", StepEntityResolver::resolveOrganizationRelationship);
+    registry.put("ORGANIZATION_ROLE", StepEntityResolver::resolveOrganizationRole);
+    registry.put("ORGANIZATION_ASSIGNMENT", StepEntityResolver::resolveOrganizationAssignment);
+    registry.put(
+        "APPLIED_ORGANIZATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedOrganizationAssignment);
+    registry.put("LANGUAGE", StepEntityResolver::resolveLanguage);
+    registry.put("LANGUAGE_ASSIGNMENT", StepEntityResolver::resolveLanguageAssignment);
+    registry.put(
+        "APPLIED_LANGUAGE_ASSIGNMENT", StepEntityResolver::resolveAppliedLanguageAssignment);
+    registry.put(
+        "PERSON_AND_ORGANIZATION_ROLE",
+        StepEntityResolver::resolvePersonAndOrganizationRole);
+    registry.put(
+        "PERSON_AND_ORGANIZATION_ASSIGNMENT",
+        StepEntityResolver::resolvePersonAndOrganizationAssignment);
+    registry.put(
+        "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedPersonAndOrganizationAssignment);
+    registry.put("CALENDAR_DATE", StepEntityResolver::resolveCalendarDate);
+    registry.put(
+        "COORDINATED_UNIVERSAL_TIME_OFFSET",
+        StepEntityResolver::resolveCoordinatedUniversalTimeOffset);
+    registry.put("LOCAL_TIME", StepEntityResolver::resolveLocalTime);
+    registry.put("DATE_AND_TIME", StepEntityResolver::resolveDateAndTime);
+    registry.put("DATE_ROLE", StepEntityResolver::resolveDateRole);
+    registry.put("DATE_ASSIGNMENT", StepEntityResolver::resolveDateAssignment);
+    registry.put("APPLIED_DATE_ASSIGNMENT", StepEntityResolver::resolveAppliedDateAssignment);
+    registry.put("DATE_TIME_ROLE", StepEntityResolver::resolveDateTimeRole);
+    registry.put("DATE_TIME_ASSIGNMENT", StepEntityResolver::resolveDateTimeAssignment);
+    registry.put(
+        "APPLIED_DATE_AND_TIME_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedDateTimeAssignment);
+    registry.put("APPROVAL_STATUS", StepEntityResolver::resolveApprovalStatus);
+    registry.put("APPROVAL", StepEntityResolver::resolveApproval);
+    registry.put("APPROVAL_ROLE", StepEntityResolver::resolveApprovalRole);
+    registry.put("APPROVAL_ASSIGNMENT", StepEntityResolver::resolveApprovalAssignment);
+    registry.put(
+        "APPLIED_APPROVAL_ASSIGNMENT", StepEntityResolver::resolveAppliedApprovalAssignment);
+    registry.put(
+        "APPROVAL_PERSON_ORGANIZATION",
+        StepEntityResolver::resolveApprovalPersonOrganization);
+    registry.put("APPROVAL_DATE_TIME", StepEntityResolver::resolveApprovalDateTime);
+    registry.put(
+        "SECURITY_CLASSIFICATION_LEVEL",
+        StepEntityResolver::resolveSecurityClassificationLevel);
+    registry.put(
+        "SECURITY_CLASSIFICATION", StepEntityResolver::resolveSecurityClassification);
+    registry.put(
+        "SECURITY_CLASSIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveSecurityClassificationAssignment);
+    registry.put(
+        "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedSecurityClassificationAssignment);
+    registry.put("CONTRACT_TYPE", StepEntityResolver::resolveContractType);
+    registry.put("CONTRACT", StepEntityResolver::resolveContract);
+    registry.put("CONTRACT_ASSIGNMENT", StepEntityResolver::resolveContractAssignment);
+    registry.put(
+        "APPLIED_CONTRACT_ASSIGNMENT", StepEntityResolver::resolveAppliedContractAssignment);
+    registry.put("CERTIFICATION_TYPE", StepEntityResolver::resolveCertificationType);
+    registry.put("CERTIFICATION", StepEntityResolver::resolveCertification);
+    registry.put(
+        "CERTIFICATION_ASSIGNMENT", StepEntityResolver::resolveCertificationAssignment);
+    registry.put(
+        "APPLIED_CERTIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedCertificationAssignment);
+    registry.put("EFFECTIVITY", StepEntityResolver::resolveEffectivity);
+    registry.put(
+        "PRODUCT_DEFINITION_EFFECTIVITY",
+        StepEntityResolver::resolveProductDefinitionEffectivity);
+    registry.put("EFFECTIVITY_RELATIONSHIP", StepEntityResolver::resolveEffectivityRelationship);
+    registry.put("CLASSIFICATION_ROLE", StepEntityResolver::resolveClassificationRole);
+    registry.put(
+        "CLASSIFICATION_ASSIGNMENT", StepEntityResolver::resolveClassificationAssignment);
+    registry.put(
+        "APPLIED_CLASSIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedClassificationAssignment);
+    registry.put("IDENTIFICATION_ROLE", StepEntityResolver::resolveIdentificationRole);
+    registry.put(
+        "IDENTIFICATION_ASSIGNMENT", StepEntityResolver::resolveIdentificationAssignment);
+    registry.put(
+        "APPLIED_IDENTIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedIdentificationAssignment);
+    registry.put(
+        "EXTERNAL_IDENTIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveExternalIdentificationAssignment);
+    registry.put(
+        "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT",
+        StepEntityResolver::resolveAppliedExternalIdentificationAssignment);
+    registry.put("NAME_ASSIGNMENT", StepEntityResolver::resolveNameAssignment);
+    registry.put("APPLIED_NAME_ASSIGNMENT", StepEntityResolver::resolveAppliedNameAssignment);
+    registry.put("DESCRIPTION_ATTRIBUTE", StepEntityResolver::resolveDescriptionAttribute);
+    registry.put("NAME_ATTRIBUTE", StepEntityResolver::resolveNameAttribute);
+    registry.put("ID_ATTRIBUTE", StepEntityResolver::resolveIdAttribute);
+    registry.put("EXTERNAL_SOURCE", StepEntityResolver::resolveExternalSource);
+    registry.put(
+        "EXTERNAL_SOURCE_RELATIONSHIP",
+        StepEntityResolver::resolveExternalSourceRelationship);
+    registry.put(
+        "EXTERNALLY_DEFINED_ITEM",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_ITEM"));
+    registry.put(
+        "EXTERNALLY_DEFINED_CLASS",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_CLASS"));
+    registry.put(
+        "EXTERNALLY_DEFINED_GENERAL_PROPERTY",
+        (resolver, instance) ->
+            resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_GENERAL_PROPERTY"));
+    registerExternallyDefinedItemAliases(
+        registry,
+        "EXTERNALLY_DEFINED_CURVE_FONT",
+        "EXTERNALLY_DEFINED_HATCH_STYLE",
+        "EXTERNALLY_DEFINED_MARKER",
+        "EXTERNALLY_DEFINED_SYMBOL",
+        "EXTERNALLY_DEFINED_TEXT_FONT");
+    registry.put("CHARACTERIZED_OBJECT", StepEntityResolver::resolveCharacterizedObject);
+    registerCharacterizedObjectAliases(
+        registry,
+        "ADDITIVE_MANUFACTURING_FEATURE",
+        "BARRING_HOLE",
+        "BASIC_ROUND_HOLE",
+        "BEAD",
+        "BOSS",
+        "CIRCULAR_PATTERN",
+        "COMPOUND_FEATURE",
+        "COMPOSITE_HOLE",
+        "CONTACT_FEATURE_DEFINITION",
+        "COUNTERBORE_HOLE_DEFINITION",
+        "COUNTERDRILL_HOLE_DEFINITION",
+        "COUNTERSINK_HOLE_DEFINITION",
+        "EXPLICIT_COMPOSITE_HOLE",
+        "EXPLICIT_ROUND_HOLE",
+        "EXTERNALLY_DEFINED_FEATURE_DEFINITION",
+        "FEATURE_DEFINITION",
+        "FEATURE_DEFINITION_WITH_CONNECTION_AREA",
+        "FEATURE_IN_PANEL",
+        "FEATURE_PATTERN",
+        "FLAT_FACE",
+        "GEAR",
+        "GENERAL_FEATURE",
+        "HOLE_IN_PANEL",
+        "JOGGLE",
+        "LOCATOR",
+        "MARKING",
+        "OUTER_ROUND",
+        "OUTSIDE_PROFILE",
+        "POCKET",
+        "PROTRUSION",
+        "RECTANGULAR_PATTERN",
+        "REMOVAL_VOLUME",
+        "REPLICATE_FEATURE",
+        "REVOLVED_PROFILE",
+        "RIB",
+        "RIB_TOP",
+        "ROUND_HOLE",
+        "ROUNDED_END",
+        "SHAPE_FEATURE_DEFINITION",
+        "SLOT",
+        "SPHERICAL_CAP",
+        "SPOTFACE_DEFINITION",
+        "SPOTFACE_HOLE_DEFINITION",
+        "THREAD",
+        "TURNED_KNURL");
+    registry.put(
+        "APEX",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "APEX"));
+    registry.put(
+        "ALL_AROUND_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "ALL_AROUND_SHAPE_ASPECT"));
+    registry.put(
+        "BETWEEN_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "BETWEEN_SHAPE_ASPECT"));
+    registry.put(
+        "CENTRE_OF_SYMMETRY",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "CENTRE_OF_SYMMETRY"));
+    registry.put(
+        "CHAMFER",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "CHAMFER"));
+    registry.put(
+        "CHAMFER_OFFSET",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "CHAMFER_OFFSET"));
+    registry.put(
+        "COMPONENT_FEATURE",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "COMPONENT_FEATURE"));
+    registry.put(
+        "COMPOSITE_GROUP_SHAPE_ASPECT",
+        (resolver, instance) ->
+            resolver.resolveShapeAspect(instance, "COMPOSITE_GROUP_SHAPE_ASPECT"));
+    registry.put(
+        "COMPOSITE_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "COMPOSITE_SHAPE_ASPECT"));
+    registry.put(
+        "COMPOSITE_UNIT_SHAPE_ASPECT",
+        (resolver, instance) ->
+            resolver.resolveShapeAspect(instance, "COMPOSITE_UNIT_SHAPE_ASPECT"));
+    registry.put(
+        "CONTINUOUS_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "CONTINUOUS_SHAPE_ASPECT"));
+    registry.put(
+        "DATUM",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "DATUM"));
+    registry.put(
+        "DATUM_FEATURE",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "DATUM_FEATURE"));
+    registry.put(
+        "DATUM_TARGET",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "DATUM_TARGET"));
+    registry.put(
+        "GEOMETRIC_ALIGNMENT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "GEOMETRIC_ALIGNMENT"));
+    registry.put(
+        "GEOMETRIC_CONTACT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "GEOMETRIC_CONTACT"));
+    registry.put(
+        "GEOMETRIC_INTERSECTION",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "GEOMETRIC_INTERSECTION"));
+    registry.put(
+        "GROUP_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "GROUP_SHAPE_ASPECT"));
+    registry.put(
+        "EDGE_ROUND",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "EDGE_ROUND"));
+    registry.put(
+        "EXTENSION",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "EXTENSION"));
+    registry.put(
+        "FILLET",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "FILLET"));
+    registry.put(
+        "PARALLEL_OFFSET",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "PARALLEL_OFFSET"));
+    registry.put(
+        "PERPENDICULAR_TO",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "PERPENDICULAR_TO"));
+    registry.put(
+        "INSTANCED_FEATURE",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "INSTANCED_FEATURE"));
+    registry.put(
+        "INSTANCED_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "INSTANCED_SHAPE_ASPECT"));
+    registry.put(
+        "SINGULAR_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "SINGULAR_SHAPE_ASPECT"));
+    registry.put(
+        "SYMMETRIC_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "SYMMETRIC_SHAPE_ASPECT"));
+    registry.put(
+        "TANGENT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "TANGENT"));
+    registry.put("SHAPE_ASPECT", StepEntityResolver::resolveShapeAspect);
+    registerShapeAspectAliases(
+        registry,
+        "APPLIED_AREA",
+        "BEAD_END",
+        "BOSS_TOP",
+        "CIRCULAR_CLOSED_PROFILE",
+        "COMPONENT_TERMINAL",
+        "CONSTITUENT_SHAPE_ASPECT",
+        "CONTACTING_FEATURE",
+        "DATUM_REFERENCE_ELEMENT",
+        "DATUM_SYSTEM",
+        "DEFAULT_MODEL_GEOMETRIC_VIEW",
+        "GENERAL_DATUM_REFERENCE",
+        "HOLE_BOTTOM",
+        "GEOMETRIC_TOLERANCE_WITH_MODIFIERS",
+        "LAYOUT_SPACING_CONTEXTUAL_AREA",
+        "MATED_PART_RELATIONSHIP",
+        "MOUNTING_RESTRICTION_AREA",
+        "MOUNTING_RESTRICTION_VOLUME",
+        "PATH_FEATURE_COMPONENT",
+        "PHYSICAL_COMPONENT_FEATURE",
+        "PHYSICAL_COMPONENT_TERMINAL",
+        "PROJECTED_ZONE_DEFINITION",
+        "REFERENCE_GRAPHIC_REGISTRATION_MARK",
+        "SEATING_PLANE",
+        "TERMINAL_FEATURE",
+        "TERMINAL_LOCATION_GROUP",
+        "TOLERANCE_ZONE_DEFINITION");
+    registerShapeAspectOccurrenceAliases(
+        registry,
+        "BASIC_ROUND_HOLE_OCCURRENCE",
+        "COUNTERBORE_HOLE_OCCURRENCE",
+        "COUNTERDRILL_HOLE_OCCURRENCE",
+        "COUNTERSINK_HOLE_OCCURRENCE",
+        "SIMPLIFIED_COUNTERBORE_HOLE_OCCURRENCE",
+        "SIMPLIFIED_COUNTERDRILL_HOLE_OCCURRENCE",
+        "SIMPLIFIED_COUNTERSINK_HOLE_OCCURRENCE",
+        "SIMPLIFIED_SPOTFACE_HOLE_OCCURRENCE",
+        "SPOTFACE_HOLE_OCCURRENCE");
+    registry.put(
+        "ANGULAR_LOCATION",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "ANGULAR_LOCATION"));
+    registry.put(
+        "COMPOSITE_SHAPE_ASPECT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(
+                instance, "COMPOSITE_SHAPE_ASPECT_RELATIONSHIP"));
+    registry.put(
+        "DIMENSIONAL_LOCATION",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "DIMENSIONAL_LOCATION"));
+    registry.put(
+        "DIMENSIONAL_SIZE",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "DIMENSIONAL_SIZE"));
+    registry.put(
+        "DIRECTED_DIMENSIONAL_LOCATION",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "DIRECTED_DIMENSIONAL_LOCATION"));
+    registry.put(
+        "FEATURE_COMPONENT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "FEATURE_COMPONENT_RELATIONSHIP"));
+    registry.put(
+        "FEATURE_FOR_DATUM_TARGET_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "FEATURE_FOR_DATUM_TARGET_RELATIONSHIP"));
+    registry.put(
+        "GEOMETRIC_ALIGNMENT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "GEOMETRIC_ALIGNMENT_RELATIONSHIP"));
+    registry.put(
+        "GEOMETRIC_CONTACT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "GEOMETRIC_CONTACT_RELATIONSHIP"));
+    registry.put(
+        "MAKE_FROM_FEATURE_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "MAKE_FROM_FEATURE_RELATIONSHIP"));
+    registry.put(
+        "PATTERN_OFFSET_MEMBERSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "PATTERN_OFFSET_MEMBERSHIP"));
+    registry.put(
+        "PATTERN_OMIT_MEMBERSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "PATTERN_OMIT_MEMBERSHIP"));
+    registry.put(
+        "SHAPE_ASPECT_ASSOCIATIVITY",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "SHAPE_ASPECT_ASSOCIATIVITY"));
+    registry.put(
+        "SHAPE_ASPECT_DERIVING_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "SHAPE_ASPECT_DERIVING_RELATIONSHIP"));
+    registry.put(
+        "SHAPE_ASPECT_TRANSITION",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "SHAPE_ASPECT_TRANSITION"));
+    registry.put(
+        "SHAPE_DEFINING_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "SHAPE_DEFINING_RELATIONSHIP"));
+    registry.put(
+        "SHAPE_FEATURE_FIT_RELATIONSHIP",
+        (resolver, instance) ->
+            resolver.resolveShapeAspectRelationship(instance, "SHAPE_FEATURE_FIT_RELATIONSHIP"));
+    registry.put(
+        "SHAPE_ASPECT_RELATIONSHIP",
+        StepEntityResolver::resolveShapeAspectRelationship);
+    registerShapeAspectRelationshipAliases(
+        registry,
+        "ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP",
+        "ASSEMBLY_SHAPE_JOINT_ITEM_RELATIONSHIP",
+        "COMPONENT_FEATURE_JOINT",
+        "COMPONENT_FEATURE_RELATIONSHIP_WITH_TRANSFORMATION",
+        "COMPONENT_MATING_CONSTRAINT_CONDITION",
+        "COMPONENT_PATH_SHAPE_ASPECT_RELATIONSHIP",
+        "CONNECTION_ZONE_INTERFACE_PLANE_RELATIONSHIP",
+        "CONNECTIVITY_DEFINITION_ITEM_RELATIONSHIP",
+        "CONTACT_FEATURE_FIT_RELATIONSHIP",
+        "DIMENSIONAL_LOCATION_WITH_DATUM_FEATURE",
+        "DIMENSIONAL_LOCATION_WITH_PATH",
+        "POSITIONED_SKETCH_TO_PART_ASSOCIATION",
+        "SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP");
     registry.put(
         "SHAPE_DEFINITION_REPRESENTATION",
         StepEntityResolver::resolveShapeDefinitionRepresentation);

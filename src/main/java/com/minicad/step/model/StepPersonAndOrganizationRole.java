@@ -1,0 +1,13 @@
+package com.minicad.step.model;
+
+/**
+ * Minimal PERSON_AND_ORGANIZATION_ROLE metadata.
+ *
+ * @param id STEP instance id
+ * @param name role label
+ */
+public record StepPersonAndOrganizationRole(
+        int id,
+        String name
+) implements StepEntity {
+}
