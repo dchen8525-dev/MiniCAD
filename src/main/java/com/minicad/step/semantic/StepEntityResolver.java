@@ -54,6 +54,8 @@ import com.minicad.step.model.StepBooleanClippingResult;
 import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepBSplineCurve;
+import com.minicad.step.model.StepBoxDomain;
+import com.minicad.step.model.StepCartesianTransformationOperator;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepCertification;
 import com.minicad.step.model.StepCertificationAssignment;
@@ -84,6 +86,7 @@ import com.minicad.step.model.StepCompositeCurve;
 import com.minicad.step.model.StepCompositeCurveOnSurface;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepConicalSurface;
+import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.model.StepContract;
 import com.minicad.step.model.StepContractAssignment;
 import com.minicad.step.model.StepContractType;
@@ -93,16 +96,20 @@ import com.minicad.step.model.StepContextDependentUnit;
 import com.minicad.step.model.StepContactRatioRepresentation;
 import com.minicad.step.model.StepCoordinatedUniversalTimeOffset;
 import com.minicad.step.model.StepCylindricalSurface;
+import com.minicad.step.model.StepCsgPrimitive;
+import com.minicad.step.model.StepCsgSolid;
 import com.minicad.step.model.StepCurveStyle;
 import com.minicad.step.model.StepDateAssignment;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepDimensionCurve;
+import com.minicad.step.model.StepDimensionalExponents;
 import com.minicad.step.model.StepDateAndTime;
 import com.minicad.step.model.StepDateTimeAssignment;
 import com.minicad.step.model.StepDateTimeRole;
 import com.minicad.step.model.StepDateRole;
 import com.minicad.step.model.StepAppliedDateAssignment;
+import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDerivedUnit;
 import com.minicad.step.model.StepDerivedUnitElement;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
@@ -143,11 +150,13 @@ import com.minicad.step.model.StepGeometricItemSpecificUsage;
 import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepGeneralProperty;
 import com.minicad.step.model.StepGeneralPropertyRelationship;
+import com.minicad.step.model.StepGeometricReplica;
 import com.minicad.step.model.StepGlobalUncertaintyAssignedContext;
 import com.minicad.step.model.StepGlobalUnitAssignedContext;
 import com.minicad.step.model.StepGroup;
 import com.minicad.step.model.StepGroupAssignment;
 import com.minicad.step.model.StepGroupRelationship;
+import com.minicad.step.model.StepHalfSpaceSolid;
 import com.minicad.step.model.StepIdAttribute;
 import com.minicad.step.model.StepIdentificationAssignment;
 import com.minicad.step.model.StepIdentificationRole;
@@ -163,6 +172,7 @@ import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepLocalTime;
 import com.minicad.step.model.StepManifoldSolidBrep;
+import com.minicad.step.model.StepMappedItem;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepMeasureRepresentationItem;
 import com.minicad.step.model.StepMechanicalDesignRequirementItemAssociation;
@@ -181,6 +191,8 @@ import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedPath;
+import com.minicad.step.model.StepOrientedCurve;
+import com.minicad.step.model.StepOrientedSurface;
 import com.minicad.step.model.StepPath;
 import com.minicad.step.model.StepPerson;
 import com.minicad.step.model.StepPersonAndOrganization;
@@ -208,6 +220,7 @@ import com.minicad.step.model.StepProductDefinitionRelationshipRelationship;
 import com.minicad.step.model.StepProductDefinitionShape;
 import com.minicad.step.model.StepProductRelatedProductCategory;
 import com.minicad.step.model.StepProductRelationship;
+import com.minicad.step.model.StepProfileDef;
 import com.minicad.step.model.StepPropertyDefinition;
 import com.minicad.step.model.StepPropertyDefinitionRelationship;
 import com.minicad.step.model.StepPropertyDefinitionRepresentation;
@@ -236,10 +249,12 @@ import com.minicad.step.model.StepRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepRepresentationContext;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
+import com.minicad.step.model.StepRectangularTrimmedSurface;
 import com.minicad.step.model.StepResourcePropertyRepresentation;
 import com.minicad.step.model.StepRowVariable;
 import com.minicad.step.model.StepScalarVariable;
 import com.minicad.step.model.StepCurve;
+import com.minicad.step.model.StepCurveBoundedSurface;
 import com.minicad.step.model.StepGeometricRepresentationItem;
 import com.minicad.step.model.StepSecurityClassification;
 import com.minicad.step.model.StepSecurityClassificationAssignment;
@@ -253,6 +268,7 @@ import com.minicad.step.model.StepShellBasedSurfaceModel;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSiUnit;
 import com.minicad.step.model.StepSolidModel;
+import com.minicad.step.model.StepSolidReplica;
 import com.minicad.step.model.StepSurface;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfacedOpenShell;
@@ -272,6 +288,7 @@ import com.minicad.step.model.StepSurfaceStyleSegmentationCurve;
 import com.minicad.step.model.StepSurfaceStyleSilhouette;
 import com.minicad.step.model.StepSurfaceStyleTransparent;
 import com.minicad.step.model.StepSurfaceStyleUsage;
+import com.minicad.step.model.StepSweptAreaSolid;
 import com.minicad.step.model.StepSymbolColour;
 import com.minicad.step.model.StepSymbolRepresentationMap;
 import com.minicad.step.model.StepSymbolStyle;
@@ -295,6 +312,7 @@ import com.minicad.step.model.StepUniformSurface;
 import com.minicad.step.model.StepQuasiUniformSurface;
 import com.minicad.step.model.StepUncertaintyMeasureWithUnit;
 import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
+import com.minicad.step.model.StepOffsetCurve2D;
 import com.minicad.step.model.StepOffsetCurve3D;
 import com.minicad.step.model.StepOffsetSurface;
 import com.minicad.step.model.StepContextDependentShapeRepresentation;
@@ -534,6 +552,24 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
+  private StepConicCurve resolveConicCurve(
+      StepEntityInstance instance, String entityName, int parameterCount) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, parameterCount + 2);
+    StepEntity position = resolve(referenceId(instance, definition, 1));
+    if (!(position instanceof StepAxis2Placement3D)
+        && !(position instanceof StepAxis2Placement2D)) {
+      throw new StepResolutionException(
+          entityName + " position must reference AXIS2_PLACEMENT_3D or AXIS2_PLACEMENT_2D");
+    }
+    List<Double> parameters = new ArrayList<>(parameterCount);
+    for (int index = 0; index < parameterCount; index++) {
+      parameters.add(numberValue(instance, definition, index + 2));
+    }
+    return new StepConicCurve(
+        instance.id(), stringValue(instance, definition, 0), position, parameters, entityName);
+  }
+
   private StepCylindricalSurface resolveCylindricalSurface(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CYLINDRICAL_SURFACE");
     requireParameterCount(instance, definition, 3);
@@ -575,6 +611,22 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
+  private StepDegenerateToroidalSurface resolveDegenerateToroidalSurface(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DEGENERATE_TOROIDAL_SURFACE");
+    requireParameterCount(instance, definition, 5);
+    return new StepDegenerateToroidalSurface(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "DEGENERATE_TOROIDAL_SURFACE position must reference AXIS2_PLACEMENT_3D"),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        booleanValue(instance, definition, 4));
+  }
+
   private StepSphericalSurface resolveSphericalSurface(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SPHERICAL_SURFACE");
     requireParameterCount(instance, definition, 3);
@@ -588,19 +640,114 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 2));
   }
 
+  private StepGeometricReplica resolveGeometricReplica(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 3);
+    StepEntity parent = resolve(referenceId(instance, definition, 1));
+    boolean validParent =
+        switch (entityName) {
+          case "POINT_REPLICA" -> parent instanceof StepCartesianPoint || parent instanceof StepPoint;
+          case "CURVE_REPLICA" -> isSupportedCurveReference(parent);
+          case "SURFACE_REPLICA" -> isSupportedSurfaceReference(parent);
+          default -> false;
+        };
+    if (!validParent) {
+      throw new UnsupportedStepEntityException(
+          entityName + " parent must reference a supported "
+              + entityName.substring(0, entityName.indexOf("_")).toLowerCase(Locale.ROOT));
+    }
+    return new StepGeometricReplica(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        parent,
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepCartesianTransformationOperator.class,
+            entityName + " transformation must reference CARTESIAN_TRANSFORMATION_OPERATOR"),
+        entityName);
+  }
+
+  private StepRectangularTrimmedSurface resolveRectangularTrimmedSurface(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RECTANGULAR_TRIMMED_SURFACE");
+    requireParameterCount(instance, definition, 8);
+    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
+    if (!isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "RECTANGULAR_TRIMMED_SURFACE basis_surface must reference a supported surface");
+    }
+    return new StepRectangularTrimmedSurface(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        basisSurface,
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4),
+        numberValue(instance, definition, 5),
+        booleanValue(instance, definition, 6),
+        booleanValue(instance, definition, 7));
+  }
+
+  private StepCurveBoundedSurface resolveCurveBoundedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CURVE_BOUNDED_SURFACE");
+    requireParameterCount(instance, definition, 4);
+    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
+    if (!isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "CURVE_BOUNDED_SURFACE basis_surface must reference a supported surface");
+    }
+    List<StepEntity> boundaries =
+        entityReferenceList(
+            instance,
+            definition,
+            2,
+            "CURVE_BOUNDED_SURFACE boundaries must contain entity references");
+    if (boundaries.isEmpty()) {
+      throw new StepResolutionException("CURVE_BOUNDED_SURFACE boundaries must not be empty");
+    }
+    for (StepEntity boundary : boundaries) {
+      if (!(boundary instanceof StepPcurve)
+          && !(boundary instanceof StepSurfaceCurve)
+          && !(boundary instanceof StepSeamCurve)
+          && !(boundary instanceof StepCompositeCurveOnSurface)
+          && !(boundary instanceof StepCompositeCurve)
+          && !isSupportedCurveReference(boundary)) {
+        throw new UnsupportedStepEntityException(
+            "CURVE_BOUNDED_SURFACE boundaries must reference supported curve entities");
+      }
+    }
+    return new StepCurveBoundedSurface(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        basisSurface,
+        boundaries,
+        booleanValue(instance, definition, 3));
+  }
+
+  private StepOrientedSurface resolveOrientedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORIENTED_SURFACE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity surfaceElement = resolve(referenceId(instance, definition, 1));
+    if (!isSupportedSurfaceReference(surfaceElement)) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_SURFACE surface_element must reference a supported surface");
+    }
+    return new StepOrientedSurface(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        surfaceElement,
+        booleanValue(instance, definition, 2));
+  }
+
   private StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
     requireParameterCount(instance, definition, 3);
     StepEntity sweptCurve = resolve(referenceId(instance, definition, 1));
-    if (!(sweptCurve instanceof StepLine)
-        && !(sweptCurve instanceof StepCircle)
-        && !(sweptCurve instanceof StepEllipse)
-        && !(sweptCurve instanceof StepBSplineCurveWithKnots)
-        && !(sweptCurve instanceof StepTrimmedCurve)
-        && !(sweptCurve instanceof StepSurfaceCurve)) {
+    if (!isSupportedCurveReference(sweptCurve)) {
       throw new UnsupportedStepEntityException(
-          "SURFACE_OF_LINEAR_EXTRUSION swept_curve must be LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, TRIMMED_CURVE or SURFACE_CURVE");
+          "SURFACE_OF_LINEAR_EXTRUSION swept_curve must reference a supported curve");
     }
     return new StepSurfaceOfLinearExtrusion(
         instance.id(),
@@ -616,14 +763,9 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "SURFACE_OF_REVOLUTION");
     requireParameterCount(instance, definition, 3);
     StepEntity sweptCurve = resolve(referenceId(instance, definition, 1));
-    if (!(sweptCurve instanceof StepLine)
-        && !(sweptCurve instanceof StepCircle)
-        && !(sweptCurve instanceof StepEllipse)
-        && !(sweptCurve instanceof StepBSplineCurveWithKnots)
-        && !(sweptCurve instanceof StepTrimmedCurve)
-        && !(sweptCurve instanceof StepSurfaceCurve)) {
+    if (!isSupportedCurveReference(sweptCurve)) {
       throw new UnsupportedStepEntityException(
-          "SURFACE_OF_REVOLUTION swept_curve must be LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, TRIMMED_CURVE or SURFACE_CURVE");
+          "SURFACE_OF_REVOLUTION swept_curve must reference a supported curve");
     }
     return new StepSurfaceOfRevolution(
         instance.id(),
@@ -639,21 +781,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "OFFSET_CURVE_3D");
     requireParameterCount(instance, definition, 5);
     StepEntity basisCurve = resolve(referenceId(instance, definition, 1));
-    if (!(basisCurve instanceof StepLine)
-        && !(basisCurve instanceof StepCircle)
-        && !(basisCurve instanceof StepEllipse)
-        && !(basisCurve instanceof StepCurve)
-        && !(basisCurve instanceof StepBoundedCurve)
-        && !(basisCurve instanceof StepBSplineCurve)
-        && !(basisCurve instanceof StepBSplineCurveWithKnots)
-        && !(basisCurve instanceof StepRationalBSplineCurve)
-        && !(basisCurve instanceof StepBezierCurve)
-        && !(basisCurve instanceof StepPiecewiseBezierCurve)
-        && !(basisCurve instanceof StepUniformCurve)
-        && !(basisCurve instanceof StepQuasiUniformCurve)
-        && !(basisCurve instanceof StepTrimmedCurve)
-        && !(basisCurve instanceof StepSurfaceCurve)
-        && !(basisCurve instanceof StepSeamCurve)) {
+    if (!isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_CURVE_3D basis_curve must reference a supported curve");
     }
@@ -669,26 +797,47 @@ public final class StepEntityResolver {
             "OFFSET_CURVE_3D ref_direction must reference DIRECTION"));
   }
 
+  private StepOffsetCurve2D resolveOffsetCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "OFFSET_CURVE_2D");
+    requireParameterCount(instance, definition, 4);
+    StepEntity basisCurve = resolve(referenceId(instance, definition, 1));
+    if (!isSupportedCurveReference(basisCurve)) {
+      throw new UnsupportedStepEntityException(
+          "OFFSET_CURVE_2D basis_curve must reference a supported curve");
+    }
+    return new StepOffsetCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        basisCurve,
+        numberValue(instance, definition, 2),
+        booleanValue(instance, definition, 3));
+  }
+
+  private StepOrientedCurve resolveOrientedCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ORIENTED_CURVE");
+    requireParameterCount(instance, definition, 3);
+    int curveElementId = referenceId(instance, definition, 1);
+    if (curveElementId == instance.id()) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_CURVE curve_element must not self-reference");
+    }
+    StepEntity curveElement = resolve(curveElementId);
+    if (!isSupportedCurveReference(curveElement)) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_CURVE curve_element must reference a supported curve");
+    }
+    return new StepOrientedCurve(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        curveElement,
+        booleanValue(instance, definition, 2));
+  }
+
   private StepOffsetSurface resolveOffsetSurface(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "OFFSET_SURFACE");
     requireParameterCount(instance, definition, 4);
     StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!(basisSurface instanceof StepPlane)
-        && !(basisSurface instanceof StepSurface)
-        && !(basisSurface instanceof StepBoundedSurface)
-        && !(basisSurface instanceof StepBSplineSurface)
-        && !(basisSurface instanceof StepBSplineSurfaceWithKnots)
-        && !(basisSurface instanceof StepRationalBSplineSurface)
-        && !(basisSurface instanceof StepBezierSurface)
-        && !(basisSurface instanceof StepPiecewiseBezierSurface)
-        && !(basisSurface instanceof StepUniformSurface)
-        && !(basisSurface instanceof StepQuasiUniformSurface)
-        && !(basisSurface instanceof StepCylindricalSurface)
-        && !(basisSurface instanceof StepConicalSurface)
-        && !(basisSurface instanceof StepToroidalSurface)
-        && !(basisSurface instanceof StepSphericalSurface)
-        && !(basisSurface instanceof StepSurfaceOfLinearExtrusion)
-        && !(basisSurface instanceof StepSurfaceOfRevolution)) {
+    if (!isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_SURFACE basis_surface must reference a supported surface");
     }
@@ -704,25 +853,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "COMPOSITE_CURVE_SEGMENT");
     requireParameterCount(instance, definition, 3);
     StepEntity parentCurve = resolve(referenceId(instance, definition, 2));
-    if (!(parentCurve instanceof StepLine)
-        && !(parentCurve instanceof StepCircle)
-        && !(parentCurve instanceof StepEllipse)
-        && !(parentCurve instanceof StepOffsetCurve3D)
-        && !(parentCurve instanceof StepCompositeCurve)
-        && !(parentCurve instanceof StepCompositeCurveOnSurface)
-        && !(parentCurve instanceof StepCurve)
-        && !(parentCurve instanceof StepBoundedCurve)
-        && !(parentCurve instanceof StepBSplineCurve)
-        && !(parentCurve instanceof StepBSplineCurveWithKnots)
-        && !(parentCurve instanceof StepRationalBSplineCurve)
-        && !(parentCurve instanceof StepBezierCurve)
-        && !(parentCurve instanceof StepPiecewiseBezierCurve)
-        && !(parentCurve instanceof StepUniformCurve)
-        && !(parentCurve instanceof StepQuasiUniformCurve)
-        && !(parentCurve instanceof StepTrimmedCurve)
-        && !(parentCurve instanceof StepPcurve)
-        && !(parentCurve instanceof StepSurfaceCurve)
-        && !(parentCurve instanceof StepSeamCurve)) {
+    if (!isSupportedCurveReference(parentCurve)) {
       throw new UnsupportedStepEntityException(
           "COMPOSITE_CURVE_SEGMENT parent_curve must reference a supported curve");
     }
@@ -750,7 +881,12 @@ public final class StepEntityResolver {
 
   private StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOSITE_CURVE_ON_SURFACE");
+    return resolveCompositeCurveOnSurface(instance, "COMPOSITE_CURVE_ON_SURFACE");
+  }
+
+  private StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepCompositeCurveOnSurface(
         instance.id(),
@@ -760,7 +896,7 @@ public final class StepEntityResolver {
             definition,
             1,
             StepCompositeCurveSegment.class,
-            "COMPOSITE_CURVE_ON_SURFACE segments must contain COMPOSITE_CURVE_SEGMENT references"),
+            entityName + " segments must contain COMPOSITE_CURVE_SEGMENT references"),
         booleanValue(instance, definition, 2));
   }
 
@@ -768,13 +904,9 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "TRIMMED_CURVE");
     requireParameterCount(instance, definition, 6);
     StepEntity basisCurve = resolve(referenceId(instance, definition, 1));
-    if (!(basisCurve instanceof StepLine)
-        && !(basisCurve instanceof StepCircle)
-        && !(basisCurve instanceof StepEllipse)
-        && !(basisCurve instanceof StepSurfaceCurve)
-        && !(basisCurve instanceof StepBSplineCurveWithKnots)) {
+    if (!isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
-          "TRIMMED_CURVE basis curve must be LINE, CIRCLE, ELLIPSE, SURFACE_CURVE or B_SPLINE_CURVE_WITH_KNOTS");
+          "TRIMMED_CURVE basis curve must reference a supported curve");
     }
     return new StepTrimmedCurve(
         instance.id(),
@@ -789,26 +921,27 @@ public final class StepEntityResolver {
   }
 
   private StepSurfaceCurve resolveSurfaceCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_CURVE");
+    return resolveSurfaceCurve(instance, "SURFACE_CURVE");
+  }
+
+  private StepSurfaceCurve resolveSurfaceCurve(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 4);
     StepEntity curve3d = resolve(referenceId(instance, definition, 1));
-    if (!(curve3d instanceof StepLine)
-        && !(curve3d instanceof StepCircle)
-        && !(curve3d instanceof StepEllipse)
-        && !(curve3d instanceof StepBSplineCurveWithKnots)) {
+    if (!isSupportedCurveReference(curve3d)) {
       throw new UnsupportedStepEntityException(
-          "SURFACE_CURVE curve_3d must be LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
+          entityName + " curve_3d must reference a supported curve");
     }
     List<StepEntity> associatedGeometry =
         entityReferenceList(
             instance,
             definition,
             2,
-            "SURFACE_CURVE associated_geometry must contain entity references");
+            entityName + " associated_geometry must contain entity references");
     for (StepEntity associated : associatedGeometry) {
       if (!(associated instanceof StepPcurve) && !(associated instanceof StepDegeneratePcurve)) {
         throw new UnsupportedStepEntityException(
-            "SURFACE_CURVE associated_geometry currently supports PCURVE or DEGENERATE_PCURVE references");
+            entityName + " associated_geometry currently supports PCURVE or DEGENERATE_PCURVE references");
       }
     }
     return new StepSurfaceCurve(
@@ -823,12 +956,9 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "SEAM_CURVE");
     requireParameterCount(instance, definition, 4);
     StepEntity curve3d = resolve(referenceId(instance, definition, 1));
-    if (!(curve3d instanceof StepLine)
-        && !(curve3d instanceof StepCircle)
-        && !(curve3d instanceof StepEllipse)
-        && !(curve3d instanceof StepBSplineCurveWithKnots)) {
+    if (!isSupportedCurveReference(curve3d)) {
       throw new UnsupportedStepEntityException(
-          "SEAM_CURVE curve_3d must be LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
+          "SEAM_CURVE curve_3d must reference a supported curve");
     }
     List<StepEntity> associatedGeometry =
         entityReferenceList(
@@ -858,13 +988,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "PCURVE");
     requireParameterCount(instance, definition, 3);
     StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!(basisSurface instanceof StepPlane)
-        && !(basisSurface instanceof StepCylindricalSurface)
-        && !(basisSurface instanceof StepConicalSurface)
-        && !(basisSurface instanceof StepToroidalSurface)
-        && !(basisSurface instanceof StepSurfaceOfLinearExtrusion)
-        && !(basisSurface instanceof StepSurfaceOfRevolution)
-        && !(basisSurface instanceof StepBSplineSurfaceWithKnots)) {
+    if (!isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "PCURVE basis surface must reference a supported surface");
     }
@@ -878,13 +1002,9 @@ public final class StepEntityResolver {
           "PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
     StepEntity item = representation.items().getFirst();
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepBSplineCurveWithKnots)
-        && !(item instanceof StepTrimmedCurve)) {
+    if (!isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
-          "PCURVE currently supports 2D LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS or TRIMMED_CURVE items");
+          "PCURVE reference_to_curve must contain a supported curve item");
     }
     return new StepPcurve(
         instance.id(), stringValue(instance, definition, 0), basisSurface, representation);
@@ -894,13 +1014,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "DEGENERATE_PCURVE");
     requireParameterCount(instance, definition, 3);
     StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!(basisSurface instanceof StepPlane)
-        && !(basisSurface instanceof StepCylindricalSurface)
-        && !(basisSurface instanceof StepConicalSurface)
-        && !(basisSurface instanceof StepToroidalSurface)
-        && !(basisSurface instanceof StepSurfaceOfLinearExtrusion)
-        && !(basisSurface instanceof StepSurfaceOfRevolution)
-        && !(basisSurface instanceof StepBSplineSurfaceWithKnots)) {
+    if (!isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_PCURVE basis surface must reference a supported surface");
     }
@@ -914,13 +1028,9 @@ public final class StepEntityResolver {
           "DEGENERATE_PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
     StepEntity item = representation.items().getFirst();
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepBSplineCurveWithKnots)
-        && !(item instanceof StepTrimmedCurve)) {
+    if (!isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
-          "DEGENERATE_PCURVE currently supports 2D LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS or TRIMMED_CURVE items");
+          "DEGENERATE_PCURVE reference_to_curve must contain a supported curve item");
     }
     return new StepDegeneratePcurve(
         instance.id(), stringValue(instance, definition, 0), basisSurface, representation);
@@ -1151,15 +1261,9 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "EDGE_CURVE");
     requireParameterCount(instance, definition, 5);
     StepEntity edgeGeometry = resolve(referenceId(instance, definition, 3));
-    if (!(edgeGeometry instanceof StepLine)
-        && !(edgeGeometry instanceof StepCircle)
-        && !(edgeGeometry instanceof StepEllipse)
-        && !(edgeGeometry instanceof StepBSplineCurveWithKnots)
-        && !(edgeGeometry instanceof StepSurfaceCurve)
-        && !(edgeGeometry instanceof StepSeamCurve)
-        && !(edgeGeometry instanceof StepTrimmedCurve)) {
+    if (!isSupportedCurveReference(edgeGeometry)) {
       throw new UnsupportedStepEntityException(
-          "EDGE_CURVE geometry must be LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE");
+          "EDGE_CURVE geometry must reference a supported curve");
     }
     return new StepEdgeCurve(
         instance.id(),
@@ -1410,16 +1514,10 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "ADVANCED_FACE");
     requireParameterCount(instance, definition, 4);
     StepEntity faceGeometry = resolve(referenceId(instance, definition, 2));
-    if (!(faceGeometry instanceof StepPlane)
-        && !(faceGeometry instanceof StepCylindricalSurface)
-        && !(faceGeometry instanceof StepConicalSurface)
-        && !(faceGeometry instanceof StepSphericalSurface)
-        && !(faceGeometry instanceof StepSurfaceOfLinearExtrusion)
-        && !(faceGeometry instanceof StepSurfaceOfRevolution)
-        && !(faceGeometry instanceof StepBSplineSurfaceWithKnots)
-        && !(faceGeometry instanceof StepToroidalSurface)) {
+    if (!isSupportedSurfaceReference(faceGeometry)) {
       throw new UnsupportedStepEntityException(
-          "ADVANCED_FACE geometry must be PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, SURFACE_OF_LINEAR_EXTRUSION, SURFACE_OF_REVOLUTION, B_SPLINE_SURFACE_WITH_KNOTS or TOROIDAL_SURFACE");
+          "ADVANCED_FACE geometry must reference a supported surface but got "
+              + faceGeometry.getClass().getSimpleName());
     }
     return new StepAdvancedFace(
         instance.id(),
@@ -1438,16 +1536,10 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "FACE_SURFACE");
     requireParameterCount(instance, definition, 4);
     StepEntity faceGeometry = resolve(referenceId(instance, definition, 2));
-    if (!(faceGeometry instanceof StepPlane)
-        && !(faceGeometry instanceof StepCylindricalSurface)
-        && !(faceGeometry instanceof StepConicalSurface)
-        && !(faceGeometry instanceof StepSphericalSurface)
-        && !(faceGeometry instanceof StepSurfaceOfLinearExtrusion)
-        && !(faceGeometry instanceof StepSurfaceOfRevolution)
-        && !(faceGeometry instanceof StepBSplineSurfaceWithKnots)
-        && !(faceGeometry instanceof StepToroidalSurface)) {
+    if (!isSupportedSurfaceReference(faceGeometry)) {
       throw new UnsupportedStepEntityException(
-          "FACE_SURFACE geometry must be PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, SURFACE_OF_LINEAR_EXTRUSION, SURFACE_OF_REVOLUTION, B_SPLINE_SURFACE_WITH_KNOTS or TOROIDAL_SURFACE");
+          "FACE_SURFACE geometry must reference a supported surface but got "
+              + faceGeometry.getClass().getSimpleName());
     }
     return new StepFaceSurface(
         instance.id(),
@@ -1714,6 +1806,11 @@ public final class StepEntityResolver {
   private boolean isBooleanOperandEntity(StepEntity entity) {
     return entity instanceof StepManifoldSolidBrep
         || entity instanceof StepBrepWithVoids
+        || entity instanceof StepCsgPrimitive
+        || entity instanceof StepCsgSolid
+        || entity instanceof StepHalfSpaceSolid
+        || entity instanceof StepSolidReplica
+        || entity instanceof StepSweptAreaSolid
         || entity instanceof StepBooleanResult
         || entity instanceof StepBooleanClippingResult;
   }
@@ -1761,7 +1858,7 @@ public final class StepEntityResolver {
     if (!isBooleanOperandEntity(firstOperand) || !isBooleanOperandEntity(secondOperand)) {
       throw new StepResolutionException(
           entityName
-              + " operands must reference MANIFOLD_SOLID_BREP, FACETED_BREP, BREP_WITH_VOIDS, BOOLEAN_RESULT or BOOLEAN_CLIPPING_RESULT");
+              + " operands must reference a supported solid or CSG operand");
     }
     return new StepBooleanResult(
         instance.id(),
@@ -1826,7 +1923,12 @@ public final class StepEntityResolver {
   }
 
   private StepProductContext resolveProductContext(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_CONTEXT");
+    return resolveProductContext(instance, "PRODUCT_CONTEXT");
+  }
+
+  private StepProductContext resolveProductContext(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     boolean stepOrder =
         unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
@@ -1837,7 +1939,7 @@ public final class StepEntityResolver {
         requireEntity(
             referenceId(instance, definition, stepOrder ? 1 : 2),
             StepApplicationContext.class,
-            "PRODUCT_CONTEXT frame_of_reference must reference APPLICATION_CONTEXT"));
+            entityName + " frame_of_reference must reference APPLICATION_CONTEXT"));
   }
 
   private StepProduct resolveProduct(StepEntityInstance instance) {
@@ -1964,7 +2066,12 @@ public final class StepEntityResolver {
 
   private StepProductDefinitionContext resolveProductDefinitionContext(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_CONTEXT");
+    return resolveProductDefinitionContext(instance, "PRODUCT_DEFINITION_CONTEXT");
+  }
+
+  private StepProductDefinitionContext resolveProductDefinitionContext(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     boolean stepOrder =
         unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
@@ -1975,7 +2082,7 @@ public final class StepEntityResolver {
         requireEntity(
             referenceId(instance, definition, stepOrder ? 1 : 2),
             StepApplicationContext.class,
-            "PRODUCT_DEFINITION_CONTEXT frame_of_reference must reference APPLICATION_CONTEXT"));
+            entityName + " frame_of_reference must reference APPLICATION_CONTEXT"));
   }
 
   private StepProductDefinition resolveProductDefinition(StepEntityInstance instance) {
@@ -2275,20 +2382,25 @@ public final class StepEntityResolver {
 
   private StepAppliedDocumentReference resolveAppliedDocumentReference(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_DOCUMENT_REFERENCE");
+    return resolveAppliedDocumentReference(instance, "APPLIED_DOCUMENT_REFERENCE");
+  }
+
+  private StepAppliedDocumentReference resolveAppliedDocumentReference(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepAppliedDocumentReference(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepDocument.class,
-            "APPLIED_DOCUMENT_REFERENCE assigned_document must reference DOCUMENT"),
+            entityName + " assigned_document must reference DOCUMENT"),
         optionalStringValue(instance, definition, 1),
         entityReferenceList(
             instance,
             definition,
             2,
-            "APPLIED_DOCUMENT_REFERENCE items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepPerson resolvePerson(StepEntityInstance instance) {
@@ -2370,23 +2482,28 @@ public final class StepEntityResolver {
 
   private StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_ORGANIZATION_ASSIGNMENT");
+    return resolveAppliedOrganizationAssignment(instance, "APPLIED_ORGANIZATION_ASSIGNMENT");
+  }
+
+  private StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepAppliedOrganizationAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepOrganization.class,
-            "APPLIED_ORGANIZATION_ASSIGNMENT assigned_organization must reference ORGANIZATION"),
+            entityName + " assigned_organization must reference ORGANIZATION"),
         requireEntity(
             referenceId(instance, definition, 1),
             StepOrganizationRole.class,
-            "APPLIED_ORGANIZATION_ASSIGNMENT role must reference ORGANIZATION_ROLE"),
+            entityName + " role must reference ORGANIZATION_ROLE"),
         entityReferenceList(
             instance,
             definition,
             2,
-            "APPLIED_ORGANIZATION_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepLanguage resolveLanguage(StepEntityInstance instance) {
@@ -2451,24 +2568,30 @@ public final class StepEntityResolver {
 
   private StepAppliedPersonAndOrganizationAssignment
       resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT");
+    return resolveAppliedPersonAndOrganizationAssignment(
+        instance, "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT");
+  }
+
+  private StepAppliedPersonAndOrganizationAssignment
+      resolveAppliedPersonAndOrganizationAssignment(
+          StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepAppliedPersonAndOrganizationAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepPersonAndOrganization.class,
-            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
+            entityName + " assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
         requireEntity(
             referenceId(instance, definition, 1),
             StepPersonAndOrganizationRole.class,
-            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT role must reference PERSON_AND_ORGANIZATION_ROLE"),
+            entityName + " role must reference PERSON_AND_ORGANIZATION_ROLE"),
         entityReferenceList(
             instance,
             definition,
             2,
-            "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepCalendarDate resolveCalendarDate(StepEntityInstance instance) {
@@ -2543,23 +2666,28 @@ public final class StepEntityResolver {
   }
 
   private StepAppliedDateAssignment resolveAppliedDateAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_DATE_ASSIGNMENT");
+    return resolveAppliedDateAssignment(instance, "APPLIED_DATE_ASSIGNMENT");
+  }
+
+  private StepAppliedDateAssignment resolveAppliedDateAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepAppliedDateAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepCalendarDate.class,
-            "APPLIED_DATE_ASSIGNMENT assigned_date must reference CALENDAR_DATE"),
+            entityName + " assigned_date must reference CALENDAR_DATE"),
         requireEntity(
             referenceId(instance, definition, 1),
             StepDateRole.class,
-            "APPLIED_DATE_ASSIGNMENT role must reference DATE_ROLE"),
+            entityName + " role must reference DATE_ROLE"),
         entityReferenceList(
             instance,
             definition,
             2,
-            "APPLIED_DATE_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepDateTimeRole resolveDateTimeRole(StepEntityInstance instance) {
@@ -2585,23 +2713,28 @@ public final class StepEntityResolver {
 
   private StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_DATE_AND_TIME_ASSIGNMENT");
+    return resolveAppliedDateTimeAssignment(instance, "APPLIED_DATE_AND_TIME_ASSIGNMENT");
+  }
+
+  private StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepAppliedDateTimeAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepDateAndTime.class,
-            "APPLIED_DATE_AND_TIME_ASSIGNMENT assigned_date_and_time must reference DATE_AND_TIME"),
+            entityName + " assigned_date_and_time must reference DATE_AND_TIME"),
         requireEntity(
             referenceId(instance, definition, 1),
             StepDateTimeRole.class,
-            "APPLIED_DATE_AND_TIME_ASSIGNMENT role must reference DATE_TIME_ROLE"),
+            entityName + " role must reference DATE_TIME_ROLE"),
         entityReferenceList(
             instance,
             definition,
             2,
-            "APPLIED_DATE_AND_TIME_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepApprovalStatus resolveApprovalStatus(StepEntityInstance instance) {
@@ -2641,19 +2774,24 @@ public final class StepEntityResolver {
 
   private StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_APPROVAL_ASSIGNMENT");
+    return resolveAppliedApprovalAssignment(instance, "APPLIED_APPROVAL_ASSIGNMENT");
+  }
+
+  private StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     return new StepAppliedApprovalAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepApproval.class,
-            "APPLIED_APPROVAL_ASSIGNMENT assigned_approval must reference APPROVAL"),
+            entityName + " assigned_approval must reference APPROVAL"),
         entityReferenceList(
             instance,
             definition,
             1,
-            "APPLIED_APPROVAL_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepApprovalPersonOrganization resolveApprovalPersonOrganization(
@@ -2726,20 +2864,26 @@ public final class StepEntityResolver {
 
   private StepAppliedSecurityClassificationAssignment
       resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT");
+    return resolveAppliedSecurityClassificationAssignment(
+        instance, "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT");
+  }
+
+  private StepAppliedSecurityClassificationAssignment
+      resolveAppliedSecurityClassificationAssignment(
+          StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     return new StepAppliedSecurityClassificationAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepSecurityClassification.class,
-            "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT assigned_security_classification must reference SECURITY_CLASSIFICATION"),
+            entityName + " assigned_security_classification must reference SECURITY_CLASSIFICATION"),
         entityReferenceList(
             instance,
             definition,
             1,
-            "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepContractType resolveContractType(StepEntityInstance instance) {
@@ -2774,19 +2918,24 @@ public final class StepEntityResolver {
 
   private StepAppliedContractAssignment resolveAppliedContractAssignment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_CONTRACT_ASSIGNMENT");
+    return resolveAppliedContractAssignment(instance, "APPLIED_CONTRACT_ASSIGNMENT");
+  }
+
+  private StepAppliedContractAssignment resolveAppliedContractAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     return new StepAppliedContractAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepContract.class,
-            "APPLIED_CONTRACT_ASSIGNMENT assigned_contract must reference CONTRACT"),
+            entityName + " assigned_contract must reference CONTRACT"),
         entityReferenceList(
             instance,
             definition,
             1,
-            "APPLIED_CONTRACT_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepCertificationType resolveCertificationType(StepEntityInstance instance) {
@@ -2822,19 +2971,24 @@ public final class StepEntityResolver {
 
   private StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_CERTIFICATION_ASSIGNMENT");
+    return resolveAppliedCertificationAssignment(instance, "APPLIED_CERTIFICATION_ASSIGNMENT");
+  }
+
+  private StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     return new StepAppliedCertificationAssignment(
         instance.id(),
         requireEntity(
             referenceId(instance, definition, 0),
             StepCertification.class,
-            "APPLIED_CERTIFICATION_ASSIGNMENT assigned_certification must reference CERTIFICATION"),
+            entityName + " assigned_certification must reference CERTIFICATION"),
         entityReferenceList(
             instance,
             definition,
             1,
-            "APPLIED_CERTIFICATION_ASSIGNMENT items must contain entity references"));
+            entityName + " items must contain entity references"));
   }
 
   private StepEffectivity resolveEffectivity(StepEntityInstance instance) {
@@ -3455,6 +3609,74 @@ public final class StepEntityResolver {
             "SYMBOL_REPRESENTATION_MAP mapped_representation must reference REPRESENTATION"));
   }
 
+  private StepMappedItem resolveMappedItem(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MAPPED_ITEM");
+    requireParameterCount(instance, definition, 2);
+    return new StepMappedItem(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepRepresentationMap.class,
+            "MAPPED_ITEM mapping_source must reference REPRESENTATION_MAP"),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepCartesianTransformationOperator resolveCartesianTransformationOperator2D(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CARTESIAN_TRANSFORMATION_OPERATOR_2D");
+    requireParameterCount(instance, definition, 5);
+    return new StepCartesianTransformationOperator(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalDirectionReference(
+            instance,
+            definition,
+            1,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_2D axis1 must reference DIRECTION"),
+        optionalDirectionReference(
+            instance,
+            definition,
+            2,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_2D axis2 must reference DIRECTION"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepCartesianPoint.class,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_2D local_origin must reference CARTESIAN_POINT"),
+        optionalNumberValue(instance, definition, 4),
+        null,
+        "CARTESIAN_TRANSFORMATION_OPERATOR_2D");
+  }
+
+  private StepCartesianTransformationOperator resolveCartesianTransformationOperator3D(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CARTESIAN_TRANSFORMATION_OPERATOR_3D");
+    requireParameterCount(instance, definition, 6);
+    return new StepCartesianTransformationOperator(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalDirectionReference(
+            instance,
+            definition,
+            1,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis1 must reference DIRECTION"),
+        optionalDirectionReference(
+            instance,
+            definition,
+            2,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis2 must reference DIRECTION"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepCartesianPoint.class,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_3D local_origin must reference CARTESIAN_POINT"),
+        optionalNumberValue(instance, definition, 4),
+        optionalDirectionReference(
+            instance,
+            definition,
+            5,
+            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis3 must reference DIRECTION"),
+        "CARTESIAN_TRANSFORMATION_OPERATOR_3D");
+  }
+
   private StepUserDefinedMarker resolveUserDefinedMarker(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "USER_DEFINED_MARKER");
     requireParameterCount(instance, definition, 3);
@@ -3756,11 +3978,32 @@ public final class StepEntityResolver {
   private StepNamedUnit resolveNamedUnit(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
     requireParameterCount(instance, definition, 1);
-    if (!isUnset(definition.parameters().getFirst())) {
-      throw new UnsupportedStepEntityException(
-          "NAMED_UNIT dimensions must be omitted or not provided");
+    StepValue dimensions = unwrapTyped(definition.parameters().getFirst());
+    if (!isUnset(dimensions)) {
+      if (!(dimensions instanceof StepValue.ReferenceValue referenceValue)) {
+        throw new UnsupportedStepEntityException(
+            "NAMED_UNIT dimensions must be omitted, not provided or reference DIMENSIONAL_EXPONENTS");
+      }
+      requireEntity(
+          referenceValue.id(),
+          StepDimensionalExponents.class,
+          "NAMED_UNIT dimensions must reference DIMENSIONAL_EXPONENTS");
     }
     return new StepNamedUnit(instance.id(), deriveUnitKind(instance));
+  }
+
+  private StepDimensionalExponents resolveDimensionalExponents(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_EXPONENTS");
+    requireParameterCount(instance, definition, 7);
+    return new StepDimensionalExponents(
+        instance.id(),
+        numberValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4),
+        numberValue(instance, definition, 5),
+        numberValue(instance, definition, 6));
   }
 
   private StepNamedUnit resolveStandaloneUnitKind(
@@ -3949,6 +4192,235 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "SOLID_MODEL");
     requireParameterCount(instance, definition, 0);
     return new StepSolidModel(instance.id(), inheritedRepresentationItemName(instance));
+  }
+
+  private StepCsgSolid resolveCsgSolid(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CSG_SOLID");
+    requireParameterCount(instance, definition, 2);
+    StepEntity treeRootExpression = resolve(referenceId(instance, definition, 1));
+    if (!isBooleanOperandEntity(treeRootExpression)) {
+      throw new StepResolutionException(
+          "CSG_SOLID tree_root_expression must reference a supported CSG operand");
+    }
+    return new StepCsgSolid(instance.id(), stringValue(instance, definition, 0), treeRootExpression);
+  }
+
+  private StepSolidReplica resolveSolidReplica(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SOLID_REPLICA");
+    requireParameterCount(instance, definition, 3);
+    StepEntity parentSolid = resolve(referenceId(instance, definition, 1));
+    if (!isBooleanOperandEntity(parentSolid) && !(parentSolid instanceof StepSolidModel)) {
+      throw new StepResolutionException(
+          "SOLID_REPLICA parent_solid must reference a supported solid model");
+    }
+    return new StepSolidReplica(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        parentSolid,
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepCartesianTransformationOperator.class,
+            "SOLID_REPLICA transformation must reference CARTESIAN_TRANSFORMATION_OPERATOR"));
+  }
+
+  private StepCsgPrimitive resolveCsgPrimitive(
+      StepEntityInstance instance,
+      String entityName,
+      Class<? extends StepEntity> positionType,
+      String positionTypeName,
+      int dimensionCount) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, dimensionCount + 2);
+    StepEntity position = resolve(referenceId(instance, definition, 1));
+    if (!positionType.isInstance(position)) {
+      throw new StepResolutionException(
+          entityName + " position must reference " + positionTypeName);
+    }
+    List<Double> dimensions = new ArrayList<>(dimensionCount);
+    for (int index = 0; index < dimensionCount; index++) {
+      dimensions.add(numberValue(instance, definition, index + 2));
+    }
+    return new StepCsgPrimitive(
+        instance.id(), stringValue(instance, definition, 0), position, dimensions, entityName);
+  }
+
+  private StepProfileDef resolveCircleProfileDef(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CIRCLE_PROFILE_DEF");
+    requireParameterCount(instance, definition, 4);
+    return new StepProfileDef(
+        instance.id(),
+        enumValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement2D.class,
+            "CIRCLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
+        List.of(),
+        List.of(numberValue(instance, definition, 3)),
+        "CIRCLE_PROFILE_DEF");
+  }
+
+  private StepProfileDef resolveRectangleProfileDef(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RECTANGLE_PROFILE_DEF");
+    requireParameterCount(instance, definition, 5);
+    return new StepProfileDef(
+        instance.id(),
+        enumValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement2D.class,
+            "RECTANGLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
+        List.of(),
+        List.of(numberValue(instance, definition, 3), numberValue(instance, definition, 4)),
+        "RECTANGLE_PROFILE_DEF");
+  }
+
+  private StepProfileDef resolveParameterizedProfileDef(
+      StepEntityInstance instance, String entityName, int parameterCount) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, parameterCount + 3);
+    List<Double> parameters = new ArrayList<>(parameterCount);
+    for (int index = 0; index < parameterCount; index++) {
+      parameters.add(numberValue(instance, definition, index + 3));
+    }
+    return new StepProfileDef(
+        instance.id(),
+        enumValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement2D.class,
+            entityName + " position must reference AXIS2_PLACEMENT_2D"),
+        List.of(),
+        parameters,
+        entityName);
+  }
+
+  private StepProfileDef resolveArbitraryClosedProfileDef(StepEntityInstance instance) {
+    return resolveArbitraryProfileDef(instance, "ARBITRARY_CLOSED_PROFILE_DEF");
+  }
+
+  private StepProfileDef resolveArbitraryProfileDef(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 3);
+    StepEntity curve = resolve(referenceId(instance, definition, 2));
+    if (!(curve instanceof StepCurve)
+        && !(curve instanceof StepPolyline)
+        && !(curve instanceof StepCompositeCurve)) {
+      throw new StepResolutionException(
+          entityName + " outer_curve must reference a curve entity");
+    }
+    return new StepProfileDef(
+        instance.id(),
+        enumValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        null,
+        List.of(curve),
+        List.of(),
+        entityName);
+  }
+
+  private StepSweptAreaSolid resolveExtrudedAreaSolid(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EXTRUDED_AREA_SOLID");
+    requireParameterCount(instance, definition, 5);
+    return new StepSweptAreaSolid(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepProfileDef.class,
+            "EXTRUDED_AREA_SOLID swept_area must reference a profile definition"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement3D.class,
+            "EXTRUDED_AREA_SOLID position must reference AXIS2_PLACEMENT_3D"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepDirection.class,
+            "EXTRUDED_AREA_SOLID extruded_direction must reference DIRECTION"),
+        numberValue(instance, definition, 4),
+        "EXTRUDED_AREA_SOLID");
+  }
+
+  private StepSweptAreaSolid resolveRevolvedAreaSolid(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "REVOLVED_AREA_SOLID");
+    requireParameterCount(instance, definition, 5);
+    return new StepSweptAreaSolid(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepProfileDef.class,
+            "REVOLVED_AREA_SOLID swept_area must reference a profile definition"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement3D.class,
+            "REVOLVED_AREA_SOLID position must reference AXIS2_PLACEMENT_3D"),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepAxis1Placement.class,
+            "REVOLVED_AREA_SOLID axis must reference AXIS1_PLACEMENT"),
+        numberValue(instance, definition, 4),
+        "REVOLVED_AREA_SOLID");
+  }
+
+  private StepBoxDomain resolveBoxDomain(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BOX_DOMAIN");
+    requireParameterCount(instance, definition, 4);
+    return new StepBoxDomain(
+        instance.id(),
+        requireEntity(
+            referenceId(instance, definition, 0),
+            StepCartesianPoint.class,
+            "BOX_DOMAIN corner must reference CARTESIAN_POINT"),
+        List.of(
+            numberValue(instance, definition, 1),
+            numberValue(instance, definition, 2),
+            numberValue(instance, definition, 3)));
+  }
+
+  private StepHalfSpaceSolid resolveHalfSpaceSolid(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "HALF_SPACE_SOLID");
+    requireParameterCount(instance, definition, 3);
+    return new StepHalfSpaceSolid(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireSurfaceReference(instance, definition, 1, "HALF_SPACE_SOLID base_surface"),
+        booleanValue(instance, definition, 2),
+        null,
+        "HALF_SPACE_SOLID");
+  }
+
+  private StepHalfSpaceSolid resolveBoxedHalfSpace(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BOXED_HALF_SPACE");
+    requireParameterCount(instance, definition, 4);
+    return new StepHalfSpaceSolid(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireSurfaceReference(instance, definition, 1, "BOXED_HALF_SPACE base_surface"),
+        booleanValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        "BOXED_HALF_SPACE");
+  }
+
+  private StepEntity requireSurfaceReference(
+      StepEntityInstance instance, StepEntityDefinition definition, int index, String fieldName) {
+    StepEntity surface = resolve(referenceId(instance, definition, index));
+    if (!(surface instanceof StepSurface)
+        && !(surface instanceof StepPlane)
+        && !(surface instanceof StepCylindricalSurface)
+        && !(surface instanceof StepConicalSurface)
+        && !(surface instanceof StepToroidalSurface)
+        && !(surface instanceof StepSphericalSurface)
+        && !(surface instanceof StepSurfaceOfLinearExtrusion)
+        && !(surface instanceof StepSurfaceOfRevolution)
+        && !(surface instanceof StepBSplineSurfaceWithKnots)
+        && !(surface instanceof StepRationalBSplineSurface)) {
+      throw new StepResolutionException(fieldName + " must reference a surface entity");
+    }
+    return surface;
   }
 
   private StepTopologicalRepresentationItem resolveTopologicalRepresentationItem(
@@ -4768,15 +5240,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "ANNOTATION_CURVE_OCCURRENCE");
     requireParameterCount(instance, definition, 3);
     StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepPolyline)
-        && !(item instanceof StepTrimmedCurve)
-        && !(item instanceof StepCompositeCurve)
-        && !(item instanceof StepCurve)
-        && !(item instanceof StepBoundedCurve)
-        && !(item instanceof StepGeometricCurveSet)) {
+    if (!isSupportedCurveReference(item) && !(item instanceof StepGeometricCurveSet)) {
       throw new StepResolutionException(
           "ANNOTATION_CURVE_OCCURRENCE item must reference a supported curve or GEOMETRIC_CURVE_SET");
     }
@@ -4796,15 +5260,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "LEADER_CURVE");
     requireParameterCount(instance, definition, 3);
     StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepPolyline)
-        && !(item instanceof StepTrimmedCurve)
-        && !(item instanceof StepCompositeCurve)
-        && !(item instanceof StepCurve)
-        && !(item instanceof StepBoundedCurve)
-        && !(item instanceof StepGeometricCurveSet)) {
+    if (!isSupportedCurveReference(item) && !(item instanceof StepGeometricCurveSet)) {
       throw new StepResolutionException(
           "LEADER_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
     }
@@ -4824,15 +5280,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "PROJECTION_CURVE");
     requireParameterCount(instance, definition, 3);
     StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepPolyline)
-        && !(item instanceof StepTrimmedCurve)
-        && !(item instanceof StepCompositeCurve)
-        && !(item instanceof StepCurve)
-        && !(item instanceof StepBoundedCurve)
-        && !(item instanceof StepGeometricCurveSet)) {
+    if (!isSupportedCurveReference(item) && !(item instanceof StepGeometricCurveSet)) {
       throw new StepResolutionException(
           "PROJECTION_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
     }
@@ -4852,15 +5300,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "DIMENSION_CURVE");
     requireParameterCount(instance, definition, 3);
     StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!(item instanceof StepLine)
-        && !(item instanceof StepCircle)
-        && !(item instanceof StepEllipse)
-        && !(item instanceof StepPolyline)
-        && !(item instanceof StepTrimmedCurve)
-        && !(item instanceof StepCompositeCurve)
-        && !(item instanceof StepCurve)
-        && !(item instanceof StepBoundedCurve)
-        && !(item instanceof StepGeometricCurveSet)) {
+    if (!isSupportedCurveReference(item) && !(item instanceof StepGeometricCurveSet)) {
       throw new StepResolutionException(
           "DIMENSION_CURVE item must reference a supported curve or GEOMETRIC_CURVE_SET");
     }
@@ -4886,14 +5326,7 @@ public final class StepEntityResolver {
             1,
             "ANNOTATION_FILL_AREA boundaries must contain curve references");
     for (StepEntity boundary : boundaries) {
-      if (!(boundary instanceof StepLine)
-          && !(boundary instanceof StepCircle)
-          && !(boundary instanceof StepEllipse)
-          && !(boundary instanceof StepPolyline)
-          && !(boundary instanceof StepTrimmedCurve)
-          && !(boundary instanceof StepCompositeCurve)
-          && !(boundary instanceof StepCurve)
-          && !(boundary instanceof StepBoundedCurve)) {
+      if (!isSupportedCurveReference(boundary)) {
         throw new StepResolutionException(
             "ANNOTATION_FILL_AREA boundaries must reference supported curves");
       }
@@ -4988,14 +5421,7 @@ public final class StepEntityResolver {
         entityReferenceList(
             instance, definition, 1, "GEOMETRIC_CURVE_SET elements must contain entity references");
     for (StepEntity element : elements) {
-      if (!(element instanceof StepLine)
-          && !(element instanceof StepCircle)
-          && !(element instanceof StepEllipse)
-          && !(element instanceof StepPolyline)
-          && !(element instanceof StepTrimmedCurve)
-          && !(element instanceof StepSurfaceCurve)
-          && !(element instanceof StepBSplineCurveWithKnots)
-          && !(element instanceof StepCartesianPoint)) {
+      if (!isSupportedCurveReference(element) && !(element instanceof StepCartesianPoint)) {
         throw new UnsupportedStepEntityException(
             "GEOMETRIC_CURVE_SET elements must be supported curves or points");
       }
@@ -5010,22 +5436,9 @@ public final class StepEntityResolver {
         entityReferenceList(
             instance, definition, 1, "GEOMETRIC_SET elements must contain entity references");
     for (StepEntity element : elements) {
-      if (!(element instanceof StepLine)
-          && !(element instanceof StepCircle)
-          && !(element instanceof StepEllipse)
-          && !(element instanceof StepPolyline)
-          && !(element instanceof StepTrimmedCurve)
-          && !(element instanceof StepSurfaceCurve)
-          && !(element instanceof StepBSplineCurveWithKnots)
-          && !(element instanceof StepCartesianPoint)
-          && !(element instanceof StepPlane)
-          && !(element instanceof StepCylindricalSurface)
-          && !(element instanceof StepConicalSurface)
-          && !(element instanceof StepToroidalSurface)
-          && !(element instanceof StepSphericalSurface)
-          && !(element instanceof StepSurfaceOfLinearExtrusion)
-          && !(element instanceof StepSurfaceOfRevolution)
-          && !(element instanceof StepBSplineSurfaceWithKnots)) {
+      if (!isSupportedCurveReference(element)
+          && !isSupportedSurfaceReference(element)
+          && !(element instanceof StepCartesianPoint)) {
         throw new UnsupportedStepEntityException(
             "GEOMETRIC_SET elements must be supported curves, surfaces or points");
       }
@@ -5487,6 +5900,15 @@ public final class StepEntityResolver {
     return numberValue(instance, definition, index);
   }
 
+  private StepDirection optionalDirectionReference(
+      StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return null;
+    }
+    return requireEntity(referenceId(instance, definition, index), StepDirection.class, message);
+  }
+
   private String enumValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
@@ -5717,6 +6139,61 @@ public final class StepEntityResolver {
         || entity instanceof StepDraughtingAnnotationOccurrence;
   }
 
+  private boolean isSupportedCurveReference(StepEntity entity) {
+    return entity instanceof StepLine
+        || entity instanceof StepCircle
+        || entity instanceof StepEllipse
+        || entity instanceof StepConicCurve
+        || entity instanceof StepPolyline
+        || entity instanceof StepOffsetCurve2D
+        || entity instanceof StepOffsetCurve3D
+        || entity instanceof StepOrientedCurve
+        || entity instanceof StepCompositeCurve
+        || entity instanceof StepCompositeCurveOnSurface
+        || entity instanceof StepCurve
+        || entity instanceof StepBoundedCurve
+        || entity instanceof StepBSplineCurve
+        || entity instanceof StepBSplineCurveWithKnots
+        || entity instanceof StepRationalBSplineCurve
+        || entity instanceof StepBezierCurve
+        || entity instanceof StepPiecewiseBezierCurve
+        || entity instanceof StepUniformCurve
+        || entity instanceof StepQuasiUniformCurve
+        || entity instanceof StepTrimmedCurve
+        || entity instanceof StepPcurve
+        || entity instanceof StepDegeneratePcurve
+        || entity instanceof StepSurfaceCurve
+        || entity instanceof StepSeamCurve
+        || (entity instanceof StepGeometricReplica replica
+            && "CURVE_REPLICA".equals(replica.entityName()));
+  }
+
+  private boolean isSupportedSurfaceReference(StepEntity entity) {
+    return entity instanceof StepPlane
+        || entity instanceof StepSurface
+        || entity instanceof StepBoundedSurface
+        || entity instanceof StepOffsetSurface
+        || entity instanceof StepBSplineSurface
+        || entity instanceof StepBSplineSurfaceWithKnots
+        || entity instanceof StepRationalBSplineSurface
+        || entity instanceof StepBezierSurface
+        || entity instanceof StepPiecewiseBezierSurface
+        || entity instanceof StepUniformSurface
+        || entity instanceof StepQuasiUniformSurface
+        || entity instanceof StepCylindricalSurface
+        || entity instanceof StepConicalSurface
+        || entity instanceof StepToroidalSurface
+        || entity instanceof StepDegenerateToroidalSurface
+        || entity instanceof StepSphericalSurface
+        || entity instanceof StepSurfaceOfLinearExtrusion
+        || entity instanceof StepSurfaceOfRevolution
+        || entity instanceof StepRectangularTrimmedSurface
+        || entity instanceof StepCurveBoundedSurface
+        || entity instanceof StepOrientedSurface
+        || (entity instanceof StepGeometricReplica replica
+            && "SURFACE_REPLICA".equals(replica.entityName()));
+  }
+
   private <T extends StepEntity> List<T> referenceList(
       StepEntityInstance instance,
       StepEntityDefinition definition,
@@ -5774,6 +6251,24 @@ public final class StepEntityResolver {
         "ACCELERATION_UNIT",
         "VELOCITY_UNIT",
         "THERMAL_RESISTANCE_UNIT",
+        "MASS_DENSITY_UNIT",
+        "DYNAMIC_VISCOSITY_UNIT",
+        "KINEMATIC_VISCOSITY_UNIT",
+        "MOMENT_OF_INERTIA_UNIT",
+        "THERMAL_CONDUCTIVITY_UNIT",
+        "HEAT_FLUX_DENSITY_UNIT",
+        "SPECIFIC_HEAT_CAPACITY_UNIT",
+        "AREA_DENSITY_UNIT",
+        "VOLUMETRIC_FLOW_RATE_UNIT",
+        "MASS_FLOW_RATE_UNIT",
+        "ROTATIONAL_FREQUENCY_UNIT",
+        "ANGULAR_VELOCITY_UNIT",
+        "ANGULAR_ACCELERATION_UNIT",
+        "TORQUE_UNIT",
+        "LINEAR_FORCE_UNIT",
+        "LINEAR_STIFFNESS_UNIT",
+        "ROTATIONAL_STIFFNESS_UNIT",
+        "LINEAR_MOMENT_UNIT",
         "FREQUENCY_UNIT",
         "FORCE_UNIT",
         "PRESSURE_UNIT",
@@ -5889,6 +6384,41 @@ public final class StepEntityResolver {
     }
   }
 
+  private static void registerProductDefinitionRelationshipRelationshipAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationshipRelationship(instance, entityName));
+    }
+  }
+
+  private static void registerTypedMeasureWithUnit(
+      Map<String, EntityFactory> registry, String entityName, String expectedUnitKind) {
+    registry.put(
+        entityName,
+        (resolver, instance) ->
+            resolver.resolveTypedMeasureWithUnit(instance, entityName, expectedUnitKind));
+  }
+
+  private static void registerTypedMeasureWithUnitPairs(
+      Map<String, EntityFactory> registry, String... unitKinds) {
+    for (String unitKind : unitKinds) {
+      String measureName = unitKind.replace("_UNIT", "_MEASURE_WITH_UNIT");
+      registerTypedMeasureWithUnit(registry, measureName, unitKind);
+    }
+  }
+
+  private static void registerStandaloneDerivedUnitKinds(
+      Map<String, EntityFactory> registry, String... unitKinds) {
+    for (String unitKind : unitKinds) {
+      registry.put(
+          unitKind,
+          (resolver, instance) -> resolver.resolveStandaloneDerivedUnitKind(instance, unitKind));
+    }
+  }
+
   private static void registerShapeAspectRelationshipAliases(
       Map<String, EntityFactory> registry, String... entityNames) {
     for (String entityName : entityNames) {
@@ -5896,6 +6426,26 @@ public final class StepEntityResolver {
           entityName,
           (resolver, instance) ->
               resolver.resolveShapeAspectRelationship(instance, entityName));
+    }
+  }
+
+  private static void registerRepresentationRelationshipAliases(
+      Map<String, EntityFactory> registry, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, entityName));
+    }
+  }
+
+  private static void registerRepresentationAliases(
+      Map<String, EntityFactory> registry, boolean shapeRepresentation, String... entityNames) {
+    for (String entityName : entityNames) {
+      registry.put(
+          entityName,
+          (resolver, instance) ->
+              resolver.resolveRepresentation(instance, entityName, shapeRepresentation));
     }
   }
 
@@ -5910,6 +6460,12 @@ public final class StepEntityResolver {
     registry.put(
         "SHAPE_REPRESENTATION",
         (resolver, instance) -> resolver.resolveRepresentation(instance, true));
+    registerRepresentationAliases(
+        registry,
+        true,
+        "GEOMETRIC_SET_SHAPE_REPRESENTATION",
+        "SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION",
+        "SURFACE_MODEL_SHAPE_REPRESENTATION");
     registry.put(
         "ADVANCED_BREP_SHAPE_REPRESENTATION",
         (resolver, instance) ->
@@ -5967,6 +6523,84 @@ public final class StepEntityResolver {
             resolver.resolveRepresentation(instance, "DIRECTION_SHAPE_REPRESENTATION", true));
     registry.put("BOOLEAN_CLIPPING_RESULT", StepEntityResolver::resolveBooleanClippingResult);
     registry.put("BOOLEAN_RESULT", StepEntityResolver::resolveBooleanResult);
+    registry.put("CSG_SOLID", StepEntityResolver::resolveCsgSolid);
+    registry.put("SOLID_REPLICA", StepEntityResolver::resolveSolidReplica);
+    registry.put(
+        "BLOCK",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance, "BLOCK", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
+    registry.put(
+        "SPHERE",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance, "SPHERE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 1));
+    registry.put(
+        "ELLIPSOID",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance, "ELLIPSOID", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
+    registry.put(
+        "RIGHT_ANGULAR_WEDGE",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance,
+                "RIGHT_ANGULAR_WEDGE",
+                StepAxis2Placement3D.class,
+                "AXIS2_PLACEMENT_3D",
+                4));
+    registry.put(
+        "RIGHT_CIRCULAR_CYLINDER",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance,
+                "RIGHT_CIRCULAR_CYLINDER",
+                StepAxis1Placement.class,
+                "AXIS1_PLACEMENT",
+                2));
+    registry.put(
+        "TORUS",
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance, "TORUS", StepAxis1Placement.class, "AXIS1_PLACEMENT", 2));
+    registry.put("CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCircleProfileDef);
+    registry.put("RECTANGLE_PROFILE_DEF", StepEntityResolver::resolveRectangleProfileDef);
+    registry.put(
+        "CENTERED_RECTANGLE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(
+                instance, "CENTERED_RECTANGLE_PROFILE_DEF", 2));
+    registry.put(
+        "CIRCULAR_HOLLOW_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "CIRCULAR_HOLLOW_PROFILE_DEF", 2));
+    registry.put("POINT_REPLICA", (resolver, instance) -> resolver.resolveGeometricReplica(instance, "POINT_REPLICA"));
+    registry.put("CURVE_REPLICA", (resolver, instance) -> resolver.resolveGeometricReplica(instance, "CURVE_REPLICA"));
+    registry.put("SURFACE_REPLICA", (resolver, instance) -> resolver.resolveGeometricReplica(instance, "SURFACE_REPLICA"));
+    registry.put(
+        "ELLIPSE_PROFILE_DEF",
+        (resolver, instance) -> resolver.resolveParameterizedProfileDef(
+            instance, "ELLIPSE_PROFILE_DEF", 2));
+    registry.put(
+        "ROUNDED_RECTANGLE_PROFILE_DEF",
+        (resolver, instance) -> resolver.resolveParameterizedProfileDef(
+            instance, "ROUNDED_RECTANGLE_PROFILE_DEF", 3));
+    registry.put(
+        "ARBITRARY_CLOSED_PROFILE_DEF",
+        StepEntityResolver::resolveArbitraryClosedProfileDef);
+    registry.put(
+        "ARBITRARY_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_PROFILE_DEF"));
+    registry.put(
+        "ARBITRARY_OPEN_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_OPEN_PROFILE_DEF"));
+    registry.put("EXTRUDED_AREA_SOLID", StepEntityResolver::resolveExtrudedAreaSolid);
+    registry.put("REVOLVED_AREA_SOLID", StepEntityResolver::resolveRevolvedAreaSolid);
+    registry.put("BOX_DOMAIN", StepEntityResolver::resolveBoxDomain);
+    registry.put("HALF_SPACE_SOLID", StepEntityResolver::resolveHalfSpaceSolid);
+    registry.put("BOXED_HALF_SPACE", StepEntityResolver::resolveBoxedHalfSpace);
     registry.put(
         "FACETED_BREP",
         (resolver, instance) -> resolver.resolveManifoldSolidBrep(instance, "FACETED_BREP"));
@@ -6527,6 +7161,9 @@ public final class StepEntityResolver {
         "APPLICATION_PROTOCOL_DEFINITION",
         StepEntityResolver::resolveApplicationProtocolDefinition);
     registry.put("PRODUCT_CONTEXT", StepEntityResolver::resolveProductContext);
+    registry.put(
+        "MECHANICAL_CONTEXT",
+        (resolver, instance) -> resolver.resolveProductContext(instance, "MECHANICAL_CONTEXT"));
     registry.put("PRODUCT", StepEntityResolver::resolveProduct);
     registry.put("PRODUCT_CATEGORY", StepEntityResolver::resolveProductCategory);
     registry.put(
@@ -6545,16 +7182,22 @@ public final class StepEntityResolver {
         "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP",
         StepEntityResolver::resolveProductDefinitionFormationRelationship);
     registry.put("PRODUCT_DEFINITION_CONTEXT", StepEntityResolver::resolveProductDefinitionContext);
+    registry.put(
+        "DESIGN_CONTEXT",
+        (resolver, instance) ->
+            resolver.resolveProductDefinitionContext(instance, "DESIGN_CONTEXT"));
     registry.put("PRODUCT_DEFINITION", StepEntityResolver::resolveProductDefinition);
     registry.put(
         "PRODUCT_DEFINITION_RELATIONSHIP",
         StepEntityResolver::resolveProductDefinitionRelationship);
     registerProductDefinitionRelationshipAliases(
         registry,
+        "ASSEMBLY_COMPONENT_USAGE",
         "BREAKDOWN_CONTEXT",
         "BREAKDOWN_ELEMENT_USAGE",
         "BREAKDOWN_OF",
         "PRODUCT_DEFINITION_USAGE",
+        "PROMISSORY_USAGE_OCCURRENCE",
         "SUPPLIED_PART_RELATIONSHIP");
     registry.put(
         "PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP",
@@ -6564,6 +7207,10 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveProductDefinitionRelationshipRelationship(
                 instance, "PRODUCT_DEFINITION_USAGE_RELATIONSHIP"));
+    registerProductDefinitionRelationshipRelationshipAliases(
+        registry,
+        "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
+        "PRODUCT_DEFINITION_SUBSTITUTE");
     registry.put("PRODUCT_DEFINITION_SHAPE", StepEntityResolver::resolveProductDefinitionShape);
     registry.put("PROPERTY_DEFINITION", StepEntityResolver::resolvePropertyDefinition);
     registry.put(
@@ -6574,6 +7221,9 @@ public final class StepEntityResolver {
         "GENERAL_PROPERTY_RELATIONSHIP",
         StepEntityResolver::resolveGeneralPropertyRelationship);
     registry.put("GROUP", StepEntityResolver::resolveGroup);
+    registry.put("CLASS", (resolver, instance) -> resolver.resolveGroup(instance, "CLASS"));
+    registry.put(
+        "CLASS_SYSTEM", (resolver, instance) -> resolver.resolveGroup(instance, "CLASS_SYSTEM"));
     registry.put("GROUP_RELATIONSHIP", StepEntityResolver::resolveGroupRelationship);
     registry.put("GROUP_ASSIGNMENT", StepEntityResolver::resolveGroupAssignment);
     registry.put("APPLIED_GROUP_ASSIGNMENT", StepEntityResolver::resolveAppliedGroupAssignment);
@@ -6586,6 +7236,10 @@ public final class StepEntityResolver {
     registry.put("DOCUMENT_REFERENCE", StepEntityResolver::resolveDocumentReference);
     registry.put(
         "APPLIED_DOCUMENT_REFERENCE", StepEntityResolver::resolveAppliedDocumentReference);
+    registry.put(
+        "CC_DESIGN_SPECIFICATION_REFERENCE",
+        (resolver, instance) ->
+            resolver.resolveAppliedDocumentReference(instance, "CC_DESIGN_SPECIFICATION_REFERENCE"));
     registry.put("PERSON", StepEntityResolver::resolvePerson);
     registry.put("ORGANIZATION", StepEntityResolver::resolveOrganization);
     registry.put(
@@ -6597,6 +7251,11 @@ public final class StepEntityResolver {
     registry.put(
         "APPLIED_ORGANIZATION_ASSIGNMENT",
         StepEntityResolver::resolveAppliedOrganizationAssignment);
+    registry.put(
+        "CC_DESIGN_ORGANIZATION_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveAppliedOrganizationAssignment(
+                instance, "CC_DESIGN_ORGANIZATION_ASSIGNMENT"));
     registry.put("LANGUAGE", StepEntityResolver::resolveLanguage);
     registry.put("LANGUAGE_ASSIGNMENT", StepEntityResolver::resolveLanguageAssignment);
     registry.put(
@@ -6610,6 +7269,11 @@ public final class StepEntityResolver {
     registry.put(
         "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT",
         StepEntityResolver::resolveAppliedPersonAndOrganizationAssignment);
+    registry.put(
+        "CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveAppliedPersonAndOrganizationAssignment(
+                instance, "CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT"));
     registry.put("CALENDAR_DATE", StepEntityResolver::resolveCalendarDate);
     registry.put(
         "COORDINATED_UNIVERSAL_TIME_OFFSET",
@@ -6619,17 +7283,34 @@ public final class StepEntityResolver {
     registry.put("DATE_ROLE", StepEntityResolver::resolveDateRole);
     registry.put("DATE_ASSIGNMENT", StepEntityResolver::resolveDateAssignment);
     registry.put("APPLIED_DATE_ASSIGNMENT", StepEntityResolver::resolveAppliedDateAssignment);
+    registry.put(
+        "CC_DESIGN_DATE_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveAppliedDateAssignment(instance, "CC_DESIGN_DATE_ASSIGNMENT"));
     registry.put("DATE_TIME_ROLE", StepEntityResolver::resolveDateTimeRole);
     registry.put("DATE_TIME_ASSIGNMENT", StepEntityResolver::resolveDateTimeAssignment);
     registry.put(
         "APPLIED_DATE_AND_TIME_ASSIGNMENT",
         StepEntityResolver::resolveAppliedDateTimeAssignment);
+    registry.put(
+        "APPLIED_DATE_TIME_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveAppliedDateTimeAssignment(instance, "APPLIED_DATE_TIME_ASSIGNMENT"));
+    registry.put(
+        "CC_DESIGN_DATE_AND_TIME_ASSIGNMENT",
+        (resolver, instance) ->
+            resolver.resolveAppliedDateTimeAssignment(
+                instance, "CC_DESIGN_DATE_AND_TIME_ASSIGNMENT"));
     registry.put("APPROVAL_STATUS", StepEntityResolver::resolveApprovalStatus);
     registry.put("APPROVAL", StepEntityResolver::resolveApproval);
     registry.put("APPROVAL_ROLE", StepEntityResolver::resolveApprovalRole);
     registry.put("APPROVAL_ASSIGNMENT", StepEntityResolver::resolveApprovalAssignment);
     registry.put(
         "APPLIED_APPROVAL_ASSIGNMENT", StepEntityResolver::resolveAppliedApprovalAssignment);
+    registry.put(
+        "CC_DESIGN_APPROVAL",
+        (resolver, instance) ->
+            resolver.resolveAppliedApprovalAssignment(instance, "CC_DESIGN_APPROVAL"));
     registry.put(
         "APPROVAL_PERSON_ORGANIZATION",
         StepEntityResolver::resolveApprovalPersonOrganization);
@@ -6645,11 +7326,20 @@ public final class StepEntityResolver {
     registry.put(
         "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT",
         StepEntityResolver::resolveAppliedSecurityClassificationAssignment);
+    registry.put(
+        "CC_DESIGN_SECURITY_CLASSIFICATION",
+        (resolver, instance) ->
+            resolver.resolveAppliedSecurityClassificationAssignment(
+                instance, "CC_DESIGN_SECURITY_CLASSIFICATION"));
     registry.put("CONTRACT_TYPE", StepEntityResolver::resolveContractType);
     registry.put("CONTRACT", StepEntityResolver::resolveContract);
     registry.put("CONTRACT_ASSIGNMENT", StepEntityResolver::resolveContractAssignment);
     registry.put(
         "APPLIED_CONTRACT_ASSIGNMENT", StepEntityResolver::resolveAppliedContractAssignment);
+    registry.put(
+        "CC_DESIGN_CONTRACT",
+        (resolver, instance) ->
+            resolver.resolveAppliedContractAssignment(instance, "CC_DESIGN_CONTRACT"));
     registry.put("CERTIFICATION_TYPE", StepEntityResolver::resolveCertificationType);
     registry.put("CERTIFICATION", StepEntityResolver::resolveCertification);
     registry.put(
@@ -6657,6 +7347,10 @@ public final class StepEntityResolver {
     registry.put(
         "APPLIED_CERTIFICATION_ASSIGNMENT",
         StepEntityResolver::resolveAppliedCertificationAssignment);
+    registry.put(
+        "CC_DESIGN_CERTIFICATION",
+        (resolver, instance) ->
+            resolver.resolveAppliedCertificationAssignment(instance, "CC_DESIGN_CERTIFICATION"));
     registry.put("EFFECTIVITY", StepEntityResolver::resolveEffectivity);
     registry.put(
         "PRODUCT_DEFINITION_EFFECTIVITY",
@@ -6701,11 +7395,18 @@ public final class StepEntityResolver {
             resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_GENERAL_PROPERTY"));
     registerExternallyDefinedItemAliases(
         registry,
+        "EXTERNALLY_DEFINED_CHARACTER_GLYPH",
         "EXTERNALLY_DEFINED_CURVE_FONT",
+        "EXTERNALLY_DEFINED_DIMENSION_DEFINITION",
         "EXTERNALLY_DEFINED_HATCH_STYLE",
         "EXTERNALLY_DEFINED_MARKER",
+        "EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM",
+        "EXTERNALLY_DEFINED_STYLE",
         "EXTERNALLY_DEFINED_SYMBOL",
-        "EXTERNALLY_DEFINED_TEXT_FONT");
+        "EXTERNALLY_DEFINED_TERMINATOR_SYMBOL",
+        "EXTERNALLY_DEFINED_TEXT_FONT",
+        "EXTERNALLY_DEFINED_TEXT_STYLE",
+        "EXTERNALLY_DEFINED_TILE");
     registry.put("CHARACTERIZED_OBJECT", StepEntityResolver::resolveCharacterizedObject);
     registerCharacterizedObjectAliases(
         registry,
@@ -7007,6 +7708,13 @@ public final class StepEntityResolver {
         StepEntityResolver::resolvePropertyDefinitionRepresentation);
     registry.put("REPRESENTATION_MAP", StepEntityResolver::resolveRepresentationMap);
     registry.put("SYMBOL_REPRESENTATION_MAP", StepEntityResolver::resolveSymbolRepresentationMap);
+    registry.put("MAPPED_ITEM", StepEntityResolver::resolveMappedItem);
+    registry.put(
+        "CARTESIAN_TRANSFORMATION_OPERATOR_2D",
+        StepEntityResolver::resolveCartesianTransformationOperator2D);
+    registry.put(
+        "CARTESIAN_TRANSFORMATION_OPERATOR_3D",
+        StepEntityResolver::resolveCartesianTransformationOperator3D);
     registry.put("USER_DEFINED_CURVE_FONT", StepEntityResolver::resolveUserDefinedCurveFont);
     registry.put("USER_DEFINED_MARKER", StepEntityResolver::resolveUserDefinedMarker);
     registry.put(
@@ -7164,6 +7872,16 @@ public final class StepEntityResolver {
         (resolver, instance) ->
             resolver.resolveRepresentationRelationship(
                 instance, "ANGULARITY_TOLERANCE_WITH_MODIFIERS"));
+    registerRepresentationRelationshipAliases(
+        registry,
+        "REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT",
+        "KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP",
+        "KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP",
+        "KINEMATIC_GROUND_REPRESENTATION_RELATIONSHIP",
+        "KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP",
+        "KINEMATIC_PAIR_REPRESENTATION_RELATIONSHIP",
+        "MECHANISM_REPRESENTATION_RELATIONSHIP",
+        "MECHANISM_STATE_REPRESENTATION_RELATIONSHIP");
     registry.put(
         "SHAPE_REPRESENTATION_RELATIONSHIP",
         StepEntityResolver::resolveShapeRepresentationRelationship);
@@ -7343,6 +8061,26 @@ public final class StepEntityResolver {
                 instance,
                 "THERMAL_RESISTANCE_MEASURE_WITH_UNIT",
                 "THERMAL_RESISTANCE_UNIT"));
+    registerTypedMeasureWithUnitPairs(
+        registry,
+        "MASS_DENSITY_UNIT",
+        "DYNAMIC_VISCOSITY_UNIT",
+        "KINEMATIC_VISCOSITY_UNIT",
+        "MOMENT_OF_INERTIA_UNIT",
+        "THERMAL_CONDUCTIVITY_UNIT",
+        "HEAT_FLUX_DENSITY_UNIT",
+        "SPECIFIC_HEAT_CAPACITY_UNIT",
+        "AREA_DENSITY_UNIT",
+        "VOLUMETRIC_FLOW_RATE_UNIT",
+        "MASS_FLOW_RATE_UNIT",
+        "ROTATIONAL_FREQUENCY_UNIT",
+        "ANGULAR_VELOCITY_UNIT",
+        "ANGULAR_ACCELERATION_UNIT",
+        "TORQUE_UNIT",
+        "LINEAR_FORCE_UNIT",
+        "LINEAR_STIFFNESS_UNIT",
+        "ROTATIONAL_STIFFNESS_UNIT",
+        "LINEAR_MOMENT_UNIT");
     registry.put(
         "GLOBAL_UNIT_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUnitAssignedContext);
     registry.put(
@@ -7351,6 +8089,7 @@ public final class StepEntityResolver {
     registry.put("MEASURE_WITH_UNIT", StepEntityResolver::resolveMeasureWithUnit);
     registry.put("DERIVED_UNIT_ELEMENT", StepEntityResolver::resolveDerivedUnitElement);
     registry.put("DERIVED_UNIT", StepEntityResolver::resolveDerivedUnit);
+    registry.put("DIMENSIONAL_EXPONENTS", StepEntityResolver::resolveDimensionalExponents);
     registry.put("SI_UNIT", StepEntityResolver::resolveSiUnit);
     registry.put(
         "CONVERSION_BASED_UNIT_WITH_OFFSET",
@@ -7470,6 +8209,26 @@ public final class StepEntityResolver {
         "DOSE_EQUIVALENT_UNIT",
         (resolver, instance) ->
             resolver.resolveStandaloneDerivedUnitKind(instance, "DOSE_EQUIVALENT_UNIT"));
+    registerStandaloneDerivedUnitKinds(
+        registry,
+        "MASS_DENSITY_UNIT",
+        "DYNAMIC_VISCOSITY_UNIT",
+        "KINEMATIC_VISCOSITY_UNIT",
+        "MOMENT_OF_INERTIA_UNIT",
+        "THERMAL_CONDUCTIVITY_UNIT",
+        "HEAT_FLUX_DENSITY_UNIT",
+        "SPECIFIC_HEAT_CAPACITY_UNIT",
+        "AREA_DENSITY_UNIT",
+        "VOLUMETRIC_FLOW_RATE_UNIT",
+        "MASS_FLOW_RATE_UNIT",
+        "ROTATIONAL_FREQUENCY_UNIT",
+        "ANGULAR_VELOCITY_UNIT",
+        "ANGULAR_ACCELERATION_UNIT",
+        "TORQUE_UNIT",
+        "LINEAR_FORCE_UNIT",
+        "LINEAR_STIFFNESS_UNIT",
+        "ROTATIONAL_STIFFNESS_UNIT",
+        "LINEAR_MOMENT_UNIT");
     registry.put("POINT", StepEntityResolver::resolvePoint);
     registry.put("RATIONAL_B_SPLINE_CURVE", StepEntityResolver::resolveRationalBSplineCurve);
     registry.put("RATIONAL_B_SPLINE_SURFACE", StepEntityResolver::resolveRationalBSplineSurface);
@@ -7491,13 +8250,23 @@ public final class StepEntityResolver {
     registry.put("COMPOSITE_CURVE_SEGMENT", StepEntityResolver::resolveCompositeCurveSegment);
     registry.put(
         "COMPOSITE_CURVE_ON_SURFACE", StepEntityResolver::resolveCompositeCurveOnSurface);
+    registry.put(
+        "BOUNDARY_CURVE",
+        (resolver, instance) ->
+            resolver.resolveCompositeCurveOnSurface(instance, "BOUNDARY_CURVE"));
+    registry.put(
+        "OUTER_BOUNDARY_CURVE",
+        (resolver, instance) ->
+            resolver.resolveCompositeCurveOnSurface(instance, "OUTER_BOUNDARY_CURVE"));
     registry.put("COMPOSITE_CURVE", StepEntityResolver::resolveCompositeCurve);
     registry.put("POLYLINE", StepEntityResolver::resolvePolyline);
     registry.put("BOUNDED_CURVE", StepEntityResolver::resolveBoundedCurve);
     registry.put("BOUNDED_SURFACE", StepEntityResolver::resolveBoundedSurface);
     registry.put("CURVE", StepEntityResolver::resolveCurve);
     registry.put("SURFACE", StepEntityResolver::resolveSurface);
+    registry.put("OFFSET_CURVE_2D", StepEntityResolver::resolveOffsetCurve2D);
     registry.put("OFFSET_CURVE_3D", StepEntityResolver::resolveOffsetCurve3D);
+    registry.put("ORIENTED_CURVE", StepEntityResolver::resolveOrientedCurve);
     registry.put("OFFSET_SURFACE", StepEntityResolver::resolveOffsetSurface);
     registry.put("VERTEX", StepEntityResolver::resolveVertex);
     registry.put("EDGE_BASED_WIREFRAME_MODEL", StepEntityResolver::resolveEdgeBasedWireframeModel);
@@ -7724,14 +8493,34 @@ public final class StepEntityResolver {
     registry.put("PLANE", StepEntityResolver::resolvePlane);
     registry.put("CIRCLE", StepEntityResolver::resolveCircle);
     registry.put("ELLIPSE", StepEntityResolver::resolveEllipse);
+    registry.put(
+        "PARABOLA",
+        (resolver, instance) -> resolver.resolveConicCurve(instance, "PARABOLA", 1));
+    registry.put(
+        "HYPERBOLA",
+        (resolver, instance) -> resolver.resolveConicCurve(instance, "HYPERBOLA", 2));
+    registry.put(
+        "DEGENERATE_CONIC",
+        (resolver, instance) -> resolver.resolveConicCurve(instance, "DEGENERATE_CONIC", 0));
     registry.put("SURFACE_CURVE", StepEntityResolver::resolveSurfaceCurve);
+    registry.put(
+        "INTERSECTION_CURVE",
+        (resolver, instance) -> resolver.resolveSurfaceCurve(instance, "INTERSECTION_CURVE"));
     registry.put("SEAM_CURVE", StepEntityResolver::resolveSeamCurve);
     registry.put("DEGENERATE_PCURVE", StepEntityResolver::resolveDegeneratePcurve);
     registry.put("PCURVE", StepEntityResolver::resolvePcurve);
     registry.put("CYLINDRICAL_SURFACE", StepEntityResolver::resolveCylindricalSurface);
     registry.put("CONICAL_SURFACE", StepEntityResolver::resolveConicalSurface);
     registry.put("TOROIDAL_SURFACE", StepEntityResolver::resolveToroidalSurface);
+    registry.put(
+        "DEGENERATE_TOROIDAL_SURFACE",
+        StepEntityResolver::resolveDegenerateToroidalSurface);
     registry.put("SPHERICAL_SURFACE", StepEntityResolver::resolveSphericalSurface);
+    registry.put(
+        "RECTANGULAR_TRIMMED_SURFACE",
+        StepEntityResolver::resolveRectangularTrimmedSurface);
+    registry.put("CURVE_BOUNDED_SURFACE", StepEntityResolver::resolveCurveBoundedSurface);
+    registry.put("ORIENTED_SURFACE", StepEntityResolver::resolveOrientedSurface);
     registry.put(
         "SURFACE_OF_LINEAR_EXTRUSION", StepEntityResolver::resolveSurfaceOfLinearExtrusion);
     registry.put("SURFACE_OF_REVOLUTION", StepEntityResolver::resolveSurfaceOfRevolution);

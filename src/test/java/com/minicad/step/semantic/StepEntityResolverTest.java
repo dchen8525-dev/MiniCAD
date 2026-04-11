@@ -11,6 +11,7 @@ import com.minicad.step.model.StepClosedShell;
 import com.minicad.step.model.StepColour;
 import com.minicad.step.model.StepColourSpecification;
 import com.minicad.step.model.StepConicalSurface;
+import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepConnectedEdgeSet;
 import com.minicad.step.model.StepConnectedFaceSet;
@@ -19,6 +20,10 @@ import com.minicad.step.model.StepCompositeCurve;
 import com.minicad.step.model.StepCompositeCurveOnSurface;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepCylindricalSurface;
+import com.minicad.step.model.StepBoxDomain;
+import com.minicad.step.model.StepCartesianTransformationOperator;
+import com.minicad.step.model.StepCsgPrimitive;
+import com.minicad.step.model.StepCsgSolid;
 import com.minicad.step.model.StepConversionBasedUnit;
 import com.minicad.step.model.StepConversionBasedUnitWithOffset;
 import com.minicad.step.model.StepContextDependentUnit;
@@ -114,8 +119,10 @@ import com.minicad.step.model.StepClassificationAssignment;
 import com.minicad.step.model.StepClassificationRole;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDescriptionAttribute;
+import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDimensionCurve;
+import com.minicad.step.model.StepDimensionalExponents;
 import com.minicad.step.model.StepDateAndTime;
 import com.minicad.step.model.StepDateAssignment;
 import com.minicad.step.model.StepDateRole;
@@ -149,6 +156,7 @@ import com.minicad.step.model.StepGeneralPropertyRelationship;
 import com.minicad.step.model.StepGroup;
 import com.minicad.step.model.StepGroupAssignment;
 import com.minicad.step.model.StepGroupRelationship;
+import com.minicad.step.model.StepHalfSpaceSolid;
 import com.minicad.step.model.StepIdAttribute;
 import com.minicad.step.model.StepIdentificationAssignment;
 import com.minicad.step.model.StepIdentificationRole;
@@ -167,6 +175,7 @@ import com.minicad.step.model.StepLanguageAssignment;
 import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepLocalTime;
 import com.minicad.step.model.StepManifoldSolidBrep;
+import com.minicad.step.model.StepMappedItem;
 import com.minicad.step.model.StepMeasureWithUnit;
 import com.minicad.step.model.StepNamedUnit;
 import com.minicad.step.model.StepNameAssignment;
@@ -204,11 +213,18 @@ import com.minicad.step.model.StepPersonAndOrganizationRole;
 import com.minicad.step.model.StepPoint;
 import com.minicad.step.model.StepPointSet;
 import com.minicad.step.model.StepPointStyle;
+import com.minicad.step.model.StepProfileDef;
+import com.minicad.step.model.StepOffsetCurve2D;
+import com.minicad.step.model.StepOrientedCurve;
+import com.minicad.step.model.StepOrientedSurface;
 import com.minicad.step.model.StepProduct;
 import com.minicad.step.model.StepProductCategory;
 import com.minicad.step.model.StepProductCategoryRelationship;
 import com.minicad.step.model.StepProjectionCurve;
+import com.minicad.step.model.StepCurveBoundedSurface;
 import com.minicad.step.model.StepProductDefinition;
+import com.minicad.step.model.StepProductContext;
+import com.minicad.step.model.StepProductDefinitionContext;
 import com.minicad.step.model.StepProductDefinitionEffectivity;
 import com.minicad.step.model.StepProductDefinitionFormation;
 import com.minicad.step.model.StepProductDefinitionFormationRelationship;
@@ -227,9 +243,11 @@ import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepResourcePropertyRepresentation;
 import com.minicad.step.model.StepRowVariable;
 import com.minicad.step.model.StepCurve;
+import com.minicad.step.model.StepGeometricReplica;
 import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepGeometricRepresentationItem;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
+import com.minicad.step.model.StepRectangularTrimmedSurface;
 import com.minicad.step.model.StepScalarVariable;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSecurityClassification;
@@ -243,6 +261,7 @@ import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepShellBasedSurfaceModel;
 import com.minicad.step.model.StepSiUnit;
 import com.minicad.step.model.StepSolidModel;
+import com.minicad.step.model.StepSolidReplica;
 import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepSurface;
 import com.minicad.step.model.StepSurfaceCurve;
@@ -261,6 +280,7 @@ import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuse;
 import com.minicad.step.model.StepSurfaceStyleReflectanceAmbientDiffuseSpecular;
 import com.minicad.step.model.StepSurfaceStyleTransparent;
 import com.minicad.step.model.StepSurfaceStyleUsage;
+import com.minicad.step.model.StepSweptAreaSolid;
 import com.minicad.step.model.StepSymbolColour;
 import com.minicad.step.model.StepSymbolRepresentationMap;
 import com.minicad.step.model.StepSymbolStyle;
@@ -484,7 +504,7 @@ class StepEntityResolverTest {
         );
 
         assertEquals(
-                "ADVANCED_FACE geometry must be PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, SURFACE_OF_LINEAR_EXTRUSION, SURFACE_OF_REVOLUTION, B_SPLINE_SURFACE_WITH_KNOTS or TOROIDAL_SURFACE",
+                "ADVANCED_FACE geometry must reference a supported surface but got StepCircle",
                 exception.getMessage()
         );
     }
@@ -1058,6 +1078,53 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveParabolaHyperbolaAndConicReferences() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PARABOLA('P0',#4,2.0);
+                #6=HYPERBOLA('H0',#4,4.0,2.0);
+                #7=CARTESIAN_POINT('S',(0.0,0.0,0.0));
+                #8=CARTESIAN_POINT('E',(1.0,0.0,0.0));
+                #9=VERTEX_POINT('VS',#7);
+                #10=VERTEX_POINT('VE',#8);
+                #11=EDGE_CURVE('EDGE-P',#9,#10,#5,.T.);
+                #12=TRIMMED_CURVE('TRIM-H',#6,(#7),(#8),.T.,.CARTESIAN.);
+                #13=SURFACE_CURVE('SURF-P',#5,(),.T.);
+                #14=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#6);
+                #15=DEGENERATE_CONIC('DC0',#4);
+                #16=GEOMETRIC_CURVE_SET('GCS',(#5,#6,#15));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepConicCurve parabola = assertInstanceOf(StepConicCurve.class, resolved.get(5));
+        StepConicCurve hyperbola = assertInstanceOf(StepConicCurve.class, resolved.get(6));
+        StepEdgeCurve edgeCurve = assertInstanceOf(StepEdgeCurve.class, resolved.get(11));
+        StepTrimmedCurve trimmedCurve = assertInstanceOf(StepTrimmedCurve.class, resolved.get(12));
+        StepSurfaceCurve surfaceCurve = assertInstanceOf(StepSurfaceCurve.class, resolved.get(13));
+        StepCompositeCurveSegment segment =
+                assertInstanceOf(StepCompositeCurveSegment.class, resolved.get(14));
+        StepConicCurve degenerateConic = assertInstanceOf(StepConicCurve.class, resolved.get(15));
+        StepGeometricCurveSet set = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(16));
+        assertEquals("PARABOLA", parabola.entityName());
+        assertEquals(List.of(2.0), parabola.parameters());
+        assertEquals("HYPERBOLA", hyperbola.entityName());
+        assertEquals(List.of(4.0, 2.0), hyperbola.parameters());
+        assertEquals(5, edgeCurve.edgeGeometry().id());
+        assertEquals(6, trimmedCurve.basisCurve().id());
+        assertEquals(5, surfaceCurve.curve3d().id());
+        assertEquals(6, segment.parentCurve().id());
+        assertEquals("DEGENERATE_CONIC", degenerateConic.entityName());
+        assertEquals(List.of(), degenerateConic.parameters());
+        assertEquals(3, set.elements().size());
+    }
+
+    @Test
     void shouldResolveComplexBsplineCurveWithoutNameParameter() {
         String step = """
                 DATA;
@@ -1133,6 +1200,57 @@ class StepEntityResolverTest {
         StepRationalBSplineCurve curve = assertInstanceOf(StepRationalBSplineCurve.class, resolved.get(20));
         assertEquals(2, curve.knots().size());
         assertEquals(2, curve.knotMultiplicities().size());
+    }
+
+    @Test
+    void shouldAllowRationalBsplineCurveAsReferencedCurveGeometry() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #8=PLANE('PL',#7);
+                #9=VECTOR('VEC',#5,1.0);
+                #10=VERTEX_POINT('V0',#1);
+                #11=VERTEX_POINT('V1',#4);
+                #20=(BOUNDED_CURVE()
+                     B_SPLINE_CURVE(3,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.)
+                     B_SPLINE_CURVE_WITH_KNOTS((4,4),(0.0,1.0),.UNSPECIFIED.)
+                     CURVE()
+                     GEOMETRIC_REPRESENTATION_ITEM()
+                     RATIONAL_B_SPLINE_CURVE((1.0,0.5,0.5,1.0))
+                     REPRESENTATION_ITEM('RBK'));
+                #21=TRIMMED_CURVE('TC',#20,(#1),(#4),.T.,.CARTESIAN.);
+                #22=SURFACE_CURVE('SC',#20,(),.T.);
+                #23=EDGE_CURVE('EC',#10,#11,#20,.T.);
+                #24=SURFACE_OF_LINEAR_EXTRUSION('EX',#20,#9);
+                #25=AXIS1_PLACEMENT('A1',#1,#5);
+                #26=SURFACE_OF_REVOLUTION('REV',#20,#25);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRationalBSplineCurve rational =
+                assertInstanceOf(StepRationalBSplineCurve.class, resolved.get(20));
+        StepTrimmedCurve trimmedCurve = assertInstanceOf(StepTrimmedCurve.class, resolved.get(21));
+        StepSurfaceCurve surfaceCurve = assertInstanceOf(StepSurfaceCurve.class, resolved.get(22));
+        StepEdgeCurve edgeCurve = assertInstanceOf(StepEdgeCurve.class, resolved.get(23));
+        StepSurfaceOfLinearExtrusion extrusion =
+                assertInstanceOf(StepSurfaceOfLinearExtrusion.class, resolved.get(24));
+        StepSurfaceOfRevolution revolution =
+                assertInstanceOf(StepSurfaceOfRevolution.class, resolved.get(26));
+
+        assertEquals(4, rational.weightsData().size());
+        assertEquals(20, trimmedCurve.basisCurve().id());
+        assertEquals(20, surfaceCurve.curve3d().id());
+        assertEquals(20, edgeCurve.edgeGeometry().id());
+        assertEquals(20, extrusion.sweptCurve().id());
+        assertEquals(20, revolution.sweptCurve().id());
     }
 
     @Test
@@ -1431,6 +1549,35 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveRationalBsplineSurfaceAsFaceGeometry() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P01',(0.0,2.0,0.0));
+                #4=CARTESIAN_POINT('P11',(2.0,2.0,1.0));
+                #10=(B_SPLINE_SURFACE(1,1,((#1,#3),(#2,#4)),.UNSPECIFIED.,.F.,.F.,.F.)
+                     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)
+                     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,0.5))));
+                #11=EDGE_LOOP('L0',());
+                #12=FACE_OUTER_BOUND('B0',#11,.T.);
+                #13=ADVANCED_FACE('AF',(#12),#10,.T.);
+                #14=FACE_SURFACE('FS',(#12),#10,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepRationalBSplineSurface surface =
+                assertInstanceOf(StepRationalBSplineSurface.class, resolved.get(10));
+        StepAdvancedFace advancedFace = assertInstanceOf(StepAdvancedFace.class, resolved.get(13));
+        StepFaceSurface faceSurface = assertInstanceOf(StepFaceSurface.class, resolved.get(14));
+        assertEquals(2, surface.uKnots().size());
+        assertEquals(10, advancedFace.faceGeometry().id());
+        assertEquals(10, faceSurface.faceGeometry().id());
+    }
+
+    @Test
     void shouldResolveUniformSurfaceMarker() {
         String step = """
                 DATA;
@@ -1641,6 +1788,35 @@ class StepEntityResolverTest {
         assertEquals(1.0, torus.minorRadius());
         assertEquals(13, surfaceCurve.curve3d().id());
         assertEquals(14, trimmedCurve.basisCurve().id());
+    }
+
+    @Test
+    void shouldResolveDegenerateToroidalSurfaceAsFaceGeometryAndSetElement() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=DEGENERATE_TOROIDAL_SURFACE('DT0',#4,5.0,1.0,.T.);
+                #6=EDGE_LOOP('L0',());
+                #7=FACE_OUTER_BOUND('B0',#6,.T.);
+                #8=ADVANCED_FACE('F0',(#7),#5,.T.);
+                #9=GEOMETRIC_SET('SET',(#5));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDegenerateToroidalSurface surface =
+                assertInstanceOf(StepDegenerateToroidalSurface.class, resolved.get(5));
+        StepAdvancedFace face = assertInstanceOf(StepAdvancedFace.class, resolved.get(8));
+        StepGeometricSet set = assertInstanceOf(StepGeometricSet.class, resolved.get(9));
+        assertEquals(5.0, surface.majorRadius());
+        assertEquals(1.0, surface.minorRadius());
+        assertEquals(true, surface.selectOuter());
+        assertEquals(5, face.faceGeometry().id());
+        assertEquals(5, set.elements().getFirst().id());
     }
 
     @Test
@@ -2949,6 +3125,26 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveNamedUnitWithDimensionalExponentsReference() {
+        String step = """
+                DATA;
+                #1=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);
+                #2=(LENGTH_UNIT() NAMED_UNIT(#1) SI_UNIT($,.METRE.));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDimensionalExponents dimensions =
+                assertInstanceOf(StepDimensionalExponents.class, resolved.get(1));
+        StepSiUnit unit = assertInstanceOf(StepSiUnit.class, resolved.get(2));
+        assertEquals(1.0, dimensions.lengthExponent());
+        assertEquals(0.0, dimensions.massExponent());
+        assertEquals("LENGTH_UNIT", unit.unitKind());
+        assertEquals("METRE", unit.unitName());
+    }
+
+    @Test
     void shouldResolveStandaloneAdditionalUnits() {
         String step = """
                 DATA;
@@ -3244,6 +3440,79 @@ class StepEntityResolverTest {
         assertEquals("ACCELERATION_MEASURE_WITH_UNIT", assertInstanceOf(StepTypedMeasureWithUnit.class, resolved.get(29)).entityName());
         assertEquals("VELOCITY_MEASURE_WITH_UNIT", assertInstanceOf(StepTypedMeasureWithUnit.class, resolved.get(30)).entityName());
         assertEquals("THERMAL_RESISTANCE_MEASURE_WITH_UNIT", assertInstanceOf(StepTypedMeasureWithUnit.class, resolved.get(31)).entityName());
+    }
+
+    @Test
+    void shouldResolveAdditionalPhysicalTypedMeasureWithUnitSubtypes() {
+        String step = """
+                DATA;
+                #1=MASS_DENSITY_UNIT();
+                #2=DYNAMIC_VISCOSITY_UNIT();
+                #3=KINEMATIC_VISCOSITY_UNIT();
+                #4=MOMENT_OF_INERTIA_UNIT();
+                #5=THERMAL_CONDUCTIVITY_UNIT();
+                #6=HEAT_FLUX_DENSITY_UNIT();
+                #7=SPECIFIC_HEAT_CAPACITY_UNIT();
+                #8=AREA_DENSITY_UNIT();
+                #9=VOLUMETRIC_FLOW_RATE_UNIT();
+                #10=MASS_FLOW_RATE_UNIT();
+                #11=ROTATIONAL_FREQUENCY_UNIT();
+                #12=ANGULAR_VELOCITY_UNIT();
+                #13=ANGULAR_ACCELERATION_UNIT();
+                #14=TORQUE_UNIT();
+                #15=LINEAR_FORCE_UNIT();
+                #16=LINEAR_STIFFNESS_UNIT();
+                #17=ROTATIONAL_STIFFNESS_UNIT();
+                #18=LINEAR_MOMENT_UNIT();
+                #21=MASS_DENSITY_MEASURE_WITH_UNIT(MASS_DENSITY_MEASURE(7.85),#1);
+                #22=DYNAMIC_VISCOSITY_MEASURE_WITH_UNIT(DYNAMIC_VISCOSITY_MEASURE(0.01),#2);
+                #23=KINEMATIC_VISCOSITY_MEASURE_WITH_UNIT(KINEMATIC_VISCOSITY_MEASURE(0.02),#3);
+                #24=MOMENT_OF_INERTIA_MEASURE_WITH_UNIT(MOMENT_OF_INERTIA_MEASURE(3.0),#4);
+                #25=THERMAL_CONDUCTIVITY_MEASURE_WITH_UNIT(THERMAL_CONDUCTIVITY_MEASURE(205.0),#5);
+                #26=HEAT_FLUX_DENSITY_MEASURE_WITH_UNIT(HEAT_FLUX_DENSITY_MEASURE(12.0),#6);
+                #27=SPECIFIC_HEAT_CAPACITY_MEASURE_WITH_UNIT(SPECIFIC_HEAT_CAPACITY_MEASURE(900.0),#7);
+                #28=AREA_DENSITY_MEASURE_WITH_UNIT(AREA_DENSITY_MEASURE(2.7),#8);
+                #29=VOLUMETRIC_FLOW_RATE_MEASURE_WITH_UNIT(VOLUMETRIC_FLOW_RATE_MEASURE(1.5),#9);
+                #30=MASS_FLOW_RATE_MEASURE_WITH_UNIT(MASS_FLOW_RATE_MEASURE(0.8),#10);
+                #31=ROTATIONAL_FREQUENCY_MEASURE_WITH_UNIT(ROTATIONAL_FREQUENCY_MEASURE(60.0),#11);
+                #32=ANGULAR_VELOCITY_MEASURE_WITH_UNIT(ANGULAR_VELOCITY_MEASURE(3.14),#12);
+                #33=ANGULAR_ACCELERATION_MEASURE_WITH_UNIT(ANGULAR_ACCELERATION_MEASURE(1.5),#13);
+                #34=TORQUE_MEASURE_WITH_UNIT(TORQUE_MEASURE(20.0),#14);
+                #35=LINEAR_FORCE_MEASURE_WITH_UNIT(LINEAR_FORCE_MEASURE(4.0),#15);
+                #36=LINEAR_STIFFNESS_MEASURE_WITH_UNIT(LINEAR_STIFFNESS_MEASURE(1000.0),#16);
+                #37=ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT(ROTATIONAL_STIFFNESS_MEASURE(250.0),#17);
+                #38=LINEAR_MOMENT_MEASURE_WITH_UNIT(LINEAR_MOMENT_MEASURE(6.0),#18);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+        List<String> unitKinds = List.of(
+                "MASS_DENSITY_UNIT",
+                "DYNAMIC_VISCOSITY_UNIT",
+                "KINEMATIC_VISCOSITY_UNIT",
+                "MOMENT_OF_INERTIA_UNIT",
+                "THERMAL_CONDUCTIVITY_UNIT",
+                "HEAT_FLUX_DENSITY_UNIT",
+                "SPECIFIC_HEAT_CAPACITY_UNIT",
+                "AREA_DENSITY_UNIT",
+                "VOLUMETRIC_FLOW_RATE_UNIT",
+                "MASS_FLOW_RATE_UNIT",
+                "ROTATIONAL_FREQUENCY_UNIT",
+                "ANGULAR_VELOCITY_UNIT",
+                "ANGULAR_ACCELERATION_UNIT",
+                "TORQUE_UNIT",
+                "LINEAR_FORCE_UNIT",
+                "LINEAR_STIFFNESS_UNIT",
+                "ROTATIONAL_STIFFNESS_UNIT",
+                "LINEAR_MOMENT_UNIT");
+
+        for (int i = 0; i < unitKinds.size(); i++) {
+            String unitKind = unitKinds.get(i);
+            assertEquals(unitKind, assertInstanceOf(StepDerivedUnit.class, resolved.get(i + 1)).unitKind());
+            assertEquals(
+                    unitKind.replace("_UNIT", "_MEASURE_WITH_UNIT"),
+                    assertInstanceOf(StepTypedMeasureWithUnit.class, resolved.get(i + 21)).entityName());
+        }
     }
 
     @Test
@@ -5146,12 +5415,20 @@ class StepEntityResolverTest {
                 #31=INCIDENCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION('IACD','incd',#3,#4);
                 #32=SURFACE_DISTANCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION('SDACD','surfd',#3,#4);
                 #33=ANGULARITY_TOLERANCE_WITH_MODIFIERS('ATWM','ang',#3,#4);
+                #34=REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT('RRSC','samectx',#3,#4);
+                #35=KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP('KFBRR','framebg',#3,#4);
+                #36=KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP('KFRR','frame',#3,#4);
+                #37=KINEMATIC_GROUND_REPRESENTATION_RELATIONSHIP('KGRR','ground',#3,#4);
+                #38=KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP('KLRR','link',#3,#4);
+                #39=KINEMATIC_PAIR_REPRESENTATION_RELATIONSHIP('KPRR','pair',#3,#4);
+                #40=MECHANISM_REPRESENTATION_RELATIONSHIP('MRR','mechanism',#3,#4);
+                #41=MECHANISM_STATE_REPRESENTATION_RELATIONSHIP('MSRR','state',#3,#4);
                 ENDSEC;
                 """;
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
-        for (int id = 5; id <= 33; id++) {
+        for (int id = 5; id <= 41; id++) {
             StepRepresentationRelationship relationship =
                     assertInstanceOf(StepRepresentationRelationship.class, resolved.get(id));
             assertEquals(3, relationship.rep1().id());
@@ -5186,6 +5463,9 @@ class StepEntityResolverTest {
         assertEquals("IACD", ((StepRepresentationRelationship) resolved.get(31)).name());
         assertEquals("SDACD", ((StepRepresentationRelationship) resolved.get(32)).name());
         assertEquals("ATWM", ((StepRepresentationRelationship) resolved.get(33)).name());
+        assertEquals("RRSC", ((StepRepresentationRelationship) resolved.get(34)).name());
+        assertEquals("KFBRR", ((StepRepresentationRelationship) resolved.get(35)).name());
+        assertEquals("MSRR", ((StepRepresentationRelationship) resolved.get(41)).name());
     }
 
     @Test
@@ -5237,6 +5517,200 @@ class StepEntityResolverTest {
         StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(3));
         assertEquals("CSG", representation.name());
         assertEquals(true, representation.shapeRepresentation());
+    }
+
+    @Test
+    void shouldResolveCsgPrimitiveSolids() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=AXIS1_PLACEMENT('AX1',#1,#2);
+                #6=BLOCK('BLK',#4,10.0,20.0,30.0);
+                #7=SPHERE('SPH',#4,5.0);
+                #8=RIGHT_CIRCULAR_CYLINDER('CYL',#5,12.0,3.0);
+                #9=TORUS('TOR',#5,8.0,2.0);
+                #10=ELLIPSOID('ELL',#4,2.0,3.0,4.0);
+                #11=RIGHT_ANGULAR_WEDGE('WEDGE',#4,10.0,20.0,30.0,5.0);
+                #12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #13=CSG_SHAPE_REPRESENTATION('CSG',(#6,#7,#8,#9,#10,#11),#12);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCsgPrimitive block = assertInstanceOf(StepCsgPrimitive.class, resolved.get(6));
+        StepCsgPrimitive sphere = assertInstanceOf(StepCsgPrimitive.class, resolved.get(7));
+        StepCsgPrimitive cylinder = assertInstanceOf(StepCsgPrimitive.class, resolved.get(8));
+        StepCsgPrimitive torus = assertInstanceOf(StepCsgPrimitive.class, resolved.get(9));
+        StepCsgPrimitive ellipsoid = assertInstanceOf(StepCsgPrimitive.class, resolved.get(10));
+        StepCsgPrimitive wedge = assertInstanceOf(StepCsgPrimitive.class, resolved.get(11));
+        assertEquals("BLOCK", block.entityName());
+        assertEquals(List.of(10.0, 20.0, 30.0), block.dimensions());
+        assertEquals(4, block.position().id());
+        assertEquals("SPHERE", sphere.entityName());
+        assertEquals(List.of(5.0), sphere.dimensions());
+        assertEquals("RIGHT_CIRCULAR_CYLINDER", cylinder.entityName());
+        assertEquals(List.of(12.0, 3.0), cylinder.dimensions());
+        assertEquals(5, cylinder.position().id());
+        assertEquals("TORUS", torus.entityName());
+        assertEquals(List.of(8.0, 2.0), torus.dimensions());
+        assertEquals("ELLIPSOID", ellipsoid.entityName());
+        assertEquals(List.of(2.0, 3.0, 4.0), ellipsoid.dimensions());
+        assertEquals("RIGHT_ANGULAR_WEDGE", wedge.entityName());
+        assertEquals(List.of(10.0, 20.0, 30.0, 5.0), wedge.dimensions());
+
+        StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(13));
+        assertEquals(6, representation.items().size());
+    }
+
+    @Test
+    void shouldResolveCsgSolidAndSolidReplica() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #6=BLOCK('BLK',#5,10.0,20.0,30.0);
+                #7=PLANE('PLANE',#5);
+                #8=HALF_SPACE_SOLID('HS',#7,.T.);
+                #9=(BOOLEAN_RESULT(.DIFFERENCE.,#6,#8) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));
+                #10=CSG_SOLID('CSG0',#9);
+                #11=CARTESIAN_TRANSFORMATION_OPERATOR_3D('XFORM',#3,#4,#1,1.0,#2);
+                #12=SOLID_REPLICA('REPLICA0',#10,#11);
+                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #14=CSG_SHAPE_REPRESENTATION('CSG',(#10,#12),#13);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepBooleanResult booleanResult = assertInstanceOf(StepBooleanResult.class, resolved.get(9));
+        assertEquals(6, booleanResult.firstOperand().id());
+        assertEquals(8, booleanResult.secondOperand().id());
+        StepCsgSolid csgSolid = assertInstanceOf(StepCsgSolid.class, resolved.get(10));
+        assertEquals("CSG0", csgSolid.name());
+        assertEquals(9, csgSolid.treeRootExpression().id());
+        StepSolidReplica solidReplica = assertInstanceOf(StepSolidReplica.class, resolved.get(12));
+        assertEquals("REPLICA0", solidReplica.name());
+        assertEquals(10, solidReplica.parentSolid().id());
+        assertEquals(11, solidReplica.transformation().id());
+        StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(14));
+        assertEquals(2, representation.items().size());
+    }
+
+    @Test
+    void shouldResolveProfileDefsAndSweptAreaSolids() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=AXIS1_PLACEMENT('AX1',#1,#2);
+                #6=AXIS2_PLACEMENT_2D('AX2',#1,#3);
+                #7=CIRCLE_PROFILE_DEF(.AREA.,'circle profile',#6,2.5);
+                #8=RECTANGLE_PROFILE_DEF(.AREA.,'rect profile',#6,4.0,6.0);
+                #9=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #10=POLYLINE('PLINE',(#1,#9));
+                #11=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'poly profile',#10);
+                #12=EXTRUDED_AREA_SOLID('EXTRUDE',#7,#4,#2,10.0);
+                #13=REVOLVED_AREA_SOLID('REVOLVE',#8,#4,#5,1.57079632679);
+                #14=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #15=CSG_SHAPE_REPRESENTATION('SWEPT',(#12,#13),#14);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef circleProfile = assertInstanceOf(StepProfileDef.class, resolved.get(7));
+        StepProfileDef rectangleProfile = assertInstanceOf(StepProfileDef.class, resolved.get(8));
+        StepProfileDef arbitraryProfile = assertInstanceOf(StepProfileDef.class, resolved.get(11));
+        assertEquals("CIRCLE_PROFILE_DEF", circleProfile.entityName());
+        assertEquals("AREA", circleProfile.profileType());
+        assertEquals(List.of(2.5), circleProfile.parameters());
+        assertEquals("RECTANGLE_PROFILE_DEF", rectangleProfile.entityName());
+        assertEquals(List.of(4.0, 6.0), rectangleProfile.parameters());
+        assertEquals("ARBITRARY_CLOSED_PROFILE_DEF", arbitraryProfile.entityName());
+        assertEquals(10, arbitraryProfile.curves().getFirst().id());
+
+        StepSweptAreaSolid extruded = assertInstanceOf(StepSweptAreaSolid.class, resolved.get(12));
+        StepSweptAreaSolid revolved = assertInstanceOf(StepSweptAreaSolid.class, resolved.get(13));
+        assertEquals("EXTRUDED_AREA_SOLID", extruded.entityName());
+        assertEquals(7, extruded.sweptArea().id());
+        assertEquals(4, extruded.position().id());
+        assertEquals(2, extruded.sweepReference().id());
+        assertEquals(10.0, extruded.parameter());
+        assertEquals("REVOLVED_AREA_SOLID", revolved.entityName());
+        assertEquals(8, revolved.sweptArea().id());
+        assertEquals(5, revolved.sweepReference().id());
+
+        StepRepresentation representation = assertInstanceOf(StepRepresentation.class, resolved.get(15));
+        assertEquals(2, representation.items().size());
+    }
+
+    @Test
+    void shouldResolveAdditionalProfileDefsAndHalfSpaceSolids() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('DZ',(0.0,0.0,1.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('AX2',#1,#4);
+                #6=ELLIPSE_PROFILE_DEF(.AREA.,'ellipse profile',#5,5.0,2.0);
+                #7=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'rounded rectangle',#5,8.0,4.0,0.5);
+                #8=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'centered rectangle',#5,3.0,7.0);
+                #9=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'hollow circle',#5,6.0,0.5);
+                #10=POLYLINE('OPEN',(#1,#2));
+                #11=ARBITRARY_PROFILE_DEF(.AREA.,'any profile',#10);
+                #12=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'open profile',#10);
+                #13=AXIS2_PLACEMENT_3D('AX3',#1,#3,#4);
+                #14=PLANE('PLANE',#13);
+                #15=BOX_DOMAIN(#1,10.0,20.0,30.0);
+                #16=HALF_SPACE_SOLID('HS',#14,.T.);
+                #17=BOXED_HALF_SPACE('BHS',#14,.F.,#15);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef ellipse = assertInstanceOf(StepProfileDef.class, resolved.get(6));
+        StepProfileDef roundedRectangle = assertInstanceOf(StepProfileDef.class, resolved.get(7));
+        StepProfileDef centeredRectangle = assertInstanceOf(StepProfileDef.class, resolved.get(8));
+        StepProfileDef circularHollow = assertInstanceOf(StepProfileDef.class, resolved.get(9));
+        StepProfileDef arbitrary = assertInstanceOf(StepProfileDef.class, resolved.get(11));
+        StepProfileDef arbitraryOpen = assertInstanceOf(StepProfileDef.class, resolved.get(12));
+        assertEquals("ELLIPSE_PROFILE_DEF", ellipse.entityName());
+        assertEquals(List.of(5.0, 2.0), ellipse.parameters());
+        assertEquals("ROUNDED_RECTANGLE_PROFILE_DEF", roundedRectangle.entityName());
+        assertEquals(List.of(8.0, 4.0, 0.5), roundedRectangle.parameters());
+        assertEquals("CENTERED_RECTANGLE_PROFILE_DEF", centeredRectangle.entityName());
+        assertEquals(List.of(3.0, 7.0), centeredRectangle.parameters());
+        assertEquals("CIRCULAR_HOLLOW_PROFILE_DEF", circularHollow.entityName());
+        assertEquals(List.of(6.0, 0.5), circularHollow.parameters());
+        assertEquals("ARBITRARY_PROFILE_DEF", arbitrary.entityName());
+        assertEquals(10, arbitrary.curves().getFirst().id());
+        assertEquals("ARBITRARY_OPEN_PROFILE_DEF", arbitraryOpen.entityName());
+
+        StepBoxDomain boxDomain = assertInstanceOf(StepBoxDomain.class, resolved.get(15));
+        assertEquals(1, boxDomain.corner().id());
+        assertEquals(List.of(10.0, 20.0, 30.0), boxDomain.dimensions());
+
+        StepHalfSpaceSolid halfSpace = assertInstanceOf(StepHalfSpaceSolid.class, resolved.get(16));
+        StepHalfSpaceSolid boxedHalfSpace =
+                assertInstanceOf(StepHalfSpaceSolid.class, resolved.get(17));
+        assertEquals("HALF_SPACE_SOLID", halfSpace.entityName());
+        assertEquals(14, halfSpace.baseSurface().id());
+        assertEquals(true, halfSpace.agreementFlag());
+        assertEquals(null, halfSpace.enclosure());
+        assertEquals("BOXED_HALF_SPACE", boxedHalfSpace.entityName());
+        assertEquals(false, boxedHalfSpace.agreementFlag());
+        assertEquals(15, boxedHalfSpace.enclosure().id());
     }
 
     @Test
@@ -5722,6 +6196,8 @@ class StepEntityResolverTest {
                 #19=PROPERTY_DEFINITION('prop-a','property a',#8);
                 #20=PROPERTY_DEFINITION('prop-b','property b',#9);
                 #21=PROPERTY_DEFINITION_RELATIONSHIP('PDRP','property relation',#19,#20);
+                #22=ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE('ACUS','usage substitute','alternate usage',#10,#11);
+                #23=PRODUCT_DEFINITION_SUBSTITUTE('PDS','definition substitute','alternate definition',#10,#11);
                 ENDSEC;
                 """;
 
@@ -5745,6 +6221,10 @@ class StepEntityResolverTest {
         assertEquals(11, relationshipRelationship.related().id());
         assertEquals("PRODUCT_DEFINITION_USAGE_RELATIONSHIP",
                 ((StepProductDefinitionRelationshipRelationship) resolved.get(17)).entityName());
+        assertEquals("ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
+                assertInstanceOf(StepProductDefinitionRelationshipRelationship.class, resolved.get(22)).entityName());
+        assertEquals("PRODUCT_DEFINITION_SUBSTITUTE",
+                assertInstanceOf(StepProductDefinitionRelationshipRelationship.class, resolved.get(23)).entityName());
         StepProductDefinitionFormationRelationship formationRelationship =
                 assertInstanceOf(StepProductDefinitionFormationRelationship.class, resolved.get(18));
         assertEquals(5, formationRelationship.relatingFormation().id());
@@ -5762,6 +6242,7 @@ class StepEntityResolverTest {
                 #1=GROUP('inspection group','group description');
                 #2=GROUP('child group',$);
                 #3=GROUP_RELATIONSHIP('group rel','relates groups',#1,#2);
+                #4=CLASS_SYSTEM('classification system','class system description');
                 ENDSEC;
                 """;
 
@@ -5771,10 +6252,12 @@ class StepEntityResolverTest {
         StepGroup child = assertInstanceOf(StepGroup.class, resolved.get(2));
         StepGroupRelationship relationship =
                 assertInstanceOf(StepGroupRelationship.class, resolved.get(3));
+        StepGroup classSystem = assertInstanceOf(StepGroup.class, resolved.get(4));
         assertEquals("GROUP", group.entityName());
         assertEquals("", child.description());
         assertEquals(1, relationship.relatingGroup().id());
         assertEquals(2, relationship.relatedGroup().id());
+        assertEquals("CLASS_SYSTEM", classSystem.entityName());
     }
 
     @Test
@@ -6007,6 +6490,102 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveCommonControlDesignAliases() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical');
+                #2=MECHANICAL_CONTEXT('part',#1,'mechanical');
+                #3=PRODUCT('PRT','part','',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);
+                #5=DESIGN_CONTEXT('design',#1,'design');
+                #6=PRODUCT_DEFINITION('def','part def',#4,#5);
+                #7=PERSON('p-1','Doe','Jane',$,$,$);
+                #8=ORGANIZATION('org-1','Acme','engineering');
+                #9=PERSON_AND_ORGANIZATION(#7,#8);
+                #10=PERSON_AND_ORGANIZATION_ROLE('creator');
+                #11=CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT(#9,#10,(#3,#6));
+                #12=CALENDAR_DATE(2026,11,4);
+                #13=DATE_ROLE('released');
+                #14=CC_DESIGN_DATE_ASSIGNMENT(#12,#13,(#6));
+                #15=COORDINATED_UNIVERSAL_TIME_OFFSET(8,$,.AHEAD.);
+                #16=LOCAL_TIME(9,15,30.0,#15);
+                #17=DATE_AND_TIME(#12,#16);
+                #18=DATE_TIME_ROLE('created');
+                #19=CC_DESIGN_DATE_AND_TIME_ASSIGNMENT(#17,#18,(#6));
+                #20=APPLIED_DATE_TIME_ASSIGNMENT(#17,#18,(#3));
+                #21=APPROVAL_STATUS('approved');
+                #22=APPROVAL(#21,'design');
+                #23=CC_DESIGN_APPROVAL(#22,(#6));
+                #24=SECURITY_CLASSIFICATION_LEVEL('unclassified');
+                #25=SECURITY_CLASSIFICATION('sec','export control',#24);
+                #26=CC_DESIGN_SECURITY_CLASSIFICATION(#25,(#6));
+                #27=CONTRACT_TYPE('purchase');
+                #28=CONTRACT('C-1','supply',#27);
+                #29=CC_DESIGN_CONTRACT(#28,(#6));
+                #30=CERTIFICATION_TYPE('material');
+                #31=CERTIFICATION('CERT-1','compliance',#30);
+                #32=CC_DESIGN_CERTIFICATION(#31,(#6));
+                #33=DOCUMENT_TYPE('specification');
+                #34=DOCUMENT('DOC-1','Spec','primary spec',#33);
+                #35=CC_DESIGN_SPECIFICATION_REFERENCE(#34,'internal',(#4,#6));
+                #36=CLASS('fixture','classification');
+                #37=ASSEMBLY_COMPONENT_USAGE('acu','assembly usage','',#6,#6);
+                #38=PROMISSORY_USAGE_OCCURRENCE('puo','promised usage','',#6,#6);
+                #39=ORGANIZATION_ROLE('design supplier');
+                #40=CC_DESIGN_ORGANIZATION_ASSIGNMENT(#8,#39,(#3,#6));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProductContext mechanicalContext = assertInstanceOf(StepProductContext.class, resolved.get(2));
+        StepProductDefinitionContext designContext =
+                assertInstanceOf(StepProductDefinitionContext.class, resolved.get(5));
+        StepAppliedPersonAndOrganizationAssignment personAssignment =
+                assertInstanceOf(StepAppliedPersonAndOrganizationAssignment.class, resolved.get(11));
+        StepAppliedDateAssignment dateAssignment =
+                assertInstanceOf(StepAppliedDateAssignment.class, resolved.get(14));
+        StepAppliedDateTimeAssignment dateTimeAssignment =
+                assertInstanceOf(StepAppliedDateTimeAssignment.class, resolved.get(19));
+        StepAppliedDateTimeAssignment compactDateTimeAssignment =
+                assertInstanceOf(StepAppliedDateTimeAssignment.class, resolved.get(20));
+        StepAppliedApprovalAssignment approvalAssignment =
+                assertInstanceOf(StepAppliedApprovalAssignment.class, resolved.get(23));
+        StepAppliedSecurityClassificationAssignment securityAssignment =
+                assertInstanceOf(StepAppliedSecurityClassificationAssignment.class, resolved.get(26));
+        StepAppliedContractAssignment contractAssignment =
+                assertInstanceOf(StepAppliedContractAssignment.class, resolved.get(29));
+        StepAppliedCertificationAssignment certificationAssignment =
+                assertInstanceOf(StepAppliedCertificationAssignment.class, resolved.get(32));
+        StepAppliedDocumentReference specificationReference =
+                assertInstanceOf(StepAppliedDocumentReference.class, resolved.get(35));
+        StepGroup classGroup = assertInstanceOf(StepGroup.class, resolved.get(36));
+        StepProductDefinitionRelationship assemblyUsage =
+                assertInstanceOf(StepProductDefinitionRelationship.class, resolved.get(37));
+        StepProductDefinitionRelationship promissoryUsage =
+                assertInstanceOf(StepProductDefinitionRelationship.class, resolved.get(38));
+        StepAppliedOrganizationAssignment organizationAssignment =
+                assertInstanceOf(StepAppliedOrganizationAssignment.class, resolved.get(40));
+
+        assertEquals("mechanical", mechanicalContext.disciplineType());
+        assertEquals("design", designContext.lifeCycleStage());
+        assertEquals(2, personAssignment.items().size());
+        assertEquals(6, dateAssignment.items().getFirst().id());
+        assertEquals(17, dateTimeAssignment.assignedDateAndTime().id());
+        assertEquals(3, compactDateTimeAssignment.items().getFirst().id());
+        assertEquals(22, approvalAssignment.assignedApproval().id());
+        assertEquals(25, securityAssignment.assignedSecurityClassification().id());
+        assertEquals(28, contractAssignment.assignedContract().id());
+        assertEquals(31, certificationAssignment.assignedCertification().id());
+        assertEquals(2, specificationReference.items().size());
+        assertEquals("CLASS", classGroup.entityName());
+        assertEquals("ASSEMBLY_COMPONENT_USAGE", assemblyUsage.entityName());
+        assertEquals("PROMISSORY_USAGE_OCCURRENCE", promissoryUsage.entityName());
+        assertEquals(2, organizationAssignment.items().size());
+        assertEquals(8, organizationAssignment.assignedOrganization().id());
+    }
+
+    @Test
     void shouldResolveEffectivityMetadata() {
         String step = """
                 DATA;
@@ -6086,6 +6665,13 @@ class StepEntityResolverTest {
                 #48=EXTERNALLY_DEFINED_MARKER('marker-1',#16);
                 #49=EXTERNALLY_DEFINED_SYMBOL('symbol-1',#16);
                 #50=EXTERNALLY_DEFINED_TEXT_FONT('text-font-1',#16);
+                #51=EXTERNALLY_DEFINED_CHARACTER_GLYPH('glyph-1',#16);
+                #52=EXTERNALLY_DEFINED_DIMENSION_DEFINITION('dimension-1',#16);
+                #53=EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM('picture-1',#16);
+                #54=EXTERNALLY_DEFINED_STYLE('style-1',#16);
+                #55=EXTERNALLY_DEFINED_TERMINATOR_SYMBOL('terminator-1',#16);
+                #56=EXTERNALLY_DEFINED_TEXT_STYLE('text-style-1',#16);
+                #57=EXTERNALLY_DEFINED_TILE('tile-1',#16);
                 ENDSEC;
                 """;
 
@@ -6163,6 +6749,20 @@ class StepEntityResolverTest {
                 assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(49));
         StepExternallyDefinedItem externallyDefinedTextFont =
                 assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(50));
+        StepExternallyDefinedItem externallyDefinedCharacterGlyph =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(51));
+        StepExternallyDefinedItem externallyDefinedDimensionDefinition =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(52));
+        StepExternallyDefinedItem externallyDefinedPictureRepresentationItem =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(53));
+        StepExternallyDefinedItem externallyDefinedStyle =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(54));
+        StepExternallyDefinedItem externallyDefinedTerminatorSymbol =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(55));
+        StepExternallyDefinedItem externallyDefinedTextStyle =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(56));
+        StepExternallyDefinedItem externallyDefinedTile =
+                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(57));
 
         assertEquals("part family", classificationRole.name());
         assertEquals(4, classificationAssignment.assignedClass().id());
@@ -6213,6 +6813,17 @@ class StepEntityResolverTest {
         assertEquals("EXTERNALLY_DEFINED_MARKER", externallyDefinedMarker.entityName());
         assertEquals("EXTERNALLY_DEFINED_SYMBOL", externallyDefinedSymbol.entityName());
         assertEquals("EXTERNALLY_DEFINED_TEXT_FONT", externallyDefinedTextFont.entityName());
+        assertEquals("EXTERNALLY_DEFINED_CHARACTER_GLYPH",
+                externallyDefinedCharacterGlyph.entityName());
+        assertEquals("EXTERNALLY_DEFINED_DIMENSION_DEFINITION",
+                externallyDefinedDimensionDefinition.entityName());
+        assertEquals("EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM",
+                externallyDefinedPictureRepresentationItem.entityName());
+        assertEquals("EXTERNALLY_DEFINED_STYLE", externallyDefinedStyle.entityName());
+        assertEquals("EXTERNALLY_DEFINED_TERMINATOR_SYMBOL",
+                externallyDefinedTerminatorSymbol.entityName());
+        assertEquals("EXTERNALLY_DEFINED_TEXT_STYLE", externallyDefinedTextStyle.entityName());
+        assertEquals("EXTERNALLY_DEFINED_TILE", externallyDefinedTile.entityName());
     }
 
     @Test
@@ -6493,6 +7104,174 @@ class StepEntityResolverTest {
         assertEquals(11, relationship.rep1().id());
         assertEquals(12, relationship.rep2().id());
         assertEquals(7, relationship.transformationOperator().id());
+    }
+
+    @Test
+    void shouldResolveMappedItemAndCartesianTransformationOperators() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DY',(0.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#4,#2);
+                #6=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #7=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #8=CARTESIAN_POINT('P',(2.0,0.0,0.0));
+                #9=REPRESENTATION('BASE',(#8),#7);
+                #10=REPRESENTATION_MAP(#5,#9);
+                #11=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#2,#3,#1,2.0,#4);
+                #12=MAPPED_ITEM(#10,#11);
+                #13=CARTESIAN_TRANSFORMATION_OPERATOR_2D('T2',$,#3,#1,$);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepCartesianTransformationOperator operator3d =
+                assertInstanceOf(StepCartesianTransformationOperator.class, resolved.get(11));
+        assertEquals("CARTESIAN_TRANSFORMATION_OPERATOR_3D", operator3d.entityName());
+        assertEquals(2, operator3d.axis1().id());
+        assertEquals(3, operator3d.axis2().id());
+        assertEquals(1, operator3d.localOrigin().id());
+        assertEquals(2.0, operator3d.scale());
+        assertEquals(4, operator3d.axis3().id());
+
+        StepMappedItem mappedItem = assertInstanceOf(StepMappedItem.class, resolved.get(12));
+        assertEquals(10, mappedItem.mappingSource().id());
+        assertEquals(11, mappedItem.mappingTarget().id());
+
+        StepCartesianTransformationOperator operator2d =
+                assertInstanceOf(StepCartesianTransformationOperator.class, resolved.get(13));
+        assertEquals("CARTESIAN_TRANSFORMATION_OPERATOR_2D", operator2d.entityName());
+        assertEquals(null, operator2d.axis1());
+        assertEquals(3, operator2d.axis2().id());
+        assertEquals(null, operator2d.scale());
+        assertEquals(null, operator2d.axis3());
+    }
+
+    @Test
+    void shouldResolveReplicasAndBoundedSurfaceEntities() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P',(1.0,0.0,0.0));
+                #3=DIRECTION('DZ',(0.0,0.0,1.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX',#1,#3,#4);
+                #6=PLANE('PL',#5);
+                #7=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T',$,$,#1,1.0,$);
+                #8=SURFACE_REPLICA('SR',#6,#7);
+                #9=RECTANGULAR_TRIMMED_SURFACE('RTS',#8,0.0,1.0,0.0,1.0,.T.,.T.);
+                #10=VECTOR('VX',#4,1.0);
+                #11=LINE('L',#1,#10);
+                #12=CURVE_REPLICA('CR',#11,#7);
+                #13=CURVE_BOUNDED_SURFACE('CBS',#8,(#12),.T.);
+                #14=OFFSET_SURFACE('OS',#9,2.0,.T.);
+                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #16=REPRESENTATION('PCURVE_REP',(#12),#15);
+                #17=PCURVE('PC',#13,#16);
+                #18=ADVANCED_FACE('AF',(),#13,.T.);
+                #19=GEOMETRIC_SET('GS',(#8,#9,#13,#14,#26,#12,#17,#1));
+                #20=VERTEX_POINT('V1',#1);
+                #21=VERTEX_POINT('V2',#2);
+                #22=EDGE_CURVE('EC',#20,#21,#12,.T.);
+                #23=TRIMMED_CURVE('TC',#12,(#1),(#2),.T.,.CARTESIAN.);
+                #24=SURFACE_CURVE('SC',#12,(#17),.PCURVE_S1.);
+                #25=POINT_REPLICA('PR',#1,#7);
+                #26=ORIENTED_SURFACE('OR',#13,.F.);
+                #27=INTERSECTION_CURVE('IC',#12,(#17),.PCURVE_S1.);
+                #28=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#27);
+                #29=BOUNDARY_CURVE('BC',(#28),.T.);
+                #30=OUTER_BOUNDARY_CURVE('OBC',(#28),.T.);
+                #31=ORIENTED_CURVE('OC',#12,.F.);
+                #32=OFFSET_CURVE_2D('OC2',#31,0.25,.F.);
+                #33=REPRESENTATION('PCURVE_OFFSET_REP',(#32),#15);
+                #34=PCURVE('PC_OFFSET',#13,#33);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricReplica surfaceReplica = assertInstanceOf(StepGeometricReplica.class, resolved.get(8));
+        StepRectangularTrimmedSurface trimmedSurface =
+                assertInstanceOf(StepRectangularTrimmedSurface.class, resolved.get(9));
+        StepGeometricReplica curveReplica = assertInstanceOf(StepGeometricReplica.class, resolved.get(12));
+        StepCurveBoundedSurface boundedSurface =
+                assertInstanceOf(StepCurveBoundedSurface.class, resolved.get(13));
+        StepOffsetSurface offsetSurface = assertInstanceOf(StepOffsetSurface.class, resolved.get(14));
+        StepPcurve pcurve = assertInstanceOf(StepPcurve.class, resolved.get(17));
+        StepAdvancedFace advancedFace = assertInstanceOf(StepAdvancedFace.class, resolved.get(18));
+        StepGeometricSet geometricSet = assertInstanceOf(StepGeometricSet.class, resolved.get(19));
+        StepEdgeCurve edgeCurve = assertInstanceOf(StepEdgeCurve.class, resolved.get(22));
+        StepTrimmedCurve trimmedCurve = assertInstanceOf(StepTrimmedCurve.class, resolved.get(23));
+        StepSurfaceCurve surfaceCurve = assertInstanceOf(StepSurfaceCurve.class, resolved.get(24));
+        StepGeometricReplica pointReplica = assertInstanceOf(StepGeometricReplica.class, resolved.get(25));
+        StepOrientedSurface orientedSurface =
+                assertInstanceOf(StepOrientedSurface.class, resolved.get(26));
+        StepSurfaceCurve intersectionCurve =
+                assertInstanceOf(StepSurfaceCurve.class, resolved.get(27));
+        StepCompositeCurveOnSurface boundaryCurve =
+                assertInstanceOf(StepCompositeCurveOnSurface.class, resolved.get(29));
+        StepCompositeCurveOnSurface outerBoundaryCurve =
+                assertInstanceOf(StepCompositeCurveOnSurface.class, resolved.get(30));
+        StepOrientedCurve orientedCurve = assertInstanceOf(StepOrientedCurve.class, resolved.get(31));
+        StepOffsetCurve2D offsetCurve2d =
+                assertInstanceOf(StepOffsetCurve2D.class, resolved.get(32));
+        StepPcurve offsetPcurve = assertInstanceOf(StepPcurve.class, resolved.get(34));
+
+        assertEquals("SURFACE_REPLICA", surfaceReplica.entityName());
+        assertEquals(6, surfaceReplica.parent().id());
+        assertEquals(7, surfaceReplica.transformation().id());
+        assertEquals(8, trimmedSurface.basisSurface().id());
+        assertEquals(1.0, trimmedSurface.u2());
+        assertEquals(8, boundedSurface.basisSurface().id());
+        assertEquals(12, boundedSurface.boundaries().getFirst().id());
+        assertEquals(9, offsetSurface.basisSurface().id());
+        assertEquals(13, pcurve.basisSurface().id());
+        assertEquals(13, advancedFace.faceGeometry().id());
+        assertEquals(8, geometricSet.elements().size());
+        assertEquals(12, edgeCurve.edgeGeometry().id());
+        assertEquals(12, trimmedCurve.basisCurve().id());
+        assertEquals(12, surfaceCurve.curve3d().id());
+        assertEquals("POINT_REPLICA", pointReplica.entityName());
+        assertEquals(13, orientedSurface.surfaceElement().id());
+        assertEquals(false, orientedSurface.orientation());
+        assertEquals(12, intersectionCurve.curve3d().id());
+        assertEquals(17, intersectionCurve.associatedGeometry().getFirst().id());
+        assertEquals(28, boundaryCurve.segments().getFirst().id());
+        assertEquals(28, outerBoundaryCurve.segments().getFirst().id());
+        assertEquals(12, orientedCurve.curveElement().id());
+        assertEquals(false, orientedCurve.orientation());
+        assertEquals(31, offsetCurve2d.basisCurve().id());
+        assertEquals(0.25, offsetCurve2d.distance());
+        assertEquals(32, offsetPcurve.referenceToCurve().items().getFirst().id());
+    }
+
+    @Test
+    void shouldResolveAdditionalShapeRepresentationAliases() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','SHAPE');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','SHAPECTX'));
+                #3=GEOMETRICALLY_BOUNDED_SURFACE_SHAPE_REPRESENTATION('GBSSR',(#1),#2);
+                #4=GEOMETRICALLY_BOUNDED_WIREFRAME_SHAPE_REPRESENTATION('GBWSR',(#1),#2);
+                #5=GEOMETRIC_SET_SHAPE_REPRESENTATION('GSSR',(#1),#2);
+                #6=MANIFOLD_SURFACE_SHAPE_REPRESENTATION('MSSR',(#1),#2);
+                #7=SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION('SBSMSR',(#1),#2);
+                #8=SURFACE_MODEL_SHAPE_REPRESENTATION('SMSR',(#1),#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        for (int id = 3; id <= 8; id++) {
+            StepRepresentation representation =
+                    assertInstanceOf(StepRepresentation.class, resolved.get(id));
+            assertEquals(true, representation.shapeRepresentation());
+            assertEquals(1, representation.items().size());
+            assertEquals(2, representation.context().id());
+        }
     }
 
     @Test

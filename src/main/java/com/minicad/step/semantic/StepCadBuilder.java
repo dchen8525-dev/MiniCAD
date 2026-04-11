@@ -38,7 +38,9 @@ import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepCircle;
 import com.minicad.step.model.StepClosedShell;
 import com.minicad.step.model.StepConicalSurface;
+import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.model.StepCylindricalSurface;
+import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
@@ -47,15 +49,23 @@ import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.StepFaceBound;
 import com.minicad.step.model.StepFaceSurface;
+import com.minicad.step.model.StepCurveBoundedSurface;
+import com.minicad.step.model.StepGeometricReplica;
 import com.minicad.step.model.StepLine;
 import com.minicad.step.model.StepManifoldSolidBrep;
+import com.minicad.step.model.StepOffsetCurve2D;
 import com.minicad.step.model.StepOpenShell;
 import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
 import com.minicad.step.model.StepOrientedEdge;
 import com.minicad.step.model.StepOrientedFace;
+import com.minicad.step.model.StepOrientedCurve;
+import com.minicad.step.model.StepOrientedSurface;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepPcurve;
+import com.minicad.step.model.StepRationalBSplineCurve;
+import com.minicad.step.model.StepRationalBSplineSurface;
+import com.minicad.step.model.StepRectangularTrimmedSurface;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
@@ -366,6 +376,18 @@ public final class StepCadBuilder {
         if (item instanceof StepEllipse ellipse) {
             return buildEllipse2(ellipse.id());
         }
+        if (item instanceof StepConicCurve conic) {
+            throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
+        }
+        if (item instanceof StepOffsetCurve2D) {
+            throw new UnsupportedGeometryException("PCURVE 2D item for OFFSET_CURVE_2D is unsupported");
+        }
+        if (item instanceof StepOrientedCurve) {
+            throw new UnsupportedGeometryException("PCURVE 2D item for ORIENTED_CURVE is unsupported");
+        }
+        if (item instanceof StepGeometricReplica replica) {
+            throw new UnsupportedGeometryException("PCURVE 2D item for " + replica.entityName() + " is unsupported");
+        }
         if (item instanceof StepBSplineCurveWithKnots spline) {
             return buildBSplineCurve2(spline.id());
         }
@@ -571,6 +593,16 @@ public final class StepCadBuilder {
             case StepEllipse ellipse -> buildEllipse(ellipse.id());
             case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
             case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            case StepConicCurve conic ->
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for " + conic.entityName() + " is unsupported");
+            case StepOffsetCurve2D ignored ->
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for OFFSET_CURVE_2D is unsupported");
+            case StepOrientedCurve ignored ->
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for ORIENTED_CURVE is unsupported");
+            case StepGeometricReplica replica ->
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for " + replica.entityName() + " is unsupported");
+            case StepRationalBSplineCurve ignored ->
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for RATIONAL_B_SPLINE_CURVE is unsupported");
             default -> throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve requires LINE, CIRCLE, ELLIPSE, SURFACE_CURVE or B_SPLINE_CURVE_WITH_KNOTS");
         };
         for (StepEntity trim : trimmedCurve.trim1()) {
@@ -601,6 +633,16 @@ public final class StepCadBuilder {
             case StepCircle circle -> buildCircle(circle.id());
             case StepEllipse ellipse -> buildEllipse(ellipse.id());
             case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            case StepConicCurve conic ->
+                    throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d for " + conic.entityName() + " is unsupported");
+            case StepOffsetCurve2D ignored ->
+                    throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d for OFFSET_CURVE_2D is unsupported");
+            case StepOrientedCurve ignored ->
+                    throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d for ORIENTED_CURVE is unsupported");
+            case StepGeometricReplica replica ->
+                    throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d for " + replica.entityName() + " is unsupported");
+            case StepRationalBSplineCurve ignored ->
+                    throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d for RATIONAL_B_SPLINE_CURVE is unsupported");
             default -> throw new UnsupportedGeometryException("SURFACE_CURVE curve_3d requires LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
         };
         SurfaceCurve3 built = new SurfaceCurve3(curve3d);
@@ -615,6 +657,16 @@ public final class StepCadBuilder {
             case StepCircle circle -> buildCircle(circle.id());
             case StepEllipse ellipse -> buildEllipse(ellipse.id());
             case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
+            case StepConicCurve conic ->
+                    throw new UnsupportedGeometryException("SEAM_CURVE curve_3d for " + conic.entityName() + " is unsupported");
+            case StepOffsetCurve2D ignored ->
+                    throw new UnsupportedGeometryException("SEAM_CURVE curve_3d for OFFSET_CURVE_2D is unsupported");
+            case StepOrientedCurve ignored ->
+                    throw new UnsupportedGeometryException("SEAM_CURVE curve_3d for ORIENTED_CURVE is unsupported");
+            case StepGeometricReplica replica ->
+                    throw new UnsupportedGeometryException("SEAM_CURVE curve_3d for " + replica.entityName() + " is unsupported");
+            case StepRationalBSplineCurve ignored ->
+                    throw new UnsupportedGeometryException("SEAM_CURVE curve_3d for RATIONAL_B_SPLINE_CURVE is unsupported");
             default -> throw new UnsupportedGeometryException("SEAM_CURVE curve_3d requires LINE, CIRCLE, ELLIPSE or B_SPLINE_CURVE_WITH_KNOTS");
         };
         return new SurfaceCurve3(curve3d);
@@ -657,6 +709,16 @@ public final class StepCadBuilder {
             case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
             case StepSeamCurve seamCurve -> buildSeamCurve(seamCurve.id());
             case StepTrimmedCurve trimmedCurve -> buildTrimmedCurve(trimmedCurve.id());
+            case StepConicCurve conic ->
+                    throw new UnsupportedGeometryException("EDGE_CURVE construction for " + conic.entityName() + " is unsupported");
+            case StepOffsetCurve2D ignored ->
+                    throw new UnsupportedGeometryException("EDGE_CURVE construction for OFFSET_CURVE_2D is unsupported");
+            case StepOrientedCurve ignored ->
+                    throw new UnsupportedGeometryException("EDGE_CURVE construction for ORIENTED_CURVE is unsupported");
+            case StepGeometricReplica replica ->
+                    throw new UnsupportedGeometryException("EDGE_CURVE construction for " + replica.entityName() + " is unsupported");
+            case StepRationalBSplineCurve ignored ->
+                    throw new UnsupportedGeometryException("EDGE_CURVE construction for RATIONAL_B_SPLINE_CURVE is unsupported");
             default -> throw new UnsupportedGeometryException("EDGE_CURVE topology requires LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE geometry");
         };
         Edge built = new Edge(
@@ -808,9 +870,27 @@ public final class StepCadBuilder {
                 buildBSplineSurface(splineSurface.id());
                 throw new UnsupportedGeometryException(faceType + " construction for B_SPLINE_SURFACE_WITH_KNOTS is unsupported");
             }
+            if (geometry instanceof StepRationalBSplineSurface rationalSplineSurface) {
+                throw new UnsupportedGeometryException(faceType + " construction for RATIONAL_B_SPLINE_SURFACE is unsupported");
+            }
             if (geometry instanceof StepToroidalSurface toroidalSurface) {
                 buildToroidalSurface(toroidalSurface.id());
                 throw new UnsupportedGeometryException(faceType + " construction for TOROIDAL_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepDegenerateToroidalSurface) {
+                throw new UnsupportedGeometryException(faceType + " construction for DEGENERATE_TOROIDAL_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepRectangularTrimmedSurface) {
+                throw new UnsupportedGeometryException(faceType + " construction for RECTANGULAR_TRIMMED_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepCurveBoundedSurface) {
+                throw new UnsupportedGeometryException(faceType + " construction for CURVE_BOUNDED_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepOrientedSurface) {
+                throw new UnsupportedGeometryException(faceType + " construction for ORIENTED_SURFACE is unsupported");
+            }
+            if (geometry instanceof StepGeometricReplica replica) {
+                throw new UnsupportedGeometryException(faceType + " construction for " + replica.entityName() + " is unsupported");
             }
             throw new UnsupportedGeometryException(faceType + " construction requires PLANE geometry");
         }
@@ -921,6 +1001,16 @@ public final class StepCadBuilder {
             case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
             case StepSeamCurve seamCurve -> buildSeamCurve(seamCurve.id());
             case StepTrimmedCurve trimmedCurve -> buildTrimmedCurve(trimmedCurve.id());
+            case StepConicCurve conic ->
+                    throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
+            case StepOffsetCurve2D ignored ->
+                    throw new UnsupportedGeometryException("surface directrix for OFFSET_CURVE_2D is unsupported");
+            case StepOrientedCurve ignored ->
+                    throw new UnsupportedGeometryException("surface directrix for ORIENTED_CURVE is unsupported");
+            case StepGeometricReplica replica ->
+                    throw new UnsupportedGeometryException("surface directrix for " + replica.entityName() + " is unsupported");
+            case StepRationalBSplineCurve ignored ->
+                    throw new UnsupportedGeometryException("surface directrix for RATIONAL_B_SPLINE_CURVE is unsupported");
             default -> throw new UnsupportedGeometryException(
                     "surface directrix requires LINE, CIRCLE, ELLIPSE, B_SPLINE_CURVE_WITH_KNOTS, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE"
             );

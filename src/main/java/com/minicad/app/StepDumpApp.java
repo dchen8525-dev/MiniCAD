@@ -292,8 +292,43 @@ public final class StepDumpApp {
         if (reason.contains("construction for TOROIDAL_SURFACE is unsupported")) {
             return "unsupported_surface.toroidal";
         }
+        if (reason.contains("construction for DEGENERATE_TOROIDAL_SURFACE is unsupported")) {
+            return "unsupported_surface.degenerate_toroidal";
+        }
         if (reason.contains("construction for B_SPLINE_SURFACE_WITH_KNOTS is unsupported")) {
             return "unsupported_surface.bspline";
+        }
+        if (reason.contains("construction for RATIONAL_B_SPLINE_SURFACE is unsupported")) {
+            return "unsupported_surface.rational_bspline";
+        }
+        if (reason.contains("construction for RECTANGULAR_TRIMMED_SURFACE is unsupported")) {
+            return "unsupported_surface.rectangular_trimmed";
+        }
+        if (reason.contains("construction for CURVE_BOUNDED_SURFACE is unsupported")) {
+            return "unsupported_surface.curve_bounded";
+        }
+        if (reason.contains("construction for ORIENTED_SURFACE is unsupported")) {
+            return "unsupported_surface.oriented";
+        }
+        if (reason.contains("construction for SURFACE_REPLICA is unsupported")) {
+            return "unsupported_surface.replica";
+        }
+        if (reason.contains("RATIONAL_B_SPLINE_CURVE is unsupported")) {
+            return "unsupported_curve.rational_bspline";
+        }
+        if (reason.contains("for CURVE_REPLICA is unsupported")) {
+            return "unsupported_curve.replica";
+        }
+        if (reason.contains("OFFSET_CURVE_2D is unsupported")) {
+            return "unsupported_curve.offset_2d";
+        }
+        if (reason.contains("ORIENTED_CURVE is unsupported")) {
+            return "unsupported_curve.oriented";
+        }
+        if (reason.contains("for PARABOLA is unsupported")
+                || reason.contains("for HYPERBOLA is unsupported")
+                || reason.contains("for DEGENERATE_CONIC is unsupported")) {
+            return "unsupported_curve.conic";
         }
         if (reason.contains("construction for SURFACE_OF_LINEAR_EXTRUSION is unsupported")) {
             return "unsupported_surface.linear_extrusion";
