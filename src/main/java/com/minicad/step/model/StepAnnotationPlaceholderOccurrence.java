@@ -8,7 +8,7 @@ import java.util.List;
  * @param id STEP instance id
  * @param name occurrence name
  * @param styles style assignments
- * @param item referenced geometric set
+ * @param item referenced point-like carrier
  * @param role placeholder role enum
  * @param lineSpacing positive line spacing
  */
@@ -16,7 +16,7 @@ public record StepAnnotationPlaceholderOccurrence(
         int id,
         String name,
         List<StepPresentationStyleAssignment> styles,
-        StepGeometricSet item,
+        StepEntity item,
         String role,
         double lineSpacing
 ) implements StepEntity {

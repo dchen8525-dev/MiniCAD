@@ -6,12 +6,14 @@ import java.util.List;
  * Minimal APPLIED_ORGANIZATION_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
+ * @param entityName concrete STEP entity name
  * @param assignedOrganization assigned organization
  * @param role assignment role
  * @param items assigned target items
  */
 public record StepAppliedOrganizationAssignment(
         int id,
+        String entityName,
         StepOrganization assignedOrganization,
         StepOrganizationRole role,
         List<StepEntity> items

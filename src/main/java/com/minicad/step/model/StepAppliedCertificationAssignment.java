@@ -6,11 +6,13 @@ import java.util.List;
  * Minimal APPLIED_CERTIFICATION_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
+ * @param entityName concrete STEP entity name
  * @param assignedCertification assigned certification
  * @param items assigned target items
  */
 public record StepAppliedCertificationAssignment(
         int id,
+        String entityName,
         StepCertification assignedCertification,
         List<StepEntity> items
 ) implements StepEntity {

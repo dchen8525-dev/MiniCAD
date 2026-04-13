@@ -30,6 +30,7 @@ import com.minicad.step.model.StepContextDependentUnit;
 import com.minicad.step.model.StepContactRatioRepresentation;
 import com.minicad.step.model.StepCoordinatedUniversalTimeOffset;
 import com.minicad.step.model.StepEdgeCurve;
+import com.minicad.step.model.StepEdgeLoop;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
 import com.minicad.step.model.StepEffectivity;
 import com.minicad.step.model.StepEntity;
@@ -185,8 +186,10 @@ import com.minicad.step.model.StepOrganizationAssignment;
 import com.minicad.step.model.StepOrganizationRelationship;
 import com.minicad.step.model.StepOrganizationRole;
 import com.minicad.step.model.StepOrientedFace;
+import com.minicad.step.model.StepOrientedEdge;
 import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
+import com.minicad.step.model.StepOpenShell;
 import com.minicad.step.model.StepOrientedPath;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepPlacedDatumTargetFeature;
@@ -327,6 +330,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -595,6 +599,30 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveNestedOrientedFace() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('PL0',#4);
+                #10=EDGE_LOOP('L0',());
+                #11=FACE_OUTER_BOUND('B0',#10,.T.);
+                #12=FACE_SURFACE('FS0',(#11),#5,.T.);
+                #13=ORIENTED_FACE('OF0',#12,.F.);
+                #14=ORIENTED_FACE('OF1',#13,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOrientedFace outer = assertInstanceOf(StepOrientedFace.class, resolved.get(14));
+        assertEquals(13, outer.faceElement().id());
+        assertEquals(true, outer.orientation());
+    }
+
+    @Test
     void shouldResolveOrientedShells() {
         String step = """
                 DATA;
@@ -623,6 +651,60 @@ class StepEntityResolverTest {
         assertEquals(false, orientedClosedShell.orientation());
         assertEquals(1, orientedOpenShell.faces().size());
         assertEquals(1, orientedClosedShell.faces().size());
+    }
+
+    @Test
+    void shouldResolveNestedOrientedShells() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('PL0',#4);
+                #6=EDGE_LOOP('L0',());
+                #7=FACE_OUTER_BOUND('B0',#6,.T.);
+                #8=ADVANCED_FACE('FACE0',(#7),#5,.T.);
+                #9=OPEN_SHELL('OS',(#8));
+                #10=CLOSED_SHELL('CS',(#8));
+                #11=ORIENTED_OPEN_SHELL('OOS0',#9,.F.);
+                #12=ORIENTED_OPEN_SHELL('OOS1',#11,.T.);
+                #13=ORIENTED_CLOSED_SHELL('OCS0',#10,.F.);
+                #14=ORIENTED_CLOSED_SHELL('OCS1',#13,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOrientedOpenShell openShell = assertInstanceOf(StepOrientedOpenShell.class, resolved.get(12));
+        StepOrientedClosedShell closedShell = assertInstanceOf(StepOrientedClosedShell.class, resolved.get(14));
+        assertEquals(11, openShell.openShellElement().id());
+        assertEquals(13, closedShell.closedShellElement().id());
+        assertEquals(1, openShell.faces().size());
+        assertEquals(1, closedShell.faces().size());
+    }
+
+    @Test
+    void shouldResolveOrientedEdgeWithExplicitVertices() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=VERTEX_POINT('V0',#1);
+                #4=VERTEX_POINT('V1',#2);
+                #5=DIRECTION('DX',(1.0,0.0,0.0));
+                #6=VECTOR('VX',#5,1.0);
+                #7=LINE('L0',#1,#6);
+                #8=EDGE_CURVE('E0',#3,#4,#7,.T.);
+                #9=ORIENTED_EDGE('OE0',#4,#3,#8,.F.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOrientedEdge orientedEdge = assertInstanceOf(StepOrientedEdge.class, resolved.get(9));
+        assertEquals(8, orientedEdge.edgeElement().id());
+        assertEquals(false, orientedEdge.orientation());
     }
 
     @Test
@@ -880,6 +962,35 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveWireShellWithMixedLoopFamilies() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=VECTOR('VX',#4,1.0);
+                #6=LINE('L0',#1,#5);
+                #7=VERTEX_POINT('V0',#1);
+                #8=VERTEX_POINT('V1',#2);
+                #9=EDGE_CURVE('E0',#7,#8,#6,.T.);
+                #10=ORIENTED_EDGE('OE0',$,$,#9,.T.);
+                #11=EDGE_LOOP('EL0',(#10));
+                #12=POLY_LOOP('PL0',(#1,#2,#3));
+                #13=WIRE_SHELL('WS0',(#11,#12));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepWireShell shell = assertInstanceOf(StepWireShell.class, resolved.get(13));
+        assertEquals("WS0", shell.name());
+        assertEquals(2, shell.loops().size());
+        assertSame(StepEdgeLoop.class, shell.loops().get(0).getClass());
+        assertSame(StepPolyLoop.class, shell.loops().get(1).getClass());
+    }
+
+    @Test
     void shouldResolveOrientedPath() {
         String step = """
                 DATA;
@@ -945,6 +1056,72 @@ class StepEntityResolverTest {
         assertEquals(2, path.edges().size());
         assertEquals(14, path.edges().getFirst().id());
         assertEquals(13, path.edges().get(1).id());
+    }
+
+    @Test
+    void shouldResolveNestedOrientedPath() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=VECTOR('VX',#4,1.0);
+                #6=LINE('L0',#1,#5);
+                #7=LINE('L1',#2,#5);
+                #8=VERTEX_POINT('V0',#1);
+                #9=VERTEX_POINT('V1',#2);
+                #10=VERTEX_POINT('V2',#3);
+                #11=EDGE_CURVE('E0',#8,#9,#6,.T.);
+                #12=EDGE_CURVE('E1',#9,#10,#7,.T.);
+                #13=ORIENTED_EDGE('OE0',$,$,#11,.T.);
+                #14=ORIENTED_EDGE('OE1',$,$,#12,.T.);
+                #15=PATH('PTH',(#13,#14));
+                #16=ORIENTED_PATH('OP0',#15,.F.);
+                #17=ORIENTED_PATH('OP1',#16,.F.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOrientedPath path = assertInstanceOf(StepOrientedPath.class, resolved.get(17));
+        assertEquals("OP1", path.name());
+        assertEquals(16, path.pathElement().id());
+        assertEquals(false, path.orientation());
+        assertEquals(2, path.edges().size());
+        assertEquals(13, path.edges().getFirst().id());
+        assertEquals(14, path.edges().get(1).id());
+    }
+
+    @Test
+    void shouldResolveOpenPathUsingOrientedEdgeEndpoints() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
+                #4=DIRECTION('DX',(1.0,0.0,0.0));
+                #5=VECTOR('VX',#4,1.0);
+                #6=LINE('L0',#1,#5);
+                #7=LINE('L1',#3,#5);
+                #8=VERTEX_POINT('V0',#1);
+                #9=VERTEX_POINT('V1',#2);
+                #10=VERTEX_POINT('V2',#3);
+                #11=EDGE_CURVE('E0',#8,#9,#6,.T.);
+                #12=EDGE_CURVE('E1',#10,#8,#7,.T.);
+                #13=ORIENTED_EDGE('OE0',$,$,#11,.F.);
+                #14=ORIENTED_EDGE('OE1',$,$,#12,.F.);
+                #15=OPEN_PATH('OP0',(#13,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOpenPath path = assertInstanceOf(StepOpenPath.class, resolved.get(15));
+        assertEquals("OP0", path.name());
+        assertEquals(2, path.edges().size());
+        assertEquals(13, path.edges().getFirst().id());
+        assertEquals(14, path.edges().get(1).id());
     }
 
     @Test
@@ -1023,6 +1200,31 @@ class StepEntityResolverTest {
         assertEquals("FBSM", model.name());
         assertEquals(1, model.faceSets().size());
         assertEquals(10, model.faceSets().getFirst().id());
+    }
+
+    @Test
+    void shouldResolveFaceBasedSurfaceModelWithShellMember() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('PL0',#4);
+                #6=EDGE_LOOP('L0',());
+                #7=FACE_OUTER_BOUND('B0',#6,.T.);
+                #8=ADVANCED_FACE('FACE0',(#7),#5,.T.);
+                #9=OPEN_SHELL('OS0',(#8));
+                #10=(FACE_BASED_SURFACE_MODEL('FBSM',(#9)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('fbsm-item'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepFaceBasedSurfaceModel model = assertInstanceOf(StepFaceBasedSurfaceModel.class, resolved.get(10));
+        assertEquals("FBSM", model.name());
+        assertEquals(1, model.faceSets().size());
+        assertEquals(9, model.faceSets().getFirst().id());
     }
 
     @Test
@@ -1315,6 +1517,38 @@ class StepEntityResolverTest {
         assertSame(StepPiecewiseBezierCurve.class, entity.getClass());
         StepPiecewiseBezierCurve curve = assertInstanceOf(StepPiecewiseBezierCurve.class, entity);
         assertEquals("pbc", curve.name());
+    }
+
+    @Test
+    void shouldResolveImplicitBsplineDataForCurveSubtypeMarkers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(2.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(3.0,1.0,0.0));
+                #10=(BEZIER_CURVE() B_SPLINE_CURVE(3,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bz'));
+                #11=(UNIFORM_CURVE() B_SPLINE_CURVE(2,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('uc'));
+                #12=(QUASI_UNIFORM_CURVE() B_SPLINE_CURVE(2,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('quc'));
+                #13=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() B_SPLINE_CURVE(1,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbc'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepBezierCurve bezier = assertInstanceOf(StepBezierCurve.class, resolved.get(10));
+        StepUniformCurve uniform = assertInstanceOf(StepUniformCurve.class, resolved.get(11));
+        StepQuasiUniformCurve quasiUniform = assertInstanceOf(StepQuasiUniformCurve.class, resolved.get(12));
+        StepPiecewiseBezierCurve piecewise = assertInstanceOf(StepPiecewiseBezierCurve.class, resolved.get(13));
+
+        assertEquals(3, bezier.degree());
+        assertEquals(4, bezier.controlPoints().size());
+        assertEquals(2, uniform.degree());
+        assertEquals(4, uniform.controlPoints().size());
+        assertEquals(2, quasiUniform.degree());
+        assertEquals(4, quasiUniform.controlPoints().size());
+        assertEquals(1, piecewise.degree());
+        assertEquals(4, piecewise.controlPoints().size());
     }
 
     @Test
@@ -1639,6 +1873,38 @@ class StepEntityResolverTest {
         assertSame(StepPiecewiseBezierSurface.class, entity.getClass());
         StepPiecewiseBezierSurface surface = assertInstanceOf(StepPiecewiseBezierSurface.class, entity);
         assertEquals("pbs", surface.name());
+    }
+
+    @Test
+    void shouldResolveImplicitBsplineDataForSurfaceSubtypeMarkers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(0.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(1.0,1.0,0.0));
+                #10=(BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bzs'));
+                #11=(UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('us'));
+                #12=(QUASI_UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('qus'));
+                #13=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbs'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepBezierSurface bezier = assertInstanceOf(StepBezierSurface.class, resolved.get(10));
+        StepUniformSurface uniform = assertInstanceOf(StepUniformSurface.class, resolved.get(11));
+        StepQuasiUniformSurface quasiUniform = assertInstanceOf(StepQuasiUniformSurface.class, resolved.get(12));
+        StepPiecewiseBezierSurface piecewise = assertInstanceOf(StepPiecewiseBezierSurface.class, resolved.get(13));
+
+        assertEquals(1, bezier.uDegree());
+        assertEquals(2, bezier.controlPoints().size());
+        assertEquals(1, uniform.uDegree());
+        assertEquals(2, uniform.controlPoints().size());
+        assertEquals(1, quasiUniform.vDegree());
+        assertEquals(2, quasiUniform.controlPoints().getFirst().size());
+        assertEquals(1, piecewise.uDegree());
+        assertEquals(2, piecewise.controlPoints().getFirst().size());
     }
 
     @Test
@@ -2442,6 +2708,302 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveAnnotationTextOccurrenceWithPointReplicaPosition() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DY',(0.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=CARTESIAN_POINT('O',(10.0,20.0,30.0));
+                #6=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#2,#3,#5,2.0,#4);
+                #7=POINT_REPLICA('PR0',#1,#6);
+                #8=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#7);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationTextOccurrence text = assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(8));
+        assertEquals("A=2.0", text.text());
+        assertEquals(7, text.position().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPointAndFillAreaOccurrencesWithVertexPointTargets() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=POLYLINE('B0',(#1,#1));
+                #4=(ANNOTATION_FILL_AREA('FA0',(#3))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=(ANNOTATION_POINT_OCCURRENCE('AP0',(#5),#2)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#5),#2));
+                #7=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#5),#4,#2)
+                    STYLED_ITEM('FAO0',(#5),#4)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPointOccurrence pointOccurrence =
+                assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(6));
+        StepAnnotationFillAreaOccurrence fillAreaOccurrence =
+                assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(7));
+        assertEquals(2, pointOccurrence.item().id());
+        assertEquals(2, fillAreaOccurrence.fillStyleTarget().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationTextOccurrenceWithVertexPointPosition() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#2);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationTextOccurrence text = assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(3));
+        assertEquals("A=2.0", text.text());
+        assertEquals(2, text.position().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPointLikeOccurrencesWithContainerCarriers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,0.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=POINT_SET('PS0',(#2));
+                #4=GEOMETRIC_CURVE_SET('GCS0',(#2));
+                #5=GEOMETRIC_SET('GS0',(#3,#4));
+                #6=PRESENTATION_STYLE_ASSIGNMENT(());
+                #7=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#3);
+                #8=(ANNOTATION_POINT_OCCURRENCE('AP0',(#6),#4)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#6),#4));
+                #9=POLYLINE('B0',(#1,#1));
+                #10=(ANNOTATION_FILL_AREA('FA0',(#9))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #11=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#6),#10,#5)
+                    STYLED_ITEM('FAO0',(#6),#10)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(3, assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(7)).position().id());
+        assertEquals(4, assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(8)).item().id());
+        assertEquals(5, assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(11)).fillStyleTarget().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPointLikeOccurrencesWithVertexShellCarrier() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=VERTEX_LOOP('VL0',#2);
+                #4=VERTEX_SHELL('VS0',#3);
+                #5=PRESENTATION_STYLE_ASSIGNMENT(());
+                #6=ANNOTATION_TEXT_OCCURRENCE('NOTE','vertex-shell',#4);
+                #7=(ANNOTATION_POINT_OCCURRENCE('AP0',(#5),#4)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#5),#4));
+                #8=POLYLINE('B0',(#1,#1));
+                #9=(ANNOTATION_FILL_AREA('FA0',(#8))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #10=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#5),#9,#4)
+                    STYLED_ITEM('FAO0',(#5),#9)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(4, assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(6)).position().id());
+        assertEquals(4, assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(7)).item().id());
+        assertEquals(4, assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(10)).fillStyleTarget().id());
+    }
+
+    @Test
+    void shouldResolvePointContainersWithVertexPointMembers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=POINT_SET('PS0',(#2));
+                #4=GEOMETRIC_SET('GS0',(#2));
+                #5=GEOMETRIC_CURVE_SET('GCS0',(#2));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPointSet pointSet = assertInstanceOf(StepPointSet.class, resolved.get(3));
+        StepGeometricSet geometricSet = assertInstanceOf(StepGeometricSet.class, resolved.get(4));
+        StepGeometricCurveSet curveSet = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(5));
+        assertEquals(2, pointSet.points().getFirst().id());
+        assertEquals(2, geometricSet.elements().getFirst().id());
+        assertEquals(2, curveSet.elements().getFirst().id());
+    }
+
+    @Test
+    void shouldResolveGeometricSetWithNestedPointAndCurveSets() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=POINT_SET('PS0',(#2));
+                #4=GEOMETRIC_CURVE_SET('GCS0',(#2));
+                #5=GEOMETRIC_SET('GS0',(#3,#4));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricSet geometricSet = assertInstanceOf(StepGeometricSet.class, resolved.get(5));
+        assertEquals(2, geometricSet.elements().size());
+        assertEquals(3, geometricSet.elements().get(0).id());
+        assertEquals(4, geometricSet.elements().get(1).id());
+    }
+
+    @Test
+    void shouldResolvePointReplicaWithVertexPointParent() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=CARTESIAN_POINT('O',(10.0,20.0,30.0));
+                #7=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#4,#6,2.0,#5);
+                #8=POINT_REPLICA('PR0',#2,#7);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricReplica pointReplica = assertInstanceOf(StepGeometricReplica.class, resolved.get(8));
+        assertEquals("POINT_REPLICA", pointReplica.entityName());
+        assertEquals(2, pointReplica.parent().id());
+    }
+
+    @Test
+    void shouldRejectPointReplicaWithPointMarkerParent() {
+        String step = """
+                DATA;
+                #1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DY',(0.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=CARTESIAN_POINT('O',(10.0,20.0,30.0));
+                #6=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#2,#3,#5,2.0,#4);
+                #7=POINT_REPLICA('PR0',#1,#6);
+                ENDSEC;
+                """;
+
+        StepResolutionException error = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertTrue(error.getMessage().contains("POINT_REPLICA parent must reference a supported point"));
+    }
+
+    @Test
+    void shouldRejectPointMarkerInAnnotationPointCarriers() {
+        String step = """
+                DATA;
+                #1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));
+                #2=PRESENTATION_STYLE_ASSIGNMENT(());
+                #3=(ANNOTATION_POINT_OCCURRENCE('AP0',(#2),#1)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#2),#1));
+                #4=ANNOTATION_TEXT_OCCURRENCE('NOTE','text',#1);
+                #5=POLYLINE('B0',());
+                #6=(ANNOTATION_FILL_AREA('FA0',(#5))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #7=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#2),#6,#1)
+                    STYLED_ITEM('FAO0',(#2),#6)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        StepResolutionException error = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertTrue(error.getMessage().contains(
+                "must reference supported point carriers or point-like annotation content/occurrences"));
+    }
+
+    @Test
+    void shouldRejectPointMarkerInPointSet() {
+        String step = """
+                DATA;
+                #1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));
+                #2=POINT_SET('PS0',(#1));
+                ENDSEC;
+                """;
+
+        UnsupportedStepEntityException error = assertThrows(
+                UnsupportedStepEntityException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertTrue(error.getMessage().contains(
+                "POINT_SET points must reference supported point carriers or point-like annotation content/occurrences"));
+    }
+
+    @Test
+    void shouldResolveNestedPointSetAndAnnotationPlaneOccurrenceElements() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=VERTEX_POINT('VP0',#1);
+                #3=POINT_SET('INNER',(#2));
+                #4=GEOMETRIC_CURVE_SET('GCS0',(#1));
+                #5=GEOMETRIC_SET('GS0',(#3,#4));
+                #6=POINT_SET('OUTER',(#3,#5));
+                #7=DIRECTION('N',(0.0,0.0,1.0));
+                #8=DIRECTION('X',(1.0,0.0,0.0));
+                #9=AXIS2_PLACEMENT_3D('AX',#1,#7,#8);
+                #10=PLANE('PL0',#9);
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=ANNOTATION_TEXT_OCCURRENCE('NOTE','TXT',#6);
+                #13=(ANNOTATION_POINT_OCCURRENCE('AP0',(#11),#5) ANNOTATION_OCCURRENCE());
+                #14=(ANNOTATION_PLANE((#12,#13))
+                    STYLED_ITEM('AP',(#11),#10)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPointSet pointSet = (StepPointSet) resolved.get(6);
+        assertEquals(List.of(3, 5), pointSet.points().stream().map(StepEntity::id).toList());
+
+        StepAnnotationPlane annotationPlane = (StepAnnotationPlane) resolved.get(14);
+        assertEquals(List.of(12, 13), annotationPlane.elements().stream().map(StepEntity::id).toList());
+    }
+
+    @Test
     void shouldResolveItemIdentifiedRepresentationUsageFamily() {
         String step = """
                 DATA;
@@ -2482,6 +3044,145 @@ class StepEntityResolverTest {
         assertEquals(3, withPlaceholder.usedRepresentation().id());
         assertEquals(12, withPlaceholder.identifiedItem().id());
         assertEquals(13, withPlaceholder.annotationPlaceholder().id());
+    }
+
+    @Test
+    void shouldResolveExtendedAnnotationUsageFamilyEntities() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PMICTX'));
+                #3=DRAUGHTING_MODEL('DM',(#1),#2);
+                #4=PROPERTY_DEFINITION('PD','',#1);
+                #5=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #6=CARTESIAN_POINT('P1',(1.0,1.0,0.0));
+                #7=ANNOTATION_POINT_OCCURRENCE('APO',(),#5);
+                #8=GEOMETRIC_SET('PHSET',(#6));
+                #9=ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(),#8,.TITLE.,1.0);
+                #10=ANNOTATION_SYMBOL_OCCURRENCE('ASO',(),#9);
+                #11=REPRESENTATION('REP_A',(),#2);
+                #12=REPRESENTATION('REP_B',(),#2);
+                #13=REPRESENTATION('REP_C',(),#2);
+                #14=REPRESENTATION_RELATIONSHIP('RR','chain',#12,#13);
+                #15=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#7,#11);
+                #16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);
+                #17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricItemSpecificUsage geometricUsage =
+                assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(15));
+        StepChainBasedGeometricItemSpecificUsage chainUsage =
+                assertInstanceOf(StepChainBasedGeometricItemSpecificUsage.class, resolved.get(16));
+        StepDraughtingModelItemAssociationWithPlaceholder withPlaceholder =
+                assertInstanceOf(StepDraughtingModelItemAssociationWithPlaceholder.class, resolved.get(17));
+
+        assertEquals(7, geometricUsage.usage().id());
+        assertEquals(11, geometricUsage.identifiedItem().id());
+        assertEquals(10, chainUsage.usage().id());
+        assertEquals(11, chainUsage.identifiedItem().id());
+        assertEquals(2, chainUsage.nodes().size());
+        assertEquals(1, chainUsage.undirectedLinks().size());
+        assertEquals(7, withPlaceholder.identifiedItem().id());
+        assertEquals(9, withPlaceholder.annotationPlaceholder().id());
+    }
+
+    @Test
+    void shouldResolveGeometricItemSpecificUsageWithPathAndWireTargets() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=VECTOR('V0',#3,1.0);
+                #5=LINE('L0',#1,#4);
+                #6=VERTEX_POINT('VP0',#1);
+                #7=VERTEX_POINT('VP1',#2);
+                #8=EDGE_CURVE('E0',#6,#7,#5,.T.);
+                #9=ORIENTED_EDGE('OE0',$,$,#8,.T.);
+                #10=OPEN_PATH('OP',(#9));
+                #11=CONNECTED_EDGE_SET('CES',(#9));
+                #12=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
+                #14=REPRESENTATION('REP_A',(),#13);
+                #15=REPRESENTATION('REP_B',(),#13);
+                #16=REPRESENTATION_RELATIONSHIP('RR','chain',#14,#15);
+                #17=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#1);
+                #18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);
+                #19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricItemSpecificUsage geometricUsage =
+                assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(18));
+        StepChainBasedGeometricItemSpecificUsage chainUsage =
+                assertInstanceOf(StepChainBasedGeometricItemSpecificUsage.class, resolved.get(19));
+
+        assertEquals(17, geometricUsage.usage().id());
+        assertEquals(10, geometricUsage.identifiedItem().id());
+        assertEquals(17, chainUsage.usage().id());
+        assertEquals(11, chainUsage.identifiedItem().id());
+    }
+
+    @Test
+    void shouldResolveGeometricItemSpecificUsageWithShellModelAndSolidTargets() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #8=PLANE('PL0',#7);
+                #13=POLY_LOOP('LOOP',(#1,#2,#3,#4));
+                #14=FACE_OUTER_BOUND('FOB',#13,.T.);
+                #15=ADVANCED_FACE('FACE0',(#14),#8,.T.);
+                #16=OPEN_SHELL('OSH',(#15));
+                #17=FACE_BASED_SURFACE_MODEL('FBM',(#16));
+                #18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
+                #19=REPRESENTATION('REP_A',(),#18);
+                #20=REPRESENTATION('REP_B',(),#18);
+                #21=REPRESENTATION_RELATIONSHIP('RR','chain',#19,#20);
+                #22=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','',#1);
+                #23=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','',#2);
+                #24=BLOCK('BLK',#7,1.0,1.0,1.0);
+                #25=POINT_SET('PS',(#1,#2));
+                #26=GEOMETRIC_CURVE_SET('GCS',(#25));
+                #27=GEOMETRIC_SET('GS',(#26));
+                #31=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#22,#16);
+                #32=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#23,(#19,#20),(#21),#17);
+                #33=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SOLID','',#22,#24);
+                #34=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SET','',#22,#27);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricItemSpecificUsage shellUsage =
+                assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(31));
+        StepChainBasedGeometricItemSpecificUsage modelUsage =
+                assertInstanceOf(StepChainBasedGeometricItemSpecificUsage.class, resolved.get(32));
+        StepGeometricItemSpecificUsage solidUsage =
+                assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(33));
+        StepGeometricItemSpecificUsage setUsage =
+                assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(34));
+
+        assertEquals(22, shellUsage.usage().id());
+        assertEquals(16, shellUsage.identifiedItem().id());
+        assertEquals(23, modelUsage.usage().id());
+        assertEquals(17, modelUsage.identifiedItem().id());
+        assertEquals(2, modelUsage.nodes().size());
+        assertEquals(1, modelUsage.undirectedLinks().size());
+        assertEquals(22, solidUsage.usage().id());
+        assertEquals(24, solidUsage.identifiedItem().id());
+        assertEquals(22, setUsage.usage().id());
+        assertEquals(27, setUsage.identifiedItem().id());
     }
 
     @Test
@@ -2540,8 +3241,491 @@ class StepEntityResolverTest {
         assertEquals(2, datumTarget.contents().size());
         assertEquals(2, geometricalTolerance.contents().size());
         assertEquals(2, roughness.contents().size());
+        assertEquals("LEADER_DIRECTED_CALLOUT", leaderDirected.entityName());
+        assertEquals("PROJECTION_DIRECTED_CALLOUT", projectionDirected.entityName());
+        assertEquals("DIMENSION_CURVE_DIRECTED_CALLOUT", dimensionCurveDirected.entityName());
+        assertEquals("DIMENSION_CALLOUT", dimension.entityName());
+        assertEquals("STRUCTURED_DIMENSION_CALLOUT", structuredDimension.entityName());
+        assertEquals("SURFACE_CONDITION_CALLOUT", surfaceCondition.entityName());
+        assertEquals("DATUM_FEATURE_CALLOUT", datumFeature.entityName());
+        assertEquals("DATUM_TARGET_CALLOUT", datumTarget.entityName());
+        assertEquals("GEOMETRICAL_TOLERANCE_CALLOUT", geometricalTolerance.entityName());
+        assertEquals("ROUGHNESS_CALLOUT", roughness.entityName());
         assertEquals(15, relationship.relatingCallout().id());
         assertEquals(16, relationship.relatedCallout().id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithDirectAnnotationContent() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0));
+                #4=POLYLINE('PL0',(#1,#2));
+                #5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMCTX'));
+                #6=REPRESENTATION('SYMREP',(#4),#5);
+                #7=AXIS2_PLACEMENT_2D('MAP',#1,#3);
+                #8=SYMBOL_REPRESENTATION_MAP(#7,#6);
+                #9=REPRESENTATION_MAP(#7,#6);
+                #10=CARTESIAN_POINT('TXT3',(3.0,4.0));
+                #11=AXIS2_PLACEMENT_2D('TGT0',#10,#3);
+                #12=ANNOTATION_SYMBOL('AS0',#8,#11);
+                #13=CARTESIAN_POINT('TXT4',(6.0,7.0));
+                #14=AXIS2_PLACEMENT_2D('TGT1',#13,#3);
+                #15=ANNOTATION_TEXT('AT0',#9,#14);
+                #16=ANNOTATION_TEXT_CHARACTER('ATC0',#9,#14);
+                #17=(ANNOTATION_FILL_AREA('FA0',(#4))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #18=CARTESIAN_POINT('TXT',(9.0,9.0,0.0));
+                #19=ANNOTATION_TEXT_OCCURRENCE('NOTE','note',#18);
+                #20=DRAUGHTING_CALLOUT('SYM_CALLOUT',(#19,#12));
+                #21=DRAUGHTING_CALLOUT('TEXT_CALLOUT',(#19,#15));
+                #22=DRAUGHTING_CALLOUT('TEXT_CHAR_CALLOUT',(#19,#16));
+                #23=DRAUGHTING_CALLOUT('FILL_CALLOUT',(#19,#17));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout symbolCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(20));
+        StepDraughtingCallout textCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(21));
+        StepDraughtingCallout textCharacterCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(22));
+        StepDraughtingCallout fillCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(23));
+        assertEquals(12, symbolCallout.contents().get(1).id());
+        assertEquals(15, textCallout.contents().get(1).id());
+        assertEquals(16, textCharacterCallout.contents().get(1).id());
+        assertEquals(17, fillCallout.contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithPointContainersAndPlaneContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);
+                #4=POINT_SET('PS',(#2));
+                #5=GEOMETRIC_SET('GS',(#2));
+                #6=PRESENTATION_STYLE_ASSIGNMENT(());
+                #7=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(#6),#5,.ANNOTATION_TEXT.,1.0)
+                    STYLED_ITEM('PH',(#6),#5)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH'));
+                #8=DIRECTION('DZ',(0.0,0.0,1.0));
+                #9=DIRECTION('DX',(1.0,0.0,0.0));
+                #10=AXIS2_PLACEMENT_3D('AX',#1,#8,#9);
+                #11=PLANE('PL0',#10);
+                #12=(ANNOTATION_PLANE((#2))
+                    STYLED_ITEM('AP',(#6),#11)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                #13=DRAUGHTING_CALLOUT('PS_CALLOUT',(#3,#4));
+                #14=DRAUGHTING_CALLOUT('PH_CALLOUT',(#3,#7));
+                #15=DRAUGHTING_CALLOUT('AP_CALLOUT',(#3,#12));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout pointSetCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(13));
+        StepDraughtingCallout placeholderCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(14));
+        StepDraughtingCallout planeCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(15));
+        assertEquals(4, pointSetCallout.contents().get(1).id());
+        assertEquals(7, placeholderCallout.contents().get(1).id());
+        assertEquals(12, planeCallout.contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithGeometricSetContent() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);
+                #4=GEOMETRIC_SET('GS',(#2));
+                #5=DRAUGHTING_CALLOUT('GS_CALLOUT',(#3,#4));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout callout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(5));
+        assertEquals(2, callout.contents().size());
+        assertEquals(4, callout.contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithPathAndWireContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=VECTOR('VX',#3,1.0);
+                #5=LINE('L0',#1,#4);
+                #6=VERTEX_POINT('V0',#1);
+                #7=VERTEX_POINT('V1',#2);
+                #8=EDGE_CURVE('E0',#6,#7,#5,.T.);
+                #9=ORIENTED_EDGE('OE0',$,$,#8,.T.);
+                #10=ORIENTED_EDGE('OE1',$,$,#8,.F.);
+                #11=PATH('PTH',(#9));
+                #12=CONNECTED_EDGE_SET('CES0',(#8));
+                #13=EDGE_LOOP('EL0',(#9,#10));
+                #14=WIRE_SHELL('WS0',(#13));
+                #15=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);
+                #16=DRAUGHTING_CALLOUT('PATH_CALLOUT',(#15,#11));
+                #17=DRAUGHTING_CALLOUT('EDGESET_CALLOUT',(#15,#12));
+                #18=DRAUGHTING_CALLOUT('WIRE_CALLOUT',(#15,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout pathCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(16));
+        StepDraughtingCallout edgeSetCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(17));
+        StepDraughtingCallout wireCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(18));
+        assertEquals(11, pathCallout.contents().get(1).id());
+        assertEquals(12, edgeSetCallout.contents().get(1).id());
+        assertEquals(14, wireCallout.contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithDirectGeometryContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(2.0,1.0,0.0));
+                #5=VERTEX_POINT('V0',#1);
+                #6=VERTEX_POINT('V1',#2);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=DIRECTION('DY',(0.0,1.0,0.0));
+                #9=DIRECTION('DZ',(0.0,0.0,1.0));
+                #10=VECTOR('VX',#7,1.0);
+                #11=LINE('L0',#1,#10);
+                #12=POLYLINE('PL0',(#1,#2,#3,#4));
+                #13=EDGE_CURVE('E0',#5,#6,#11,.T.);
+                #14=ORIENTED_EDGE('OE0',$,$,#13,.T.);
+                #15=CARTESIAN_POINT('O',(10.0,0.0,0.0));
+                #16=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#7,#8,#15,1.0,#9);
+                #17=POINT_REPLICA('PR0',#1,#16);
+                #18=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct',#1);
+                #19=DRAUGHTING_CALLOUT('DIRECT_CALLOUT',(#18,#1,#5,#17,#11,#12,#13,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout callout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(19));
+        assertEquals(8, callout.contents().size());
+        assertEquals(1, callout.contents().get(1).id());
+        assertEquals(5, callout.contents().get(2).id());
+        assertEquals(17, callout.contents().get(3).id());
+        assertEquals(11, callout.contents().get(4).id());
+        assertEquals(12, callout.contents().get(5).id());
+        assertEquals(13, callout.contents().get(6).id());
+        assertEquals(14, callout.contents().get(7).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithAdvancedCurveContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=VECTOR('VX',#3,1.0);
+                #7=LINE('L0',#1,#6);
+                #8=TRIMMED_CURVE('TC0',#7,(#1),(#2),.T.,.CARTESIAN.);
+                #9=ORIENTED_CURVE('OC0',#8,.F.);
+                #10=CARTESIAN_POINT('T0',(10.0,0.0,0.0));
+                #11=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#3,#4,#10,1.0,#5);
+                #12=CURVE_REPLICA('CR0',#8,#11);
+                #13=ANNOTATION_TEXT_OCCURRENCE('NOTE','advanced',#1);
+                #14=DRAUGHTING_CALLOUT('ADV_CALLOUT',(#13,#8,#9,#12));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout callout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(14));
+        assertEquals(4, callout.contents().size());
+        assertEquals(8, callout.contents().get(1).id());
+        assertEquals(9, callout.contents().get(2).id());
+        assertEquals(12, callout.contents().get(3).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithExtendedContainerContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VERTEX_POINT('V2',#3);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=DIRECTION('DY',(0.0,1.0,0.0));
+                #9=VECTOR('VX',#7,1.0);
+                #10=VECTOR('VY',#8,1.0);
+                #11=LINE('L0',#1,#9);
+                #12=LINE('L1',#2,#10);
+                #13=EDGE_CURVE('E0',#4,#5,#11,.T.);
+                #14=EDGE_CURVE('E1',#5,#6,#12,.T.);
+                #15=CONNECTED_EDGE_SET('CES0',(#13,#14));
+                #16=(EDGE_BASED_WIREFRAME_MODEL('EBWM',(#15)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('EBWM'));
+                #17=POLY_LOOP('PL0',(#1,#2,#3));
+                #18=VERTEX_LOOP('VL0',#4);
+                #19=VERTEX_SHELL('VS0',#18);
+                #20=WIRE_SHELL('WS0',(#17));
+                #21=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#20,#19));
+                #22=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);
+                #23=DRAUGHTING_CALLOUT('PL_CALLOUT',(#22,#17));
+                #24=DRAUGHTING_CALLOUT('VL_CALLOUT',(#22,#18));
+                #25=DRAUGHTING_CALLOUT('VS_CALLOUT',(#22,#19));
+                #26=DRAUGHTING_CALLOUT('EBWM_CALLOUT',(#22,#16));
+                #27=DRAUGHTING_CALLOUT('SBWM_CALLOUT',(#22,#21));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout polyLoopCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(23));
+        StepDraughtingCallout vertexLoopCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(24));
+        StepDraughtingCallout vertexShellCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(25));
+        StepDraughtingCallout edgeWireframeCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(26));
+        StepDraughtingCallout shellWireframeCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(27));
+        assertEquals(17, polyLoopCallout.contents().get(1).id());
+        assertEquals(18, vertexLoopCallout.contents().get(1).id());
+        assertEquals(19, vertexShellCallout.contents().get(1).id());
+        assertEquals(16, edgeWireframeCallout.contents().get(1).id());
+        assertEquals(21, shellWireframeCallout.contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithFaceShellAndSurfaceModelContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=PLANE('PL',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('AF0',(#71),#13,.T.);
+                #81=ORIENTED_FACE('OF0',#80,.F.);
+                #82=FACE_SURFACE('FS0',(#71),#13,.T.);
+                #83=OPEN_SHELL('OS0',(#80));
+                #84=SURFACED_OPEN_SHELL('SOS0',(#82));
+                #85=ORIENTED_OPEN_SHELL('OOS0',#83,.F.);
+                #86=CLOSED_SHELL('CS0',(#80));
+                #87=ORIENTED_CLOSED_SHELL('OCS0',#86,.F.);
+                #88=CONNECTED_FACE_SET('CFS0',(#80));
+                #89=CONNECTED_FACE_SUB_SET('CFSS0',(#80),#88);
+                #90=(FACE_BASED_SURFACE_MODEL('FBSM0',(#88,#83))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FBSM0'));
+                #91=SHELL_BASED_SURFACE_MODEL('SBSM0',(#83,#84,#85,#86,#87));
+                #92=ANNOTATION_TEXT_OCCURRENCE('NOTE','shell-face',#1);
+                #93=DRAUGHTING_CALLOUT('AF_CALLOUT',(#92,#80));
+                #94=DRAUGHTING_CALLOUT('OF_CALLOUT',(#92,#81));
+                #95=DRAUGHTING_CALLOUT('FS_CALLOUT',(#92,#82));
+                #96=DRAUGHTING_CALLOUT('OS_CALLOUT',(#92,#83));
+                #97=DRAUGHTING_CALLOUT('SOS_CALLOUT',(#92,#84));
+                #98=DRAUGHTING_CALLOUT('OOS_CALLOUT',(#92,#85));
+                #99=DRAUGHTING_CALLOUT('CS_CALLOUT',(#92,#86));
+                #100=DRAUGHTING_CALLOUT('OCS_CALLOUT',(#92,#87));
+                #101=DRAUGHTING_CALLOUT('CFS_CALLOUT',(#92,#88));
+                #102=DRAUGHTING_CALLOUT('CFSS_CALLOUT',(#92,#89));
+                #103=DRAUGHTING_CALLOUT('FBSM_CALLOUT',(#92,#90));
+                #104=DRAUGHTING_CALLOUT('SBSM_CALLOUT',(#92,#91));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(80, assertInstanceOf(StepDraughtingCallout.class, resolved.get(93)).contents().get(1).id());
+        assertEquals(81, assertInstanceOf(StepDraughtingCallout.class, resolved.get(94)).contents().get(1).id());
+        assertEquals(82, assertInstanceOf(StepDraughtingCallout.class, resolved.get(95)).contents().get(1).id());
+        assertEquals(83, assertInstanceOf(StepDraughtingCallout.class, resolved.get(96)).contents().get(1).id());
+        assertEquals(84, assertInstanceOf(StepDraughtingCallout.class, resolved.get(97)).contents().get(1).id());
+        assertEquals(85, assertInstanceOf(StepDraughtingCallout.class, resolved.get(98)).contents().get(1).id());
+        assertEquals(86, assertInstanceOf(StepDraughtingCallout.class, resolved.get(99)).contents().get(1).id());
+        assertEquals(87, assertInstanceOf(StepDraughtingCallout.class, resolved.get(100)).contents().get(1).id());
+        assertEquals(88, assertInstanceOf(StepDraughtingCallout.class, resolved.get(101)).contents().get(1).id());
+        assertEquals(89, assertInstanceOf(StepDraughtingCallout.class, resolved.get(102)).contents().get(1).id());
+        assertEquals(90, assertInstanceOf(StepDraughtingCallout.class, resolved.get(103)).contents().get(1).id());
+        assertEquals(91, assertInstanceOf(StepDraughtingCallout.class, resolved.get(104)).contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithBrepSolidContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=PLANE('PL',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('AF0',(#71),#13,.T.);
+                #81=CLOSED_SHELL('CS0',(#80));
+                #82=MANIFOLD_SOLID_BREP('MSB0',#81);
+                #83=BREP_WITH_VOIDS('BWV0',#81,());
+                #84=ANNOTATION_TEXT_OCCURRENCE('NOTE','solid-callout',#1);
+                #85=DRAUGHTING_CALLOUT('MSB_CALLOUT',(#84,#82));
+                #86=DRAUGHTING_CALLOUT('BWV_CALLOUT',(#84,#83));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(82, assertInstanceOf(StepDraughtingCallout.class, resolved.get(85)).contents().get(1).id());
+        assertEquals(83, assertInstanceOf(StepDraughtingCallout.class, resolved.get(86)).contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithBuildableSolidFamilyContents() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=BLOCK('BLK',#4,10.0,20.0,30.0);
+                #6=CARTESIAN_POINT('PZ',(0.0,0.0,15.0));
+                #7=AXIS2_PLACEMENT_3D('PLAX',#6,#2,#3);
+                #8=PLANE('PLANE',#7);
+                #9=HALF_SPACE_SOLID('HS',#8,.T.);
+                #10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));
+                #11=CSG_SOLID('CSG0',#10);
+                #12=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));
+                #20=CARTESIAN_POINT('P2D',(0.0,0.0));
+                #21=DIRECTION('DX2',(1.0,0.0));
+                #22=AXIS2_PLACEMENT_2D('PROFILE_AX',#20,#21);
+                #23=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#22,4.0,2.0);
+                #24=DIRECTION('DIR',(0.0,0.0,1.0));
+                #25=EXTRUDED_AREA_SOLID('EX0',#23,#4,#24,5.0);
+                #26=CARTESIAN_POINT('T',(10.0,0.0,0.0));
+                #27=DIRECTION('DY',(0.0,1.0,0.0));
+                #28=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#3,#27,#26,1.0,#2);
+                #29=SOLID_REPLICA('SR0',#25,#28);
+                #30=ANNOTATION_TEXT_OCCURRENCE('NOTE','solid-family',#1);
+                #31=DRAUGHTING_CALLOUT('PRIM_CALLOUT',(#30,#5));
+                #32=DRAUGHTING_CALLOUT('BOOL_CALLOUT',(#30,#10));
+                #33=DRAUGHTING_CALLOUT('CSG_CALLOUT',(#30,#11));
+                #34=DRAUGHTING_CALLOUT('BCR_CALLOUT',(#30,#12));
+                #35=DRAUGHTING_CALLOUT('EX_CALLOUT',(#30,#25));
+                #36=DRAUGHTING_CALLOUT('SR_CALLOUT',(#30,#29));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(5, assertInstanceOf(StepDraughtingCallout.class, resolved.get(31)).contents().get(1).id());
+        assertEquals(10, assertInstanceOf(StepDraughtingCallout.class, resolved.get(32)).contents().get(1).id());
+        assertEquals(11, assertInstanceOf(StepDraughtingCallout.class, resolved.get(33)).contents().get(1).id());
+        assertEquals(12, assertInstanceOf(StepDraughtingCallout.class, resolved.get(34)).contents().get(1).id());
+        assertEquals(25, assertInstanceOf(StepDraughtingCallout.class, resolved.get(35)).contents().get(1).id());
+        assertEquals(29, assertInstanceOf(StepDraughtingCallout.class, resolved.get(36)).contents().get(1).id());
+    }
+
+    @Test
+    void shouldResolveDraughtingCalloutWithOccurrenceWrappers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0));
+                #4=POLYLINE('PL0',(#1,#2));
+                #5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMCTX'));
+                #6=REPRESENTATION('SYMREP',(#4),#5);
+                #7=AXIS2_PLACEMENT_2D('MAP',#1,#3);
+                #8=SYMBOL_REPRESENTATION_MAP(#7,#6);
+                #9=CARTESIAN_POINT('TXT3',(3.0,4.0));
+                #10=AXIS2_PLACEMENT_2D('TGT0',#9,#3);
+                #11=ANNOTATION_SYMBOL('AS0',#8,#10);
+                #12=PRESENTATION_STYLE_ASSIGNMENT(());
+                #13=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#12),#11);
+                #14=(DRAUGHTING_ANNOTATION_OCCURRENCE('DAO0',(#12),#11)
+                    STYLED_ITEM('DAO0',(#12),#11)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('DAO0'));
+                #15=CARTESIAN_POINT('TXT',(9.0,9.0,0.0));
+                #16=ANNOTATION_TEXT_OCCURRENCE('NOTE','note',#15);
+                #17=DRAUGHTING_CALLOUT('SUB_CALLOUT',(#16,#13));
+                #18=DRAUGHTING_CALLOUT('DAO_CALLOUT',(#16,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepDraughtingCallout subfigureCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(17));
+        StepDraughtingCallout draughtingCallout = assertInstanceOf(StepDraughtingCallout.class, resolved.get(18));
+        assertEquals(13, subfigureCallout.contents().get(1).id());
+        assertEquals(14, draughtingCallout.contents().get(1).id());
     }
 
     @Test
@@ -2625,6 +3809,96 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveUsageAndAssociationFamilyWithVertexLoopTarget() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
+                #3=REPRESENTATION('REP_A',(#1),#2);
+                #4=REPRESENTATION('REP_B',(#1),#2);
+                #5=REPRESENTATION('REP_C',(#1),#2);
+                #6=REPRESENTATION_RELATIONSHIP('RR','chain',#4,#5);
+                #7=PROPERTY_DEFINITION('PD','',#1);
+                #8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #9=VERTEX_POINT('VP0',#8);
+                #10=VERTEX_LOOP('VLOOP',#9);
+                #11=ITEM_IDENTIFIED_REPRESENTATION_USAGE('USAGE','generic',#7,#3,#10);
+                #12=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CBIIRU','chain',#7,(#4,#5),(#6),#10);
+                #13=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','assoc',#7,#3,#10);
+                #14=PMI_REQUIREMENT_ITEM_ASSOCIATION('PRIA','req',#7,#3,#10,#7);
+                #15=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDRIA','mdreq',#7,#3,#10,#7);
+                #16=PLACED_TARGET('PT','target',#7,#3,#10);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(10, assertInstanceOf(StepItemIdentifiedRepresentationUsage.class, resolved.get(11)).identifiedItem().id());
+        assertEquals(10, assertInstanceOf(StepChainBasedItemIdentifiedRepresentationUsage.class, resolved.get(12)).identifiedItem().id());
+        assertEquals(10, assertInstanceOf(StepDraughtingModelItemAssociation.class, resolved.get(13)).identifiedItem().id());
+        assertEquals(10, assertInstanceOf(StepPmiRequirementItemAssociation.class, resolved.get(14)).identifiedItem().id());
+        assertEquals(10, assertInstanceOf(StepMechanicalDesignRequirementItemAssociation.class, resolved.get(15)).identifiedItem().id());
+        assertEquals(10, assertInstanceOf(StepPlacedTarget.class, resolved.get(16)).identifiedItem().id());
+    }
+
+    @Test
+    void shouldResolveUsageFamiliesWithDirectAnnotationContentEntities() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));
+                #2=REPRESENTATION('REP_USED',(),#1);
+                #3=REPRESENTATION('REP_A',(),#1);
+                #4=REPRESENTATION('REP_B',(),#1);
+                #5=REPRESENTATION_RELATIONSHIP('RR','chain',#3,#4);
+                #6=PROPERTY_DEFINITION('PD','',#2);
+                #7=CARTESIAN_POINT('O',(0.0,0.0));
+                #8=DIRECTION('X',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
+                #10=REPRESENTATION('SYMREP',(),#1);
+                #11=SYMBOL_REPRESENTATION_MAP(#9,#10);
+                #12=CARTESIAN_POINT('P0',(10.0,20.0));
+                #13=AXIS2_PLACEMENT_2D('TGT0',#12,#8);
+                #14=ANNOTATION_SYMBOL('AS0',#11,#13);
+                #15=REPRESENTATION_MAP(#9,#10);
+                #16=CARTESIAN_POINT('P1',(30.0,40.0));
+                #17=AXIS2_PLACEMENT_2D('TGT1',#16,#8);
+                #18=ANNOTATION_TEXT('AT0',#15,#17);
+                #19=ANNOTATION_TEXT_CHARACTER('ATC0',#15,#17);
+                #20=CARTESIAN_POINT('F0',(0.0,0.0,0.0));
+                #21=CARTESIAN_POINT('F1',(1.0,0.0,0.0));
+                #22=CARTESIAN_POINT('F2',(1.0,1.0,0.0));
+                #23=POLYLINE('PL0',(#20,#21,#22));
+                #24=(ANNOTATION_FILL_AREA('FA0',(#23))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #25=POINT_SET('PS0',(#20));
+                #26=ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(),#25,.TITLE.,1.0);
+                #27=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','',#6,#2,#14);
+                #28=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','',#6,(#3,#4),(#5),#18);
+                #29=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#6,#2,#19);
+                #30=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#6,#2,#24,#6);
+                #31=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDRIA','',#6,#2,#14,#6);
+                #32=PLACED_TARGET('PT','',#6,#2,#18);
+                #33=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#24,#2);
+                #34=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGIU','',#14,(#3,#4),(#5),#2);
+                #35=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','',#6,#2,#19,#26);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(14, assertInstanceOf(StepItemIdentifiedRepresentationUsage.class, resolved.get(27)).identifiedItem().id());
+        assertEquals(18, assertInstanceOf(StepChainBasedItemIdentifiedRepresentationUsage.class, resolved.get(28)).identifiedItem().id());
+        assertEquals(19, assertInstanceOf(StepDraughtingModelItemAssociation.class, resolved.get(29)).identifiedItem().id());
+        assertEquals(24, assertInstanceOf(StepPmiRequirementItemAssociation.class, resolved.get(30)).identifiedItem().id());
+        assertEquals(14, assertInstanceOf(StepMechanicalDesignRequirementItemAssociation.class, resolved.get(31)).identifiedItem().id());
+        assertEquals(18, assertInstanceOf(StepPlacedTarget.class, resolved.get(32)).identifiedItem().id());
+        assertEquals(24, assertInstanceOf(StepGeometricItemSpecificUsage.class, resolved.get(33)).usage().id());
+        assertEquals(14, assertInstanceOf(StepChainBasedGeometricItemSpecificUsage.class, resolved.get(34)).usage().id());
+        assertEquals(19, assertInstanceOf(StepDraughtingModelItemAssociationWithPlaceholder.class, resolved.get(35)).identifiedItem().id());
+    }
+
+    @Test
     void shouldResolveAdditionalAnnotationOccurrenceFamilyEntities() {
         String step = """
                 DATA;
@@ -2662,6 +3936,73 @@ class StepEntityResolverTest {
         assertEquals(12, associativity.relatedAnnotationOccurrence().id());
         assertEquals(12, dimensionAssociativity.relatingAnnotationOccurrence().id());
         assertEquals(13, dimensionAssociativity.relatedAnnotationOccurrence().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationWrapperOccurrencesWithAdditionalAnnotationItems() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=POINT_SET('PS0',(#1));
+                #3=PRESENTATION_STYLE_ASSIGNMENT(());
+                #4=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH0',(#3),#2,.ANNOTATION_TEXT.,1.0)
+                    STYLED_ITEM('PH0',(#3),#2)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH0'));
+                #5=(ANNOTATION_POINT_OCCURRENCE('AP0',(#3),#1)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#3),#1));
+                #6=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#3),#4);
+                #7=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#3),#5);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationSymbolOccurrence symbolOccurrence =
+                assertInstanceOf(StepAnnotationSymbolOccurrence.class, resolved.get(6));
+        StepAnnotationSubfigureOccurrence subfigureOccurrence =
+                assertInstanceOf(StepAnnotationSubfigureOccurrence.class, resolved.get(7));
+        assertEquals(4, symbolOccurrence.item().id());
+        assertEquals(5, subfigureOccurrence.item().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationOccurrenceAssociativityWithTerminatorSymbol() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
+                #2=REPRESENTATION('SYM',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(10.0,20.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_SYMBOL('AS0',#6,#9);
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);
+                #13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #14=DIRECTION('DIR0',(1.0,0.0,0.0));
+                #15=VECTOR('V0',#14,1.0);
+                #16=LINE('L0',#13,#15);
+                #17=PROJECTION_CURVE('PC0',(#11),#16);
+                #18=TERMINATOR_SYMBOL('TS0',(#11),#10,#17);
+                #19=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#12,#18);
+                #20=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#18,#17);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationOccurrenceRelationship associativity =
+                assertInstanceOf(StepAnnotationOccurrenceRelationship.class, resolved.get(19));
+        StepAnnotationOccurrenceRelationship dimensionAssociativity =
+                assertInstanceOf(StepAnnotationOccurrenceRelationship.class, resolved.get(20));
+        assertEquals(12, associativity.relatingAnnotationOccurrence().id());
+        assertEquals(18, associativity.relatedAnnotationOccurrence().id());
+        assertEquals(18, dimensionAssociativity.relatingAnnotationOccurrence().id());
+        assertEquals(17, dimensionAssociativity.relatedAnnotationOccurrence().id());
     }
 
     @Test
@@ -2799,6 +4140,39 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveTerminatorSymbolWithWrappedAnnotationItem() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=POINT_SET('PS0',(#1));
+                #3=PRESENTATION_STYLE_ASSIGNMENT(());
+                #4=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH0',(#3),#2,.ANNOTATION_TEXT.,1.0)
+                    STYLED_ITEM('PH0',(#3),#2)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH0'));
+                #5=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#3),#4);
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=VECTOR('VX',#6,1.0);
+                #8=LINE('L0',#1,#7);
+                #9=(PROJECTION_CURVE('PC0',(#3),#8)
+                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#3),#8)
+                    STYLED_ITEM('PC0',(#3),#8)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PC0'));
+                #10=TERMINATOR_SYMBOL('TS0',(#3),#5,#9);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepTerminatorSymbol terminatorSymbol =
+                assertInstanceOf(StepTerminatorSymbol.class, resolved.get(10));
+        assertEquals("TS0", terminatorSymbol.name());
+        assertEquals(5, terminatorSymbol.item().id());
+        assertEquals(9, terminatorSymbol.annotatedCurve().id());
+    }
+
+    @Test
     void shouldResolveAnnotationOccurrenceRelationship() {
         String step = """
                 DATA;
@@ -2832,6 +4206,42 @@ class StepEntityResolverTest {
         assertEquals("links point to symbol", relationship.description());
         assertEquals(3, relationship.relatingAnnotationOccurrence().id());
         assertEquals(15, relationship.relatedAnnotationOccurrence().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationOccurrenceRelationshipWithTerminatorSymbol() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
+                #2=REPRESENTATION('SYM',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P',(30.0,40.0));
+                #8=DIRECTION('DX',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('TGT',#7,#8);
+                #10=ANNOTATION_SYMBOL('AS0',#6,#9);
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #13=DIRECTION('DIR0',(1.0,0.0,0.0));
+                #14=VECTOR('V0',#13,1.0);
+                #15=LINE('L0',#12,#14);
+                #16=ANNOTATION_CURVE_OCCURRENCE('ACO0',(#11),#15);
+                #17=TERMINATOR_SYMBOL('TS0',(#11),#10,#16);
+                #18=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);
+                #19=ANNOTATION_OCCURRENCE_RELATIONSHIP('rel','links symbol to terminator',#18,#17);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationOccurrenceRelationship relationship =
+                assertInstanceOf(StepAnnotationOccurrenceRelationship.class, resolved.get(19));
+        assertEquals("rel", relationship.name());
+        assertEquals("links symbol to terminator", relationship.description());
+        assertEquals(18, relationship.relatingAnnotationOccurrence().id());
+        assertEquals(17, relationship.relatedAnnotationOccurrence().id());
     }
 
     @Test
@@ -2957,6 +4367,215 @@ class StepEntityResolverTest {
         assertEquals("GC0", curveSet.name());
         assertEquals(2, curveSet.elements().size());
         assertSame(StepPolyline.class, curveSet.elements().getFirst().getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricCurveSetWithTopologyAndPaths() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VERTEX_POINT('V2',#3);
+                #7=LINE('L0',#1,#10);
+                #8=EDGE_CURVE('E0',#4,#5,#7,.T.);
+                #9=(SUBEDGE('SE0',#4,#5,#8) EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('subedge'));
+                #10=VECTOR('VX',#11,1.0);
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=ORIENTED_EDGE('OE0',*,*,#8,.T.);
+                #13=PATH('PTH',(#12));
+                #14=POLY_LOOP('PL0',(#1,#2,#3));
+                #15=GEOMETRIC_CURVE_SET('GCS0',(#9,#13,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricCurveSet curveSet = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(15));
+        assertEquals("GCS0", curveSet.name());
+        assertEquals(3, curveSet.elements().size());
+        assertSame(StepSubedge.class, curveSet.elements().get(0).getClass());
+        assertSame(StepPath.class, curveSet.elements().get(1).getClass());
+        assertSame(StepPolyLoop.class, curveSet.elements().get(2).getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricSetWithSurfaceAndTopologyMembers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=CYLINDRICAL_SURFACE('CYL',#4,2.0);
+                #6=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #7=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #8=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #9=VERTEX_POINT('V0',#6);
+                #10=VERTEX_POINT('V1',#7);
+                #11=VECTOR('VX',#3,1.0);
+                #12=LINE('L0',#6,#11);
+                #13=EDGE_CURVE('E0',#9,#10,#12,.T.);
+                #14=ORIENTED_EDGE('OE0',*,*,#13,.T.);
+                #15=ORIENTED_PATH('OP0',#16,.T.);
+                #16=PATH('PTH',(#14));
+                #17=POLY_LOOP('PL0',(#6,#7,#8));
+                #18=GEOMETRIC_SET('GS0',(#5,#15,#17));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricSet set = assertInstanceOf(StepGeometricSet.class, resolved.get(18));
+        assertEquals("GS0", set.name());
+        assertEquals(3, set.elements().size());
+        assertSame(StepCylindricalSurface.class, set.elements().get(0).getClass());
+        assertSame(StepOrientedPath.class, set.elements().get(1).getClass());
+        assertSame(StepPolyLoop.class, set.elements().get(2).getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricSetsWithWireAndLoopContainers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VECTOR('VX',#7,1.0);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=LINE('L0',#1,#6);
+                #9=EDGE_CURVE('E0',#4,#5,#8,.T.);
+                #10=ORIENTED_EDGE('OE0',*,*,#9,.T.);
+                #11=ORIENTED_EDGE('OE1',*,*,#9,.F.);
+                #12=CONNECTED_EDGE_SET('CES0',(#9,#10));
+                #13=VERTEX_LOOP('VL0',#4);
+                #14=EDGE_LOOP('EL0',(#10,#11));
+                #15=WIRE_SHELL('WS0',(#14,#13));
+                #16=GEOMETRIC_CURVE_SET('GCS0',(#12,#14));
+                #17=GEOMETRIC_SET('GS0',(#12,#14,#13,#15));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricCurveSet curveSet = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(16));
+        assertEquals(2, curveSet.elements().size());
+        assertSame(StepConnectedEdgeSet.class, curveSet.elements().get(0).getClass());
+        assertSame(StepEdgeLoop.class, curveSet.elements().get(1).getClass());
+
+        StepGeometricSet set = assertInstanceOf(StepGeometricSet.class, resolved.get(17));
+        assertEquals(4, set.elements().size());
+        assertSame(StepConnectedEdgeSet.class, set.elements().get(0).getClass());
+        assertSame(StepEdgeLoop.class, set.elements().get(1).getClass());
+        assertSame(StepVertexLoop.class, set.elements().get(2).getClass());
+        assertSame(StepWireShell.class, set.elements().get(3).getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricCurveSetWithWireContainersAndWireframeModels() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=VERTEX_POINT('V0',#1);
+                #4=VERTEX_POINT('V1',#2);
+                #5=DIRECTION('DX',(1.0,0.0,0.0));
+                #6=VECTOR('VX',#5,1.0);
+                #7=LINE('L0',#1,#6);
+                #8=EDGE_CURVE('E0',#3,#4,#7,.T.);
+                #9=ORIENTED_EDGE('OE0',*,*,#8,.T.);
+                #10=ORIENTED_EDGE('OE1',*,*,#8,.F.);
+                #11=CONNECTED_EDGE_SET('CES0',(#8,#9));
+                #12=EDGE_LOOP('EL0',(#9,#10));
+                #13=VERTEX_LOOP('VL0',#3);
+                #14=VERTEX_SHELL('VS0',#13);
+                #15=WIRE_SHELL('WS0',(#12,#13));
+                #16=(EDGE_BASED_WIREFRAME_MODEL('EBWM',(#11))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('EBWM'));
+                #17=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#15,#14));
+                #18=GEOMETRIC_CURVE_SET('GCS0',(#11,#12,#13,#15,#16,#17));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricCurveSet curveSet = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(18));
+        assertEquals(6, curveSet.elements().size());
+        assertSame(StepConnectedEdgeSet.class, curveSet.elements().get(0).getClass());
+        assertSame(StepEdgeLoop.class, curveSet.elements().get(1).getClass());
+        assertSame(StepVertexLoop.class, curveSet.elements().get(2).getClass());
+        assertSame(StepWireShell.class, curveSet.elements().get(3).getClass());
+        assertSame(StepEdgeBasedWireframeModel.class, curveSet.elements().get(4).getClass());
+        assertSame(StepShellBasedWireframeModel.class, curveSet.elements().get(5).getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricSetWithShellModelAndSolidMembers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=DIRECTION('DZ',(0.0,0.0,1.0));
+                #6=DIRECTION('DX',(1.0,0.0,0.0));
+                #7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #8=PLANE('PL0',#7);
+                #9=POLY_LOOP('LOOP',(#1,#2,#3,#4));
+                #10=FACE_OUTER_BOUND('FOB',#9,.T.);
+                #11=ADVANCED_FACE('FACE0',(#10),#8,.T.);
+                #12=OPEN_SHELL('OSH',(#11));
+                #13=(FACE_BASED_SURFACE_MODEL('FBM',(#12))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FBM'));
+                #14=BLOCK('BLK',#7,1.0,1.0,1.0);
+                #15=GEOMETRIC_SET('GS0',(#12,#13,#14));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricSet set = assertInstanceOf(StepGeometricSet.class, resolved.get(15));
+        assertEquals(3, set.elements().size());
+        assertSame(StepOpenShell.class, set.elements().get(0).getClass());
+        assertSame(StepFaceBasedSurfaceModel.class, set.elements().get(1).getClass());
+        assertSame(StepCsgPrimitive.class, set.elements().get(2).getClass());
+    }
+
+    @Test
+    void shouldResolveGeometricSetsWithNestedSetMembers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=VECTOR('VX',#3,1.0);
+                #5=LINE('L0',#1,#4);
+                #6=POINT_SET('PS0',(#1));
+                #7=GEOMETRIC_CURVE_SET('INNER_GCS',(#5));
+                #8=GEOMETRIC_SET('INNER_GS',(#6,#7));
+                #9=GEOMETRIC_CURVE_SET('OUTER_GCS',(#6,#8,#7));
+                #10=GEOMETRIC_SET('OUTER_GS',(#8,#9));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepGeometricCurveSet outerCurveSet = assertInstanceOf(StepGeometricCurveSet.class, resolved.get(9));
+        assertEquals(3, outerCurveSet.elements().size());
+        assertSame(StepPointSet.class, outerCurveSet.elements().get(0).getClass());
+        assertSame(StepGeometricSet.class, outerCurveSet.elements().get(1).getClass());
+        assertSame(StepGeometricCurveSet.class, outerCurveSet.elements().get(2).getClass());
+
+        StepGeometricSet outerSet = assertInstanceOf(StepGeometricSet.class, resolved.get(10));
+        assertEquals(2, outerSet.elements().size());
+        assertSame(StepGeometricSet.class, outerSet.elements().get(0).getClass());
+        assertSame(StepGeometricCurveSet.class, outerSet.elements().get(1).getClass());
     }
 
     @Test
@@ -3706,6 +5325,127 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveAnnotationFillAreaOccurrenceWithPointReplicaTarget() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DY',(0.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=CARTESIAN_POINT('O',(10.0,20.0,30.0));
+                #6=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#2,#3,#5,2.0,#4);
+                #7=POINT_REPLICA('PR0',#1,#6);
+                #8=CARTESIAN_POINT('P1',(0.0,0.0,0.0));
+                #9=CARTESIAN_POINT('P2',(1.0,0.0,0.0));
+                #10=CARTESIAN_POINT('P3',(1.0,1.0,0.0));
+                #11=CARTESIAN_POINT('P4',(0.0,1.0,0.0));
+                #12=POLYLINE('B0',(#8,#9,#10,#11,#8));
+                #13=(ANNOTATION_FILL_AREA('FA0',(#12))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #14=PRESENTATION_STYLE_ASSIGNMENT(());
+                #15=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#14),#13,#7)
+                    STYLED_ITEM('FAO0',(#14),#13)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationFillAreaOccurrence occurrence =
+                assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(15));
+        assertEquals("FAO0", occurrence.name());
+        assertEquals(1, occurrence.styles().size());
+        assertEquals(13, occurrence.item().id());
+        assertEquals(7, occurrence.fillStyleTarget().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationFillAreaWithPathAndWireBoundaries() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VERTEX_POINT('V2',#3);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=DIRECTION('DY',(0.0,1.0,0.0));
+                #9=VECTOR('VX',#7,1.0);
+                #10=VECTOR('VY',#8,1.0);
+                #11=LINE('L0',#1,#9);
+                #12=LINE('L1',#2,#10);
+                #13=EDGE_CURVE('E0',#4,#5,#11,.T.);
+                #14=EDGE_CURVE('E1',#5,#6,#12,.T.);
+                #15=CONNECTED_EDGE_SET('CES',(#13,#14));
+                #16=POLY_LOOP('PL0',(#1,#2,#3));
+                #17=WIRE_SHELL('WS0',(#16));
+                #18=(ANNOTATION_FILL_AREA('FA0',(#15,#17))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationFillArea fillArea = assertInstanceOf(StepAnnotationFillArea.class, resolved.get(18));
+        assertEquals(2, fillArea.boundaries().size());
+        assertEquals(15, fillArea.boundaries().get(0).id());
+        assertEquals(17, fillArea.boundaries().get(1).id());
+    }
+
+    @Test
+    void shouldResolveAnnotationCurveAndFillAreaWithWireframeModelCarriers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VERTEX_POINT('V2',#3);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=DIRECTION('DY',(0.0,1.0,0.0));
+                #9=VECTOR('VX',#7,1.0);
+                #10=VECTOR('VY',#8,1.0);
+                #11=LINE('L0',#1,#9);
+                #12=LINE('L1',#2,#10);
+                #13=EDGE_CURVE('E0',#4,#5,#11,.T.);
+                #14=EDGE_CURVE('E1',#5,#6,#12,.T.);
+                #15=CONNECTED_EDGE_SET('CES0',(#13,#14));
+                #16=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#15));
+                #17=POLY_LOOP('PL0',(#1,#2,#3));
+                #18=WIRE_SHELL('WS0',(#17));
+                #19=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#18));
+                #20=PRESENTATION_STYLE_ASSIGNMENT(());
+                #21=(ANNOTATION_CURVE_OCCURRENCE('AC0',(#20),#16)
+                    STYLED_ITEM('AC0',(#20),#16)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AC0'));
+                #22=(PROJECTION_CURVE('PC0',(#20),#19)
+                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#20),#19)
+                    STYLED_ITEM('PC0',(#20),#19)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PC0'));
+                #23=(ANNOTATION_FILL_AREA('FA0',(#16,#19))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(16, assertInstanceOf(StepAnnotationCurveOccurrence.class, resolved.get(21)).item().id());
+        assertEquals(19, assertInstanceOf(StepProjectionCurve.class, resolved.get(22)).item().id());
+        StepAnnotationFillArea fillArea = assertInstanceOf(StepAnnotationFillArea.class, resolved.get(23));
+        assertEquals(2, fillArea.boundaries().size());
+        assertEquals(16, fillArea.boundaries().get(0).id());
+        assertEquals(19, fillArea.boundaries().get(1).id());
+    }
+
+    @Test
     void shouldResolveAnnotationPlaceholderOccurrence() {
         String step = """
                 DATA;
@@ -3728,6 +5468,164 @@ class StepEntityResolverTest {
         assertEquals(2, occurrence.item().id());
         assertEquals("ANNOTATION_TEXT", occurrence.role());
         assertEquals(2.5, occurrence.lineSpacing());
+    }
+
+    @Test
+    void shouldResolveAnnotationPlaceholderOccurrenceWithPointContainers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=POINT_SET('PS0',(#1));
+                #3=GEOMETRIC_CURVE_SET('GCS0',(#1));
+                #4=PRESENTATION_STYLE_ASSIGNMENT(());
+                #5=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH_PS',(#4),#2,.ANNOTATION_TEXT.,1.0)
+                    STYLED_ITEM('PH_PS',(#4),#2)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH_PS'));
+                #6=(ANNOTATION_PLACEHOLDER_OCCURRENCE('PH_GCS',(#4),#3,.ANNOTATION_TEXT.,1.0)
+                    STYLED_ITEM('PH_GCS',(#4),#3)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PH_GCS'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPlaceholderOccurrence pointSetOccurrence =
+                assertInstanceOf(StepAnnotationPlaceholderOccurrence.class, resolved.get(5));
+        StepAnnotationPlaceholderOccurrence curveSetOccurrence =
+                assertInstanceOf(StepAnnotationPlaceholderOccurrence.class, resolved.get(6));
+        assertEquals(2, pointSetOccurrence.item().id());
+        assertEquals(3, curveSetOccurrence.item().id());
+    }
+
+    @Test
+    void shouldResolvePointLikeAnnotationOccurrenceCarriers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=PRESENTATION_STYLE_ASSIGNMENT(());
+                #3=(ANNOTATION_POINT_OCCURRENCE('AP_BASE',(#2),#1)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP_BASE',(#2),#1));
+                #4=ANNOTATION_TEXT_OCCURRENCE('NOTE','nested',#3);
+                #5=POLYLINE('B0',(#1,#1));
+                #6=(ANNOTATION_FILL_AREA('FA0',(#5))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #7=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#2),#6,#4)
+                    STYLED_ITEM('FAO0',(#2),#6)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                #8=(ANNOTATION_POINT_OCCURRENCE('AP_NESTED',(#2),#7)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP_NESTED',(#2),#7));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationTextOccurrence textOccurrence =
+                assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(4));
+        StepAnnotationFillAreaOccurrence fillAreaOccurrence =
+                assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(7));
+        StepAnnotationPointOccurrence pointOccurrence =
+                assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(8));
+
+        assertEquals(3, textOccurrence.position().id());
+        assertEquals(4, fillAreaOccurrence.fillStyleTarget().id());
+        assertEquals(7, pointOccurrence.item().id());
+    }
+
+    @Test
+    void shouldResolveDirectAnnotationContentPointCarriers() {
+        String step = """
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));
+                #2=REPRESENTATION('REP',(),#1);
+                #3=CARTESIAN_POINT('O',(0.0,0.0));
+                #4=DIRECTION('X',(1.0,0.0));
+                #5=AXIS2_PLACEMENT_2D('MAP',#3,#4);
+                #6=SYMBOL_REPRESENTATION_MAP(#5,#2);
+                #7=CARTESIAN_POINT('P0',(10.0,20.0));
+                #8=AXIS2_PLACEMENT_2D('TGT0',#7,#4);
+                #9=ANNOTATION_SYMBOL('AS0',#6,#8);
+                #10=REPRESENTATION_MAP(#5,#2);
+                #11=CARTESIAN_POINT('P1',(30.0,40.0));
+                #12=AXIS2_PLACEMENT_2D('TGT1',#11,#4);
+                #13=ANNOTATION_TEXT('AT0',#10,#12);
+                #14=ANNOTATION_TEXT_CHARACTER('ATC0',#10,#12);
+                #15=CARTESIAN_POINT('F0',(0.0,0.0,0.0));
+                #16=CARTESIAN_POINT('F1',(1.0,0.0,0.0));
+                #17=CARTESIAN_POINT('F2',(1.0,1.0,0.0));
+                #18=POLYLINE('B0',(#15,#16,#17));
+                #19=(ANNOTATION_FILL_AREA('FA0',(#18))
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FA0'));
+                #20=PRESENTATION_STYLE_ASSIGNMENT(());
+                #21=ANNOTATION_TEXT_OCCURRENCE('NOTE','symbol-pos',#9);
+                #22=(ANNOTATION_POINT_OCCURRENCE('AP0',(#20),#13)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#20),#13));
+                #23=(ANNOTATION_FILL_AREA_OCCURRENCE('FAO0',(#20),#19,#14)
+                    STYLED_ITEM('FAO0',(#20),#19)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('FAO0'));
+                #24=POINT_SET('PS0',(#9,#19));
+                #25=DIRECTION('N',(0.0,0.0,1.0));
+                #26=DIRECTION('X3',(1.0,0.0,0.0));
+                #27=AXIS2_PLACEMENT_3D('AX',#15,#25,#26);
+                #28=PLANE('PL0',#27);
+                #29=(ANNOTATION_PLANE((#9,#19))
+                    STYLED_ITEM('AP',(#20),#28)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationTextOccurrence textOccurrence =
+                assertInstanceOf(StepAnnotationTextOccurrence.class, resolved.get(21));
+        StepAnnotationPointOccurrence pointOccurrence =
+                assertInstanceOf(StepAnnotationPointOccurrence.class, resolved.get(22));
+        StepAnnotationFillAreaOccurrence fillAreaOccurrence =
+                assertInstanceOf(StepAnnotationFillAreaOccurrence.class, resolved.get(23));
+        StepPointSet pointSet = assertInstanceOf(StepPointSet.class, resolved.get(24));
+        StepAnnotationPlane annotationPlane =
+                assertInstanceOf(StepAnnotationPlane.class, resolved.get(29));
+
+        assertEquals(9, textOccurrence.position().id());
+        assertEquals(13, pointOccurrence.item().id());
+        assertEquals(14, fillAreaOccurrence.fillStyleTarget().id());
+        assertEquals(List.of(9, 19), pointSet.points().stream().map(StepEntity::id).toList());
+        assertEquals(List.of(9, 19), annotationPlane.elements().stream().map(StepEntity::id).toList());
+    }
+
+    @Test
+    void shouldResolvePointSetWithPointLikeAnnotationOccurrenceCarriers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=PRESENTATION_STYLE_ASSIGNMENT(());
+                #3=(ANNOTATION_POINT_OCCURRENCE('AP0',(#2),#1)
+                    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#2),#1));
+                #4=ANNOTATION_TEXT_OCCURRENCE('NOTE','TXT',#3);
+                #5=DIRECTION('N',(0.0,0.0,1.0));
+                #6=DIRECTION('X',(1.0,0.0,0.0));
+                #7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
+                #8=PLANE('PL0',#7);
+                #9=(ANNOTATION_PLANE((#4))
+                    STYLED_ITEM('AP',(#2),#8)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                #10=POINT_SET('PS0',(#3,#9));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepPointSet pointSet = assertInstanceOf(StepPointSet.class, resolved.get(10));
+        assertEquals(2, pointSet.points().size());
+        assertEquals(3, pointSet.points().get(0).id());
+        assertEquals(9, pointSet.points().get(1).id());
     }
 
     @Test
@@ -3757,6 +5655,91 @@ class StepEntityResolverTest {
         assertEquals(5, annotationPlane.item().id());
         assertEquals(1, annotationPlane.elements().size());
         assertEquals(6, annotationPlane.elements().get(0).id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPlaneWithNestedPointContainers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('N',(0.0,0.0,1.0));
+                #3=DIRECTION('X',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('AP',#4);
+                #6=CARTESIAN_POINT('P0',(1.0,2.0,0.0));
+                #7=VERTEX_POINT('VP0',#6);
+                #8=POINT_SET('PS0',(#7));
+                #9=GEOMETRIC_CURVE_SET('GCS0',(#7));
+                #10=PRESENTATION_STYLE_ASSIGNMENT(());
+                #11=(ANNOTATION_PLANE((#8,#9))
+                    STYLED_ITEM('AP',(#10),#5)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPlane annotationPlane = assertInstanceOf(StepAnnotationPlane.class, resolved.get(11));
+        assertEquals(2, annotationPlane.elements().size());
+        assertEquals(8, annotationPlane.elements().get(0).id());
+        assertEquals(9, annotationPlane.elements().get(1).id());
+    }
+
+    @Test
+    void shouldResolveAnnotationPlaneWithNestedGeometricSet() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('N',(0.0,0.0,1.0));
+                #3=DIRECTION('X',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('AP',#4);
+                #6=CARTESIAN_POINT('P0',(1.0,2.0,0.0));
+                #7=VERTEX_POINT('VP0',#6);
+                #8=POINT_SET('PS0',(#7));
+                #9=GEOMETRIC_CURVE_SET('GCS0',(#7));
+                #10=GEOMETRIC_SET('GS0',(#8,#9));
+                #11=PRESENTATION_STYLE_ASSIGNMENT(());
+                #12=(ANNOTATION_PLANE((#10))
+                    STYLED_ITEM('AP',(#11),#5)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepAnnotationPlane annotationPlane = assertInstanceOf(StepAnnotationPlane.class, resolved.get(12));
+        assertEquals(1, annotationPlane.elements().size());
+        assertEquals(10, annotationPlane.elements().getFirst().id());
+    }
+
+    @Test
+    void shouldRejectPointMarkerInAnnotationPlaneElements() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('N',(0.0,0.0,1.0));
+                #3=DIRECTION('X',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('AP',#4);
+                #6=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PM'));
+                #7=PRESENTATION_STYLE_ASSIGNMENT(());
+                #8=(ANNOTATION_PLANE((#6))
+                    STYLED_ITEM('AP',(#7),#5)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AP'));
+                ENDSEC;
+                """;
+
+        UnsupportedStepEntityException exception = assertThrows(
+                UnsupportedStepEntityException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertTrue(exception.getMessage().contains(
+                "ANNOTATION_PLANE elements must reference supported point carriers or point-like annotation content/occurrences"));
     }
 
     @Test
@@ -3809,6 +5792,62 @@ class StepEntityResolverTest {
         assertEquals("DC0", dimensionCurve.name());
         assertEquals(1, dimensionCurve.styles().size());
         assertEquals(4, dimensionCurve.item().id());
+    }
+
+    @Test
+    void shouldResolveAnnotationCurveFamilyWithPathAndWireCarriers() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=VERTEX_POINT('V0',#1);
+                #5=VERTEX_POINT('V1',#2);
+                #6=VERTEX_POINT('V2',#3);
+                #7=DIRECTION('DX',(1.0,0.0,0.0));
+                #8=DIRECTION('DY',(0.0,1.0,0.0));
+                #9=VECTOR('VX',#7,1.0);
+                #10=VECTOR('VY',#8,1.0);
+                #11=LINE('L0',#1,#9);
+                #12=LINE('L1',#2,#10);
+                #13=EDGE_CURVE('E0',#4,#5,#11,.T.);
+                #14=EDGE_CURVE('E1',#5,#6,#12,.T.);
+                #15=ORIENTED_EDGE('OE0',$,$,#13,.T.);
+                #16=ORIENTED_EDGE('OE1',$,$,#14,.T.);
+                #17=PATH('PTH',(#15));
+                #18=OPEN_PATH('OPH',(#16));
+                #19=CONNECTED_EDGE_SET('CES',(#13,#14));
+                #20=POLY_LOOP('PL0',(#1,#2,#3));
+                #21=WIRE_SHELL('WS0',(#20));
+                #22=PRESENTATION_STYLE_ASSIGNMENT(());
+                #23=(ANNOTATION_CURVE_OCCURRENCE('AC0',(#22),#17)
+                    STYLED_ITEM('AC0',(#22),#17)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('AC0'));
+                #24=(LEADER_CURVE('LC0',(#22),#18)
+                    ANNOTATION_CURVE_OCCURRENCE('LC0',(#22),#18)
+                    STYLED_ITEM('LC0',(#22),#18)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('LC0'));
+                #25=(DIMENSION_CURVE('DC0',(#22),#19)
+                    ANNOTATION_CURVE_OCCURRENCE('DC0',(#22),#19)
+                    STYLED_ITEM('DC0',(#22),#19)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('DC0'));
+                #26=(PROJECTION_CURVE('PC0',(#22),#21)
+                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#22),#21)
+                    STYLED_ITEM('PC0',(#22),#21)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('PC0'));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals(17, assertInstanceOf(StepAnnotationCurveOccurrence.class, resolved.get(23)).item().id());
+        assertEquals(18, assertInstanceOf(StepLeaderCurve.class, resolved.get(24)).item().id());
+        assertEquals(19, assertInstanceOf(StepDimensionCurve.class, resolved.get(25)).item().id());
+        assertEquals(21, assertInstanceOf(StepProjectionCurve.class, resolved.get(26)).item().id());
     }
 
     @Test
@@ -5104,9 +7143,13 @@ class StepEntityResolverTest {
         StepRepresentation machiningToolDirection =
                 assertInstanceOf(StepRepresentation.class, resolved.get(6));
         assertEquals("AM", analysisModel.name());
+        assertEquals("ANALYSIS_MODEL", analysisModel.entityName());
         assertEquals("LANG", languageAssignment.name());
+        assertEquals("LANGUAGE_ASSIGNMENT", languageAssignment.entityName());
         assertEquals("MSG", messageContents.name());
+        assertEquals("MESSAGE_CONTENTS_ASSIGNMENT", messageContents.entityName());
         assertEquals("MTDR", machiningToolDirection.name());
+        assertEquals("MACHINING_TOOL_DIRECTION_REPRESENTATION", machiningToolDirection.entityName());
         assertEquals(false, analysisModel.shapeRepresentation());
         assertEquals(false, languageAssignment.shapeRepresentation());
         assertEquals(false, messageContents.shapeRepresentation());
@@ -5137,9 +7180,13 @@ class StepEntityResolverTest {
         StepRepresentation countersink =
                 assertInstanceOf(StepRepresentation.class, resolved.get(6));
         assertEquals("FKP", foundedPath.name());
+        assertEquals("FOUNDED_KINEMATIC_PATH", foundedPath.entityName());
         assertEquals("SCBH", counterbore.name());
+        assertEquals("SIMPLIFIED_COUNTERBORE_HOLE_DEFINITION", counterbore.entityName());
         assertEquals("SCDH", counterdrill.name());
+        assertEquals("SIMPLIFIED_COUNTERDRILL_HOLE_DEFINITION", counterdrill.entityName());
         assertEquals("SCSH", countersink.name());
+        assertEquals("SIMPLIFIED_COUNTERSINK_HOLE_DEFINITION", countersink.entityName());
         assertEquals(false, foundedPath.shapeRepresentation());
         assertEquals(false, counterbore.shapeRepresentation());
         assertEquals(false, counterdrill.shapeRepresentation());
@@ -5203,9 +7250,13 @@ class StepEntityResolverTest {
         StepRepresentation toolpathSpeedProfile =
                 assertInstanceOf(StepRepresentation.class, resolved.get(6));
         assertEquals("MSSR", spindleSpeed.name());
+        assertEquals("MACHINING_SPINDLE_SPEED_REPRESENTATION", spindleSpeed.entityName());
         assertEquals("MTBR", toolBody.name());
+        assertEquals("MACHINING_TOOL_BODY_REPRESENTATION", toolBody.entityName());
         assertEquals("MTDR2", toolDimension.name());
+        assertEquals("MACHINING_TOOL_DIMENSION_REPRESENTATION", toolDimension.entityName());
         assertEquals("MTSPR", toolpathSpeedProfile.name());
+        assertEquals("MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION", toolpathSpeedProfile.entityName());
         assertEquals(false, spindleSpeed.shapeRepresentation());
         assertEquals(false, toolBody.shapeRepresentation());
         assertEquals(false, toolDimension.shapeRepresentation());
@@ -5236,9 +7287,13 @@ class StepEntityResolverTest {
         StepRepresentation otherListTable =
                 assertInstanceOf(StepRepresentation.class, resolved.get(6));
         assertEquals("FMTR", freeformTolerance.name());
+        assertEquals("FREEFORM_MILLING_TOLERANCE_REPRESENTATION", freeformTolerance.entityName());
         assertEquals("HR", hardness.name());
+        assertEquals("HARDNESS_REPRESENTATION", hardness.entityName());
         assertEquals("DTT", defaultTolerance.name());
+        assertEquals("DEFAULT_TOLERANCE_TABLE", defaultTolerance.entityName());
         assertEquals("OLTR", otherListTable.name());
+        assertEquals("OTHER_LIST_TABLE_REPRESENTATION", otherListTable.entityName());
         assertEquals(false, freeformTolerance.shapeRepresentation());
         assertEquals(false, hardness.shapeRepresentation());
         assertEquals(false, defaultTolerance.shapeRepresentation());
@@ -5269,9 +7324,13 @@ class StepEntityResolverTest {
         StepRepresentation evaluatedCharacteristic =
                 assertInstanceOf(StepRepresentation.class, resolved.get(6));
         assertEquals("CR", characterized.name());
+        assertEquals("CHARACTERIZED_REPRESENTATION", characterized.entityName());
         assertEquals("CIWR", characterizedItem.name());
+        assertEquals("CHARACTERIZED_ITEM_WITHIN_REPRESENTATION", characterizedItem.entityName());
         assertEquals("CCBIWR", characterizedChainBasedItem.name());
+        assertEquals("CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION", characterizedChainBasedItem.entityName());
         assertEquals("ECPITR", evaluatedCharacteristic.name());
+        assertEquals("EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT", evaluatedCharacteristic.entityName());
         assertEquals(false, characterized.shapeRepresentation());
         assertEquals(false, characterizedItem.shapeRepresentation());
         assertEquals(false, characterizedChainBasedItem.shapeRepresentation());
@@ -5465,7 +7524,21 @@ class StepEntityResolverTest {
         assertEquals("ATWM", ((StepRepresentationRelationship) resolved.get(33)).name());
         assertEquals("RRSC", ((StepRepresentationRelationship) resolved.get(34)).name());
         assertEquals("KFBRR", ((StepRepresentationRelationship) resolved.get(35)).name());
+        assertEquals("CONSTRUCTIVE_GEOMETRY_REPRESENTATION_RELATIONSHIP",
+                ((StepRepresentationRelationship) resolved.get(5)).entityName());
+        assertEquals("DEFINITIONAL_REPRESENTATION_RELATIONSHIP",
+                ((StepRepresentationRelationship) resolved.get(8)).entityName());
+        assertEquals("SHAPE_REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION",
+                ((StepRepresentationRelationship) resolved.get(19)).entityName());
+        assertEquals("COAXIAL_ASSEMBLY_CONSTRAINT",
+                ((StepRepresentationRelationship) resolved.get(23)).entityName());
+        assertEquals("REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT",
+                ((StepRepresentationRelationship) resolved.get(34)).entityName());
+        assertEquals("KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP",
+                ((StepRepresentationRelationship) resolved.get(35)).entityName());
         assertEquals("MSRR", ((StepRepresentationRelationship) resolved.get(41)).name());
+        assertEquals("MECHANISM_STATE_REPRESENTATION_RELATIONSHIP",
+                ((StepRepresentationRelationship) resolved.get(41)).entityName());
     }
 
     @Test
@@ -6213,12 +8286,20 @@ class StepEntityResolverTest {
                 ((StepProductDefinitionRelationship) resolved.get(10)).entityName());
         assertEquals("PRODUCT_DEFINITION_USAGE",
                 ((StepProductDefinitionRelationship) resolved.get(11)).entityName());
+        assertEquals("BREAKDOWN_CONTEXT",
+                ((StepProductDefinitionRelationship) resolved.get(12)).entityName());
+        assertEquals("BREAKDOWN_ELEMENT_USAGE",
+                ((StepProductDefinitionRelationship) resolved.get(13)).entityName());
+        assertEquals("BREAKDOWN_OF",
+                ((StepProductDefinitionRelationship) resolved.get(14)).entityName());
         assertEquals("SUPPLIED_PART_RELATIONSHIP",
                 ((StepProductDefinitionRelationship) resolved.get(15)).entityName());
         StepProductDefinitionRelationshipRelationship relationshipRelationship =
                 assertInstanceOf(StepProductDefinitionRelationshipRelationship.class, resolved.get(16));
         assertEquals(10, relationshipRelationship.relating().id());
         assertEquals(11, relationshipRelationship.related().id());
+        assertEquals("PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP",
+                relationshipRelationship.entityName());
         assertEquals("PRODUCT_DEFINITION_USAGE_RELATIONSHIP",
                 ((StepProductDefinitionRelationshipRelationship) resolved.get(17)).entityName());
         assertEquals("ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
@@ -6231,6 +8312,7 @@ class StepEntityResolverTest {
         assertEquals(6, formationRelationship.relatedFormation().id());
         StepPropertyDefinitionRelationship propertyRelationship =
                 assertInstanceOf(StepPropertyDefinitionRelationship.class, resolved.get(21));
+        assertEquals("PROPERTY_DEFINITION_RELATIONSHIP", propertyRelationship.entityName());
         assertEquals(19, propertyRelationship.relatingPropertyDefinition().id());
         assertEquals(20, propertyRelationship.relatedPropertyDefinition().id());
     }
@@ -6257,6 +8339,7 @@ class StepEntityResolverTest {
         assertEquals("", child.description());
         assertEquals(1, relationship.relatingGroup().id());
         assertEquals(2, relationship.relatedGroup().id());
+        assertEquals("GROUP_RELATIONSHIP", relationship.entityName());
         assertEquals("CLASS_SYSTEM", classSystem.entityName());
     }
 
@@ -6465,27 +8548,35 @@ class StepEntityResolverTest {
         assertEquals(6, personAssignment.assignedPersonAndOrganization().id());
         assertEquals(7, personAssignment.role().id());
         assertEquals(1, appliedPersonAssignment.items().size());
+        assertEquals("APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT", appliedPersonAssignment.entityName());
         assertEquals(3, appliedPersonAssignment.items().getFirst().id());
         assertEquals(2, appliedDateTime.items().size());
+        assertEquals("APPLIED_DATE_AND_TIME_ASSIGNMENT", appliedDateTime.entityName());
         assertEquals(13, appliedDateTime.assignedDateAndTime().id());
         assertEquals(17, approvalAssignment.assignedApproval().id());
+        assertEquals("APPLIED_APPROVAL_ASSIGNMENT", appliedApproval.entityName());
         assertEquals(3, appliedApproval.items().getFirst().id());
         assertEquals(21, securityAssignment.assignedSecurityClassification().id());
+        assertEquals("APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT", appliedSecurity.entityName());
         assertEquals(3, appliedSecurity.items().getFirst().id());
         assertEquals(25, documentReference.assignedDocument().id());
+        assertEquals("APPLIED_DOCUMENT_REFERENCE", appliedDocument.entityName());
         assertEquals("internal", appliedDocument.source());
         assertEquals(3, appliedDocument.items().getFirst().id());
         assertEquals("purchase", contractType.description());
         assertEquals(28, contract.kind().id());
         assertEquals(29, contractAssignment.assignedContract().id());
+        assertEquals("APPLIED_CONTRACT_ASSIGNMENT", appliedContract.entityName());
         assertEquals(3, appliedContract.items().getFirst().id());
         assertEquals("material", certificationType.description());
         assertEquals(32, certification.kind().id());
         assertEquals(33, certificationAssignment.assignedCertification().id());
+        assertEquals("APPLIED_CERTIFICATION_ASSIGNMENT", appliedCertification.entityName());
         assertEquals(3, appliedCertification.items().getFirst().id());
         assertEquals("release", dateRole.name());
         assertEquals(10, dateAssignment.assignedDate().id());
         assertEquals(36, dateAssignment.role().id());
+        assertEquals("APPLIED_DATE_ASSIGNMENT", appliedDate.entityName());
         assertEquals(3, appliedDate.items().getFirst().id());
     }
 
@@ -6567,20 +8658,32 @@ class StepEntityResolverTest {
         StepAppliedOrganizationAssignment organizationAssignment =
                 assertInstanceOf(StepAppliedOrganizationAssignment.class, resolved.get(40));
 
+        assertEquals("MECHANICAL_CONTEXT", mechanicalContext.entityName());
         assertEquals("mechanical", mechanicalContext.disciplineType());
+        assertEquals("DESIGN_CONTEXT", designContext.entityName());
         assertEquals("design", designContext.lifeCycleStage());
+        assertEquals("CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT", personAssignment.entityName());
         assertEquals(2, personAssignment.items().size());
+        assertEquals("CC_DESIGN_DATE_ASSIGNMENT", dateAssignment.entityName());
         assertEquals(6, dateAssignment.items().getFirst().id());
+        assertEquals("CC_DESIGN_DATE_AND_TIME_ASSIGNMENT", dateTimeAssignment.entityName());
         assertEquals(17, dateTimeAssignment.assignedDateAndTime().id());
+        assertEquals("APPLIED_DATE_TIME_ASSIGNMENT", compactDateTimeAssignment.entityName());
         assertEquals(3, compactDateTimeAssignment.items().getFirst().id());
+        assertEquals("CC_DESIGN_APPROVAL", approvalAssignment.entityName());
         assertEquals(22, approvalAssignment.assignedApproval().id());
+        assertEquals("CC_DESIGN_SECURITY_CLASSIFICATION", securityAssignment.entityName());
         assertEquals(25, securityAssignment.assignedSecurityClassification().id());
+        assertEquals("CC_DESIGN_CONTRACT", contractAssignment.entityName());
         assertEquals(28, contractAssignment.assignedContract().id());
+        assertEquals("CC_DESIGN_CERTIFICATION", certificationAssignment.entityName());
         assertEquals(31, certificationAssignment.assignedCertification().id());
+        assertEquals("CC_DESIGN_SPECIFICATION_REFERENCE", specificationReference.entityName());
         assertEquals(2, specificationReference.items().size());
         assertEquals("CLASS", classGroup.entityName());
         assertEquals("ASSEMBLY_COMPONENT_USAGE", assemblyUsage.entityName());
         assertEquals("PROMISSORY_USAGE_OCCURRENCE", promissoryUsage.entityName());
+        assertEquals("CC_DESIGN_ORGANIZATION_ASSIGNMENT", organizationAssignment.entityName());
         assertEquals(2, organizationAssignment.items().size());
         assertEquals(8, organizationAssignment.assignedOrganization().id());
     }
@@ -7006,6 +9109,32 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveBaseShapeAspectOccurrence() {
+        String step = """
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical design');
+                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
+                #3=PRODUCT('PRT','Part','Part',(#2));
+                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
+                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
+                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
+                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
+                #9=SHAPE_ASPECT_OCCURRENCE('SAO0','occ',#7,.T.,#8);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepShapeAspectOccurrence occurrence =
+                assertInstanceOf(StepShapeAspectOccurrence.class, resolved.get(9));
+        assertEquals("SHAPE_ASPECT_OCCURRENCE", occurrence.entityName());
+        assertEquals(7, occurrence.ofShape().id());
+        assertEquals("T", occurrence.productDefinitional());
+        assertEquals(8, occurrence.definition().id());
+    }
+
+    @Test
     void shouldResolveFeatureDefinitionAliases() {
         String step = """
                 DATA;
@@ -7272,6 +9401,18 @@ class StepEntityResolverTest {
             assertEquals(1, representation.items().size());
             assertEquals(2, representation.context().id());
         }
+        assertEquals("GEOMETRICALLY_BOUNDED_SURFACE_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(3)).entityName());
+        assertEquals("GEOMETRICALLY_BOUNDED_WIREFRAME_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(4)).entityName());
+        assertEquals("GEOMETRIC_SET_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(5)).entityName());
+        assertEquals("MANIFOLD_SURFACE_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(6)).entityName());
+        assertEquals("SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(7)).entityName());
+        assertEquals("SURFACE_MODEL_SHAPE_REPRESENTATION",
+                assertInstanceOf(StepRepresentation.class, resolved.get(8)).entityName());
     }
 
     @Test
@@ -7296,5 +9437,33 @@ class StepEntityResolverTest {
         assertEquals("rr", relationship.name());
         assertEquals(4, relationship.rep1().id());
         assertEquals(5, relationship.rep2().id());
+        assertEquals("REPRESENTATION_RELATIONSHIP", relationship.entityName());
+    }
+
+    @Test
+    void shouldResolveRepresentationRelationshipAliases() {
+        String step = """
+                DATA;
+                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','R');
+                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #3=REPRESENTATION('REP_A',(#1),#2);
+                #4=REPRESENTATION('REP_B',(#1),#2);
+                #5=DEFINITIONAL_REPRESENTATION_RELATIONSHIP('DRR','def link',#3,#4);
+                #6=TOPOLOGY_TO_GEOMETRY_MODEL_ASSOCIATION('TGMA','topo geom',#3,#4);
+                #7=KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP('KFRR','frame link',#3,#4);
+                #8=COAXIAL_ASSEMBLY_CONSTRAINT('CAC','coaxial',#3,#4);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        assertEquals("DEFINITIONAL_REPRESENTATION_RELATIONSHIP",
+                assertInstanceOf(StepRepresentationRelationship.class, resolved.get(5)).entityName());
+        assertEquals("TOPOLOGY_TO_GEOMETRY_MODEL_ASSOCIATION",
+                assertInstanceOf(StepRepresentationRelationship.class, resolved.get(6)).entityName());
+        assertEquals("KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP",
+                assertInstanceOf(StepRepresentationRelationship.class, resolved.get(7)).entityName());
+        assertEquals("COAXIAL_ASSEMBLY_CONSTRAINT",
+                assertInstanceOf(StepRepresentationRelationship.class, resolved.get(8)).entityName());
     }
 }

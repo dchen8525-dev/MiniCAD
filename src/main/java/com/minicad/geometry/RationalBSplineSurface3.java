@@ -7,31 +7,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Minimal non-rational tensor-product B-spline surface with knot multiplicities.
+ * Minimal rational tensor-product B-spline surface.
  *
  * @param uDegree degree in the U direction
  * @param vDegree degree in the V direction
  * @param controlPoints control-point grid indexed as [u][v]
+ * @param weightsData weight grid aligned with control points
  * @param uMultiplicities U-knot multiplicities
  * @param vMultiplicities V-knot multiplicities
  * @param uKnots unique U-knot values
  * @param vKnots unique V-knot values
  */
-public record BSplineSurface3(
+public record RationalBSplineSurface3(
         int uDegree,
         int vDegree,
         List<List<CartesianPoint>> controlPoints,
+        List<List<Double>> weightsData,
         List<Integer> uMultiplicities,
         List<Integer> vMultiplicities,
         List<Double> uKnots,
         List<Double> vKnots
 ) implements SurfaceGeometry {
 
-    public BSplineSurface3 {
+    public RationalBSplineSurface3 {
         if (uDegree < 1 || vDegree < 1) {
             throw new GeometryException("surface degrees must be at least 1");
         }
         controlPoints = controlPoints.stream().map(List::copyOf).toList();
+        weightsData = weightsData.stream().map(List::copyOf).toList();
         uMultiplicities = List.copyOf(uMultiplicities);
         vMultiplicities = List.copyOf(vMultiplicities);
         uKnots = List.copyOf(uKnots);
@@ -43,9 +46,12 @@ public record BSplineSurface3(
         if (vCount < vDegree + 1) {
             throw new GeometryException("V control-point count must be at least degree + 1");
         }
-        for (List<CartesianPoint> row : controlPoints) {
-            if (row.size() != vCount) {
-                throw new GeometryException("control-point rows must have uniform length");
+        if (weightsData.size() != controlPoints.size()) {
+            throw new GeometryException("weight rows must match control-point rows");
+        }
+        for (int row = 0; row < controlPoints.size(); row++) {
+            if (controlPoints.get(row).size() != vCount || weightsData.get(row).size() != vCount) {
+                throw new GeometryException("control-point and weight rows must have uniform length");
             }
         }
         if (uMultiplicities.size() != uKnots.size() || vMultiplicities.size() != vKnots.size()) {
@@ -81,22 +87,35 @@ public record BSplineSurface3(
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.getFirst().size();
-
         int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExpanded);
         int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExpanded);
 
-        Vector3 sum = new Vector3(0.0, 0.0, 0.0);
+        Vector3 numerator = new Vector3(0.0, 0.0, 0.0);
+        double denominator = 0.0;
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
             double nu = basisValue(ui, uDegree, clampedU, uExpanded);
             for (int j = 0; j <= vDegree; j++) {
                 int vj = vSpan - vDegree + j;
                 double nv = basisValue(vj, vDegree, clampedV, vExpanded);
+                double weightedBasis = nu * nv * weightsData.get(ui).get(vj);
                 CartesianPoint control = controlPoints.get(ui).get(vj);
-                sum = sum.add(new Vector3(control.x() * nu * nv, control.y() * nu * nv, control.z() * nu * nv));
+                numerator = numerator.add(new Vector3(
+                        control.x() * weightedBasis,
+                        control.y() * weightedBasis,
+                        control.z() * weightedBasis
+                ));
+                denominator += weightedBasis;
             }
         }
-        return new CartesianPoint(sum.x(), sum.y(), sum.z());
+        if (Epsilon.isZero(denominator)) {
+            throw new GeometryException("rational surface denominator is zero");
+        }
+        return new CartesianPoint(
+                numerator.x() / denominator,
+                numerator.y() / denominator,
+                numerator.z() / denominator
+        );
     }
 
     public Vector3 normalAt(double u, double v) {

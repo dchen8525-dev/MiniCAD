@@ -4,6 +4,7 @@ package com.minicad.step.model;
  * Minimal ANNOTATION_OCCURRENCE_RELATIONSHIP.
  *
  * @param id STEP instance id
+ * @param entityName STEP entity name
  * @param name relationship name
  * @param description relationship description
  * @param relatingAnnotationOccurrence source occurrence
@@ -11,6 +12,7 @@ package com.minicad.step.model;
  */
 public record StepAnnotationOccurrenceRelationship(
         int id,
+        String entityName,
         String name,
         String description,
         StepEntity relatingAnnotationOccurrence,

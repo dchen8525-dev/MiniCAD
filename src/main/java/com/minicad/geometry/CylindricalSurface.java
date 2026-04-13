@@ -10,7 +10,7 @@ import com.minicad.common.Preconditions;
  * @param position cylinder placement
  * @param radius positive radius
  */
-public record CylindricalSurface(Axis2Placement3D position, double radius) {
+public record CylindricalSurface(Axis2Placement3D position, double radius) implements SurfaceGeometry {
 
     /**
      * Creates a cylindrical surface and validates its invariants.

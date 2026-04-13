@@ -6,12 +6,14 @@ import java.util.List;
  * Minimal APPLIED_DATE_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
+ * @param entityName concrete STEP entity name
  * @param assignedDate assigned calendar date
  * @param role assignment role
  * @param items assigned target items
  */
 public record StepAppliedDateAssignment(
         int id,
+        String entityName,
         StepCalendarDate assignedDate,
         StepDateRole role,
         List<StepEntity> items

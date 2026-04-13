@@ -10,13 +10,15 @@ import java.util.List;
  * @param items referenced items
  * @param context representation context
  * @param shapeRepresentation whether this entity originated from SHAPE_REPRESENTATION
+ * @param entityName concrete STEP entity name
  */
 public record StepRepresentation(
         int id,
         String name,
         List<StepEntity> items,
         StepEntity context,
-        boolean shapeRepresentation
+        boolean shapeRepresentation,
+        String entityName
 ) implements StepEntity {
 
     public StepRepresentation {

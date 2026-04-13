@@ -11,7 +11,7 @@ import com.minicad.common.Preconditions;
  * @param majorRadius distance from axis to tube center
  * @param minorRadius tube radius
  */
-public record ToroidalSurface(Axis2Placement3D position, double majorRadius, double minorRadius) {
+public record ToroidalSurface(Axis2Placement3D position, double majorRadius, double minorRadius) implements SurfaceGeometry {
 
     /**
      * Creates a toroidal surface and validates its invariants.

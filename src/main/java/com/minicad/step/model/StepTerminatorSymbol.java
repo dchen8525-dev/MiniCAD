@@ -8,14 +8,14 @@ import java.util.List;
  * @param id STEP instance id
  * @param name symbol name
  * @param styles presentation style assignments
- * @param item referenced annotation symbol
+ * @param item referenced supported annotation content or occurrence
  * @param annotatedCurve referenced annotation curve occurrence
  */
 public record StepTerminatorSymbol(
         int id,
         String name,
         List<StepPresentationStyleAssignment> styles,
-        StepAnnotationSymbol item,
+        StepEntity item,
         StepEntity annotatedCurve
 ) implements StepEntity {
 

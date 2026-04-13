@@ -8,13 +8,13 @@ import java.util.List;
  * @param id STEP instance id
  * @param name occurrence name
  * @param styles assigned styles
- * @param item referenced annotation symbol
+ * @param item referenced supported annotation content or occurrence
  */
 public record StepAnnotationSubfigureOccurrence(
         int id,
         String name,
         List<StepPresentationStyleAssignment> styles,
-        StepAnnotationSymbol item
+        StepEntity item
 ) implements StepEntity {
 
     public StepAnnotationSubfigureOccurrence {

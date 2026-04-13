@@ -23,6 +23,7 @@ class SolidTest {
         Solid solid = new Solid(shell);
 
         assertEquals(shell, solid.outerShell());
+        assertEquals(0, solid.voidShells().size());
     }
 
     @Test
@@ -32,6 +33,16 @@ class SolidTest {
         TopologyException exception = assertThrows(TopologyException.class, () -> new Solid(shell));
 
         assertEquals("solid requires a closed shell", exception.getMessage());
+    }
+
+    @Test
+    void shouldCreateSolidWithVoidShells() {
+        Shell shell = new Shell(List.of(faceOnZ0()), true);
+        Shell voidShell = new Shell(List.of(faceOnZ0()), true);
+
+        Solid solid = new Solid(shell, List.of(voidShell));
+
+        assertEquals(1, solid.voidShells().size());
     }
 
     private static Face faceOnZ0() {

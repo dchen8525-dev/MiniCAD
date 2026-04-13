@@ -10,7 +10,7 @@ import com.minicad.common.Preconditions;
  * @param origin point on the plane
  * @param normal unit plane normal
  */
-public record Plane(CartesianPoint origin, Direction3 normal) {
+public record Plane(CartesianPoint origin, Direction3 normal) implements SurfaceGeometry {
 
     /**
      * Creates a plane and validates its fields.

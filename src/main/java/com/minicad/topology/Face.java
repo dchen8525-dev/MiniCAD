@@ -2,20 +2,21 @@ package com.minicad.topology;
 
 import com.minicad.common.TopologyException;
 import com.minicad.geometry.Plane;
+import com.minicad.geometry.SurfaceGeometry;
 
 import java.util.List;
 
 /**
- * Minimal planar face.
+ * Minimal face with optional planar validation.
  *
- * @param surface supporting plane
+ * @param surface supporting surface
  * @param bounds face boundaries
  * @param sameSense whether the face orientation matches the surface normal
  */
-public record Face(Plane surface, List<FaceBound> bounds, boolean sameSense) {
+public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean sameSense) {
 
     /**
-     * Creates a planar face and validates that loop vertices lie on the plane.
+     * Creates a face and validates that planar loop vertices lie on the plane.
      */
     public Face {
         if (surface == null) {
@@ -37,18 +38,24 @@ public record Face(Plane surface, List<FaceBound> bounds, boolean sameSense) {
             if (bound.outer()) {
                 hasOuter = true;
             }
-            if (bound.loop() instanceof EdgeLoop edgeLoop) {
+            if (surface instanceof Plane plane && bound.loop() instanceof EdgeLoop edgeLoop) {
                 for (OrientedEdge edge : edgeLoop.edges()) {
-                    if (!surface.contains(edge.startVertex().point())) {
+                    if (!plane.contains(edge.startVertex().point())) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
-                    if (!surface.contains(edge.endVertex().point())) {
+                    if (!plane.contains(edge.endVertex().point())) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
                 }
-            } else if (bound.loop() instanceof VertexLoop vertexLoop) {
-                if (!surface.contains(vertexLoop.vertex().point())) {
+            } else if (surface instanceof Plane plane && bound.loop() instanceof VertexLoop vertexLoop) {
+                if (!plane.contains(vertexLoop.vertex().point())) {
                     throw new TopologyException("all face vertices must lie on the plane");
+                }
+            } else if (surface instanceof Plane plane && bound.loop() instanceof PolyLoop polyLoop) {
+                for (var point : polyLoop.points()) {
+                    if (!plane.contains(point)) {
+                        throw new TopologyException("all face vertices must lie on the plane");
+                    }
                 }
             }
         }

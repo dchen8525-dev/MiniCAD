@@ -10,7 +10,7 @@ import com.minicad.common.Preconditions;
  * @param radius radius at placement origin
  * @param semiAngle cone semi-angle in radians
  */
-public record ConicalSurface(Axis2Placement3D position, double radius, double semiAngle) {
+public record ConicalSurface(Axis2Placement3D position, double radius, double semiAngle) implements SurfaceGeometry {
 
     /**
      * Creates a conical surface and validates its invariants.

@@ -7,12 +7,14 @@ package com.minicad.step.model;
  * @param name context name
  * @param disciplineType discipline type
  * @param frameOfReference referenced application context
+ * @param entityName concrete STEP entity name
  */
 public record StepProductContext(
         int id,
         String name,
         String disciplineType,
-        StepApplicationContext frameOfReference
+        StepApplicationContext frameOfReference,
+        String entityName
 ) implements StepEntity {
 
     @Override

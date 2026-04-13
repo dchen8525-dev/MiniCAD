@@ -12,6 +12,6 @@ public record StepAnnotationTextOccurrence(
         int id,
         String name,
         String text,
-        StepCartesianPoint position
+        StepEntity position
 ) implements StepEntity {
 }
