@@ -2019,6 +2019,12 @@ public final class StepCadBuilder {
                     new ProfileLoops(normalizeOuterLoop(roundedRectangleProfile(profile)), List.of());
             case "CIRCULAR_HOLLOW_PROFILE_DEF" ->
                     circularHollowProfile(profile);
+            case "RECTANGLE_HOLLOW_PROFILE_DEF" ->
+                    rectangleHollowProfile(profile);
+            case "CENTERED_CIRCLE_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(centeredCircleProfile(profile)), List.of());
+            case "CENTRE_LINE_ARC_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(centreLineArcProfile(profile)), List.of());
             case "ARBITRARY_CLOSED_PROFILE_DEF", "ARBITRARY_PROFILE_DEF" ->
                     new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
             case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" ->
