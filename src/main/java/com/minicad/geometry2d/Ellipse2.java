@@ -53,6 +53,6 @@ public record Ellipse2(Point2 center, Direction2 xDirection, double semiAxis1, d
         Vector2 y = new Vector2(-x.y(), x.x());
         double normalizedX = offset.dot(x) / semiAxis1;
         double normalizedY = offset.dot(y) / semiAxis2;
-        return Math.abs((normalizedX * normalizedX) + (normalizedY * normalizedY) - 1.0) <= 1.0e-9;
+        return Epsilon.equals((normalizedX * normalizedX) + (normalizedY * normalizedY), 1.0);
     }
 }

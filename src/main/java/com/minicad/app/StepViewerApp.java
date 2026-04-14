@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Lightweight local web app for viewing supported STEP topology in the browser.
@@ -172,27 +173,30 @@ public final class StepViewerApp {
 
     @MultipartConfig
     private static final class PreviewServlet extends HttpServlet {
+        private static final AtomicLong requestIdCounter = new AtomicLong(0);
+
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            long requestId = requestIdCounter.incrementAndGet();
             byte[] requestBody = readPreviewRequestBody(request);
             StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
             String stepText = decodedStepText.text();
-            log.info("requestId=1 stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
-                    "request_received", request.getRemoteAddr(),
+            log.info("requestId={} stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
+                    requestId, "request_received", request.getRemoteAddr(),
                     request.getContentType(),
                     requestBody.length, stepText.length(),
                     decodedStepText.charset().name(),
                     hexPrefix(requestBody, 16));
             if (stepText.isBlank()) {
-                log.info("requestId=1 stage={} reason=blank_body", "request_rejected");
+                log.info("requestId={} stage={} reason=blank_body", requestId, "request_rejected");
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
                 return;
             }
 
             long startedAt = System.nanoTime();
             long exportStartedAt = System.nanoTime();
-            log.info("requestId=1 stage={} textLength={}",
-                    "export_start", stepText.length());
+            log.info("requestId={} stage={} textLength={}",
+                    requestId, "export_start", stepText.length());
             try {
                 Path cachePath = previewCachePath(stepText);
                 byte[] previewBinary;
@@ -200,31 +204,31 @@ public final class StepViewerApp {
                 if (Files.exists(cachePath)) {
                     previewBinary = Files.readAllBytes(cachePath);
                     cacheStatus = "hit";
-                    log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
-                            "export_cache_hit", cachePath, previewBinary.length);
+                    log.info("requestId={} stage={} cachePath={}, binaryLength={}",
+                            requestId, "export_cache_hit", cachePath, previewBinary.length);
                 } else {
                     previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
                     Files.createDirectories(cachePath.getParent());
                     Files.write(cachePath, previewBinary);
                     cacheStatus = "miss";
-                    log.info("requestId=1 stage={} cachePath={}, binaryLength={}",
-                            "export_cache_miss_written", cachePath, previewBinary.length);
+                    log.info("requestId={} stage={} cachePath={}, binaryLength={}",
+                            requestId, "export_cache_miss_written", cachePath, previewBinary.length);
                 }
-                log.info("requestId=1 stage={} elapsedMs={}, binaryLength={}",
-                        "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
+                log.info("requestId={} stage={} elapsedMs={}, binaryLength={}",
+                        requestId, "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
                 response.setHeader("X-MiniCAD-Cache", cacheStatus);
                 response.setHeader("X-MiniCAD-Cache-Path", cachePath.toString());
                 response.setHeader("X-MiniCAD-Preview-Format", "glb-v1");
                 send(response, HttpServletResponse.SC_OK, "model/gltf-binary", previewBinary);
-                log.info("requestId=1 stage={} status=200, totalElapsedMs={}",
-                        "response_sent", elapsedMillis(startedAt));
+                log.info("requestId={} stage={} status=200, totalElapsedMs={}",
+                        requestId, "response_sent", elapsedMillis(startedAt));
             } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-                log.info("requestId=1 stage={} elapsedMs={}, errorType={}, message={}",
-                        "export_failed", elapsedMillis(startedAt),
+                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
+                        requestId, "export_failed", elapsedMillis(startedAt),
                         ex.getClass().getSimpleName(), ex.getMessage());
                 if (ex instanceof StepParseException parseException) {
-                    log.info("requestId=1 stage={} context={}",
-                            "export_failed_context", diagnosticContext(stepText, parseException.getMessage()));
+                    log.info("requestId={} stage={} context={}",
+                            requestId, "export_failed_context", diagnosticContext(stepText, parseException.getMessage()));
                 }
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
             }
@@ -275,8 +279,8 @@ public final class StepViewerApp {
 
     private static Path resolveExamplePath(String name) {
         return switch (name == null || name.isBlank() ? "minimal-square" : name) {
-            case "minimal-square" -> Path.of("examples/minimal-square.step");
-            case "plate-with-round-hole" -> Path.of("examples/plate-with-round-hole.step");
+            case "minimal-square" -> Path.of("examples", "minimal-square.step");
+            case "plate-with-round-hole" -> Path.of("examples", "plate-with-round-hole.step");
             default -> Path.of("examples", name + ".step");
         };
     }

@@ -1,33 +1,104 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
+import java.util.Objects;
+
 /**
- * Unit 2D direction.
+ * Immutable unit 2D direction.
  *
  * @param x x component
  * @param y y component
  */
 public record Direction2(double x, double y) {
 
+    /**
+     * Creates a normalized direction from already-normalized components.
+     */
     public Direction2 {
         Preconditions.requireFinite(x, "x");
         Preconditions.requireFinite(y, "y");
         double norm = Math.sqrt(x * x + y * y);
-        if (norm == 0.0) {
-            throw new GeometryException("direction must not be zero");
+        if (!Epsilon.equals(norm, 1.0)) {
+            throw new GeometryException("direction must be unit length");
         }
-        x /= norm;
-        y /= norm;
     }
 
+    /**
+     * Creates a direction by normalizing a vector.
+     *
+     * @param vector source vector
+     * @return unit direction
+     */
     public static Direction2 from(Vector2 vector) {
         Preconditions.requireNonNull(vector, "vector");
-        return new Direction2(vector.x(), vector.y());
+        double norm = vector.norm();
+        if (Epsilon.isZero(norm)) {
+            throw new GeometryException("cannot normalize zero-length vector");
+        }
+        return new Direction2(vector.x() / norm, vector.y() / norm);
     }
 
+    /**
+     * Converts this direction to a vector with unit length.
+     *
+     * @return equivalent unit vector
+     */
     public Vector2 asVector() {
         return new Vector2(x, y);
+    }
+
+    /**
+     * Returns the opposite direction.
+     *
+     * @return reversed direction
+     */
+    public Direction2 reverse() {
+        return new Direction2(-x, -y);
+    }
+
+    /**
+     * Computes the dot product with another direction.
+     *
+     * @param other second direction
+     * @return dot product
+     */
+    public double dot(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.x + y * other.y;
+    }
+
+    /**
+     * Compares this direction with another using epsilon tolerance.
+     * Two directions are equal if their components differ by less than epsilon.
+     *
+     * @param obj the object to compare
+     * @return true if the directions are equal within epsilon tolerance
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Direction2 other)) {
+            return false;
+        }
+        return Epsilon.equals(x, other.x)
+                && Epsilon.equals(y, other.y);
+    }
+
+    /**
+     * Computes hash code based on discretized values to maintain consistency with equals.
+     *
+     * @return hash code
+     */
+    @Override
+    public int hashCode() {
+        // Discretize to maintain equals/hashCode contract
+        long xi = Math.round(x / Epsilon.EPS);
+        long yi = Math.round(y / Epsilon.EPS);
+        return Objects.hash(xi, yi);
     }
 }

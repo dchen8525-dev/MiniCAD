@@ -13,6 +13,9 @@ import java.util.List;
 public record PolyLoop(List<CartesianPoint> points) implements Loop {
 
     public PolyLoop {
+        if (points == null) {
+            throw new TopologyException("poly loop points must not be null");
+        }
         points = List.copyOf(points);
         if (points.size() < 3) {
             throw new TopologyException("poly loop must contain at least three points");

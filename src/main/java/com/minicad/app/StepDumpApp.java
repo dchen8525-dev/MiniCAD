@@ -448,6 +448,7 @@ public final class StepDumpApp {
             }
             return "REPRESENTATION";
         }
+        // Attempt to get entityName via reflection; if the method doesn't exist, fall back to class name
         try {
             var method = entity.getClass().getMethod("entityName");
             Object value = method.invoke(entity);
@@ -455,6 +456,7 @@ public final class StepDumpApp {
                 return name;
             }
         } catch (ReflectiveOperationException ignored) {
+            // entityName method not present or not accessible, use class name fallback below
         }
         String simpleName = entity.getClass().getSimpleName();
         if (simpleName.startsWith("Step")) {

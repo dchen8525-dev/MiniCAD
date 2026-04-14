@@ -4,6 +4,8 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
+import java.util.Objects;
+
 /**
  * Immutable unit direction in 3D.
  *
@@ -69,5 +71,39 @@ public record Direction3(double x, double y, double z) {
     public double dot(Direction3 other) {
         Preconditions.requireNonNull(other, "other");
         return x * other.x + y * other.y + z * other.z;
+    }
+
+    /**
+     * Compares this direction with another using epsilon tolerance.
+     * Two directions are equal if their components differ by less than epsilon.
+     *
+     * @param obj the object to compare
+     * @return true if the directions are equal within epsilon tolerance
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Direction3 other)) {
+            return false;
+        }
+        return Epsilon.equals(x, other.x)
+                && Epsilon.equals(y, other.y)
+                && Epsilon.equals(z, other.z);
+    }
+
+    /**
+     * Computes hash code based on discretized values to maintain consistency with equals.
+     *
+     * @return hash code
+     */
+    @Override
+    public int hashCode() {
+        // Discretize to maintain equals/hashCode contract
+        long xi = Math.round(x / Epsilon.EPS);
+        long yi = Math.round(y / Epsilon.EPS);
+        long zi = Math.round(z / Epsilon.EPS);
+        return Objects.hash(xi, yi, zi);
     }
 }
