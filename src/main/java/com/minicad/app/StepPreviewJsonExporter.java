@@ -1820,7 +1820,10 @@ public final class StepPreviewJsonExporter {
         Set<Integer> shellIds = new TreeSet<>();
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
-                collectShellLikeIds(item, shellIds);
+                StepEntity unwrapped = unwrapStyledItem(item);
+                if (!isRepresentationSolidItem(unwrapped)) {
+                    collectShellLikeIds(item, shellIds);
+                }
             }
         }
         return shellIds;
@@ -1834,12 +1837,7 @@ public final class StepPreviewJsonExporter {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = unwrapStyledItem(item);
-                if (unwrapped instanceof StepSweptAreaSolid
-                        || unwrapped instanceof StepSolidReplica
-                        || unwrapped instanceof StepCsgSolid
-                        || unwrapped instanceof StepCsgPrimitive
-                        || unwrapped instanceof StepBooleanClippingResult
-                        || unwrapped instanceof StepBooleanResult) {
+                if (isRepresentationSolidItem(unwrapped)) {
                     solidIds.add(unwrapped.id());
                 }
             }
@@ -1869,6 +1867,10 @@ public final class StepPreviewJsonExporter {
         Map<Integer, StepMetadataExtractor.DisplayMetadata> metadataByShellId = new LinkedHashMap<>();
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
+                StepEntity unwrapped = unwrapStyledItem(item);
+                if (isRepresentationSolidItem(unwrapped)) {
+                    continue;
+                }
                 StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
                 Set<Integer> itemShellIds = new LinkedHashSet<>();
                 collectShellLikeIds(item, itemShellIds);
@@ -1889,18 +1891,24 @@ public final class StepPreviewJsonExporter {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = unwrapStyledItem(item);
-                if (unwrapped instanceof StepSweptAreaSolid
-                        || unwrapped instanceof StepSolidReplica
-                        || unwrapped instanceof StepCsgSolid
-                        || unwrapped instanceof StepCsgPrimitive
-                        || unwrapped instanceof StepBooleanClippingResult
-                        || unwrapped instanceof StepBooleanResult) {
+                if (isRepresentationSolidItem(unwrapped)) {
                     StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
                     metadataBySolidId.put(unwrapped.id(), mergeMetadata(metadataBySolidId.get(unwrapped.id()), itemMetadata));
                 }
             }
         }
         return Map.copyOf(metadataBySolidId);
+    }
+
+    private static boolean isRepresentationSolidItem(StepEntity entity) {
+        return entity instanceof StepManifoldSolidBrep
+                || entity instanceof StepBrepWithVoids
+                || entity instanceof StepSweptAreaSolid
+                || entity instanceof StepSolidReplica
+                || entity instanceof StepCsgSolid
+                || entity instanceof StepCsgPrimitive
+                || entity instanceof StepBooleanClippingResult
+                || entity instanceof StepBooleanResult;
     }
 
     private static List<StepRepresentation> linkedShapeRepresentations(

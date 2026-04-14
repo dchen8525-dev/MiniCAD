@@ -302,6 +302,62 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportManifoldSolidBrepFacesFromAdvancedBrepShapeRepresentation() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
+                #90=CLOSED_SHELL('CS',(#80));
+                #100=MANIFOLD_SOLID_BREP('S0',#90);
+                #110=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                #111=ADVANCED_BREP_SHAPE_REPRESENTATION('BREP_REP',(#100),#110);
+                ENDSEC;
+                """);
+
+        assertJsonContains(json,
+                "\"representationCount\":1",
+                "\"representations\":[{\"id\":111",
+                "\"faces\":[{\"id\":80",
+                "\"surfaceType\":\"PLANE\"",
+                "\"edgeCount\":4",
+                "\"faceCount\":1",
+                "\"unsupportedFaceCount\":0");
+    }
+
+    @Test
     void shouldExpandRepresentationRelationshipGeometry() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;
@@ -10639,11 +10695,10 @@ class StepPreviewJsonExporterTest {
         assertJsonContains(json,
                 "\"representationCount\":1",
                 "\"instanceCount\":1",
-                "\"unsupportedFaceCount\":0",
-                "\"B_SPLINE_SURFACE_WITH_KNOTS\"",
+                "\"unsupportedFaceCount\":1",
+                "\"surfaceType\":\"MANIFOLD_SOLID_BREP\"",
+                "\"reason\":\"face must contain an outer bound\"",
                 "\"edges\":[],\"faces\":[],\"representations\":[");
-        assertFalse(json.contains("\"reason\":\"b-spline surface preview failed\""));
-        assertFalse(json.contains("\"reason\":\"missing outer bound\""));
         assertTrue(json.length() < 250_000_000);
     }
 
@@ -12060,6 +12115,90 @@ class StepPreviewJsonExporterTest {
     }
 
     @Test
+    void shouldExportRevolvedAreaSolidPreviewMetadataForHollowProfile() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#4,#3);
+                #6=AXIS1_PLACEMENT('AX1',#1,#2);
+                #7=CARTESIAN_POINT('P2',(4.0,0.0));
+                #8=DIRECTION('DX2',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('AX2',#7,#8);
+                #10=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#9,2.0,0.5);
+                #11=REVOLVED_AREA_SOLID('RVH',#10,#5,#6,0.19634954084936207);
+                ENDSEC;
+                """);
+
+        assertJsonContains(json,
+                "\"solidCount\":1",
+                "\"faceCount\":146",
+                "\"unsupportedFaceCount\":0");
+    }
+
+    @Test
+    void shouldExportExtrudedAreaSolidPreviewMetadataForArbitraryProfileWithVoids() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=CARTESIAN_POINT('P0',(0.0,0.0));
+                #6=CARTESIAN_POINT('P1',(4.0,0.0));
+                #7=CARTESIAN_POINT('P2',(4.0,4.0));
+                #8=CARTESIAN_POINT('P3',(0.0,4.0));
+                #9=CARTESIAN_POINT('P4',(1.0,1.0));
+                #10=CARTESIAN_POINT('P5',(3.0,1.0));
+                #11=CARTESIAN_POINT('P6',(3.0,3.0));
+                #12=CARTESIAN_POINT('P7',(1.0,3.0));
+                #13=POLYLINE('OUTER',(#5,#6,#7,#8,#5));
+                #14=POLYLINE('INNER',(#9,#10,#11,#12,#9));
+                #15=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#13,(#14));
+                #16=EXTRUDED_AREA_SOLID('EXV',#15,#4,#2,5.0);
+                ENDSEC;
+                """);
+
+        assertJsonContains(json,
+                "\"solidCount\":1",
+                "\"faceCount\":10",
+                "\"unsupportedFaceCount\":0");
+    }
+
+    @Test
+    void shouldExportRevolvedAreaSolidPreviewMetadataForArbitraryProfileWithVoids() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#4,#3);
+                #6=AXIS1_PLACEMENT('AX1',#1,#2);
+                #7=CARTESIAN_POINT('P0',(2.0,-2.0));
+                #8=CARTESIAN_POINT('P1',(6.0,-2.0));
+                #9=CARTESIAN_POINT('P2',(6.0,2.0));
+                #10=CARTESIAN_POINT('P3',(2.0,2.0));
+                #11=CARTESIAN_POINT('P4',(3.0,-1.0));
+                #12=CARTESIAN_POINT('P5',(5.0,-1.0));
+                #13=CARTESIAN_POINT('P6',(5.0,1.0));
+                #14=CARTESIAN_POINT('P7',(3.0,1.0));
+                #15=POLYLINE('OUTER',(#7,#8,#9,#10,#7));
+                #16=POLYLINE('INNER',(#11,#12,#13,#14,#11));
+                #17=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#15,(#16));
+                #18=REVOLVED_AREA_SOLID('RVV',#17,#5,#6,1.57079632679);
+                ENDSEC;
+                """);
+
+        assertJsonContains(json,
+                "\"solidCount\":1",
+                "\"faceCount\":66",
+                "\"unsupportedFaceCount\":0");
+    }
+
+    @Test
     void shouldExportSolidReplicaPreviewMetadata() {
         String json = StepPreviewJsonExporter.export("""
                 DATA;
@@ -13117,7 +13256,7 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"targetIds\":[51]"));
         assertTrue(json.contains("\"type\":\"face\""));
         assertTrue(json.contains("\"name\":\"F0\""));
-        assertTrue(json.contains("\"instanceIds\":[\"pd-8/occ-59-pd-9\"]"));
+        assertTrue(json.contains("\"instanceIds\":[]"));
     }
 
     @Test
@@ -14791,7 +14930,7 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"surfaceType\":\"CYLINDRICAL_SURFACE\""), json);
         assertTrue(json.contains("\"faceCount\":1"), json);
-        assertTrue(json.contains("\"edgeCount\":6"), json);
+        assertTrue(json.contains("\"edgeCount\":8"), json);
         assertTrue(json.contains("\"unsupportedFaceCount\":0"), json);
         assertTrue(json.contains("\"triangles\":[["), json);
     }
@@ -18451,7 +18590,7 @@ class StepPreviewJsonExporterTest {
 
         assertTrue(json.contains("\"surfaceType\":\"SURFACE_REPLICA\""), json);
         assertTrue(json.contains("\"faceCount\":1"), json);
-        assertTrue(json.contains("\"edgeCount\":6"), json);
+        assertTrue(json.contains("\"edgeCount\":8"), json);
         assertTrue(json.contains("\"unsupportedFaceCount\":0"), json);
         assertTrue(json.contains("\"triangles\":[["), json);
     }

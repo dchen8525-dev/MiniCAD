@@ -4460,14 +4460,45 @@ public final class StepEntityResolver {
     return resolveArbitraryProfileDef(instance, "ARBITRARY_CLOSED_PROFILE_DEF");
   }
 
+  private StepProfileDef resolveArbitraryProfileDefWithVoids(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ARBITRARY_PROFILE_DEF_WITH_VOIDS");
+    requireParameterCount(instance, definition, 4);
+    StepEntity outerCurve = resolve(referenceId(instance, definition, 2));
+    if (!isSupportedArbitraryProfileCurve(outerCurve)) {
+      throw new StepResolutionException(
+          "ARBITRARY_PROFILE_DEF_WITH_VOIDS outer_curve must reference a curve entity");
+    }
+    List<StepEntity> innerCurves =
+        entityReferenceList(
+            instance,
+            definition,
+            3,
+            "ARBITRARY_PROFILE_DEF_WITH_VOIDS inner_curves must contain curve references");
+    for (StepEntity innerCurve : innerCurves) {
+      if (!isSupportedArbitraryProfileCurve(innerCurve)) {
+        throw new StepResolutionException(
+            "ARBITRARY_PROFILE_DEF_WITH_VOIDS inner_curves must reference curve entities");
+      }
+    }
+    List<StepEntity> curves = new ArrayList<>(1 + innerCurves.size());
+    curves.add(outerCurve);
+    curves.addAll(innerCurves);
+    return new StepProfileDef(
+        instance.id(),
+        enumValue(instance, definition, 0),
+        optionalStringValue(instance, definition, 1),
+        null,
+        curves,
+        List.of(),
+        "ARBITRARY_PROFILE_DEF_WITH_VOIDS");
+  }
+
   private StepProfileDef resolveArbitraryProfileDef(
       StepEntityInstance instance, String entityName) {
     StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     StepEntity curve = resolve(referenceId(instance, definition, 2));
-    if (!(curve instanceof StepCurve)
-        && !(curve instanceof StepPolyline)
-        && !(curve instanceof StepCompositeCurve)) {
+    if (!isSupportedArbitraryProfileCurve(curve)) {
       throw new StepResolutionException(
           entityName + " outer_curve must reference a curve entity");
     }
@@ -4479,6 +4510,12 @@ public final class StepEntityResolver {
         List.of(curve),
         List.of(),
         entityName);
+  }
+
+  private boolean isSupportedArbitraryProfileCurve(StepEntity curve) {
+    return curve instanceof StepCurve
+        || curve instanceof StepPolyline
+        || curve instanceof StepCompositeCurve;
   }
 
   private StepSweptAreaSolid resolveExtrudedAreaSolid(StepEntityInstance instance) {
@@ -7037,6 +7074,9 @@ public final class StepEntityResolver {
         "ARBITRARY_PROFILE_DEF",
         (resolver, instance) ->
             resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_PROFILE_DEF"));
+    registry.put(
+        "ARBITRARY_PROFILE_DEF_WITH_VOIDS",
+        StepEntityResolver::resolveArbitraryProfileDefWithVoids);
     registry.put(
         "ARBITRARY_OPEN_PROFILE_DEF",
         (resolver, instance) ->

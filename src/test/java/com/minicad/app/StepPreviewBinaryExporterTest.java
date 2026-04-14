@@ -90,7 +90,8 @@ class StepPreviewBinaryExporterTest {
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
-                "\"curve\":{\"type\":\"circle_arc\"",
+                "\"curve\":{",
+                "\"type\":\"circle_arc\"",
                 "\"radius\":",
                 "\"sweepAngle\":",
                 "\"xDirection\":");

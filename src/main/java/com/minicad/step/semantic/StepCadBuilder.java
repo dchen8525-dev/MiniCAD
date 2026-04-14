@@ -1914,11 +1914,10 @@ public final class StepCadBuilder {
 
     private Solid buildRevolvedAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
         ProfileLoops profileLoops = buildAreaProfileLoops(sweptAreaSolid.sweptArea());
-        if (!profileLoops.inner().isEmpty()) {
-            throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID with inner profile loops is unsupported");
-        }
-        List<Point2> profile = profileLoops.outer();
-        if (profile.size() < 3) {
+        List<List<Point2>> profileRings = new ArrayList<>();
+        profileRings.add(profileLoops.outer());
+        profileRings.addAll(profileLoops.inner());
+        if (profileLoops.outer().size() < 3) {
             throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID requires at least 3 profile points");
         }
         if (!(sweptAreaSolid.sweepReference() instanceof StepAxis1Placement axisPlacement)) {
@@ -1934,46 +1933,72 @@ public final class StepCadBuilder {
 
         Axis2Placement3D solidPlacement = buildPlacement(sweptAreaSolid.position().id());
         Axis1Placement revolutionAxis = buildAxis1Placement(axisPlacement.id());
-        List<CartesianPoint> section = profile.stream()
-                .map(point -> mapProfilePoint(sweptAreaSolid.sweptArea(), solidPlacement, point))
+        List<List<CartesianPoint>> sectionRings = profileRings.stream()
+                .map(loop -> loop.stream()
+                        .map(point -> mapProfilePoint(sweptAreaSolid.sweptArea(), solidPlacement, point))
+                        .toList())
                 .toList();
-        for (CartesianPoint point : section) {
-            if (distanceToAxis(point, revolutionAxis) <= 1.0e-9) {
-                throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID profile must not intersect the revolution axis");
+        for (List<CartesianPoint> ring : sectionRings) {
+            for (CartesianPoint point : ring) {
+                if (distanceToAxis(point, revolutionAxis) <= 1.0e-9) {
+                    throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID profile must not intersect the revolution axis");
+                }
             }
         }
 
         int stepCount = Math.max(1, (int) Math.ceil(Math.abs(angle) / (Math.PI / 16.0)));
         boolean closedRevolution = Math.abs(Math.abs(angle) - Math.PI * 2.0) <= 1.0e-9;
-        List<List<CartesianPoint>> sections = new ArrayList<>(closedRevolution ? stepCount : stepCount + 1);
         int sectionCount = closedRevolution ? stepCount : stepCount + 1;
-        for (int step = 0; step < sectionCount; step++) {
-            double sectionAngle = angle * step / stepCount;
-            List<CartesianPoint> rotated = section.stream()
-                    .map(point -> rotateAroundAxis(point, revolutionAxis, sectionAngle))
-                    .toList();
-            sections.add(rotated);
-        }
+        List<List<List<CartesianPoint>>> revolvedRings = sectionRings.stream()
+                .map(ring -> {
+                    List<List<CartesianPoint>> sections = new ArrayList<>(sectionCount);
+                    for (int step = 0; step < sectionCount; step++) {
+                        double sectionAngle = angle * step / stepCount;
+                        sections.add(ring.stream()
+                                .map(point -> rotateAroundAxis(point, revolutionAxis, sectionAngle))
+                                .toList());
+                    }
+                    return List.copyOf(sections);
+                })
+                .toList();
 
         List<Face> faces = new ArrayList<>();
         if (!closedRevolution) {
-            Vector3 startSweep = sweepDirectionAtSection(section, revolutionAxis, angle >= 0.0);
-            Vector3 endSweep = sweepDirectionAtSection(sections.getLast(), revolutionAxis, angle >= 0.0);
-            faces.add(faceFromPolyLoop(closeLoop3(section), polygonNormal(section, startSweep.scale(-1.0))));
-            faces.add(faceFromPolyLoop(reverseClosedLoop3(sections.getLast()), polygonNormal(sections.getLast(), endSweep)));
+            List<CartesianPoint> outerStart = sectionRings.getFirst();
+            List<List<CartesianPoint>> innerStart = sectionRings.subList(1, sectionRings.size());
+            List<CartesianPoint> outerEnd = revolvedRings.getFirst().getLast();
+            List<List<CartesianPoint>> innerEnd = revolvedRings.stream()
+                    .skip(1)
+                    .map(List::getLast)
+                    .toList();
+            Vector3 startSweep = sweepDirectionAtSection(outerStart, revolutionAxis, angle >= 0.0);
+            Vector3 endSweep = sweepDirectionAtSection(outerEnd, revolutionAxis, angle >= 0.0);
+            faces.add(faceFromProfileLoops(
+                    closeLoop3(outerStart),
+                    closeLoops3(innerStart),
+                    polygonNormal(outerStart, startSweep.scale(-1.0))
+            ));
+            faces.add(faceFromProfileLoops(
+                    reverseClosedLoop3(outerEnd),
+                    reverseClosedLoops3(innerEnd),
+                    polygonNormal(outerEnd, endSweep)
+            ));
         }
-        for (int sectionIndex = 0; sectionIndex < stepCount; sectionIndex++) {
-            List<CartesianPoint> current = sections.get(sectionIndex);
-            List<CartesianPoint> next = sections.get((sectionIndex + 1) % sections.size());
-            for (int pointIndex = 0; pointIndex < section.size(); pointIndex++) {
-                CartesianPoint a = current.get(pointIndex);
-                CartesianPoint b = current.get((pointIndex + 1) % section.size());
-                CartesianPoint c = next.get((pointIndex + 1) % section.size());
-                CartesianPoint d = next.get(pointIndex);
-                faces.add(faceFromPolyLoop(
-                        List.of(a, b, c, d, a),
-                        quadNormal(a, b, c, d)
-                ));
+        for (List<List<CartesianPoint>> ringSections : revolvedRings) {
+            int ringSize = ringSections.getFirst().size();
+            for (int sectionIndex = 0; sectionIndex < stepCount; sectionIndex++) {
+                List<CartesianPoint> current = ringSections.get(sectionIndex);
+                List<CartesianPoint> next = ringSections.get((sectionIndex + 1) % ringSections.size());
+                for (int pointIndex = 0; pointIndex < ringSize; pointIndex++) {
+                    CartesianPoint a = current.get(pointIndex);
+                    CartesianPoint b = current.get((pointIndex + 1) % ringSize);
+                    CartesianPoint c = next.get((pointIndex + 1) % ringSize);
+                    CartesianPoint d = next.get(pointIndex);
+                    faces.add(faceFromPolyLoop(
+                            List.of(a, b, c, d, a),
+                            quadNormal(a, b, c, d)
+                    ));
+                }
             }
         }
         return new Solid(new Shell(faces, true));
@@ -1996,6 +2021,8 @@ public final class StepCadBuilder {
                     circularHollowProfile(profile);
             case "ARBITRARY_CLOSED_PROFILE_DEF", "ARBITRARY_PROFILE_DEF" ->
                     new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
+            case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" ->
+                    arbitraryProfileWithVoids(profile);
             default -> throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
         };
     }
@@ -2101,9 +2128,25 @@ public final class StepCadBuilder {
         if (profile.curves().isEmpty()) {
             throw new UnsupportedGeometryException(profile.entityName() + " requires a profile curve");
         }
-        Object curve = buildCurve2(profile.curves().getFirst());
+        return arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst());
+    }
+
+    private ProfileLoops arbitraryProfileWithVoids(StepProfileDef profile) {
+        if (profile.curves().isEmpty()) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires an outer profile curve");
+        }
+        List<Point2> outer = normalizeOuterLoop(arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst()));
+        List<List<Point2>> inner = profile.curves().stream()
+                .skip(1)
+                .map(curve -> normalizeInnerLoop(arbitraryProfileCurve(profile.entityName(), curve)))
+                .toList();
+        return new ProfileLoops(outer, inner);
+    }
+
+    private List<Point2> arbitraryProfileCurve(String entityName, StepEntity curveEntity) {
+        Object curve = buildCurve2(curveEntity);
         if (!(curve instanceof Curve2 curve2)) {
-            throw new UnsupportedGeometryException(profile.entityName() + " profile curve is not 2D");
+            throw new UnsupportedGeometryException(entityName + " profile curve is not 2D");
         }
         return sampleCurve2(curve2, 72);
     }

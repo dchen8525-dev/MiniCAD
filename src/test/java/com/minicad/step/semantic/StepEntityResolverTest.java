@@ -7787,6 +7787,34 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveArbitraryProfileDefWithVoids() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=CARTESIAN_POINT('A',(4.0,0.0));
+                #3=CARTESIAN_POINT('B',(4.0,4.0));
+                #4=CARTESIAN_POINT('C',(0.0,4.0));
+                #5=CARTESIAN_POINT('D',(1.0,1.0));
+                #6=CARTESIAN_POINT('E',(3.0,1.0));
+                #7=CARTESIAN_POINT('F',(3.0,3.0));
+                #8=CARTESIAN_POINT('G',(1.0,3.0));
+                #9=POLYLINE('OUTER',(#1,#2,#3,#4,#1));
+                #10=POLYLINE('INNER',(#5,#6,#7,#8,#5));
+                #11=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#9,(#10));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(11));
+        assertEquals("ARBITRARY_PROFILE_DEF_WITH_VOIDS", profile.entityName());
+        assertEquals("AREA", profile.profileType());
+        assertEquals(2, profile.curves().size());
+        assertEquals(9, profile.curves().get(0).id());
+        assertEquals(10, profile.curves().get(1).id());
+    }
+
+    @Test
     void shouldResolveBooleanResult() {
         String step = """
                 DATA;

@@ -1352,6 +1352,31 @@ class StepCadBuilderTest {
     }
 
     @Test
+    void shouldBuildRevolvedAreaSolidFromHollowProfile() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#4,#3);
+                #6=AXIS1_PLACEMENT('AX1',#1,#2);
+                #7=CARTESIAN_POINT('P2',(4.0,0.0));
+                #8=DIRECTION('DX2',(1.0,0.0));
+                #9=AXIS2_PLACEMENT_2D('AX2',#7,#8);
+                #10=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#9,2.0,0.5);
+                #11=REVOLVED_AREA_SOLID('RVH',#10,#5,#6,0.19634954084936207);
+                ENDSEC;
+                """);
+
+        Solid solid = builder.buildSolid(11);
+
+        assertEquals(146, solid.outerShell().faces().size());
+        assertEquals(true, solid.outerShell().closed());
+        assertEquals(0, solid.voidShells().size());
+    }
+
+    @Test
     void shouldBuildExtrudedAreaSolidFromCircularAndHollowProfiles() {
         StepCadBuilder builder = builder("""
                 DATA;
@@ -1383,6 +1408,68 @@ class StepCadBuilderTest {
         assertEquals(51, rounded.outerShell().faces().size());
         assertEquals(146, hollow.outerShell().faces().size());
         assertEquals(0, hollow.voidShells().size());
+    }
+
+    @Test
+    void shouldBuildExtrudedAreaSolidFromArbitraryProfileWithVoids() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=CARTESIAN_POINT('P0',(0.0,0.0));
+                #6=CARTESIAN_POINT('P1',(4.0,0.0));
+                #7=CARTESIAN_POINT('P2',(4.0,4.0));
+                #8=CARTESIAN_POINT('P3',(0.0,4.0));
+                #9=CARTESIAN_POINT('P4',(1.0,1.0));
+                #10=CARTESIAN_POINT('P5',(3.0,1.0));
+                #11=CARTESIAN_POINT('P6',(3.0,3.0));
+                #12=CARTESIAN_POINT('P7',(1.0,3.0));
+                #13=POLYLINE('OUTER',(#5,#6,#7,#8,#5));
+                #14=POLYLINE('INNER',(#9,#10,#11,#12,#9));
+                #15=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#13,(#14));
+                #16=EXTRUDED_AREA_SOLID('EXV',#15,#4,#2,5.0);
+                ENDSEC;
+                """);
+
+        Solid solid = builder.buildSolid(16);
+
+        assertEquals(10, solid.outerShell().faces().size());
+        assertEquals(true, solid.outerShell().closed());
+        assertEquals(0, solid.voidShells().size());
+    }
+
+    @Test
+    void shouldBuildRevolvedAreaSolidFromArbitraryProfileWithVoids() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=DIRECTION('DY',(0.0,1.0,0.0));
+                #5=AXIS2_PLACEMENT_3D('AX3',#1,#4,#3);
+                #6=AXIS1_PLACEMENT('AX1',#1,#2);
+                #7=CARTESIAN_POINT('P0',(2.0,-2.0));
+                #8=CARTESIAN_POINT('P1',(6.0,-2.0));
+                #9=CARTESIAN_POINT('P2',(6.0,2.0));
+                #10=CARTESIAN_POINT('P3',(2.0,2.0));
+                #11=CARTESIAN_POINT('P4',(3.0,-1.0));
+                #12=CARTESIAN_POINT('P5',(5.0,-1.0));
+                #13=CARTESIAN_POINT('P6',(5.0,1.0));
+                #14=CARTESIAN_POINT('P7',(3.0,1.0));
+                #15=POLYLINE('OUTER',(#7,#8,#9,#10,#7));
+                #16=POLYLINE('INNER',(#11,#12,#13,#14,#11));
+                #17=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#15,(#16));
+                #18=REVOLVED_AREA_SOLID('RVV',#17,#5,#6,1.57079632679);
+                ENDSEC;
+                """);
+
+        Solid solid = builder.buildSolid(18);
+
+        assertEquals(66, solid.outerShell().faces().size());
+        assertEquals(true, solid.outerShell().closed());
+        assertEquals(0, solid.voidShells().size());
     }
 
     @Test
