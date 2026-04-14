@@ -5777,7 +5777,7 @@ class StepDumpAppTest {
 
         assertDumpContains(file,
                 "SHAPE_ASPECT_RELATIONSHIP #37: builtItems=4, unsupportedFaces=0",
-                "DIMENSIONAL_LOCATION #39: builtItems=4, unsupportedFaces=0",
+                "DIMENSIONAL_LOCATION: 1",
                 "SHAPE_ASPECT_DERIVING_RELATIONSHIP #45: builtItems=4, unsupportedFaces=0",
                 "SHAPE_FEATURE_FIT_RELATIONSHIP #54: builtItems=4, unsupportedFaces=0");
     }

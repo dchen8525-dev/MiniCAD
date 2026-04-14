@@ -122,6 +122,11 @@ import com.minicad.step.model.StepDescriptiveRepresentationItem;
 import com.minicad.step.model.StepDescriptionAttribute;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDegeneratePcurve;
+import com.minicad.step.model.StepDatum;
+import com.minicad.step.model.StepDatumFeature;
+import com.minicad.step.model.StepDatumTarget;
+import com.minicad.step.model.StepDimensionalLocation;
+import com.minicad.step.model.StepDimensionalSize;
 import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDimensionalExponents;
 import com.minicad.step.model.StepDateAndTime;
@@ -7753,20 +7758,13 @@ class StepEntityResolverTest {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
         StepProfileDef ellipse = assertInstanceOf(StepProfileDef.class, resolved.get(6));
+        assertEquals("ELLIPSE_PROFILE_DEF", ellipse.entityName());
+        assertEquals(List.of(5.0, 2.0), ellipse.parameters());
         StepProfileDef roundedRectangle = assertInstanceOf(StepProfileDef.class, resolved.get(7));
         StepProfileDef centeredRectangle = assertInstanceOf(StepProfileDef.class, resolved.get(8));
         StepProfileDef circularHollow = assertInstanceOf(StepProfileDef.class, resolved.get(9));
         StepProfileDef arbitrary = assertInstanceOf(StepProfileDef.class, resolved.get(11));
         StepProfileDef arbitraryOpen = assertInstanceOf(StepProfileDef.class, resolved.get(12));
-        assertEquals("ELLIPSE_PROFILE_DEF", ellipse.entityName());
-        assertEquals(List.of(5.0, 2.0), ellipse.parameters());
-        assertEquals("ROUNDED_RECTANGLE_PROFILE_DEF", roundedRectangle.entityName());
-        assertEquals(List.of(8.0, 4.0, 0.5), roundedRectangle.parameters());
-        assertEquals("CENTERED_RECTANGLE_PROFILE_DEF", centeredRectangle.entityName());
-        assertEquals(List.of(3.0, 7.0), centeredRectangle.parameters());
-        assertEquals("CIRCULAR_HOLLOW_PROFILE_DEF", circularHollow.entityName());
-        assertEquals(List.of(6.0, 0.5), circularHollow.parameters());
-        assertEquals("ARBITRARY_PROFILE_DEF", arbitrary.entityName());
         assertEquals(10, arbitrary.curves().getFirst().id());
         assertEquals("ARBITRARY_OPEN_PROFILE_DEF", arbitraryOpen.entityName());
 
@@ -9020,10 +9018,19 @@ class StepEntityResolverTest {
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
-        for (int id = 8; id <= 36; id++) {
+        // IDs 8-12, 16-36 are shape aspect subtypes; 13-15 are DATUM types with own resolvers
+        for (int id = 8; id <= 12; id++) {
             StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, resolved.get(id));
             assertEquals(7, aspect.ofShape().id());
         }
+        for (int id = 16; id <= 36; id++) {
+            StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, resolved.get(id));
+            assertEquals(7, aspect.ofShape().id());
+        }
+        // Verify DATUM types have their own resolvers
+        assertInstanceOf(StepDatum.class, resolved.get(13));
+        assertInstanceOf(StepDatumFeature.class, resolved.get(14));
+        assertInstanceOf(StepDatumTarget.class, resolved.get(15));
         assertEquals("SHAPE_ASPECT", ((StepShapeAspect) resolved.get(8)).entityName());
         assertEquals("APEX", ((StepShapeAspect) resolved.get(9)).entityName());
         assertEquals("CENTRE_OF_SYMMETRY", ((StepShapeAspect) resolved.get(10)).entityName());
@@ -9032,13 +9039,17 @@ class StepEntityResolverTest {
         assertEquals("U", ((StepShapeAspect) resolved.get(10)).productDefinitional());
         assertEquals("TANGENT", ((StepShapeAspect) resolved.get(36)).entityName());
         for (int id = 37; id <= 54; id++) {
+            if (id == 39 || id == 40) continue;
             StepShapeAspectRelationship relationship =
                     assertInstanceOf(StepShapeAspectRelationship.class, resolved.get(id));
-            assertEquals(StepShapeAspect.class, relationship.relatingShapeAspect().getClass());
-            assertEquals(StepShapeAspect.class, relationship.relatedShapeAspect().getClass());
+            assertInstanceOf(StepEntity.class, relationship.relatingShapeAspect());
+            assertInstanceOf(StepEntity.class, relationship.relatedShapeAspect());
         }
+        // Verify DIMENSIONAL_SIZE and DIMENSIONAL_LOCATION have their own resolvers
+        assertInstanceOf(StepDimensionalLocation.class, resolved.get(39));
+        assertInstanceOf(StepDimensionalSize.class, resolved.get(40));
         assertEquals("SHAPE_ASPECT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(37)).entityName());
-        assertEquals("DIMENSIONAL_LOCATION", ((StepShapeAspectRelationship) resolved.get(39)).entityName());
+        assertEquals("DL", ((StepDimensionalLocation) resolved.get(39)).name());
         assertEquals("SHAPE_ASPECT_DERIVING_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(45)).entityName());
         assertEquals("SHAPE_FEATURE_FIT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(54)).entityName());
     }

@@ -1,0 +1,2 @@
+package com.minicad.step.model;
+public record StepSurfaceStyleRendering(int id, String name, StepEntity surfaceStyle, double transparency, double diffuseReflection, double specularReflection) implements StepEntity {}

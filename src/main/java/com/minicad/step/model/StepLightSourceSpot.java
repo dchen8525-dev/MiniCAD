@@ -1,0 +1,2 @@
+package com.minicad.step.model;
+public record StepLightSourceSpot(int id, String name, StepEntity color, double intensity, StepEntity position, StepEntity orientation, double concentration, double spreadAngle) implements StepEntity {}
