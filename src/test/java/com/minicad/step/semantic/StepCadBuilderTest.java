@@ -32,6 +32,8 @@ import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepProfileDef;
+import com.minicad.step.model.StepCsgPrimitive;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.Edge;
 import com.minicad.topology.Face;
@@ -2529,6 +2531,356 @@ class StepCadBuilderTest {
         assertEquals(12.0, point.x());
         assertEquals(24.0, point.y());
         assertEquals(36.0, point.z());
+    }
+
+    // Phase 1 tests: Boolean UNION, SweptDiskSolid, Tapered solids, RightCircularCone, Profiles
+
+    @Test
+    void shouldBuildBooleanUnionWithHalfSpace() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DY',(0.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=AXIS2_PLACEMENT_3D('AX',#1,#4,#2);
+                #6=PLANE('PL0',#5);
+                #7=CARTESIAN_POINT('MIN',(0.0,0.0,0.0));
+                #8=BOX_DOMAIN(#7,2.0,2.0,2.0);
+                #9=BOXED_HALF_SPACE('HS',#6,.T.,#8);
+                #10=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #11=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #12=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #13=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #20=DIRECTION('D1',(1.0,0.0,0.0));
+                #21=VECTOR('V1',#20,1.0);
+                #22=LINE('L1',#10,#21);
+                #23=DIRECTION('D2',(0.0,1.0,0.0));
+                #24=VECTOR('V2',#23,1.0);
+                #25=LINE('L2',#11,#24);
+                #26=DIRECTION('D3',(-1.0,0.0,0.0));
+                #27=VECTOR('V3',#26,1.0);
+                #28=LINE('L3',#12,#27);
+                #29=DIRECTION('D4',(0.0,-1.0,0.0));
+                #30=VECTOR('V4',#29,1.0);
+                #31=LINE('L4',#13,#30);
+                #40=VERTEX_POINT('V0',#10);
+                #41=VERTEX_POINT('V1',#11);
+                #42=VERTEX_POINT('V2',#12);
+                #43=VERTEX_POINT('V3',#13);
+                #50=EDGE_CURVE('E0',#40,#41,#22,.T.);
+                #51=EDGE_CURVE('E1',#41,#42,#25,.T.);
+                #52=EDGE_CURVE('E2',#42,#43,#28,.T.);
+                #53=EDGE_CURVE('E3',#43,#40,#31,.T.);
+                #60=ORIENTED_EDGE('OE0',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE1',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE2',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE3',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#6,.T.);
+                #90=CLOSED_SHELL('CS',(#80));
+                #100=FACETED_BREP('FB',#90);
+                #110=(BOOLEAN_RESULT(.UNION.,#100,#9)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('BOOL'));
+                ENDSEC;
+                """);
+
+        Solid solid = builder.buildSolid(110);
+        // Union produces a solid with merged faces from both operands
+        assertTrue(solid.outerShell().faces().size() >= 1);
+    }
+
+    @Test
+    void shouldRejectBooleanUnionWithoutHalfSpace() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DZ',(0.0,0.0,1.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);
+                #5=PLANE('PL0',#4);
+                #6=FACE_SURFACE('FS',(),#5,.T.);
+                #7=CLOSED_SHELL('CS1',(#6));
+                #8=CLOSED_SHELL('CS2',(#6));
+                #9=FACETED_BREP('FB1',#7);
+                #10=FACETED_BREP('FB2',#8);
+                #11=(BOOLEAN_RESULT(.UNION.,#9,#10)
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('BOOL'));
+                ENDSEC;
+                """);
+
+        assertThrows(UnsupportedGeometryException.class, () -> builder.buildSolid(11));
+    }
+
+    @Test
+    void shouldBuildRightCircularConePrimitive() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=(RIGHT_CIRCULAR_CONE('CONE',#4,5.0,2.0)
+                    CSG_PRIMITIVE()
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('cone'));
+                #6=(CSG_SOLID('SOLID',#5)
+                    SOLID_MODEL()
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('solid'));
+                ENDSEC;
+                """);
+
+        Solid cone = builder.buildSolid(6);
+        // Cone should have base face + lateral triangular faces
+        assertTrue(cone.outerShell().faces().size() >= 2);
+    }
+
+    @Test
+    void shouldResolveRectangleHollowProfileDef() {
+        // Just verify resolution works - profile is already tested via buildSolid
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(RECTANGLE_HOLLOW_PROFILE_DEF(.AREA.,'RH',#3,4.0,3.0,0.5,0.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """);
+
+        // Verify the profile was resolved - check that entity 4 is in the map
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(RECTANGLE_HOLLOW_PROFILE_DEF(.AREA.,'RH',#3,4.0,3.0,0.5,0.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("RECTANGLE_HOLLOW_PROFILE_DEF", profile.entityName());
+        assertEquals("AREA", profile.profileType());
+        assertEquals(4, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveCenteredCircleProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(CENTERED_CIRCLE_PROFILE_DEF(.AREA.,'CC',#3,2.0,1.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("CENTERED_CIRCLE_PROFILE_DEF", profile.entityName());
+        assertEquals("AREA", profile.profileType());
+        assertEquals(2, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveIShapeProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(I_SHAPE_PROFILE_DEF(.AREA.,'IBEAM',#3,100.0,200.0,10.0,10.0,5.0,0.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("I_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals(6, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveLShapeProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(L_SHAPE_PROFILE_DEF(.AREA.,'ANGLE',#3,50.0,50.0,5.0,5.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("L_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals(4, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveUShapeProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(U_SHAPE_PROFILE_DEF(.AREA.,'CHANNEL',#3,50.0,100.0,5.0,10.0,5.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("U_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals(5, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveTShapeProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(T_SHAPE_PROFILE_DEF(.AREA.,'TEE',#3,100.0,50.0,10.0,10.0,5.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("T_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals(5, profile.parameters().size());
+    }
+
+    @Test
+    void shouldResolveZShapeProfileDef() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                com.minicad.step.syntax.StepParser.parse("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=(Z_SHAPE_PROFILE_DEF(.AREA.,'ZBEAM',#3,50.0,100.0,5.0,10.0,5.0)
+                    PROFILE_DEFINITION()
+                    PRODUCT_DEFINITION_SHAPE('',$,$));
+                ENDSEC;
+                """));
+        StepEntity entity = resolved.get(4);
+        assertInstanceOf(StepProfileDef.class, entity);
+        StepProfileDef profile = (StepProfileDef) entity;
+        assertEquals("Z_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals(5, profile.parameters().size());
+    }
+
+    @Test
+    void shouldBuildIndexedPolyCurve() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=(INDEXED_POLY_CURVE('IPC',(#1,#2,#3,#4),(0,1,2,3),.F.)
+                    BOUNDED_CURVE()
+                    CURVE()
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('ipc'));
+                ENDSEC;
+                """);
+
+        Curve3 curve = builder.buildCurveReference3(5);
+        assertInstanceOf(Polyline3.class, curve);
+        Polyline3 polyline = (Polyline3) curve;
+        assertEquals(4, polyline.points().size());
+    }
+
+    @Test
+    void shouldBuildIndexedPolyCurveClosed() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #5=(INDEXED_POLY_CURVE('IPC',(#1,#2,#3,#4),(0,1,2,3),.T.)
+                    BOUNDED_CURVE()
+                    CURVE()
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('ipc'));
+                ENDSEC;
+                """);
+
+        Curve3 curve = builder.buildCurveReference3(5);
+        assertInstanceOf(Polyline3.class, curve);
+        Polyline3 polyline = (Polyline3) curve;
+        // Closed curve should have first point appended at end
+        assertEquals(5, polyline.points().size());
+        assertEquals(polyline.points().getFirst(), polyline.points().getLast());
+    }
+
+    @Test
+    void shouldRejectNonManifoldSolidBrep() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('DZ',(0.0,0.0,1.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);
+                #5=PLANE('PL0',#4);
+                #6=FACE_SURFACE('FS',(),#5,.T.);
+                #7=OPEN_SHELL('OS',(#6));
+                #8=NON_MANIFOLD_SOLID_BREP('NMB',#7);
+                ENDSEC;
+                """);
+
+        assertThrows(UnsupportedGeometryException.class, () -> builder.buildSolid(8));
+    }
+
+    @Test
+    void shouldBuildExtrudedAreaSolidTapered() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
+                #5=CARTESIAN_POINT('P0',(0.0,0.0));
+                #6=DIRECTION('DX2',(1.0,0.0));
+                #7=AXIS2_PLACEMENT_2D('AX2',#5,#6);
+                #8=(RECTANGLE_PROFILE_DEF(.AREA.,'R',#7,4.0,2.0)
+                    PROFILE_DEFINITION());
+                #9=DIRECTION('DIR',(0.0,0.0,1.0));
+                #10=(EXTRUDED_AREA_SOLID_TAPERED('EXT',#8,#9,10.0,0.05)
+                    SOLID_MODEL()
+                    GEOMETRIC_REPRESENTATION_ITEM()
+                    REPRESENTATION_ITEM('ext'));
+                ENDSEC;
+                """);
+
+        Solid solid = builder.buildSolid(10);
+        assertTrue(solid.outerShell().faces().size() >= 6);
     }
 
     private static Plane planeSurface(Face face) {

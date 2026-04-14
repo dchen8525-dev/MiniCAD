@@ -61,7 +61,7 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepClothoid, StepIndexedPolyCurve, StepSurfaceOfConstantRadius, StepDegenerateCurve,
         StepEdgeWire, StepRectangularCompositeSurface, StepSurfacePatch,
         StepCompositeCurveOnSurface3D, StepLineSegment, StepOffsetSurface2,
-        StepRightCircularCone, StepPolygonalBoundedHalfSpace, StepSubface,
+        StepPolygonalBoundedHalfSpace, StepSubface,
         StepOrientedSubface, StepRectangleHollowProfileDef, StepCentreLineArcProfileDef,
         StepSweptDiskSolid, StepRuledSurface,
         StepCenteredCircleProfileDef, StepRevolvedAreaSolidTapered, StepExtrudedAreaSolidTapered,

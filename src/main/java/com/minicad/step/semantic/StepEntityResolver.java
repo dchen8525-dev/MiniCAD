@@ -92,6 +92,8 @@ import com.minicad.step.model.StepConfigurationItem;
 import com.minicad.step.model.StepDatum;
 import com.minicad.step.model.StepDatumFeature;
 import com.minicad.step.model.StepDatumReference;
+import com.minicad.step.model.StepDatumReferenceCompartment;
+import com.minicad.step.model.StepDatumReferenceElement;
 import com.minicad.step.model.StepDatumTarget;
 import com.minicad.step.model.StepDimensionalLocation;
 import com.minicad.step.model.StepDimensionalSize;
@@ -371,7 +373,6 @@ import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepSurfaceOfConstantRadius;
 import com.minicad.step.model.StepSphericalSurface;
-import com.minicad.step.model.StepRightCircularCone;
 import com.minicad.step.model.StepPolygonalBoundedHalfSpace;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepSurfaceSideStyle;
@@ -2085,6 +2086,18 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         integerValue(instance, definition, 1),
         resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepDatumReferenceCompartment resolveDatumReferenceCompartment(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_COMPARTMENT");
+    requireParameterCount(instance, definition, 6);
+    return new StepDatumReferenceCompartment(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        integerValue(instance, definition, 3),
+        resolve(referenceId(instance, definition, 4)));
   }
 
   private StepDatumTarget resolveDatumTarget(StepEntityInstance instance) {
@@ -6710,20 +6723,6 @@ public final class StepEntityResolver {
         booleanValue(instance, definition, 4));
   }
 
-  private StepRightCircularCone resolveRightCircularCone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RIGHT_CIRCULAR_CONE");
-    requireParameterCount(instance, definition, 4);
-    return new StepRightCircularCone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "RIGHT_CIRCULAR_CONE position must reference AXIS2_PLACEMENT_3D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
-  }
-
   private StepPolygonalBoundedHalfSpace resolvePolygonalBoundedHalfSpace(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "POLYGONAL_BOUNDED_HALF_SPACE");
     requireParameterCount(instance, definition, 5);
@@ -8411,10 +8410,15 @@ public final class StepEntityResolver {
                 instance, "TORUS", StepAxis1Placement.class, "AXIS1_PLACEMENT", 2));
     registry.put(
         "RIGHT_CIRCULAR_CONE",
-        StepEntityResolver::resolveRightCircularCone);
+        (resolver, instance) ->
+            resolver.resolveCsgPrimitive(
+                instance, "RIGHT_CIRCULAR_CONE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 2));
     registry.put("CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCircleProfileDef);
     registry.put("RECTANGLE_PROFILE_DEF", StepEntityResolver::resolveRectangleProfileDef);
-    registry.put("RECTANGLE_HOLLOW_PROFILE_DEF", StepEntityResolver::resolveRectangleHollowProfileDef);
+    registry.put(
+        "RECTANGLE_HOLLOW_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "RECTANGLE_HOLLOW_PROFILE_DEF", 4));
     registry.put(
         "CENTERED_RECTANGLE_PROFILE_DEF",
         (resolver, instance) ->
@@ -8435,8 +8439,14 @@ public final class StepEntityResolver {
         "ROUNDED_RECTANGLE_PROFILE_DEF",
         (resolver, instance) -> resolver.resolveParameterizedProfileDef(
             instance, "ROUNDED_RECTANGLE_PROFILE_DEF", 3));
-    registry.put("CENTRE_LINE_ARC_PROFILE_DEF", StepEntityResolver::resolveCentreLineArcProfileDef);
-    registry.put("CENTERED_CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCenteredCircleProfileDef);
+    registry.put(
+        "CENTRE_LINE_ARC_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "CENTRE_LINE_ARC_PROFILE_DEF", 2));
+    registry.put(
+        "CENTERED_CIRCLE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "CENTERED_CIRCLE_PROFILE_DEF", 2));
     registry.put(
         "ARBITRARY_CLOSED_PROFILE_DEF",
         StepEntityResolver::resolveArbitraryClosedProfileDef);
@@ -8451,6 +8461,75 @@ public final class StepEntityResolver {
         "ARBITRARY_OPEN_PROFILE_DEF",
         (resolver, instance) ->
             resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_OPEN_PROFILE_DEF"));
+    // Standard structural steel profile definitions (Phase 2E)
+    registry.put(
+        "I_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "I_SHAPE_PROFILE_DEF", 6));
+    registry.put(
+        "T_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "T_SHAPE_PROFILE_DEF", 5));
+    registry.put(
+        "L_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "L_SHAPE_PROFILE_DEF", 4));
+    registry.put(
+        "U_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "U_SHAPE_PROFILE_DEF", 5));
+    registry.put(
+        "C_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "C_SHAPE_PROFILE_DEF", 5));
+    registry.put(
+        "Z_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "Z_SHAPE_PROFILE_DEF", 5));
+    registry.put(
+        "HAT_SHAPE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "HAT_SHAPE_PROFILE_DEF", 5));
+    registry.put(
+        "ANGLE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "ANGLE_PROFILE_DEF", 4));
+    registry.put(
+        "CHANNEL_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "CHANNEL_PROFILE_DEF", 5));
+    registry.put(
+        "TEE_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "TEE_PROFILE_DEF", 5));
+    registry.put(
+        "I_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "I_PROFILE_DEF", 6));
+    registry.put(
+        "L_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "L_PROFILE_DEF", 4));
+    registry.put(
+        "T_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "T_PROFILE_DEF", 5));
+    registry.put(
+        "U_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "U_PROFILE_DEF", 5));
+    registry.put(
+        "Z_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "Z_PROFILE_DEF", 5));
+    registry.put(
+        "FLAT_BAR_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "FLAT_BAR_PROFILE_DEF", 2));
+    registry.put(
+        "DOVE_TAIL_PROFILE_DEF",
+        (resolver, instance) ->
+            resolver.resolveParameterizedProfileDef(instance, "DOVE_TAIL_PROFILE_DEF", 4));
     registry.put("EXTRUDED_AREA_SOLID", StepEntityResolver::resolveExtrudedAreaSolid);
     registry.put("REVOLVED_AREA_SOLID", StepEntityResolver::resolveRevolvedAreaSolid);
     registry.put("BOX_DOMAIN", StepEntityResolver::resolveBoxDomain);
@@ -9272,6 +9351,15 @@ public final class StepEntityResolver {
         "EXTERNALLY_DEFINED_TEXT_STYLE",
         "EXTERNALLY_DEFINED_TILE");
     registry.put("CHARACTERIZED_OBJECT", StepEntityResolver::resolveCharacterizedObject);
+    // Phase 2A: Additional manufacturing features
+    registerCharacterizedObjectAliases(
+        registry,
+        "MACHINING_OPERATION",
+        "MACHINED_SURFACE",
+        "TWO_5D_MANUFACTURING_FEATURE",
+        "MANUFACTURING_FEATURE_REPRESENTATION",
+        "DEPRESSION",
+        "EDGE_ROUND");
     registerCharacterizedObjectAliases(
         registry,
         "ADDITIVE_MANUFACTURING_FEATURE",
@@ -10154,6 +10242,17 @@ public final class StepEntityResolver {
     registry.put("SURFACED_EDGE_CURVE", StepEntityResolver::resolveSurfacedEdgeCurve);
     registry.put("GEOMETRIC_TOLERANCE",
         (resolver, instance) -> resolver.resolveGeometricTolerance(instance, "GEOMETRIC_TOLERANCE"));
+    // Phase 2C: PMI extension entities
+    registry.put(
+        "GEOMETRIC_TOLERANCE_WITH_DEFINED_UNIT",
+        (resolver, instance) -> resolver.resolveGeometricTolerance(instance, "GEOMETRIC_TOLERANCE_WITH_DEFINED_UNIT"));
+    registry.put("DATUM_REFERENCE_COMPARTMENT", StepEntityResolver::resolveDatumReferenceCompartment);
+    registry.put(
+        "DATUM_REFERENCE_ELEMENT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "DATUM_REFERENCE_ELEMENT"));
+    registry.put(
+        "COMMON_DATUM",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "COMMON_DATUM"));
     registry.put("TOLERANCE_ZONE_FORM", StepEntityResolver::resolveToleranceZoneForm);
     registry.put("TOLERANCE_ZONE", StepEntityResolver::resolveToleranceZone);
     registry.put("CONFIGURATION_ITEM", StepEntityResolver::resolveConfigurationItem);
@@ -10161,6 +10260,19 @@ public final class StepEntityResolver {
     registry.put("FEATURE_CONTROL_FRAME", StepEntityResolver::resolveFeatureControlFrame);
     registry.put("RUNOUT_TOLERANCE_ZONE", StepEntityResolver::resolveRunoutToleranceZone);
     registry.put("MATERIAL_DESIGNATION", StepEntityResolver::resolveMaterialDesignation);
+    // Phase 2D: Material and configuration entities
+    registry.put(
+        "MATERIAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "MATERIAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "EFFECTIVITY_CONTEXT",
+        (resolver, instance) -> resolver.resolveEffectivity(instance));
+    registry.put(
+        "CLASSIFIED_EFFECTIVITY",
+        (resolver, instance) -> resolver.resolveEffectivity(instance));
     registry.put("LAYERED_ITEM", StepEntityResolver::resolveLayeredItem);
     registry.put("COLOR_SPECIFICATION", StepEntityResolver::resolveColorSpecification);
     registry.put("WITH_DESCRIPTIVE_REPRESENTATION_ITEM",
@@ -10377,8 +10489,20 @@ public final class StepEntityResolver {
     registry.put("GEOMETRIC_SURFACE_SET", StepEntityResolver::resolveGeometricSurfaceSet);
     registry.put("GEOMETRIC_SET", StepEntityResolver::resolveGeometricSet);
     registry.put("POINT_SET", StepEntityResolver::resolvePointSet);
+    // Phase 2B: Additional geometric set variants
     registry.put(
-        "LEADER_DIRECTED_CALLOUT",
+        "GEOMETRIC_SET_2D",
+        (resolver, instance) -> resolver.resolveGeometricSet(instance));
+    registry.put(
+        "GEOMETRIC_SET_3D",
+        (resolver, instance) -> resolver.resolveGeometricSet(instance));
+    registry.put(
+        "TRIANGULATED_SURFACE_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "POLYGONAL_FACE_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put("LEADER_DIRECTED_CALLOUT",
         (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "LEADER_DIRECTED_CALLOUT"));
     registry.put(
         "PROJECTION_DIRECTED_CALLOUT",
@@ -10519,6 +10643,10 @@ public final class StepEntityResolver {
     registry.put("CONNECTED_FACE_SUB_SET", StepEntityResolver::resolveConnectedFaceSubSet);
     registry.put("CONNECTED_FACE_SET", StepEntityResolver::resolveConnectedFaceSet);
     registry.put("TESSELLATED_FACE_SET", StepEntityResolver::resolveTessellatedFaceSet);
+    // Phase 2B: Advanced geometry entities
+    registry.put(
+        "TRIANGULATED_FACE_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance)); // Same as TESSELLATED_FACE_SET
     registry.put("SUBFACE", StepEntityResolver::resolveSubface);
     registry.put("ORIENTED_SUBFACE", StepEntityResolver::resolveOrientedSubface);
     registry.put("SURFACED_OPEN_SHELL", StepEntityResolver::resolveSurfacedOpenShell);

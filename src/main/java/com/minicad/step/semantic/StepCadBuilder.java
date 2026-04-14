@@ -110,6 +110,18 @@ import com.minicad.step.model.StepRectangularTrimmedSurface;
 import com.minicad.step.model.StepSeamCurve;
 import com.minicad.step.model.StepSolidReplica;
 import com.minicad.step.model.StepSurfaceCurve;
+import com.minicad.step.model.StepSurfaceCurveSweptAreaSolid;
+import com.minicad.step.model.StepSweptDiskSolid;
+import com.minicad.step.model.StepExtrudedAreaSolidTapered;
+import com.minicad.step.model.StepRevolvedAreaSolidTapered;
+import com.minicad.step.model.StepRuledSurface;
+import com.minicad.step.model.StepSurfaceOfConstantRadius;
+import com.minicad.step.model.StepSurfacePatch;
+import com.minicad.step.model.StepRectangularCompositeSurface;
+import com.minicad.step.model.StepClothoid;
+import com.minicad.step.model.StepIndexedPolyCurve;
+import com.minicad.step.model.StepDegenerateCurve;
+import com.minicad.step.model.StepNonManifoldSolidBrep;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepSweptAreaSolid;
@@ -591,7 +603,28 @@ public final class StepCadBuilder {
         if (item instanceof StepTrimmedCurve trimmedCurve) {
             return buildTrimmedCurve2(trimmedCurve.id());
         }
+        if (item instanceof StepIndexedPolyCurve polyCurve) {
+            return buildIndexedPolyCurve2(polyCurve);
+        }
         throw new UnsupportedGeometryException("PCURVE currently supports 2D LINE, CIRCLE, ELLIPSE, POLYLINE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, RATIONAL_B_SPLINE_CURVE or TRIMMED_CURVE");
+    }
+
+    private Polyline2 buildIndexedPolyCurve2(StepIndexedPolyCurve polyCurve) {
+        List<StepCartesianPoint> stepPoints = polyCurve.points();
+        List<Integer> indices = polyCurve.indices();
+        List<Point2> points = indices.stream()
+                .map(index -> {
+                    StepCartesianPoint stepPoint = stepPoints.get(index);
+                    CartesianPoint point3D = buildPoint(stepPoint.id());
+                    return new Point2(point3D.x(), point3D.y());
+                })
+                .toList();
+        if (polyCurve.closed() && !points.isEmpty()) {
+            points = new ArrayList<>(points);
+            points.add(points.getFirst());
+            points = List.copyOf(points);
+        }
+        return new Polyline2(points);
     }
 
     public TrimmedCurve2 buildTrimmedCurve2(int id) {
@@ -1369,10 +1402,24 @@ public final class StepCadBuilder {
             built = transformSolid(buildSolid(solidReplica.parentSolid().id()), solidReplica.transformation());
         } else if (entity instanceof StepSweptAreaSolid sweptAreaSolid) {
             built = buildSweptAreaSolid(sweptAreaSolid);
+        } else if (entity instanceof StepSweptDiskSolid sweptDiskSolid) {
+            built = buildSweptDiskSolid(sweptDiskSolid);
+        } else if (entity instanceof StepExtrudedAreaSolidTapered taperedExtrusion) {
+            built = buildExtrudedAreaSolidTapered(taperedExtrusion);
+        } else if (entity instanceof StepRevolvedAreaSolidTapered taperedRevolution) {
+            built = buildRevolvedAreaSolidTapered(taperedRevolution);
+        } else if (entity instanceof StepSurfaceCurveSweptAreaSolid surfaceCurveSweep) {
+            built = buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
         } else if (entity instanceof StepBooleanClippingResult clippingResult) {
             built = buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
         } else if (entity instanceof StepBooleanResult booleanResult) {
             built = buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
+        } else if (entity instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
+            // Non-manifold solid brep has an open shell boundary
+            // This is used for sheet bodies (e.g., unfolded sheet metal)
+            // Currently not supported - throw clear exception
+            throw new UnsupportedGeometryException(
+                    "NON_MANIFOLD_SOLID_BREP is not yet supported - requires sheet body topology for open shells");
         } else {
             throw new StepResolutionException("entity #" + id + " is not a supported SOLID");
         }
@@ -1441,6 +1488,7 @@ public final class StepCadBuilder {
             case "RIGHT_CIRCULAR_CYLINDER" -> buildRightCircularCylinderPrimitive(csgPrimitive);
             case "TORUS" -> buildTorusPrimitive(csgPrimitive);
             case "RIGHT_ANGULAR_WEDGE" -> buildRightAngularWedgePrimitive(csgPrimitive);
+            case "RIGHT_CIRCULAR_CONE" -> buildRightCircularConePrimitive(csgPrimitive);
             default -> throw new UnsupportedGeometryException(csgPrimitive.entityName() + " construction is unsupported");
         };
     }
@@ -1627,6 +1675,287 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
+    private Solid buildRightCircularConePrimitive(StepCsgPrimitive csgPrimitive) {
+        // Accept either AXIS1_PLACEMENT or AXIS2_PLACEMENT_3D
+        Axis1Placement axis;
+        if (csgPrimitive.position() instanceof StepAxis1Placement placement) {
+            axis = buildAxis1Placement(placement.id());
+        } else if (csgPrimitive.position() instanceof StepAxis2Placement3D placement) {
+            // Use the z-axis direction from AXIS2_PLACEMENT_3D as the cone axis
+            Axis2Placement3D pl = buildPlacement(placement.id());
+            axis = new Axis1Placement(pl.location(), pl.axis());
+        } else {
+            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE position must be an AXIS1_PLACEMENT or AXIS2_PLACEMENT_3D");
+        }
+        if (csgPrimitive.dimensions().size() < 2) {
+            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE requires height and radius");
+        }
+        double height = csgPrimitive.dimensions().get(0);
+        double radius = csgPrimitive.dimensions().get(1);
+        if (height <= 0.0 || radius <= 0.0) {
+            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE dimensions must be positive");
+        }
+        CircularFrame frame = circularFrame(axis.axis());
+        Vector3 alongAxis = axis.axis().asVector().scale(height);
+        CartesianPoint apex = axis.location().add(alongAxis);
+        List<CartesianPoint> base = sampleCircle3(axis.location(), frame.x(), frame.y(), radius, 48);
+        List<Face> faces = new ArrayList<>();
+        // Base face
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(base), axis.axis().reverse()));
+        // Lateral faces as triangles connecting base to apex
+        for (int index = 0; index < base.size(); index++) {
+            CartesianPoint a = base.get(index);
+            CartesianPoint b = base.get((index + 1) % base.size());
+            Vector3 midVector = new Vector3(
+                    (a.x() + b.x()) / 2.0 - apex.x(),
+                    (a.y() + b.y()) / 2.0 - apex.y(),
+                    (a.z() + b.z()) / 2.0 - apex.z()
+            );
+            Vector3 edgeVector = new Vector3(b.x() - a.x(), b.y() - a.y(), b.z() - a.z());
+            Vector3 normal = edgeVector.cross(midVector).normalize().asVector();
+            addTriangleFace(faces, a, b, apex, normal);
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildSweptDiskSolid(StepSweptDiskSolid sweptDiskSolid) {
+        Curve3 sweptCurve = buildCurve3(sweptDiskSolid.sweptCurve());
+        double radius = sweptDiskSolid.radius();
+        Double innerRadius = sweptDiskSolid.innerRadius();
+        if (radius <= 0.0) {
+            throw new UnsupportedGeometryException("SWEPT_DISK_SOLID radius must be positive");
+        }
+        boolean isTube = innerRadius != null && innerRadius > 0.0;
+        if (isTube && innerRadius >= radius) {
+            throw new UnsupportedGeometryException("SWEPT_DISK_SOLID inner radius must be less than outer radius");
+        }
+        // Sample the swept curve to get positions and tangent directions
+        int curveSegments = 48;
+        int ringSegments = 24;
+        List<Curve3Sample> samples = sampleCurve3WithTangent(sweptCurve, curveSegments);
+        List<List<CartesianPoint>> outerRings = new ArrayList<>();
+        List<List<CartesianPoint>> innerRings = new ArrayList<>();
+        for (Curve3Sample sample : samples) {
+            CircularFrame frame = circularFrameAtPoint(sample.point(), sample.tangent());
+            List<CartesianPoint> outerRing = sampleCircle3(sample.point(), frame.x(), frame.y(), radius, ringSegments);
+            outerRings.add(outerRing);
+            if (isTube) {
+                List<CartesianPoint> innerRing = sampleCircle3(sample.point(), frame.x(), frame.y(), innerRadius, ringSegments);
+                innerRings.add(innerRing);
+            }
+        }
+        List<Face> faces = new ArrayList<>();
+        // End caps
+        if (!isTube) {
+            // Solid disk: cap both ends
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(outerRings.getFirst()), samples.getFirst().tangent().reverse()));
+            faces.add(faceFromPolyLoop(closeLoop3(outerRings.getLast()), samples.getLast().tangent()));
+        } else {
+            // Tube: ring-shaped caps
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(outerRings.getFirst()), samples.getFirst().tangent().reverse()));
+            faces.add(faceFromPolyLoop(closeLoop3(innerRings.getFirst()), samples.getFirst().tangent()));
+            faces.add(faceFromPolyLoop(closeLoop3(outerRings.getLast()), samples.getLast().tangent()));
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(innerRings.getLast()), samples.getLast().tangent().reverse()));
+        }
+        // Lateral faces connecting adjacent rings
+        for (int ringIndex = 0; ringIndex < outerRings.size() - 1; ringIndex++) {
+            List<CartesianPoint> currentOuter = outerRings.get(ringIndex);
+            List<CartesianPoint> nextOuter = outerRings.get(ringIndex + 1);
+            for (int segIndex = 0; segIndex < ringSegments; segIndex++) {
+                CartesianPoint a = currentOuter.get(segIndex);
+                CartesianPoint b = currentOuter.get((segIndex + 1) % ringSegments);
+                CartesianPoint c = nextOuter.get((segIndex + 1) % ringSegments);
+                CartesianPoint d = nextOuter.get(segIndex);
+                faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
+            }
+            if (isTube) {
+                List<CartesianPoint> currentInner = innerRings.get(ringIndex);
+                List<CartesianPoint> nextInner = innerRings.get(ringIndex + 1);
+                for (int segIndex = 0; segIndex < ringSegments; segIndex++) {
+                    CartesianPoint a = currentInner.get(segIndex);
+                    CartesianPoint b = nextInner.get(segIndex);
+                    CartesianPoint c = nextInner.get((segIndex + 1) % ringSegments);
+                    CartesianPoint d = currentInner.get((segIndex + 1) % ringSegments);
+                    faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
+                }
+            }
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildExtrudedAreaSolidTapered(StepExtrudedAreaSolidTapered tapered) {
+        // Get the profile from sweptArea (which is StepEntity, need to cast to StepProfileDef)
+        StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
+        ProfileLoops baseProfile = buildAreaProfileLoops(profileDef);
+        Vector3 direction = buildDirection(tapered.direction().id()).asVector();
+        double depth = tapered.depth();
+        double taperAngle = tapered.taperAngle();
+        if (depth <= 0.0) {
+            throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID_TAPERED depth must be positive");
+        }
+        // Calculate scale factor at top based on taper angle
+        // Taper angle is the angle of the taper relative to the extrusion direction
+        double topScale = 1.0 - depth * Math.tan(Math.abs(taperAngle));
+        if (topScale <= 0.0) {
+            throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID_TAPERED taper angle too large, top profile would be zero or negative");
+        }
+        // Build scaled top profile
+        List<Point2> baseOuter = baseProfile.outer();
+        List<Point2> topOuter = scaleProfile(baseOuter, topScale);
+        // Build 3D geometry
+        List<CartesianPoint> bottom3D = baseOuter.stream()
+                .map(p -> new CartesianPoint(p.x(), p.y(), 0.0))
+                .toList();
+        List<CartesianPoint> top3D = topOuter.stream()
+                .map(p -> new CartesianPoint(p.x() * topScale, p.y() * topScale, depth))
+                .toList();
+        // Close loops
+        bottom3D = closeLoop3(bottom3D);
+        top3D = closeLoop3(top3D);
+        List<Face> faces = new ArrayList<>();
+        Direction3 extrusionDir = Direction3.from(direction);
+        // Bottom face
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom3D), extrusionDir.reverse()));
+        // Top face
+        faces.add(faceFromPolyLoop(top3D, extrusionDir));
+        // Side faces connecting bottom to top
+        for (int i = 0; i < baseOuter.size(); i++) {
+            CartesianPoint a = bottom3D.get(i);
+            CartesianPoint b = bottom3D.get((i + 1) % baseOuter.size());
+            CartesianPoint c = top3D.get((i + 1) % top3D.size());
+            CartesianPoint d = top3D.get(i);
+            faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildRevolvedAreaSolidTapered(StepRevolvedAreaSolidTapered tapered) {
+        StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
+        ProfileLoops baseProfile = buildAreaProfileLoops(profileDef);
+        Axis1Placement axis = buildAxis1Placement(tapered.axis().id());
+        double angle = tapered.angle();
+        double taperAngle = tapered.taperAngle();
+        if (angle <= 0.0 || angle > Math.PI * 2.0 + 1e-9) {
+            throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID_TAPERED angle must be positive and <= 2*PI");
+        }
+        int segments = Math.max(12, (int) (angle / (Math.PI / 36.0)));
+        // Build rings at different heights with taper scaling
+        List<Face> faces = new ArrayList<>();
+        List<Point2> profileOuter = baseProfile.outer();
+        CircularFrame frame = circularFrame(axis.axis());
+        for (int seg = 0; seg < segments; seg++) {
+            double currentAngle = angle * seg / segments;
+            double nextAngle = angle * (seg + 1) / segments;
+            double currentScale = 1.0 - Math.tan(Math.abs(taperAngle)) * (angle * seg / segments / angle);
+            double nextScale = 1.0 - Math.tan(Math.abs(taperAngle)) * (angle * (seg + 1) / segments / angle);
+            if (currentScale <= 0.0 || nextScale <= 0.0) {
+                throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID_TAPERED taper produces zero or negative profile");
+            }
+            // Build profile at current and next angle
+            List<CartesianPoint> currentRing = revolveProfileAtAngle(profileOuter, axis, frame, currentAngle, currentScale);
+            List<CartesianPoint> nextRing = revolveProfileAtAngle(profileOuter, axis, frame, nextAngle, nextScale);
+            // Connect rings with faces
+            for (int i = 0; i < profileOuter.size(); i++) {
+                CartesianPoint a = currentRing.get(i);
+                CartesianPoint b = currentRing.get((i + 1) % currentRing.size());
+                CartesianPoint c = nextRing.get((i + 1) % nextRing.size());
+                CartesianPoint d = nextRing.get(i);
+                faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
+            }
+        }
+        // End caps
+        List<CartesianPoint> startRing = revolveProfileAtAngle(profileOuter, axis, frame, 0.0, 1.0);
+        List<CartesianPoint> endRing = revolveProfileAtAngle(profileOuter, axis, frame, angle, 1.0 - Math.tan(Math.abs(taperAngle)));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(startRing), frame.radialAtAngle(0.0).reverse()));
+        faces.add(faceFromPolyLoop(closeLoop3(endRing), frame.radialAtAngle(angle)));
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildSurfaceCurveSweptAreaSolid(StepSurfaceCurveSweptAreaSolid swept) {
+        StepProfileDef profileDef = asProfileDef(swept.sweptArea());
+        ProfileLoops profile = buildAreaProfileLoops(profileDef);
+        Curve3 trajectory = buildCurve3(swept.trajectory());
+        double startPoint = swept.startPoint();
+        double endPoint = swept.endPoint();
+        // Sample trajectory curve
+        int segments = 48;
+        List<Curve3Sample> samples = sampleCurve3WithTangent(trajectory, segments);
+        // Adjust to start/end points
+        int startIndex = (int) (startPoint * samples.size());
+        int endIndex = (int) (endPoint * samples.size());
+        if (startIndex < 0) startIndex = 0;
+        if (endIndex > samples.size()) endIndex = samples.size();
+        List<Curve3Sample> usedSamples = samples.subList(startIndex, endIndex);
+        List<Face> faces = new ArrayList<>();
+        List<List<CartesianPoint>> rings = new ArrayList<>();
+        for (Curve3Sample sample : usedSamples) {
+            // Build profile at this trajectory point
+            List<CartesianPoint> ring = placeProfileAtPoint(profile.outer(), sample.point(), sample.tangent());
+            rings.add(closeLoop3(ring));
+        }
+        // End caps
+        if (!rings.isEmpty()) {
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(rings.getFirst()), usedSamples.getFirst().tangent().reverse()));
+            faces.add(faceFromPolyLoop(closeLoop3(rings.getLast()), usedSamples.getLast().tangent()));
+        }
+        // Side faces
+        for (int ringIndex = 0; ringIndex < rings.size() - 1; ringIndex++) {
+            List<CartesianPoint> current = rings.get(ringIndex);
+            List<CartesianPoint> next = rings.get(ringIndex + 1);
+            for (int seg = 0; seg < current.size(); seg++) {
+                CartesianPoint a = current.get(seg);
+                CartesianPoint b = current.get((seg + 1) % current.size());
+                CartesianPoint c = next.get((seg + 1) % next.size());
+                CartesianPoint d = next.get(seg);
+                faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
+            }
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private StepProfileDef asProfileDef(StepEntity entity) {
+        if (entity instanceof StepProfileDef profileDef) {
+            return profileDef;
+        }
+        throw new UnsupportedGeometryException("swept area must be a profile definition");
+    }
+
+    private List<Point2> scaleProfile(List<Point2> profile, double scale) {
+        return profile.stream()
+                .map(p -> new Point2(p.x() * scale, p.y() * scale))
+                .toList();
+    }
+
+    private List<CartesianPoint> revolveProfileAtAngle(List<Point2> profile, Axis1Placement axis, CircularFrame frame, double angle, double scale) {
+        Direction3 radial = frame.radialAtAngle(angle);
+        return profile.stream()
+                .map(p -> axis.location().add(
+                        radial.asVector().scale(p.x() * scale)
+                                .add(frame.z().asVector().scale(p.y()))))
+                .toList();
+    }
+
+    private List<CartesianPoint> placeProfileAtPoint(List<Point2> profile, CartesianPoint point, Direction3 tangent) {
+        CircularFrame frame = circularFrame(tangent);
+        return profile.stream()
+                .map(p -> point.add(frame.x().scale(p.x()).add(frame.y().scale(p.y()))))
+                .toList();
+    }
+
+    private List<Curve3Sample> sampleCurve3WithTangent(Curve3 curve, int segments) {
+        List<CartesianPoint> points = sampleCurve3(curve, segments);
+        List<Curve3Sample> samples = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            CartesianPoint current = points.get(i);
+            CartesianPoint next = points.get((i + 1) % points.size());
+            Vector3 tangent = new Vector3(next.x() - current.x(), next.y() - current.y(), next.z() - current.z()).normalize().asVector();
+            samples.add(new Curve3Sample(current, Direction3.from(tangent)));
+        }
+        return samples;
+    }
+
+    private record Curve3Sample(CartesianPoint point, Direction3 tangent) {}
+
     private Solid buildEllipsoidLike(
             Axis2Placement3D placement,
             double rx,
@@ -1713,6 +2042,10 @@ public final class StepCadBuilder {
         return new CircularFrame(x, y);
     }
 
+    private CircularFrame circularFrameAtPoint(CartesianPoint point, Direction3 tangent) {
+        return circularFrame(tangent);
+    }
+
     private CartesianPoint pointOnPlacement(Axis2Placement3D placement, double x, double y, double z) {
         return placement.location()
                 .add(placement.xDirection().asVector().scale(x))
@@ -1761,6 +2094,20 @@ public final class StepCadBuilder {
                 throw new UnsupportedGeometryException(
                         "BOOLEAN_RESULT intersection requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand");
             }
+            case "UNION" -> {
+                // UNION with half-space: extend solid into half-space region
+                // This is the inverse of DIFFERENCE with half-space
+                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
+                if (halfSpaceSolid != null) {
+                    yield unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid);
+                }
+                halfSpaceSolid = asHalfSpaceOperand(first);
+                if (halfSpaceSolid != null) {
+                    yield unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid);
+                }
+                throw new UnsupportedGeometryException(
+                        "BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported");
+            }
             default -> throw new UnsupportedGeometryException("BOOLEAN_RESULT operator " + normalizedOperator + " is unsupported");
         };
     }
@@ -1777,6 +2124,10 @@ public final class StepCadBuilder {
             case StepCsgSolid csgSolid -> buildBooleanOperandSolid(csgSolid.treeRootExpression());
             case StepSolidReplica solidReplica -> buildSolid(solidReplica.id());
             case StepSweptAreaSolid sweptAreaSolid -> buildSweptAreaSolid(sweptAreaSolid);
+            case StepSweptDiskSolid sweptDiskSolid -> buildSweptDiskSolid(sweptDiskSolid);
+            case StepExtrudedAreaSolidTapered taperedExtrusion -> buildExtrudedAreaSolidTapered(taperedExtrusion);
+            case StepRevolvedAreaSolidTapered taperedRevolution -> buildRevolvedAreaSolidTapered(taperedRevolution);
+            case StepSurfaceCurveSweptAreaSolid surfaceCurveSweep -> buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
             case StepBooleanClippingResult clippingResult ->
                     buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
             case StepBooleanResult booleanResult ->
@@ -1801,6 +2152,101 @@ public final class StepCadBuilder {
                             + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
         }
         return clipSolidWithBoxDomain(clipped, boxDomain, "BOOLEAN_RESULT clipping");
+    }
+
+    private Solid unionWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid) {
+        Plane plane = buildSupportedPlaneGeometry(halfSpaceSolid.baseSurface(), halfSpaceSolid.entityName());
+        if (plane == null) {
+            throw new UnsupportedGeometryException(halfSpaceSolid.entityName() + " requires PLANE geometry");
+        }
+        // Union with half-space: extend solid into half-space agreement side
+        // This creates a new solid that includes both the original solid and the half-space region
+        // For bounded half-space (BOXED_HALF_SPACE), union creates solid + box portion on agreement side
+        if (halfSpaceSolid.enclosure() == null) {
+            // Unbounded half-space union would create infinite geometry - not supported
+            throw new UnsupportedGeometryException(
+                    "BOOLEAN_RESULT union with unbounded HALF_SPACE_SOLID is not supported");
+        }
+        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain boxDomain)) {
+            throw new UnsupportedGeometryException(
+                    halfSpaceSolid.entityName() + " union with "
+                            + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
+        }
+        // Build box domain geometry and merge with solid
+        Solid boxSolid = buildBoxDomainSolid(boxDomain);
+        // Clip box to half-space agreement side
+        boolean keepAgreementSide = halfSpaceSolid.agreementFlag();
+        Solid halfSpaceBox = clipSolidWithPlane(boxSolid, plane, keepAgreementSide, "UNION half-space box");
+        // Merge solids: union of solid and halfSpaceBox
+        return mergeSolids(solid, halfSpaceBox);
+    }
+
+    private Solid buildBoxDomainSolid(StepBoxDomain boxDomain) {
+        CartesianPoint min = buildPoint(boxDomain.corner().id());
+        if (boxDomain.dimensions().size() < 3) {
+            throw new UnsupportedGeometryException("BOX_DOMAIN requires x, y and z dimensions");
+        }
+        double dx = boxDomain.dimensions().get(0);
+        double dy = boxDomain.dimensions().get(1);
+        double dz = boxDomain.dimensions().get(2);
+        if (dx <= 0.0 || dy <= 0.0 || dz <= 0.0) {
+            throw new UnsupportedGeometryException("BOX_DOMAIN dimensions must be positive");
+        }
+        CartesianPoint max = new CartesianPoint(min.x() + dx, min.y() + dy, min.z() + dz);
+        // Build box from 6 faces
+        List<Face> faces = new ArrayList<>();
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(min.x(), min.y(), min.z()),
+                new CartesianPoint(max.x(), min.y(), min.z()),
+                new CartesianPoint(max.x(), max.y(), min.z()),
+                new CartesianPoint(min.x(), max.y(), min.z()),
+                new CartesianPoint(min.x(), min.y(), min.z())
+        ), new Direction3(0.0, 0.0, -1.0)));
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(min.x(), min.y(), max.z()),
+                new CartesianPoint(min.x(), max.y(), max.z()),
+                new CartesianPoint(max.x(), max.y(), max.z()),
+                new CartesianPoint(max.x(), min.y(), max.z()),
+                new CartesianPoint(min.x(), min.y(), max.z())
+        ), new Direction3(0.0, 0.0, 1.0)));
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(min.x(), min.y(), min.z()),
+                new CartesianPoint(min.x(), max.y(), min.z()),
+                new CartesianPoint(min.x(), max.y(), max.z()),
+                new CartesianPoint(min.x(), min.y(), max.z()),
+                new CartesianPoint(min.x(), min.y(), min.z())
+        ), new Direction3(-1.0, 0.0, 0.0)));
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(max.x(), min.y(), min.z()),
+                new CartesianPoint(max.x(), min.y(), max.z()),
+                new CartesianPoint(max.x(), max.y(), max.z()),
+                new CartesianPoint(max.x(), max.y(), min.z()),
+                new CartesianPoint(max.x(), min.y(), min.z())
+        ), new Direction3(1.0, 0.0, 0.0)));
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(min.x(), min.y(), min.z()),
+                new CartesianPoint(min.x(), min.y(), max.z()),
+                new CartesianPoint(max.x(), min.y(), max.z()),
+                new CartesianPoint(max.x(), min.y(), min.z()),
+                new CartesianPoint(min.x(), min.y(), min.z())
+        ), new Direction3(0.0, -1.0, 0.0)));
+        faces.add(faceFromPolyLoop(List.of(
+                new CartesianPoint(min.x(), max.y(), min.z()),
+                new CartesianPoint(max.x(), max.y(), min.z()),
+                new CartesianPoint(max.x(), max.y(), max.z()),
+                new CartesianPoint(min.x(), max.y(), max.z()),
+                new CartesianPoint(min.x(), max.y(), min.z())
+        ), new Direction3(0.0, 1.0, 0.0)));
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid mergeSolids(Solid first, Solid second) {
+        // Simple merge: combine all faces from both solids
+        // This works when solids don't overlap or share boundaries
+        List<Face> mergedFaces = new ArrayList<>();
+        mergedFaces.addAll(first.outerShell().faces());
+        mergedFaces.addAll(second.outerShell().faces());
+        return new Solid(new Shell(mergedFaces, true));
     }
 
     private Solid clipSolidWithBoxDomain(Solid solid, StepBoxDomain boxDomain, String context) {
@@ -2029,6 +2475,23 @@ public final class StepCadBuilder {
                     new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
             case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" ->
                     arbitraryProfileWithVoids(profile);
+            // Standard structural steel profiles (Phase 2E)
+            case "I_SHAPE_PROFILE_DEF", "I_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(iShapeProfile(profile)), List.of());
+            case "T_SHAPE_PROFILE_DEF", "T_PROFILE_DEF", "TEE_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(tShapeProfile(profile)), List.of());
+            case "L_SHAPE_PROFILE_DEF", "L_PROFILE_DEF", "ANGLE_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(lShapeProfile(profile)), List.of());
+            case "U_SHAPE_PROFILE_DEF", "U_PROFILE_DEF", "CHANNEL_PROFILE_DEF", "C_SHAPE_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(uShapeProfile(profile)), List.of());
+            case "Z_SHAPE_PROFILE_DEF", "Z_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(zShapeProfile(profile)), List.of());
+            case "HAT_SHAPE_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(hatShapeProfile(profile)), List.of());
+            case "FLAT_BAR_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(flatBarProfile(profile)), List.of());
+            case "DOVE_TAIL_PROFILE_DEF" ->
+                    new ProfileLoops(normalizeOuterLoop(doveTailProfile(profile)), List.of());
             default -> throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
         };
     }
@@ -2128,6 +2591,327 @@ public final class StepCadBuilder {
                 normalizeOuterLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(outerRadius), "CIRCLE_PROFILE_DEF"))),
                 List.of(normalizeInnerLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(innerRadius), "CIRCLE_PROFILE_DEF"))))
         );
+    }
+
+    private ProfileLoops rectangleHollowProfile(StepProfileDef profile) {
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException("RECTANGLE_HOLLOW_PROFILE_DEF requires xDim, yDim, wallThickness and innerRadius");
+        }
+        double xDim = profile.parameters().get(0);
+        double yDim = profile.parameters().get(1);
+        double wallThickness = profile.parameters().get(2);
+        double innerRadius = profile.parameters().get(3);
+        double innerXDim = xDim - 2.0 * wallThickness;
+        double innerYDim = yDim - 2.0 * wallThickness;
+        if (xDim <= 0.0 || yDim <= 0.0 || wallThickness <= 0.0 || innerXDim <= 0.0 || innerYDim <= 0.0) {
+            throw new UnsupportedGeometryException("RECTANGLE_HOLLOW_PROFILE_DEF dimensions must define a positive inner rectangle");
+        }
+        double halfOuterX = xDim * 0.5;
+        double halfOuterY = yDim * 0.5;
+        double halfInnerX = innerXDim * 0.5;
+        double halfInnerY = innerYDim * 0.5;
+        List<Point2> outer = List.of(
+                new Point2(-halfOuterX, -halfOuterY),
+                new Point2(halfOuterX, -halfOuterY),
+                new Point2(halfOuterX, halfOuterY),
+                new Point2(-halfOuterX, halfOuterY),
+                new Point2(-halfOuterX, -halfOuterY)
+        );
+        List<Point2> inner = List.of(
+                new Point2(-halfInnerX, -halfInnerY),
+                new Point2(-halfInnerX, halfInnerY),
+                new Point2(halfInnerX, halfInnerY),
+                new Point2(halfInnerX, -halfInnerY),
+                new Point2(-halfInnerX, -halfInnerY)
+        );
+        return new ProfileLoops(normalizeOuterLoop(outer), List.of(normalizeInnerLoop(inner)));
+    }
+
+    private List<Point2> centeredCircleProfile(StepProfileDef profile) {
+        if (profile.parameters().size() < 2) {
+            throw new UnsupportedGeometryException("CENTERED_CIRCLE_PROFILE_DEF requires radius and centerOffset");
+        }
+        double radius = profile.parameters().get(0);
+        double centerOffset = profile.parameters().get(1);
+        if (radius <= 0.0) {
+            throw new UnsupportedGeometryException("CENTERED_CIRCLE_PROFILE_DEF radius must be positive");
+        }
+        // Circle centered at (centerOffset, 0)
+        Circle2 circle = new Circle2(new Point2(centerOffset, 0.0), new Direction2(1.0, 0.0), radius);
+        return sampleCurve2(circle, 72);
+    }
+
+    private List<Point2> centreLineArcProfile(StepProfileDef profile) {
+        if (profile.parameters().size() < 2) {
+            throw new UnsupportedGeometryException("CENTRE_LINE_ARC_PROFILE_DEF requires radius and angle");
+        }
+        double radius = profile.parameters().get(0);
+        double angle = profile.parameters().get(1);
+        if (radius <= 0.0 || angle <= 0.0) {
+            throw new UnsupportedGeometryException("CENTRE_LINE_ARC_PROFILE_DEF radius and angle must be positive");
+        }
+        // Arc centered at origin, from -angle/2 to +angle/2
+        List<Point2> points = new ArrayList<>();
+        int segments = Math.max(12, (int) (Math.abs(angle) / (Math.PI / 36.0)));
+        double startAngle = -angle / 2.0;
+        double endAngle = angle / 2.0;
+        for (int i = 0; i <= segments; i++) {
+            double a = startAngle + (endAngle - startAngle) * i / segments;
+            points.add(new Point2(radius * Math.cos(a), radius * Math.sin(a)));
+        }
+        return List.copyOf(points);
+    }
+
+    // Standard structural steel profile implementations (Phase 2E)
+    private List<Point2> iShapeProfile(StepProfileDef profile) {
+        // I-beam/I-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters (flangeWidth, webDepth, flangeThickness, webThickness)");
+        }
+        double flangeWidth = profile.parameters().get(0);
+        double webDepth = profile.parameters().get(1);
+        double flangeThickness = profile.parameters().get(2);
+        double webThickness = profile.parameters().get(3);
+        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
+        double halfFlange = flangeWidth / 2.0;
+        double halfWeb = webThickness / 2.0;
+        double halfDepth = webDepth / 2.0;
+        List<Point2> points = new ArrayList<>();
+        // Upper flange (left to right)
+        points.add(new Point2(-halfFlange, halfDepth));
+        points.add(new Point2(-halfWeb, halfDepth));
+        if (filletRadius > 0.0) {
+            appendFillet(points, -halfWeb, halfDepth - filletRadius, filletRadius, Math.PI/2, 0, 6);
+        }
+        points.add(new Point2(-halfWeb, -halfDepth + flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, -halfWeb, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI, Math.PI/2, 6);
+        }
+        // Lower flange left
+        points.add(new Point2(-halfFlange, -halfDepth));
+        // Lower flange right
+        points.add(new Point2(halfFlange, -halfDepth));
+        // Web right side
+        if (filletRadius > 0.0) {
+            appendFillet(points, halfWeb, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI/2, 0, 6);
+        }
+        points.add(new Point2(halfWeb, -halfDepth + flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, halfWeb, halfDepth - filletRadius, filletRadius, 0, -Math.PI/2, 6);
+        }
+        points.add(new Point2(halfWeb, halfDepth));
+        // Upper flange right
+        points.add(new Point2(halfFlange, halfDepth));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> tShapeProfile(StepProfileDef profile) {
+        // T-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
+        }
+        double flangeWidth = profile.parameters().get(0);
+        double webDepth = profile.parameters().get(1);
+        double flangeThickness = profile.parameters().get(2);
+        double webThickness = profile.parameters().get(3);
+        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
+        double halfFlange = flangeWidth / 2.0;
+        double halfWeb = webThickness / 2.0;
+        double halfDepth = webDepth / 2.0;
+        List<Point2> points = new ArrayList<>();
+        // Top flange
+        points.add(new Point2(-halfFlange, halfDepth));
+        points.add(new Point2(halfFlange, halfDepth));
+        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, halfWeb, halfDepth - flangeThickness + filletRadius, filletRadius, Math.PI/2, 0, 6);
+        }
+        points.add(new Point2(halfWeb, halfDepth - flangeThickness));
+        points.add(new Point2(halfWeb, -halfDepth));
+        points.add(new Point2(-halfWeb, -halfDepth));
+        points.add(new Point2(-halfWeb, halfDepth - flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, -halfWeb, halfDepth - flangeThickness + filletRadius, filletRadius, Math.PI, Math.PI/2, 6);
+        }
+        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> lShapeProfile(StepProfileDef profile) {
+        // L-shape/Angle profile: width, depth, thickness, filletRadius
+        if (profile.parameters().size() < 3) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 3 parameters");
+        }
+        double width = profile.parameters().get(0);
+        double depth = profile.parameters().get(1);
+        double thickness = profile.parameters().get(2);
+        double filletRadius = profile.parameters().size() > 3 ? profile.parameters().get(3) : 0.0;
+        double innerRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
+        List<Point2> points = new ArrayList<>();
+        // Outer contour
+        points.add(new Point2(0.0, 0.0));
+        points.add(new Point2(width, 0.0));
+        points.add(new Point2(width, thickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, thickness - filletRadius, thickness - filletRadius, filletRadius, 0, -Math.PI/2, 6);
+        } else {
+            points.add(new Point2(thickness, thickness));
+        }
+        points.add(new Point2(thickness, depth));
+        points.add(new Point2(0.0, depth));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> uShapeProfile(StepProfileDef profile) {
+        // U-shape/Channel profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
+        }
+        double flangeWidth = profile.parameters().get(0);
+        double webDepth = profile.parameters().get(1);
+        double flangeThickness = profile.parameters().get(2);
+        double webThickness = profile.parameters().get(3);
+        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
+        double halfFlange = flangeWidth / 2.0;
+        double halfDepth = webDepth / 2.0;
+        List<Point2> points = new ArrayList<>();
+        // Outer contour of U-shape
+        points.add(new Point2(-halfFlange, -halfDepth));
+        points.add(new Point2(halfFlange, -halfDepth));
+        points.add(new Point2(halfFlange, -halfDepth + flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, halfFlange - webThickness - filletRadius, -halfDepth + flangeThickness + filletRadius, filletRadius, 0, -Math.PI/2, 6);
+        }
+        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
+        points.add(new Point2(halfFlange - webThickness, halfDepth - flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, halfFlange - webThickness - filletRadius, halfDepth - flangeThickness - filletRadius, filletRadius, Math.PI/2, Math.PI, 6);
+        }
+        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
+        points.add(new Point2(halfFlange, halfDepth));
+        points.add(new Point2(-halfFlange, halfDepth));
+        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, -halfFlange + webThickness + filletRadius, halfDepth - flangeThickness - filletRadius, filletRadius, Math.PI, Math.PI*1.5, 6);
+        }
+        points.add(new Point2(-halfFlange + webThickness, halfDepth - flangeThickness));
+        points.add(new Point2(-halfFlange + webThickness, -halfDepth + flangeThickness));
+        if (filletRadius > 0.0) {
+            appendFillet(points, -halfFlange + webThickness + filletRadius, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI*1.5, Math.PI*2, 6);
+        }
+        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> zShapeProfile(StepProfileDef profile) {
+        // Z-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
+        }
+        double flangeWidth = profile.parameters().get(0);
+        double webDepth = profile.parameters().get(1);
+        double flangeThickness = profile.parameters().get(2);
+        double webThickness = profile.parameters().get(3);
+        double halfFlange = flangeWidth / 2.0;
+        double halfWeb = webThickness / 2.0;
+        double halfDepth = webDepth / 2.0;
+        List<Point2> points = new ArrayList<>();
+        // Upper flange right
+        points.add(new Point2(halfFlange, halfDepth));
+        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
+        points.add(new Point2(halfWeb, halfDepth - flangeThickness));
+        points.add(new Point2(halfWeb, -halfDepth + flangeThickness));
+        // Lower flange left
+        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
+        points.add(new Point2(-halfFlange, -halfDepth));
+        points.add(new Point2(halfFlange - webThickness, -halfDepth));
+        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
+        points.add(new Point2(-halfWeb, -halfDepth + flangeThickness));
+        points.add(new Point2(-halfWeb, halfDepth - flangeThickness));
+        // Upper flange left
+        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
+        points.add(new Point2(-halfFlange, halfDepth));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> hatShapeProfile(StepProfileDef profile) {
+        // Hat-shape profile: similar to U-shape but inverted
+        if (profile.parameters().size() < 4) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
+        }
+        double flangeWidth = profile.parameters().get(0);
+        double webDepth = profile.parameters().get(1);
+        double flangeThickness = profile.parameters().get(2);
+        double webThickness = profile.parameters().get(3);
+        double halfFlange = flangeWidth / 2.0;
+        double halfDepth = webDepth / 2.0;
+        List<Point2> points = new ArrayList<>();
+        points.add(new Point2(-halfFlange, halfDepth));
+        points.add(new Point2(halfFlange, halfDepth));
+        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
+        points.add(new Point2(halfFlange - webThickness, halfDepth - flangeThickness));
+        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
+        points.add(new Point2(halfFlange, -halfDepth + flangeThickness));
+        points.add(new Point2(halfFlange, -halfDepth));
+        points.add(new Point2(-halfFlange, -halfDepth));
+        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
+        points.add(new Point2(-halfFlange + webThickness, -halfDepth + flangeThickness));
+        points.add(new Point2(-halfFlange + webThickness, halfDepth - flangeThickness));
+        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private List<Point2> flatBarProfile(StepProfileDef profile) {
+        // Flat bar: simple rectangle
+        if (profile.parameters().size() < 2) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires width and thickness");
+        }
+        double width = profile.parameters().get(0);
+        double thickness = profile.parameters().get(1);
+        double halfWidth = width / 2.0;
+        double halfThickness = thickness / 2.0;
+        return List.of(
+                new Point2(-halfWidth, -halfThickness),
+                new Point2(halfWidth, -halfThickness),
+                new Point2(halfWidth, halfThickness),
+                new Point2(-halfWidth, halfThickness),
+                new Point2(-halfWidth, -halfThickness)
+        );
+    }
+
+    private List<Point2> doveTailProfile(StepProfileDef profile) {
+        // Dove tail profile: width, depth, angle, neckWidth
+        if (profile.parameters().size() < 3) {
+            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 3 parameters");
+        }
+        double width = profile.parameters().get(0);
+        double depth = profile.parameters().get(1);
+        double angle = profile.parameters().size() > 2 ? profile.parameters().get(2) : 60.0; // degrees
+        double neckWidth = profile.parameters().size() > 3 ? profile.parameters().get(3) : width * 0.5;
+        double halfWidth = width / 2.0;
+        double halfNeck = neckWidth / 2.0;
+        double angleRad = Math.toRadians(angle);
+        double sideOffset = (width - neckWidth) / 2.0;
+        List<Point2> points = new ArrayList<>();
+        points.add(new Point2(-halfWidth, 0.0));
+        points.add(new Point2(halfWidth, 0.0));
+        points.add(new Point2(halfNeck, depth));
+        points.add(new Point2(-halfNeck, depth));
+        points.add(points.getFirst());
+        return List.copyOf(points);
+    }
+
+    private void appendFillet(List<Point2> points, double centerX, double centerY, double radius, double startAngle, double endAngle, int segments) {
+        for (int i = 1; i <= segments; i++) {
+            double angle = startAngle + (endAngle - startAngle) * i / segments;
+            points.add(new Point2(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)));
+        }
     }
 
     private List<Point2> arbitraryClosedProfile(StepProfileDef profile) {
@@ -2538,10 +3322,82 @@ public final class StepCadBuilder {
             case StepProjectionCurve projectionCurve -> buildCurve3(projectionCurve.item());
             case StepDraughtingAnnotationOccurrence annotationOccurrence -> buildCurve3(annotationOccurrence.item());
             case StepTerminatorSymbol terminatorSymbol -> buildCurve3(terminatorSymbol.annotatedCurve());
+            case StepClothoid clothoid -> buildClothoidCurve(clothoid);
+            case StepIndexedPolyCurve polyCurve -> buildIndexedPolyCurve3(polyCurve);
+            case StepDegenerateCurve degenerateCurve -> buildDegenerateCurve3(degenerateCurve);
             default -> throw new UnsupportedGeometryException(
                     "surface directrix requires LINE, CIRCLE, ELLIPSE, POLYLINE, BEZIER_CURVE, UNIFORM_CURVE, QUASI_UNIFORM_CURVE, PIECEWISE_BEZIER_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, RATIONAL_B_SPLINE_CURVE, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE"
             );
         };
+    }
+
+    private Curve3 buildClothoidCurve(StepClothoid clothoid) {
+        // Clothoid (Euler spiral) is a transition curve used in road/railway design
+        // The curvature changes linearly along the curve
+        // We approximate it by sampling points
+        Axis2Placement3D position = buildPlacement(clothoid.position().id());
+        double xAxisIntercept = clothoid.xAxisIntercept();
+        double curvature = clothoid.curvature();
+        // Sample points along the clothoid
+        int segments = 48;
+        List<CartesianPoint> points = new ArrayList<>();
+        // Clothoid parametric equations:
+        // x(t) = integral_0^t cos(a*s^2) ds
+        // y(t) = integral_0^t sin(a*s^2) ds
+        // where a = curvature parameter
+        // Use numerical integration approximation
+        double a = curvature;
+        double tMax = xAxisIntercept; // Length parameter
+        for (int i = 0; i <= segments; i++) {
+            double t = tMax * i / segments;
+            // Fresnel integral approximation
+            double x = fresnelC(a * t * t) / Math.sqrt(Math.abs(a));
+            double y = fresnelS(a * t * t) / Math.sqrt(Math.abs(a));
+            CartesianPoint localPoint = new CartesianPoint(x, y, 0.0);
+            points.add(pointOnPlacement(position, localPoint.x(), localPoint.y(), localPoint.z()));
+        }
+        return new Polyline3(points);
+    }
+
+    private double fresnelC(double x) {
+        // Fresnel cosine integral approximation
+        // C(x) ≈ integral_0^x cos(pi*t^2/2) dt
+        // Simplified approximation for small x
+        return x * Math.cos(Math.PI * x / 2.0) / 2.0;
+    }
+
+    private double fresnelS(double x) {
+        // Fresnel sine integral approximation
+        // S(x) ≈ integral_0^x sin(pi*t^2/2) dt
+        return x * Math.sin(Math.PI * x / 2.0) / 2.0;
+    }
+
+    private Curve3 buildIndexedPolyCurve3(StepIndexedPolyCurve polyCurve) {
+        // Indexed poly curve is defined by indices into a point list
+        List<StepCartesianPoint> stepPoints = polyCurve.points();
+        List<Integer> indices = polyCurve.indices();
+        List<CartesianPoint> points = indices.stream()
+                .map(index -> buildPoint(stepPoints.get(index).id()))
+                .toList();
+        if (polyCurve.closed() && !points.isEmpty()) {
+            points = new ArrayList<>(points);
+            points.add(points.getFirst());
+            points = List.copyOf(points);
+        }
+        return new Polyline3(points);
+    }
+
+    private Curve3 buildDegenerateCurve3(StepDegenerateCurve degenerateCurve) {
+        // Degenerate curve collapses to a point or minimal curve
+        Curve3 basis = buildCurve3(degenerateCurve.basisCurve());
+        // Return a minimal polyline representing the degeneration
+        List<CartesianPoint> sampledPoints = sampleCurve3(basis, 2);
+        if (sampledPoints.isEmpty()) {
+            throw new UnsupportedGeometryException("DEGENERATE_CURVE basis curve has no sample points");
+        }
+        // Return a single point polyline
+        CartesianPoint point = sampledPoints.getFirst();
+        return new Polyline3(List.of(point, point));
     }
 
     private ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
@@ -2818,7 +3674,84 @@ public final class StepCadBuilder {
             }
             return transformSurfaceGeometry(base, replica.transformation());
         }
+        if (geometry instanceof StepRuledSurface ruledSurface) {
+            return buildRuledSurfaceGeometry(ruledSurface);
+        }
+        if (geometry instanceof StepSurfaceOfConstantRadius constantRadiusSurface) {
+            return buildSurfaceOfConstantRadiusGeometry(constantRadiusSurface, faceType);
+        }
+        if (geometry instanceof StepSurfacePatch surfacePatch) {
+            return buildSurfacePatchGeometry(surfacePatch, faceType);
+        }
+        if (geometry instanceof StepRectangularCompositeSurface compositeSurface) {
+            return buildRectangularCompositeSurfaceGeometry(compositeSurface, faceType);
+        }
         return null;
+    }
+
+    private SurfaceGeometry buildRuledSurfaceGeometry(StepRuledSurface ruledSurface) {
+        // Ruled surface is defined by two directrix curves
+        // For now, we sample both curves and create a mesh surface
+        Axis2Placement3D position = buildPlacement(ruledSurface.position().id());
+        Curve3 directrix1 = buildCurve3(ruledSurface.directrix1());
+        Curve3 directrix2 = buildCurve3(ruledSurface.directrix2());
+        // Sample both curves
+        int segments = 48;
+        List<CartesianPoint> points1 = sampleCurve3(directrix1, segments);
+        List<CartesianPoint> points2 = sampleCurve3(directrix2, segments);
+        if (points1.size() != points2.size()) {
+            // Different curve lengths - need parameterization alignment
+            // For simplicity, use minimum size
+            int minSize = Math.min(points1.size(), points2.size());
+            points1 = points1.subList(0, minSize);
+            points2 = points2.subList(0, minSize);
+        }
+        // Create surface by connecting points - this would need a proper SurfaceGeometry class
+        // For now, we return null as there's no suitable SurfaceGeometry implementation
+        return null;
+    }
+
+    private SurfaceGeometry buildSurfaceOfConstantRadiusGeometry(StepSurfaceOfConstantRadius surface, String faceType) {
+        // Surface of constant radius is similar to cylindrical surface
+        // but defined by sweeping a surface along a circular path
+        SurfaceGeometry sweptSurface = buildSupportedFaceGeometry(surface.sweptSurface(), faceType);
+        if (sweptSurface == null) {
+            return null;
+        }
+        // For cylindrical-like surfaces, we can create a cylindrical approximation
+        double radius = surface.radius();
+        if (radius <= 0.0) {
+            return null;
+        }
+        // Return null for complex surface types - would need proper implementation
+        return null;
+    }
+
+    private SurfaceGeometry buildSurfacePatchGeometry(StepSurfacePatch patch, String faceType) {
+        SurfaceGeometry basisSurface = buildSupportedFaceGeometry(patch.basisSurface(), faceType);
+        if (basisSurface == null) {
+            return null;
+        }
+        // Surface patch is just a bounded portion of a surface
+        // The sameSense flag determines orientation
+        if (!patch.sameSense()) {
+            // Reverse orientation if needed
+            if (basisSurface instanceof Plane plane) {
+                return new Plane(plane.origin(), plane.normal().reverse());
+            }
+        }
+        return basisSurface;
+    }
+
+    private SurfaceGeometry buildRectangularCompositeSurfaceGeometry(StepRectangularCompositeSurface surface, String faceType) {
+        SurfaceGeometry parentSurface = buildSupportedFaceGeometry(surface.parentSurface(), faceType);
+        if (parentSurface == null) {
+            return null;
+        }
+        // Rectangular composite surface is a bounded rectangular region of the parent surface
+        // The u1, u2, v1, v2 parameters define the boundaries
+        // For now, return the parent surface - proper implementation would trim to bounds
+        return parentSurface;
     }
 
     private SurfaceGeometry offsetSupportedSurfaceGeometry(StepOffsetSurface offsetSurface, String faceType) {
@@ -4161,6 +5094,12 @@ public final class StepCadBuilder {
     }
 
     private record CircularFrame(Vector3 x, Vector3 y) {
+        Direction3 radialAtAngle(double angle) {
+            return Direction3.from(x.scale(Math.cos(angle)).add(y.scale(Math.sin(angle))));
+        }
+        Direction3 z() {
+            return Direction3.from(x.cross(y));
+        }
     }
 
     private record ProfileLoops(List<Point2> outer, List<List<Point2>> inner) {

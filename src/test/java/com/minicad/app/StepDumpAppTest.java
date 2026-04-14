@@ -7499,7 +7499,7 @@ class StepDumpAppTest {
 
         assertDumpContains(file,
                 "BOOLEAN_RESULT #19: faces=0, unsupportedFaces=1",
-                "unsupportedReasons: BOOLEAN_RESULT operator UNION is unsupported:1",
+                "unsupportedReasons: BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported:1",
                 "unsupportedReasonCodes: unsupported_boolean.result:1",
                 "booleanResults=1");
     }

@@ -125,6 +125,10 @@ import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDatum;
 import com.minicad.step.model.StepDatumFeature;
 import com.minicad.step.model.StepDatumTarget;
+import com.minicad.step.model.StepDatumReferenceCompartment;
+import com.minicad.step.model.StepDatumReferenceElement;
+import com.minicad.step.model.StepTessellatedFaceSet;
+import com.minicad.step.model.StepGeometricTolerance;
 import com.minicad.step.model.StepDimensionalLocation;
 import com.minicad.step.model.StepDimensionalSize;
 import com.minicad.step.model.StepDimensionCurve;
@@ -9504,5 +9508,149 @@ class StepEntityResolverTest {
                 assertInstanceOf(StepRepresentationRelationship.class, resolved.get(7)).entityName());
         assertEquals("COAXIAL_ASSEMBLY_CONSTRAINT",
                 assertInstanceOf(StepRepresentationRelationship.class, resolved.get(8)).entityName());
+    }
+
+    @Test
+    void shouldResolveIShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=I_SHAPE_PROFILE_DEF(.AREA.,'I_BEAM',#3,100.0,50.0,50.0,10.0,8.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("I_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("I_BEAM", profile.name());
+    }
+
+    @Test
+    void shouldResolveTShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=T_SHAPE_PROFILE_DEF(.AREA.,'T_BEAM',#3,80.0,40.0,10.0,8.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("T_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("T_BEAM", profile.name());
+    }
+
+    @Test
+    void shouldResolveLShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=L_SHAPE_PROFILE_DEF(.AREA.,'L_ANGLE',#3,60.0,40.0,8.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("L_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("L_ANGLE", profile.name());
+    }
+
+    @Test
+    void shouldResolveUShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=U_SHAPE_PROFILE_DEF(.AREA.,'U_CHANNEL',#3,50.0,30.0,8.0,5.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("U_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("U_CHANNEL", profile.name());
+    }
+
+    @Test
+    void shouldResolveZShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=Z_SHAPE_PROFILE_DEF(.AREA.,'Z_BEAM',#3,60.0,40.0,30.0,8.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("Z_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("Z_BEAM", profile.name());
+    }
+
+    @Test
+    void shouldResolveHatShapeProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=HAT_SHAPE_PROFILE_DEF(.AREA.,'HAT',#3,50.0,30.0,20.0,8.0,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("HAT_SHAPE_PROFILE_DEF", profile.entityName());
+        assertEquals("HAT", profile.name());
+    }
+
+    @Test
+    void shouldResolveFlatBarProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=FLAT_BAR_PROFILE_DEF(.AREA.,'FLAT',#3,50.0,10.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("FLAT_BAR_PROFILE_DEF", profile.entityName());
+        assertEquals("FLAT", profile.name());
+    }
+
+    @Test
+    void shouldResolveDoveTailProfileDef() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX2',#1,#2);
+                #4=DOVE_TAIL_PROFILE_DEF(.AREA.,'DOVE',#3,30.0,15.0,0.3,5.0);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepProfileDef profile = assertInstanceOf(StepProfileDef.class, resolved.get(4));
+        assertEquals("DOVE_TAIL_PROFILE_DEF", profile.entityName());
+        assertEquals("DOVE", profile.name());
     }
 }
