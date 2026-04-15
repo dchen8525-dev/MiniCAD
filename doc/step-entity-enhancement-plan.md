@@ -1,18 +1,29 @@
 # 工业级 STEP 实体支持增强计划
 
-## 现状
+## 现状（已更新）
 
 | 指标 | 数值 |
 |---|---|
-| Registry 条目 | 770 |
-| Model Classes | 430+ |
-| 测试用例 | 759 (全部通过) |
+| Registry 条目 | 1100+ |
+| Model Classes | 824 |
+| 测试用例 | 1347 (全部通过) |
+
+### 已完成工作
+
+- **Phase 1: CAD 构建链路全部打通**——所有关键几何实体都实现了 CAD 构建方法
+- **Phase 2: 实体注册大幅扩展**——新增 230+ 实体别名注册，覆盖：
+  - 几何公差类型扩展（COAXIALITY_TOLERANCE, RUNOUT_TOLERANCE 等）
+  - Shape Aspect 扩展（50+ 制造特征类型）
+  - Representation 类型扩展（60+ 形状表示类型）
+  - Representation Relationship 扩展（30+ 关系类型）
+  - Characterized Object 扩展（60+ 操作和特征类型）
+  - Externally Defined Item 扩展（27+ 外部定义类型）
 
 ### 核心发现
 
 - **解析层（StepEntityResolver）已覆盖所有示例文件中的实体**——67 种示例文件实体类型全部注册
-- **主要瓶颈在 CAD 构建层（StepCadBuilder）**：约 20+ 个已解析的几何实体类型没有对应的 CAD 构建方法
-- 结果：**"解析成功但无法生成几何"**——大量实体在 resolver 层正常解析，但在 CAD builder 层被 `UnsupportedGeometryException` 拦截
+- **CAD 构建层（StepCadBuilder）已全面实现**——Phase 1 中列出的所有几何实体都已实现构建方法
+- 支持实体类型包括：SWEPT_DISK_SOLID、EXTRUDED_AREA_SOLID_TAPERED、REVOLVED_AREA_SOLID_TAPERED、SURFACE_CURVE_SWEPT_AREA_SOLID、RIGHT_CIRCULAR_CONE、RULED_SURFACE、SURFACE_OF_CONSTANT_RADIUS、SURFACE_PATCH、RECTANGULAR_COMPOSITE_SURFACE、CLOTHOID、INDEXED_POLY_CURVE、DEGENERATE_CURVE、Boolean UNION 等
 
 ---
 
