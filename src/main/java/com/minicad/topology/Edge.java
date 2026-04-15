@@ -2,6 +2,7 @@ package com.minicad.topology;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.TopologyException;
+import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
@@ -53,6 +54,73 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         if (!liesOnCurve(end.point(), curve)) {
             throw new TopologyException("end vertex must lie on edge curve");
         }
+    }
+
+    /**
+     * Returns the bounding box of the edge.
+     *
+     * @return bounding box enclosing the edge vertices
+     */
+    public BoundingBox3 boundingBox() {
+        return BoundingBox3.of(start.point(), end.point());
+    }
+
+    /**
+     * Returns the approximate length of the edge.
+     *
+     * @return approximate length
+     */
+    public double length() {
+        if (start.point().distanceTo(end.point()) <= Epsilon.EPS) {
+            // Closed curve - return full curve length
+            if (curve instanceof Circle circle) {
+                return circle.circumference();
+            } else if (curve instanceof Ellipse3 ellipse) {
+                return ellipse.perimeter();
+            }
+        }
+        // For non-closed curves, use the distance between start and end
+        // This is the most reliable for Line edges
+        if (curve instanceof Line3) {
+            return start.point().distanceTo(end.point());
+        }
+        // For other curves, approximate using samples
+        List<CartesianPoint> samples = sampleCurve(curve);
+        double totalLength = 0.0;
+        for (int i = 0; i < samples.size() - 1; i++) {
+            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
+        }
+        return totalLength;
+    }
+
+    /**
+     * Gets bounding box from curve.
+     */
+    private static BoundingBox3 getCurveBoundingBox(Curve3 curve) {
+        if (curve instanceof Circle circle) {
+            return circle.boundingBox();
+        } else if (curve instanceof Ellipse3 ellipse) {
+            return ellipse.boundingBox();
+        } else if (curve instanceof Polyline3 polyline) {
+            return polyline.boundingBox();
+        } else if (curve instanceof TrimmedCurve3 trimmed) {
+            return trimmed.boundingBox();
+        } else if (curve instanceof BSplineCurve3 bspline) {
+            return bspline.boundingBox();
+        } else if (curve instanceof RationalBSplineCurve3 rational) {
+            return rational.boundingBox();
+        } else if (curve instanceof CompositeCurve3 composite) {
+            return composite.boundingBox();
+        } else if (curve instanceof Line3 line) {
+            return BoundingBox3.of(line.origin(), line.pointAt(1.0));
+        }
+        // For other curves, sample and compute
+        BoundingBox3 box = BoundingBox3.empty();
+        List<CartesianPoint> samples = sampleCurve(curve);
+        for (CartesianPoint point : samples) {
+            box = box.union(point);
+        }
+        return box;
     }
 
     private static boolean liesOnCurve(CartesianPoint point, Curve3 curve) {
@@ -151,5 +219,128 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
             return isClosedCurve(surfaceCurve.curve3d());
         }
         return false;
+    }
+
+    /**
+     * Returns samples along the edge curve.
+     *
+     * @param segments number of segments to sample
+     * @return list of sampled points along the curve
+     */
+    public List<CartesianPoint> sample(int segments) {
+        return sampleCurveWithSegments(curve, segments);
+    }
+
+    /**
+     * Returns the midpoint of the edge.
+     *
+     * @return midpoint of the edge
+     */
+    public CartesianPoint midpoint() {
+        List<CartesianPoint> samples = sample(100);
+        if (samples.size() < 2) {
+            return start.point().midpoint(end.point());
+        }
+        // Find midpoint by cumulative distance
+        double halfLength = length() / 2.0;
+        double cumulative = 0.0;
+        for (int i = 0; i < samples.size() - 1; i++) {
+            double segmentLength = samples.get(i).distanceTo(samples.get(i + 1));
+            if (cumulative + segmentLength >= halfLength) {
+                double t = (halfLength - cumulative) / segmentLength;
+                return samples.get(i).interpolate(samples.get(i + 1), t);
+            }
+            cumulative += segmentLength;
+        }
+        return samples.get(samples.size() - 1);
+    }
+
+    /**
+     * Returns the closest point on the edge to a given point.
+     *
+     * @param point target point
+     * @return closest point on the edge
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        List<CartesianPoint> samples = sample(256);
+        CartesianPoint closest = samples.get(0);
+        double minDistance = point.distanceTo(closest);
+        for (int i = 1; i < samples.size(); i++) {
+            double distance = point.distanceTo(samples.get(i));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = samples.get(i);
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Returns the distance from a point to the edge.
+     *
+     * @param point target point
+     * @return minimum distance to the edge
+     */
+    public double distanceTo(CartesianPoint point) {
+        return point.distanceTo(closestPointTo(point));
+    }
+
+    /**
+     * Checks if a point lies on the edge within tolerance.
+     *
+     * @param point point to check
+     * @return true if point lies on the edge
+     */
+    public boolean contains(CartesianPoint point) {
+        return distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+    }
+
+    private static List<CartesianPoint> sampleCurveWithSegments(Curve3 curve, int segments) {
+        if (curve instanceof Line3 line) {
+            return List.of(line.origin(), line.pointAt(1.0));
+        }
+        if (curve instanceof Circle circle) {
+            List<CartesianPoint> samples = new ArrayList<>(segments + 1);
+            for (int index = 0; index <= segments; index++) {
+                samples.add(circle.pointAt(Math.PI * 2.0 * index / segments));
+            }
+            return List.copyOf(samples);
+        }
+        if (curve instanceof Ellipse3 ellipse) {
+            List<CartesianPoint> samples = new ArrayList<>(segments + 1);
+            for (int index = 0; index <= segments; index++) {
+                samples.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
+            }
+            return List.copyOf(samples);
+        }
+        if (curve instanceof BSplineCurve3 spline) {
+            return spline.sample(segments);
+        }
+        if (curve instanceof RationalBSplineCurve3 spline) {
+            return spline.sample(segments);
+        }
+        if (curve instanceof Polyline3 polyline) {
+            return polyline.points();
+        }
+        if (curve instanceof TrimmedCurve3 trimmedCurve) {
+            return sampleCurveWithSegments(trimmedCurve.basisCurve(), segments);
+        }
+        if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return sampleCurveWithSegments(surfaceCurve.curve3d(), segments);
+        }
+        if (curve instanceof CompositeCurve3 compositeCurve) {
+            List<CartesianPoint> samples = new ArrayList<>();
+            boolean first = true;
+            for (Curve3 segment : compositeCurve.segments()) {
+                List<CartesianPoint> segmentSamples = sampleCurveWithSegments(segment, segments / compositeCurve.segments().size());
+                int startIndex = first ? 0 : 1;
+                for (int index = startIndex; index < segmentSamples.size(); index++) {
+                    samples.add(segmentSamples.get(index));
+                }
+                first = false;
+            }
+            return List.copyOf(samples);
+        }
+        return List.of();
     }
 }

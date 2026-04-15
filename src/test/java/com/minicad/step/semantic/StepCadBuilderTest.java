@@ -15,6 +15,10 @@ import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.Ellipse3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.OffsetSurface3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.geometry.Hyperbola3;
+import com.minicad.geometry.DegenerateCurve3;
+import com.minicad.geometry.Clothoid3;
 import com.minicad.geometry.Plane;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry.RationalBSplineCurve3;
@@ -45,6 +49,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -272,7 +277,7 @@ class StepCadBuilderTest {
     }
 
     @Test
-    void shouldBuildParabolaBackedEdgeAsApproximatePolyline() {
+    void shouldBuildParabolaBackedEdgeAsParabola3() {
         StepCadBuilder builder = builder("""
                 DATA;
                 #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
@@ -280,7 +285,7 @@ class StepCadBuilderTest {
                 #3=DIRECTION('DX',(1.0,0.0,0.0));
                 #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
                 #5=PARABOLA('PAR0',#4,2.0);
-                #6=CARTESIAN_POINT('S',(8.0,-8.0,0.0));
+                #6=CARTESIAN_POINT('S',(-8.0,8.0,0.0));
                 #7=CARTESIAN_POINT('E',(8.0,8.0,0.0));
                 #8=VERTEX_POINT('V0',#6);
                 #9=VERTEX_POINT('V1',#7);
@@ -290,13 +295,34 @@ class StepCadBuilderTest {
 
         Edge edge = builder.buildEdge(10);
 
-        assertInstanceOf(Polyline3.class, edge.curve());
-        assertTrue(edge.curve().contains(edge.start().point()));
-        assertTrue(edge.curve().contains(edge.end().point()));
+        assertInstanceOf(Parabola3.class, edge.curve());
+        assertEquals(2.0, ((Parabola3) edge.curve()).focalDistance());
     }
 
     @Test
-    void shouldBuildHyperbolaPcurveAsApproximatePolyline2() {
+    void shouldBuildClothoidAsClothoid3() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('O',(0.0,0.0));
+                #2=DIRECTION('DX',(1.0,0.0));
+                #3=AXIS2_PLACEMENT_2D('AX',#1,#2);
+                #4=CLOTHOID('CL0',#3,1.0,0.5);
+                #5=CARTESIAN_POINT('O3',(0.0,0.0,0.0));
+                #6=DIRECTION('DZ',(0.0,0.0,1.0));
+                #7=DIRECTION('DX3',(1.0,0.0,0.0));
+                #8=AXIS2_PLACEMENT_3D('AX3',#5,#6,#7);
+                ENDSEC;
+                """);
+
+        Clothoid3 clothoid = builder.buildClothoid(4);
+
+        assertNotNull(clothoid);
+        assertEquals(1.0, clothoid.xAxisIntercept());
+        assertEquals(0.5, clothoid.curvature());
+    }
+
+    @Test
+    void shouldBuildHyperbolaPcurveAsHyperbola2() {
         StepCadBuilder builder = builder("""
                 DATA;
                 #1=CARTESIAN_POINT('O',(0.0,0.0));
@@ -317,8 +343,10 @@ class StepCadBuilderTest {
 
         Object curve = builder.buildPcurve2(8);
 
-        assertInstanceOf(com.minicad.geometry2d.Polyline2.class, curve);
-        assertTrue(((com.minicad.geometry2d.Polyline2) curve).contains(new Point2(4.0, 0.0)));
+        assertInstanceOf(com.minicad.geometry2d.Hyperbola2.class, curve);
+        com.minicad.geometry2d.Hyperbola2 hyperbola = (com.minicad.geometry2d.Hyperbola2) curve;
+        assertEquals(4.0, hyperbola.semiAxisA());
+        assertEquals(2.0, hyperbola.semiAxisB());
     }
 
     @Test
@@ -418,13 +446,16 @@ class StepCadBuilderTest {
         SurfaceCurve3 surfaceCurve = builder.buildSurfaceCurve(7);
         CompositeCurve3 compositeCurve = builder.buildCompositeCurve(9);
 
-        assertInstanceOf(Polyline3.class, surfaceCurve.curve3d());
+        assertInstanceOf(Parabola3.class, surfaceCurve.curve3d());
+        assertEquals(2.0, ((Parabola3) surfaceCurve.curve3d()).focalDistance());
         assertEquals(1, compositeCurve.segments().size());
-        assertInstanceOf(Polyline3.class, compositeCurve.segments().getFirst());
+        assertInstanceOf(Hyperbola3.class, compositeCurve.segments().getFirst());
+        assertEquals(4.0, ((Hyperbola3) compositeCurve.segments().getFirst()).semiAxisA());
+        assertEquals(2.0, ((Hyperbola3) compositeCurve.segments().getFirst()).semiAxisB());
     }
 
     @Test
-    void shouldBuildDegenerateConicAsZeroLengthPolyline() {
+    void shouldBuildDegenerateConicAsDegenerateCurve3() {
         StepCadBuilder builder = builder("""
                 DATA;
                 #1=CARTESIAN_POINT('O',(1.0,2.0,3.0));
@@ -438,9 +469,8 @@ class StepCadBuilderTest {
 
         Curve3 curve = builder.buildCurveReference3(5);
 
-        Polyline3 polyline = assertInstanceOf(Polyline3.class, curve);
-        assertEquals(2, polyline.points().size());
-        assertEquals(polyline.points().getFirst(), polyline.points().getLast());
+        DegenerateCurve3 degenerate = assertInstanceOf(DegenerateCurve3.class, curve);
+        assertEquals(new CartesianPoint(1.0, 2.0, 3.0), degenerate.point());
         assertTrue(curve.contains(new CartesianPoint(1.0, 2.0, 3.0)));
     }
 
@@ -497,7 +527,9 @@ class StepCadBuilderTest {
 
         SurfaceCurve3 seamCurve = builder.buildSeamCurve(17);
 
-        assertInstanceOf(Polyline3.class, seamCurve.curve3d());
+        assertInstanceOf(Hyperbola3.class, seamCurve.curve3d());
+        assertEquals(4.0, ((Hyperbola3) seamCurve.curve3d()).semiAxisA());
+        assertEquals(2.0, ((Hyperbola3) seamCurve.curve3d()).semiAxisB());
     }
 
     @Test
@@ -2841,7 +2873,9 @@ class StepCadBuilderTest {
     }
 
     @Test
-    void shouldRejectNonManifoldSolidBrep() {
+    void shouldBuildNonManifoldSolidBrep() {
+        // Non-manifold solid brep now supports open shell boundary (sheet bodies)
+        // For a valid solid we need a closed shell
         StepCadBuilder builder = builder("""
                 DATA;
                 #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
@@ -2849,13 +2883,22 @@ class StepCadBuilderTest {
                 #3=DIRECTION('DZ',(0.0,0.0,1.0));
                 #4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);
                 #5=PLANE('PL0',#4);
-                #6=FACE_SURFACE('FS',(),#5,.T.);
-                #7=OPEN_SHELL('OS',(#6));
-                #8=NON_MANIFOLD_SOLID_BREP('NMB',#7);
+                #6=CARTESIAN_POINT('P1',(0.0,0.0,0.0));
+                #7=CARTESIAN_POINT('P2',(1.0,0.0,0.0));
+                #8=CARTESIAN_POINT('P3',(1.0,1.0,0.0));
+                #9=CARTESIAN_POINT('P4',(0.0,1.0,0.0));
+                #10=POLY_LOOP('',(#6,#7,#8,#9));
+                #11=FACE_BOUND('FB',#10,.T.);
+                #12=ADVANCED_FACE('AF',(#11),#5,.T.);
+                #13=CLOSED_SHELL('CS',(#12));
+                #14=NON_MANIFOLD_SOLID_BREP('NMB',#13);
                 ENDSEC;
                 """);
 
-        assertThrows(UnsupportedGeometryException.class, () -> builder.buildSolid(8));
+        // Should now build successfully with closed shell
+        Solid solid = builder.buildSolid(14);
+        assertTrue(solid != null);
+        assertTrue(solid.outerShell() != null);
     }
 
     @Test

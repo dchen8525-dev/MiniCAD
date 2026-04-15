@@ -74,6 +74,49 @@ public record Direction3(double x, double y, double z) {
     }
 
     /**
+     * Computes the cross product with another direction.
+     *
+     * @param other second direction
+     * @return cross product vector (not necessarily unit length)
+     */
+    public Vector3 cross(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new Vector3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    /**
+     * Computes the angle between this direction and another direction.
+     *
+     * @param other other direction
+     * @return angle in radians (0 to PI)
+     */
+    public double angleBetween(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        double dotProduct = dot(other);
+        double cosAngle = Math.max(-1.0, Math.min(1.0, dotProduct));
+        return Math.acos(cosAngle);
+    }
+
+    /**
+     * Returns a direction perpendicular to this one.
+     * If this direction is along Z axis, returns X direction.
+     *
+     * @return perpendicular direction
+     */
+    public Direction3 perpendicular() {
+        if (Math.abs(x) < 0.9) {
+            return Direction3.from(cross(new Direction3(1, 0, 0)));
+        } else if (Math.abs(y) < 0.9) {
+            return Direction3.from(cross(new Direction3(0, 1, 0)));
+        }
+        return Direction3.from(cross(new Direction3(0, 0, 1)));
+    }
+
+    /**
      * Compares this direction with another using epsilon tolerance.
      * Two directions are equal if their components differ by less than epsilon.
      *
@@ -105,5 +148,69 @@ public record Direction3(double x, double y, double z) {
         long yi = Math.round(y / Epsilon.EPS);
         long zi = Math.round(z / Epsilon.EPS);
         return Objects.hash(xi, yi, zi);
+    }
+
+    /**
+     * Returns a direction rotated around an axis by an angle.
+     *
+     * @param axis rotation axis
+     * @param angle rotation angle in radians
+     * @return rotated direction
+     */
+    public Direction3 rotateAround(Direction3 axis, double angle) {
+        Preconditions.requireNonNull(axis, "axis");
+        Preconditions.requireFinite(angle, "angle");
+        Vector3 k = axis.asVector();
+        Vector3 v = asVector();
+        // Rodrigues' rotation formula
+        Vector3 cosTerm = v.scale(Math.cos(angle));
+        Vector3 sinTerm = k.cross(v).scale(Math.sin(angle));
+        Vector3 dotTerm = k.scale(k.dot(v) * (1 - Math.cos(angle)));
+        return from(cosTerm.add(sinTerm).add(dotTerm));
+    }
+
+    /**
+     * Returns the signed angle between this direction and another direction.
+     *
+     * @param other other direction
+     * @param reference reference direction for determining sign
+     * @return signed angle in radians
+     */
+    public double signedAngleBetween(Direction3 other, Direction3 reference) {
+        Preconditions.requireNonNull(other, "other");
+        Preconditions.requireNonNull(reference, "reference");
+        double angle = angleBetween(other);
+        Vector3 crossProduct = cross(other);
+        if (crossProduct.dot(reference.asVector()) < 0) {
+            return -angle;
+        }
+        return angle;
+    }
+
+    /**
+     * Returns a unit direction along the X axis.
+     *
+     * @return (1, 0, 0)
+     */
+    public static Direction3 xAxis() {
+        return new Direction3(1, 0, 0);
+    }
+
+    /**
+     * Returns a unit direction along the Y axis.
+     *
+     * @return (0, 1, 0)
+     */
+    public static Direction3 yAxis() {
+        return new Direction3(0, 1, 0);
+    }
+
+    /**
+     * Returns a unit direction along the Z axis.
+     *
+     * @return (0, 0, 1)
+     */
+    public static Direction3 zAxis() {
+        return new Direction3(0, 0, 1);
     }
 }

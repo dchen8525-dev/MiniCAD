@@ -14,6 +14,10 @@ import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Ellipse3;
+import com.minicad.geometry.Clothoid3;
+import com.minicad.geometry.DegenerateCurve3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.geometry.Hyperbola3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.OffsetSurface3;
 import com.minicad.geometry.Plane;
@@ -24,6 +28,8 @@ import com.minicad.geometry.SphericalSurface;
 import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
+import com.minicad.geometry.RuledSurface3;
+import com.minicad.geometry.SurfaceOfConstantRadius3;
 import com.minicad.geometry.SurfaceCurve3;
 import com.minicad.geometry.TrimmedCurve3;
 import com.minicad.geometry.ToroidalSurface;
@@ -34,7 +40,9 @@ import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.CompositeCurve2;
 import com.minicad.geometry2d.Curve2;
 import com.minicad.geometry2d.Ellipse2;
+import com.minicad.geometry2d.Hyperbola2;
 import com.minicad.geometry2d.Line2;
+import com.minicad.geometry2d.Parabola2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.Polyline2;
 import com.minicad.geometry2d.RationalBSplineCurve2;
@@ -190,6 +198,9 @@ public final class StepCadBuilder {
     private final Map<Integer, RationalBSplineSurface3> rationalBsplineSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SurfaceCurve3> surfaceCurves = new LinkedHashMap<>();
     private final Map<Integer, TrimmedCurve3> trimmedCurves = new LinkedHashMap<>();
+    private final Map<Integer, Parabola3> parabolas = new LinkedHashMap<>();
+    private final Map<Integer, Hyperbola3> hyperbolas = new LinkedHashMap<>();
+    private final Map<Integer, Clothoid3> clothoids = new LinkedHashMap<>();
     private final Map<Integer, Vertex> vertices = new LinkedHashMap<>();
     private final Map<Integer, Edge> edges = new LinkedHashMap<>();
     private final Map<Integer, OrientedEdge> orientedEdges = new LinkedHashMap<>();
@@ -1166,6 +1177,114 @@ public final class StepCadBuilder {
     }
 
     /**
+     * Builds a parabola geometry object.
+     *
+     * @param id STEP entity id
+     * @return built parabola
+     */
+    public Parabola3 buildParabola(int id) {
+        Parabola3 existing = parabolas.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepConicCurve conic = requireEntity(id, StepConicCurve.class, "PARABOLA");
+        if (!"PARABOLA".equals(conic.entityName())) {
+            throw new StepResolutionException("entity #" + id + " is not a PARABOLA");
+        }
+        if (!(conic.position() instanceof StepAxis2Placement3D placement3d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D PARABOLA");
+        }
+        if (conic.parameters().isEmpty()) {
+            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
+        }
+        double focalDistance = conic.parameters().getFirst();
+        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
+        }
+        Parabola3 built = new Parabola3(buildPlacement(placement3d.id()), focalDistance);
+        parabolas.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a hyperbola geometry object.
+     *
+     * @param id STEP entity id
+     * @return built hyperbola
+     */
+    public Hyperbola3 buildHyperbola(int id) {
+        Hyperbola3 existing = hyperbolas.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepConicCurve conic = requireEntity(id, StepConicCurve.class, "HYPERBOLA");
+        if (!"HYPERBOLA".equals(conic.entityName())) {
+            throw new StepResolutionException("entity #" + id + " is not a HYPERBOLA");
+        }
+        if (!(conic.position() instanceof StepAxis2Placement3D placement3d)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D HYPERBOLA");
+        }
+        if (conic.parameters().size() < 2) {
+            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
+        }
+        double semiAxisA = conic.parameters().get(0);
+        double semiAxisB = conic.parameters().get(1);
+        if (!Double.isFinite(semiAxisA) || !Double.isFinite(semiAxisB)
+                || semiAxisA <= Epsilon.EPS || semiAxisB <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
+        }
+        Hyperbola3 built = new Hyperbola3(buildPlacement(placement3d.id()), semiAxisA, semiAxisB);
+        hyperbolas.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a clothoid geometry object.
+     *
+     * @param id STEP entity id
+     * @return built clothoid
+     */
+    public Clothoid3 buildClothoid(int id) {
+        Clothoid3 existing = clothoids.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepClothoid clothoid = requireEntity(id, StepClothoid.class, "CLOTHOID");
+        // CLOTHOID uses 2D placement, need to convert to 3D
+        Axis2Placement3D position = convert2DPlacementTo3D(clothoid.position());
+        double xAxisIntercept = clothoid.xAxisIntercept();
+        double curvature = clothoid.curvature();
+        if (!Double.isFinite(xAxisIntercept) || !Double.isFinite(curvature)) {
+            throw new UnsupportedGeometryException("CLOTHOID requires finite xAxisIntercept and curvature");
+        }
+        if (Math.abs(curvature) < Epsilon.EPS) {
+            throw new UnsupportedGeometryException("CLOTHOID curvature must be non-zero");
+        }
+        Clothoid3 built = new Clothoid3(position, xAxisIntercept, curvature);
+        clothoids.put(id, built);
+        return built;
+    }
+
+    /**
+     * Converts a 2D placement to a 3D placement in the XY plane (Z=0).
+     */
+    private Axis2Placement3D convert2DPlacementTo3D(StepEntity position) {
+        if (position instanceof StepAxis2Placement3D placement3D) {
+            return buildPlacement(placement3D.id());
+        }
+        if (!(position instanceof StepAxis2Placement2D placement2D)) {
+            throw new StepResolutionException("position must be AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+        }
+        Point2 origin = buildPoint2(placement2D.location().id());
+        Direction2 refDir = buildDirection2(placement2D.refDirection().id());
+        // Create 3D placement: location at (x, y, 0), Z axis as normal, X direction from 2D
+        CartesianPoint location3D = new CartesianPoint(origin.x(), origin.y(), 0.0);
+        Direction3 axis = new Direction3(0, 0, 1);
+        Direction3 xDirection = new Direction3(refDir.x(), refDir.y(), 0);
+        return new Axis2Placement3D(location3D, axis, xDirection);
+    }
+
+    /**
      * Builds a topological vertex.
      *
      * @param id STEP entity id
@@ -1417,9 +1536,10 @@ public final class StepCadBuilder {
         } else if (entity instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
             // Non-manifold solid brep has an open shell boundary
             // This is used for sheet bodies (e.g., unfolded sheet metal)
-            // Currently not supported - throw clear exception
-            throw new UnsupportedGeometryException(
-                    "NON_MANIFOLD_SOLID_BREP is not yet supported - requires sheet body topology for open shells");
+            // Build the shell - it may be an open shell which is valid for non-manifold
+            Shell outerShell = buildShell(nonManifoldBrep.outer().id());
+            // Non-manifold solids have open shells as boundaries
+            built = new Solid(outerShell);
         } else {
             throw new StepResolutionException("entity #" + id + " is not a supported SOLID");
         }
@@ -3332,31 +3452,8 @@ public final class StepCadBuilder {
     }
 
     private Curve3 buildClothoidCurve(StepClothoid clothoid) {
-        // Clothoid (Euler spiral) is a transition curve used in road/railway design
-        // The curvature changes linearly along the curve
-        // We approximate it by sampling points
-        Axis2Placement3D position = buildPlacement(clothoid.position().id());
-        double xAxisIntercept = clothoid.xAxisIntercept();
-        double curvature = clothoid.curvature();
-        // Sample points along the clothoid
-        int segments = 48;
-        List<CartesianPoint> points = new ArrayList<>();
-        // Clothoid parametric equations:
-        // x(t) = integral_0^t cos(a*s^2) ds
-        // y(t) = integral_0^t sin(a*s^2) ds
-        // where a = curvature parameter
-        // Use numerical integration approximation
-        double a = curvature;
-        double tMax = xAxisIntercept; // Length parameter
-        for (int i = 0; i <= segments; i++) {
-            double t = tMax * i / segments;
-            // Fresnel integral approximation
-            double x = fresnelC(a * t * t) / Math.sqrt(Math.abs(a));
-            double y = fresnelS(a * t * t) / Math.sqrt(Math.abs(a));
-            CartesianPoint localPoint = new CartesianPoint(x, y, 0.0);
-            points.add(pointOnPlacement(position, localPoint.x(), localPoint.y(), localPoint.z()));
-        }
-        return new Polyline3(points);
+        // Return proper Clothoid3 geometry object
+        return buildClothoid(clothoid.id());
     }
 
     private double fresnelC(double x) {
@@ -3388,16 +3485,15 @@ public final class StepCadBuilder {
     }
 
     private Curve3 buildDegenerateCurve3(StepDegenerateCurve degenerateCurve) {
-        // Degenerate curve collapses to a point or minimal curve
+        // Degenerate curve collapses to a point
         Curve3 basis = buildCurve3(degenerateCurve.basisCurve());
-        // Return a minimal polyline representing the degeneration
         List<CartesianPoint> sampledPoints = sampleCurve3(basis, 2);
         if (sampledPoints.isEmpty()) {
             throw new UnsupportedGeometryException("DEGENERATE_CURVE basis curve has no sample points");
         }
-        // Return a single point polyline
+        // Return a degenerate curve at the first sample point
         CartesianPoint point = sampledPoints.getFirst();
-        return new Polyline3(List.of(point, point));
+        return new DegenerateCurve3(point);
     }
 
     private ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
@@ -3455,14 +3551,10 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement3D placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
         }
-        Axis2Placement3D placement = buildPlacement(placement3D.id());
         return switch (conic.entityName()) {
-            case "PARABOLA" -> new Polyline3(sampleParabolaPoints3(placement, conic.parameters()));
-            case "HYPERBOLA" -> new Polyline3(sampleHyperbolaPoints3(placement, conic.parameters()));
-            case "DEGENERATE_CONIC" -> {
-                CartesianPoint point = placement.location();
-                yield new Polyline3(List.of(point, point));
-            }
+            case "PARABOLA" -> buildParabola(conic.id());
+            case "HYPERBOLA" -> buildHyperbola(conic.id());
+            case "DEGENERATE_CONIC" -> new DegenerateCurve3(buildPlacement(placement3D.id()).location());
             default -> throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
         };
     }
@@ -3474,11 +3566,37 @@ public final class StepCadBuilder {
         Point2 origin = buildPoint2(placement2D.location().id());
         Direction2 xDirection = buildDirection2(placement2D.refDirection().id());
         return switch (conic.entityName()) {
-            case "PARABOLA" -> new Polyline2(sampleParabolaPoints2(origin, xDirection, conic.parameters()));
-            case "HYPERBOLA" -> new Polyline2(sampleHyperbolaPoints2(origin, xDirection, conic.parameters()));
+            case "PARABOLA" -> buildParabola2(origin, xDirection, conic.parameters());
+            case "HYPERBOLA" -> buildHyperbola2(origin, xDirection, conic.parameters());
             case "DEGENERATE_CONIC" -> new Polyline2(List.of(origin, origin));
             default -> throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
         };
+    }
+
+    private Parabola2 buildParabola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
+        if (parameters.isEmpty()) {
+            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
+        }
+        double focalDistance = parameters.getFirst();
+        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
+        }
+        // Parabola vertex is at origin, axis direction is yDirection (perpendicular to x)
+        Direction2 yDirection = new Direction2(-xDirection.y(), xDirection.x());
+        return new Parabola2(origin, yDirection, focalDistance);
+    }
+
+    private Hyperbola2 buildHyperbola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
+        if (parameters.size() < 2) {
+            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
+        }
+        double semiAxisA = parameters.get(0);
+        double semiAxisB = parameters.get(1);
+        if (!Double.isFinite(semiAxisA) || !Double.isFinite(semiAxisB)
+                || semiAxisA <= Epsilon.EPS || semiAxisB <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
+        }
+        return new Hyperbola2(origin, xDirection, semiAxisA, semiAxisB);
     }
 
     private List<CartesianPoint> sampleParabolaPoints3(Axis2Placement3D placement, List<Double> parameters) {
@@ -3691,40 +3809,24 @@ public final class StepCadBuilder {
 
     private SurfaceGeometry buildRuledSurfaceGeometry(StepRuledSurface ruledSurface) {
         // Ruled surface is defined by two directrix curves
-        // For now, we sample both curves and create a mesh surface
         Axis2Placement3D position = buildPlacement(ruledSurface.position().id());
         Curve3 directrix1 = buildCurve3(ruledSurface.directrix1());
         Curve3 directrix2 = buildCurve3(ruledSurface.directrix2());
-        // Sample both curves
-        int segments = 48;
-        List<CartesianPoint> points1 = sampleCurve3(directrix1, segments);
-        List<CartesianPoint> points2 = sampleCurve3(directrix2, segments);
-        if (points1.size() != points2.size()) {
-            // Different curve lengths - need parameterization alignment
-            // For simplicity, use minimum size
-            int minSize = Math.min(points1.size(), points2.size());
-            points1 = points1.subList(0, minSize);
-            points2 = points2.subList(0, minSize);
-        }
-        // Create surface by connecting points - this would need a proper SurfaceGeometry class
-        // For now, we return null as there's no suitable SurfaceGeometry implementation
-        return null;
+        // Create ruled surface geometry
+        return new RuledSurface3(directrix1, directrix2);
     }
 
     private SurfaceGeometry buildSurfaceOfConstantRadiusGeometry(StepSurfaceOfConstantRadius surface, String faceType) {
-        // Surface of constant radius is similar to cylindrical surface
-        // but defined by sweeping a surface along a circular path
+        // Surface of constant radius: sweep a surface along a path with constant radius
         SurfaceGeometry sweptSurface = buildSupportedFaceGeometry(surface.sweptSurface(), faceType);
         if (sweptSurface == null) {
             return null;
         }
-        // For cylindrical-like surfaces, we can create a cylindrical approximation
         double radius = surface.radius();
         if (radius <= 0.0) {
             return null;
         }
-        // Return null for complex surface types - would need proper implementation
-        return null;
+        return new SurfaceOfConstantRadius3(sweptSurface, radius);
     }
 
     private SurfaceGeometry buildSurfacePatchGeometry(StepSurfacePatch patch, String faceType) {
@@ -4467,6 +4569,15 @@ public final class StepCadBuilder {
             }
             return List.copyOf(points);
         }
+        if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.sample(segments);
+        }
+        if (curve instanceof Parabola3 parabola) {
+            return parabola.sample(segments);
+        }
+        if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.sample(segments);
+        }
         throw new UnsupportedGeometryException("curve sampling for " + curveTypeName(curve) + " is unsupported");
     }
 
@@ -4875,6 +4986,12 @@ public final class StepCadBuilder {
                     transformCurve3(revolutionSurface.sweptCurve(), transformation),
                     transformPoint3(revolutionSurface.axisOrigin(), transformation),
                     transformDirection3(revolutionSurface.axisDirection(), transformation));
+            case RuledSurface3 ruledSurface -> new RuledSurface3(
+                    transformCurve3(ruledSurface.directrix1(), transformation),
+                    transformCurve3(ruledSurface.directrix2(), transformation));
+            case SurfaceOfConstantRadius3 constantRadiusSurface -> new SurfaceOfConstantRadius3(
+                    transformSurfaceGeometry(constantRadiusSurface.sweptSurface(), transformation),
+                    constantRadiusSurface.radius() * scale);
         };
     }
 

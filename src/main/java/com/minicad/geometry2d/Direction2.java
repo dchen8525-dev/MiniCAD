@@ -71,6 +71,59 @@ public record Direction2(double x, double y) {
     }
 
     /**
+     * Computes the angle between this direction and another direction.
+     *
+     * @param other other direction
+     * @return angle in radians (0 to PI)
+     */
+    public double angleBetween(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double dotProduct = dot(other);
+        double cosAngle = Math.max(-1.0, Math.min(1.0, dotProduct));
+        return Math.acos(cosAngle);
+    }
+
+    /**
+     * Computes the signed angle from this direction to another direction.
+     * Positive angle indicates counter-clockwise rotation.
+     *
+     * @param other other direction
+     * @return signed angle in radians (-PI to PI)
+     */
+    public double signedAngleTo(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double angle = Math.atan2(other.y, other.x) - Math.atan2(y, x);
+        if (angle > Math.PI) {
+            angle -= 2 * Math.PI;
+        } else if (angle < -Math.PI) {
+            angle += 2 * Math.PI;
+        }
+        return angle;
+    }
+
+    /**
+     * Returns a direction perpendicular to this one (rotated 90 degrees counter-clockwise).
+     *
+     * @return perpendicular direction
+     */
+    public Direction2 perpendicular() {
+        return new Direction2(-y, x);
+    }
+
+    /**
+     * Rotates this direction by a given angle.
+     *
+     * @param angle rotation angle in radians
+     * @return rotated direction
+     */
+    public Direction2 rotate(double angle) {
+        Preconditions.requireFinite(angle, "angle");
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new Direction2(x * cos - y * sin, x * sin + y * cos);
+    }
+
+    /**
      * Compares this direction with another using epsilon tolerance.
      * Two directions are equal if their components differ by less than epsilon.
      *

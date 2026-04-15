@@ -2,6 +2,7 @@ package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
+import com.minicad.common.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +150,40 @@ public record RationalBSplineSurface3(
         return List.copyOf(rows);
     }
 
+    /**
+     * Returns the approximate bounding box based on control points.
+     * This is a conservative bound that may be larger than the actual surface extent.
+     *
+     * @return bounding box enclosing all control points
+     */
+    public BoundingBox3 boundingBox() {
+        BoundingBox3 box = BoundingBox3.empty();
+        for (List<CartesianPoint> row : controlPoints) {
+            for (CartesianPoint point : row) {
+                box = box.union(point);
+            }
+        }
+        return box;
+    }
+
+    /**
+     * Returns a more accurate bounding box by sampling the surface.
+     *
+     * @param uSegments number of segments along U
+     * @param vSegments number of segments along V
+     * @return bounding box enclosing sampled surface points
+     */
+    public BoundingBox3 boundingBox(int uSegments, int vSegments) {
+        BoundingBox3 box = BoundingBox3.empty();
+        List<List<CartesianPoint>> samples = sampleGrid(uSegments, vSegments);
+        for (List<CartesianPoint> row : samples) {
+            for (CartesianPoint point : row) {
+                box = box.union(point);
+            }
+        }
+        return box;
+    }
+
     private static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(value, max));
     }
@@ -198,5 +233,45 @@ public record RationalBSplineSurface3(
                 ? 0.0
                 : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
         return left + right;
+    }
+
+    /**
+     * Returns the closest point on the surface to a given point using sampling.
+     * For rational B-spline surfaces, this uses a grid sampling approach since analytical
+     * inversion is complex.
+     *
+     * @param point target point
+     * @return approximate closest point on the surface
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint closest = null;
+        double minDistance = Double.POSITIVE_INFINITY;
+
+        // Sample at multiple resolutions to find closest point
+        for (int resolution : new int[]{16, 32, 64}) {
+            List<List<CartesianPoint>> grid = sampleGrid(resolution, resolution);
+            for (List<CartesianPoint> row : grid) {
+                for (CartesianPoint sample : row) {
+                    double distance = point.distanceTo(sample);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closest = sample;
+                    }
+                }
+            }
+        }
+        return closest != null ? closest : pointAt(uStart(), vStart());
+    }
+
+    /**
+     * Returns the shortest distance from a point to the surface.
+     *
+     * @param point target point
+     * @return approximate shortest distance to the surface
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return point.distanceTo(closestPointTo(point));
     }
 }

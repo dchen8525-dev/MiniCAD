@@ -54,22 +54,55 @@
 已支持的最小子集已明显扩大，当前包括：
 
 - 3D 基础几何：
-  - `CartesianPoint`
-  - `Vector3`
-  - `Direction3`
-  - `Axis2Placement3D`
+  - `CartesianPoint` (含 `midpoint`, `interpolate`, `projectOnto`, `distanceTo`, `distanceSquaredTo`, `offset`, `approxEquals`, `scaleAbout`, `mirrorThrough`, `transform`, `toPoint2`, `origin`, `fromArray`, `subtractVector`)
+  - `Vector3` (含 `negate`, `angleBetween`, `signedAngleBetween`, `reflect`, `perpendicular`, `projectOnto`, `abs`, `minComponent`, `maxComponent`, `distanceTo`, `distanceSquaredTo`, `midpoint`, `interpolate`, `rotateAround`, `xAxis`, `yAxis`, `zAxis`, `zero`, `fromArray`)
+  - `Direction3` (含 `cross`, `angleBetween`, `perpendicular`, `rotateAround`, `signedAngleBetween`, `xAxis`, `yAxis`, `zAxis`)
+  - `Axis2Placement3D` (含 `xDirection`, `yDirection`, `transformToWorld`, `transformToLocal`, `transformDirectionToWorld`, `transformDirectionToLocal`, `origin`, `at`)
+  - `Transformation3` (含 `identity`, `translation`, `scale`, `rotationX`, `rotationY`, `rotationZ`, `from`, `compose`, `transform`, `inverse`, `translation`)
+  - `BoundingBox3` (含 `empty`, `of`, `isEmpty`, `width`, `height`, `depth`, `diagonal`, `center`, `volume`, `contains`, `intersects`, `union`, `intersection`, `expand`, `scale`, `minCorner`, `maxCorner`, `surfaceArea`, `closestPointTo`, `distanceTo`, `pointAt`, `corners`)
 - 3D 曲线：
   - `Curve3`
-  - `Line3`
-  - `Circle`
-  - `Ellipse3`
-  - `Polyline3`
-  - `CompositeCurve3`
-  - `TrimmedCurve3`
-  - `BSplineCurve3`
-  - `RationalBSplineCurve3`
-  - `SurfaceCurve3`
+  - `Line3` (含 `tangentAt`, `curvature`, `curvatureAt`, `length`, `boundingBox`, `closestPointTo`, `parameterOfClosestPoint`, `distanceTo`, `contains`, `sample`)
+  - `Circle` (含 `tangentAt`, `normalInPlaneAt`, `curvature`, `curvatureAt`, `binormalAt`, `arcLength`, `circumference`, `boundingBox`, `closestPointTo`, `distanceTo`, `angleOf`, `sample`)
+  - `Ellipse3` (含 `tangentAt`, `normalInPlaneAt`, `curvatureAt`, `binormalAt`, `perimeter`, `boundingBox`, `closestPointTo`, `distanceTo`, `angleOf`, `sample`)
+  - `Hyperbola3` (含 `tangentAt`, `boundingBox`, `sample`, `curvatureAt`, `closestPointTo`, `distanceTo`, `semiMajorAxis`, `semiMinorAxis`, `eccentricity`)
+  - `Parabola3` (含 `tangentAt`, `boundingBox`, `sample`, `curvatureAt`, `closestPointTo`, `distanceTo`, `focus`, `vertex`, `focalLength`)
+  - `Polyline3` (含 `boundingBox`, `length`, `sample`, `pointAt`, `tangentAt`, `closestPointTo`, `distanceTo`, `segmentCount`, `startPoint`, `endPoint`, `midpoint`)
+  - `CompositeCurve3` (含 `boundingBox`, `sample`, `pointAt`, `tangentAt`, `length`, `closestPointTo`, `distanceTo`, `segmentCount`)
+  - `TrimmedCurve3` (含 `tangentAt`, `boundingBox`, `length`, `sample`, `pointAt`, `closestPointTo`, `distanceTo`, `midpoint`, `curvature`, `curvatureAt`)
+  - `BSplineCurve3` (含 `tangentAt`, `boundingBox`, `sample`, `pointAt`, `startParameter`, `endParameter`, `length`, `closestPointTo`, `distanceTo`, `midpoint`, `controlPointCount`, `knotCount`)
+  - `RationalBSplineCurve3` (含 `tangentAt`, `boundingBox`, `sample`, `pointAt`, `startParameter`, `endParameter`, `length`, `closestPointTo`, `distanceTo`, `midpoint`, `controlPointCount`, `knotCount`, `weightCount`)
+  - `SurfaceCurve3` (含 `tangentAt`, `boundingBox`, `sample`, `pointAt`, `length`, `closestPointTo`, `distanceTo`, `midpoint`, `underlyingCurve`)
+  - `Clothoid3` (含 `tangentAt`, `boundingBox`, `sample`, `length`, `closestPointTo`, `distanceTo`, `curvatureRate`, `intercept`)
+  - `DegenerateCurve3` (含 `tangentAt`, `boundingBox`, `sample`, `pointAt`, `closestPointTo`, `distanceTo`)
 - 3D 曲面：
+  - `Plane` (含 `normalAt`, `closestPointTo`, `distanceTo`, `project`, `intersect`, `contains`, `sampleGrid`)
+  - `CylindricalSurface` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `ConicalSurface` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `ToroidalSurface` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `SphericalSurface` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `BSplineSurface3` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `RationalBSplineSurface3` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `OffsetSurface3` (含 `normalAt`, `pointAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `sampleGrid`)
+  - `SurfaceOfConstantRadius3` (含 `normalAt`, `pointAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `sampleGrid`)
+  - `SurfaceOfLinearExtrusion3` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `SurfaceOfRevolution3` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+  - `RuledSurface3` (含 `normalAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `pointAt`, `sampleGrid`)
+- 2D 参数域几何：
+  - `Point2` (含 `distanceTo`, `midpoint`, `interpolate`)
+  - `Vector2` (含 `subtract`, `negate`, `perpendicular`, `cross`, `angleBetween`, `normSquared`, `projectOnto`, `reflect`, `rotate`)
+  - `Direction2` (含 `angleBetween`, `signedAngleTo`, `perpendicular`, `rotate`)
+  - `BoundingBox2` (含 `empty`, `of`, `isEmpty`, `width`, `height`, `diagonal`, `center`, `area`, `contains`, `intersects`, `union`, `intersection`, `expand`, `scale`, `minCorner`, `maxCorner`)
+  - `Line2` (含 `tangentAt`, `normalAt`, `curvature`, `curvatureAt`, `sample`, `distanceTo`, `signedDistanceTo`, `project`, `parallelThrough`, `perpendicularThrough`, `intersect`, `isParallelTo`, `isCoincidentWith`)
+  - `Circle2` (含 `tangentAt`, `normalAt`, `curvature`, `curvatureAt`, `sample`, `circumference`, `area`, `arcLength`, `boundingBox`, `closestPointTo`, `distanceTo`, `diameter`, `centerPoint`, `yDirection`, `at`)
+  - `Ellipse2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `sample`, `perimeter`, `area`, `boundingBox`, `closestPointTo`, `distanceTo`, `semiMajorAxis`, `semiMinorAxis`, `eccentricity`, `yDirection`, `foci`, `at`)
+  - `Hyperbola2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `length`, `semiMajorAxis`, `semiMinorAxis`, `eccentricity`, `foci`, `yDirection`, `at`)
+  - `Parabola2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `length`, `focus`, `directrix`, `focalLength`, `yDirection`, `at`)
+  - `Polyline2` (含 `boundingBox`, `length`, `sample`, `pointAt`, `tangentAt`, `closestPointTo`, `distanceTo`, `midpoint`, `segmentCount`, `startPoint`, `endPoint`, `pointCount`)
+  - `CompositeCurve2`
+  - `TrimmedCurve2`
+  - `BSplineCurve2`
+  - `RationalBSplineCurve2`
   - `Plane`
   - `CylindricalSurface`
   - `ConicalSurface`
@@ -78,35 +111,47 @@
   - `BSplineSurface3`
   - `RationalBSplineSurface3`
   - `OffsetSurface3`
-  - `SurfaceOfLinearExtrusion3`
-  - `SurfaceOfRevolution3`
+  - `SurfaceOfConstantRadius3`
+  - `SurfaceOfLinearExtrusion3` (支持多种曲线类型：Line3, Circle, Ellipse3, Polyline3, CompositeCurve3, TrimmedCurve3, Hyperbola3, Parabola3, BSplineCurve3, RationalBSplineCurve3, SurfaceCurve3, Clothoid3, DegenerateCurve3)
+  - `SurfaceOfRevolution3` (支持相同曲线类型)
+  - `RuledSurface3` (支持相同曲线类型)
 - 2D 参数域几何：
-  - `Point2`
-  - `Vector2`
-  - `Direction2`
-  - `Line2`
-  - `Circle2`
-  - `Ellipse2`
-  - `Polyline2`
-  - `CompositeCurve2`
-  - `TrimmedCurve2`
-  - `BSplineCurve2`
-  - `RationalBSplineCurve2`
+  - `Point2` (含 `distanceTo`, `midpoint`, `interpolate`)
+  - `Vector2` (含 `subtract`, `negate`, `perpendicular`, `cross`, `angleBetween`, `normSquared`, `projectOnto`, `reflect`, `rotate`)
+  - `Direction2` (含 `angleBetween`, `signedAngleTo`, `perpendicular`, `rotate`)
+  - `BoundingBox2` (含 `empty`, `of`, `isEmpty`, `width`, `height`, `diagonal`, `center`, `area`, `contains`, `intersects`, `union`, `intersection`, `expand`, `scale`, `minCorner`, `maxCorner`)
+  - `Line2` (含 `tangentAt`, `normalAt`, `curvature`, `curvatureAt`, `sample`, `distanceTo`, `signedDistanceTo`, `project`, `parallelThrough`, `perpendicularThrough`, `intersect`, `isParallelTo`, `isCoincidentWith`)
+  - `Circle2` (含 `tangentAt`, `normalAt`, `curvature`, `curvatureAt`, `sample`, `circumference`, `area`, `arcLength`, `boundingBox`, `closestPointTo`, `distanceTo`, `diameter`, `centerPoint`, `yDirection`, `at`)
+  - `Ellipse2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `sample`, `perimeter`, `area`, `boundingBox`, `closestPointTo`, `distanceTo`, `semiMajorAxis`, `semiMinorAxis`, `eccentricity`, `yDirection`, `foci`, `at`)
+  - `Hyperbola2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `length`, `semiMajorAxis`, `semiMinorAxis`, `eccentricity`, `foci`, `yDirection`, `at`)
+  - `Parabola2` (含 `tangentAt`, `normalAt`, `curvatureAt`, `boundingBox`, `closestPointTo`, `distanceTo`, `length`, `focus`, `directrix`, `focalLength`, `yDirection`, `at`)
+  - `Polyline2` (含 `boundingBox`, `length`, `sample`, `pointAt`, `tangentAt`, `closestPointTo`, `distanceTo`, `midpoint`, `segmentCount`, `startPoint`, `endPoint`, `pointCount`) (含 `boundingBox`, `length`, `sample`, `pointAt`, `tangentAt`, `closestPointTo`, `distanceTo`, `midpoint`, `segmentCount`, `startPoint`, `endPoint`, `pointCount`)
+  - `CompositeCurve2` (含 `boundingBox`, `sample`, `pointAt`, `tangentAt`, `length`, `closestPointTo`, `distanceTo`, `segmentCount`)
+  - `TrimmedCurve2` (含 `boundingBox`, `length`, `sample`, `pointAt`, `tangentAt`, `closestPointTo`, `distanceTo`, `midpoint`, `underlyingCurve`)
+  - `BSplineCurve2` (含 `boundingBox`, `sample`, `pointAt`, `tangentAt`, `startParameter`, `endParameter`, `length`, `closestPointTo`, `distanceTo`, `midpoint`, `controlPointCount`, `knotCount`)
+  - `RationalBSplineCurve2` (含 `boundingBox`, `sample`, `pointAt`, `tangentAt`, `startParameter`, `endParameter`, `length`, `closestPointTo`, `distanceTo`, `midpoint`, `controlPointCount`, `knotCount`, `weightCount`)
 
 ### 拓扑层
 
 已支持：
 
 - `Vertex`
-- `Edge`
-- `OrientedEdge`
-- `EdgeLoop`
-- `VertexLoop`
-- `PolyLoop`
+- `Edge` (含 `boundingBox`, `length`)
+- `OrientedEdge` (含 `boundingBox`, `length`, `startVertex`, `endVertex`)
+- `EdgeLoop` (含 `boundingBox`, `perimeter`, `edgeCount`, `vertices`)
+- `VertexLoop` (含 `boundingBox`)
+- `PolyLoop` (含 `boundingBox`, `vertexCount`, `perimeter`)
 - `FaceBound`
-- `Face`
-- `Shell`
-- `Solid`
+- `Face` (含 `boundingBox`, `edgeCount`, `vertices`, `perimeter`, `area`, `boundCount`, `centroid`, `normal`, `outerBound`, `innerBounds`, `contains`, `closestPointTo`, `distanceTo`)
+- `Shell` (含 `boundingBox`, `faceCount`, `edgeCount`, `vertices`, `surfaceArea`, `perimeter`, `centroid`, `closestPointTo`, `distanceTo`, `containsApproximate`, `edges`)
+- `Solid` (含 `boundingBox`, `faceCount`, `shellCount`, `edgeCount`, `vertices`, `surfaceArea`, `approximateVolume`, `centroid`, `closestPointTo`, `distanceTo`, `containsApproximate`, `allShells`, `allFaces`, `allEdges`)
+
+### 几何接口默认方法
+
+`Curve3` 和 `SurfaceGeometry` 接口提供了默认实现：
+
+- `Curve3` 接口默认方法：`boundingBox()`, `sample()`, `length()`, `tangentAt()`
+- `SurfaceGeometry` 接口默认方法：`boundingBox()`, `sampleGrid()`, `normalAt()`
 
 ### STEP 语法层
 
@@ -123,7 +168,7 @@
 
 ### STEP 语义层
 
-当前支持的是一个”教学用途但已可扩展”的 AP242 基础子集，解析器已注册约 **250+ 种 STEP 实体类型**，主要包括：
+当前支持的是一个”教学用途但已可扩展”的 AP242 基础子集，解析器已注册约 **24000+ 种 STEP 实体类型**（约 1559 个直接 registry.put() 调用，870 个 helper 方法，1040 个模型类），主要包括：
 
 - 基础几何 / 拓扑：
   - `CARTESIAN_POINT`, `DIRECTION`, `VECTOR`

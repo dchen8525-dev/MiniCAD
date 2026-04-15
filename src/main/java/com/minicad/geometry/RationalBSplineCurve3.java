@@ -111,6 +111,43 @@ public record RationalBSplineCurve3(
         return List.copyOf(samples);
     }
 
+    /**
+     * Computes the tangent vector at a given parameter.
+     * Uses numerical differentiation for simplicity.
+     *
+     * @param parameter parameter in the knot domain
+     * @return unit tangent vector
+     */
+    public Vector3 tangentAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        double start = startParameter();
+        double end = endParameter();
+        double eps = (end - start) * 1e-6;
+        eps = Math.max(eps, 1e-12);
+
+        double u1 = Math.max(start, parameter - eps);
+        double u2 = Math.min(end, parameter + eps);
+
+        CartesianPoint p1 = pointAt(u1);
+        CartesianPoint p2 = pointAt(u2);
+        Vector3 tangent = p2.subtract(p1);
+
+        if (tangent.norm() <= Epsilon.EPS) {
+            // Degenerate case, use a larger epsilon
+            u1 = Math.max(start, parameter - 1e-3);
+            u2 = Math.min(end, parameter + 1e-3);
+            p1 = pointAt(u1);
+            p2 = pointAt(u2);
+            tangent = p2.subtract(p1);
+        }
+
+        if (tangent.norm() <= Epsilon.EPS) {
+            // Still degenerate, return a default direction
+            return new Vector3(1, 0, 0);
+        }
+        return tangent.normalize().asVector();
+    }
+
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
@@ -120,6 +157,35 @@ public record RationalBSplineCurve3(
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the approximate bounding box based on control points.
+     * This is a conservative bound that may be larger than the actual curve extent.
+     *
+     * @return bounding box enclosing all control points
+     */
+    public BoundingBox3 boundingBox() {
+        BoundingBox3 box = BoundingBox3.empty();
+        for (CartesianPoint point : controlPoints) {
+            box = box.union(point);
+        }
+        return box;
+    }
+
+    /**
+     * Returns a more accurate bounding box by sampling the curve.
+     *
+     * @param segments number of segments to sample
+     * @return bounding box enclosing sampled curve points
+     */
+    public BoundingBox3 boundingBox(int segments) {
+        BoundingBox3 box = BoundingBox3.empty();
+        List<CartesianPoint> samples = sample(segments);
+        for (CartesianPoint point : samples) {
+            box = box.union(point);
+        }
+        return box;
     }
 
     private static int findSpan(int n, int p, double u, List<Double> knots) {
@@ -157,5 +223,89 @@ public record RationalBSplineCurve3(
                 ? 0.0
                 : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
         return left + right;
+    }
+
+    /**
+     * Returns the approximate length of the curve.
+     * Computed by summing distances between sampled points.
+     *
+     * @return approximate curve length
+     */
+    public double length() {
+        List<CartesianPoint> samples = sample(256);
+        double totalLength = 0.0;
+        for (int i = 0; i < samples.size() - 1; i++) {
+            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
+        }
+        return totalLength;
+    }
+
+    /**
+     * Returns the closest point on the curve to a given point.
+     *
+     * @param point target point
+     * @return closest point on the curve
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        List<CartesianPoint> samples = sample(256);
+        CartesianPoint closest = samples.get(0);
+        double minDistance = point.distanceTo(closest);
+        for (int i = 1; i < samples.size(); i++) {
+            double distance = point.distanceTo(samples.get(i));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = samples.get(i);
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Returns the distance from a point to the curve.
+     *
+     * @param point target point
+     * @return minimum distance to the curve
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return point.distanceTo(closestPointTo(point));
+    }
+
+    /**
+     * Returns the midpoint of the curve.
+     *
+     * @return midpoint
+     */
+    public CartesianPoint midpoint() {
+        double midParam = (startParameter() + endParameter()) / 2.0;
+        return pointAt(midParam);
+    }
+
+    /**
+     * Returns the control point count.
+     *
+     * @return number of control points
+     */
+    public int controlPointCount() {
+        return controlPoints.size();
+    }
+
+    /**
+     * Returns the knot count (unique knots).
+     *
+     * @return number of unique knots
+     */
+    public int knotCount() {
+        return knots.size();
+    }
+
+    /**
+     * Returns the weight count.
+     *
+     * @return number of weights
+     */
+    public int weightCount() {
+        return weights.size();
     }
 }

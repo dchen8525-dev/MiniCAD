@@ -153,4 +153,132 @@ public record RationalBSplineCurve2(
                 : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
         return left + right;
     }
+
+    /**
+     * Computes the tangent vector at a given parameter.
+     *
+     * @param parameter parameter in the knot domain
+     * @return unit tangent vector
+     */
+    public Vector2 tangentAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        double start = startParameter();
+        double end = endParameter();
+        double eps = (end - start) * 1e-6;
+        eps = Math.max(eps, 1e-12);
+
+        double u1 = Math.max(start, parameter - eps);
+        double u2 = Math.min(end, parameter + eps);
+
+        Point2 p1 = pointAt(u1);
+        Point2 p2 = pointAt(u2);
+        Vector2 tangent = p2.subtract(p1);
+
+        if (tangent.isZero()) {
+            return new Vector2(1, 0);
+        }
+        return tangent.normalize().asVector();
+    }
+
+    /**
+     * Returns the approximate bounding box based on control points.
+     *
+     * @return bounding box enclosing all control points
+     */
+    public BoundingBox2 boundingBox() {
+        return BoundingBox2.of(controlPoints);
+    }
+
+    /**
+     * Returns a more accurate bounding box by sampling the curve.
+     *
+     * @param segments number of segments to sample
+     * @return bounding box enclosing sampled curve points
+     */
+    public BoundingBox2 boundingBox(int segments) {
+        return BoundingBox2.of(sample(segments));
+    }
+
+    /**
+     * Returns the approximate length of the curve.
+     *
+     * @return approximate curve length
+     */
+    public double length() {
+        List<Point2> samples = sample(256);
+        double totalLength = 0.0;
+        for (int i = 0; i < samples.size() - 1; i++) {
+            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
+        }
+        return totalLength;
+    }
+
+    /**
+     * Returns the closest point on the curve to a given point.
+     *
+     * @param point target point
+     * @return closest point on the curve
+     */
+    public Point2 closestPointTo(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        List<Point2> samples = sample(256);
+        Point2 closest = samples.get(0);
+        double minDistance = point.distanceTo(closest);
+        for (int i = 1; i < samples.size(); i++) {
+            double distance = point.distanceTo(samples.get(i));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = samples.get(i);
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Returns the distance from a point to the curve.
+     *
+     * @param point target point
+     * @return minimum distance to the curve
+     */
+    public double distanceTo(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        return point.distanceTo(closestPointTo(point));
+    }
+
+    /**
+     * Returns the midpoint of the curve.
+     *
+     * @return midpoint
+     */
+    public Point2 midpoint() {
+        double midParam = (startParameter() + endParameter()) / 2.0;
+        return pointAt(midParam);
+    }
+
+    /**
+     * Returns the control point count.
+     *
+     * @return number of control points
+     */
+    public int controlPointCount() {
+        return controlPoints.size();
+    }
+
+    /**
+     * Returns the knot count (unique knots).
+     *
+     * @return number of unique knots
+     */
+    public int knotCount() {
+        return knots.size();
+    }
+
+    /**
+     * Returns the weight count.
+     *
+     * @return number of weights
+     */
+    public int weightCount() {
+        return weights.size();
+    }
 }
