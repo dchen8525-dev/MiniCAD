@@ -10,7 +10,7 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepConicalSurface, StepToroidalSurface, StepDegenerateToroidalSurface, StepSphericalSurface, StepSurfaceOfLinearExtrusion, StepSurfaceOfRevolution, StepRectangularTrimmedSurface, StepCurveBoundedSurface, StepOrientedSurface,
         StepTrimmedCurve, StepTopologicalRepresentationItem, StepVertex, StepEdge, StepFace, StepPath, StepOpenPath, StepOrientedPath, StepSubpath, StepVertexPoint, StepEdgeCurve, StepSubedge, StepConnectedEdgeSet, StepEdgeBasedWireframeModel,
         StepOrientedEdge, StepLoop, StepFaceBound, StepFaceEntity, StepConnectedFaceSet, StepConnectedFaceSubSet, StepOpenShell, StepSurfacedOpenShell, StepOrientedOpenShell, StepVertexShell, StepWireShell,
-        StepClosedShell, StepOrientedClosedShell, StepSolidModel, StepManifoldSolidBrep, StepBrepWithVoids, StepBooleanResult, StepBooleanClippingResult, StepCsgPrimitive, StepCsgSolid, StepSolidReplica, StepProfileDef, StepSweptAreaSolid, StepHalfSpaceSolid, StepBoxDomain, StepRepresentationContext, StepGeometricRepresentationContext,
+        StepClosedShell, StepOrientedClosedShell, StepSolidModel, StepManifoldSolidBrep, StepFacettedBrep, StepBrepWithVoids, StepBooleanResult, StepBooleanClippingResult, StepCsgPrimitive, StepCsgSolid, StepSolidReplica, StepProfileDef, StepSweptAreaSolid, StepHalfSpaceSolid, StepBoxDomain, StepRepresentationContext, StepGeometricRepresentationContext,
         StepDimensionalExponents, StepNamedUnit, StepSiUnit, StepContextDependentUnit, StepConversionBasedUnit, StepConversionBasedUnitWithOffset, StepRepresentation, StepApplicationContext, StepProductContext, StepProduct,
         StepProductRelationship, StepProductDefinitionFormation, StepProductDefinitionFormationRelationship, StepProductDefinitionContext, StepProductDefinition, StepProductDefinitionRelationship, StepProductDefinitionRelationshipRelationship, StepRepresentationMap, StepSymbolRepresentationMap,
         StepProductDefinitionShape, StepCharacterizedObject, StepShapeAspect, StepShapeAspectOccurrence, StepShapeAspectRelationship, StepShapeDefinitionRepresentation, StepMeasureWithUnit, StepTypedMeasureWithUnit,
@@ -394,7 +394,16 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         // Log level entry entities
         StepErrorEntry, StepWarningEntry, StepInfoEntry, StepDebugEntry,
         StepTraceEntry, StepPerformanceEntry, StepMetricEntry, StepMeasurementEntry,
-        StepStatisticsEntry, StepSummaryEntry {
+        StepStatisticsEntry, StepSummaryEntry,
+        // 2D curve entities
+        StepCircle2D, StepEllipse2D,
+        StepHyperbola2D, StepParabola2D, StepLine2D,
+        StepPolyline2D, StepTrimmedCurve2D, StepBoundedCurve2D, StepCompositeCurve2D,
+        StepCurve2D, StepBSplineCurve2D, StepRationalBSplineCurve2D, StepBezierCurve2D,
+        StepQuasiUniformCurve2D, StepUniformCurve2D, StepPiecewiseBezierCurve2D,
+        StepIndexedPolyCurve2D, StepDegenerateCurve2D,
+        // Tessellation entities
+        StepSeamEdge, StepTessellatedFace, StepTessellatedTriangle {
 
     /**
      * Returns the original STEP instance id.

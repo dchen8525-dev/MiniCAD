@@ -84,7 +84,30 @@ import com.minicad.step.model.StepCentreLineArcProfileDef;
 import com.minicad.step.model.StepCenteredCircleProfileDef;
 import com.minicad.step.model.StepChamferEdge;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepChamferDefinition;
+import com.minicad.step.model.StepFilletDefinition;
 import com.minicad.step.model.StepFilletEdge;
+import com.minicad.step.model.StepMachiningOperation;
+import com.minicad.step.model.StepMachiningOperationSequence;
+import com.minicad.step.model.StepRound;
+import com.minicad.step.model.StepGroove;
+import com.minicad.step.model.StepHole;
+import com.minicad.step.model.StepSlot;
+import com.minicad.step.model.StepStud;
+import com.minicad.step.model.StepProtrusion;
+import com.minicad.step.model.StepCutout;
+import com.minicad.step.model.StepDepression;
+import com.minicad.step.model.StepMarking;
+import com.minicad.step.model.StepCircularPattern;
+import com.minicad.step.model.StepLinearPattern;
+import com.minicad.step.model.StepPattern;
+import com.minicad.step.model.StepFeaturePattern;
+import com.minicad.step.model.StepCompositeDatumReference;
+import com.minicad.step.model.StepAssemblyProcessPlan;
+import com.minicad.step.model.StepMachiningProcessPlan;
+import com.minicad.step.model.StepMachiningWorkPlan;
+import com.minicad.step.model.StepRectangularToleranceZone;
+import com.minicad.step.model.StepToleranceModifier;
 import com.minicad.step.model.StepComposedText;
 import com.minicad.step.model.StepComplexClippingResult;
 import com.minicad.step.model.StepCompositeText;
@@ -100,12 +123,18 @@ import com.minicad.step.model.StepDatumFeature;
 import com.minicad.step.model.StepDatumReference;
 import com.minicad.step.model.StepDatumReferenceCompartment;
 import com.minicad.step.model.StepDatumReferenceElement;
+import com.minicad.step.model.StepDatumSystemReference;
+import com.minicad.step.model.StepTolerancePair;
+import com.minicad.step.model.StepToleranceSet;
+import com.minicad.step.model.StepDatumSystem;
 import com.minicad.step.model.StepDatumTarget;
 import com.minicad.step.model.StepDimensionalLocation;
 import com.minicad.step.model.StepDimensionalSize;
 import com.minicad.step.model.StepDirectedDimensionalSize;
 import com.minicad.step.model.StepFeatureControlFrame;
 import com.minicad.step.model.StepGeometricTolerance;
+import com.minicad.step.model.StepGeometricMeasurement;
+import com.minicad.step.model.StepDimensionalMeasurement;
 import com.minicad.step.model.StepLayeredItem;
 import com.minicad.step.model.StepMaterialDesignation;
 import com.minicad.step.model.StepMeasureQualification;
@@ -199,6 +228,10 @@ import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepCylindricalSurfaceWithEllipticalAxis;
 import com.minicad.step.model.StepCsgPrimitive;
 import com.minicad.step.model.StepCsgSolid;
+import com.minicad.step.model.StepCsgVolume;
+import com.minicad.step.model.StepBlockVolume;
+import com.minicad.step.model.StepTypedMeasureWithUnit;
+import com.minicad.step.model.StepCartesianTransformationOperator;
 import com.minicad.step.model.StepCurveStyle;
 import com.minicad.step.model.StepDateAssignment;
 import com.minicad.step.model.StepDegeneratePcurve;
@@ -241,6 +274,7 @@ import com.minicad.step.model.StepExternalIdentificationAssignment;
 import com.minicad.step.model.StepExternalSourceRelationship;
 import com.minicad.step.model.StepExternallyDefinedItem;
 import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.StepFacettedBrep;
 import com.minicad.step.model.StepFaceBound;
 import com.minicad.step.model.StepFaceBasedSurfaceModel;
 import com.minicad.step.model.StepFaceSurface;
@@ -361,7 +395,10 @@ import com.minicad.step.model.StepRuledSurface;
 import com.minicad.step.model.StepRevolvedAreaSolidTapered;
 import com.minicad.step.model.StepExtrudedAreaSolidTapered;
 import com.minicad.step.model.StepSurfaceCurveSweptAreaSolid;
+import com.minicad.step.model.StepTessellatedFace;
 import com.minicad.step.model.StepTessellatedFaceSet;
+import com.minicad.step.model.StepTessellatedTriangle;
+import com.minicad.step.model.StepFiniteElementMesh;
 import com.minicad.step.model.StepTextLiteral;
 import com.minicad.step.model.StepRepresentationMap;
 import com.minicad.step.model.StepRepresentationItem;
@@ -385,6 +422,7 @@ import com.minicad.step.model.StepShapeRepresentationRelationship;
 import com.minicad.step.model.StepShapeDefinitionRepresentation;
 import com.minicad.step.model.StepShellBasedSurfaceModel;
 import com.minicad.step.model.StepSeamCurve;
+import com.minicad.step.model.StepSeamEdge;
 import com.minicad.step.model.StepSiUnit;
 import com.minicad.step.model.StepSolidModel;
 import com.minicad.step.model.StepSolidReplica;
@@ -451,6 +489,7 @@ import com.minicad.step.model.StepContextDependentShapeRepresentation;
 import com.minicad.step.model.StepFace;
 import com.minicad.step.model.StepEdge;
 import com.minicad.step.model.StepLoop;
+import com.minicad.step.model.StepMachinedSurface;
 import com.minicad.step.model.StepVector;
 import com.minicad.step.model.StepVertex;
 import com.minicad.step.model.StepVertexLoop;
@@ -462,6 +501,24 @@ import com.minicad.step.model.StepUserDefinedMarker;
 import com.minicad.step.model.StepUserDefinedTerminatorSymbol;
 import com.minicad.step.model.StepWireShell;
 import com.minicad.step.model.StepShellBasedWireframeModel;
+import com.minicad.step.model.StepCircle2D;
+import com.minicad.step.model.StepEllipse2D;
+import com.minicad.step.model.StepHyperbola2D;
+import com.minicad.step.model.StepParabola2D;
+import com.minicad.step.model.StepLine2D;
+import com.minicad.step.model.StepPolyline2D;
+import com.minicad.step.model.StepTrimmedCurve2D;
+import com.minicad.step.model.StepBoundedCurve2D;
+import com.minicad.step.model.StepCompositeCurve2D;
+import com.minicad.step.model.StepCurve2D;
+import com.minicad.step.model.StepBSplineCurve2D;
+import com.minicad.step.model.StepRationalBSplineCurve2D;
+import com.minicad.step.model.StepBezierCurve2D;
+import com.minicad.step.model.StepQuasiUniformCurve2D;
+import com.minicad.step.model.StepUniformCurve2D;
+import com.minicad.step.model.StepPiecewiseBezierCurve2D;
+import com.minicad.step.model.StepIndexedPolyCurve2D;
+import com.minicad.step.model.StepDegenerateCurve2D;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
 import com.minicad.step.syntax.StepFile;
@@ -1386,16 +1443,27 @@ public final class StepEntityResolver {
       throw new UnsupportedStepEntityException(
           "TRIMMED_CURVE basis curve must reference a supported curve");
     }
+    // Trims can be entity references (e.g., #5) or parameter values (e.g., 0.0).
+    // Pass through raw StepValues so the builder can handle both.
+    List<StepValue> trim1 = trimValues(definition, 2, "TRIMMED_CURVE trim_1");
+    List<StepValue> trim2 = trimValues(definition, 3, "TRIMMED_CURVE trim_2");
     return new StepTrimmedCurve(
         instance.id(),
         stringValue(instance, definition, 0),
         basisCurve,
-        entityReferenceList(
-            instance, definition, 2, "TRIMMED_CURVE trim_1 must contain entity references"),
-        entityReferenceList(
-            instance, definition, 3, "TRIMMED_CURVE trim_2 must contain entity references"),
+        trim1,
+        trim2,
         booleanValue(instance, definition, 4),
         enumValue(instance, definition, 5));
+  }
+
+  private List<StepValue> trimValues(StepEntityDefinition definition, int index, String message) {
+    StepValue value = unwrapTyped(definition.parameters().get(index));
+    if (!(value instanceof StepValue.ListValue listValue)) {
+      throw new StepResolutionException(
+          definition.name() + " parameter " + index + " must be a list");
+    }
+    return List.copyOf(listValue.elements());
   }
 
   private StepSurfaceCurve resolveSurfaceCurve(StepEntityInstance instance) {
@@ -2352,6 +2420,20 @@ public final class StepEntityResolver {
         outer);
   }
 
+  private StepFacettedBrep resolveFacettedBrep(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FACETTED_BREP");
+    requireParameterCount(instance, definition, 2);
+    StepEntity outer = resolve(referenceId(instance, definition, 1));
+    if (!isClosedShellEntity(outer) && !isOpenShellEntity(outer)) {
+      throw new StepResolutionException(
+          "FACETTED_BREP outer must reference CLOSED_SHELL or OPEN_SHELL");
+    }
+    return new StepFacettedBrep(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        outer);
+  }
+
   private StepShellBasedSurfaceModel resolveShellBasedSurfaceModel(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SHELL_BASED_SURFACE_MODEL");
     requireParameterCount(instance, definition, 2);
@@ -2587,6 +2669,467 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         stringValue(instance, definition, 1),
         resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepDatumSystem resolveDatumSystem(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATUM_SYSTEM");
+    requireParameterCount(instance, definition, 4);
+    StepValue datumValue = unwrapTyped(definition.parameters().get(2));
+    List<StepEntity> datums;
+    if (datumValue instanceof StepValue.ListValue listValue) {
+      datums = new ArrayList<>(listValue.elements().size());
+      for (StepValue element : listValue.elements()) {
+        StepValue unwrapped = unwrapTyped(element);
+        if (unwrapped instanceof StepValue.ReferenceValue ref) {
+          datums.add(resolve(ref.id()));
+        }
+      }
+    } else if (datumValue instanceof StepValue.ReferenceValue ref) {
+      datums = List.of(resolve(ref.id()));
+    } else {
+      throw new StepResolutionException(
+          "DATUM_SYSTEM datums must contain entity references");
+    }
+    StepValue lastValue = unwrapTyped(definition.parameters().get(3));
+    StepEntity tolerance = lastValue instanceof StepValue.ReferenceValue ref
+        ? resolve(ref.id()) : null;
+    return new StepDatumSystem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        datums,
+        stringValue(instance, definition, 1),
+        tolerance);
+  }
+
+  private StepDatumSystemReference resolveDatumSystemReference(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATUM_SYSTEM_REFERENCE");
+    requireParameterCount(instance, definition, 4);
+    return new StepDatumSystemReference(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        integerValue(instance, definition, 2));
+  }
+
+  private StepTolerancePair resolveTolerancePair(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TOLERANCE_PAIR");
+    requireParameterCount(instance, definition, 6);
+    return new StepTolerancePair(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        optionalNumberValue(instance, definition, 1),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        stringValue(instance, definition, 4));
+  }
+
+  private StepToleranceSet resolveToleranceSet(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TOLERANCE_SET");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> tolerances =
+        entityReferenceList(
+            instance, definition, 1,
+            "TOLERANCE_SET tolerances must contain entity references");
+    return new StepToleranceSet(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        tolerances,
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepGeometricMeasurement resolveGeometricMeasurement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GEOMETRIC_MEASUREMENT");
+    requireParameterCount(instance, definition, 8);
+    List<StepEntity> measurementPoints =
+        entityReferenceList(
+            instance, definition, 6,
+            "GEOMETRIC_MEASUREMENT measurement_points must contain entity references");
+    return new StepGeometricMeasurement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        stringValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        numberValue(instance, definition, 4),
+        measurementPoints,
+        stringValue(instance, definition, 5));
+  }
+
+  private StepDimensionalMeasurement resolveDimensionalMeasurement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_MEASUREMENT");
+    requireParameterCount(instance, definition, 9);
+    return new StepDimensionalMeasurement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        stringValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4),
+        numberValue(instance, definition, 5),
+        numberValue(instance, definition, 6),
+        resolve(referenceId(instance, definition, 7)));
+  }
+
+  // Manufacturing operation resolvers
+  private StepMachiningOperation resolveMachiningOperation(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MACHINING_OPERATION");
+    requireParameterCount(instance, definition, 4);
+    List<StepEntity> features =
+        entityReferenceList(
+            instance, definition, 3,
+            "MACHINING_OPERATION features must contain entity references");
+    return new StepMachiningOperation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        features);
+  }
+
+  private StepMachiningOperationSequence resolveMachiningOperationSequence(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MACHINING_OPERATION_SEQUENCE");
+    requireParameterCount(instance, definition, 4);
+    List<StepEntity> operations =
+        entityReferenceList(
+            instance, definition, 2,
+            "MACHINING_OPERATION_SEQUENCE operations must contain entity references");
+    return new StepMachiningOperationSequence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        operations,
+        stringValue(instance, definition, 3));
+  }
+
+  // Feature definition resolvers
+  private StepFilletDefinition resolveFilletDefinition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FILLET_DEFINITION");
+    requireParameterCount(instance, definition, 4);
+    List<StepEntity> edges =
+        entityReferenceList(
+            instance, definition, 2,
+            "FILLET_DEFINITION edges must contain entity references");
+    return new StepFilletDefinition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        edges,
+        optionalNumberValue(instance, definition, 3));
+  }
+
+  private StepChamferDefinition resolveChamferDefinition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CHAMFER_DEFINITION");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> edges =
+        entityReferenceList(
+            instance, definition, 2,
+            "CHAMFER_DEFINITION edges must contain entity references");
+    return new StepChamferDefinition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        edges,
+        optionalNumberValue(instance, definition, 3),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepRound resolveRound(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ROUND");
+    requireParameterCount(instance, definition, 4);
+    List<StepEntity> edges =
+        entityReferenceList(
+            instance, definition, 2,
+            "ROUND edges must contain entity references");
+    return new StepRound(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        edges,
+        optionalNumberValue(instance, definition, 3));
+  }
+
+  private StepGroove resolveGroove(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GROOVE");
+    requireParameterCount(instance, definition, 5);
+    return new StepGroove(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepHole resolveHole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "HOLE");
+    requireParameterCount(instance, definition, 6);
+    return new StepHole(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        stringValue(instance, definition, 4));
+  }
+
+  private StepSlot resolveSlot(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SLOT");
+    requireParameterCount(instance, definition, 6);
+    return new StepSlot(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepStud resolveStud(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STUD");
+    requireParameterCount(instance, definition, 5);
+    return new StepStud(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepProtrusion resolveProtrusion(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PROTRUSION");
+    requireParameterCount(instance, definition, 6);
+    return new StepProtrusion(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepCutout resolveCutout(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CUTOUT");
+    requireParameterCount(instance, definition, 5);
+    return new StepCutout(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepDepression resolveDepression(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DEPRESSION");
+    requireParameterCount(instance, definition, 6);
+    return new StepDepression(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepMarking resolveMarking(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MARKING");
+    requireParameterCount(instance, definition, 5);
+    return new StepMarking(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        optionalNumberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  // Pattern resolvers
+  private StepCircularPattern resolveCircularPattern(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CIRCULAR_PATTERN");
+    requireParameterCount(instance, definition, 6);
+    return new StepCircularPattern(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)),
+        optionalNumberValue(instance, definition, 3),
+        optionalIntegerValue(instance, definition, 4));
+  }
+
+  private StepLinearPattern resolveLinearPattern(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LINEAR_PATTERN");
+    requireParameterCount(instance, definition, 6);
+    return new StepLinearPattern(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)),
+        optionalNumberValue(instance, definition, 3),
+        optionalIntegerValue(instance, definition, 4));
+  }
+
+  private StepCompositeDatumReference resolveCompositeDatumReference(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COMPOSITE_DATUM_REFERENCE");
+    requireParameterCount(instance, definition, 4);
+    List<StepEntity> datums =
+        entityReferenceList(
+            instance, definition, 2,
+            "COMPOSITE_DATUM_REFERENCE datums must contain entity references");
+    return new StepCompositeDatumReference(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        datums,
+        stringValue(instance, definition, 3));
+  }
+
+  private StepCsgVolume resolveCsgVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CSG_VOLUME");
+    requireParameterCount(instance, definition, 3);
+    return new StepCsgVolume(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepBlockVolume resolveBlockVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BLOCK_VOLUME");
+    requireParameterCount(instance, definition, 6);
+    return new StepBlockVolume(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepAssemblyProcessPlan resolveAssemblyProcessPlan(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ASSEMBLY_PROCESS_PLAN");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> items =
+        entityReferenceList(
+            instance, definition, 2,
+            "ASSEMBLY_PROCESS_PLAN items must contain entity references");
+    List<StepEntity> assemblySequence =
+        entityReferenceList(
+            instance, definition, 4,
+            "ASSEMBLY_PROCESS_PLAN assembly_sequence must contain entity references");
+    return new StepAssemblyProcessPlan(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        items,
+        resolve(referenceId(instance, definition, 3)),
+        assemblySequence);
+  }
+
+  private StepMachiningProcessPlan resolveMachiningProcessPlan(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MACHINING_PROCESS_PLAN");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> items =
+        entityReferenceList(
+            instance, definition, 2,
+            "MACHINING_PROCESS_PLAN items must contain entity references");
+    List<StepEntity> operations =
+        entityReferenceList(
+            instance, definition, 4,
+            "MACHINING_PROCESS_PLAN operations must contain entity references");
+    return new StepMachiningProcessPlan(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        items,
+        resolve(referenceId(instance, definition, 3)),
+        operations);
+  }
+
+  private StepMachiningWorkPlan resolveMachiningWorkPlan(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MACHINING_WORK_PLAN");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> items =
+        entityReferenceList(
+            instance, definition, 2,
+            "MACHINING_WORK_PLAN items must contain entity references");
+    List<StepEntity> machiningSetup =
+        entityReferenceList(
+            instance, definition, 4,
+            "MACHINING_WORK_PLAN machining_setup must contain entity references");
+    return new StepMachiningWorkPlan(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        items,
+        resolve(referenceId(instance, definition, 3)),
+        machiningSetup);
+  }
+
+  private StepRectangularToleranceZone resolveRectangularToleranceZone(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RECTANGULAR_TOLERANCE_ZONE");
+    requireParameterCount(instance, definition, 6);
+    return new StepRectangularToleranceZone(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)),
+        optionalNumberValue(instance, definition, 3),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepToleranceModifier resolveToleranceModifier(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TOLERANCE_MODIFIER");
+    requireParameterCount(instance, definition, 5);
+    return new StepToleranceModifier(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 3);
+    return new StepTypedMeasureWithUnit(
+        instance.id(),
+        entityName,
+        numberValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepCartesianTransformationOperator resolveCartesianTransformationOperator(
+      StepEntityInstance instance) {
+    // Base type: check for concrete 2D/3D subtype at the same ID
+    StepEntityDefinition concrete = instance.definitions().stream()
+        .filter(d -> !d.name().equals("CARTESIAN_TRANSFORMATION_OPERATOR"))
+        .filter(d -> d.name().startsWith("CARTESIAN_TRANSFORMATION_OPERATOR"))
+        .findFirst()
+        .orElse(null);
+    if (concrete != null) {
+      return resolveCartesianTransformationOperator(instance, concrete.name());
+    }
+    throw new UnsupportedStepEntityException("CARTESIAN_TRANSFORMATION_OPERATOR is an abstract base type with no concrete subtype");
+  }
+
+  private StepCartesianTransformationOperator resolveCartesianTransformationOperator(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    // 2D has 4-5 params, 3D has 6-7 params
+    int paramCount = definition.parameters().size();
+    return new StepCartesianTransformationOperator(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        paramCount >= 4 ? optionalResolveDirection(referenceId(instance, definition, 1)) : null,
+        paramCount >= 5 ? optionalResolveDirection(referenceId(instance, definition, 2)) : null,
+        optionalResolveCartesianPoint(referenceId(instance, definition, paramCount >= 7 ? 3 : paramCount == 6 ? 2 : 2)),
+        paramCount >= 6 ? optionalNumberValue(instance, definition, paramCount >= 7 ? 4 : 3) : null,
+        paramCount >= 7 ? optionalResolveDirection(referenceId(instance, definition, 5)) : null,
+        entityName);
+  }
+
+  private StepDirection optionalResolveDirection(int id) {
+    StepEntity entity = resolve(id);
+    if (entity instanceof StepDirection direction) {
+      return direction;
+    }
+    return null;
+  }
+
+  private StepCartesianPoint optionalResolveCartesianPoint(int id) {
+    StepEntity entity = resolve(id);
+    if (entity instanceof StepCartesianPoint point) {
+      return point;
+    }
+    return null;
   }
 
   private StepDimensionalSize resolveDimensionalSize(StepEntityInstance instance) {
@@ -5886,6 +6429,31 @@ public final class StepEntityResolver {
         entityName);
   }
 
+  private StepProfileDef resolveProfileDef(StepEntityInstance instance) {
+    // PROFILE_DEF is an abstract base type. Check for concrete subtypes at the same ID.
+    StepEntityDefinition concrete = instance.definitions().stream()
+        .filter(d -> !d.name().equals("PROFILE_DEF"))
+        .filter(d -> d.name().endsWith("_PROFILE_DEF"))
+        .findFirst()
+        .orElse(null);
+    if (concrete != null) {
+      return resolveProfileDefSubtype(instance, concrete);
+    }
+    throw new UnsupportedStepEntityException("PROFILE_DEF is an abstract base type with no concrete subtype");
+  }
+
+  private StepProfileDef resolveProfileDefSubtype(StepEntityInstance instance, StepEntityDefinition concrete) {
+    return switch (concrete.name()) {
+      case "CIRCLE_PROFILE_DEF" -> resolveCircleProfileDef(instance);
+      case "RECTANGLE_PROFILE_DEF" -> resolveRectangleProfileDef(instance);
+      case "ARBITRARY_CLOSED_PROFILE_DEF" -> resolveArbitraryClosedProfileDef(instance);
+      case "ARBITRARY_PROFILE_DEF" -> resolveArbitraryProfileDef(instance, concrete.name());
+      case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" -> resolveArbitraryProfileDefWithVoids(instance);
+      case "PARAMETERIZED_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, concrete.name(), 3);
+      default -> throw new UnsupportedStepEntityException("PROFILE_DEF subtype " + concrete.name() + " is not a StepProfileDef");
+    };
+  }
+
   private boolean isSupportedArbitraryProfileCurve(StepEntity curve) {
     return curve instanceof StepCurve
         || curve instanceof StepPolyline
@@ -7099,6 +7667,317 @@ public final class StepEntityResolver {
         basisCurve);
   }
 
+  private StepCircle2D resolveCircle2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CIRCLE_2D");
+    requireParameterCount(instance, definition, 3);
+    return new StepCircle2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "CIRCLE_2D position must reference AXIS2_PLACEMENT_2D"),
+        numberValue(instance, definition, 2));
+  }
+
+  private StepEllipse2D resolveEllipse2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ELLIPSE_2D");
+    requireParameterCount(instance, definition, 4);
+    return new StepEllipse2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "ELLIPSE_2D position must reference AXIS2_PLACEMENT_2D"),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepHyperbola2D resolveHyperbola2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "HYPERBOLA_2D");
+    requireParameterCount(instance, definition, 4);
+    return new StepHyperbola2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "HYPERBOLA_2D position must reference AXIS2_PLACEMENT_2D"),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepParabola2D resolveParabola2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PARABOLA_2D");
+    requireParameterCount(instance, definition, 3);
+    return new StepParabola2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "PARABOLA_2D position must reference AXIS2_PLACEMENT_2D"),
+        numberValue(instance, definition, 2));
+  }
+
+  private StepLine2D resolveLine2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LINE_2D");
+    requireParameterCount(instance, definition, 3);
+    return new StepLine2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepCartesianPoint.class,
+            "LINE_2D point must reference CARTESIAN_POINT"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepDirection.class,
+            "LINE_2D direction must reference DIRECTION"));
+  }
+
+  private StepPolyline2D resolvePolyline2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "POLYLINE_2D");
+    requireParameterCount(instance, definition, 2);
+    return new StepPolyline2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepCartesianPoint.class,
+            "POLYLINE_2D points must reference CARTESIAN_POINT"));
+  }
+
+  private StepTrimmedCurve2D resolveTrimmedCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TRIMMED_CURVE_2D");
+    requireParameterCount(instance, definition, 5);
+    return new StepTrimmedCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepCurve.class,
+            "TRIMMED_CURVE_2D basis_curve must reference a curve"),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        booleanValue(instance, definition, 4));
+  }
+
+  private StepCompositeCurve2D resolveCompositeCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COMPOSITE_CURVE_2D");
+    requireParameterCount(instance, definition, 3);
+    return new StepCompositeCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepCompositeCurveSegment.class,
+            "COMPOSITE_CURVE_2D segments must reference COMPOSITE_CURVE_SEGMENT"),
+        booleanValue(instance, definition, 2));
+  }
+
+  private StepBSplineCurve2D resolveBSplineCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "B_SPLINE_CURVE_2D");
+    requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepBSplineCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, definition, 0) : "",
+        integerValue(instance, definition, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
+        enumValue(instance, definition, hasName ? 3 : 2));
+  }
+
+  private StepRationalBSplineCurve2D resolveRationalBSplineCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition rational = definition(instance, "RATIONAL_B_SPLINE_CURVE_2D");
+    requireParameterCount(instance, rational, 1);
+    StepEntityDefinition base = definition(instance, "B_SPLINE_CURVE_2D");
+    requireParameterCountIn(instance, base, 4, 5);
+    boolean hasName = base.parameters().size() == 5;
+    return new StepRationalBSplineCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, base, 0) : "",
+        integerValue(instance, base, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            base,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "RATIONAL_B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
+        numberList(instance, rational, 0),
+        enumValue(instance, base, hasName ? 3 : 2));
+  }
+
+  private StepBezierCurve2D resolveBezierCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BEZIER_CURVE_2D");
+    requireParameterCountIn(instance, definition, 3, 4);
+    boolean hasName = definition.parameters().size() == 4;
+    return new StepBezierCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, definition, 0) : "",
+        integerValue(instance, definition, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "BEZIER_CURVE_2D control points must reference CARTESIAN_POINT"));
+  }
+
+  private StepQuasiUniformCurve2D resolveQuasiUniformCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "QUASI_UNIFORM_CURVE_2D");
+    requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepQuasiUniformCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, definition, 0) : "",
+        integerValue(instance, definition, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "QUASI_UNIFORM_CURVE_2D control points must reference CARTESIAN_POINT"),
+        enumValue(instance, definition, hasName ? 3 : 2));
+  }
+
+  private StepUniformCurve2D resolveUniformCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "UNIFORM_CURVE_2D");
+    requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepUniformCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, definition, 0) : "",
+        integerValue(instance, definition, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "UNIFORM_CURVE_2D control points must reference CARTESIAN_POINT"),
+        enumValue(instance, definition, hasName ? 3 : 2));
+  }
+
+  private StepPiecewiseBezierCurve2D resolvePiecewiseBezierCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PIECEWISE_BEZIER_CURVE_2D");
+    requireParameterCountIn(instance, definition, 3, 4);
+    boolean hasName = definition.parameters().size() == 4;
+    return new StepPiecewiseBezierCurve2D(
+        instance.id(),
+        hasName ? stringValue(instance, definition, 0) : "",
+        integerValue(instance, definition, hasName ? 1 : 0),
+        referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "PIECEWISE_BEZIER_CURVE_2D control points must reference CARTESIAN_POINT"));
+  }
+
+  private StepIndexedPolyCurve2D resolveIndexedPolyCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "INDEXED_POLY_CURVE_2D");
+    requireParameterCount(instance, definition, 3);
+    return new StepIndexedPolyCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        referenceList(
+            instance,
+            definition,
+            1,
+            StepCartesianPoint.class,
+            "INDEXED_POLY_CURVE_2D points must reference CARTESIAN_POINT"),
+        integerList(instance, definition, 2));
+  }
+
+  private StepDegenerateCurve2D resolveDegenerateCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DEGENERATE_CURVE_2D");
+    requireParameterCount(instance, definition, 2);
+    return new StepDegenerateCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepCartesianPoint.class,
+            "DEGENERATE_CURVE_2D point must reference CARTESIAN_POINT"));
+  }
+
+  private StepBoundedCurve2D resolveBoundedCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BOUNDED_CURVE_2D");
+    requireParameterCount(instance, definition, 2);
+    return new StepBoundedCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepCurve.class,
+            "BOUNDED_CURVE_2D curve must reference a 2D curve entity"));
+  }
+
+  private StepCurve2D resolveCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CURVE_2D");
+    requireParameterCount(instance, definition, 3);
+    // Equation parameter may be wrapped in nested list: ((a,b,c,d)) -> ListValue containing ListValue
+    StepValue eqParam = unwrapTyped(definition.parameters().get(2));
+    if (eqParam instanceof StepValue.ListValue outerList
+        && outerList.elements().size() == 1
+        && outerList.elements().getFirst() instanceof StepValue.ListValue innerList) {
+      eqParam = innerList;
+    }
+    List<Double> eqList = extractNumberList(definition, eqParam, "CURVE_2D");
+    double[] equation = new double[eqList.size()];
+    for (int i = 0; i < eqList.size(); i++) {
+      equation[i] = eqList.get(i);
+    }
+    return new StepCurve2D(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "CURVE_2D position must reference AXIS2_PLACEMENT_2D"),
+        equation);
+  }
+
+  private StepSweptAreaSolid resolveSweptAreaSolid(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    int sweepRefId = referenceId(instance, definition, 3);
+    return new StepSweptAreaSolid(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepProfileDef.class,
+            entityName + " swept area must reference a profile definition"),
+        requireEntity(
+            referenceId(instance, definition, 2),
+            StepAxis2Placement3D.class,
+            entityName + " position must reference AXIS2_PLACEMENT_3D"),
+        resolve(sweepRefId),
+        numberValue(instance, definition, 4),
+        entityName);
+  }
+
+  private StepMachinedSurface resolveMachinedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MACHINED_SURFACE");
+    requireParameterCount(instance, definition, 2);
+    int faceId = referenceId(instance, definition, 1);
+    return new StepMachinedSurface(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(faceId));
+  }
+
   private StepEdgeWire resolveEdgeWire(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "EDGE_WIRE");
     requireParameterCount(instance, definition, 2);
@@ -7260,18 +8139,19 @@ public final class StepEntityResolver {
 
   private StepRectangleHollowProfileDef resolveRectangleHollowProfileDef(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "RECTANGLE_HOLLOW_PROFILE_DEF");
-    requireParameterCount(instance, definition, 6);
+    requireParameterCountIn(instance, definition, 6, 7);
+    boolean hasName = definition.parameters().size() == 7;
     return new StepRectangleHollowProfileDef(
         instance.id(),
-        stringValue(instance, definition, 0),
+        hasName ? stringValue(instance, definition, 1) : "",
         requireEntity(
-            referenceId(instance, definition, 1),
+            referenceId(instance, definition, hasName ? 2 : 1),
             StepAxis2Placement2D.class,
             "RECTANGLE_HOLLOW_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5));
+        numberValue(instance, definition, hasName ? 3 : 2),
+        numberValue(instance, definition, hasName ? 4 : 3),
+        numberValue(instance, definition, hasName ? 5 : 4),
+        numberValue(instance, definition, hasName ? 6 : 5));
   }
 
   private StepCentreLineArcProfileDef resolveCentreLineArcProfileDef(StepEntityInstance instance) {
@@ -7321,16 +8201,17 @@ public final class StepEntityResolver {
 
   private StepCenteredCircleProfileDef resolveCenteredCircleProfileDef(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CENTERED_CIRCLE_PROFILE_DEF");
-    requireParameterCount(instance, definition, 4);
+    requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
     return new StepCenteredCircleProfileDef(
         instance.id(),
-        stringValue(instance, definition, 0),
+        hasName ? stringValue(instance, definition, 1) : "",
         requireEntity(
-            referenceId(instance, definition, 1),
+            referenceId(instance, definition, hasName ? 2 : 1),
             StepAxis2Placement2D.class,
             "CENTERED_CIRCLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+        numberValue(instance, definition, hasName ? 3 : 2),
+        numberValue(instance, definition, hasName ? 4 : 3));
   }
 
   private StepRevolvedAreaSolidTapered resolveRevolvedAreaSolidTapered(StepEntityInstance instance) {
@@ -7473,6 +8354,91 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         coordinates,
         List.copyOf(faceIndices));
+  }
+
+  private StepSeamEdge resolveSeamEdge(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SEAM_EDGE");
+    requireParameterCount(instance, definition, 3);
+    StepEntity edgeStart = resolve(referenceId(instance, definition, 1));
+    if (!(edgeStart instanceof StepVertexPoint) && !(edgeStart instanceof StepVertex)) {
+      throw new StepResolutionException(
+          "SEAM_EDGE edge_start must reference VERTEX but got " + edgeStart.getClass().getSimpleName());
+    }
+    StepEntity edgeEnd = resolve(referenceId(instance, definition, 2));
+    if (!(edgeEnd instanceof StepVertexPoint) && !(edgeEnd instanceof StepVertex)) {
+      throw new StepResolutionException(
+          "SEAM_EDGE edge_end must reference VERTEX but got " + edgeEnd.getClass().getSimpleName());
+    }
+    return new StepSeamEdge(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        edgeStart,
+        edgeEnd);
+  }
+
+  private StepTessellatedFace resolveTessellatedFace(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TESSELLATED_FACE");
+    requireParameterCount(instance, definition, 2);
+    List<StepEntity> triangles = entityReferenceList(
+        instance, definition, 1, "TESSELLATED_FACE triangles must contain entity references");
+    return new StepTessellatedFace(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        triangles);
+  }
+
+  private StepTessellatedTriangle resolveTessellatedTriangle(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TESSELLATED_TRIANGLE");
+    requireParameterCount(instance, definition, 5);
+    StepEntity v1 = resolve(referenceId(instance, definition, 2));
+    StepEntity v2 = resolve(referenceId(instance, definition, 3));
+    StepEntity v3 = resolve(referenceId(instance, definition, 4));
+    if (!(v1 instanceof StepVertexPoint) && !(v1 instanceof StepVertex)) {
+      throw new StepResolutionException(
+          "TESSELLATED_TRIANGLE vertex1 must reference VERTEX but got " + v1.getClass().getSimpleName());
+    }
+    if (!(v2 instanceof StepVertexPoint) && !(v2 instanceof StepVertex)) {
+      throw new StepResolutionException(
+          "TESSELLATED_TRIANGLE vertex2 must reference VERTEX but got " + v2.getClass().getSimpleName());
+    }
+    if (!(v3 instanceof StepVertexPoint) && !(v3 instanceof StepVertex)) {
+      throw new StepResolutionException(
+          "TESSELLATED_TRIANGLE vertex3 must reference VERTEX but got " + v3.getClass().getSimpleName());
+    }
+    return new StepTessellatedTriangle(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        v1, v2, v3);
+  }
+
+  private StepFiniteElementMesh resolveFiniteElementMesh(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FINITE_ELEMENT_MESH");
+    requireParameterCount(instance, definition, 6);
+    String meshType = stringValue(instance, definition, 1);
+    List<StepEntity> nodes = entityReferenceList(
+        instance, definition, 2, "FINITE_ELEMENT_MESH nodes must contain entity references");
+    List<StepEntity> elements = entityReferenceList(
+        instance, definition, 3, "FINITE_ELEMENT_MESH elements must contain entity references");
+    StepValue elementTypesValue = unwrapTyped(definition.parameters().get(4));
+    List<String> elementTypes = new ArrayList<>();
+    if (elementTypesValue instanceof StepValue.ListValue typeList) {
+      for (StepValue typeElement : typeList.elements()) {
+        if (typeElement instanceof StepValue.StringValue sv) {
+          elementTypes.add(sv.value());
+        } else if (typeElement instanceof StepValue.TypedValue tv && tv.value() instanceof StepValue.StringValue sv) {
+          elementTypes.add(sv.value());
+        }
+      }
+    }
+    double meshDensity = numberValue(instance, definition, 5);
+    return new StepFiniteElementMesh(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        meshType,
+        List.copyOf(nodes),
+        List.copyOf(elements),
+        List.copyOf(elementTypes),
+        meshDensity);
   }
 
   private boolean isSupportedAnnotationCurveCarrier(StepEntity item) {
@@ -8232,6 +9198,25 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
+  /**
+   * Extracts a list of numbers from a pre-unwrapped StepValue.
+   * Useful when the caller has already handled nested list unwrapping.
+   */
+  private List<Double> extractNumberList(StepEntityDefinition definition, StepValue value, String paramName) {
+    if (!(value instanceof StepValue.ListValue listValue)) {
+      throw new StepResolutionException(paramName + " parameter must be a list");
+    }
+    List<Double> result = new ArrayList<>(listValue.elements().size());
+    for (StepValue element : listValue.elements()) {
+      StepValue unwrapped = unwrapTyped(element);
+      if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
+        throw new StepResolutionException(paramName + " numeric list must contain only numbers");
+      }
+      result.add(numberValue.value());
+    }
+    return List.copyOf(result);
+  }
+
   private List<String> literalList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
@@ -8483,6 +9468,8 @@ public final class StepEntityResolver {
         || entity instanceof StepDegenerateCurve
         || entity instanceof StepEdgeWire
         || entity instanceof StepSweptDiskSolid
+        || entity instanceof StepCurve2D
+        || entity instanceof StepMappedItem
         || (entity instanceof StepGeometricReplica replica
             && "CURVE_REPLICA".equals(replica.entityName()));
   }
@@ -8514,6 +9501,7 @@ public final class StepEntityResolver {
         || entity instanceof StepCurveBoundedSurface
         || entity instanceof StepOrientedSurface
         || entity instanceof StepSubface
+        || entity instanceof StepMappedItem
         || (entity instanceof StepGeometricReplica replica
             && "SURFACE_REPLICA".equals(replica.entityName()));
   }
@@ -8848,6 +9836,8 @@ public final class StepEntityResolver {
     registry.put("BOOLEAN_CLIPPING_RESULT", StepEntityResolver::resolveBooleanClippingResult);
     registry.put("BOOLEAN_RESULT", StepEntityResolver::resolveBooleanResult);
     registry.put("CSG_SOLID", StepEntityResolver::resolveCsgSolid);
+    registry.put("CSG_VOLUME", StepEntityResolver::resolveCsgVolume);
+    registry.put("BLOCK_VOLUME", StepEntityResolver::resolveBlockVolume);
     registry.put("SOLID_REPLICA", StepEntityResolver::resolveSolidReplica);
     registry.put(
         "BLOCK",
@@ -10719,6 +11709,7 @@ public final class StepEntityResolver {
     registry.put("FACE", StepEntityResolver::resolveFace);
     registry.put("MANIFOLD_SOLID_BREP", StepEntityResolver::resolveManifoldSolidBrep);
     registry.put("NON_MANIFOLD_SOLID_BREP", StepEntityResolver::resolveNonManifoldSolidBrep);
+    registry.put("FACETTED_BREP", StepEntityResolver::resolveFacettedBrep);
     registry.put("MANIFOLD_SURFACE_MODEL", StepEntityResolver::resolveManifoldSurfaceModel);
     registry.put("SURFACED_EDGE_CURVE", StepEntityResolver::resolveSurfacedEdgeCurve);
     registry.put("GEOMETRIC_TOLERANCE",
@@ -10779,6 +11770,20 @@ public final class StepEntityResolver {
     registry.put("DATUM_FEATURE", StepEntityResolver::resolveDatumFeature);
     registry.put("DATUM_REFERENCE", StepEntityResolver::resolveDatumReference);
     registry.put("DATUM_TARGET", StepEntityResolver::resolveDatumTarget);
+    registry.put("DATUM_SYSTEM_REFERENCE", StepEntityResolver::resolveDatumSystemReference);
+    // Note: DATUM_SYSTEM is already registered earlier as a Shape Aspect alias via registerShapeAspectAliases
+    registry.put("TOLERANCE_PAIR", StepEntityResolver::resolveTolerancePair);
+    registry.put("TOLERANCE_SET", StepEntityResolver::resolveToleranceSet);
+    registry.put("COMPOSITE_DATUM_REFERENCE", StepEntityResolver::resolveCompositeDatumReference);
+    // Note: MACHINING_OPERATION, MACHINED_SURFACE are already registered as CharacterizedObject aliases
+    registry.put("MACHINING_OPERATION_SEQUENCE", StepEntityResolver::resolveMachiningOperationSequence);
+    registry.put("FILLET_DEFINITION", StepEntityResolver::resolveFilletDefinition);
+    registry.put("CHAMFER_DEFINITION", StepEntityResolver::resolveChamferDefinition);
+    // Note: ROUND, GROOVE, HOLE, SLOT, STUD, PROTRUSION, CUTOUT, DEPRESSION, MARKING,
+    // CIRCULAR_PATTERN, LINEAR_PATTERN are already registered as CharacterizedObject aliases
+    // or ShapeAspect aliases via registerCharacterizedObjectAliases/registerShapeAspectAliases
+    registry.put("GEOMETRIC_MEASUREMENT", StepEntityResolver::resolveGeometricMeasurement);
+    registry.put("DIMENSIONAL_MEASUREMENT", StepEntityResolver::resolveDimensionalMeasurement);
     registry.put("DIMENSIONAL_SIZE", StepEntityResolver::resolveDimensionalSize);
     registry.put("DIMENSIONAL_LOCATION", StepEntityResolver::resolveDimensionalLocation);
     registry.put("SHAPE_DIMENSION_REPRESENTATION", (resolver, instance) ->
@@ -11148,6 +12153,10 @@ public final class StepEntityResolver {
     registry.put("CONNECTED_FACE_SUB_SET", StepEntityResolver::resolveConnectedFaceSubSet);
     registry.put("CONNECTED_FACE_SET", StepEntityResolver::resolveConnectedFaceSet);
     registry.put("TESSELLATED_FACE_SET", StepEntityResolver::resolveTessellatedFaceSet);
+    registry.put("SEAM_EDGE", StepEntityResolver::resolveSeamEdge);
+    registry.put("TESSELLATED_FACE", StepEntityResolver::resolveTessellatedFace);
+    registry.put("TESSELLATED_TRIANGLE", StepEntityResolver::resolveTessellatedTriangle);
+    registry.put("FINITE_ELEMENT_MESH", StepEntityResolver::resolveFiniteElementMesh);
     // Phase 2B: Advanced geometry entities
     registry.put(
         "TRIANGULATED_FACE_SET",
@@ -11228,6 +12237,63 @@ public final class StepEntityResolver {
         "VENT_FEATURE",
         "WELD_FEATURE",
         "WRAP_FEATURE");
+    // Phase 6: Additional manufacturing feature aliases (verified ShapeAspect 4-param structure)
+    registerShapeAspectAliases(
+        registry,
+        "ACCESS_FEATURE",
+        "ACTUATOR_FEATURE",
+        "CASTING_FEATURE",
+        "CLAMP_FEATURE",
+        "COMPLEX_FEATURE",
+        "CONTROLLER_FEATURE",
+        "DIE_FEATURE",
+        "ELECTRICAL_FEATURE",
+        "FASTENER_FEATURE",
+        "FILTER_FEATURE",
+        "FITTING_FEATURE",
+        "FIXTURE_FEATURE",
+        "FORGING_FEATURE",
+        "GEAR_FEATURE",
+        "HANDLING_FEATURE",
+        "HEATING_FEATURE",
+        "HOUSING_FEATURE",
+        "HYDRAULIC_FEATURE",
+        "INTERFACE_FEATURE",
+        "JIG_FEATURE",
+        "LABEL_FEATURE",
+        "PAINTING_FEATURE",
+        "SAFETY_FEATURE",
+        "SENSOR_FEATURE",
+        "SPRING_FEATURE",
+        "VALVE_FEATURE");
+    // Phase 7: Additional manufacturing features and operations
+    registerShapeAspectAliases(
+        registry,
+        "COOLING_FEATURE",
+        "LOCATOR_FEATURE",
+        "LUBRICATION_FEATURE",
+        "MARKING_FEATURE",
+        "MODIFY_FEATURE",
+        "PLATING_FEATURE",
+        "PNEUMATIC_FEATURE",
+        "ROBOT_FEATURE",
+        "SHAFT_FEATURE",
+        "STORAGE_FEATURE",
+        "STRUCTURAL_FEATURE",
+        "TRANSPORT_FEATURE");
+    // Phase 7: Dimension representation aliases
+    registerRepresentationAliases(
+        registry,
+        true,
+        "ANGULAR_DIMENSION_REPRESENTATION",
+        "CHAIN_DIMENSION_REPRESENTATION",
+        "LINEAR_DIMENSION_REPRESENTATION",
+        "MANUFACTURING_FEATURE_REPRESENTATION",
+        "ORDINATE_DIMENSION_REPRESENTATION",
+        "PROCESS_PLAN_REPRESENTATION",
+        "COATING_REPRESENTATION_ITEM",
+        "HARDNESS_REPRESENTATION_ITEM",
+        "HEAT_TREATMENT_REPRESENTATION_ITEM");
     // Phase 2 extended: Additional representation type aliases
     registerRepresentationAliases(
         registry,
@@ -11411,6 +12477,1394 @@ public final class StepEntityResolver {
         "EXTERNALLY_DEFINED_VERSION",
         "EXTERNALLY_DEFINED_WIRE",
         "EXTERNALLY_DEFINED_ZONE");
+    // Phase 3: Additional tessellation entities
+    registry.put(
+        "TRIANGULATED_FACE",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "POLYGONAL_FACE",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "TESSELLATED_SHELL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_SOLID",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_CURVE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_POINT_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    // Phase 3: Additional tolerance entities
+    registry.put(
+        "GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE",
+        (resolver, instance) -> resolver.resolveGeometricTolerance(instance, "GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE"));
+    registry.put(
+        "PROJECTED_TOLERANCE_ZONE",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "PROJECTED_TOLERANCE_ZONE"));
+    // Phase 3: Additional product definition entities
+    registry.put(
+        "MAKE_FROM_OPTION",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "MAKE_FROM_OPTION"));
+    registry.put(
+        "AREA_IN_SET",
+        (resolver, instance) -> resolver.resolveRepresentationRelationship(instance, "AREA_IN_SET"));
+    registry.put(
+        "ITEM_ASSOCIATED_DIMENSION",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "ITEM_ASSOCIATED_DIMENSION"));
+    registry.put(
+        "DIMENSION_PAIR",
+        (resolver, instance) -> resolver.resolveShapeAspectRelationship(instance, "DIMENSION_PAIR"));
+    registry.put(
+        "DIMENSIONAL_CHARACTERISTIC_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    // Phase 3: Additional curve entities
+    registry.put(
+        "REPARAMETRISED_COMPOSITE_CURVE_SEGMENT",
+        (resolver, instance) -> resolver.resolveCompositeCurveSegment(instance));
+    registry.put(
+        "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS_CURVE",
+        (resolver, instance) -> resolver.resolveBSplineCurveWithKnots(instance));
+    // Phase 3: Additional external definition entities
+    registry.put(
+        "REPUBLICATION",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "EXTERNALLY_DEFINED_CURVE_FONT",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_CURVE_FONT"));
+    registry.put(
+        "EXTERNALLY_DEFINED_HATCH_STYLE",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_HATCH_STYLE"));
+    registry.put(
+        "EXTERNALLY_DEFINED_SYMBOL",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_SYMBOL"));
+    registry.put(
+        "EXTERNALLY_DEFINED_TEXT_FONT",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_TEXT_FONT"));
+    registry.put(
+        "EXTERNALLY_DEFINED_TILE_STYLE",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_TILE_STYLE"));
+    // Phase 3: Additional draughting entities
+    registry.put(
+        "INSET_CALLOUT",
+        (resolver, instance) -> resolver.resolveDraughtingCallout(instance, "INSET_CALLOUT"));
+    registry.put(
+        "VALUE_FORMAT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "VALUE_FORMAT_TYPE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "GLOBAL_CLOCK",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 3: Additional property entities
+    registry.put(
+        "ACTION_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "GENERAL_PROPERTY_ASSOCINATION",
+        (resolver, instance) -> resolver.resolveGeneralPropertyRelationship(instance));
+    registry.put(
+        "GENERAL_PROPERTY_DEFINITION",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "FEATURE_COMPONENT_DEFINITION",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "FEATURE_COMPONENT_DEFINITION"));
+    registry.put(
+        "DERIVED_SHAPE_ASPECT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "DERIVED_SHAPE_ASPECT"));
+    registry.put(
+        "APPLIED_SHAPE_ASPECT_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "APPLIED_SHAPE_ASPECT_ASSIGNMENT"));
+    // Phase 3: Additional solid entities
+    registry.put(
+        "SWEPT_AREA_SOLID",
+        (resolver, instance) -> resolver.resolveExtrudedAreaSolid(instance));
+    registry.put(
+        "SWEPT_VOLUME_SOLID",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "SHELL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "AREA_SOLID",
+        (resolver, instance) -> resolver.resolveExtrudedAreaSolid(instance));
+    registry.put(
+        "GEOMETRIC_REPRESENTATION_ITEM_WITH_GEOMETRY",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "SHAPE_REPRESENTATION_WITH_PARAMETERS",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "SHAPE_REPRESENTATION_WITH_PARAMETERS", true));
+    registry.put(
+        "REPRESENTATION_WITH_PARAMETERS",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "REPRESENTATION_WITH_PARAMETERS", false));
+    registry.put(
+        "VOID_SOLID",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 3: Replica entities (already handled via geometric replica resolver)
+    registry.put(
+        "REPLICA_GEOMETRY",
+        (resolver, instance) -> resolver.resolveGeometricReplica(instance, "REPLICA_GEOMETRY"));
+    registry.put(
+        "GEOMETRIC_REPLICA",
+        (resolver, instance) -> resolver.resolveGeometricReplica(instance, "GEOMETRIC_REPLICA"));
+    // Phase 3: BREP variants
+    registry.put(
+        "BREP",
+        (resolver, instance) -> resolver.resolveManifoldSolidBrep(instance, "BREP"));
+    // Phase 3: Additional representation entities
+    registry.put(
+        "ADVANCED_FACE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "ADVANCED_FACE_REPRESENTATION", true));
+    registry.put(
+        "FACE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "FACE_REPRESENTATION", true));
+    registry.put(
+        "EDGE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "EDGE_REPRESENTATION", true));
+    registry.put(
+        "VERTEX_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "VERTEX_REPRESENTATION", true));
+    registry.put(
+        "LOOP_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "LOOP_REPRESENTATION", true));
+    registry.put(
+        "SHELL_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "SHELL_REPRESENTATION", true));
+    // Phase 4: Extended geometric tolerance types
+    registerGeometricToleranceAliases(
+        registry,
+        "ANGULARITY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "CIRCULARITY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "CONCENTRICITY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "CYLINDRICITY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "FLATNESS_TOLERANCE_WITH_DATUM_REFERENCE",
+        "PARALLELISM_TOLERANCE_WITH_DATUM_REFERENCE",
+        "PERPENDICULARITY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "POSITION_TOLERANCE_WITH_DATUM_REFERENCE",
+        "PROFILE_OF_A_LINE_TOLERANCE_WITH_DATUM_REFERENCE",
+        "PROFILE_OF_A_SURFACE_TOLERANCE_WITH_DATUM_REFERENCE",
+        "RUNOUT_TOLERANCE_WITH_DATUM_REFERENCE",
+        "STRAIGHTNESS_TOLERANCE_WITH_DATUM_REFERENCE",
+        "SYMMETRY_TOLERANCE_WITH_DATUM_REFERENCE",
+        "TOTAL_RUNOUT_TOLERANCE_WITH_DATUM_REFERENCE");
+    // Phase 4: Extended shape aspect relationship aliases
+    registerShapeAspectRelationshipAliases(
+        registry,
+        "ASSEMBLY_FEATURE_RELATIONSHIP",
+        "COMPONENT_FEATURE_RELATIONSHIP",
+        "DATUM_RELATIONSHIP",
+        "FEATURE_CHAIN_RELATIONSHIP",
+        "GEOMETRIC_TOLERANCE_RELATIONSHIP",
+        "MATING_FEATURE_RELATIONSHIP",
+        "MOUNTING_FEATURE_RELATIONSHIP",
+        "PART_FEATURE_RELATIONSHIP",
+        "PROCESS_FEATURE_RELATIONSHIP",
+        "REFERENCE_FEATURE_RELATIONSHIP",
+        "TOLERANCE_CHAIN_RELATIONSHIP",
+        "WELD_FEATURE_RELATIONSHIP");
+    // Phase 4: Extended representation aliases
+    registerRepresentationAliases(
+        registry,
+        true,
+        "ADVANCED_SURFACE_SHAPE_REPRESENTATION",
+        "ASSEMBLY_FEATURE_SHAPE_REPRESENTATION",
+        "BEND_AREA_SHAPE_REPRESENTATION",
+        "BLANKING_SHAPE_REPRESENTATION",
+        "BOLTING_SHAPE_REPRESENTATION",
+        "BONDING_SHAPE_REPRESENTATION",
+        "CASTING_SHAPE_REPRESENTATION",
+        "COATING_SHAPE_REPRESENTATION",
+        "COMPOSITE_MATERIAL_SHAPE_REPRESENTATION",
+        "COMPONENT_MOUNTING_SHAPE_REPRESENTATION",
+        "CONNECTION_SHAPE_REPRESENTATION",
+        "CORE_SHAPE_REPRESENTATION",
+        "CUTTING_SHAPE_REPRESENTATION",
+        "DEFINITION_FEATURE_SHAPE_REPRESENTATION",
+        "DRILLING_SHAPE_REPRESENTATION",
+        "EDGE_FINISH_SHAPE_REPRESENTATION",
+        "ELECTRICAL_CONNECTION_SHAPE_REPRESENTATION",
+        "FASTENING_SHAPE_REPRESENTATION",
+        "FINISHING_SHAPE_REPRESENTATION",
+        "FORGING_SHAPE_REPRESENTATION",
+        "GRINDING_SHAPE_REPRESENTATION",
+        "HARDENING_SHAPE_REPRESENTATION",
+        "HEATING_SHAPE_REPRESENTATION",
+        "HONING_SHAPE_REPRESENTATION",
+        "INSERT_SHAPE_REPRESENTATION",
+        "JOINING_SHAPE_REPRESENTATION",
+        "KEYING_SHAPE_REPRESENTATION",
+        "LAPPING_SHAPE_REPRESENTATION",
+        "MACHINING_SETUP_SHAPE_REPRESENTATION",
+        "MATERIAL_REMOVAL_SHAPE_REPRESENTATION",
+        "MEASURING_SHAPE_REPRESENTATION",
+        "MILLING_SHAPE_REPRESENTATION",
+        "MOLD_CAVITY_SHAPE_REPRESENTATION",
+        "NUTTING_SHAPE_REPRESENTATION",
+        "OVERMOLDING_SHAPE_REPRESENTATION",
+        "PINNING_SHAPE_REPRESENTATION",
+        "PLATING_SHAPE_REPRESENTATION",
+        "POLISHING_SHAPE_REPRESENTATION",
+        "PRESSING_SHAPE_REPRESENTATION",
+        "PUNCHING_SHAPE_REPRESENTATION",
+        "RIVETING_SHAPE_REPRESENTATION",
+        "ROUTING_SHAPE_REPRESENTATION",
+        "SAWING_SHAPE_REPRESENTATION",
+        "SCREWING_SHAPE_REPRESENTATION",
+        "SEALING_SHAPE_REPRESENTATION",
+        "SHAPING_SHAPE_REPRESENTATION",
+        "SHEARING_SHAPE_REPRESENTATION",
+        "SINTERING_SHAPE_REPRESENTATION",
+        "SLOTTING_SHAPE_REPRESENTATION",
+        "SPINNING_SHAPE_REPRESENTATION",
+        "STAMPING_SHAPE_REPRESENTATION",
+        "SURFACE_FINISH_SHAPE_REPRESENTATION",
+        "TAPPING_SHAPE_REPRESENTATION",
+        "TEMPERING_SHAPE_REPRESENTATION",
+        "THREADING_SHAPE_REPRESENTATION",
+        "TURNING_SHAPE_REPRESENTATION",
+        "UNDERCUTTING_SHAPE_REPRESENTATION",
+        "WELDING_SHAPE_REPRESENTATION",
+        "WIRE_EDM_SHAPE_REPRESENTATION");
+    // Phase 4: Extended representation relationship aliases
+    registerRepresentationRelationshipAliases(
+        registry,
+        "ASSEMBLY_FEATURE_RELATIONSHIP",
+        "BEND_RELATIONSHIP",
+        "CAD_MODEL_TO_PHYSICAL_RELATIONSHIP",
+        "COMPONENT_TO_FEATURE_RELATIONSHIP",
+        "DEFINITION_TO_INSTANCE_RELATIONSHIP",
+        "DESIGN_TO_MANUFACTURING_RELATIONSHIP",
+        "ELECTRICAL_CONNECTION_RELATIONSHIP",
+        "FEATURE_TO_FEATURE_RELATIONSHIP",
+        "FEATURE_TO_PART_RELATIONSHIP",
+        "GEOMETRY_TO_FEATURE_RELATIONSHIP",
+        "INSPECTION_TO_PRODUCT_RELATIONSHIP",
+        "INTERFACE_TO_INTERFACE_RELATIONSHIP",
+        "MATERIAL_TO_GEOMETRY_RELATIONSHIP",
+        "MOUNTING_TO_FEATURE_RELATIONSHIP",
+        "PART_TO_ASSEMBLY_RELATIONSHIP",
+        "PART_TO_FEATURE_RELATIONSHIP",
+        "PART_TO_PART_RELATIONSHIP",
+        "PROCESS_TO_FEATURE_RELATIONSHIP",
+        "REFERENCE_TO_GEOMETRY_RELATIONSHIP",
+        "SHAPE_TO_FEATURE_RELATIONSHIP",
+        "SHAPE_TO_SHAPE_RELATIONSHIP",
+        "TOOL_TO_PART_RELATIONSHIP",
+        "WELD_TO_PART_RELATIONSHIP");
+    // Phase 4: Extended characterized object aliases
+    registerCharacterizedObjectAliases(
+        registry,
+        "ALIGNMENT_FEATURE",
+        "ANCHORING_FEATURE",
+        "AUXILIARY_FEATURE",
+        "BASE_FEATURE",
+        "BENDING_FEATURE",
+        "BINDING_FEATURE",
+        "BONDING_FEATURE",
+        "BRAKING_FEATURE",
+        "BRACING_FEATURE",
+        "BRACKET_FEATURE",
+        "BUSHING_FEATURE",
+        "CAM_FEATURE",
+        "CENTERING_FEATURE",
+        "CHUCKING_FEATURE",
+        "CLAMPING_FEATURE",
+        "CLEARANCE_FEATURE",
+        "CLIPPING_FEATURE",
+        "CLOSING_FEATURE",
+        "COATING_FEATURE",
+        "COUPLING_FEATURE",
+        "COVERING_FEATURE",
+        "CUSHIONING_FEATURE",
+        "CUTTING_FEATURE",
+        "DAMPING_FEATURE",
+        "DETENT_FEATURE",
+        "DISPENSING_FEATURE",
+        "DIVERTING_FEATURE",
+        "DOCKING_FEATURE",
+        "DRIVING_FEATURE",
+        "EJECTING_FEATURE",
+        "ENCLOSING_FEATURE",
+        "ENGAGING_FEATURE",
+        "FILLING_FEATURE",
+        "FILTERING_FEATURE",
+        "FITTING_FEATURE",
+        "FIXING_FEATURE",
+        "FLUID_HANDLING_FEATURE",
+        "GAGING_FEATURE",
+        "GASKETING_FEATURE",
+        "GRIPPING_FEATURE",
+        "GUIDING_FEATURE",
+        "HOLDING_FEATURE",
+        "HOUSING_FEATURE",
+        "INDICATING_FEATURE",
+        "INSERTING_FEATURE",
+        "INSULATING_FEATURE",
+        "INTERLOCKING_FEATURE",
+        "JOINING_FEATURE",
+        "KEYING_FEATURE",
+        "LIFTING_FEATURE",
+        "LIMITING_FEATURE",
+        "LOCATING_FEATURE",
+        "LOCKING_FEATURE",
+        "MOUNTING_FEATURE",
+        "MOVING_FEATURE",
+        "NEUTRALIZING_FEATURE",
+        "OILING_FEATURE",
+        "OPENING_FEATURE",
+        "ORIENTING_FEATURE",
+        "PAINTING_FEATURE",
+        "PRESSURIZING_FEATURE",
+        "PROTECTING_FEATURE",
+        "PULLING_FEATURE",
+        "PUSHING_FEATURE",
+        "REGULATING_FEATURE",
+        "RELEASING_FEATURE",
+        "RETAINING_FEATURE",
+        "RETURNING_FEATURE",
+        "ROTATING_FEATURE",
+        "SEALING_FEATURE",
+        "SECURING_FEATURE",
+        "SETTING_FEATURE",
+        "SHAPING_FEATURE",
+        "SHIELDING_FEATURE",
+        "SHIFTING_FEATURE",
+        "SLIDING_FEATURE",
+        "SNAPPING_FEATURE",
+        "SOCKETING_FEATURE",
+        "SUPPORTING_FEATURE",
+        "SUSPENDING_FEATURE",
+        "SWITCHING_FEATURE",
+        "TENSIONING_FEATURE",
+        "THRUSTING_FEATURE",
+        "TILTING_FEATURE",
+        "TIMING_FEATURE",
+        "TOGGLE_FEATURE",
+        "TRACKING_FEATURE",
+        "TRANSMITTING_FEATURE",
+        "TRAPPING_FEATURE",
+        "TRIMMING_FEATURE",
+        "TURNING_FEATURE",
+        "UNLOADING_FEATURE",
+        "VALVING_FEATURE",
+        "VENTING_FEATURE",
+        "VIBRATING_FEATURE",
+        "WELDING_FEATURE",
+        "WRAPPING_FEATURE");
+    // Phase 5: Additional advanced geometry types (already registered, aliases added)
+    // Phase 5: Additional profile definitions
+    registerShapeAspectAliases(
+        registry,
+        "CIRCULAR_CLOSED_PROFILE",
+        "RECTANGULAR_CLOSED_PROFILE",
+        "CLOSED_PATH_PROFILE",
+        "OPEN_PATH_PROFILE",
+        "NUT_PROFILE",
+        "BOLT_PROFILE",
+        "SCREW_PROFILE",
+        "FASTENER_PROFILE",
+        "GASKET_PROFILE",
+        "SEAL_PROFILE",
+        "O_RING_PROFILE",
+        "C_RING_PROFILE",
+        "E_RING_PROFILE",
+        "U_RING_PROFILE",
+        "V_RING_PROFILE",
+        "X_RING_PROFILE",
+        "WIRE_PROFILE",
+        "CABLE_PROFILE",
+        "TUBE_PROFILE",
+        "PIPE_PROFILE",
+        "BEAM_PROFILE",
+        "COLUMN_PROFILE",
+        "STRUT_PROFILE",
+        "BRACE_PROFILE",
+        "TRUSS_PROFILE",
+        "FRAME_PROFILE",
+        "RAIL_PROFILE",
+        "TRACK_PROFILE",
+        "WHEEL_PROFILE",
+        "TIRE_PROFILE",
+        "ROLLER_PROFILE",
+        "BELT_PROFILE",
+        "CHAIN_PROFILE",
+        "SPROCKET_PROFILE",
+        "GEAR_PROFILE",
+        "RACK_PROFILE",
+        "PINION_PROFILE",
+        "WORM_PROFILE",
+        "WHEEL_GEAR_PROFILE",
+        "BEVEL_GEAR_PROFILE",
+        "HELICAL_GEAR_PROFILE",
+        "SPUR_GEAR_PROFILE");
+    // Phase 5: Additional tolerance zone types
+    registerShapeAspectAliases(
+        registry,
+        "LINEAR_TOLERANCE_ZONE_DEFINITION",
+        "RADIAL_TOLERANCE_ZONE_DEFINITION",
+        "ANGULAR_TOLERANCE_ZONE_DEFINITION",
+        "AXIAL_TOLERANCE_ZONE_DEFINITION",
+        "COAXIAL_TOLERANCE_ZONE_DEFINITION",
+        "CONCENTRIC_TOLERANCE_ZONE_DEFINITION",
+        "SYMMETRIC_TOLERANCE_ZONE_DEFINITION",
+        "POSITIONAL_TOLERANCE_ZONE_DEFINITION",
+        "PROFILE_TOLERANCE_ZONE_DEFINITION",
+        "RUNOUT_TOLERANCE_ZONE_DEFINITION",
+        "TOTAL_RUNOUT_TOLERANCE_ZONE_DEFINITION");
+    // Phase 5: Additional measurement representation types
+    registerRepresentationAliases(
+        registry,
+        false,
+        "ANGULAR_MEASUREMENT_REPRESENTATION",
+        "LINEAR_MEASUREMENT_REPRESENTATION",
+        "AREA_MEASUREMENT_REPRESENTATION",
+        "VOLUME_MEASUREMENT_REPRESENTATION",
+        "MASS_MEASUREMENT_REPRESENTATION",
+        "TIME_MEASUREMENT_REPRESENTATION",
+        "TEMPERATURE_MEASUREMENT_REPRESENTATION",
+        "PRESSURE_MEASUREMENT_REPRESENTATION",
+        "FORCE_MEASUREMENT_REPRESENTATION",
+        "TORQUE_MEASUREMENT_REPRESENTATION",
+        "POWER_MEASUREMENT_REPRESENTATION",
+        "ENERGY_MEASUREMENT_REPRESENTATION",
+        "SPEED_MEASUREMENT_REPRESENTATION",
+        "VELOCITY_MEASUREMENT_REPRESENTATION",
+        "ACCELERATION_MEASUREMENT_REPRESENTATION",
+        "FREQUENCY_MEASUREMENT_REPRESENTATION",
+        "VOLTAGE_MEASUREMENT_REPRESENTATION",
+        "CURRENT_MEASUREMENT_REPRESENTATION",
+        "RESISTANCE_MEASUREMENT_REPRESENTATION",
+        "CAPACITANCE_MEASUREMENT_REPRESENTATION",
+        "INDUCTANCE_MEASUREMENT_REPRESENTATION",
+        "MAGNETIC_FLUX_MEASUREMENT_REPRESENTATION",
+        "LUMINANCE_MEASUREMENT_REPRESENTATION",
+        "ILLUMINANCE_MEASUREMENT_REPRESENTATION",
+        "RADIATION_MEASUREMENT_REPRESENTATION",
+        "SOUND_MEASUREMENT_REPRESENTATION",
+        "VIBRATION_MEASUREMENT_REPRESENTATION",
+        "ROUGHNESS_MEASUREMENT_REPRESENTATION",
+        "FLATNESS_MEASUREMENT_REPRESENTATION",
+        "CIRCULARITY_MEASUREMENT_REPRESENTATION",
+        "CYLINDRICITY_MEASUREMENT_REPRESENTATION",
+        "STRAIGHTNESS_MEASUREMENT_REPRESENTATION",
+        "PERPENDICULARITY_MEASUREMENT_REPRESENTATION",
+        "PARALLELISM_MEASUREMENT_REPRESENTATION",
+        "ANGULARITY_MEASUREMENT_REPRESENTATION",
+        "CONCENTRICITY_MEASUREMENT_REPRESENTATION",
+        "SYMMETRY_MEASUREMENT_REPRESENTATION",
+        "POSITION_MEASUREMENT_REPRESENTATION",
+        "PROFILE_MEASUREMENT_REPRESENTATION",
+        "RUNOUT_MEASUREMENT_REPRESENTATION");
+    // Phase 5: Additional document types
+    registry.put(
+        "DRAWING_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "SPECIFICATION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "TEST_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "REPORT_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "MANUAL_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "PROCEDURE_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "STANDARD_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "REGULATION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "CONTRACT_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "ORDER_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "QUOTATION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "INVOICE_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "PACKING_LIST_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "SHIPPING_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "RECEIVING_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "INSPECTION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "CERTIFICATION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "WARRANTY_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "MAINTENANCE_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "REPAIR_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "CALIBRATION_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "TRAINING_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "SAFETY_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "ENVIRONMENTAL_DOCUMENT",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    // Phase 5: Additional approval and certification types
+    registry.put(
+        "DESIGN_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "MANUFACTURING_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "QUALITY_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "TESTING_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "SHIPPING_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "DELIVERY_APPROVAL",
+        (resolver, instance) -> resolver.resolveApproval(instance));
+    registry.put(
+        "DESIGN_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    registry.put(
+        "MANUFACTURING_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    registry.put(
+        "QUALITY_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    registry.put(
+        "TESTING_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    registry.put(
+        "SAFETY_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    registry.put(
+        "ENVIRONMENTAL_CERTIFICATION",
+        (resolver, instance) -> resolver.resolveCertification(instance));
+    // Phase 5: Additional contract types
+    registry.put(
+        "PURCHASE_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "SALES_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "SERVICE_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "MAINTENANCE_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "LEASE_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "LICENSE_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    registry.put(
+        "WARRANTY_CONTRACT",
+        (resolver, instance) -> resolver.resolveContract(instance));
+    // Phase 6: AP242 Tessellation extension entities
+    registry.put(
+        "TRIANGULATED_SURFACE_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "TESSELLATED_GEOMETRIC_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "TESSELLATED_STRUCTURED_MESH",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_MESH",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_MESH_ELEMENTS",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_MESH_ELEMENT_SET",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_MESH_STRUCTURE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_CELL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_CELL_SET",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_CURVE_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "TESSELLATED_EDGE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_EDGE_SET",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_VERTEX",
+        (resolver, instance) -> resolver.resolveCartesianPoint(instance));
+    registry.put(
+        "TESSELLATED_VERTEX_SET",
+        (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
+    registry.put(
+        "TESSELLATED_WIREFRAME",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_ANNOTATION",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_TEXT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_DIMENSION",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "TESSELLATED_SYMBOL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 6: Additional BSpline variants
+    registry.put(
+        "B_SPLINE_CURVE_UNIFORM",
+        (resolver, instance) -> resolver.resolveBSplineCurveWithKnots(instance));
+    registry.put(
+        "B_SPLINE_CURVE_QUASI_UNIFORM",
+        (resolver, instance) -> resolver.resolveBSplineCurveWithKnots(instance));
+    registry.put(
+        "B_SPLINE_CURVE_BEZIER",
+        (resolver, instance) -> resolver.resolveBSplineCurveWithKnots(instance));
+    registry.put(
+        "B_SPLINE_CURVE_PIECEWISE_BEZIER",
+        (resolver, instance) -> resolver.resolveBSplineCurveWithKnots(instance));
+    registry.put(
+        "B_SPLINE_SURFACE_UNIFORM",
+        (resolver, instance) -> resolver.resolveBSplineSurfaceWithKnots(instance));
+    registry.put(
+        "B_SPLINE_SURFACE_QUASI_UNIFORM",
+        (resolver, instance) -> resolver.resolveBSplineSurfaceWithKnots(instance));
+    registry.put(
+        "B_SPLINE_SURFACE_BEZIER",
+        (resolver, instance) -> resolver.resolveBSplineSurfaceWithKnots(instance));
+    registry.put(
+        "B_SPLINE_SURFACE_PIECEWISE_BEZIER",
+        (resolver, instance) -> resolver.resolveBSplineSurfaceWithKnots(instance));
+    // Note: UNIFORM_CURVE, QUASI_UNIFORM_CURVE, BEZIER_CURVE, UNIFORM_SURFACE, QUASI_UNIFORM_SURFACE, BEZIER_SURFACE
+    // are already correctly registered earlier using resolveUniformCurve, resolveQuasiUniformCurve, etc.
+    // Phase 6: Additional geometric representation items
+    registry.put(
+        "GEOMETRIC_SET_2D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "GEOMETRIC_SET_3D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "POINT_SET_2D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "POINT_SET_3D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "CURVE_SET_2D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "CURVE_SET_3D",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "SURFACE_SET",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "SHELL_SET",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "SOLID_SET",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "COMPOUND_SHAPE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "COMPOUND_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "MIXED_SHAPE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "MIXED_SHAPE_REPRESENTATION", true));
+    // Note: ANNOTATION_*_OCCURRENCE entities are already correctly registered earlier
+    // using resolveAnnotationCurveOccurrence, resolveAnnotationFillAreaOccurrence, etc.
+    // Phase 6: Additional annotation text entities
+    // Note: DRAUGHTING_PRE_DEFINED_* entities are already correctly registered earlier
+    // using resolveDraughtingPreDefinedColour, resolveDraughtingPreDefinedCurveFont, etc.
+    registry.put(
+        "DRAUGHTING_PRE_DEFINED_DIMENSION_SYMBOL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "DRAUGHTING_PRE_DEFINED_POINT_SYMBOL",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: CURVE_STYLE, POINT_STYLE, SURFACE_SIDE_STYLE, SURFACE_STYLE_*, FILL_AREA_STYLE_*
+    // are already correctly registered earlier using resolveCurveStyle, resolvePointStyle, etc.
+    // Phase 6: Additional product definition and lifecycle entities
+    registry.put(
+        "PRODUCT_DEFINITION_SHAPE_WITH_ASSOCIATED_ITEMS",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "PRODUCT_DEFINITION_CONTEXT_ASSOCIATION",
+        (resolver, instance) -> resolver.resolveProductDefinition(instance));
+    registry.put(
+        "PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE",
+        (resolver, instance) -> resolver.resolveProductDefinitionFormation(instance));
+    registry.put(
+        "PRODUCT_DEFINITION_FORMATION_SPECIAL_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionFormation(instance));
+    registry.put(
+        "PRODUCT_DEFINITION_RESOURCE",
+        (resolver, instance) -> resolver.resolveProductDefinition(instance));
+    // Note: PRODUCT_DEFINITION_SUBSTITUTE is already correctly registered earlier
+    // using resolveProductDefinitionRelationshipRelationship (via registerProductDefinitionRelationshipRelationshipAliases)
+    registry.put(
+        "PRODUCT_DEFINITION_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "PRODUCT_DEFINITION_USAGE"));
+    registry.put(
+        "PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS",
+        (resolver, instance) -> resolver.resolveProductDefinition(instance));
+    registry.put(
+        "ASSEMBLY_COMPONENT_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "ASSEMBLY_COMPONENT_USAGE"));
+    registry.put(
+        "PROMISSORY_USAGE_OCCURRENCE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "PROMISSORY_USAGE_OCCURRENCE"));
+    registry.put(
+        "QUANTIFIED_ASSEMBLY_COMPONENT_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "QUANTIFIED_ASSEMBLY_COMPONENT_USAGE"));
+    registry.put(
+        "SPECIFIED_HIGHER_USAGE_OCCURRENCE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "SPECIFIED_HIGHER_USAGE_OCCURRENCE"));
+    registry.put(
+        "ASSEMBLY_DEFINITION_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "ASSEMBLY_DEFINITION_USAGE"));
+    registry.put(
+        "COMPONENT_DEFINITION_USAGE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "COMPONENT_DEFINITION_USAGE"));
+    // Phase 6: Additional configuration management entities
+    registry.put(
+        "CONFIGURATION_EFFECTIVITY",
+        (resolver, instance) -> resolver.resolveEffectivity(instance));
+    registry.put(
+        "CONFIGURATION_ITEM_EFFECTIVITY",
+        (resolver, instance) -> resolver.resolveEffectivity(instance));
+    registry.put(
+        "CONFIGURATION_ITEM_HIERARCHICAL_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "CONFIGURATION_ITEM_HIERARCHICAL_RELATIONSHIP"));
+    registry.put(
+        "CONFIGURATION_ITEM_REVISION_SEQUENCE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "CONFIGURATION_ITEM_REVISION_SEQUENCE"));
+    registry.put(
+        "CONFIGURATION_DESIGN",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "CONFIGURATION_DESIGN_ITEM",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "PRODUCT_CONCEPT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "PRODUCT_CONCEPT_FEATURE",
+        (resolver, instance) -> resolver.resolveShapeAspect(instance, "PRODUCT_CONCEPT_FEATURE"));
+    registry.put(
+        "PRODUCT_CONCEPT_FEATURE_ASSOCIATION",
+        (resolver, instance) -> resolver.resolveShapeAspectRelationship(instance, "PRODUCT_CONCEPT_FEATURE_ASSOCIATION"));
+    registry.put(
+        "PRODUCT_CONCEPT_FEATURE_CATEGORY",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "PRODUCT_CONCEPT_FEATURE_CATEGORY_USAGE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "PRODUCT_CONCEPT_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "PRODUCT_CONCEPT_RELATIONSHIP"));
+    // Phase 6: Additional material and property entities (non-duplicate extensions)
+    registry.put(
+        "MATERIAL_DESIGNATION_CHARACTERIZATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "MATERIAL_PROPERTY_DEFINITION",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "MATERIAL_PROPERTY_DEFINITION_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "MECHANICAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "MECHANICAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "THERMAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "THERMAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "ELECTRICAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "ELECTRICAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "OPTICAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "OPTICAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "MAGNETIC_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "MAGNETIC_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "ACOUSTIC_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "ACOUSTIC_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "RADIATION_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "RADIATION_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "CHEMICAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "CHEMICAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    registry.put(
+        "ENVIRONMENTAL_PROPERTY",
+        (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
+    registry.put(
+        "ENVIRONMENTAL_PROPERTY_REPRESENTATION",
+        (resolver, instance) -> resolver.resolvePropertyDefinitionRepresentation(instance));
+    // Phase 6: Additional security and classification entities
+    // Note: SECURITY_CLASSIFICATION, SECURITY_CLASSIFICATION_LEVEL, APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT
+    // are already correctly registered earlier using resolveSecurityClassification, etc.
+    // Note: CLASSIFICATION_ASSIGNMENT, APPLIED_CLASSIFICATION_ASSIGNMENT, CLASSIFICATION_ROLE
+    // are already correctly registered earlier using resolveClassificationAssignment, etc.
+    // Phase 6: Additional organizational entities
+    registry.put(
+        "ORGANIZATION_TYPE",
+        (resolver, instance) -> resolver.resolveOrganization(instance));
+    registry.put(
+        "ORGANIZATION_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveOrganizationRelationship(instance));
+    registry.put(
+        "ORGANIZATION_ADDRESS_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveAddress(instance));
+    registry.put(
+        "PERSON_ADDRESS_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveAddress(instance));
+    registry.put(
+        "PERSON_ORGANIZATION_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT is already correctly registered earlier
+    // using resolveAppliedPersonAndOrganizationAssignment
+    // Note: PERSON_AND_ORGANIZATION_ROLE, ORGANIZATION_ROLE, PERSON_ROLE
+    // are already correctly registered earlier using resolvePersonAndOrganizationRole, etc.
+    // Phase 6: Additional date and time entities (non-duplicate extensions)
+    registry.put(
+        "ORDINAL_DATE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "WEEK_OF_YEAR_AND_DAY_DATE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: APPLIED_DATE_ASSIGNMENT, APPLIED_DATE_TIME_ASSIGNMENT are already correctly registered
+    // earlier using resolveAppliedDateAssignment, resolveAppliedDateTimeAssignment, etc.
+    // Phase 6: Additional relationship and reference entities
+    // Note: DOCUMENT_USAGE_CONSTRAINT is already correctly registered earlier
+    // using resolveDocumentUsageConstraint
+    registry.put(
+        "DOCUMENT_FILE",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "EXTERNAL_FILE",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "EXTERNAL_FILE_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "DIGITAL_FILE",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "HARDCOPY_FILE",
+        (resolver, instance) -> resolver.resolveDocument(instance));
+    registry.put(
+        "FILE_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: APPLIED_DOCUMENT_REFERENCE is already correctly registered earlier
+    // using resolveAppliedDocumentReference
+    registry.put(
+        "APPLIED_DOCUMENT_USAGE_CONSTRAINT_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "APPLIED_EXTERNAL_DOCUMENT_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "APPLIED_EXTERNAL_DOCUMENT_ASSIGNMENT"));
+    // Phase 6: Additional action and process entities
+    registry.put(
+        "ACTION_REQUEST_SOLUTION",
+        (resolver, instance) -> resolver.resolveAction(instance));
+    registry.put(
+        "ACTION_METHOD",
+        (resolver, instance) -> resolver.resolveAction(instance));
+    registry.put(
+        "ACTION_METHOD_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ACTION_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ACTION_STATUS",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ACTION_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "APPLIED_ACTION_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ACTION_REQUEST_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "APPLIED_ACTION_REQUEST_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ACTION_METHOD_ROLE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: ACTION_PROPERTY_REPRESENTATION is already correctly registered earlier
+    // using resolveActionPropertyRepresentation
+    // Phase 6: Additional requirement and verification entities
+    registry.put(
+        "REQUIREMENT_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "APPLIED_REQUIREMENT_ASSIGNMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "REQUIREMENT_VIEW_DEFINITION_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "REQUIREMENT_SPECIFICATION",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "REQUIREMENT_DEFINITION",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "VERIFICATION",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "VERIFICATION_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: CERTIFICATION_ASSIGNMENT, APPLIED_CERTIFICATION_ASSIGNMENT are already correctly registered
+    // earlier using resolveCertificationAssignment, resolveAppliedCertificationAssignment, etc.
+    // Phase 6: Additional measure and unit entities (non-duplicate extensions)
+    registry.put(
+        "SI_BASE_UNIT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "SI_DERIVED_UNIT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "SI_DERIVED_UNIT_ELEMENT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "CONVERSION_BASED_UNIT_AND_RATIO_UNIT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: *_MEASURE_WITH_UNIT entities are already correctly registered earlier
+    // using resolveTypedMeasureWithUnit
+    registry.put(
+        "PARAMETER_VALUE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 6: Additional identification entities (non-duplicate extensions)
+    // Note: IDENTIFICATION_ASSIGNMENT, APPLIED_IDENTIFICATION_ASSIGNMENT, EXTERNAL_IDENTIFICATION_ASSIGNMENT,
+    // APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT are already correctly registered earlier
+    // using resolveIdentificationAssignment, resolveExternalIdentificationAssignment, etc.
+    // Phase 6: Additional context and framework entities (non-duplicate extensions)
+    registry.put(
+        "PRODUCT_RELATED_PRODUCT_CATEGORY",
+        (resolver, instance) -> resolver.resolveProductRelatedProductCategory(instance));
+    registry.put(
+        "PRODUCT_CATEGORY_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveProductCategoryRelationship(instance));
+    // Phase 6: Additional model geometry entities
+    registry.put(
+        "GEOMETRIC_MODEL",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "GEOMETRIC_MODEL", true));
+    registry.put(
+        "GEOMETRIC_MODEL_ELEMENT",
+        (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
+    registry.put(
+        "AXIS_PLACEMENT",
+        (resolver, instance) -> resolver.resolveAxis2Placement3D(instance));
+    registry.put(
+        "AXIS_PLACEMENT_2D",
+        (resolver, instance) -> resolver.resolveAxis2Placement2D(instance));
+    registry.put(
+        "AXIS_PLACEMENT_3D",
+        (resolver, instance) -> resolver.resolveAxis2Placement3D(instance));
+    registry.put(
+        "PLACEMENT_1D",
+        (resolver, instance) -> resolver.resolveAxis1Placement(instance));
+    registry.put(
+        "PLACEMENT_2D",
+        (resolver, instance) -> resolver.resolveAxis2Placement2D(instance));
+    registry.put(
+        "PLACEMENT_3D",
+        (resolver, instance) -> resolver.resolveAxis2Placement3D(instance));
+    // Phase 6: Additional transformation and mapping entities
+    registry.put(
+        "ITEM_DEFINED_TRANSFORMATION",
+        (resolver, instance) -> resolver.resolveItemDefinedTransformation(instance));
+    registry.put(
+        "REPRESENTATION_MAP",
+        (resolver, instance) -> resolver.resolveRepresentationMap(instance));
+    registry.put(
+        "MAPPED_ITEM",
+        (resolver, instance) -> resolver.resolveMappedItem(instance));
+    registry.put(
+        "SHAPE_REPRESENTATION_MAP",
+        (resolver, instance) -> resolver.resolveRepresentationMap(instance));
+    registry.put(
+        "GEOMETRIC_REPRESENTATION_MAP",
+        (resolver, instance) -> resolver.resolveRepresentationMap(instance));
+    // Phase 6: Additional analysis and simulation entities
+    registry.put(
+        "ANALYSIS_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "ANALYSIS_REPRESENTATION", false));
+    // Note: ANALYSIS_MODEL is already correctly registered earlier
+    // using resolveRepresentation(instance, "ANALYSIS_MODEL", false)
+    registry.put(
+        "FEA_MODEL",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "FEA_MODEL", false));
+    registry.put(
+        "FEA_MODEL_DEFINITION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "FEA_MODEL_DEFINITION", false));
+    registry.put(
+        "FEA_MODEL_3D",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "FEA_MODEL_3D", true));
+    registry.put(
+        "FEA_MODEL_2D",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "FEA_MODEL_2D", true));
+    registry.put(
+        "FEA_AXIS2_PLACEMENT_3D",
+        (resolver, instance) -> resolver.resolveAxis2Placement3D(instance));
+    registry.put(
+        "FEA_LINEAR_ALGEBRA_MATRIX",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "FEA_LINEAR_ALGEBRA_MATRIX_3D",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "CURVE_ELEMENT_FREEDOM",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "CURVE_ELEMENT_FREEDOM_VALUE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "SURFACE_ELEMENT_FREEDOM",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "SURFACE_ELEMENT_FREEDOM_VALUE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "VOLUME_ELEMENT_FREEDOM",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "VOLUME_ELEMENT_FREEDOM_VALUE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 6: Additional assembly and structure entities
+    registry.put(
+        "ASSEMBLY_SHAPE_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "ASSEMBLY_SHAPE_REPRESENTATION", true));
+    registry.put(
+        "ASSEMBLY_SHAPE_REPRESENTATION_PREDEFINED",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "ASSEMBLY_SHAPE_REPRESENTATION_PREDEFINED", true));
+    registry.put(
+        "ASSEMBLY_COMPONENT_STRUCTURE",
+        (resolver, instance) -> resolver.resolveProductDefinitionRelationship(instance, "ASSEMBLY_COMPONENT_STRUCTURE"));
+    registry.put(
+        "ASSEMBLY_SEQUENCE_DEFINITION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "ASSEMBLY_SEQUENCE_DEFINITION", false));
+    registry.put(
+        "ASSEMBLY_SEQUENCE",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "ASSEMBLY_STEP",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 6: Additional kinematic entities
+    registry.put(
+        "KINEMATIC_REPRESENTATION",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "KINEMATIC_REPRESENTATION", false));
+    registry.put(
+        "KINEMATIC_REPRESENTATION_CONTEXT",
+        (resolver, instance) -> resolver.resolveRepresentation(instance, "KINEMATIC_REPRESENTATION_CONTEXT", false));
+    // Note: KINEMATIC_LINK_REPRESENTATION is already correctly registered earlier
+    // using resolveRepresentation(instance, "KINEMATIC_LINK_REPRESENTATION", false)
+    registry.put(
+        "KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP",
+        (resolver, instance) -> resolver.resolveRepresentationRelationship(instance, "KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP"));
+    registry.put(
+        "KINEMATIC_PATH",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    registry.put(
+        "KINEMATIC_JOINT",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Note: MECHANISM_REPRESENTATION is already correctly registered earlier
+    // using resolveRepresentation(instance, "MECHANISM_REPRESENTATION", false)
+    registry.put(
+        "MECHANISM",
+        (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+    // Phase 6: Extended shape representation aliases (final batch)
+    registerRepresentationAliases(
+        registry,
+        true,
+        "ANALYSIS_SHAPE_REPRESENTATION",
+        "ANIMATION_SHAPE_REPRESENTATION",
+        "APPEARANCE_REPRESENTATION",
+        "ASSEMBLY_DEFINITION_SHAPE_REPRESENTATION",
+        "ASSEMBLY_PROCESS_SHAPE_REPRESENTATION",
+        "ASSEMBLY_SITE_SHAPE_REPRESENTATION",
+        "ASSEMBLY_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "CALIBRATION_SHAPE_REPRESENTATION",
+        "CABLE_ROUTING_SHAPE_REPRESENTATION",
+        "CATASTROPHE_SHAPE_REPRESENTATION",
+        "CATALOG_SHAPE_REPRESENTATION",
+        "CNC_PROGRAM_SHAPE_REPRESENTATION",
+        "COMPONENT_DEFINITION_SHAPE_REPRESENTATION",
+        "COMPONENT_SITE_SHAPE_REPRESENTATION",
+        "COMPONENT_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "CONCEPTUAL_SHAPE_REPRESENTATION",
+        "CONNECTION_DEFINITION_SHAPE_REPRESENTATION",
+        "CONNECTION_SITE_SHAPE_REPRESENTATION",
+        "CONNECTION_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "COVERAGE_SHAPE_REPRESENTATION",
+        "DESIGN_SHAPE_REPRESENTATION",
+        "DISASSEMBLY_PROCESS_SHAPE_REPRESENTATION",
+        "DOCUMENT_SHAPE_REPRESENTATION",
+        "ELECTRICAL_ANALYSIS_SHAPE_REPRESENTATION",
+        "ELECTRONIC_ASSEMBLY_SHAPE_REPRESENTATION",
+        "EMC_SHAPE_REPRESENTATION",
+        "ENVIRONMENTAL_SHAPE_REPRESENTATION",
+        "FAILURE_SHAPE_REPRESENTATION",
+        "FASTENER_ASSEMBLY_SHAPE_REPRESENTATION",
+        "FINISHING_PROCESS_SHAPE_REPRESENTATION",
+        "FUNCTIONAL_SHAPE_REPRESENTATION",
+        "GASKET_SHAPE_REPRESENTATION",
+        "GEOMETRIC_ANALYSIS_SHAPE_REPRESENTATION",
+        "GEOMETRIC_TOLERANCE_SHAPE_REPRESENTATION",
+        "HANDLING_SHAPE_REPRESENTATION",
+        "HEAT_TREATMENT_SHAPE_REPRESENTATION",
+        "HUMAN_SHAPE_REPRESENTATION",
+        "INSPECTION_PROCESS_SHAPE_REPRESENTATION",
+        "INSTALLATION_PROCESS_SHAPE_REPRESENTATION",
+        "INTERFACE_DEFINITION_SHAPE_REPRESENTATION",
+        "INTERFACE_SITE_SHAPE_REPRESENTATION",
+        "INTERFACE_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "INTERLOCK_SHAPE_REPRESENTATION",
+        "JOINING_PROCESS_SHAPE_REPRESENTATION",
+        "KINEMATIC_SHAPE_REPRESENTATION",
+        "LAYOUT_SHAPE_REPRESENTATION",
+        "LIFE_CYCLE_SHAPE_REPRESENTATION",
+        "LOGISTIC_SHAPE_REPRESENTATION",
+        "LOGISTIC_PROCESS_SHAPE_REPRESENTATION",
+        "LOGISTIC_SITE_SHAPE_REPRESENTATION",
+        "LOGISTIC_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "MAINTENANCE_PROCESS_SHAPE_REPRESENTATION",
+        "MANUFACTURING_SHAPE_REPRESENTATION",
+        "MARKING_SHAPE_REPRESENTATION",
+        "MATERIAL_FLOW_SHAPE_REPRESENTATION",
+        "MECHANICAL_ANALYSIS_SHAPE_REPRESENTATION",
+        "MOUNTING_DEFINITION_SHAPE_REPRESENTATION",
+        "MOUNTING_SITE_SHAPE_REPRESENTATION",
+        "MOUNTING_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "NETWORK_SHAPE_REPRESENTATION",
+        "OPERATOR_SHAPE_REPRESENTATION",
+        "PACKAGING_PROCESS_SHAPE_REPRESENTATION",
+        "PART_DEFINITION_SHAPE_REPRESENTATION",
+        "PART_SITE_SHAPE_REPRESENTATION",
+        "PART_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "PATH_SHAPE_REPRESENTATION",
+        "PHYSICAL_SHAPE_REPRESENTATION",
+        "PIPE_DEFINITION_SHAPE_REPRESENTATION",
+        "PIPE_SITE_SHAPE_REPRESENTATION",
+        "PIPE_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "PLANNING_SHAPE_REPRESENTATION",
+        "POSITION_SHAPE_REPRESENTATION",
+        "PROCESS_PLAN_SHAPE_REPRESENTATION",
+        "PROCESS_SITE_SHAPE_REPRESENTATION",
+        "PROCESS_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "PROTECTION_SHAPE_REPRESENTATION",
+        "QUALITY_CONTROL_SHAPE_REPRESENTATION",
+        "RACK_SHAPE_REPRESENTATION",
+        "RECOVERY_SHAPE_REPRESENTATION",
+        "RECYCLING_SHAPE_REPRESENTATION",
+        "REPAIR_PROCESS_SHAPE_REPRESENTATION",
+        "RESOURCE_SHAPE_REPRESENTATION",
+        "RESPONSE_SHAPE_REPRESENTATION",
+        "RISK_SHAPE_REPRESENTATION",
+        "ROBOT_SHAPE_REPRESENTATION",
+        "RULE_SHAPE_REPRESENTATION",
+        "SAFETY_SHAPE_REPRESENTATION",
+        "SCHEDULE_SHAPE_REPRESENTATION",
+        "Schematic_SHAPE_REPRESENTATION",
+        "SEALING_SHAPE_REPRESENTATION",
+        "SERVICE_SHAPE_REPRESENTATION",
+        "SETUP_SHAPE_REPRESENTATION",
+        "SHIPMENT_SHAPE_REPRESENTATION",
+        "SIMULATION_SHAPE_REPRESENTATION",
+        "SITE_SHAPE_REPRESENTATION",
+        "SOFTWARE_SHAPE_REPRESENTATION",
+        "SOLUTION_SHAPE_REPRESENTATION",
+        "SPECIFICATION_SHAPE_REPRESENTATION",
+        "STANDARD_OPERATION_SHAPE_REPRESENTATION",
+        "STORAGE_SHAPE_REPRESENTATION",
+        "STRUCTURAL_ANALYSIS_SHAPE_REPRESENTATION",
+        "SUPPLIER_SHAPE_REPRESENTATION",
+        "SUPPORT_SHAPE_REPRESENTATION",
+        "SYSTEM_SHAPE_REPRESENTATION",
+        "TEST_SHAPE_REPRESENTATION",
+        "TESTING_PROCESS_SHAPE_REPRESENTATION",
+        "THERMAL_ANALYSIS_SHAPE_REPRESENTATION",
+        "TOOL_DEFINITION_SHAPE_REPRESENTATION",
+        "TOOL_SITE_SHAPE_REPRESENTATION",
+        "TOOL_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "TRAINING_SHAPE_REPRESENTATION",
+        "TRANSPORT_SHAPE_REPRESENTATION",
+        "VALIDATION_SHAPE_REPRESENTATION",
+        "VARIANT_DEFINITION_SHAPE_REPRESENTATION",
+        "VARIANT_SITE_SHAPE_REPRESENTATION",
+        "VARIANT_WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "VIRTUAL_SHAPE_REPRESENTATION",
+        "VISUALIZATION_SHAPE_REPRESENTATION",
+        "WAREHOUSE_SHAPE_REPRESENTATION",
+        "WARRANTY_SHAPE_REPRESENTATION",
+        "WORK_INSTRUCTION_SHAPE_REPRESENTATION",
+        "WORK_SHAPE_REPRESENTATION",
+        "ZONE_DEFINITION_SHAPE_REPRESENTATION",
+        "ZONE_SITE_SHAPE_REPRESENTATION",
+        "ZONE_WORK_INSTRUCTION_SHAPE_REPRESENTATION");
+
+    // 2D curve entities
+    registry.put("CIRCLE_2D", StepEntityResolver::resolveCircle2D);
+    registry.put("ELLIPSE_2D", StepEntityResolver::resolveEllipse2D);
+    registry.put("HYPERBOLA_2D", StepEntityResolver::resolveHyperbola2D);
+    registry.put("PARABOLA_2D", StepEntityResolver::resolveParabola2D);
+    registry.put("LINE_2D", StepEntityResolver::resolveLine2D);
+    registry.put("POLYLINE_2D", StepEntityResolver::resolvePolyline2D);
+    registry.put("TRIMMED_CURVE_2D", StepEntityResolver::resolveTrimmedCurve2D);
+    registry.put("COMPOSITE_CURVE_2D", StepEntityResolver::resolveCompositeCurve2D);
+    registry.put("B_SPLINE_CURVE_2D", StepEntityResolver::resolveBSplineCurve2D);
+    registry.put("RATIONAL_B_SPLINE_CURVE_2D", StepEntityResolver::resolveRationalBSplineCurve2D);
+    registry.put("BEZIER_CURVE_2D", StepEntityResolver::resolveBezierCurve2D);
+    registry.put("QUASI_UNIFORM_CURVE_2D", StepEntityResolver::resolveQuasiUniformCurve2D);
+    registry.put("UNIFORM_CURVE_2D", StepEntityResolver::resolveUniformCurve2D);
+    registry.put("PIECEWISE_BEZIER_CURVE_2D", StepEntityResolver::resolvePiecewiseBezierCurve2D);
+    registry.put("INDEXED_POLY_CURVE_2D", StepEntityResolver::resolveIndexedPolyCurve2D);
+    registry.put("DEGENERATE_CURVE_2D", StepEntityResolver::resolveDegenerateCurve2D);
+
+    // Surfaces with resolver methods but missing registry entries
+    registry.put("COMPOSITE_CURVE_ON_SURFACE", StepEntityResolver::resolveCompositeCurveOnSurface);
+    registry.put("DEGENERATE_TOROIDAL_SURFACE", StepEntityResolver::resolveDegenerateToroidalSurface);
+    registry.put("SURFACE_OF_LINEAR_EXTRUSION", StepEntityResolver::resolveSurfaceOfLinearExtrusion);
+    registry.put("RECTANGULAR_TRIMMED_SURFACE", StepEntityResolver::resolveRectangularTrimmedSurface);
+    registry.put("SURFACE_STYLE_PARAMETER_LINE", StepEntityResolver::resolveSurfaceStyleParameterLine);
+    registry.put("SURFACE_STYLE_REFLECTANCE_AMBIENT", StepEntityResolver::resolveSurfaceStyleReflectanceAmbient);
+    registry.put("SURFACE_STYLE_SEGMENTATION_CURVE", StepEntityResolver::resolveSurfaceStyleSegmentationCurve);
+
+    // CSG and solids
+    registry.put("CSG_PRIMITIVE", (resolver, instance) ->
+        resolver.resolveCsgPrimitive(instance, "CSG_PRIMITIVE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
+
+    // Transformations
+    registry.put("CARTESIAN_TRANSFORMATION_OPERATOR", StepEntityResolver::resolveCartesianTransformationOperator);
+    registry.put("CARTESIAN_TRANSFORMATION_OPERATOR_2D", StepEntityResolver::resolveCartesianTransformationOperator2D);
+    registry.put("CARTESIAN_TRANSFORMATION_OPERATOR_3D", StepEntityResolver::resolveCartesianTransformationOperator3D);
+    registry.put("ITEM_DEFINED_TRANSFORMATION", StepEntityResolver::resolveItemDefinedTransformation);
+
+    // Profile definitions
+    registry.put("CENTERED_CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCenteredCircleProfileDef);
+    registry.put("CENTRE_LINE_ARC_PROFILE_DEF", StepEntityResolver::resolveCentreLineArcProfileDef);
+    registry.put("RECTANGLE_HOLLOW_PROFILE_DEF", StepEntityResolver::resolveRectangleHollowProfileDef);
+    registry.put("ARBITRARY_CLOSED_PROFILE_DEF", (resolver, instance) ->
+        resolver.resolveArbitraryClosedProfileDef(instance));
+    registry.put("ARBITRARY_PROFILE_DEF", (resolver, instance) ->
+        resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_PROFILE_DEF"));
+    registry.put("ARBITRARY_PROFILE_DEF_WITH_VOIDS", StepEntityResolver::resolveArbitraryProfileDefWithVoids);
+    registry.put("PARAMETERIZED_PROFILE_DEF", (resolver, instance) ->
+        resolver.resolveParameterizedProfileDef(instance, "PARAMETERIZED_PROFILE_DEF", 3));
+    registry.put("PROFILE_DEF", StepEntityResolver::resolveProfileDef);
+    registry.put("CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCircleProfileDef);
+    registry.put("RECTANGLE_PROFILE_DEF", StepEntityResolver::resolveRectangleProfileDef);
+
+    // Representation and context
+    registry.put("GEOMETRIC_REPRESENTATION_CONTEXT", StepEntityResolver::resolveGeometricRepresentationContext);
+    registry.put("GEOMETRIC_REPRESENTATION_ITEM", StepEntityResolver::resolveGeometricRepresentationItem);
+    registry.put("TOPOLOGICAL_REPRESENTATION_ITEM", StepEntityResolver::resolveTopologicalRepresentationItem);
+    registry.put("CONTEXT_DEPENDENT_SHAPE_REPRESENTATION", StepEntityResolver::resolveContextDependentShapeRepresentation);
+    registry.put("NEXT_ASSEMBLY_USAGE_OCCURRENCE", StepEntityResolver::resolveNextAssemblyUsageOccurrence);
+    registry.put("DESCRIPTIVE_REPRESENTATION_ITEM", StepEntityResolver::resolveDescriptiveRepresentationItem);
+    registry.put("MEASURE_REPRESENTATION_ITEM", StepEntityResolver::resolveMeasureRepresentationItem);
+    registry.put("VALUE_REPRESENTATION_ITEM", StepEntityResolver::resolveValueRepresentationItem);
+
+    // Units and uncertainty
+    registry.put("GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUncertaintyAssignedContext);
+    registry.put("GLOBAL_UNIT_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUnitAssignedContext);
+    registry.put("CONVERSION_BASED_UNIT_WITH_OFFSET", StepEntityResolver::resolveConversionBasedUnitWithOffset);
+    registry.put("TYPED_MEASURE_WITH_UNIT", (resolver, instance) ->
+        resolver.resolveTypedMeasureWithUnit(instance, "TYPED_MEASURE_WITH_UNIT"));
+    registry.put("UNCERTAINTY_MEASURE_WITH_UNIT", StepEntityResolver::resolveUncertaintyMeasureWithUnit);
+    registry.put("COORDINATED_UNIVERSAL_TIME_OFFSET", StepEntityResolver::resolveCoordinatedUniversalTimeOffset);
+
+    // Tolerance and datum
+    registry.put("DATUM_SYSTEM", StepEntityResolver::resolveDatumSystem);
+    registry.put("SHAPE_ASPECT_RELATIONSHIP", StepEntityResolver::resolveShapeAspectRelationship);
+    registry.put("SHAPE_DEFINITION_REPRESENTATION", StepEntityResolver::resolveShapeDefinitionRepresentation);
+    registry.put("SHAPE_REPRESENTATION_RELATIONSHIP", StepEntityResolver::resolveShapeRepresentationRelationship);
+    registry.put("RECTANGULAR_TOLERANCE_ZONE", StepEntityResolver::resolveRectangularToleranceZone);
+
+    // Curves with resolver methods but missing registry entries
+    registry.put("B_SPLINE_CURVE", StepEntityResolver::resolveBSplineCurve);
+
+    // 2D curves needing new resolver methods
+    registry.put("BOUNDED_CURVE_2D", StepEntityResolver::resolveBoundedCurve2D);
+    registry.put("CURVE_2D", StepEntityResolver::resolveCurve2D);
+
+    // Swept area solids (generic, delegate to specific subtypes)
+    registry.put("EXTRUDED_AREA_SOLID", (resolver, instance) ->
+        resolver.resolveSweptAreaSolid(instance, "EXTRUDED_AREA_SOLID"));
+    registry.put("REVOLVED_AREA_SOLID", (resolver, instance) ->
+        resolver.resolveSweptAreaSolid(instance, "REVOLVED_AREA_SOLID"));
+
+    // Machined surface
+    registry.put("MACHINED_SURFACE", StepEntityResolver::resolveMachinedSurface);
+
     return registry;
   }
 

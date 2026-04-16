@@ -1,15 +1,17 @@
 package com.minicad.step.model;
 
+import com.minicad.step.syntax.StepValue;
 import java.util.List;
 
 /**
  * Resolved TRIMMED_CURVE for supported basis curves.
+ * Trim values can be entity references (Cartesian points) or parameter values (numeric literals).
  *
  * @param id step id
  * @param name step label
  * @param basisCurve basis curve
- * @param trim1 first trim list
- * @param trim2 second trim list
+ * @param trim1 first trim list (entity references or numeric parameter values)
+ * @param trim2 second trim list (entity references or numeric parameter values)
  * @param senseAgreement orientation agreement
  * @param masterRepresentation trimming preference enum
  */
@@ -17,8 +19,8 @@ public record StepTrimmedCurve(
         int id,
         String name,
         StepEntity basisCurve,
-        List<StepEntity> trim1,
-        List<StepEntity> trim2,
+        List<StepValue> trim1,
+        List<StepValue> trim2,
         boolean senseAgreement,
         String masterRepresentation
 ) implements StepEntity {

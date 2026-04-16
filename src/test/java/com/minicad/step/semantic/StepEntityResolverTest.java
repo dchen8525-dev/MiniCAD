@@ -266,6 +266,7 @@ import com.minicad.step.model.StepSecurityClassification;
 import com.minicad.step.model.StepSecurityClassificationAssignment;
 import com.minicad.step.model.StepSecurityClassificationLevel;
 import com.minicad.step.model.StepShapeAspect;
+import com.minicad.step.model.StepDatumSystem;
 import com.minicad.step.model.StepShapeAspectOccurrence;
 import com.minicad.step.model.StepShapeAspectRelationship;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
@@ -9124,6 +9125,8 @@ class StepEntityResolverTest {
             StepEntity entity = resolved.get(id);
             if (entity instanceof StepShapeAspectOccurrence occurrence) {
                 assertEquals(7, occurrence.ofShape().id());
+            } else if (entity instanceof StepDatumSystem) {
+                // DATUM_SYSTEM resolves to its own type, not a shape aspect
             } else {
                 StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, entity);
                 assertEquals(7, aspect.ofShape().id());

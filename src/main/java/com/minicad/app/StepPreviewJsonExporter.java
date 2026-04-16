@@ -45,6 +45,7 @@ import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepAbstractVariable;
 import com.minicad.step.model.StepAddress;
 import com.minicad.step.model.StepAdvancedFace;
+import com.minicad.step.syntax.StepValue;
 import com.minicad.step.model.StepAnnotationCurveOccurrence;
 import com.minicad.step.model.StepAnnotationFillArea;
 import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
@@ -10527,11 +10528,15 @@ public final class StepPreviewJsonExporter {
         } else if (definition instanceof StepTrimmedCurve curve) {
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
-            for (StepEntity trim : curve.trim1()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, trim, resolved, instanceIdsByTargetId);
+            for (StepValue trim : curve.trim1()) {
+                if (trim instanceof StepValue.ReferenceValue ref) {
+                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
+                }
             }
-            for (StepEntity trim : curve.trim2()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, trim, resolved, instanceIdsByTargetId);
+            for (StepValue trim : curve.trim2()) {
+                if (trim instanceof StepValue.ReferenceValue ref) {
+                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
+                }
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOffsetCurve2D curve) {
@@ -12630,8 +12635,16 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
         } else if (entity instanceof StepTrimmedCurve curve) {
             targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.trim1(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.trim2(), resolved, visiting));
+            for (StepValue trim : curve.trim1()) {
+                if (trim instanceof StepValue.ReferenceValue ref && resolved.containsKey(ref.id())) {
+                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
+                }
+            }
+            for (StepValue trim : curve.trim2()) {
+                if (trim instanceof StepValue.ReferenceValue ref && resolved.containsKey(ref.id())) {
+                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
+                }
+            }
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
         } else if (entity instanceof StepSurfaceCurve curve) {
             targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting));

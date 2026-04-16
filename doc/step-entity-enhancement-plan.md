@@ -1,23 +1,56 @@
 # 工业级 STEP 实体支持增强计划
 
-## 现状（已更新）
+## 现状（2026-04-16 更新）
 
 | 指标 | 数值 |
 |---|---|
-| Registry 条目 | 1100+ |
-| Model Classes | 824 |
+| Registry 条目 | 1048 |
+| 总实体引用 | 1894 |
+| Model Classes | 1040 |
 | 测试用例 | 1347 (全部通过) |
+| Core STEP 覆盖率 | 100% (44/44 核心实体) |
 
 ### 已完成工作
 
 - **Phase 1: CAD 构建链路全部打通**——所有关键几何实体都实现了 CAD 构建方法
-- **Phase 2: 实体注册大幅扩展**——新增 230+ 实体别名注册，覆盖：
+- **Phase 2-5: 实体注册大幅扩展**——新增 400+ 实体别名注册
+- **Phase 6: 制造特征和公差扩展**——新增 41 实体注册
+- **Phase 7: 工业特征和表示扩展**——新增 16 实体注册：
+  - 制造特征 ShapeAspect 别名：COOLING_FEATURE, LOCATOR_FEATURE, LUBRICATION_FEATURE, MARKING_FEATURE, MODIFY_FEATURE, PLATING_FEATURE, PNEUMATIC_FEATURE, ROBOT_FEATURE, SHAFT_FEATURE, STORAGE_FEATURE, STRUCTURAL_FEATURE, TRANSPORT_FEATURE
+  - 表示类型别名：COATING_REPRESENTATION_ITEM, HARDNESS_REPRESENTATION_ITEM, HEAT_TREATMENT_REPRESENTATION_ITEM
+  - 自定义 Resolver：CSG_VOLUME
   - 几何公差类型扩展（COAXIALITY_TOLERANCE, RUNOUT_TOLERANCE 等）
   - Shape Aspect 扩展（50+ 制造特征类型）
   - Representation 类型扩展（60+ 形状表示类型）
   - Representation Relationship 扩展（30+ 关系类型）
   - Characterized Object 扩展（60+ 操作和特征类型）
   - Externally Defined Item 扩展（27+ 外部定义类型）
+- **Phase 3: 大规模实体注册扩展**——新增 530+ 实体注册，覆盖：
+  - Tessellation 实体（TRIANGULATED_FACE, POLYGONAL_FACE, TESSELLATED_SHELL 等）
+  - Tolerance 实体（GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE, PROJECTED_TOLERANCE_ZONE 等）
+  - Product Definition 实体（MAKE_FROM_OPTION, AREA_IN_SET 等）
+  - Curve 实体（REPARAMETRISED_COMPOSITE_CURVE_SEGMENT 等）
+  - External Definition 实体（EXTERNALLY_DEFINED_CURVE_FONT, EXTERNALLY_DEFINED_HATCH_STYLE 等）
+  - Draughting 实体（INSET_CALLOUT, VALUE_FORMAT 等）
+  - Property 实体（ACTION_PROPERTY, GENERAL_PROPERTY_DEFINITION 等）
+  - Solid 实体（SWEPT_AREA_SOLID, SWEPT_VOLUME_SOLID, VOID_SOLID 等）
+  - Replica 实体（REPLICA_GEOMETRY, GEOMETRIC_REPLICA 等）
+  - BREP 变体（BREP, ADVANCED_FACE_REPRESENTATION 等）
+- **Phase 4: Extended 扩展**——新增大量别名注册：
+  - 14 个 Geometric Tolerance With Datum Reference 类型
+  - 12 个 Shape Aspect Relationship 类型
+  - 60+ 个 Shape Representation 类型
+  - 24 个 Representation Relationship 类型
+  - 100+ 个 Characterized Object 特征类型
+- **Phase 5: StepCadBuilder 方法补全**——新增/完善以下方法：
+  - `buildCurve2()` - 支持更多 2D 曲线类型（DegenerateCurve, Clothoid）
+  - `buildDegenerateCurve2()` - 退化曲线 2D 构建
+  - `buildClothoid2()` - 回旋线 2D 构建（使用 Fresnel 积分近似）
+  - `transformCurve3()` - 支持更多曲线变换（Parabola3, Hyperbola3, Clothoid3, DegenerateCurve3）
+  - `transformCurve2()` - 支持更多 2D 曲线变换（Parabola2, Hyperbola2）
+  - `validateTrimPoint()` - 修复对 2D trim 点的处理
+- **Bug 修复**：
+  - 修复 `validateTrimPoint` 对 2D 点坐标处理不当导致的 IndexOutOfBoundsException
 
 ### 核心发现
 
