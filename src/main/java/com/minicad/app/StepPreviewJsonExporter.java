@@ -751,7 +751,9 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepComplexClippingResult
                     || entity instanceof StepHalfSpaceSolid
                     || entity instanceof StepCsgVolume
-                    || entity instanceof StepBlockVolume) {
+                    || entity instanceof StepBlockVolume
+                    || entity instanceof StepFiniteElementMesh
+                    || entity instanceof StepFlatPattern) {
                 solidIds.add(entity.id());
             }
             if (isStandaloneEdgeSource(entity)) {
