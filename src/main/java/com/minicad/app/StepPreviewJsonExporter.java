@@ -146,6 +146,8 @@ import com.minicad.step.model.StepBlendedSurface;
 import com.minicad.step.model.StepBSplineSurfaceWithKnotsAndBreakpoints;
 import com.minicad.step.model.StepConicalSurfaceWithEllipticalAxis;
 import com.minicad.step.model.StepCylindricalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepFlatPattern;
+import com.minicad.step.model.StepFiniteElementMesh;
 import com.minicad.step.model.StepFacettedBrep;
 import com.minicad.step.model.StepFreeFormSurface;
 import com.minicad.step.model.StepMachinedSurface;
@@ -190,6 +192,7 @@ import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepBezierCurve;
 import com.minicad.step.model.StepBezierSurface;
 import com.minicad.step.model.StepBoundedCurve;
+import com.minicad.step.model.StepBoundedCurve2D;
 import com.minicad.step.model.StepBoundedSurface;
 import com.minicad.step.model.StepCalendarDate;
 import com.minicad.step.model.StepCharacterGlyphStyleOutline;
@@ -2217,7 +2220,9 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepComplexClippingResult
                 || entity instanceof StepHalfSpaceSolid
                 || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume;
+                || entity instanceof StepBlockVolume
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern;
     }
 
     private static List<StepRepresentation> linkedShapeRepresentations(
@@ -2590,7 +2595,9 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepTessellatedFace
                 || entity instanceof StepGeometricSurfaceSet
                 || entity instanceof StepPlanarBox
-                || entity instanceof StepPlanarExtent;
+                || entity instanceof StepPlanarExtent
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern;
     }
 
     private static FacePayload toPlanarFacePayload(
@@ -7332,11 +7339,18 @@ public final class StepPreviewJsonExporter {
                     || item instanceof StepBSplineCurve2D
                     || item instanceof StepRationalBSplineCurve2D
                     || item instanceof StepLine2D
-                    || item instanceof StepCurve2D) {
+                    || item instanceof StepCurve2D
+                    || item instanceof StepBoundedCurve2D) {
                 return builder.buildCurve3From2D(item.id());
             }
         } catch (UnsupportedGeometryException | StepResolutionException ex) {
             return null;
+        }
+        if (item instanceof StepBoundedCurve bounded) {
+            return builder.buildCurveReference3(bounded.id());
+        }
+        if (item instanceof StepMappedItem mappedItem) {
+            return curveForLooseEdge(mappedItem.mappingTarget(), builder);
         }
         return null;
     }
