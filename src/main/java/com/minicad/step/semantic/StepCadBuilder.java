@@ -129,6 +129,9 @@ import com.minicad.step.model.StepTessellatedFace;
 import com.minicad.step.model.StepTessellatedFaceSet;
 import com.minicad.step.model.StepTessellatedTriangle;
 import com.minicad.step.model.StepSeamEdge;
+import com.minicad.step.model.StepCenteredCircleProfileDef;
+import com.minicad.step.model.StepCentreLineArcProfileDef;
+import com.minicad.step.model.StepRectangleHollowProfileDef;
 import com.minicad.step.model.StepWireShell;
 import com.minicad.step.model.StepOrientedClosedShell;
 import com.minicad.step.model.StepOrientedOpenShell;
@@ -3635,6 +3638,27 @@ public final class StepCadBuilder {
     private StepProfileDef asProfileDef(StepEntity entity) {
         if (entity instanceof StepProfileDef profileDef) {
             return profileDef;
+        }
+        // Dedicated profile types with their own model classes
+        if (entity instanceof StepCenteredCircleProfileDef) {
+            return new StepProfileDef(
+                entity.id(), "AREA", "", null, List.of(),
+                List.of(((StepCenteredCircleProfileDef) entity).radius(),
+                        ((StepCenteredCircleProfileDef) entity).centerOffset()),
+                "CENTERED_CIRCLE_PROFILE_DEF");
+        }
+        if (entity instanceof StepCentreLineArcProfileDef) {
+            return new StepProfileDef(
+                entity.id(), "AREA", "", null, List.of(),
+                List.of(((StepCentreLineArcProfileDef) entity).radius(),
+                        ((StepCentreLineArcProfileDef) entity).angle()),
+                "CENTRE_LINE_ARC_PROFILE_DEF");
+        }
+        if (entity instanceof StepRectangleHollowProfileDef def) {
+            return new StepProfileDef(
+                entity.id(), "AREA", "", null, List.of(),
+                List.of(def.xDim(), def.yDim(), def.wallThickness(), def.innerRadius()),
+                "RECTANGLE_HOLLOW_PROFILE_DEF");
         }
         throw new UnsupportedGeometryException("swept area must be a profile definition");
     }

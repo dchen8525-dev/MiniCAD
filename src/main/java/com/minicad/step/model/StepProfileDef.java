@@ -23,9 +23,6 @@ public record StepProfileDef(
     String entityName)
     implements StepEntity {
 
-  /**
-   * Creates an immutable profile definition record.
-   */
   public StepProfileDef {
     curves = List.copyOf(curves);
     parameters = List.copyOf(parameters);
