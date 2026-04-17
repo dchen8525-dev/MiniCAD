@@ -278,6 +278,8 @@ public final class StepCadBuilder {
     private final Map<Integer, ConicalSurface> conicalSurfaces = new LinkedHashMap<>();
     private final Map<Integer, ToroidalSurface> toroidalSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SphericalSurface> sphericalSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, RuledSurface3> ruledSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, SurfaceOfConstantRadius3> constantRadiusSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SurfaceOfLinearExtrusion3> linearExtrusionSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SurfaceOfRevolution3> revolutionSurfaces = new LinkedHashMap<>();
     private final Map<Integer, BSplineCurve3> bsplineCurves = new LinkedHashMap<>();
@@ -894,7 +896,7 @@ public final class StepCadBuilder {
         if (item instanceof StepMappedItem mappedItem) {
             return buildCurve2(mappedItem.mappingTarget());
         }
-        throw new UnsupportedGeometryException("PCURVE 2D curve type " + stepEntityTypeName(item) + " is not supported");
+        throw new UnsupportedGeometryException("2D curve type " + stepEntityTypeName(item) + " is not supported");
     }
 
     /**
@@ -1431,6 +1433,35 @@ public final class StepCadBuilder {
         return built;
     }
 
+    public RuledSurface3 buildRuledSurface(int id) {
+        RuledSurface3 existing = ruledSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepRuledSurface surface = requireEntity(id, StepRuledSurface.class, "RULED_SURFACE");
+        Axis2Placement3D position = buildPlacement(surface.position().id());
+        Curve3 directrix1 = buildCurve3(surface.directrix1());
+        Curve3 directrix2 = buildCurve3(surface.directrix2());
+        RuledSurface3 built = new RuledSurface3(directrix1, directrix2);
+        ruledSurfaces.put(id, built);
+        return built;
+    }
+
+    public SurfaceOfConstantRadius3 buildSurfaceOfConstantRadius(int id) {
+        SurfaceOfConstantRadius3 existing = constantRadiusSurfaces.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepSurfaceOfConstantRadius surface = requireEntity(id, StepSurfaceOfConstantRadius.class, "SURFACE_OF_CONSTANT_RADIUS");
+        SurfaceGeometry sweptSurface = buildSupportedFaceGeometry(surface.sweptSurface(), "SURFACE_OF_CONSTANT_RADIUS");
+        if (sweptSurface == null) {
+            throw new UnsupportedGeometryException("Swept surface is null for SURFACE_OF_CONSTANT_RADIUS");
+        }
+        SurfaceOfConstantRadius3 built = new SurfaceOfConstantRadius3(sweptSurface, surface.radius());
+        constantRadiusSurfaces.put(id, built);
+        return built;
+    }
+
     /**
      * Builds a SURFACE_OF_LINEAR_EXTRUSION geometry object.
      *
@@ -1762,11 +1793,7 @@ public final class StepCadBuilder {
             return existing;
         }
         StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
-        Curve3 basis = switch (trimmedCurve.basisCurve()) {
-            case StepConicCurve conic ->
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve for " + conic.entityName() + " is unsupported");
-            default -> buildCurve3(trimmedCurve.basisCurve());
-        };
+        Curve3 basis = buildCurve3(trimmedCurve.basisCurve());
         for (StepValue trim : trimmedCurve.trim1()) {
             validateTrimValue(trim, basis, "trim_1");
         }
@@ -2174,7 +2201,7 @@ public final class StepCadBuilder {
             case StepVertexLoop vertexLoop -> buildVertexLoop(vertexLoop.id());
             case com.minicad.step.model.StepPolyLoop polyLoop -> buildPolyLoop(polyLoop.id());
             default -> throw new UnsupportedGeometryException(
-                    "FACE_BOUND construction requires EDGE_LOOP or VERTEX_LOOP");
+                    "FACE_BOUND construction requires EDGE_LOOP, VERTEX_LOOP, or POLY_LOOP");
         };
         FaceBound built = stepFaceBound.outer()
                 ? FaceBound.outer(builtLoop, stepFaceBound.orientation())
@@ -3095,7 +3122,7 @@ public final class StepCadBuilder {
      * Checks if an entity can be dispatched to buildSolid.
      * Used for abstract base type resolution.
      */
-    private boolean canBuildAsSolid(StepEntity entity) {
+    public boolean canBuildAsSolid(StepEntity entity) {
         return entity instanceof StepManifoldSolidBrep
                 || entity instanceof StepFacettedBrep
                 || entity instanceof StepBrepWithVoids
@@ -5126,8 +5153,25 @@ public final class StepCadBuilder {
                 // Dispatch through to the mapping target for geometry.
                 yield buildCurve3(mappedItem.mappingTarget());
             }
+            // 2D-specific curve types lifted to 3D via sampling
+            case StepCompositeCurve2D composite2D -> liftCurve2(buildCompositeCurve2D(composite2D));
+            case StepTrimmedCurve2D trimmed2D -> liftCurve2(buildTrimmedCurve2D(trimmed2D));
+            case StepBSplineCurve2D spline2D -> liftCurve2(buildBSplineCurve2D(spline2D));
+            case StepRationalBSplineCurve2D rational2D -> liftCurve2(buildRationalBSplineCurve2D(rational2D));
+            case StepBezierCurve2D bezier2D -> liftCurve2(buildBezierCurve2D(bezier2D));
+            case StepQuasiUniformCurve2D quasiUniform2D -> liftCurve2(buildQuasiUniformCurve2D(quasiUniform2D));
+            case StepUniformCurve2D uniform2D -> liftCurve2(buildUniformCurve2D(uniform2D));
+            case StepPiecewiseBezierCurve2D piecewiseBezier2D -> liftCurve2(buildPiecewiseBezierCurve2D(piecewiseBezier2D));
+            case StepIndexedPolyCurve2D polyCurve2D -> liftCurve2(buildIndexedPolyCurve2D(polyCurve2D));
+            case StepDegenerateCurve2D degenerate2D -> liftCurve2(buildDegenerateCurve2D(degenerate2D));
+            case StepCircle2D circle2D -> liftCurve2(buildCircle2D(circle2D));
+            case StepEllipse2D ellipse2D -> liftCurve2(buildEllipse2D(ellipse2D));
+            case StepLine2D line2D -> liftCurve2(buildLine2D(line2D));
+            case StepPolyline2D polyline2D -> liftCurve2(buildPolyline2D(polyline2D));
+            case StepHyperbola2D hyperbola2D -> liftCurve2(buildHyperbola2D(hyperbola2D));
+            case StepParabola2D parabola2D -> liftCurve2(buildParabola2D(parabola2D));
             default -> throw new UnsupportedGeometryException(
-                    "surface directrix requires LINE, CIRCLE, ELLIPSE, POLYLINE, BEZIER_CURVE, UNIFORM_CURVE, QUASI_UNIFORM_CURVE, PIECEWISE_BEZIER_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, RATIONAL_B_SPLINE_CURVE, SURFACE_CURVE, SEAM_CURVE, TRIMMED_CURVE, PATH, OPEN_PATH, SUBPATH or ORIENTED_PATH"
+                    "curve type " + curve.getClass().getSimpleName() + " is not a supported 3D curve"
             );
         };
     }
@@ -5605,6 +5649,10 @@ public final class StepCadBuilder {
         if (geometry instanceof StepFreeFormSurface freeForm) {
             return buildFreeFormSurface(freeForm);
         }
+        // Machined surface: delegate to underlying face geometry
+        if (geometry instanceof StepMachinedSurface machinedSurface) {
+            return buildSupportedFaceGeometry(machinedSurface.face(), faceType);
+        }
         // Bounded surface - marker type with no geometry data
         if (geometry instanceof StepBoundedSurface boundedSurface) {
             StepEntity actual = entitiesById.get(boundedSurface.id());
@@ -5621,6 +5669,10 @@ public final class StepCadBuilder {
             }
             return null;
         }
+        // Machined surface: delegate to underlying face geometry
+        if (geometry instanceof StepMachinedSurface machinedSurface) {
+            return buildSupportedFaceGeometry(machinedSurface.face(), faceType);
+        }
         // MAPPED_ITEM: dispatch through to mapping target for surface geometry
         if (geometry instanceof StepMappedItem mappedItem) {
             return buildSupportedFaceGeometry(mappedItem.mappingTarget(), faceType);
@@ -5629,15 +5681,25 @@ public final class StepCadBuilder {
     }
 
     private SurfaceGeometry buildRuledSurfaceGeometry(StepRuledSurface ruledSurface) {
+        RuledSurface3 existing = ruledSurfaces.get(ruledSurface.id());
+        if (existing != null) {
+            return existing;
+        }
         // Ruled surface is defined by two directrix curves
         Axis2Placement3D position = buildPlacement(ruledSurface.position().id());
         Curve3 directrix1 = buildCurve3(ruledSurface.directrix1());
         Curve3 directrix2 = buildCurve3(ruledSurface.directrix2());
         // Create ruled surface geometry
-        return new RuledSurface3(directrix1, directrix2);
+        RuledSurface3 built = new RuledSurface3(directrix1, directrix2);
+        ruledSurfaces.put(ruledSurface.id(), built);
+        return built;
     }
 
     private SurfaceGeometry buildSurfaceOfConstantRadiusGeometry(StepSurfaceOfConstantRadius surface, String faceType) {
+        SurfaceOfConstantRadius3 existing = constantRadiusSurfaces.get(surface.id());
+        if (existing != null) {
+            return existing;
+        }
         // Surface of constant radius: sweep a surface along a path with constant radius
         SurfaceGeometry sweptSurface = buildSupportedFaceGeometry(surface.sweptSurface(), faceType);
         if (sweptSurface == null) {
@@ -5647,7 +5709,9 @@ public final class StepCadBuilder {
         if (radius <= 0.0) {
             return null;
         }
-        return new SurfaceOfConstantRadius3(sweptSurface, radius);
+        SurfaceOfConstantRadius3 built = new SurfaceOfConstantRadius3(sweptSurface, radius);
+        constantRadiusSurfaces.put(surface.id(), built);
+        return built;
     }
 
     private SurfaceGeometry buildSurfacePatchGeometry(StepSurfacePatch patch, String faceType) {
@@ -5731,7 +5795,7 @@ public final class StepCadBuilder {
 
     // Build methods for elliptical axis and extended surface types
 
-    private CylindricalSurface buildCylindricalSurfaceWithEllipticalAxis(int id) {
+    public CylindricalSurface buildCylindricalSurfaceWithEllipticalAxis(int id) {
         CylindricalSurface existing = cylindricalSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5745,7 +5809,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private ConicalSurface buildConicalSurfaceWithEllipticalAxis(int id) {
+    public ConicalSurface buildConicalSurfaceWithEllipticalAxis(int id) {
         ConicalSurface existing = conicalSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5759,7 +5823,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private SphericalSurface buildSphericalSurfaceWithEllipticalAxis(int id) {
+    public SphericalSurface buildSphericalSurfaceWithEllipticalAxis(int id) {
         SphericalSurface existing = sphericalSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5772,7 +5836,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private ToroidalSurface buildToroidalSurfaceWithCylindricalAxis(int id) {
+    public ToroidalSurface buildToroidalSurfaceWithCylindricalAxis(int id) {
         ToroidalSurface existing = toroidalSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5786,7 +5850,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private ToroidalSurface buildToroidalSurfaceWithEllipticalAxis(int id) {
+    public ToroidalSurface buildToroidalSurfaceWithEllipticalAxis(int id) {
         ToroidalSurface existing = toroidalSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5799,7 +5863,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private BSplineSurface3 buildBSplineSurfaceWithBreakpoints(int id) {
+    public BSplineSurface3 buildBSplineSurfaceWithBreakpoints(int id) {
         BSplineSurface3 existing = bsplineSurfaces.get(id);
         if (existing != null) {
             return existing;
@@ -5999,6 +6063,10 @@ public final class StepCadBuilder {
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
             buildBSplineSurface(splineSurface.id());
+            return;
+        }
+        if (geometry instanceof StepBSplineSurface splineSurface) {
+            buildGenericBSplineSurface(splineSurface.id());
             return;
         }
         if (geometry instanceof StepRationalBSplineSurface rationalSplineSurface) {
@@ -6407,6 +6475,12 @@ public final class StepCadBuilder {
         return List.copyOf(knots);
     }
 
+    public Curve3 buildCurve3From2D(int id) {
+        StepEntity entity = requireExistingEntity(id);
+        Curve2 curve2 = (Curve2) buildCurve2(entity);
+        return liftCurve2(curve2);
+    }
+
     private Curve3 liftCurve2(Curve2 curve2) {
         List<Point2> points2 = sampleCurve2(curve2, 72);
         List<CartesianPoint> points3 = points2.stream()
@@ -6646,29 +6720,6 @@ public final class StepCadBuilder {
     }
 
     private List<CartesianPoint> sampleCurve3(Curve3 curve, int segments) {
-        if (curve instanceof Line3 line) {
-            return List.of(line.origin(), line.pointAt(1.0));
-        }
-        if (curve instanceof Circle circle) {
-            List<CartesianPoint> points = new ArrayList<>(segments + 1);
-            for (int index = 0; index <= segments; index++) {
-                points.add(circle.pointAt(Math.PI * 2.0 * index / segments));
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Ellipse3 ellipse) {
-            List<CartesianPoint> points = new ArrayList<>(segments + 1);
-            for (int index = 0; index <= segments; index++) {
-                points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof BSplineCurve3 spline) {
-            return spline.sample(segments);
-        }
-        if (curve instanceof RationalBSplineCurve3 spline) {
-            return spline.sample(segments);
-        }
         if (curve instanceof TrimmedCurve3 trimmedCurve) {
             return sampleTrimmedCurve3(trimmedCurve, segments);
         }
@@ -6691,21 +6742,11 @@ public final class StepCadBuilder {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Clothoid3 clothoid) {
-            return clothoid.sample(segments);
+        List<CartesianPoint> points = curve.sample(segments);
+        if (points.isEmpty()) {
+            throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
         }
-        if (curve instanceof Parabola3 parabola) {
-            return parabola.sample(segments);
-        }
-        if (curve instanceof Hyperbola3 hyperbola) {
-            return hyperbola.sample(segments);
-        }
-        if (curve instanceof DegenerateCurve3 degenerate) {
-            // Degenerate curve is a single point, return that point duplicated
-            CartesianPoint point = degenerate.point();
-            return List.of(point, point);
-        }
-        throw new UnsupportedGeometryException("curve sampling for " + curveTypeName(curve) + " is unsupported");
+        return points;
     }
 
     private static Vector2 tangentAt(List<Point2> points, int index) {
@@ -7331,44 +7372,7 @@ public final class StepCadBuilder {
      * Evaluates a curve at a given parameter value to produce a CartesianPoint for parameter-based trims.
      */
     private static CartesianPoint evaluateCurveAtParameter(Curve3 curve, double param, String slot) {
-        return switch (curve) {
-            case Line3 line -> line.pointAt(param);
-            case Circle circle -> circle.pointAt(param);
-            case Ellipse3 ellipse -> ellipse.pointAt(param);
-            case Polyline3 polyline -> evaluatePolylineAtParameter(polyline, param);
-            case TrimmedCurve3 trimmed -> evaluateCurveAtParameter(trimmed.basisCurve(), param, slot);
-            case CompositeCurve3 composite -> evaluateCompositeAtParameter(composite, param);
-            case com.minicad.geometry.BSplineCurve3 bspline -> bspline.pointAt(param);
-            case com.minicad.geometry.RationalBSplineCurve3 rational -> rational.pointAt(param);
-            case com.minicad.geometry.Clothoid3 clothoid -> clothoid.pointAt(param);
-            case com.minicad.geometry.DegenerateCurve3 degenerate -> degenerate.pointAt(param);
-            default -> throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " parameter trim not supported for curve type " + curve.getClass().getSimpleName());
-        };
-    }
-
-    private static CartesianPoint evaluatePolylineAtParameter(Polyline3 polyline, double param) {
-        List<CartesianPoint> points = polyline.points();
-        if (points.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim on empty polyline");
-        }
-        int segments = points.size() - 1;
-        double t = param * segments;
-        int index = (int) Math.max(0, Math.min(Math.floor(t), segments - 1));
-        double localT = t - index;
-        CartesianPoint p1 = points.get(index);
-        CartesianPoint p2 = points.get(index + 1);
-        return p1.add(p2.subtract(p1).scale(localT));
-    }
-
-    private static CartesianPoint evaluateCompositeAtParameter(CompositeCurve3 composite, double param) {
-        List<Curve3> segments = composite.segments();
-        if (segments.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim on empty composite curve");
-        }
-        double t = param * segments.size();
-        int index = (int) Math.max(0, Math.min((int) Math.floor(t), segments.size() - 1));
-        double localT = t - index;
-        return evaluateCurveAtParameter(segments.get(index), localT, "composite segment");
+        return curve.pointAt(param);
     }
 
     /**

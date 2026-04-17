@@ -6450,6 +6450,14 @@ public final class StepEntityResolver {
       case "ARBITRARY_PROFILE_DEF" -> resolveArbitraryProfileDef(instance, concrete.name());
       case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" -> resolveArbitraryProfileDefWithVoids(instance);
       case "PARAMETERIZED_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, concrete.name(), 3);
+      case "CENTERED_CIRCLE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "CENTERED_CIRCLE_PROFILE_DEF", 2);
+      case "CENTRE_LINE_ARC_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "CENTRE_LINE_ARC_PROFILE_DEF", 2);
+      case "ELLIPSE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "ELLIPSE_PROFILE_DEF", 2);
+      case "L_SHAPE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "L_SHAPE_PROFILE_DEF", 4);
+      case "U_SHAPE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "U_SHAPE_PROFILE_DEF", 5);
+      case "Z_SHAPE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "Z_SHAPE_PROFILE_DEF", 5);
+      case "CHANNEL_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "CHANNEL_PROFILE_DEF", 5);
+      case "T_SHAPE_PROFILE_DEF" -> resolveParameterizedProfileDef(instance, "T_SHAPE_PROFILE_DEF", 5);
       default -> throw new UnsupportedStepEntityException("PROFILE_DEF subtype " + concrete.name() + " is not a StepProfileDef");
     };
   }
@@ -7092,9 +7100,10 @@ public final class StepEntityResolver {
                                     && !(style instanceof StepSurfaceStyleReflectanceAmbient)
                                     && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuse)
                                     && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular)
+                                    && !(style instanceof StepSurfaceStyleRendering)
                                     && !(style instanceof StepSurfaceStyleParameterLine)) {
                                 throw new StepResolutionException(
-                                        "SURFACE_SIDE_STYLE styles must reference SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR or SURFACE_STYLE_PARAMETER_LINE");
+                                        "SURFACE_SIDE_STYLE styles must reference SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR, SURFACE_STYLE_RENDERING or SURFACE_STYLE_PARAMETER_LINE");
                             }
                             return style;
                         })
