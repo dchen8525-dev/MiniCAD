@@ -25,7 +25,10 @@ import com.minicad.geometry.Plane;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry.RationalBSplineCurve3;
 import com.minicad.geometry.RationalBSplineSurface3;
+import com.minicad.geometry.RuledSurface3;
+import com.minicad.geometry.SurfaceOfConstantRadius3;
 import com.minicad.geometry.SurfaceCurve3;
+import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
 import com.minicad.geometry.SphericalSurface;
@@ -92,6 +95,22 @@ import com.minicad.step.model.StepBrepWithVoids;
 import com.minicad.step.model.StepChainBasedItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.StepChainBasedGeometricItemSpecificUsage;
 import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepClothoid;
+import com.minicad.step.model.StepBezierCurve2D;
+import com.minicad.step.model.StepBSplineCurve2D;
+import com.minicad.step.model.StepCircle2D;
+import com.minicad.step.model.StepCompositeCurve2D;
+import com.minicad.step.model.StepCurve2D;
+import com.minicad.step.model.StepEllipse2D;
+import com.minicad.step.model.StepIndexedPolyCurve2D;
+import com.minicad.step.model.StepLine2D;
+import com.minicad.step.model.StepPolyline2D;
+import com.minicad.step.model.StepQuasiUniformCurve2D;
+import com.minicad.step.model.StepRationalBSplineCurve2D;
+import com.minicad.step.model.StepSeamCurve;
+import com.minicad.step.model.StepTrimmedCurve2D;
+import com.minicad.step.model.StepUniformCurve2D;
+import com.minicad.step.model.StepPiecewiseBezierCurve2D;
 import com.minicad.step.model.StepCertification;
 import com.minicad.step.model.StepCertificationAssignment;
 import com.minicad.step.model.StepCertificationType;
@@ -115,10 +134,31 @@ import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceBound;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.StepFaceBasedSurfaceModel;
+import com.minicad.step.model.StepManifoldSurfaceModel;
 import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepFillAreaStyle;
 import com.minicad.step.model.StepFillAreaStyleColour;
 import com.minicad.step.model.StepDirection;
+import com.minicad.step.model.StepAdvancedBrep;
+import com.minicad.step.model.StepBlendedSurface;
+import com.minicad.step.model.StepBSplineSurfaceWithKnotsAndBreakpoints;
+import com.minicad.step.model.StepConicalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepCylindricalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepFacettedBrep;
+import com.minicad.step.model.StepFreeFormSurface;
+import com.minicad.step.model.StepMachinedSurface;
+import com.minicad.step.model.StepNonManifoldSolidBrep;
+import com.minicad.step.model.StepOffsetSurface2;
+import com.minicad.step.model.StepRectangularCompositeSurface;
+import com.minicad.step.model.StepSphericalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepSurfacePatch;
+import com.minicad.step.model.StepToroidalSurfaceWithCylindricalAxis;
+import com.minicad.step.model.StepToroidalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepRuledSurface;
+import com.minicad.step.model.StepSurfaceOfConstantRadius;
+import com.minicad.step.model.StepTessellatedFace;
+import com.minicad.step.model.StepTessellatedFaceSet;
+import com.minicad.step.model.StepTessellatedTriangle;
 import com.minicad.step.model.StepForwardChainingRulePremise;
 import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricReplica;
@@ -139,6 +179,7 @@ import com.minicad.step.model.StepAnnotationTextOccurrence;
 import com.minicad.step.model.StepBackChainingRuleBody;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
+import com.minicad.step.model.StepBSplineCurveWithKnotsAndBreakpoints;
 import com.minicad.step.model.StepBSplineSurface;
 import com.minicad.step.model.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.StepBezierCurve;
@@ -156,6 +197,7 @@ import com.minicad.step.model.StepColourRgb;
 import com.minicad.step.model.StepColourSpecification;
 import com.minicad.step.model.StepCompositeCurve;
 import com.minicad.step.model.StepCompositeCurveOnSurface;
+import com.minicad.step.model.StepCompositeCurveOnSurface3D;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.model.StepContract;
@@ -175,6 +217,8 @@ import com.minicad.step.model.StepDateAndTime;
 import com.minicad.step.model.StepDateRole;
 import com.minicad.step.model.StepDateTimeAssignment;
 import com.minicad.step.model.StepDateTimeRole;
+import com.minicad.step.model.StepDegenerateCurve;
+import com.minicad.step.model.StepDegenerateCurve2D;
 import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDescriptiveRepresentationItem;
@@ -188,6 +232,10 @@ import com.minicad.step.model.StepDocumentUsageConstraint;
 import com.minicad.step.model.StepEdge;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdgeLoop;
+import com.minicad.step.model.StepEdgeWire;
+import com.minicad.step.model.StepChamferEdge;
+import com.minicad.step.model.StepFilletEdge;
+import com.minicad.step.model.StepSeamEdge;
 import com.minicad.step.model.StepEllipse;
 import com.minicad.step.model.StepExternalIdentificationAssignment;
 import com.minicad.step.model.StepExternallyDefinedItem;
@@ -202,6 +250,7 @@ import com.minicad.step.model.StepGroup;
 import com.minicad.step.model.StepGroupAssignment;
 import com.minicad.step.model.StepGroupRelationship;
 import com.minicad.step.model.StepItemIdentifiedRepresentationUsage;
+import com.minicad.step.model.StepIndexedPolyCurve;
 import com.minicad.step.model.StepKinematicPropertyDefinitionRepresentation;
 import com.minicad.step.model.StepKinematicPropertyMechanismRepresentation;
 import com.minicad.step.model.StepKinematicPropertyRepresentationRelation;
@@ -232,6 +281,8 @@ import com.minicad.step.model.StepOrientedPath;
 import com.minicad.step.model.StepOrientedSurface;
 import com.minicad.step.model.StepPath;
 import com.minicad.step.model.StepOffsetCurve2D;
+import com.minicad.step.model.StepHyperbola2D;
+import com.minicad.step.model.StepParabola2D;
 import com.minicad.step.model.StepOffsetCurve3D;
 import com.minicad.step.model.StepOffsetSurface;
 import com.minicad.step.model.StepLoop;
@@ -291,6 +342,7 @@ import com.minicad.step.model.StepSecurityClassificationAssignment;
 import com.minicad.step.model.StepSecurityClassificationLevel;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepLine;
+import com.minicad.step.model.StepLineSegment;
 import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPolyLoop;
 import com.minicad.step.model.StepPcurve;
@@ -318,6 +370,7 @@ import com.minicad.step.model.StepSurface;
 import com.minicad.step.model.StepSurfaceCurve;
 import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceSideStyle;
+import com.minicad.step.model.StepSurfacedEdgeCurve;
 import com.minicad.step.model.StepSurfaceStyleBoundary;
 import com.minicad.step.model.StepSurfaceStyleControlGrid;
 import com.minicad.step.model.StepSurfaceStyleFillArea;
@@ -333,6 +386,12 @@ import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
 import com.minicad.step.model.StepSurfacedOpenShell;
 import com.minicad.step.model.StepSweptAreaSolid;
+import com.minicad.step.model.StepComplexClippingResult;
+import com.minicad.step.model.StepExtrudedAreaSolidTapered;
+import com.minicad.step.model.StepPolygonalBoundedHalfSpace;
+import com.minicad.step.model.StepRevolvedAreaSolidTapered;
+import com.minicad.step.model.StepSurfaceCurveSweptAreaSolid;
+import com.minicad.step.model.StepSweptDiskSolid;
 import com.minicad.step.model.StepSphericalSurface;
 import com.minicad.step.model.StepSymbolRepresentationMap;
 import com.minicad.step.model.StepSymbolColour;
@@ -533,6 +592,8 @@ public final class StepPreviewJsonExporter {
         long metadataStartedAt = System.nanoTime();
         StepMetadataExtractor metadata = StepMetadataExtractor.fromResolved(resolved);
         log.debug("stage={} elapsedMs={}", "metadata_done", elapsedMillis(metadataStartedAt));
+        ProductMetadataExtractor.ProductMetadata productInfo = ProductMetadataExtractor.extract(stepFile, resolved);
+        UnitExtractor.UnitInfo units = UnitExtractor.extract(resolved);
         long assemblyStartedAt = System.nanoTime();
         AssemblyData assembly = buildAssemblyData(resolved, builder, metadata);
         log.info("stage={} elapsedMs={}, representations={}, instances={}, unsupportedFaces={}", "assembly_done",
@@ -603,6 +664,8 @@ public final class StepPreviewJsonExporter {
                 stats,
                 bounds.toPayload(),
                 validation,
+                productInfo,
+                units,
                 pmi,
                 unsupportedBooleans,
                 unsupportedFaces,
@@ -669,7 +732,13 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepCsgSolid
                     || entity instanceof StepCsgPrimitive
                     || entity instanceof StepBooleanClippingResult
-                    || entity instanceof StepBooleanResult) {
+                    || entity instanceof StepBooleanResult
+                    || entity instanceof StepSweptDiskSolid
+                    || entity instanceof StepExtrudedAreaSolidTapered
+                    || entity instanceof StepRevolvedAreaSolidTapered
+                    || entity instanceof StepSurfaceCurveSweptAreaSolid
+                    || entity instanceof StepPolygonalBoundedHalfSpace
+                    || entity instanceof StepComplexClippingResult) {
                 solidIds.add(entity.id());
             }
             if (isStandaloneEdgeSource(entity)) {
@@ -696,7 +765,22 @@ public final class StepPreviewJsonExporter {
         int processedFaces = 0;
 
         for (Integer shellId : shellIds) {
-            List<StepFaceEntity> shellFaces = shellFaces(resolved.get(shellId));
+            StepEntity shellEntity = resolved.get(shellId);
+            if (shellEntity instanceof StepTessellatedFaceSet tessellated) {
+                List<FacePayload> tessFaces = buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
+                faces.addAll(tessFaces);
+                log.debug("stage={} shellId={}, tessellatedFaceCount={}", "geometry_tessellated_shell", shellId, tessFaces.size());
+                continue;
+            }
+            if (shellEntity instanceof StepTessellatedFace tessellatedFace) {
+                FacePayload payload = buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
+                if (payload != null) {
+                    faces.add(payload);
+                }
+                log.debug("stage={} shellId={}, tessellatedFaceBuilt={}", "geometry_tessellated_face", shellId, payload != null);
+                continue;
+            }
+            List<StepFaceEntity> shellFaces = shellFaces(shellEntity);
             log.debug("stage={} shellId={}, shellFaceCount={}", "geometry_shell_start", shellId, shellFaces.size());
             for (StepFaceEntity stepFace : shellFaces) {
                 PreviewFaceResult previewFace = buildPreviewFaceResult(
@@ -830,6 +914,21 @@ public final class StepPreviewJsonExporter {
             shellIds.add(solidBrep.outer().id());
             return;
         }
+        if (item instanceof StepFacettedBrep facettedBrep) {
+            shellIds.add(facettedBrep.outer().id());
+            return;
+        }
+        if (item instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
+            shellIds.add(nonManifoldBrep.outer().id());
+            return;
+        }
+        if (item instanceof StepAdvancedBrep advancedBrep) {
+            shellIds.add(advancedBrep.outer().id());
+            for (StepEntity voidShell : advancedBrep.voids()) {
+                shellIds.add(voidShell.id());
+            }
+            return;
+        }
         if (item instanceof StepBrepWithVoids brepWithVoids) {
             shellIds.add(brepWithVoids.outer().id());
             for (StepEntity voidShell : brepWithVoids.voids()) {
@@ -839,6 +938,20 @@ public final class StepPreviewJsonExporter {
         }
         if (item instanceof StepShellBasedSurfaceModel surfaceModel) {
             for (StepEntity shell : surfaceModel.shells()) {
+                collectShellLikeIds(shell, shellIds);
+            }
+            return;
+        }
+        if (item instanceof StepTessellatedFaceSet) {
+            shellIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepTessellatedFace) {
+            shellIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepManifoldSurfaceModel manifoldModel) {
+            for (StepEntity shell : manifoldModel.shells()) {
                 collectShellLikeIds(shell, shellIds);
             }
             return;
@@ -1108,6 +1221,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepShellBasedWireframeModel
                 || item instanceof StepEdgeBasedWireframeModel
                 || item instanceof StepConnectedEdgeSet
+                || item instanceof StepEdgeWire
                 || item instanceof StepPath
                 || item instanceof StepOpenPath
                 || item instanceof StepSubpath
@@ -1138,6 +1252,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepQuasiUniformCurve
                 || item instanceof StepPiecewiseBezierCurve
                 || item instanceof StepBSplineCurveWithKnots
+                || item instanceof StepBSplineCurve
                 || item instanceof com.minicad.step.model.StepRationalBSplineCurve
                 || item instanceof StepSurfaceCurve
                 || item instanceof StepSeamCurve
@@ -1145,6 +1260,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepPolyline
                 || item instanceof com.minicad.step.model.StepCompositeCurve
                 || item instanceof com.minicad.step.model.StepCompositeCurveOnSurface
+                || item instanceof StepCompositeCurveOnSurface3D
                 || item instanceof StepOffsetCurve2D
                 || item instanceof StepOffsetCurve3D
                 || item instanceof StepPcurve
@@ -1156,6 +1272,36 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepProjectionCurve
                 || item instanceof StepDraughtingAnnotationOccurrence
                 || item instanceof StepTerminatorSymbol
+                || item instanceof StepClothoid
+                || item instanceof StepIndexedPolyCurve
+                || item instanceof StepDegenerateCurve
+                || item instanceof StepBSplineCurveWithKnotsAndBreakpoints
+                || item instanceof StepLineSegment
+                || item instanceof StepEdgeCurve
+                || item instanceof StepSurfacedEdgeCurve
+                || item instanceof StepPath
+                || item instanceof StepOpenPath
+                || item instanceof StepSubpath
+                || item instanceof StepOrientedPath
+                || item instanceof StepCurve
+                || item instanceof StepBoundedCurve
+                || item instanceof StepCircle2D
+                || item instanceof StepEllipse2D
+                || item instanceof StepPolyline2D
+                || item instanceof StepTrimmedCurve2D
+                || item instanceof StepCompositeCurve2D
+                || item instanceof StepBezierCurve2D
+                || item instanceof StepQuasiUniformCurve2D
+                || item instanceof StepUniformCurve2D
+                || item instanceof StepPiecewiseBezierCurve2D
+                || item instanceof StepIndexedPolyCurve2D
+                || item instanceof StepDegenerateCurve2D
+                || item instanceof StepBSplineCurve2D
+                || item instanceof StepRationalBSplineCurve2D
+                || item instanceof StepLine2D
+                || item instanceof StepCurve2D
+                || item instanceof StepHyperbola2D
+                || item instanceof StepParabola2D
                 || (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName()));
     }
 
@@ -1420,6 +1566,7 @@ public final class StepPreviewJsonExporter {
             }
         }
         if (previewGeometry instanceof StepBSplineSurfaceWithKnots
+                || previewGeometry instanceof StepBSplineSurface
                 || previewGeometry instanceof StepBezierSurface
                 || previewGeometry instanceof StepUniformSurface
                 || previewGeometry instanceof StepQuasiUniformSurface
@@ -1480,6 +1627,90 @@ public final class StepPreviewJsonExporter {
             }
             return trimmed;
         }
+        if (previewGeometry instanceof StepCylindricalSurfaceWithEllipticalAxis
+                || previewGeometry instanceof StepConicalSurfaceWithEllipticalAxis
+                || previewGeometry instanceof StepSphericalSurfaceWithEllipticalAxis
+                || previewGeometry instanceof StepToroidalSurfaceWithCylindricalAxis
+                || previewGeometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
+            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            if (trimmed.face() != null) {
+                logPreviewFacePayload("face_payload_built", trimmed.face());
+            }
+            return trimmed;
+        }
+        if (previewGeometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            if (trimmed.face() != null) {
+                logPreviewFacePayload("face_payload_built", trimmed.face());
+            }
+            return trimmed;
+        }
+        if (previewGeometry instanceof StepFreeFormSurface) {
+            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+            if (trimmed.face() != null) {
+                logPreviewFacePayload("face_payload_built", trimmed.face());
+            }
+            return trimmed;
+        }
+        if (previewGeometry instanceof StepRuledSurface ruledSurface) {
+            try {
+                FacePayload payload = toRuledSurfaceFacePayload(stepFace, ruledSurface, builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "ruled surface preview failed"));
+        }
+        if (previewGeometry instanceof StepSurfaceOfConstantRadius surfaceOfConstantRadius) {
+            try {
+                FacePayload payload = toSurfaceOfConstantRadiusFacePayload(stepFace, surfaceOfConstantRadius, builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
+        }
+        if (previewGeometry instanceof StepBlendedSurface blended) {
+            // Blended surface: approximate by rendering the primary surface with blend radius as metadata
+            try {
+                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, blended.primarySurface(), metadata, builder);
+                if (trimmed.face() != null) {
+                    logPreviewFacePayload("face_payload_built", trimmed.face());
+                    return trimmed;
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
+        }
+        // Free-form surfaces: try parametric mapping, fall back to sampled tessellation
+        if (previewGeometry instanceof StepFreeFormSurface freeForm) {
+            try {
+                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
+                if (trimmed.face() != null) {
+                    logPreviewFacePayload("face_payload_built", trimmed.face());
+                    return trimmed;
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            // Fallback: tessellate via sampled grid if parametric mapping fails
+            try {
+                List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
+                if (!bounds.isEmpty()) {
+                    BSplineSurface3 surface = buildFreeFormSurface(freeForm, builder);
+                    FacePayload payload = toSampledSurfaceFacePayload(stepFace, surface, "FREE_FORM_SURFACE", bounds, metadata);
+                    if (payload != null) {
+                        logPreviewFacePayload("face_payload_built", payload);
+                        return new PreviewFaceResult(payload, null);
+                    }
+                }
+            } catch (Exception ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
+        }
         String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
         String reason = unsupportedSurface == null
                 ? "surface type not previewable"
@@ -1504,6 +1735,30 @@ public final class StepPreviewJsonExporter {
             }
             if (current instanceof StepOffsetSurface offsetSurface) {
                 current = offsetSurface.basisSurface();
+                continue;
+            }
+            if (current instanceof StepOffsetSurface2 offsetSurface2) {
+                current = offsetSurface2.basisSurface();
+                continue;
+            }
+            if (current instanceof StepSurfacePatch surfacePatch) {
+                current = surfacePatch.basisSurface();
+                continue;
+            }
+            if (current instanceof StepRectangularCompositeSurface compositeSurface) {
+                current = compositeSurface.parentSurface();
+                continue;
+            }
+            if (current instanceof StepMachinedSurface machinedSurface) {
+                current = machinedSurface.face();
+                continue;
+            }
+            if (current instanceof StepBlendedSurface blended) {
+                current = blended.primarySurface();
+                continue;
+            }
+            if (current instanceof StepMappedItem mappedItem) {
+                current = mappedItem.mappingTarget();
                 continue;
             }
             if (current instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
@@ -1534,6 +1789,21 @@ public final class StepPreviewJsonExporter {
         }
         if (surface instanceof StepOffsetSurface offsetSurface) {
             return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
+        }
+        if (surface instanceof StepOffsetSurface2 offsetSurface2) {
+            return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
+        }
+        if (surface instanceof StepSurfacePatch surfacePatch) {
+            return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
+        }
+        if (surface instanceof StepRectangularCompositeSurface compositeSurface) {
+            return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
+        }
+        if (surface instanceof StepMachinedSurface machinedSurface) {
+            return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
+        }
+        if (surface instanceof StepBlendedSurface blended) {
+            return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
         }
         if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
             if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator transformation) {
@@ -1903,13 +2173,24 @@ public final class StepPreviewJsonExporter {
 
     private static boolean isRepresentationSolidItem(StepEntity entity) {
         return entity instanceof StepManifoldSolidBrep
+                || entity instanceof StepFacettedBrep
+                || entity instanceof StepNonManifoldSolidBrep
+                || entity instanceof StepAdvancedBrep
                 || entity instanceof StepBrepWithVoids
                 || entity instanceof StepSweptAreaSolid
                 || entity instanceof StepSolidReplica
                 || entity instanceof StepCsgSolid
                 || entity instanceof StepCsgPrimitive
                 || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult;
+                || entity instanceof StepBooleanResult
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTessellatedFace
+                || entity instanceof StepSweptDiskSolid
+                || entity instanceof StepExtrudedAreaSolidTapered
+                || entity instanceof StepRevolvedAreaSolidTapered
+                || entity instanceof StepSurfaceCurveSweptAreaSolid
+                || entity instanceof StepPolygonalBoundedHalfSpace
+                || entity instanceof StepComplexClippingResult;
     }
 
     private static List<StepRepresentation> linkedShapeRepresentations(
@@ -1966,7 +2247,9 @@ public final class StepPreviewJsonExporter {
         int[] rgb = right.rgb() != null ? right.rgb() : left.rgb();
         Set<String> layers = new LinkedHashSet<>(left.layers());
         layers.addAll(right.layers());
-        return new StepMetadataExtractor.DisplayMetadata(rgb, List.copyOf(layers));
+        double transparency = right.transparency() > 0 ? right.transparency() : left.transparency();
+        StepMetadataExtractor.PbrMetadata pbr = right.pbr() != null ? right.pbr() : left.pbr();
+        return new StepMetadataExtractor.DisplayMetadata(rgb, List.copyOf(layers), transparency, pbr);
     }
 
     private static String faceDisplayName(StepFaceEntity stepFace) {
@@ -1993,6 +2276,13 @@ public final class StepPreviewJsonExporter {
         return new ColorPayload(rgb[0], rgb[1], rgb[2]);
     }
 
+    private static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
+        if (metadata == null) {
+            return null;
+        }
+        return new PbrPayload(metadata.diffuse(), metadata.specular(), metadata.specularExponent(), metadata.specularColor());
+    }
+
     private static int countEntities(Map<Integer, StepEntity> resolved, Class<? extends StepEntity> type) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
@@ -2013,7 +2303,13 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepCsgSolid
                     || entity instanceof StepCsgPrimitive
                     || entity instanceof StepBooleanClippingResult
-                    || entity instanceof StepBooleanResult) {
+                    || entity instanceof StepBooleanResult
+                    || entity instanceof StepSweptDiskSolid
+                    || entity instanceof StepExtrudedAreaSolidTapered
+                    || entity instanceof StepRevolvedAreaSolidTapered
+                    || entity instanceof StepSurfaceCurveSweptAreaSolid
+                    || entity instanceof StepPolygonalBoundedHalfSpace
+                    || entity instanceof StepComplexClippingResult) {
                 count++;
             }
         }
@@ -2122,6 +2418,106 @@ public final class StepPreviewJsonExporter {
         return unsupported;
     }
 
+    private static List<FacePayload> buildTessellatedFacePayloads(
+            StepTessellatedFaceSet tessellated,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) {
+        List<StepCartesianPoint> coords = tessellated.coordinates();
+        List<PointPayload> points = new ArrayList<>(coords.size());
+        for (StepCartesianPoint cp : coords) {
+            double cx = cp.coordinates().get(0);
+            double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
+            double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
+            points.add(new PointPayload(cx, cy, cz));
+        }
+        List<FacePayload> faces = new ArrayList<>(tessellated.faceIndices().size());
+        for (List<Integer> faceIndex : tessellated.faceIndices()) {
+            if (faceIndex.size() < 3) continue;
+            PointPayload p1 = points.get(faceIndex.get(0) - 1);
+            PointPayload p2 = points.get(faceIndex.get(1) - 1);
+            PointPayload p3 = points.get(faceIndex.get(2) - 1);
+            VectorPayload normal = computeNormal(p1, p2, p3);
+            if (normal == null) continue;
+            List<PointPayload> triangle = List.of(p1, p2, p3);
+            FacePayload face = new FacePayload(
+                    tessellated.id(),
+                    tessellated.name(),
+                    "TESSELLATED_FACE_SET",
+                    p1,
+                    normal,
+                    true,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    List.of(new LoopPayload(true, triangle)),
+                    triangle,
+                    null,
+                    null
+            );
+            faces.add(face);
+        }
+        return faces;
+    }
+
+    private static FacePayload buildTessellatedFacePayload(
+            StepTessellatedFace tessellatedFace,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) {
+        List<PointPayload> allPoints = new ArrayList<>();
+        for (StepEntity triangleRef : tessellatedFace.triangles()) {
+            if (triangleRef instanceof StepTessellatedTriangle triangle) {
+                PointPayload p1 = pointPayloadFromVertex(triangle.vertex1());
+                PointPayload p2 = pointPayloadFromVertex(triangle.vertex2());
+                PointPayload p3 = pointPayloadFromVertex(triangle.vertex3());
+                if (p1 == null || p2 == null || p3 == null) continue;
+                VectorPayload normal = computeNormal(p1, p2, p3);
+                if (normal == null) continue;
+                List<PointPayload> tri = List.of(p1, p2, p3);
+                return new FacePayload(
+                        tessellatedFace.id(),
+                        tessellatedFace.name(),
+                        "TESSELLATED_FACE",
+                        p1,
+                        normal,
+                        true,
+                        toColorPayload(metadata.rgb()),
+                        metadata.transparency(),
+                        toPbrPayload(metadata.pbr()),
+                        metadata.layers(),
+                        List.of(new LoopPayload(true, tri)),
+                        tri,
+                        null,
+                        null
+                );
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Computes the face normal from three triangle vertices using the cross product.
+     * Returns null if the normal is degenerate (near-zero length).
+     */
+    private static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
+        double nx = (p2.y() - p1.y()) * (p3.z() - p1.z()) - (p2.z() - p1.z()) * (p3.y() - p1.y());
+        double ny = (p2.z() - p1.z()) * (p3.x() - p1.x()) - (p2.x() - p1.x()) * (p3.z() - p1.z());
+        double nz = (p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x());
+        double len = Math.sqrt(nx * nx + ny * ny + nz * nz);
+        if (len < 1.0e-9) return null;
+        return new VectorPayload(nx / len, ny / len, nz / len);
+    }
+
+    private static PointPayload pointPayloadFromVertex(StepEntity vertex) {
+        if (vertex instanceof StepCartesianPoint cp) {
+            double cx = cp.coordinates().get(0);
+            double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
+            double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
+            return new PointPayload(cx, cy, cz);
+        }
+        return null;
+    }
+
     private static List<StepFaceEntity> shellFaces(StepEntity entity) {
         if (entity instanceof StepOpenShell openShell) {
             return openShell.faces();
@@ -2159,7 +2555,9 @@ public final class StepPreviewJsonExporter {
     private static boolean isShellLikeEntity(StepEntity entity) {
         return isShellEntity(entity)
                 || entity instanceof StepConnectedFaceSet
-                || entity instanceof StepConnectedFaceSubSet;
+                || entity instanceof StepConnectedFaceSubSet
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTessellatedFace;
     }
 
     private static FacePayload toPlanarFacePayload(
@@ -2184,6 +2582,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 face.sameSense(),
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 List.of(),
@@ -2275,6 +2675,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2362,6 +2764,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2459,6 +2863,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2526,6 +2932,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2537,6 +2945,12 @@ public final class StepPreviewJsonExporter {
     private static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
             return builder.buildBSplineSurface(splineSurface.id());
+        }
+        if (geometry instanceof StepBSplineSurface splineSurface) {
+            return builder.buildGenericBSplineSurface(splineSurface.id());
+        }
+        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface) {
+            return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
         }
         if (geometry instanceof StepBezierSurface splineSurface) {
             return builder.buildBezierSurface(splineSurface.id());
@@ -2551,6 +2965,42 @@ public final class StepPreviewJsonExporter {
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
         }
         throw new UnsupportedGeometryException(surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
+    }
+
+    private static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
+        int uCount = surface.controlPoints().size();
+        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().getFirst().size();
+        if (uCount < 2 || vCount < 2) {
+            throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
+        }
+        List<List<CartesianPoint>> controlPoints = new ArrayList<>(uCount);
+        for (List<StepEntity> row : surface.controlPoints()) {
+            List<CartesianPoint> pointRow = new ArrayList<>(row.size());
+            for (StepEntity pt : row) {
+                if (pt instanceof com.minicad.step.model.StepCartesianPoint cartesianPoint) {
+                    pointRow.add(builder.buildPoint(cartesianPoint.id()));
+                } else {
+                    throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
+                }
+            }
+            controlPoints.add(List.copyOf(pointRow));
+        }
+        int uDegree = surface.degreeU();
+        int vDegree = surface.degreeV();
+        // Generate uniform knot vectors
+        int uKnotCount = uCount + uDegree + 1;
+        int vKnotCount = vCount + vDegree + 1;
+        List<Double> uKnots = new ArrayList<>();
+        for (int i = 0; i < uKnotCount; i++) {
+            uKnots.add((double) i / (uKnotCount - 1));
+        }
+        List<Double> vKnots = new ArrayList<>();
+        for (int i = 0; i < vKnotCount; i++) {
+            vKnots.add((double) i / (vKnotCount - 1));
+        }
+        List<Integer> uMults = List.of(1);
+        List<Integer> vMults = List.of(1);
+        return new BSplineSurface3(uDegree, vDegree, controlPoints, uMults, vMults, uKnots, vKnots);
     }
 
     private static FacePayload toRationalBSplineSurfaceFacePayload(
@@ -2583,6 +3033,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2624,6 +3076,75 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                triangles,
+                null,
+                null
+        );
+    }
+
+    private static FacePayload toRuledSurfaceFacePayload(
+            StepFaceEntity stepFace,
+            StepRuledSurface stepSurface,
+            StepCadBuilder builder,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) throws TopologyException, StepResolutionException, UnsupportedGeometryException, GeometryException {
+        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
+        if (bounds.isEmpty()) {
+            return null;
+        }
+        RuledSurface3 surface = builder.buildRuledSurface(stepSurface.id());
+        return toSampledSurfaceFacePayload(stepFace, surface, "RULED_SURFACE", bounds, metadata);
+    }
+
+    private static FacePayload toSurfaceOfConstantRadiusFacePayload(
+            StepFaceEntity stepFace,
+            StepSurfaceOfConstantRadius stepSurface,
+            StepCadBuilder builder,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) throws TopologyException, StepResolutionException, UnsupportedGeometryException, GeometryException {
+        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
+        if (bounds.isEmpty()) {
+            return null;
+        }
+        SurfaceOfConstantRadius3 surface = builder.buildSurfaceOfConstantRadius(stepSurface.id());
+        return toSampledSurfaceFacePayload(stepFace, surface, "SURFACE_OF_CONSTANT_RADIUS", bounds, metadata);
+    }
+
+    private static FacePayload toSampledSurfaceFacePayload(
+            StepFaceEntity stepFace,
+            SurfaceGeometry surface,
+            String surfaceType,
+            List<FaceBound> bounds,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) {
+        int segments = 32;
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(segments, segments);
+        if (grid.isEmpty()) {
+            return null;
+        }
+        boolean sameSense = faceSameSense(stepFace);
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        if (triangles.isEmpty()) {
+            return null;
+        }
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) {
+            normal = normal.scale(-1.0);
+        }
+        return new FacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                surfaceType,
+                triangles.get(0),
+                new VectorPayload(normal.x(), normal.y(), normal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
                 triangles,
@@ -2748,6 +3269,8 @@ public final class StepPreviewJsonExporter {
                         new VectorPayload(normal.x(), normal.y(), normal.z()),
                         faceSameSense(stepFace),
                         toColorPayload(metadata.rgb()),
+                        metadata.transparency(),
+                        toPbrPayload(metadata.pbr()),
                         metadata.layers(),
                         toParametricLoopPayloads(loops, mapper),
                         triangles,
@@ -4107,6 +4630,183 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
+        // Elliptical-axis surfaces — CadBuilder approximates these as standard surfaces
+        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis) {
+            CylindricalSurface surface = builder.buildCylindricalSurfaceWithEllipticalAxis(ellipticalAxis.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, axialHeight(surface.position(), point));
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return surfacePoint(surface, u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return cylindricalNormal(surface, u, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+            };
+        }
+        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis ellipticalAxis) {
+            ConicalSurface surface = builder.buildConicalSurfaceWithEllipticalAxis(ellipticalAxis.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, axialHeight(surface.position(), point));
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return conicalSurfacePoint(surface, u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return conicalNormal(surface, u, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+            };
+        }
+        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis ellipticalAxis) {
+            SphericalSurface surface = builder.buildSphericalSurfaceWithEllipticalAxis(ellipticalAxis.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    double u = unwrapPeriodic(sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, sphericalV(surface.position(), point, surface.radius()));
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return sphericalSurfacePoint(surface.position(), surface.radius(), u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return sphericalNormal(surface.position(), u, v, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+            };
+        }
+        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis ellipticalAxis) {
+            ToroidalSurface surface = builder.buildToroidalSurfaceWithCylindricalAxis(ellipticalAxis.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    Double previousU = previous == null ? null : previous.u();
+                    Double previousV = previous == null ? null : previous.v();
+                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    return new UvPoint(u, v);
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return toroidalSurfacePoint(surface, u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return toroidalNormal(surface, u, v, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+
+                @Override
+                public Double vPeriod() {
+                    return Math.PI * 2.0;
+                }
+            };
+        }
+        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis ellipticalAxis) {
+            ToroidalSurface surface = builder.buildToroidalSurfaceWithEllipticalAxis(ellipticalAxis.id());
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    Double previousU = previous == null ? null : previous.u();
+                    Double previousV = previous == null ? null : previous.v();
+                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    return new UvPoint(u, v);
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return toroidalSurfacePoint(surface, u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return toroidalNormal(surface, u, v, true);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return Math.PI * 2.0;
+                }
+
+                @Override
+                public Double vPeriod() {
+                    return Math.PI * 2.0;
+                }
+            };
+        }
+        if (geometry instanceof StepOffsetSurface2 offsetSurface2) {
+            ParametricSurfaceMapper base = mapperForSurface(offsetSurface2.basisSurface(), builder);
+            if (base == null) {
+                return null;
+            }
+            double dist = offsetSurface2.sameSense() ? offsetSurface2.distance() : -offsetSurface2.distance();
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    return base.project(point, previous);
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    CartesianPoint basePoint = base.pointAt(u, v);
+                    Vector3 normal = base.normalAt(u, v);
+                    return basePoint.add(normal.scale(dist));
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return base.normalAt(u, v);
+                }
+
+                @Override
+                public Double uPeriod() {
+                    return base.uPeriod();
+                }
+
+                @Override
+                public Double vPeriod() {
+                    return base.vPeriod();
+                }
+            };
+        }
         if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
             if (!(replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator transformation)) {
                 return null;
@@ -4340,6 +5040,8 @@ public final class StepPreviewJsonExporter {
             };
         }
         if (geometry instanceof StepBSplineSurfaceWithKnots
+                || geometry instanceof StepBSplineSurface
+                || geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints
                 || geometry instanceof StepBezierSurface
                 || geometry instanceof StepUniformSurface
                 || geometry instanceof StepQuasiUniformSurface
@@ -4367,6 +5069,18 @@ public final class StepPreviewJsonExporter {
         }
         if (geometry instanceof StepSurfaceOfRevolution revolutionSurface) {
             return revolutionMapper(revolutionSurface, builder);
+        }
+        // Rectangular composite surface: delegate to parent surface mapper
+        if (geometry instanceof StepRectangularCompositeSurface compositeSurface) {
+            return mapperForSurface(compositeSurface.parentSurface(), builder);
+        }
+        // Surface patch: delegate to basis surface mapper
+        if (geometry instanceof StepSurfacePatch surfacePatch) {
+            return mapperForSurface(surfacePatch.basisSurface(), builder);
+        }
+        // Blended surface: delegate to primary surface mapper
+        if (geometry instanceof StepBlendedSurface blended) {
+            return mapperForSurface(blended.primarySurface(), builder);
         }
         return null;
     }
@@ -4656,7 +5370,111 @@ public final class StepPreviewJsonExporter {
             }
             case StepTrimmedCurve trimmedCurve -> curveEvaluator(trimmedCurve.basisCurve(), builder);
             case StepSurfaceCurve surfaceCurve -> curveEvaluator(surfaceCurve.curve3d(), builder);
+            case StepRationalBSplineCurve spline -> {
+                com.minicad.geometry.RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve(spline.id());
+                yield new CurveEvaluator() {
+                    @Override public double start() { return geometry.startParameter(); }
+                    @Override public double end() { return geometry.endParameter(); }
+                    @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
+                };
+            }
+            case StepPolyline polyline -> {
+                Polyline3 geometry = builder.buildPolyline(polyline.id());
+                yield new CurveEvaluator() {
+                    @Override public double start() { return 0.0; }
+                    @Override public double end() { return 1.0; }
+                    @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
+                };
+            }
+            case com.minicad.step.model.StepCompositeCurve compositeCurve -> {
+                CompositeCurve3 geometry = builder.buildCompositeCurve(compositeCurve.id());
+                yield sampledCurveEvaluator(geometry);
+            }
+            case StepBezierCurve bezier -> sampledCurveEvaluator(builder.buildCurveReference3(bezier.id()));
+            case StepUniformCurve uniform -> sampledCurveEvaluator(builder.buildCurveReference3(uniform.id()));
+            case StepQuasiUniformCurve quasiUniform -> sampledCurveEvaluator(builder.buildCurveReference3(quasiUniform.id()));
+            case StepPiecewiseBezierCurve piecewiseBezier -> sampledCurveEvaluator(builder.buildCurveReference3(piecewiseBezier.id()));
+            case StepOffsetCurve3D offsetCurve3D -> sampledCurveEvaluator(builder.buildOffsetCurve3(offsetCurve3D.id()));
+            case StepConicCurve conic -> {
+                List<CartesianPoint> points = sampleConicCurvePoints(conic, builder);
+                if (points == null || points.size() < 2) yield null;
+                yield sampledCurveEvaluator(new Polyline3(points));
+            }
+            case StepOrientedCurve orientedCurve -> curveEvaluator(orientedCurve.curveElement(), builder);
+            case StepGeometricReplica replica -> curveEvaluator(replica.parent(), builder);
+            case StepBSplineCurve bspline -> sampledCurveEvaluator(builder.buildCurveReference3(bspline.id()));
+            case StepSeamCurve seamCurve -> sampledCurveEvaluator(builder.buildSeamCurve(seamCurve.id()).curve3d());
+            case StepCircle2D circle2D -> sampledCurveEvaluator(builder.buildCurve3From2D(circle2D.id()));
+            case StepEllipse2D ellipse2D -> sampledCurveEvaluator(builder.buildCurve3From2D(ellipse2D.id()));
+            case StepPolyline2D polyline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(polyline2D.id()));
+            case StepTrimmedCurve2D trimmedCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(trimmedCurve2D.id()));
+            case StepCompositeCurve2D compositeCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(compositeCurve2D.id()));
+            case StepBezierCurve2D bezier2D -> sampledCurveEvaluator(builder.buildCurve3From2D(bezier2D.id()));
+            case StepQuasiUniformCurve2D quasiUniform2D -> sampledCurveEvaluator(builder.buildCurve3From2D(quasiUniform2D.id()));
+            case StepUniformCurve2D uniform2D -> sampledCurveEvaluator(builder.buildCurve3From2D(uniform2D.id()));
+            case StepPiecewiseBezierCurve2D piecewiseBezier2D -> sampledCurveEvaluator(builder.buildCurve3From2D(piecewiseBezier2D.id()));
+            case StepIndexedPolyCurve2D polyCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(polyCurve2D.id()));
+            case StepDegenerateCurve2D degenerateCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(degenerateCurve2D.id()));
+            case StepBSplineCurve2D bspline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(bspline2D.id()));
+            case StepRationalBSplineCurve2D rationalBspline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(rationalBspline2D.id()));
+            case StepLine2D line2D -> sampledCurveEvaluator(builder.buildCurve3From2D(line2D.id()));
+            case StepCurve2D curve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(curve2D.id()));
+            case StepHyperbola2D hyperbola2D -> sampledCurveEvaluator(builder.buildCurve3From2D(hyperbola2D.id()));
+            case StepParabola2D parabola2D -> sampledCurveEvaluator(builder.buildCurve3From2D(parabola2D.id()));
+            case StepOffsetCurve2D offsetCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(offsetCurve2D.id()));
+            case StepClothoid clothoid -> sampledCurveEvaluator(builder.buildCurveReference3(clothoid.id()));
+            case StepIndexedPolyCurve polyCurve -> sampledCurveEvaluator(builder.buildCurveReference3(polyCurve.id()));
+            case StepDegenerateCurve degenerate -> sampledCurveEvaluator(builder.buildCurveReference3(degenerate.id()));
+            case StepBSplineCurveWithKnotsAndBreakpoints splineBreak -> sampledCurveEvaluator(builder.buildBSplineCurveWithBreakpoints(splineBreak.id()));
+            case StepCompositeCurveOnSurface compositeOnSurface -> sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface.id()));
+            case StepCompositeCurveOnSurface3D compositeOnSurface3D -> sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface3D.id()));
+            case StepLineSegment lineSeg -> {
+                List<CartesianPoint> pts = List.of(
+                        builder.buildPoint(lineSeg.startPoint().id()),
+                        builder.buildPoint(lineSeg.endPoint().id())
+                );
+                yield sampledCurveEvaluator(new Polyline3(pts));
+            }
+            case StepPath path -> sampledCurveEvaluator(builder.buildPath(path.id()));
+            case StepOpenPath openPath -> sampledCurveEvaluator(builder.buildPath(openPath.id()));
+            case StepSubpath subpath -> sampledCurveEvaluator(builder.buildPath(subpath.id()));
+            case StepOrientedPath orientedPath -> sampledCurveEvaluator(builder.buildPath(orientedPath.id()));
+            case StepEdgeCurve edgeCurve -> sampledCurveEvaluator(builder.buildCurveReference3(edgeCurve.id()));
+            case StepSurfacedEdgeCurve surfacedEdge -> sampledCurveEvaluator(builder.buildCurveReference3(surfacedEdge.id()));
+            case StepAnnotationCurveOccurrence occurrence -> curveEvaluator(occurrence.item(), builder);
+            case StepDimensionCurve dimensionCurve -> curveEvaluator(dimensionCurve.item(), builder);
+            case StepLeaderCurve leaderCurve -> curveEvaluator(leaderCurve.item(), builder);
+            case StepProjectionCurve projectionCurve -> curveEvaluator(projectionCurve.item(), builder);
+            case StepDraughtingAnnotationOccurrence annotationOccurrence -> curveEvaluator(annotationOccurrence.item(), builder);
+            case StepTerminatorSymbol terminatorSymbol -> curveEvaluator(terminatorSymbol.annotatedCurve(), builder);
+            case StepCurve abstractCurve -> sampledCurveEvaluator(builder.buildCurveReference3(abstractCurve.id()));
+            case StepBoundedCurve boundedCurve -> sampledCurveEvaluator(builder.buildCurveReference3(boundedCurve.id()));
+            case StepMappedItem mappedItem -> curveEvaluator(mappedItem.mappingTarget(), builder);
             default -> null;
+        };
+    }
+
+    private static CurveEvaluator sampledCurveEvaluator(Curve3 curve) {
+        List<CartesianPoint> points = curve.sample(128);
+        if (points.size() < 2) return null;
+        return new CurveEvaluator() {
+            @Override public double start() { return 0.0; }
+            @Override public double end() { return 1.0; }
+            @Override
+            public CartesianPoint pointAt(double parameter) {
+                double t = Math.max(0, Math.min(1, parameter));
+                double idx = t * (points.size() - 1);
+                int i0 = (int) idx;
+                int i1 = Math.min(i0 + 1, points.size() - 1);
+                double f = idx - i0;
+                CartesianPoint p0 = points.get(i0);
+                CartesianPoint p1 = points.get(i1);
+                return new CartesianPoint(
+                        p0.x() + (p1.x() - p0.x()) * f,
+                        p0.y() + (p1.y() - p0.y()) * f,
+                        p0.z() + (p1.z() - p0.z()) * f
+                );
+            }
         };
     }
 
@@ -5418,6 +6236,12 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepBooleanResult) {
             return "BOOLEAN_RESULT";
         }
+        if (geometry instanceof StepSweptDiskSolid) {
+            return "SWEPT_DISK_SOLID";
+        }
+        if (geometry instanceof StepComplexClippingResult) {
+            return "COMPLEX_CLIPPING_RESULT";
+        }
         if (geometry instanceof StepGeometricReplica replica) {
             return replica.entityName();
         }
@@ -5509,6 +6333,8 @@ public final class StepPreviewJsonExporter {
                 new VectorPayload(-base.normal().x(), -base.normal().y(), -base.normal().z()),
                 !base.sameSense(),
                 base.color(),
+                base.transparency(),
+                base.pbr(),
                 base.layers(),
                 base.loops(),
                 List.copyOf(reversedTriangles),
@@ -5611,14 +6437,17 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
-        StepEdgeCurve edge = (StepEdgeCurve) resolved.get(edgeId);
-        CartesianPoint start = pointFromStep(edge.start().point());
-        CartesianPoint end = pointFromStep(edge.end().point());
-        return new EdgePayload(
-                edgeId,
-                toPointPayloads(polyline),
-                edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder)
-        );
+        StepEntity entity = resolved.get(edgeId);
+        if (entity instanceof StepEdgeCurve edge) {
+            CartesianPoint start = pointFromStep(edge.start().point());
+            CartesianPoint end = pointFromStep(edge.end().point());
+            return new EdgePayload(
+                    edgeId,
+                    toPointPayloads(polyline),
+                    edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder)
+            );
+        }
+        return new EdgePayload(edgeId, toPointPayloads(polyline), null);
     }
 
     private static EdgePayload buildTopologyEdgePayload(int edgeId, Edge edge) {
@@ -5845,6 +6674,108 @@ public final class StepPreviewJsonExporter {
         if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
             return "CURVE_REPLICA";
         }
+        if (item instanceof StepBSplineCurve) {
+            return "B_SPLINE_CURVE";
+        }
+        if (item instanceof com.minicad.step.model.StepRationalBSplineCurve) {
+            return "RATIONAL_B_SPLINE_CURVE";
+        }
+        if (item instanceof StepCompositeCurveOnSurface3D) {
+            return "COMPOSITE_CURVE_ON_SURFACE_3D";
+        }
+        if (item instanceof StepClothoid) {
+            return "CLOTHOID";
+        }
+        if (item instanceof StepIndexedPolyCurve) {
+            return "INDEXED_POLY_CURVE";
+        }
+        if (item instanceof StepDegenerateCurve) {
+            return "DEGENERATE_CURVE";
+        }
+        if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+            return "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS";
+        }
+        if (item instanceof StepLineSegment) {
+            return "LINE_SEGMENT";
+        }
+        if (item instanceof StepEdgeCurve) {
+            return "EDGE_CURVE";
+        }
+        if (item instanceof StepSurfacedEdgeCurve) {
+            return "SURFACED_EDGE_CURVE";
+        }
+        if (item instanceof StepCompositeCurveOnSurface) {
+            return "COMPOSITE_CURVE_ON_SURFACE";
+        }
+        if (item instanceof StepPath) {
+            return "PATH";
+        }
+        if (item instanceof StepOpenPath) {
+            return "OPEN_PATH";
+        }
+        if (item instanceof StepSubpath) {
+            return "SUBPATH";
+        }
+        if (item instanceof StepOrientedPath orientedPath) {
+            return "ORIENTED_PATH";
+        }
+        if (item instanceof StepCurve) {
+            return "CURVE";
+        }
+        if (item instanceof StepBoundedCurve) {
+            return "BOUNDED_CURVE";
+        }
+        if (item instanceof StepCircle2D) {
+            return "CIRCLE_2D";
+        }
+        if (item instanceof StepEllipse2D) {
+            return "ELLIPSE_2D";
+        }
+        if (item instanceof StepPolyline2D) {
+            return "POLYLINE_2D";
+        }
+        if (item instanceof StepTrimmedCurve2D) {
+            return "TRIMMED_CURVE_2D";
+        }
+        if (item instanceof StepCompositeCurve2D) {
+            return "COMPOSITE_CURVE_2D";
+        }
+        if (item instanceof StepBezierCurve2D) {
+            return "BEZIER_CURVE_2D";
+        }
+        if (item instanceof StepQuasiUniformCurve2D) {
+            return "QUASI_UNIFORM_CURVE_2D";
+        }
+        if (item instanceof StepUniformCurve2D) {
+            return "UNIFORM_CURVE_2D";
+        }
+        if (item instanceof StepPiecewiseBezierCurve2D) {
+            return "PIECEWISE_BEZIER_CURVE_2D";
+        }
+        if (item instanceof StepIndexedPolyCurve2D) {
+            return "INDEXED_POLY_CURVE_2D";
+        }
+        if (item instanceof StepDegenerateCurve2D) {
+            return "DEGENERATE_CURVE_2D";
+        }
+        if (item instanceof StepBSplineCurve2D) {
+            return "B_SPLINE_CURVE_2D";
+        }
+        if (item instanceof StepRationalBSplineCurve2D) {
+            return "RATIONAL_B_SPLINE_CURVE_2D";
+        }
+        if (item instanceof StepLine2D) {
+            return "LINE_2D";
+        }
+        if (item instanceof StepCurve2D) {
+            return "CURVE_2D";
+        }
+        if (item instanceof StepHyperbola2D) {
+            return "HYPERBOLA_2D";
+        }
+        if (item instanceof StepParabola2D) {
+            return "PARABOLA_2D";
+        }
         return null;
     }
 
@@ -5887,6 +6818,9 @@ public final class StepPreviewJsonExporter {
         }
         if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
             return previewCurveTypeName(replica.parent());
+        }
+        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+            return previewCurveTypeName(trimmedCurve2D.basisCurve());
         }
         return null;
     }
@@ -5931,6 +6865,9 @@ public final class StepPreviewJsonExporter {
         if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
             return replica.parent().id();
         }
+        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+            return trimmedCurve2D.basisCurve().id();
+        }
         return null;
     }
 
@@ -5944,6 +6881,9 @@ public final class StepPreviewJsonExporter {
     private static Boolean previewCurveSenseAgreement(StepEntity item) {
         if (item instanceof StepTrimmedCurve trimmedCurve) {
             return trimmedCurve.senseAgreement();
+        }
+        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+            return trimmedCurve2D.senseAgreement();
         }
         return null;
     }
@@ -5964,6 +6904,9 @@ public final class StepPreviewJsonExporter {
         }
         if (item instanceof StepOffsetCurve3D offsetCurve3D) {
             return offsetCurve3D.selfIntersect();
+        }
+        if (item instanceof StepCompositeCurveOnSurface compositeOnSurface) {
+            return compositeOnSurface.selfIntersect();
         }
         return null;
     }
@@ -6295,6 +7238,68 @@ public final class StepPreviewJsonExporter {
                 List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
                 return points == null ? null : new Polyline3(points);
             }
+            if (item instanceof StepIndexedPolyCurve polyCurve) {
+                return builder.buildCurveReference3(polyCurve.id());
+            }
+            if (item instanceof StepClothoid clothoid) {
+                return builder.buildCurveReference3(clothoid.id());
+            }
+            if (item instanceof StepDegenerateCurve degenerate) {
+                return builder.buildCurveReference3(degenerate.id());
+            }
+            if (item instanceof StepBSplineCurve bspline) {
+                return builder.buildCurveReference3(bspline.id());
+            }
+            if (item instanceof StepCompositeCurveOnSurface compositeOnSurface) {
+                return builder.buildCurveReference3(compositeOnSurface.id());
+            }
+            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints splineBreak) {
+                return builder.buildBSplineCurveWithBreakpoints(splineBreak.id());
+            }
+            if (item instanceof StepLineSegment lineSeg) {
+                return new Polyline3(List.of(
+                        builder.buildPoint(lineSeg.startPoint().id()),
+                        builder.buildPoint(lineSeg.endPoint().id())
+                ));
+            }
+            if (item instanceof StepEdgeCurve edgeCurve) {
+                return builder.buildCurveReference3(edgeCurve.id());
+            }
+            if (item instanceof StepSurfacedEdgeCurve surfacedEdge) {
+                return builder.buildCurveReference3(surfacedEdge.id());
+            }
+            if (item instanceof StepCompositeCurveOnSurface3D compositeOnSurface3D) {
+                return builder.buildCurveReference3(compositeOnSurface3D.id());
+            }
+            if (item instanceof StepPath path) {
+                return builder.buildPath(path.id());
+            }
+            if (item instanceof StepOpenPath openPath) {
+                return builder.buildPath(openPath.id());
+            }
+            if (item instanceof StepSubpath subpath) {
+                return builder.buildPath(subpath.id());
+            }
+            if (item instanceof StepSeamCurve seamCurve) {
+                return builder.buildSeamCurve(seamCurve.id()).curve3d();
+            }
+            if (item instanceof StepCircle2D
+                    || item instanceof StepEllipse2D
+                    || item instanceof StepPolyline2D
+                    || item instanceof StepTrimmedCurve2D
+                    || item instanceof StepCompositeCurve2D
+                    || item instanceof StepBezierCurve2D
+                    || item instanceof StepQuasiUniformCurve2D
+                    || item instanceof StepUniformCurve2D
+                    || item instanceof StepPiecewiseBezierCurve2D
+                    || item instanceof StepIndexedPolyCurve2D
+                    || item instanceof StepDegenerateCurve2D
+                    || item instanceof StepBSplineCurve2D
+                    || item instanceof StepRationalBSplineCurve2D
+                    || item instanceof StepLine2D
+                    || item instanceof StepCurve2D) {
+                return builder.buildCurve3From2D(item.id());
+            }
         } catch (UnsupportedGeometryException | StepResolutionException ex) {
             return null;
         }
@@ -6307,6 +7312,8 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         return switch (curve.entityName()) {
+            case "CIRCLE" -> sampleConicCirclePoints(curve, matrix);
+            case "ELLIPSE" -> sampleConicEllipsePoints(curve, matrix);
             case "PARABOLA" -> sampleParabolaPoints(curve, matrix);
             case "HYPERBOLA" -> sampleHyperbolaPoints(curve, matrix);
             case "DEGENERATE_CONIC" -> {
@@ -6315,6 +7322,32 @@ public final class StepPreviewJsonExporter {
             }
             default -> null;
         };
+    }
+
+    private static List<CartesianPoint> sampleConicCirclePoints(StepConicCurve curve, double[] matrix) {
+        if (curve.parameters().isEmpty()) return null;
+        double radius = curve.parameters().get(0);
+        if (!Double.isFinite(radius) || radius <= Epsilon.EPS) return null;
+        return sampleConicPointsInMatrix(matrix, radius, radius, 72);
+    }
+
+    private static List<CartesianPoint> sampleConicEllipsePoints(StepConicCurve curve, double[] matrix) {
+        if (curve.parameters().size() < 2) return null;
+        double semiMajor = curve.parameters().get(0);
+        double semiMinor = curve.parameters().get(1);
+        if (!Double.isFinite(semiMajor) || !Double.isFinite(semiMinor)) return null;
+        if (semiMajor <= Epsilon.EPS || semiMinor <= Epsilon.EPS) return null;
+        return sampleConicPointsInMatrix(matrix, semiMajor, semiMinor, 72);
+    }
+
+    private static List<CartesianPoint> sampleConicPointsInMatrix(double[] matrix, double rx, double ry, int segments) {
+        List<CartesianPoint> points = new ArrayList<>(segments + 1);
+        for (int i = 0; i <= segments; i++) {
+            double angle = 2.0 * Math.PI * i / segments;
+            CartesianPoint local = new CartesianPoint(rx * Math.cos(angle), ry * Math.sin(angle), 0.0);
+            points.add(transformCartesian(local, matrix));
+        }
+        return List.copyOf(points);
     }
 
     private static List<CartesianPoint> sampleParabolaPoints(StepConicCurve curve, double[] matrix) {
@@ -6361,21 +7394,6 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        if (curve instanceof Line3 line) {
-            return List.of(line.origin(), line.pointAt(1.0));
-        }
-        if (curve instanceof Circle circle) {
-            return sampleCirclePoints(circle, 72);
-        }
-        if (curve instanceof Ellipse3 ellipse) {
-            return sampleEllipsePoints(ellipse, 72);
-        }
-        if (curve instanceof BSplineCurve3 spline) {
-            return spline.sample(72);
-        }
-        if (curve instanceof RationalBSplineCurve3 spline) {
-            return spline.sample(72);
-        }
         if (curve instanceof TrimmedCurve3 trimmedCurve) {
             return sampleTrimmedCurve3(trimmedCurve, 72);
         }
@@ -6398,7 +7416,11 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        throw new UnsupportedGeometryException("curve sampling for " + curveTypeName(curve) + " is unsupported");
+        List<CartesianPoint> points = curve.sample(72);
+        if (points.isEmpty()) {
+            throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
+        }
+        return points;
     }
 
     private static Curve3 liftCurve2(Curve2 curve) {
@@ -6589,22 +7611,6 @@ public final class StepPreviewJsonExporter {
 
     private static List<Point2> sampleEllipse2Points(Ellipse2 ellipse, int segments) {
         List<Point2> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
-        }
-        return List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleCirclePoints(Circle circle, int segments) {
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            points.add(circle.pointAt(Math.PI * 2.0 * index / segments));
-        }
-        return List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleEllipsePoints(Ellipse3 ellipse, int segments) {
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
         }
@@ -6940,6 +7946,8 @@ public final class StepPreviewJsonExporter {
                 payload.stats(),
                 payload.bounds(),
                 payload.validation(),
+                payload.product(),
+                payload.units(),
                 payload.pmi(),
                 payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
@@ -6970,6 +7978,8 @@ public final class StepPreviewJsonExporter {
                 face.normal(),
                 face.sameSense(),
                 face.color(),
+                face.transparency(),
+                face.pbr(),
                 face.layers(),
                 reduceLoopPoints(face.loops(), loopFactor),
                 reduceTrianglePoints(face.triangles(), triangleFactor),
@@ -7509,6 +8519,8 @@ public final class StepPreviewJsonExporter {
                 .toList();
         int[] rgb = metadata.rgb() != null ? metadata.rgb() : null;
         ColorPayload color = rgb == null ? face.color() : toColorPayload(rgb);
+        double transparency = metadata.transparency() > 0 ? metadata.transparency() : face.transparency();
+        PbrPayload pbr = metadata.pbr() != null ? toPbrPayload(metadata.pbr()) : face.pbr();
         List<String> layers = metadata.layers().isEmpty() ? face.layers() : metadata.layers();
         return new FacePayload(
                 mappedPayloadId(mappedItemId, face.stepId(), 2),
@@ -7518,6 +8530,8 @@ public final class StepPreviewJsonExporter {
                 transform(face.normal(), matrix),
                 face.sameSense(),
                 color,
+                transparency,
+                pbr,
                 layers,
                 loops,
                 triangles,
@@ -8267,7 +9281,13 @@ public final class StepPreviewJsonExporter {
                 || content instanceof StepCsgSolid
                 || content instanceof StepCsgPrimitive
                 || content instanceof StepBooleanResult
-                || content instanceof StepBooleanClippingResult) {
+                || content instanceof StepBooleanClippingResult
+                || content instanceof StepSweptDiskSolid
+                || content instanceof StepExtrudedAreaSolidTapered
+                || content instanceof StepRevolvedAreaSolidTapered
+                || content instanceof StepSurfaceCurveSweptAreaSolid
+                || content instanceof StepPolygonalBoundedHalfSpace
+                || content instanceof StepComplexClippingResult) {
             appendPmiLeaderForSolid(content, leader, builder);
             return;
         }
@@ -8643,7 +9663,13 @@ public final class StepPreviewJsonExporter {
                 || target instanceof StepCsgSolid
                 || target instanceof StepCsgPrimitive
                 || target instanceof StepBooleanResult
-                || target instanceof StepBooleanClippingResult) {
+                || target instanceof StepBooleanClippingResult
+                || target instanceof StepSweptDiskSolid
+                || target instanceof StepExtrudedAreaSolidTapered
+                || target instanceof StepRevolvedAreaSolidTapered
+                || target instanceof StepSurfaceCurveSweptAreaSolid
+                || target instanceof StepPolygonalBoundedHalfSpace
+                || target instanceof StepComplexClippingResult) {
             return "solid";
         }
         if (target instanceof StepRepresentation) {
@@ -8771,6 +9797,12 @@ public final class StepPreviewJsonExporter {
             return solid.name();
         }
         if (target instanceof StepBooleanClippingResult solid) {
+            return solid.name();
+        }
+        if (target instanceof StepSweptDiskSolid solid) {
+            return solid.name();
+        }
+        if (target instanceof StepComplexClippingResult solid) {
             return solid.name();
         }
         if (target instanceof StepRepresentation representation) {
@@ -10445,6 +11477,15 @@ public final class StepPreviewJsonExporter {
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptArea(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.position(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweepReference(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+        } else if (definition instanceof StepSweptDiskSolid solid) {
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+        } else if (definition instanceof StepComplexClippingResult solid) {
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.firstOperand(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.secondOperand(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSolidReplica solid) {
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
@@ -12873,6 +13914,13 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectSemanticTargets(solid.position(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.sweepReference(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+        } else if (entity instanceof StepSweptDiskSolid solid) {
+            targets.addAll(collectSemanticTargets(solid.sweptCurve(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+        } else if (entity instanceof StepComplexClippingResult solid) {
+            targets.addAll(collectSemanticTargets(solid.firstOperand(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.secondOperand(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
         } else if (entity instanceof StepSolidReplica solid) {
             targets.addAll(collectSemanticTargets(solid.parentSolid(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.transformation(), resolved, visiting));
@@ -14291,6 +15339,10 @@ public final class StepPreviewJsonExporter {
         appendBounds(json, payload.bounds());
         json.append(",\"validation\":");
         appendValidation(json, payload.validation());
+        json.append(",\"product\":");
+        appendProductMetadata(json, payload.product());
+        json.append(",\"units\":");
+        appendUnitInfo(json, payload.units());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
         json.append(",\"unsupportedBooleans\":");
@@ -14382,6 +15434,8 @@ public final class StepPreviewJsonExporter {
                 payload.stats(),
                 payload.bounds(),
                 payload.validation(),
+                payload.product(),
+                payload.units(),
                 payload.pmi(),
                 payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
@@ -14441,6 +15495,10 @@ public final class StepPreviewJsonExporter {
         appendBounds(json, payload.bounds());
         json.append(",\"validation\":");
         appendValidation(json, payload.validation());
+        json.append(",\"product\":");
+        appendProductMetadata(json, payload.product());
+        json.append(",\"units\":");
+        appendUnitInfo(json, payload.units());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
         json.append(",\"unsupportedBooleans\":");
@@ -14954,6 +16012,51 @@ public final class StepPreviewJsonExporter {
         json.append(']');
     }
 
+    private static void appendProductMetadata(StringBuilder json, ProductMetadataExtractor.ProductMetadata product) {
+        json.append('{');
+        json.append("\"fileName\":").append(quoteNullable(product.fileName()));
+        json.append(",\"fileDescription\":").append(quoteNullable(product.fileDescription()));
+        json.append(",\"productName\":").append(quoteNullable(product.productName()));
+        json.append(",\"productDescription\":").append(quoteNullable(product.productDescription()));
+        json.append(",\"productIdentifier\":").append(quoteNullable(product.productIdentifier()));
+        json.append(",\"schemas\":");
+        appendStringList(json, product.schemaNames());
+        json.append(",\"components\":");
+        appendComponentList(json, product.components());
+        json.append('}');
+    }
+
+    private static void appendUnitInfo(StringBuilder json, UnitExtractor.UnitInfo units) {
+        json.append('{');
+        json.append("\"lengthUnit\":").append(quoteNullable(units.lengthUnit()));
+        json.append(",\"scaleToMeters\":");
+        if (units.scaleToMeters() != null) {
+            json.append(format(units.scaleToMeters()));
+        } else {
+            json.append("null");
+        }
+        json.append(",\"angleUnit\":").append(quoteNullable(units.angleUnit()));
+        json.append('}');
+    }
+
+    private static void appendComponentList(StringBuilder json, List<ProductMetadataExtractor.ProductMetadata.ComponentInfo> list) {
+        json.append('[');
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) json.append(',');
+            ProductMetadataExtractor.ProductMetadata.ComponentInfo c = list.get(i);
+            json.append('{');
+            json.append("\"name\":").append(quoteNullable(c.name()));
+            json.append(",\"identifier\":").append(quoteNullable(c.identifier()));
+            json.append(",\"description\":").append(quoteNullable(c.description()));
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    private static String quoteNullable(String s) {
+        return s == null ? "null" : quote(s);
+    }
+
     private static void appendPmi(StringBuilder json, List<PmiPayload> pmi) {
         json.append('[');
         for (int i = 0; i < pmi.size(); i++) {
@@ -15234,6 +16337,11 @@ public final class StepPreviewJsonExporter {
         json.append(",\"sameSense\":").append(face.sameSense());
         json.append(",\"color\":");
         appendColor(json, face.color());
+        json.append(",\"transparency\":").append(format(face.transparency()));
+        if (face.pbr() != null) {
+            json.append(",\"pbr\":");
+            appendPbr(json, face.pbr());
+        }
         json.append(",\"layers\":");
         appendStringList(json, face.layers());
         if (face.surface() != null) {
@@ -15263,6 +16371,22 @@ public final class StepPreviewJsonExporter {
                 .append(',')
                 .append(color.blue())
                 .append(']');
+    }
+
+    private static void appendPbr(StringBuilder json, PbrPayload pbr) {
+        json.append('{');
+        json.append("\"diffuse\":").append(format(pbr.diffuse()));
+        json.append(",\"specular\":").append(format(pbr.specular()));
+        if (pbr.specularExponent() != null) {
+            json.append(",\"specularExponent\":").append(format(pbr.specularExponent()));
+        }
+        if (pbr.specularColor() != null) {
+            json.append(",\"specularColor\":[")
+                    .append(pbr.specularColor()[0]).append(',')
+                    .append(pbr.specularColor()[1]).append(',')
+                    .append(pbr.specularColor()[2]).append(']');
+        }
+        json.append('}');
     }
 
     private static void appendLoops(StringBuilder json, List<LoopPayload> loops) {
@@ -15357,6 +16481,8 @@ public final class StepPreviewJsonExporter {
             PreviewStats stats,
             BoundsPayload bounds,
             ValidationPayload validation,
+            ProductMetadataExtractor.ProductMetadata product,
+            UnitExtractor.UnitInfo units,
             List<PmiPayload> pmi,
             List<UnsupportedBooleanPayload> unsupportedBooleans,
             List<UnsupportedFacePayload> unsupportedFaces,
@@ -15504,6 +16630,8 @@ public final class StepPreviewJsonExporter {
             PreviewStats stats,
             BoundsPayload bounds,
             ValidationPayload validation,
+            ProductMetadataExtractor.ProductMetadata product,
+            UnitExtractor.UnitInfo units,
             List<PmiPayload> pmi,
             List<UnsupportedBooleanPayload> unsupportedBooleans,
             List<UnsupportedFacePayload> unsupportedFaces,
@@ -15724,6 +16852,8 @@ public final class StepPreviewJsonExporter {
             VectorPayload normal,
             boolean sameSense,
             ColorPayload color,
+            double transparency,
+            PbrPayload pbr,
             List<String> layers,
             List<LoopPayload> loops,
             List<PointPayload> triangles,
@@ -15835,6 +16965,9 @@ public final class StepPreviewJsonExporter {
     }
 
     private record ColorPayload(int red, int green, int blue) {
+    }
+
+    private record PbrPayload(double diffuse, double specular, Double specularExponent, int[] specularColor) {
     }
 
     private record GeometrySummary(int faceCount, int edgeCount, double approxSurfaceArea, double approxEdgeLength) {
@@ -15982,7 +17115,7 @@ public final class StepPreviewJsonExporter {
                 }
             } else {
                 for (FacePayload face : payload.faces()) {
-                    int meshIndex = addFaceMesh(face, face.color());
+                    int meshIndex = addFaceMesh(face);
                     childList(nodes.get(rootNode)).add(addNode(
                             face.name(),
                             meshIndex,
@@ -16084,7 +17217,7 @@ public final class StepPreviewJsonExporter {
             for (FacePayload face : representation.faces()) {
                 faces.add(new FaceNode(
                         face,
-                        addFaceMesh(face, face.color() == null ? representation.color() : face.color()),
+                        addFaceMesh(face),
                         face.name() == null || face.name().isBlank() ? "Face #" + face.stepId() : face.name()
                 ));
             }
@@ -16099,12 +17232,12 @@ public final class StepPreviewJsonExporter {
             return new RepresentationMeshes(representation.name(), List.copyOf(faces), List.copyOf(edges));
         }
 
-        private int addFaceMesh(FacePayload face, ColorPayload color) {
+        private int addFaceMesh(FacePayload face) {
             IndexedTriangleMesh meshData = indexedTriangleMesh(face.triangles());
             int positionAccessor = addAccessor(meshData.positions(), true);
             int normalAccessor = addAccessor(meshData.normals(), false);
             int indexAccessor = addIndexAccessor(meshData.indices());
-            int materialIndex = materialIndex(color == null ? DEFAULT_FACE_COLOR : color, false);
+            int materialIndex = materialIndex(face);
             Map<String, Object> primitive = new LinkedHashMap<>();
             primitive.put("attributes", Map.of(
                     "POSITION", positionAccessor,
@@ -16185,6 +17318,46 @@ public final class StepPreviewJsonExporter {
             return accessors.size() - 1;
         }
 
+        private int materialIndex(FacePayload face) {
+            ColorPayload color = face.color() != null ? face.color() : DEFAULT_FACE_COLOR;
+            double alpha = 1.0 - face.transparency();
+            double metallic, roughness;
+            if (face.pbr() != null) {
+                PbrPayload pbr = face.pbr();
+                metallic = Math.sqrt(pbr.specular());
+                roughness = 1.0 - pbr.diffuse();
+            } else {
+                metallic = 0.08;
+                roughness = 0.48;
+            }
+            long alphaRounded = Math.round(alpha * 100);
+            long metallicRounded = Math.round(metallic * 100);
+            long roughnessRounded = Math.round(roughness * 100);
+            String key = "f:" + color.red() + "," + color.green() + "," + color.blue()
+                    + ",a" + alphaRounded + ",m" + metallicRounded + ",r" + roughnessRounded;
+            Integer existing = materialCache.get(key);
+            if (existing != null) {
+                return existing;
+            }
+            Map<String, Object> gltfPbr = new LinkedHashMap<>();
+            gltfPbr.put("baseColorFactor", List.of(
+                    color.red() / 255.0,
+                    color.green() / 255.0,
+                    color.blue() / 255.0,
+                    alpha
+            ));
+            gltfPbr.put("metallicFactor", metallic);
+            gltfPbr.put("roughnessFactor", roughness);
+            Map<String, Object> material = new LinkedHashMap<>();
+            material.put("pbrMetallicRoughness", gltfPbr);
+            material.put("doubleSided", true);
+            material.put("alphaMode", "BLEND");
+            materials.add(material);
+            int index = materials.size() - 1;
+            materialCache.put(key, index);
+            return index;
+        }
+
         private int materialIndex(ColorPayload color, boolean line) {
             String key = (line ? "line:" : "face:") + color.red() + "," + color.green() + "," + color.blue();
             Integer existing = materialCache.get(key);
@@ -16258,6 +17431,7 @@ public final class StepPreviewJsonExporter {
                     List.of("名称", face.name() == null ? "" : face.name()),
                     List.of("曲面", face.surfaceType() == null ? "PLANE" : face.surfaceType()),
                     List.of("颜色", formatColorValue(face.color())),
+                    List.of("透明度", face.transparency() > 0 ? String.format("%.2f", face.transparency()) : "无"),
                     List.of("图层", formatLayersValue(face.layers())),
                     List.of("边界环", String.valueOf(face.loops().size())),
                     List.of("内环", String.valueOf(face.loops().stream().filter(loop -> !loop.outer()).count())),
@@ -16277,6 +17451,7 @@ public final class StepPreviewJsonExporter {
                     List.of("表示", representationName == null ? "" : representationName),
                     List.of("实例", instance.id()),
                     List.of("颜色", formatColorValue(face.color())),
+                    List.of("透明度", face.transparency() > 0 ? String.format("%.2f", face.transparency()) : "无"),
                     List.of("图层", formatLayersValue(face.layers())),
                     List.of("边界环", String.valueOf(face.loops().size())),
                     List.of("内环", String.valueOf(face.loops().stream().filter(loop -> !loop.outer()).count())),
