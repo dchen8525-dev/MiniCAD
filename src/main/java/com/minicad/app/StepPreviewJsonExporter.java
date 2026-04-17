@@ -25,6 +25,7 @@ import com.minicad.geometry.Plane;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry.RationalBSplineCurve3;
 import com.minicad.geometry.RationalBSplineSurface3;
+import com.minicad.geometry.OffsetSurface3;
 import com.minicad.geometry.RuledSurface3;
 import com.minicad.geometry.SurfaceOfConstantRadius3;
 import com.minicad.geometry.SurfaceCurve3;
@@ -753,11 +754,40 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepCsgVolume
                     || entity instanceof StepBlockVolume
                     || entity instanceof StepFiniteElementMesh
-                    || entity instanceof StepFlatPattern) {
+                    || entity instanceof StepFlatPattern
+                    || entity instanceof StepBrepWithVoids
+                    || entity instanceof StepManifoldSolidBrep
+                    || entity instanceof StepFacettedBrep
+                    || entity instanceof StepNonManifoldSolidBrep
+                    || entity instanceof StepAdvancedBrep
+                    || entity instanceof StepMappedItem
+                    || entity instanceof StepSolidModel
+                    || entity instanceof StepSurfacePatch) {
                 solidIds.add(entity.id());
             }
             if (isStandaloneEdgeSource(entity)) {
                 collectStandaloneEdges(entity, standaloneEdges, resolved, builder);
+            }
+        }
+        // Remove shells that are referenced by B-rep solids to avoid duplicate processing
+        for (Integer solidId : solidIds) {
+            StepEntity solidEntity = resolved.get(solidId);
+            if (solidEntity instanceof StepManifoldSolidBrep brep) {
+                shellIds.remove(brep.outer().id());
+            } else if (solidEntity instanceof StepFacettedBrep brep) {
+                shellIds.remove(brep.outer().id());
+            } else if (solidEntity instanceof StepNonManifoldSolidBrep brep) {
+                shellIds.remove(brep.outer().id());
+            } else if (solidEntity instanceof StepAdvancedBrep brep) {
+                shellIds.remove(brep.outer().id());
+                for (StepEntity voidShell : brep.voids()) {
+                    shellIds.remove(voidShell.id());
+                }
+            } else if (solidEntity instanceof StepBrepWithVoids brep) {
+                shellIds.remove(brep.outer().id());
+                for (StepEntity voidShell : brep.voids()) {
+                    shellIds.remove(voidShell.id());
+                }
             }
         }
         GeometryCollection shellGeometry = buildGeometryForShells(shellIds, resolved, builder, metadata, Map.of());
@@ -865,7 +895,7 @@ public final class StepPreviewJsonExporter {
                 String baseName = entity == null ? null : entity.name();
                 int faceIndex = 0;
                 for (Face face : solid.outerShell().faces()) {
-                    faces.add(toPlanarFacePayload(
+                    faces.add(facePayloadFromTopologyFace(
                             solidId * 1000 + faceIndex++,
                             face,
                             baseName,
@@ -875,7 +905,7 @@ public final class StepPreviewJsonExporter {
                 }
                 for (var voidShell : solid.voidShells()) {
                     for (Face face : voidShell.faces()) {
-                        faces.add(toPlanarFacePayload(
+                        faces.add(facePayloadFromTopologyFace(
                                 solidId * 1000 + faceIndex++,
                                 face,
                                 baseName,
@@ -925,30 +955,16 @@ public final class StepPreviewJsonExporter {
             shellIds.add(item.id());
             return;
         }
-        if (item instanceof StepManifoldSolidBrep solidBrep) {
-            shellIds.add(solidBrep.outer().id());
-            return;
-        }
-        if (item instanceof StepFacettedBrep facettedBrep) {
-            shellIds.add(facettedBrep.outer().id());
-            return;
-        }
-        if (item instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
-            shellIds.add(nonManifoldBrep.outer().id());
-            return;
-        }
-        if (item instanceof StepAdvancedBrep advancedBrep) {
-            shellIds.add(advancedBrep.outer().id());
-            for (StepEntity voidShell : advancedBrep.voids()) {
-                shellIds.add(voidShell.id());
-            }
-            return;
-        }
-        if (item instanceof StepBrepWithVoids brepWithVoids) {
-            shellIds.add(brepWithVoids.outer().id());
-            for (StepEntity voidShell : brepWithVoids.voids()) {
-                shellIds.add(voidShell.id());
-            }
+        // B-rep solid types (MANIFOLD_SOLID_BREP, FACETTED_BREP, etc.) are now handled
+        // through the solid path — skip shell collection to avoid duplicate output.
+        if (item instanceof StepManifoldSolidBrep
+                || item instanceof StepFacettedBrep
+                || item instanceof StepNonManifoldSolidBrep
+                || item instanceof StepAdvancedBrep
+                || item instanceof StepBrepWithVoids
+                || item instanceof StepMappedItem
+                || item instanceof StepSolidModel
+                || item instanceof StepSurfacePatch) {
             return;
         }
         if (item instanceof StepShellBasedSurfaceModel surfaceModel) {
@@ -1543,7 +1559,7 @@ public final class StepPreviewJsonExporter {
                     return trimmed;
                 }
                 if (geometry instanceof StepPlane) {
-                    FacePayload payload = toPlanarFacePayload(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
+                    FacePayload payload = facePayloadFromTopologyFace(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
                     logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
@@ -2617,56 +2633,84 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepPlanarBox
                 || entity instanceof StepPlanarExtent
                 || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern;
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepSurfacePatch;
     }
 
-    private static FacePayload toPlanarFacePayload(
+    private static FacePayload facePayloadFromTopologyFace(
             int stepId,
             Face face,
             String name,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
-        if (!(face.surface() instanceof Plane plane)) {
-            throw new UnsupportedGeometryException("planar face payload requires PLANE topology");
+        SurfaceGeometry surface = face.surface();
+        boolean sameSense = face.sameSense();
+        if (surface instanceof Plane plane) {
+            List<LoopPayload> loops = new ArrayList<>();
+            for (FaceBound bound : face.bounds()) {
+                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            }
+            Direction3 normal = plane.normal();
+            if (!sameSense) {
+                normal = normal.reverse();
+            }
+            return new FacePayload(
+                    stepId,
+                    name,
+                    "PLANE",
+                    toPointPayload(plane.origin()),
+                    new VectorPayload(normal.x(), normal.y(), normal.z()),
+                    sameSense,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    loops,
+                    List.of(),
+                    new FaceSurfacePayload(
+                            "plane_face",
+                            List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
+                            List.of(plane.normal().x(), plane.normal().y(), plane.normal().z()),
+                            basisDirectionForNormal(normal),
+                            0.0,
+                            null, null, 0.0, 0.0, 0.0, 0.0,
+                            null, null, null, null, null, null, null
+                    ),
+                    null
+            );
+        }
+        // Non-planar: grid-based triangulation
+        int segments = 32;
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(segments, segments);
+        if (grid.isEmpty()) {
+            throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " produced no sample grid");
+        }
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        if (triangles.isEmpty()) {
+            throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " triangulation produced no cells");
+        }
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) {
+            normal = normal.scale(-1.0);
         }
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
             loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
         }
-        Direction3 normal = plane.normal();
         return new FacePayload(
                 stepId,
                 name,
-                "PLANE",
-                toPointPayload(plane.origin()),
+                surfaceTypeNameForGeometry(surface),
+                new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
-                face.sameSense(),
+                sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
-                List.of(),
-                new FaceSurfacePayload(
-                        "plane_face",
-                        List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
-                        List.of(normal.x(), normal.y(), normal.z()),
-                        basisDirectionForNormal(normal),
-                        0.0,
-                        null,
-                        null,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                ),
+                triangles,
+                null,
                 null
         );
     }
@@ -6308,6 +6352,23 @@ public final class StepPreviewJsonExporter {
         return geometry.getClass().getSimpleName();
     }
 
+    private static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
+        return switch (surface) {
+            case Plane ignored -> "PLANE";
+            case CylindricalSurface ignored -> "CYLINDRICAL_SURFACE";
+            case ConicalSurface ignored -> "CONICAL_SURFACE";
+            case SphericalSurface ignored -> "SPHERICAL_SURFACE";
+            case ToroidalSurface ignored -> "TOROIDAL_SURFACE";
+            case BSplineSurface3 ignored -> "BSPLINE_SURFACE";
+            case RationalBSplineSurface3 ignored -> "RATIONAL_BSPLINE_SURFACE";
+            case RuledSurface3 ignored -> "RULED_SURFACE";
+            case SurfaceOfRevolution3 ignored -> "SURFACE_OF_REVOLUTION";
+            case OffsetSurface3 ignored -> "OFFSET_SURFACE";
+            case SurfaceOfLinearExtrusion3 ignored -> "SURFACE_OF_LINEAR_EXTRUSION";
+            case SurfaceOfConstantRadius3 ignored -> "SURFACE_OF_CONSTANT_RADIUS";
+        };
+    }
+
     private static UvPoint nearestUvOnRationalBSplineSurface(
             RationalBSplineSurface3 surface,
             CartesianPoint point,
@@ -7965,10 +8026,13 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<CartesianPoint> sampleCircleArc(Circle circle, CartesianPoint start, CartesianPoint end, boolean naturalForward) {
-        double startAngle = circle.angleOf(start);
-        double endAngle = circle.angleOf(end);
+        // Project points onto circle if they're close (numerical tolerance)
+        CartesianPoint projectedStart = circle.contains(start) ? start : circle.closestPointTo(start);
+        CartesianPoint projectedEnd = circle.contains(end) ? end : circle.closestPointTo(end);
+        double startAngle = circle.angleOf(projectedStart);
+        double endAngle = circle.angleOf(projectedEnd);
         double delta = endAngle - startAngle;
-        if (start.distanceTo(end) <= Epsilon.EPS) {
+        if (projectedStart.distanceTo(projectedEnd) <= Epsilon.EPS) {
             delta = naturalForward ? Math.PI * 2.0 : -Math.PI * 2.0;
         } else if (naturalForward) {
             if (delta < 0.0) {
