@@ -21,6 +21,10 @@ import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Ellipse3;
 import com.minicad.geometry.Line3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.geometry.Hyperbola3;
+import com.minicad.geometry.Clothoid3;
+import com.minicad.geometry.DegenerateCurve3;
 import com.minicad.geometry.Plane;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry.RationalBSplineCurve3;
@@ -1044,6 +1048,14 @@ public final class StepPreviewJsonExporter {
         }
         if (item instanceof StepEdgeCurve edgeCurve) {
             edges.putIfAbsent(edgeCurve.id(), buildEdgePayload(edgeCurve.id(), resolved, builder));
+            return;
+        }
+        if (item instanceof StepFilletEdge filletEdge) {
+            edges.putIfAbsent(filletEdge.id(), buildEdgePayload(filletEdge.id(), resolved, builder));
+            return;
+        }
+        if (item instanceof StepChamferEdge chamferEdge) {
+            edges.putIfAbsent(chamferEdge.id(), buildEdgePayload(chamferEdge.id(), resolved, builder));
             return;
         }
         if (item instanceof StepPath path) {
@@ -5189,6 +5201,30 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepBlendedSurface blended) {
             return mapperForSurface(blended.primarySurface(), builder);
         }
+        // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
+        if (geometry instanceof StepFreeFormSurface freeForm) {
+            BSplineSurface3 surface = buildFreeFormSurface(freeForm, builder);
+            double uSpan = surface.uEnd() - surface.uStart();
+            double vSpan = surface.vEnd() - surface.vStart();
+            return new ParametricSurfaceMapper() {
+                @Override
+                public UvPoint project(CartesianPoint point, UvPoint previous) {
+                    double u = previous != null ? previous.u() : surface.uStart() + uSpan * 0.5;
+                    double v = previous != null ? previous.v() : surface.vStart() + vSpan * 0.5;
+                    return new UvPoint(u, v);
+                }
+
+                @Override
+                public CartesianPoint pointAt(double u, double v) {
+                    return surface.pointAt(u, v);
+                }
+
+                @Override
+                public Vector3 normalAt(double u, double v) {
+                    return surface.normalAt(u, v);
+                }
+            };
+        }
         return null;
     }
 
@@ -6587,6 +6623,26 @@ public final class StepPreviewJsonExporter {
                 }
             }
         }
+        if (entity instanceof StepFilletEdge filletEdge) {
+            // Fillet edge: sample the original edge geometry for preview.
+            StepEntity original = filletEdge.originalEdge();
+            if (original != null) {
+                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.getFirst(), polyline.getLast(), true, builder);
+                if (curvePayload != null) {
+                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload);
+                }
+            }
+        }
+        if (entity instanceof StepChamferEdge chamferEdge) {
+            // Chamfer edge: sample the original edge geometry for preview.
+            StepEntity original = chamferEdge.originalEdge();
+            if (original != null) {
+                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.getFirst(), polyline.getLast(), true, builder);
+                if (curvePayload != null) {
+                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload);
+                }
+            }
+        }
         return new EdgePayload(edgeId, toPointPayloads(polyline), null);
     }
 
@@ -7969,7 +8025,44 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, OFFSET_CURVE_2D/3D, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE topology");
+        if (curve instanceof Parabola3 parabola) {
+            List<CartesianPoint> points = new ArrayList<>(parabola.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof Hyperbola3 hyperbola) {
+            List<CartesianPoint> points = new ArrayList<>(hyperbola.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof Clothoid3 clothoid) {
+            List<CartesianPoint> points = new ArrayList<>(clothoid.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof DegenerateCurve3 degenerate) {
+            // Degenerate curve: a single collapsed point; return start-end as a degenerate edge
+            return List.of(start, end);
+        }
+        throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, PARABOLA, HYPERBOLA, CLOTHOID, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, OFFSET_CURVE_2D/3D, SURFACE_CURVE, SEAM_CURVE, DEGENERATE_CURVE or TRIMMED_CURVE topology");
     }
 
     private static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {

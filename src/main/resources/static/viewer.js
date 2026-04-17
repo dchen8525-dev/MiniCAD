@@ -1459,10 +1459,16 @@ function renderGlbPreview(result) {
         }
         if (node.isMesh && node.material) {
             const baseColor = node.material.color?.clone() ?? new THREE.Color(0xc87a52);
+            const metalness = node.material.metalness ?? 0.08;
+            const roughness = node.material.roughness ?? 0.52;
+            const opacity = node.material.opacity != null ? node.material.opacity : 1.0;
+            const transparent = opacity < 1.0;
             node.material = new THREE.MeshStandardMaterial({
                 color: baseColor,
-                metalness: 0.08,
-                roughness: 0.52,
+                metalness,
+                roughness,
+                opacity,
+                transparent,
                 side: THREE.DoubleSide
             });
         }
