@@ -1,5 +1,7 @@
 # MiniCAD 与 OpenCASCADE OCCT 兼容实现计划
 
+**基于 OpenCASCADE OCCT 8.0.0-rc5 分析**
+
 ## Context
 
 **目标**: 使 MiniCAD STEP 解析能力与 OpenCASCADE OCCT 8.0.0-rc3 兼容，确保能够完整解析 OCCT 支持的所有 STEP 实体类型。
@@ -273,15 +275,15 @@ public class OcctCompatibilityChecker {
 
 ---
 
-## OCCT 参考文件路径
+## OCCT 参考文件路径（基于 OCCT 8.0.0-rc5）
 
 | 文件 | 路径 |
 |------|------|
-| 实体注册协议 | `D:\opencascade\OCCT-8_0_0_rc3\src\DataExchange\TKDESTEP\StepAP214\StepAP214_Protocol.cxx` |
-| 头部协议 | `D:\opencascade\OCCT-8_0_0_rc3\src\DataExchange\TKDESTEP\HeaderSection\HeaderSection_Protocol.cxx` |
-| StepDimTol 模块 | `D:\opencascade\OCCT-8_0_0_rc3\src\DataExchange\TKDESTEP\StepDimTol\*.hxx` |
-| StepFEA 模块 | `D:\opencascade\OCCT-8_0_0_rc3\src\DataExchange\TKDESTEP\StepFEA\*.hxx` |
-| StepKinematics 模块 | `D:\opencascade\OCCT-8_0_0_rc3\src\DataExchange\TKDESTEP\StepKinematics\*.hxx` |
+| 实体注册协议 | `D:\opencascade\OCCT-8_0_0_rc5\src\DataExchange\TKDESTEP\StepAP214\StepAP214_Protocol.cxx` |
+| 头部协议 | `D:\opencascade\OCCT-8_0_0_rc5\src\DataExchange\TKDESTEP\HeaderSection\HeaderSection_Protocol.cxx` |
+| StepDimTol 模块 | `D:\opencascade\OCCT-8_0_0_rc5\src\DataExchange\TKDESTEP\StepDimTol\*.hxx` |
+| StepFEA 模块 | `D:\opencascade\OCCT-8_0_0_rc5\src\DataExchange\TKDESTEP\StepFEA\*.hxx` |
+| StepKinematics 模块 | `D:\opencascade\OCCT-8_0_0_rc5\src\DataExchange\TKDESTEP\StepKinematics\*.hxx` |
 
 ---
 
