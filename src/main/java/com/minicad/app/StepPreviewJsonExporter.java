@@ -122,6 +122,8 @@ import com.minicad.step.model.StepConnectedFaceSubSet;
 import com.minicad.step.model.StepCartesianTransformationOperator;
 import com.minicad.step.model.StepCsgPrimitive;
 import com.minicad.step.model.StepCsgSolid;
+import com.minicad.step.model.StepCsgVolume;
+import com.minicad.step.model.StepBlockVolume;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepContextDependentShapeRepresentation;
 import com.minicad.step.model.StepCartesianPoint;
@@ -349,6 +351,8 @@ import com.minicad.step.model.StepLineSegment;
 import com.minicad.step.model.StepPolyline;
 import com.minicad.step.model.StepPolyLoop;
 import com.minicad.step.model.StepPcurve;
+import com.minicad.step.model.StepPlanarBox;
+import com.minicad.step.model.StepPlanarExtent;
 import com.minicad.step.model.StepPiecewiseBezierCurve;
 import com.minicad.step.model.StepPiecewiseBezierSurface;
 import com.minicad.step.model.StepQuasiUniformCurve;
@@ -741,7 +745,10 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepRevolvedAreaSolidTapered
                     || entity instanceof StepSurfaceCurveSweptAreaSolid
                     || entity instanceof StepPolygonalBoundedHalfSpace
-                    || entity instanceof StepComplexClippingResult) {
+                    || entity instanceof StepComplexClippingResult
+                    || entity instanceof StepHalfSpaceSolid
+                    || entity instanceof StepCsgVolume
+                    || entity instanceof StepBlockVolume) {
                 solidIds.add(entity.id());
             }
             if (isStandaloneEdgeSource(entity)) {
@@ -2203,7 +2210,10 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepRevolvedAreaSolidTapered
                 || entity instanceof StepSurfaceCurveSweptAreaSolid
                 || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepComplexClippingResult;
+                || entity instanceof StepComplexClippingResult
+                || entity instanceof StepHalfSpaceSolid
+                || entity instanceof StepCsgVolume
+                || entity instanceof StepBlockVolume;
     }
 
     private static List<StepRepresentation> linkedShapeRepresentations(
@@ -2322,7 +2332,10 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepRevolvedAreaSolidTapered
                     || entity instanceof StepSurfaceCurveSweptAreaSolid
                     || entity instanceof StepPolygonalBoundedHalfSpace
-                    || entity instanceof StepComplexClippingResult) {
+                    || entity instanceof StepComplexClippingResult
+                    || entity instanceof StepHalfSpaceSolid
+                    || entity instanceof StepCsgVolume
+                    || entity instanceof StepBlockVolume) {
                 count++;
             }
         }
@@ -2571,7 +2584,9 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepConnectedFaceSubSet
                 || entity instanceof StepTessellatedFaceSet
                 || entity instanceof StepTessellatedFace
-                || entity instanceof StepGeometricSurfaceSet;
+                || entity instanceof StepGeometricSurfaceSet
+                || entity instanceof StepPlanarBox
+                || entity instanceof StepPlanarExtent;
     }
 
     private static FacePayload toPlanarFacePayload(
