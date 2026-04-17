@@ -200,20 +200,6 @@ public record RationalBSplineCurve2(
     }
 
     /**
-     * Returns the approximate length of the curve.
-     *
-     * @return approximate curve length
-     */
-    public double length() {
-        List<Point2> samples = sample(256);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
-    }
-
-    /**
      * Returns the closest point on the curve to a given point.
      *
      * @param point target point

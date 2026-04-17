@@ -27,14 +27,17 @@ public sealed interface SurfaceGeometry permits
      * @return bounding box enclosing the surface
      */
     default BoundingBox3 boundingBox() {
-        BoundingBox3 box = BoundingBox3.empty();
         java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(32, 32);
+        if (grid.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        BoundingBox3.Box box = BoundingBox3.mutable();
         for (java.util.List<CartesianPoint> row : grid) {
             for (CartesianPoint point : row) {
-                box = box.union(point);
+                box.expand(point);
             }
         }
-        return box;
+        return box.toImmutable();
     }
 
     /**
@@ -61,7 +64,6 @@ public sealed interface SurfaceGeometry permits
     default Vector3 normalAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        double eps = 0.001;
         java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(64, 64);
         if (grid.isEmpty() || grid.get(0).isEmpty()) {
             return new Vector3(0, 0, 1);
@@ -79,9 +81,10 @@ public sealed interface SurfaceGeometry permits
         Vector3 tangentV = pv.subtract(pu);
         Vector3 normal = tangentU.cross(tangentV);
 
-        if (normal.norm() <= Epsilon.EPS) {
+        double norm = normal.norm();
+        if (norm <= Epsilon.EPS) {
             return new Vector3(0, 0, 1);
         }
-        return normal.normalize().asVector();
+        return normal.scale(1.0 / norm);
     }
 }

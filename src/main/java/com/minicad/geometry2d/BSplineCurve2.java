@@ -179,52 +179,6 @@ public record BSplineCurve2(
     }
 
     /**
-     * Returns the approximate length of the curve.
-     *
-     * @return approximate curve length
-     */
-    public double length() {
-        List<Point2> samples = sample(256);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
-    }
-
-    /**
-     * Returns the closest point on the curve to a given point.
-     *
-     * @param point target point
-     * @return closest point on the curve
-     */
-    public Point2 closestPointTo(Point2 point) {
-        Preconditions.requireNonNull(point, "point");
-        List<Point2> samples = sample(256);
-        Point2 closest = samples.get(0);
-        double minDistance = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
-            double distance = point.distanceTo(samples.get(i));
-            if (distance < minDistance) {
-                minDistance = distance;
-                closest = samples.get(i);
-            }
-        }
-        return closest;
-    }
-
-    /**
-     * Returns the distance from a point to the curve.
-     *
-     * @param point target point
-     * @return minimum distance to the curve
-     */
-    public double distanceTo(Point2 point) {
-        Preconditions.requireNonNull(point, "point");
-        return point.distanceTo(closestPointTo(point));
-    }
-
-    /**
      * Returns the midpoint of the curve.
      *
      * @return midpoint

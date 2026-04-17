@@ -53,7 +53,7 @@ public interface Curve2 {
      * @return approximate length
      */
     default double length() {
-        List<Point2> samples = sample(128);
+        List<Point2> samples = sample(256);
         double totalLength = 0.0;
         for (int i = 0; i < samples.size() - 1; i++) {
             totalLength += samples.get(i).distanceTo(samples.get(i + 1));
@@ -75,14 +75,13 @@ public interface Curve2 {
         if (samples.size() < 2) {
             return new Vector2(1, 0);
         }
-        // Map parameter to index in samples
         int index = (int) (parameter * (samples.size() - 1));
         index = Math.max(0, Math.min(index, samples.size() - 2));
         Vector2 tangent = samples.get(index + 1).subtract(samples.get(index));
         if (tangent.norm() <= Epsilon.EPS) {
             return new Vector2(1, 0);
         }
-        return tangent.normalize().asVector();
+        return tangent.scale(1.0 / tangent.norm());
     }
 
     /**

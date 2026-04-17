@@ -63,6 +63,7 @@ public record RationalBSplineCurve3(
         return expanded.get(expanded.size() - degree - 1);
     }
 
+    @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         List<Double> expanded = expandedKnots();
@@ -226,26 +227,12 @@ public record RationalBSplineCurve3(
     }
 
     /**
-     * Returns the approximate length of the curve.
-     * Computed by summing distances between sampled points.
-     *
-     * @return approximate curve length
-     */
-    public double length() {
-        List<CartesianPoint> samples = sample(256);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
-    }
-
-    /**
      * Returns the closest point on the curve to a given point.
      *
      * @param point target point
      * @return closest point on the curve
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         List<CartesianPoint> samples = sample(256);
@@ -267,6 +254,7 @@ public record RationalBSplineCurve3(
      * @param point target point
      * @return minimum distance to the curve
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

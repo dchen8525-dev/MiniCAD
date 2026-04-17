@@ -36,6 +36,7 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
      * @param t parameter value (arc length scaled by curvature)
      * @return point on the clothoid
      */
+    @Override
     public CartesianPoint pointAt(double t) {
         Preconditions.requireFinite(t, "t");
         // Fresnel integrals: C(t) = integral of cos(pi*t^2/2), S(t) = integral of sin(pi*t^2/2)
@@ -203,25 +204,12 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
     }
 
     /**
-     * Returns the approximate length of the clothoid segment.
-     *
-     * @return approximate length
-     */
-    public double length() {
-        java.util.List<CartesianPoint> samples = sample(256);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
-    }
-
-    /**
      * Returns the closest point on the clothoid to a given point.
      *
      * @param point target point
      * @return closest point on the clothoid (approximately)
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto clothoid plane
@@ -254,6 +242,7 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
      * @param point target point
      * @return approximate distance to the clothoid
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

@@ -65,6 +65,50 @@ public record BoundingBox3(double minX, double minY, double minZ, double maxX, d
     }
 
     /**
+     * Mutable bounding box builder for hot-path accumulation.
+     * Avoids record allocations and precondition checks during loops.
+     */
+    public static final class Box {
+        private double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, minZ = Double.MAX_VALUE;
+        private double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
+
+        public void expand(CartesianPoint point) {
+            double x = point.x(), y = point.y(), z = point.z();
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (z < minZ) minZ = z;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+            if (z > maxZ) maxZ = z;
+        }
+
+        public void expand(BoundingBox3 other) {
+            if (other.minX < minX) minX = other.minX;
+            if (other.minY < minY) minY = other.minY;
+            if (other.minZ < minZ) minZ = other.minZ;
+            if (other.maxX > maxX) maxX = other.maxX;
+            if (other.maxY > maxY) maxY = other.maxY;
+            if (other.maxZ > maxZ) maxZ = other.maxZ;
+        }
+
+        public BoundingBox3 toImmutable() {
+            if (minX > maxX || minY > maxY || minZ > maxZ) {
+                return BoundingBox3.empty();
+            }
+            return new BoundingBox3(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+    }
+
+    /**
+     * Returns a mutable box builder for accumulating bounds without allocation.
+     *
+     * @return new mutable box
+     */
+    public static Box mutable() {
+        return new Box();
+    }
+
+    /**
      * Creates a bounding box from multiple points.
      *
      * @param points collection of points
@@ -75,11 +119,11 @@ public record BoundingBox3(double minX, double minY, double minZ, double maxX, d
         if (points.isEmpty()) {
             return empty();
         }
-        BoundingBox3 box = empty();
+        Box box = mutable();
         for (CartesianPoint point : points) {
-            box = box.union(point);
+            box.expand(point);
         }
-        return box;
+        return box.toImmutable();
     }
 
     /**

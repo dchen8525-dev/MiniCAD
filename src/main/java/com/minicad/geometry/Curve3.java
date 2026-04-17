@@ -64,12 +64,38 @@ public sealed interface Curve3 permits
      * @return approximate length
      */
     default double length() {
-        java.util.List<CartesianPoint> samples = sample(128);
+        java.util.List<CartesianPoint> samples = sample(256);
         double totalLength = 0.0;
         for (int i = 0; i < samples.size() - 1; i++) {
             totalLength += samples.get(i).distanceTo(samples.get(i + 1));
         }
         return totalLength;
+    }
+
+    /**
+     * Returns the point on the curve at the given parameter value.
+     *
+     * @param parameter parameter value (interpretation depends on curve type)
+     * @return point on the curve
+     */
+    CartesianPoint pointAt(double parameter);
+
+    /**
+     * Returns the closest point on this curve to the given point.
+     *
+     * @param point query point
+     * @return closest point on the curve
+     */
+    CartesianPoint closestPointTo(CartesianPoint point);
+
+    /**
+     * Returns the minimum distance from this curve to the given point.
+     *
+     * @param point query point
+     * @return distance
+     */
+    default double distanceTo(CartesianPoint point) {
+        return point.distanceTo(closestPointTo(point));
     }
 
     /**
@@ -82,17 +108,13 @@ public sealed interface Curve3 permits
     default Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         double eps = 0.001;
-        java.util.List<CartesianPoint> samples = sample(256);
-        if (samples.size() < 2) {
+        CartesianPoint p = pointAt(parameter);
+        CartesianPoint pNext = pointAt(parameter + eps);
+        Vector3 tangent = pNext.subtract(p);
+        double norm = tangent.norm();
+        if (norm <= Epsilon.EPS) {
             return new Vector3(1, 0, 0);
         }
-        // Map parameter to index in samples
-        int index = (int) (parameter * (samples.size() - 1));
-        index = Math.max(0, Math.min(index, samples.size() - 2));
-        Vector3 tangent = samples.get(index + 1).subtract(samples.get(index));
-        if (tangent.norm() <= Epsilon.EPS) {
-            return new Vector3(1, 0, 0);
-        }
-        return tangent.normalize().asVector();
+        return tangent.scale(1.0 / norm);
     }
 }
