@@ -1731,6 +1731,10 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
         }
+        // Machined surface: delegate to the underlying face geometry
+        if (previewGeometry instanceof StepMachinedSurface machinedSurface) {
+            return buildPreviewFaceResult((StepFaceEntity) machinedSurface.face(), builder, metadata);
+        }
         String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
         String reason = unsupportedSurface == null
                 ? "surface type not previewable"
@@ -7314,6 +7318,8 @@ public final class StepPreviewJsonExporter {
             }
             if (item instanceof StepCircle2D
                     || item instanceof StepEllipse2D
+                    || item instanceof StepHyperbola2D
+                    || item instanceof StepParabola2D
                     || item instanceof StepPolyline2D
                     || item instanceof StepTrimmedCurve2D
                     || item instanceof StepCompositeCurve2D

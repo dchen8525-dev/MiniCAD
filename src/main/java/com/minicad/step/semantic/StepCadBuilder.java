@@ -5270,6 +5270,12 @@ public final class StepCadBuilder {
                             revolution.sweptCurve(),
                             revolution.axisOrigin(),
                             revolution.axisDirection().reverse());
+            case RuledSurface3 ruled -> new RuledSurface3(
+                    reverseCurve3(ruled.directrix1()),
+                    reverseCurve3(ruled.directrix2()));
+            case SurfaceOfConstantRadius3 constant -> new SurfaceOfConstantRadius3(
+                    reverseSurfaceSense(constant.sweptSurface()),
+                    constant.radius());
             default -> surface;
         };
     }
