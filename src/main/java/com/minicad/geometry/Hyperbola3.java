@@ -38,6 +38,7 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
      * @param t parameter value (t >= 1 or t <= -1 for the two branches)
      * @return point on the hyperbola (right branch for t > 0)
      */
+    @Override
     public CartesianPoint pointAt(double t) {
         Preconditions.requireFinite(t, "t");
         // Parametric form using hyperbolic cosine and sine
@@ -191,6 +192,7 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
      * @param point target point
      * @return closest point on the hyperbola (approximately)
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto hyperbola plane
@@ -224,6 +226,7 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
      * @param point target point
      * @return approximate distance to the hyperbola
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

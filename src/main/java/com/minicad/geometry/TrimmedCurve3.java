@@ -38,6 +38,7 @@ public record TrimmedCurve3(
      * @param parameter parameter value (0 to 1)
      * @return point on the trimmed curve
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         if (senseAgreement) {
@@ -119,6 +120,7 @@ public record TrimmedCurve3(
      * @param point target point
      * @return closest point on the trimmed curve
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // For linear interpolation between trim points
@@ -137,6 +139,7 @@ public record TrimmedCurve3(
      * @param point target point
      * @return minimum distance to the trimmed curve
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

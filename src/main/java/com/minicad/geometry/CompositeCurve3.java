@@ -39,6 +39,7 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
      * @param parameter parameter value (0 to 1)
      * @return point on the composite curve
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         if (segments.isEmpty()) {
@@ -218,6 +219,7 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
      * @param point target point
      * @return closest point on the composite curve
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = null;
@@ -239,6 +241,7 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
      * @param point target point
      * @return minimum distance to the composite curve
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

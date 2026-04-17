@@ -29,6 +29,7 @@ public record Circle(Axis2Placement3D position, double radius) implements Curve3
      * @param angle angle in radians from the local X axis
      * @return point on the circle
      */
+    @Override
     public CartesianPoint pointAt(double angle) {
         Preconditions.requireFinite(angle, "angle");
         Vector3 radial = position.xDirection().asVector().scale(Math.cos(angle) * radius)
@@ -233,6 +234,7 @@ public record Circle(Axis2Placement3D position, double radius) implements Curve3
      * @param point target point
      * @return closest point on the circle
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto circle plane
@@ -260,6 +262,7 @@ public record Circle(Axis2Placement3D position, double radius) implements Curve3
      * @param point target point
      * @return shortest distance to the circle
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = closestPointTo(point);

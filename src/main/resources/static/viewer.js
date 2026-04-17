@@ -2,6 +2,15 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+function escHtml(s) {
+    return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+function setTextAndShow(el, text) {
+    el.textContent = text;
+    el.style.display = text ? '' : 'none';
+}
+
 const fileInput = document.querySelector('#file-input');
 const statusText = document.querySelector('#status-text');
 const validationDetails = document.querySelector('#validation-details');
@@ -389,6 +398,58 @@ function updateValidation(validation = {}) {
         ['校验', nativeChecks]
     ].map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
     updateValidationReport(validation.report ?? validation.nativeChecks);
+}
+
+function updateProduct(product = {}) {
+    const card = document.getElementById('product-card');
+    const nameEl = document.getElementById('product-name');
+    const descEl = document.getElementById('product-desc');
+    const idEl = document.getElementById('product-identifier');
+    const schemaEl = document.getElementById('product-schema');
+    const compEl = document.getElementById('product-components');
+
+    const productName = product.productName;
+    const productDesc = product.productDescription;
+    const productId = product.productIdentifier;
+    const fileName = product.fileName;
+    const schemas = Array.isArray(product.schemas) ? product.schemas : [];
+    const components = Array.isArray(product.components) ? product.components : [];
+
+    if (!productName && !productDesc && !productId && !fileName && schemas.length === 0 && components.length === 0) {
+        card.style.display = 'none';
+        return;
+    }
+
+    card.style.display = '';
+    setTextAndShow(nameEl, productName || fileName || '');
+    setTextAndShow(descEl, productDesc || '');
+    setTextAndShow(idEl, productId ? `ID: ${productId}` : '');
+    setTextAndShow(schemaEl, schemas.length > 0 ? schemas.join(', ') : '');
+    compEl.innerHTML = components.map((c) => {
+        const label = c.name || c.identifier || 'Component';
+        return `<li class="component-item"><strong>${escHtml(label)}</strong>${c.description ? `<br><span style="color:var(--muted);font-size:0.8rem">${escHtml(c.description)}</span>` : ''}</li>`;
+    }).join('');
+}
+
+function updateUnits(units = {}) {
+    const card = document.getElementById('units-card');
+    const unitEl = document.getElementById('unit-value');
+    const scaleEl = document.getElementById('unit-scale');
+    const angleEl = document.getElementById('unit-angle');
+
+    const lengthUnit = units.lengthUnit;
+    const scaleToMeters = units.scaleToMeters;
+    const angleUnit = units.angleUnit;
+
+    if (!lengthUnit && !angleUnit) {
+        card.style.display = 'none';
+        return;
+    }
+
+    card.style.display = '';
+    setTextAndShow(unitEl, lengthUnit || '未指定');
+    setTextAndShow(scaleEl, scaleToMeters != null ? `1 单位 = ${scaleToMeters} 米` : '');
+    setTextAndShow(angleEl, angleUnit ? `角度: ${angleUnit}` : '');
 }
 
 function updateValidationReport(report = {}) {
@@ -1379,6 +1440,8 @@ function renderGlbPreview(result) {
     updateUnsupportedBooleans(preview.unsupportedBooleans);
     updateStats(preview.stats);
     updateValidation(preview.validation);
+    updateProduct(preview.product);
+    updateUnits(preview.units);
     renderAssemblyTree(Array.isArray(preview.instances) ? preview.instances : []);
 
     modelRoot.add(result.scene);

@@ -38,6 +38,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
      * @param parameter parameter value
      * @return point on the underlying curve
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         return getPointOnCurveInternal(curve3d, parameter);
     }
@@ -299,6 +300,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
      * @param point target point
      * @return closest point on the curve
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return getClosestPointOnCurve(curve3d, point);
@@ -342,6 +344,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
      * @param point target point
      * @return minimum distance to the curve
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

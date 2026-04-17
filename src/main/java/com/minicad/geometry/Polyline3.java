@@ -72,6 +72,7 @@ public record Polyline3(List<CartesianPoint> points) implements Curve3 {
      * @param parameter parameter value (0 to 1)
      * @return point on the polyline
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         int segments = points.size() - 1;
@@ -162,6 +163,7 @@ public record Polyline3(List<CartesianPoint> points) implements Curve3 {
      * @param point target point
      * @return closest point on the polyline
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = points.get(0);
@@ -183,6 +185,7 @@ public record Polyline3(List<CartesianPoint> points) implements Curve3 {
      * @param point target point
      * @return minimum distance to the polyline
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

@@ -26,6 +26,7 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
      * @param parameter signed distance along the unit direction
      * @return point at the given parameter
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         return origin.add(direction.asVector().scale(parameter));
@@ -52,6 +53,17 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
      */
     public boolean contains(CartesianPoint point) {
         return distanceTo(point) <= com.minicad.common.Epsilon.EPS;
+    }
+
+    /**
+     * Samples a segment of the line at discrete points from parameter 0 to 1.
+     *
+     * @param segments number of segments
+     * @return list of sampled points
+     */
+    @Override
+    public java.util.List<CartesianPoint> sample(int segments) {
+        return sample(segments, 0.0, 1.0);
     }
 
     /**
@@ -135,6 +147,7 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
      * @param point target point
      * @return closest point on the line
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.projectOnto(this);

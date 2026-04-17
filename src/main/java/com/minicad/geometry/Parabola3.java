@@ -34,6 +34,7 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
      * @param t parameter value
      * @return point on the parabola
      */
+    @Override
     public CartesianPoint pointAt(double t) {
         Preconditions.requireFinite(t, "t");
         // Standard parabola equation y = x^2 / (4p)
@@ -158,6 +159,7 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
      * @param point target point
      * @return closest point on the parabola (approximately)
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto parabola plane
@@ -186,6 +188,7 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
      * @param point target point
      * @return approximate distance to the parabola
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point));

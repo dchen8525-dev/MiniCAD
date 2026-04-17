@@ -40,6 +40,7 @@ public record DegenerateCurve3(CartesianPoint point) implements Curve3 {
      * @param parameter ignored
      * @return the degenerate point
      */
+    @Override
     public CartesianPoint pointAt(double parameter) {
         return point;
     }
@@ -72,6 +73,7 @@ public record DegenerateCurve3(CartesianPoint point) implements Curve3 {
      * @param other target point
      * @return the degenerate point
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint other) {
         Preconditions.requireNonNull(other, "other");
         return point;
@@ -83,6 +85,7 @@ public record DegenerateCurve3(CartesianPoint point) implements Curve3 {
      * @param other target point
      * @return distance to the degenerate point
      */
+    @Override
     public double distanceTo(CartesianPoint other) {
         Preconditions.requireNonNull(other, "other");
         return other.distanceTo(point);

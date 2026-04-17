@@ -321,6 +321,53 @@
             word-break: break-word;
         }
 
+        .product-card h2 {
+            margin: 0 0 0.55rem;
+            font-size: 1rem;
+        }
+
+        .product-card .product-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.35rem;
+            word-break: break-word;
+        }
+
+        .product-card .product-desc {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.4;
+            margin-bottom: 0.35rem;
+            word-break: break-word;
+        }
+
+        .product-card .product-id {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-family: "SFMono-Regular", Consolas, monospace;
+        }
+
+        .product-card .product-schema {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .product-card .component-list {
+            margin: 0.5rem 0 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .product-card .component-item {
+            padding: 0.45rem 0.55rem;
+            border-radius: 0.55rem;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
         .assembly-card h2 {
             margin: 0 0 0.55rem;
             font-size: 1rem;
@@ -496,6 +543,22 @@
                 <dt>线长</dt><dd>0</dd>
                 <dt>中心</dt><dd>0, 0, 0</dd>
             </dl>
+        </section>
+
+        <section class="product-card" id="product-card" style="display:none;">
+            <h2>产品信息</h2>
+            <div class="product-name" id="product-name"></div>
+            <div class="product-desc" id="product-desc"></div>
+            <div class="product-id" id="product-identifier"></div>
+            <div class="product-schema" id="product-schema"></div>
+            <ul class="component-list" id="product-components"></ul>
+        </section>
+
+        <section class="product-card units-card" id="units-card" style="display:none;">
+            <h2>单位</h2>
+            <div class="product-name" id="unit-value"></div>
+            <div class="product-desc" id="unit-scale"></div>
+            <div class="product-desc" id="unit-angle"></div>
         </section>
 
         <section class="validation-report-card">

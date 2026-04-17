@@ -10475,4 +10475,32 @@ class StepPreviewJsonExporterTest {
             assertTrue(metadata.contains(fragment), metadata);
         }
     }
+
+    @Test
+    void shouldExportGlbForEngineStp() throws Exception {
+        byte[] raw = Files.readAllBytes(Path.of("examples/engine.stp"));
+        String stepText = new String(raw, java.nio.charset.StandardCharsets.ISO_8859_1);
+        byte[] binary = StepPreviewJsonExporter.exportGlb(stepText);
+        String metadata = metadataFromGlb(binary);
+        // engine.stp: 93K entities, 31 solids, small number of unsupported faces relative to total
+        assertTrue(metadata.contains("\"entityCount\":93829"), "engine.stp should have 93829 entities");
+        assertTrue(metadata.contains("\"solidCount\":31"), "engine.stp should have 31 solids");
+    }
+
+    @Test
+    void shouldExportGlbForFanStp() throws Exception {
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/fan.stp")));
+        String metadata = metadataFromGlb(binary);
+        // fan.stp: 42K entities, 1 solid, 1 unsupported face from assembly representation
+        assertTrue(metadata.contains("\"entityCount\":41905"), "fan.stp should have 41905 entities");
+        assertTrue(metadata.contains("\"solidCount\":1"), "fan.stp should have 1 solid");
+    }
+
+    @Test
+    void shouldExportJsonForToroidalSeamWithZeroUnsupportedFaces() throws Exception {
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/toroidal-seam-two-holes.step")));
+        assertTrue(json.contains("\"unsupportedFaceCount\":0"), "toroidal-seam should have 0 unsupported faces");
+        assertTrue(json.contains("\"product\":"), "should include product metadata");
+        assertTrue(json.contains("\"units\":"), "should include unit metadata");
+    }
 }

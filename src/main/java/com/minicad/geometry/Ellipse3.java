@@ -31,6 +31,7 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
      * @param angle angle in radians from local X
      * @return point on the ellipse
      */
+    @Override
     public CartesianPoint pointAt(double angle) {
         Preconditions.requireFinite(angle, "angle");
         Vector3 offset = position.xDirection().asVector().scale(Math.cos(angle) * semiAxis1)
@@ -227,6 +228,7 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
      * @param point target point
      * @return approximate closest point on the ellipse
      */
+    @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto ellipse plane
@@ -254,6 +256,7 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
      * @param point target point
      * @return approximate shortest distance to the ellipse
      */
+    @Override
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = closestPointTo(point);
