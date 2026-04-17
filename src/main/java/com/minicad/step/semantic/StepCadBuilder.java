@@ -166,6 +166,7 @@ import com.minicad.step.model.StepSweptDiskSolid;
 import com.minicad.step.model.StepExtrudedAreaSolidTapered;
 import com.minicad.step.model.StepRevolvedAreaSolidTapered;
 import com.minicad.step.model.StepRuledSurface;
+import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceOfConstantRadius;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepRectangularCompositeSurface;
@@ -2393,6 +2394,14 @@ public final class StepCadBuilder {
         } else if (entity instanceof StepMappedItem mappedItem) {
             // MAPPED_ITEM: dispatch through to mapping target for shell geometry
             built = buildShell(mappedItem.mappingTarget().id());
+        } else if (entity instanceof StepSurfaceModel surfaceModel) {
+            // SurfaceModel is an abstract base type. Check for concrete subtype at same ID.
+            StepEntity actual = entitiesById.get(surfaceModel.id());
+            if (actual != null && actual != surfaceModel) {
+                built = buildShell(actual.id());
+            } else {
+                throw new StepResolutionException("entity #" + id + " is an abstract SURFACE_MODEL with no concrete subtype");
+            }
         } else {
             throw new StepResolutionException("entity #" + id + " is not an OPEN_SHELL, SURFACED_OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
         }

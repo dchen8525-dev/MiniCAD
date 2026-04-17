@@ -1241,6 +1241,10 @@ public final class StepPreviewJsonExporter {
             collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder);
             return;
         }
+        if (item instanceof StepSubedge subedge) {
+            collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder);
+            return;
+        }
         if (isSampledCurveSource(item)) {
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
@@ -1270,6 +1274,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepAnnotationSubfigureOccurrence
                 || item instanceof StepFilletEdge
                 || item instanceof StepChamferEdge
+                || item instanceof StepSubedge
                 || item instanceof StepAnnotationText
                 || item instanceof StepAnnotationTextCharacter
                 || item instanceof StepDimensionCurve
