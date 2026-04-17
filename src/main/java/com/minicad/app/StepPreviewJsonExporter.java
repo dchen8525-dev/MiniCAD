@@ -1060,6 +1060,18 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
+        if (item instanceof StepEdgeWire edgeWire) {
+            for (StepEntity edge : edgeWire.edges()) {
+                collectStandaloneEdges(edge, edges, resolved, builder);
+            }
+            return;
+        }
+        if (item instanceof StepGeometricSurfaceSet surfaceSet) {
+            for (StepEntity element : surfaceSet.elements()) {
+                collectStandaloneEdges(element, edges, resolved, builder);
+            }
+            return;
+        }
         if (item instanceof StepEdgeLoop edgeLoop) {
             for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder));
@@ -1264,7 +1276,8 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepLeaderCurve
                 || item instanceof StepProjectionCurve
                 || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol;
+                || item instanceof StepTerminatorSymbol
+                || item instanceof StepGeometricSurfaceSet;
     }
 
     private static boolean isSampledCurveSource(StepEntity item) {
@@ -7120,11 +7133,54 @@ public final class StepPreviewJsonExporter {
             Collections.reverse(reversed);
             return List.copyOf(reversed);
         }
+        if (item instanceof StepGeometricSet geometricSet) {
+            return sampleGeometricCollectionPoints(geometricSet.elements(), builder);
+        }
+        if (item instanceof StepGeometricCurveSet curveSet) {
+            return sampleGeometricCollectionPoints(curveSet.elements(), builder);
+        }
+        if (item instanceof StepConnectedEdgeSet connectedEdgeSet) {
+            return sampleGeometricCollectionPoints(connectedEdgeSet.edges(), builder);
+        }
+        if (item instanceof StepWireShell wireShell) {
+            return sampleWireShellPoints(wireShell, builder);
+        }
+        if (item instanceof StepEdgeWire edgeWire) {
+            return sampleGeometricCollectionPoints(edgeWire.edges(), builder);
+        }
         Curve3 curve = curveForLooseEdge(item, builder);
         if (curve == null) {
             return null;
         }
         return sampleLooseCurve(curve);
+    }
+
+    private static List<CartesianPoint> sampleGeometricCollectionPoints(
+            List<StepEntity> elements,
+            StepCadBuilder builder
+    ) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (StepEntity element : elements) {
+            List<CartesianPoint> sampled = sampleLooseEdgePoints(element, builder);
+            if (sampled != null && !sampled.isEmpty()) {
+                points.addAll(sampled);
+            }
+        }
+        return points.isEmpty() ? null : List.copyOf(points);
+    }
+
+    private static List<CartesianPoint> sampleWireShellPoints(
+            StepWireShell wireShell,
+            StepCadBuilder builder
+    ) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (StepLoop loop : wireShell.loops()) {
+            List<CartesianPoint> sampled = sampleLooseEdgePoints(loop, builder);
+            if (sampled != null && !sampled.isEmpty()) {
+                points.addAll(sampled);
+            }
+        }
+        return points.isEmpty() ? null : List.copyOf(points);
     }
 
     private static List<CartesianPoint> sampleMappedAnnotationPoints(
