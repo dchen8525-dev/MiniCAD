@@ -3146,7 +3146,10 @@ public final class StepCadBuilder {
                 || entity instanceof StepBlockVolume
                 || entity instanceof StepHalfSpaceSolid
                 || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepSolidModel;
+                || entity instanceof StepSolidModel
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepMappedItem;
     }
 
     private StepEntity requireExistingEntity(int id) {
