@@ -164,6 +164,9 @@ import com.minicad.step.model.StepGeometricCurveSet;
 import com.minicad.step.model.StepGeometricReplica;
 import com.minicad.step.model.StepGeometricRepresentationContext;
 import com.minicad.step.model.StepGeometricRepresentationItem;
+import com.minicad.step.model.StepGeometricSurfaceSet;
+import com.minicad.step.model.StepOrientedSubface;
+import com.minicad.step.model.StepSubface;
 import com.minicad.step.model.StepGeometricSet;
 import com.minicad.step.model.StepGeometricItemSpecificUsage;
 import com.minicad.step.model.StepGeneralProperty;
@@ -1206,6 +1209,14 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
+        if (item instanceof StepFilletEdge filletEdge) {
+            collectStandaloneEdges(filletEdge.originalEdge(), edges, resolved, builder);
+            return;
+        }
+        if (item instanceof StepChamferEdge chamferEdge) {
+            collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder);
+            return;
+        }
         if (isSampledCurveSource(item)) {
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
@@ -1233,6 +1244,8 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepAnnotationSymbol
                 || item instanceof StepAnnotationSymbolOccurrence
                 || item instanceof StepAnnotationSubfigureOccurrence
+                || item instanceof StepFilletEdge
+                || item instanceof StepChamferEdge
                 || item instanceof StepAnnotationText
                 || item instanceof StepAnnotationTextCharacter
                 || item instanceof StepDimensionCurve
@@ -2557,7 +2570,8 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepConnectedFaceSet
                 || entity instanceof StepConnectedFaceSubSet
                 || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace;
+                || entity instanceof StepTessellatedFace
+                || entity instanceof StepGeometricSurfaceSet;
     }
 
     private static FacePayload toPlanarFacePayload(
