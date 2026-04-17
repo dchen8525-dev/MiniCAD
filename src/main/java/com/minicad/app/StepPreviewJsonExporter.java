@@ -2258,7 +2258,10 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepCsgVolume
                 || entity instanceof StepBlockVolume
                 || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern;
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepMappedItem
+                || entity instanceof StepSolidModel
+                || entity instanceof StepSurfacePatch;
     }
 
     private static List<StepRepresentation> linkedShapeRepresentations(
@@ -6536,7 +6539,10 @@ public final class StepPreviewJsonExporter {
             Edge edge = builder.buildEdge(edgeId);
             return sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense());
         } catch (TopologyException ex) {
-            StepEdgeCurve edge = (StepEdgeCurve) resolved.get(edgeId);
+            StepEntity entity = resolved.get(edgeId);
+            if (!(entity instanceof StepEdgeCurve edge)) {
+                throw ex;
+            }
             CartesianPoint start = pointFromStep(edge.start().point());
             CartesianPoint end = pointFromStep(edge.end().point());
             StepEntity edgeGeometry = edge.edgeGeometry();
@@ -6567,6 +6573,19 @@ public final class StepPreviewJsonExporter {
                     toPointPayloads(polyline),
                     edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder)
             );
+        }
+        if (entity instanceof StepSeamEdge seamEdge) {
+            // Seam edge: curve geometry is resolved at the same ID in entitiesById.
+            StepEntity actual = resolved.get(seamEdge.id());
+            if (actual != null && actual != seamEdge) {
+                Edge edge = builder.buildEdge(edgeId);
+                CartesianPoint start = edge.start().point();
+                CartesianPoint end = edge.end().point();
+                EdgeCurvePayload curvePayload = edgeCurvePayload(actual, start, end, true, builder);
+                if (curvePayload != null) {
+                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload);
+                }
+            }
         }
         return new EdgePayload(edgeId, toPointPayloads(polyline), null);
     }
