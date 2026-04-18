@@ -138,39 +138,60 @@ public record BSplineCurve3(
 
     /**
      * Computes the tangent vector at a given parameter.
-     * Uses numerical differentiation for simplicity.
+     * Uses analytical B-spline derivative basis functions.
      *
      * @param parameter parameter in the knot domain
      * @return unit tangent vector
      */
     public Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        double start = startParameter();
-        double end = endParameter();
-        double eps = (end - start) * 1e-6;
-        eps = Math.max(eps, 1e-12);
-
-        double u1 = Math.max(start, parameter - eps);
-        double u2 = Math.min(end, parameter + eps);
-
-        CartesianPoint p1 = pointAt(u1);
-        CartesianPoint p2 = pointAt(u2);
-        Vector3 tangent = p2.subtract(p1);
-
-        if (tangent.norm() <= Epsilon.EPS) {
-            // Degenerate case, use a larger epsilon
-            u1 = Math.max(start, parameter - 1e-3);
-            u2 = Math.min(end, parameter + 1e-3);
-            p1 = pointAt(u1);
-            p2 = pointAt(u2);
-            tangent = p2.subtract(p1);
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        double low = expanded.get(p);
+        double high = expanded.get(n + 1);
+        double u = Math.max(low, Math.min(parameter, high));
+        if (Epsilon.equals(u, high)) {
+            u = high - 1e-12 * (high - low);
+        }
+        if (u <= low) {
+            u = low + 1e-12 * (high - low);
         }
 
-        if (tangent.norm() <= Epsilon.EPS) {
-            // Still degenerate, return a default direction
+        // Derivative of B-spline curve: C'(u) = sum_{i=0}^{n-1} N'_{i,p}(u) * P_i
+        // where N'_{i,p}(u) = p/(u_{i+p}-u_i)*N_{i,p-1}(u) - p/(u_{i+p+1}-u_{i+1})*N_{i+1,p-1}(u)
+        Vector3 deriv = new Vector3(0, 0, 0);
+        int span = findSpan(n, p, u, expanded);
+        for (int i = 0; i <= n - 1; i++) {
+            double dN = derivativeBasisValue(i, p, u, expanded);
+            if (dN == 0.0) continue;
+            CartesianPoint cp = controlPoints.get(i);
+            deriv = deriv.add(new Vector3(cp.x() * dN, cp.y() * dN, cp.z() * dN));
+        }
+
+        double norm = deriv.norm();
+        if (norm <= Epsilon.EPS) {
             return new Vector3(1, 0, 0);
         }
-        return tangent.normalize().asVector();
+        return deriv.normalize().asVector();
+    }
+
+    /**
+     * Computes the derivative of the i-th B-spline basis function of degree p at parameter u.
+     * N'_{i,p}(u) = p/(u_{i+p}-u_i)*N_{i,p-1}(u) - p/(u_{i+p+1}-u_{i+1})*N_{i+1,p-1}(u)
+     */
+    private static double derivativeBasisValue(int i, int degree, double u, List<Double> knots) {
+        double left = 0.0;
+        double leftDenom = knots.get(i + degree) - knots.get(i);
+        if (!Epsilon.isZero(leftDenom)) {
+            left = degree / leftDenom * basisValue(i, degree - 1, u, knots);
+        }
+        double right = 0.0;
+        double rightDenom = knots.get(i + degree + 1) - knots.get(i + 1);
+        if (!Epsilon.isZero(rightDenom)) {
+            right = degree / rightDenom * basisValue(i + 1, degree - 1, u, knots);
+        }
+        return left - right;
     }
 
     /**
@@ -226,6 +247,96 @@ public record BSplineCurve3(
                 left.y() * (1.0 - alpha) + right.y() * alpha,
                 left.z() * (1.0 - alpha) + right.z() * alpha
         );
+    }
+
+    private static double basisValue(int i, int degree, double parameter, List<Double> knots) {
+        if (degree == 0) {
+            if ((parameter >= knots.get(i) && parameter < knots.get(i + 1))
+                    || (Epsilon.equals(parameter, knots.getLast()) && Epsilon.equals(parameter, knots.get(i + 1)))) {
+                return 1.0;
+            }
+            return 0.0;
+        }
+        double leftDenominator = knots.get(i + degree) - knots.get(i);
+        double rightDenominator = knots.get(i + degree + 1) - knots.get(i + 1);
+        double left = Epsilon.isZero(leftDenominator)
+                ? 0.0
+                : (parameter - knots.get(i)) / leftDenominator * basisValue(i, degree - 1, parameter, knots);
+        double right = Epsilon.isZero(rightDenominator)
+                ? 0.0
+                : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
+        return left + right;
+    }
+
+    /**
+     * Returns the arc length of the curve using 32-point Gaussian quadrature.
+     *
+     * @return arc length over the full parameter domain
+     */
+    @Override
+    public double length() {
+        return gaussQuadrature(startParameter(), endParameter());
+    }
+
+    private static final int GAUSS_N = 32;
+    private static final double[] GAUSS_X = {
+        -0.996894172985140, -0.983854788768613, -0.961400809760511, -0.929812651677548,
+        -0.889377050628409, -0.840550098353115, -0.783971013939431, -0.720413875045378,
+        -0.650766551414760, -0.575975012947340, -0.497102538347580, -0.415229116622684,
+        -0.331455893110555, -0.246876990064692, -0.162591823366242, -0.079675930880349,
+         0.079675930880349,  0.162591823366242,  0.246876990064692,  0.331455893110555,
+         0.415229116622684,  0.497102538347580,  0.575975012947340,  0.650766551414760,
+         0.720413875045378,  0.783971013939431,  0.840550098353115,  0.889377050628409,
+         0.929812651677548,  0.961400809760511,  0.983854788768613,  0.996894172985140
+    };
+    private static final double[] GAUSS_W = {
+        0.007947149836018, 0.018579693272805, 0.029167679278553, 0.039572907980768,
+        0.049672763998220, 0.059353930990974, 0.068513928020353, 0.077062344660031,
+        0.084921918644628, 0.092029303586642, 0.098335635821898, 0.103806905129982,
+        0.108423041553502, 0.112178184079459, 0.115079646992635, 0.117147879250790,
+        0.117147879250790, 0.115079646992635, 0.112178184079459, 0.108423041553502,
+        0.103806905129982,  0.098335635821898,  0.092029303586642,  0.084921918644628,
+        0.077062344660031,  0.068513928020353,  0.059353930990974,  0.049672763998220,
+        0.039572907980768,  0.029167679278553,  0.018579693272805,  0.007947149836018
+    };
+
+    private double gaussQuadrature(double a, double b) {
+        double mid = (a + b) * 0.5;
+        double halfLen = (b - a) * 0.5;
+        double sum = 0.0;
+        for (int i = 0; i < GAUSS_N; i++) {
+            double t = mid + halfLen * GAUSS_X[i];
+            double speed = derivativeNorm(t);
+            sum += GAUSS_W[i] * speed;
+        }
+        return sum * halfLen;
+    }
+
+    private double derivativeNorm(double u) {
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        Vector3 deriv = new Vector3(0, 0, 0);
+        for (int i = 0; i <= n - 1; i++) {
+            double dN = derivativeBasisValue(i, p, u, expanded);
+            if (dN == 0.0) continue;
+            CartesianPoint cp = controlPoints.get(i);
+            deriv = deriv.add(new Vector3(cp.x() * dN, cp.y() * dN, cp.z() * dN));
+        }
+        return deriv.norm();
+    }
+
+    /**
+     * Returns the arc length of the curve over a sub-interval.
+     *
+     * @param tMin start parameter
+     * @param tMax end parameter
+     * @return arc length from tMin to tMax
+     */
+    public double length(double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        return gaussQuadrature(tMin, tMax);
     }
 
     /**

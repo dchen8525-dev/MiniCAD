@@ -235,4 +235,29 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
         double x = offset.dot(position.xDirection().asVector());
         return x / (2.0 * focalDistance);
     }
+
+    /**
+     * Returns the arc length for a parameter range.
+     * Closed-form integral: L = p * [t*sqrt(1+t^2) + asinh(t)] from tMin to tMax.
+     *
+     * @param tMin minimum parameter
+     * @param tMax maximum parameter
+     * @return arc length
+     */
+    public double length(double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        double a = asinhTerm(tMax);
+        double b = asinhTerm(tMin);
+        return focalDistance * (a - b);
+    }
+
+    private static double asinhTerm(double t) {
+        return t * Math.sqrt(1.0 + t * t) + Math.log(t + Math.sqrt(1.0 + t * t));
+    }
+
+    @Override
+    public double length() {
+        return length(-1.0, 1.0);
+    }
 }

@@ -79,6 +79,17 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
     }
 
     /**
+     * Returns the length of the unit parameter segment [0,1].
+     * For an infinite line this is the distance between parameter 0 and 1.
+     *
+     * @return length (always 1.0 for the unit segment)
+     */
+    @Override
+    public double length() {
+        return 1.0;
+    }
+
+    /**
      * Returns the tangent vector at any point on the line.
      * For a line, the tangent is constant and equal to the direction.
      *

@@ -114,39 +114,75 @@ public record RationalBSplineCurve3(
 
     /**
      * Computes the tangent vector at a given parameter.
-     * Uses numerical differentiation for simplicity.
+     * Uses analytical rational B-spline derivative via quotient rule.
      *
      * @param parameter parameter in the knot domain
      * @return unit tangent vector
      */
     public Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        double start = startParameter();
-        double end = endParameter();
-        double eps = (end - start) * 1e-6;
-        eps = Math.max(eps, 1e-12);
-
-        double u1 = Math.max(start, parameter - eps);
-        double u2 = Math.min(end, parameter + eps);
-
-        CartesianPoint p1 = pointAt(u1);
-        CartesianPoint p2 = pointAt(u2);
-        Vector3 tangent = p2.subtract(p1);
-
-        if (tangent.norm() <= Epsilon.EPS) {
-            // Degenerate case, use a larger epsilon
-            u1 = Math.max(start, parameter - 1e-3);
-            u2 = Math.min(end, parameter + 1e-3);
-            p1 = pointAt(u1);
-            p2 = pointAt(u2);
-            tangent = p2.subtract(p1);
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        double low = expanded.get(p);
+        double high = expanded.get(n + 1);
+        double u = Math.max(low, Math.min(parameter, high));
+        if (Epsilon.equals(u, high)) {
+            u = high - 1e-12 * (high - low);
+        }
+        if (u <= low) {
+            u = low + 1e-12 * (high - low);
         }
 
-        if (tangent.norm() <= Epsilon.EPS) {
-            // Still degenerate, return a default direction
+        // Rational curve: C(u) = A(u) / W(u)
+        // C'(u) = (A'(u)*W(u) - A(u)*W'(u)) / W(u)^2
+        // A(u) = sum(w_i * P_i * N_i(u)), W(u) = sum(w_i * N_i(u))
+        // A'(u) = sum(w_i * P_i * N'_i(u)), W'(u) = sum(w_i * N'_i(u))
+        Vector3 aPrime = new Vector3(0, 0, 0);
+        Vector3 a = new Vector3(0, 0, 0);
+        double wPrime = 0.0;
+        double w = 0.0;
+
+        for (int i = 0; i < controlPoints.size(); i++) {
+            double Ni = basisValue(i, p, u, expanded);
+            double dNi = derivativeBasisValue(i, p, u, expanded);
+            double wi = weights.get(i);
+            CartesianPoint cp = controlPoints.get(i);
+
+            a = a.add(new Vector3(cp.x() * wi * Ni, cp.y() * wi * Ni, cp.z() * wi * Ni));
+            w += wi * Ni;
+            aPrime = aPrime.add(new Vector3(cp.x() * wi * dNi, cp.y() * wi * dNi, cp.z() * wi * dNi));
+            wPrime += wi * dNi;
+        }
+
+        Vector3 numerator = aPrime.scale(w).subtract(a.scale(wPrime));
+        double denomSq = w * w;
+        if (Epsilon.isZero(denomSq)) {
             return new Vector3(1, 0, 0);
         }
-        return tangent.normalize().asVector();
+
+        double norm = numerator.norm();
+        if (norm <= Epsilon.EPS) {
+            return new Vector3(1, 0, 0);
+        }
+        return numerator.normalize().asVector();
+    }
+
+    /**
+     * Computes the derivative of the i-th B-spline basis function of degree p at parameter u.
+     */
+    private static double derivativeBasisValue(int i, int degree, double u, List<Double> knots) {
+        double left = 0.0;
+        double leftDenom = knots.get(i + degree) - knots.get(i);
+        if (!Epsilon.isZero(leftDenom)) {
+            left = degree / leftDenom * basisValue(i, degree - 1, u, knots);
+        }
+        double right = 0.0;
+        double rightDenom = knots.get(i + degree + 1) - knots.get(i + 1);
+        if (!Epsilon.isZero(rightDenom)) {
+            right = degree / rightDenom * basisValue(i + 1, degree - 1, u, knots);
+        }
+        return left - right;
     }
 
     @Override
@@ -161,6 +197,114 @@ public record RationalBSplineCurve3(
      *
      * @return bounding box enclosing all control points
      */
+    /**
+     * Returns the arc length of the curve using 32-point Gaussian quadrature.
+     *
+     * @return arc length over the full parameter domain
+     */
+    @Override
+    public double length() {
+        return gaussQuadrature(startParameter(), endParameter());
+    }
+
+    private static final int GAUSS_N = 32;
+    private static final double[] GAUSS_X = {
+        -0.996894172985140, -0.983854788768613, -0.961400809760511, -0.929812651677548,
+        -0.889377050628409, -0.840550098353115, -0.783971013939431, -0.720413875045378,
+        -0.650766551414760, -0.575975012947340, -0.497102538347580, -0.415229116622684,
+        -0.331455893110555, -0.246876990064692, -0.162591823366242, -0.079675930880349,
+         0.079675930880349,  0.162591823366242,  0.246876990064692,  0.331455893110555,
+         0.415229116622684,  0.497102538347580,  0.575975012947340,  0.650766551414760,
+         0.720413875045378,  0.783971013939431,  0.840550098353115,  0.889377050628409,
+         0.929812651677548,  0.961400809760511,  0.983854788768613,  0.996894172985140
+    };
+    private static final double[] GAUSS_W = {
+        0.007947149836018, 0.018579693272805, 0.029167679278553, 0.039572907980768,
+        0.049672763998220, 0.059353930990974, 0.068513928020353, 0.077062344660031,
+        0.084921918644628, 0.092029303586642, 0.098335635821898, 0.103806905129982,
+        0.108423041553502, 0.112178184079459, 0.115079646992635, 0.117147879250790,
+        0.117147879250790, 0.115079646992635, 0.112178184079459, 0.108423041553502,
+        0.103806905129982,  0.098335635821898,  0.092029303586642,  0.084921918644628,
+        0.077062344660031,  0.068513928020353,  0.059353930990974,  0.049672763998220,
+        0.039572907980768,  0.029167679278553,  0.018579693272805,  0.007947149836018
+    };
+
+    private double gaussQuadrature(double a, double b) {
+        double mid = (a + b) * 0.5;
+        double halfLen = (b - a) * 0.5;
+        double sum = 0.0;
+        for (int i = 0; i < GAUSS_N; i++) {
+            double t = mid + halfLen * GAUSS_X[i];
+            double speed = derivativeNorm(t);
+            sum += GAUSS_W[i] * speed;
+        }
+        return sum * halfLen;
+    }
+
+    private double derivativeNorm(double u) {
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        // Rational B-spline derivative: C'(u) = (A'(u)*W(u) - A(u)*W'(u)) / W(u)^2
+        Vector3 aPrim = new Vector3(0, 0, 0);
+        double wPrim = 0.0;
+        for (int i = 0; i <= n - 1; i++) {
+            double dN = derivativeBasisValue(i, p, u, expanded);
+            if (dN == 0.0) continue;
+            CartesianPoint cp = controlPoints.get(i);
+            aPrim = aPrim.add(new Vector3(cp.x() * dN, cp.y() * dN, cp.z() * dN));
+            wPrim += weights.get(i) * dN;
+        }
+        CartesianPoint rationalPt = rationalPointAt(u);
+        double w = weightAt(u);
+        Vector3 a = new Vector3(rationalPt.x(), rationalPt.y(), rationalPt.z()).scale(w);
+        double wSq = w * w;
+        if (wSq <= Epsilon.EPS) return 0.0;
+        Vector3 deriv = aPrim.scale(w).subtract(a.scale(wPrim)).scale(1.0 / wSq);
+        return deriv.norm();
+    }
+
+    private double weightAt(double u) {
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        double w = 0.0;
+        for (int i = 0; i <= n; i++) {
+            w += weights.get(i) * basisValue(i, p, u, expanded);
+        }
+        return w;
+    }
+
+    private CartesianPoint rationalPointAt(double u) {
+        List<Double> expanded = expandedKnots();
+        int n = controlPoints.size() - 1;
+        int p = degree;
+        double wx = 0, wy = 0, wz = 0, w = 0;
+        for (int i = 0; i <= n; i++) {
+            double b = basisValue(i, p, u, expanded) * weights.get(i);
+            CartesianPoint cp = controlPoints.get(i);
+            wx += cp.x() * b;
+            wy += cp.y() * b;
+            wz += cp.z() * b;
+            w += b;
+        }
+        if (w == 0.0) return controlPoints.get(0);
+        return new CartesianPoint(wx / w, wy / w, wz / w);
+    }
+
+    /**
+     * Returns the arc length of the curve over a sub-interval.
+     *
+     * @param tMin start parameter
+     * @param tMax end parameter
+     * @return arc length from tMin to tMax
+     */
+    public double length(double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        return gaussQuadrature(tMin, tMax);
+    }
+
     public BoundingBox3 boundingBox() {
         BoundingBox3 box = BoundingBox3.empty();
         for (CartesianPoint point : controlPoints) {

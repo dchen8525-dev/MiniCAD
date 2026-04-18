@@ -979,6 +979,122 @@ function rebuildParametricFaceGeometry(node) {
         hasSurfaceUvLoops: Array.isArray(node.userData?.surfaceUvLoops),
         originalVertexCount: node.geometry?.getAttribute?.('position')?.count ?? 0
     };
+
+    function evaluateBasisPoint(basis, u, v) {
+        const type = basis.type;
+        const center = basis.center ? vectorFromArray(basis.center) : new THREE.Vector3(0, 0, 0);
+        const axis = basis.axis ? vectorFromArray(basis.axis).normalize() : new THREE.Vector3(0, 0, 1);
+        const xDir = basis.xDirection ? vectorFromArray(basis.xDirection).normalize() : new THREE.Vector3(1, 0, 0);
+        const yDir = axis.clone().cross(xDir).normalize();
+        if (type === 'plane_face' || type === 'PLANE') {
+            return [center.x + xDir.x * u + yDir.x * v, center.y + xDir.y * u + yDir.y * v, center.z + xDir.z * u + yDir.z * v];
+        }
+        if (type === 'cylindrical_strip' || type === 'CYLINDRICAL_SURFACE') {
+            const r = basis.radius || 1;
+            return [center.x + xDir.x * r * Math.cos(u * Math.PI * 2) + yDir.x * r * Math.sin(u * Math.PI * 2) + axis.x * v,
+                     center.y + xDir.y * r * Math.cos(u * Math.PI * 2) + yDir.y * r * Math.sin(u * Math.PI * 2) + axis.y * v,
+                     center.z + xDir.z * r * Math.cos(u * Math.PI * 2) + yDir.z * r * Math.sin(u * Math.PI * 2) + axis.z * v];
+        }
+        if (type === 'conical_strip' || type === 'CONICAL_SURFACE') {
+            const r = (basis.radius || 1) + v * Math.tan(basis.semiAngle || 0.5);
+            return [center.x + xDir.x * r * Math.cos(u * Math.PI * 2) + yDir.x * r * Math.sin(u * Math.PI * 2) + axis.x * v,
+                     center.y + xDir.y * r * Math.cos(u * Math.PI * 2) + yDir.y * r * Math.sin(u * Math.PI * 2) + axis.y * v,
+                     center.z + xDir.z * r * Math.cos(u * Math.PI * 2) + yDir.z * r * Math.sin(u * Math.PI * 2) + axis.z * v];
+        }
+        if (type === 'spherical_surface' || type === 'SPHERICAL_SURFACE') {
+            const r = basis.radius || 1;
+            const theta = u * Math.PI * 2;
+            const phi = v * Math.PI;
+            return [center.x + r * Math.sin(phi) * Math.cos(theta) * xDir.x + r * Math.sin(phi) * Math.sin(theta) * yDir.x + r * Math.cos(phi) * axis.x,
+                     center.y + r * Math.sin(phi) * Math.cos(theta) * xDir.y + r * Math.sin(phi) * Math.sin(theta) * yDir.y + r * Math.cos(phi) * axis.y,
+                     center.z + r * Math.sin(phi) * Math.cos(theta) * xDir.z + r * Math.sin(phi) * Math.sin(theta) * yDir.z + r * Math.cos(phi) * axis.z];
+        }
+        if (type === 'toroidal_strip' || type === 'TOROIDAL_SURFACE') {
+            const R = basis.radius || 1;
+            const r = basis.minorRadius || 0.3;
+            const theta = u * Math.PI * 2;
+            const phi = v * Math.PI * 2;
+            const ringR = R + r * Math.cos(phi);
+            return [center.x + ringR * Math.cos(theta) * xDir.x + ringR * Math.sin(theta) * yDir.x + r * Math.sin(phi) * axis.x,
+                     center.y + ringR * Math.cos(theta) * xDir.y + ringR * Math.sin(theta) * yDir.y + r * Math.sin(phi) * axis.y,
+                     center.z + ringR * Math.cos(theta) * xDir.z + ringR * Math.sin(theta) * yDir.z + r * Math.sin(phi) * axis.z];
+        }
+        if (type === 'surface_of_revolution' || type === 'SURFACE_OF_REVOLUTION') {
+            const sweepAngle = basis.sweepAngle ?? Math.PI * 2;
+            const startAngle = basis.startAngle ?? 0;
+            const angle = startAngle + sweepAngle * u;
+            const profileR = (basis.radius || 1) * (1 - v) + ((basis.semiAxis1 || basis.radius) || 1) * v;
+            return [center.x + profileR * Math.cos(angle) * xDir.x + profileR * Math.sin(angle) * yDir.x + axis.x * v,
+                     center.y + profileR * Math.cos(angle) * xDir.y + profileR * Math.sin(angle) * yDir.y + axis.y * v,
+                     center.z + profileR * Math.cos(angle) * xDir.z + profileR * Math.sin(angle) * yDir.z + axis.z * v];
+        }
+        if (type === 'surface_of_linear_extrusion' || type === 'SURFACE_OF_LINEAR_EXTRUSION') {
+            return [center.x + xDir.x * u + yDir.x * v * (basis.upperHeight || 1),
+                     center.y + xDir.y * u + yDir.y * v * (basis.upperHeight || 1),
+                     center.z + xDir.z * u + yDir.z * v * (basis.upperHeight || 1)];
+        }
+        if (type === 'ruled_surface' || type === 'RULED_SURFACE') {
+            const d1 = basis.directrix1;
+            const d2 = basis.directrix2;
+            if (!d1 || !d2 || d1.length === 0) return null;
+            const ci = Math.min(Math.floor(u * (d1.length - 1)), d1.length - 1);
+            const p1 = vectorFromArray(d1[ci]);
+            const p2 = vectorFromArray(d2[Math.min(ci, d2.length - 1)]);
+            return [p1.x + (p2.x - p1.x) * v, p1.y + (p2.y - p1.y) * v, p1.z + (p2.z - p1.z) * v];
+        }
+        return null;
+    }
+
+    function evaluateBasisNormal(basis, u, v) {
+        const type = basis.type;
+        const center = basis.center ? vectorFromArray(basis.center) : new THREE.Vector3(0, 0, 0);
+        const axis = basis.axis ? vectorFromArray(basis.axis).normalize() : new THREE.Vector3(0, 0, 1);
+        const xDir = basis.xDirection ? vectorFromArray(basis.xDirection).normalize() : new THREE.Vector3(1, 0, 0);
+        const yDir = axis.clone().cross(xDir).normalize();
+        if (type === 'plane_face' || type === 'PLANE') {
+            const n = axis.clone().cross(xDir).normalize();
+            return [n.x, n.y, n.z];
+        }
+        if (type === 'cylindrical_strip' || type === 'CYLINDRICAL_SURFACE') {
+            const angle = u * Math.PI * 2;
+            return [xDir.x * Math.cos(angle) + yDir.x * Math.sin(angle),
+                     xDir.y * Math.cos(angle) + yDir.y * Math.sin(angle),
+                     xDir.z * Math.cos(angle) + yDir.z * Math.sin(angle)];
+        }
+        if (type === 'conical_strip' || type === 'CONICAL_SURFACE') {
+            const angle = u * Math.PI * 2;
+            const semiAngle = basis.semiAngle || 0.5;
+            const n = new THREE.Vector3(
+                xDir.x * Math.cos(angle) + yDir.x * Math.sin(angle) - axis.x * Math.tan(semiAngle),
+                xDir.y * Math.cos(angle) + yDir.y * Math.sin(angle) - axis.y * Math.tan(semiAngle),
+                xDir.z * Math.cos(angle) + yDir.z * Math.sin(angle) - axis.z * Math.tan(semiAngle)
+            ).normalize();
+            return [n.x, n.y, n.z];
+        }
+        if (type === 'spherical_surface' || type === 'SPHERICAL_SURFACE') {
+            const theta = u * Math.PI * 2;
+            const phi = v * Math.PI;
+            const n = new THREE.Vector3(
+                Math.sin(phi) * Math.cos(theta) * xDir.x + Math.sin(phi) * Math.sin(theta) * yDir.x + Math.cos(phi) * axis.x,
+                Math.sin(phi) * Math.cos(theta) * xDir.y + Math.sin(phi) * Math.sin(theta) * yDir.y + Math.cos(phi) * axis.y,
+                Math.sin(phi) * Math.cos(theta) * xDir.z + Math.sin(phi) * Math.sin(theta) * yDir.z + Math.cos(phi) * axis.z
+            ).normalize();
+            return [n.x, n.y, n.z];
+        }
+        if (type === 'toroidal_strip' || type === 'TOROIDAL_SURFACE') {
+            const theta = u * Math.PI * 2;
+            const phi = v * Math.PI * 2;
+            const n = new THREE.Vector3(
+                Math.cos(phi) * Math.cos(theta) * xDir.x + Math.cos(phi) * Math.sin(theta) * yDir.x + Math.sin(phi) * axis.x,
+                Math.cos(phi) * Math.cos(theta) * xDir.y + Math.cos(phi) * Math.sin(theta) * yDir.y + Math.sin(phi) * axis.y,
+                Math.cos(phi) * Math.cos(theta) * xDir.z + Math.cos(phi) * Math.sin(theta) * yDir.z + Math.sin(phi) * axis.z
+            ).normalize();
+            return [n.x, n.y, n.z];
+        }
+        // For complex types (bspline, etc.), return null to fall back to mesh
+        return null;
+    }
+
     if (surface.type === 'bspline_surface' && Array.isArray(node.userData?.surfaceUvLoops) && node.userData.surfaceUvLoops.length > 0) {
         const outerLoop = node.userData.surfaceUvLoops.find((loop) => loop.outer);
         if (!outerLoop || !Array.isArray(outerLoop.points) || outerLoop.points.length < 3) {
@@ -1570,6 +1686,165 @@ function rebuildParametricFaceGeometry(node) {
             parametricType: surface.type,
             curveSegments,
             heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'ruled_surface') {
+        const d1 = surface.directrix1;
+        const d2 = surface.directrix2;
+        if (!d1 || !d2 || d1.length === 0 || d2.length === 0) {
+            logJson('parametricFace:skip', { ...faceLog, reason: 'missing-directrix-curves' });
+            return;
+        }
+        const curveSegments = Math.max(32, d1.length - 1);
+        const ruleSegments = 8;
+        const vertexCount = (curveSegments + 1) * (ruleSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let i = 0; i <= curveSegments; i += 1) {
+            const ci = Math.min(i, d1.length - 1);
+            const p1 = vectorFromArray(d1[ci]);
+            const p2 = vectorFromArray(d2[ci]);
+            for (let j = 0; j <= ruleSegments; j += 1) {
+                const t = j / ruleSegments;
+                const offset = (i * (ruleSegments + 1) + j) * 3;
+                positions[offset] = p1.x + (p2.x - p1.x) * t;
+                positions[offset + 1] = p1.y + (p2.y - p1.y) * t;
+                positions[offset + 2] = p1.z + (p2.z - p1.z) * t;
+            }
+        }
+
+        for (let i = 0; i < curveSegments; i += 1) {
+            const iNext = Math.min(i + 1, curveSegments);
+            const p1 = vectorFromArray(d1[Math.min(i, d1.length - 1)]);
+            const p1n = vectorFromArray(d1[Math.min(iNext, d1.length - 1)]);
+            const p2 = vectorFromArray(d2[Math.min(i, d2.length - 1)]);
+            const p2n = vectorFromArray(d2[Math.min(iNext, d2.length - 1)]);
+            const tangent = p1n.clone().sub(p1).normalize();
+            const ruling = p2.clone().sub(p1).normalize();
+            let n = tangent.clone().cross(ruling).normalize();
+            if (n.length() < 0.001) n = new THREE.Vector3(0, 0, 1);
+            if (!sameSense) n.multiplyScalar(-1);
+            for (let j = 0; j <= ruleSegments; j += 1) {
+                const offset = (i * (ruleSegments + 1) + j) * 3;
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+                const offset2 = (iNext * (ruleSegments + 1) + j) * 3;
+                normals[offset2] = n.x;
+                normals[offset2 + 1] = n.y;
+                normals[offset2 + 2] = n.z;
+            }
+        }
+
+        for (let i = 0; i < curveSegments; i += 1) {
+            for (let j = 0; j < ruleSegments; j += 1) {
+                const a = i * (ruleSegments + 1) + j;
+                const b = a + 1;
+                const c = a + ruleSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            parametricType: 'ruled_surface',
+            curveSegments,
+            ruleSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'constant_radius_surface' || surface.type === 'offset_surface') {
+        const basis = surface.basisSurface;
+        if (!basis || !basis.type) {
+            logJson('parametricFace:skip', { ...faceLog, reason: 'missing-basis-surface' });
+            return;
+        }
+        const radius = surface.radius || 0;
+        const isOffset = surface.type === 'offset_surface';
+        const dist = isOffset ? (surface.offsetDistance ?? radius) : radius;
+
+        const uSegments = 32;
+        const vSegments = 32;
+        const vertexCount = (uSegments + 1) * (vSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= vSegments; v += 1) {
+            for (let u = 0; u <= uSegments; u += 1) {
+                const uu = u / uSegments;
+                const vv = v / vSegments;
+                const bp = evaluateBasisPoint(basis, uu, vv);
+                const bn = evaluateBasisNormal(basis, uu, vv);
+                if (!bp || !bn) {
+                    const offset = (v * (uSegments + 1) + u) * 3;
+                    positions[offset] = 0;
+                    positions[offset + 1] = 0;
+                    positions[offset + 2] = 0;
+                    normals[offset] = 0;
+                    normals[offset + 1] = 0;
+                    normals[offset + 2] = 1;
+                    continue;
+                }
+                const offset = (v * (uSegments + 1) + u) * 3;
+                positions[offset] = bp[0] + bn[0] * dist;
+                positions[offset + 1] = bp[1] + bn[1] * dist;
+                positions[offset + 2] = bp[2] + bn[2] * dist;
+                let n = new THREE.Vector3(bn[0], bn[1], bn[2]).normalize();
+                if (!sameSense) n.multiplyScalar(-1);
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < vSegments; v += 1) {
+            for (let u = 0; u < uSegments; u += 1) {
+                const a = v * (uSegments + 1) + u;
+                const b = a + 1;
+                const c = a + uSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            parametricType: surface.type,
+            basisType: basis.type,
+            offsetDistance: dist,
             rebuiltVertexCount: vertexCount,
             rebuiltIndexCount: indices.length
         });

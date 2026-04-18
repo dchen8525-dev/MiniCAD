@@ -1,5 +1,6 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -30,5 +31,21 @@ public record DegenerateCurve2(Point2 point) implements Curve2 {
     @Override
     public BoundingBox2 boundingBox() {
         return BoundingBox2.of(point, point);
+    }
+
+    @Override
+    public Vector2 tangentAt(double parameter) {
+        throw new GeometryException("degenerate curve has no meaningful tangent");
+    }
+
+    @Override
+    public double length() {
+        return 0.0;
+    }
+
+    @Override
+    public Point2 closestPointTo(Point2 query) {
+        Preconditions.requireNonNull(query, "query");
+        return point;
     }
 }

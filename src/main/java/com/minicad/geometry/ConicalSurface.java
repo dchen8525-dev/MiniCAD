@@ -99,6 +99,16 @@ public record ConicalSurface(Axis2Placement3D position, double radius, double se
         return worldNormal.normalize().asVector();
     }
 
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        return normalAt(u);
+    }
+
+    @Override
+    public BoundingBox3 boundingBox() {
+        return boundingBox(-1.0, 1.0);
+    }
+
     /**
      * Returns the bounding box for a conical patch.
      *

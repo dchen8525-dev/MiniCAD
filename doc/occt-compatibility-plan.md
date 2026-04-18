@@ -57,6 +57,12 @@
 - fan.stp 结果：16 → 0 unsupported faces（100% 改善）
 - 21 个 .step test files 剩余 unsupported faces 均为 conical seam、multi-trimmed loops 等 intentional edge case 测试（2D/pcurve 实体已过滤）
 
+**几何方法解析化（2026-04-18 第八轮）**:
+- `CylindricalSurface.normalAt(u,v)` / `ConicalSurface.normalAt(u,v)`: 添加接口签名匹配 override，避免 64×64 数值差分
+- `DegenerateCurve2.tangentAt()`: 抛出 GeometryException 替代返回无意义 (1,0)，与 DegenerateCurve3 一致
+- `Parabola3.length()`: 闭式公式 L = p*[t*sqrt(1+t^2)+asinh(t)]；`Hyperbola3.length()`: 32 点高斯积分；`Clothoid3.length()`: 解析 speed=const
+- `BSplineCurve3.tangentAt()`: 添加 basisValue+derivativeBasisValue 解析求导；`RationalBSplineCurve3.tangentAt()`: 商法则解析导数
+
 **Viewer 渲染修复（2026-04-18）**:
 - `viewer.js` 中 `rebuildParametricFaceGeometry()` 新增 4 种曲面类型的参数化渲染支持
 - `spherical_surface`: 球面经纬网格重建（支持 trim 范围）
@@ -72,5 +78,13 @@
 - 3 个管线补齐: `KINEMATIC_FRAME_BASED_TRANSFORMATION`, `VALIDATION_PROPERTY_REPRESENTATION`, `CALCULATED_GEOMETRIC_REPRESENTATION_ITEM`
 - 链路补全: Tessellated FaceSet/Face 的 `buildSolid()` 分支补齐
 - 高级曲面 Viewer 参数化渲染: 4 个曲面类型（paraboloid_surface、hyperboloid_surface、surface_of_translation、surface_of_projection）从通用三角化升级为 parametric rebuild — exporter 新增 FaceSurfacePayload 序列化 + viewer.js 解析重建
+
+---
+
+**几何方法解析化（2026-04-18 第九轮）**:
+- `RuledSurface3` / `SurfaceOfConstantRadius3` / `OffsetSurface3` exporter 补齐: `toRuledSurfaceFacePayload` / `toSurfaceOfConstantRadiusFacePayload` 方法实现（采样三角化 + FaceSurfacePayload 元数据序列化）
+- viewer.js `ruled_surface` 参数化重建: 利用 directrix1/directrix2 采样点列进行线性扫掠重建
+- viewer.js `constant_radius_surface` / `offset_surface` 参数化重建: 利用 basisSurface 嵌套载荷 + 法线偏移重建
+- 全部 1393 测试通过，编译零错误
 
 ---

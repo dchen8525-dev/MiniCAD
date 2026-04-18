@@ -144,6 +144,24 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核：
 
 ## 下一步工作（近期优先级）
 
+### 已完成（2026-04-18 第八轮更新）
+
+**SurfaceGeometry `normalAt` 接口缺失补全**:
+- `CylindricalSurface.normalAt(u, v)`: 添加 `@Override` 委托已有 `normalAt(double angle)`（之前走接口默认数值差分 64×64 sampleGrid）
+- `ConicalSurface.normalAt(u, v)`: 添加 `@Override` 委托已有 `normalAt(double angle)`（同上）
+
+**DegenerateCurve2 `tangentAt()` 静默错误修复**:
+- 添加 `@Override` 抛出 `GeometryException`，与 `DegenerateCurve3` 行为一致（之前走接口默认数值差分，返回无意义的 (1,0)）
+
+**Curve3 `length()` 解析化（之前走 256 采样默认实现）**:
+- `Parabola3.length()`: 闭式积分公式 L = p * [t*sqrt(1+t^2) + asinh(t)]，替代 256 采样
+- `Hyperbola3.length()`: 32 点高斯积分，速度函数 sqrt(a^2 + b^2*t^2/(t^2-1))
+- `Clothoid3.length()`: 解析推导 speed = sqrt(pi/2)*xAxisIntercept（常数），length = delta_t * scale
+
+**Curve3 `tangentAt()` 解析化（之前走数值差分）**:
+- `BSplineCurve3.tangentAt()`: 添加 `basisValue` + `derivativeBasisValue` 解析求导 C'(u) = sum(N'_{i,p}(u) * P_i)
+- `RationalBSplineCurve3.tangentAt()`: 商法则 C'(u) = (A'(u)*W(u) - A(u)*W'(u)) / W(u)^2，添加 `derivativeBasisValue`
+
 ### 已完成（2026-04-18 第七轮更新）
 
 **Curve2 `length()` 全类型覆盖（之前走 256 采样默认实现或无实现）**:

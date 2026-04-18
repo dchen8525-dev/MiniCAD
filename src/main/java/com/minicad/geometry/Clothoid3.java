@@ -301,4 +301,24 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
         }
         return bestT;
     }
+
+    /**
+     * Returns the arc length for a parameter range.
+     * Clothoid parameterization gives constant speed = sqrt(pi/2) * xAxisIntercept,
+     * so length(t0, t1) = |t1 - t0| * sqrt(pi/2) * xAxisIntercept.
+     *
+     * @param tMin minimum parameter
+     * @param tMax maximum parameter
+     * @return arc length
+     */
+    public double length(double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        return Math.abs(tMax - tMin) * Math.sqrt(Math.PI / 2.0) * xAxisIntercept;
+    }
+
+    @Override
+    public double length() {
+        return length(0.0, 1.0);
+    }
 }

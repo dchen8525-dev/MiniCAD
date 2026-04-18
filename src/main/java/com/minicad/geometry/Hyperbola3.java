@@ -272,4 +272,64 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
         double tApprox = x / semiAxisA;
         return Math.abs(tApprox) < 1.0 ? Math.signum(tApprox) : tApprox;
     }
+
+    /**
+     * Returns the arc length for a parameter range on one branch.
+     * Uses 32-point Gaussian quadrature for accuracy.
+     *
+     * @param tMin minimum parameter (>= 1)
+     * @param tMax maximum parameter
+     * @return arc length on the right branch
+     */
+    public double length(double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        if (tMin < 1.0) tMin = 1.0;
+        if (tMax < tMin) tMax = tMin;
+        return gaussQuadrature(tMin, tMax);
+    }
+
+    private double hyperbolaSpeed(double t) {
+        double t2 = t * t;
+        if (t2 <= 1.0 + 1e-12) return semiAxisA;
+        double dy2 = semiAxisB * semiAxisB * t2 / (t2 - 1.0);
+        return Math.sqrt(semiAxisA * semiAxisA + dy2);
+    }
+
+    private double gaussQuadrature(double a, double b) {
+        double mid = (a + b) * 0.5;
+        double half = (b - a) * 0.5;
+        double sum = 0.0;
+        for (int i = 0; i < GAUSS_POINTS.length; i += 2) {
+            double xi = GAUSS_POINTS[i];
+            double wi = GAUSS_WEIGHTS[i];
+            double t = mid + half * xi;
+            sum += wi * hyperbolaSpeed(t);
+            if (i + 1 < GAUSS_POINTS.length) {
+                double xi2 = GAUSS_POINTS[i + 1];
+                double wi2 = GAUSS_WEIGHTS[i + 1];
+                double t2 = mid + half * xi2;
+                sum += wi2 * hyperbolaSpeed(t2);
+            }
+        }
+        return sum * half;
+    }
+
+    private static final double[] GAUSS_POINTS = {
+        -0.991821584, -0.968158569, -0.919962775, -0.849122978, -0.757785470,
+        -0.648606984, -0.524847769, -0.390250460, -0.248715320, -0.104097113,
+         0.104097113,  0.248715320,  0.390250460,  0.524847769,  0.648606984,
+         0.757785470,  0.849122978,  0.919962775,  0.968158569,  0.991821584
+    };
+    private static final double[] GAUSS_WEIGHTS = {
+        0.020702387,  0.020520775,  0.020150043,  0.019593433,  0.018856867,
+        0.017948300,  0.016877522,  0.015655979,  0.014296616,  0.012813781,
+        0.012813781,  0.014296616,  0.015655979,  0.016877522,  0.017948300,
+        0.018856867,  0.019593433,  0.020150043,  0.020520775,  0.020702387
+    };
+
+    @Override
+    public double length() {
+        return length(1.0, 2.0) + length(1.0, 2.0);
+    }
 }

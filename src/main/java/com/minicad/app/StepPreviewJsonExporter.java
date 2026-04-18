@@ -3375,7 +3375,38 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         RuledSurface3 surface = builder.buildRuledSurface(stepSurface.id());
-        return toSampledSurfaceFacePayload(stepFace, surface, "RULED_SURFACE", bounds, metadata);
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        if (triangles.isEmpty()) {
+            return null;
+        }
+        boolean sameSense = faceSameSense(stepFace);
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) normal = normal.scale(-1.0);
+        List<LoopPayload> loops = new ArrayList<>();
+        for (FaceBound bound : bounds) {
+            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+        }
+        return new FacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                "RULED_SURFACE",
+                triangles.get(0),
+                new VectorPayload(normal.x(), normal.y(), normal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                loops,
+                triangles,
+                new FaceSurfacePayload(
+                        "ruled_surface", null, null, null, 0.0, null, null,
+                        0.0, 0.0, 0.0, 0.0,
+                        null, null, null, null, null, null, null
+                ),
+                null
+        );
     }
 
     private static FacePayload toSurfaceOfConstantRadiusFacePayload(
@@ -3389,7 +3420,38 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         SurfaceOfConstantRadius3 surface = builder.buildSurfaceOfConstantRadius(stepSurface.id());
-        return toSampledSurfaceFacePayload(stepFace, surface, "SURFACE_OF_CONSTANT_RADIUS", bounds, metadata);
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        if (triangles.isEmpty()) {
+            return null;
+        }
+        boolean sameSense = faceSameSense(stepFace);
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) normal = normal.scale(-1.0);
+        List<LoopPayload> loops = new ArrayList<>();
+        for (FaceBound bound : bounds) {
+            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+        }
+        return new FacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                "SURFACE_OF_CONSTANT_RADIUS",
+                triangles.get(0),
+                new VectorPayload(normal.x(), normal.y(), normal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                loops,
+                triangles,
+                new FaceSurfacePayload(
+                        "constant_radius_surface", null, null, null, surface.radius(), null, null,
+                        0.0, 0.0, 0.0, 0.0,
+                        null, null, null, null, null, null, null
+                ),
+                null
+        );
     }
 
     private static FacePayload toSampledSurfaceFacePayload(
