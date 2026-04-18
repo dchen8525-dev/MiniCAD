@@ -1,5 +1,6 @@
 package com.minicad.geometry;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -298,6 +299,10 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             return parabola.tangentAt(parameter);
         } else if (segment instanceof SurfaceCurve3 surfaceCurve) {
             return surfaceCurve.tangentAt(parameter);
+        } else if (segment instanceof Clothoid3 clothoid) {
+            return clothoid.tangentAt(parameter * 2 * Math.PI);
+        } else if (segment instanceof DegenerateCurve3 degenerate) {
+            return degenerate.tangentAt(parameter);
         }
         return new Vector3(1, 0, 0);
     }
@@ -313,6 +318,22 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             return trimmed.closestPointTo(point);
         } else if (segment instanceof Line3 line) {
             return line.closestPointTo(point);
+        } else if (segment instanceof BSplineCurve3 bspline) {
+            return bspline.closestPointTo(point);
+        } else if (segment instanceof RationalBSplineCurve3 rational) {
+            return rational.closestPointTo(point);
+        } else if (segment instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.closestPointTo(point);
+        } else if (segment instanceof Parabola3 parabola) {
+            return parabola.closestPointTo(point);
+        } else if (segment instanceof Hyperbola3 hyperbola) {
+            return hyperbola.closestPointTo(point);
+        } else if (segment instanceof Clothoid3 clothoid) {
+            return clothoid.closestPointTo(point);
+        } else if (segment instanceof DegenerateCurve3 degenerate) {
+            return degenerate.closestPointTo(point);
+        } else if (segment instanceof CompositeCurve3 composite) {
+            return composite.closestPointTo(point);
         }
         // For other curves, find closest by sampling
         java.util.List<CartesianPoint> samples = sampleSegment(segment, 256);
@@ -326,5 +347,42 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             }
         }
         return closest;
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * The parameter is in [0,1], distributed uniformly across segments.
+     *
+     * @param point a point on or near the composite curve
+     * @return parameter value in [0,1]
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        int n = segments.size();
+        for (int i = 0; i < n; i++) {
+            Curve3 seg = segments.get(i);
+            CartesianPoint segClosest = closestPointOnSegment(seg, point);
+            double dist = point.distanceTo(segClosest);
+            if (dist <= Epsilon.EPS * 10) {
+                double localParam = seg.parameterAt(segClosest);
+                return (i + Math.max(0, Math.min(1, localParam))) / n;
+            }
+        }
+        // Fallback: find closest segment
+        double bestDist = Double.POSITIVE_INFINITY;
+        int bestSeg = 0;
+        double bestLocalParam = 0;
+        for (int i = 0; i < n; i++) {
+            Curve3 seg = segments.get(i);
+            CartesianPoint segClosest = closestPointOnSegment(seg, point);
+            double dist = point.distanceTo(segClosest);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestSeg = i;
+                bestLocalParam = seg.parameterAt(segClosest);
+            }
+        }
+        return (bestSeg + Math.max(0, Math.min(1, bestLocalParam))) / n;
     }
 }

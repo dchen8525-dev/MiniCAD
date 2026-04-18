@@ -18,7 +18,11 @@ public sealed interface SurfaceGeometry permits
         SurfaceOfLinearExtrusion3,
         SurfaceOfRevolution3,
         RuledSurface3,
-        SurfaceOfConstantRadius3 {
+        SurfaceOfConstantRadius3,
+        ParaboloidSurface,
+        HyperboloidSurface,
+        SurfaceOfTranslation3,
+        SurfaceOfProjection3 {
 
     /**
      * Returns the approximate bounding box of the surface by sampling.

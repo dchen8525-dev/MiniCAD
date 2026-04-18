@@ -127,6 +127,13 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
         return Math.abs(end - start);
     }
 
+    @Override
+    public double length() {
+        // Line3 is infinite; default samples [0,1] which gives unit length.
+        // Prefer length(start, end) for finite segments.
+        return 1.0;
+    }
+
     /**
      * Returns the bounding box for a finite segment of the line.
      * Infinite lines cannot have a bounded box, so this requires parameter bounds.
@@ -163,5 +170,17 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
         Preconditions.requireNonNull(point, "point");
         Vector3 offset = point.subtract(origin);
         return offset.dot(direction.asVector());
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * For Line3, the parameter is the signed distance along the unit direction.
+     *
+     * @param point a point on or near the line
+     * @return signed distance parameter of the projected point
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        return parameterOfClosestPoint(point);
     }
 }

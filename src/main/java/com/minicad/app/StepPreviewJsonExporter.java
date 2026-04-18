@@ -32,6 +32,10 @@ import com.minicad.geometry.RationalBSplineSurface3;
 import com.minicad.geometry.OffsetSurface3;
 import com.minicad.geometry.RuledSurface3;
 import com.minicad.geometry.SurfaceOfConstantRadius3;
+import com.minicad.geometry.ParaboloidSurface;
+import com.minicad.geometry.HyperboloidSurface;
+import com.minicad.geometry.SurfaceOfTranslation3;
+import com.minicad.geometry.SurfaceOfProjection3;
 import com.minicad.geometry.SurfaceCurve3;
 import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
@@ -44,8 +48,11 @@ import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.CompositeCurve2;
 import com.minicad.geometry2d.Curve2;
+import com.minicad.geometry2d.DegenerateCurve2;
 import com.minicad.geometry2d.Ellipse2;
+import com.minicad.geometry2d.Hyperbola2;
 import com.minicad.geometry2d.Line2;
+import com.minicad.geometry2d.Parabola2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.Polyline2;
 import com.minicad.geometry2d.RationalBSplineCurve2;
@@ -2687,6 +2694,158 @@ public final class StepPreviewJsonExporter {
                             List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
                             List.of(plane.normal().x(), plane.normal().y(), plane.normal().z()),
                             basisDirectionForNormal(normal),
+                            0.0,
+                            null, null, 0.0, 0.0, 0.0, 0.0,
+                            null, null, null, null, null, null, null
+                    ),
+                    null
+            );
+        }
+        // Paraboloid surface: parametric payload for viewer rebuild
+        if (surface instanceof ParaboloidSurface paraboloid) {
+            Axis2Placement3D pos = paraboloid.position();
+            Vector3 normal = surface.normalAt(0.5, 0.5);
+            if (!sameSense) {
+                normal = normal.scale(-1.0);
+            }
+            List<LoopPayload> loops = new ArrayList<>();
+            for (FaceBound bound : face.bounds()) {
+                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            }
+            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            return new FacePayload(
+                    stepId,
+                    name,
+                    "PARABOLOID_SURFACE",
+                    new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
+                    new VectorPayload(normal.x(), normal.y(), normal.z()),
+                    sameSense,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    loops,
+                    triangles,
+                    new FaceSurfacePayload(
+                            "paraboloid_surface",
+                            List.of(pos.location().x(), pos.location().y(), pos.location().z()),
+                            List.of(pos.axis().x(), pos.axis().y(), pos.axis().z()),
+                            List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
+                            paraboloid.focalLength(),
+                            null, null, 0.0, 0.0, 0.0, 0.0,
+                            null, null, null, null, null, null, null
+                    ),
+                    null
+            );
+        }
+        // Hyperboloid surface: parametric payload for viewer rebuild
+        if (surface instanceof HyperboloidSurface hyperboloid) {
+            Axis2Placement3D pos = hyperboloid.position();
+            Vector3 normal = surface.normalAt(0.5, 0.5);
+            if (!sameSense) {
+                normal = normal.scale(-1.0);
+            }
+            List<LoopPayload> loops = new ArrayList<>();
+            for (FaceBound bound : face.bounds()) {
+                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            }
+            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            return new FacePayload(
+                    stepId,
+                    name,
+                    "HYPERBOLOID_SURFACE",
+                    new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
+                    new VectorPayload(normal.x(), normal.y(), normal.z()),
+                    sameSense,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    loops,
+                    triangles,
+                    new FaceSurfacePayload(
+                            "hyperboloid_surface",
+                            List.of(pos.location().x(), pos.location().y(), pos.location().z()),
+                            List.of(pos.axis().x(), pos.axis().y(), pos.axis().z()),
+                            List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
+                            hyperboloid.radius(),
+                            null, hyperboloid.semiAxis(), 0.0, 0.0, 0.0, 0.0,
+                            null, null, null, null, null, null, null
+                    ),
+                    null
+            );
+        }
+        // Surface of translation: parametric payload for viewer rebuild
+        if (surface instanceof SurfaceOfTranslation3 translation) {
+            Vector3 dir = translation.direction();
+            Vector3 normal = surface.normalAt(0.5, 0.5);
+            if (!sameSense) {
+                normal = normal.scale(-1.0);
+            }
+            List<LoopPayload> loops = new ArrayList<>();
+            for (FaceBound bound : face.bounds()) {
+                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            }
+            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            return new FacePayload(
+                    stepId,
+                    name,
+                    "SURFACE_OF_TRANSLATION",
+                    new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
+                    new VectorPayload(normal.x(), normal.y(), normal.z()),
+                    sameSense,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    loops,
+                    triangles,
+                    new FaceSurfacePayload(
+                            "surface_of_translation",
+                            null,
+                            List.of(dir.x(), dir.y(), dir.z()),
+                            null,
+                            0.0,
+                            null, null, 0.0, 0.0, 0.0, 0.0,
+                            null, null, null, null, null, null, null
+                    ),
+                    null
+            );
+        }
+        // Surface of projection: parametric payload for viewer rebuild
+        if (surface instanceof SurfaceOfProjection3 projection) {
+            Vector3 dir = projection.projectionDirection();
+            Vector3 normal = surface.normalAt(0.5, 0.5);
+            if (!sameSense) {
+                normal = normal.scale(-1.0);
+            }
+            List<LoopPayload> loops = new ArrayList<>();
+            for (FaceBound bound : face.bounds()) {
+                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            }
+            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            return new FacePayload(
+                    stepId,
+                    name,
+                    "SURFACE_OF_PROJECTION",
+                    new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
+                    new VectorPayload(normal.x(), normal.y(), normal.z()),
+                    sameSense,
+                    toColorPayload(metadata.rgb()),
+                    metadata.transparency(),
+                    toPbrPayload(metadata.pbr()),
+                    metadata.layers(),
+                    loops,
+                    triangles,
+                    new FaceSurfacePayload(
+                            "surface_of_projection",
+                            null,
+                            List.of(dir.x(), dir.y(), dir.z()),
+                            null,
                             0.0,
                             null, null, 0.0, 0.0, 0.0, 0.0,
                             null, null, null, null, null, null, null
@@ -6405,6 +6564,10 @@ public final class StepPreviewJsonExporter {
             case OffsetSurface3 ignored -> "OFFSET_SURFACE";
             case SurfaceOfLinearExtrusion3 ignored -> "SURFACE_OF_LINEAR_EXTRUSION";
             case SurfaceOfConstantRadius3 ignored -> "SURFACE_OF_CONSTANT_RADIUS";
+            case ParaboloidSurface ignored -> "PARABOLOID_SURFACE";
+            case HyperboloidSurface ignored -> "HYPERBOLOID_SURFACE";
+            case SurfaceOfTranslation3 ignored -> "SURFACE_OF_TRANSLATION";
+            case SurfaceOfProjection3 ignored -> "SURFACE_OF_PROJECTION";
         };
     }
 
@@ -7690,6 +7853,15 @@ public final class StepPreviewJsonExporter {
         if (curve instanceof Ellipse2 ellipse) {
             return sampleEllipse2Points(ellipse, 72);
         }
+        if (curve instanceof Parabola2 parabola) {
+            return parabola.sample(72);
+        }
+        if (curve instanceof Hyperbola2 hyperbola) {
+            return hyperbola.sample(72);
+        }
+        if (curve instanceof DegenerateCurve2 degenerate) {
+            return List.of(degenerate.point());
+        }
         if (curve instanceof BSplineCurve2 spline) {
             return spline.sample(72);
         }
@@ -7800,6 +7972,18 @@ public final class StepPreviewJsonExporter {
         if (curve instanceof Ellipse3) {
             return "ELLIPSE";
         }
+        if (curve instanceof Parabola3) {
+            return "PARABOLA";
+        }
+        if (curve instanceof Hyperbola3) {
+            return "HYPERBOLA";
+        }
+        if (curve instanceof Clothoid3) {
+            return "CLOTHOID";
+        }
+        if (curve instanceof DegenerateCurve3) {
+            return "DEGENERATE_CURVE";
+        }
         if (curve instanceof BSplineCurve3) {
             return "B_SPLINE_CURVE";
         }
@@ -7830,6 +8014,15 @@ public final class StepPreviewJsonExporter {
         }
         if (curve instanceof Ellipse2) {
             return "ELLIPSE";
+        }
+        if (curve instanceof Parabola2) {
+            return "PARABOLA";
+        }
+        if (curve instanceof Hyperbola2) {
+            return "HYPERBOLA";
+        }
+        if (curve instanceof DegenerateCurve2) {
+            return "DEGENERATE_CURVE";
         }
         if (curve instanceof BSplineCurve2) {
             return "B_SPLINE_CURVE";

@@ -10,7 +10,7 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepConicalSurface, StepToroidalSurface, StepDegenerateToroidalSurface, StepSphericalSurface, StepSurfaceOfLinearExtrusion, StepSurfaceOfRevolution, StepRectangularTrimmedSurface, StepCurveBoundedSurface, StepOrientedSurface,
         StepTrimmedCurve, StepTopologicalRepresentationItem, StepVertex, StepEdge, StepFace, StepPath, StepOpenPath, StepOrientedPath, StepSubpath, StepVertexPoint, StepEdgeCurve, StepSubedge, StepConnectedEdgeSet, StepEdgeBasedWireframeModel,
         StepOrientedEdge, StepLoop, StepFaceBound, StepFaceEntity, StepConnectedFaceSet, StepConnectedFaceSubSet, StepOpenShell, StepSurfacedOpenShell, StepOrientedOpenShell, StepVertexShell, StepWireShell,
-        StepClosedShell, StepOrientedClosedShell, StepSolidModel, StepManifoldSolidBrep, StepFacettedBrep, StepBrepWithVoids, StepBooleanResult, StepBooleanClippingResult, StepCsgPrimitive, StepCsgSolid, StepSolidReplica, StepProfileDef, StepSweptAreaSolid, StepHalfSpaceSolid, StepBoxDomain, StepRepresentationContext, StepGeometricRepresentationContext,
+        StepClosedShell, StepOrientedClosedShell, StepSolidModel, StepManifoldSolidBrep, StepFacettedBrep, StepBrepWithVoids, StepBooleanResult, StepBooleanClippingResult, StepCsgPrimitive, StepCsgSolid, StepSolidReplica, StepProfileDef, StepSweptAreaSolid, StepHalfSpaceSolid, StepBoxDomain, StepExtrudedFaceSolid, StepRevolvedFaceSolid, StepSweptFaceSolid, StepRepresentationContext, StepGeometricRepresentationContext,
         StepDimensionalExponents, StepNamedUnit, StepSiUnit, StepContextDependentUnit, StepConversionBasedUnit, StepConversionBasedUnitWithOffset, StepRepresentation, StepApplicationContext, StepProductContext, StepProduct,
         StepProductRelationship, StepProductDefinitionFormation, StepProductDefinitionFormationRelationship, StepProductDefinitionContext, StepProductDefinition, StepProductDefinitionRelationship, StepProductDefinitionRelationshipRelationship, StepRepresentationMap, StepSymbolRepresentationMap,
         StepProductDefinitionShape, StepCharacterizedObject, StepShapeAspect, StepShapeAspectOccurrence, StepShapeAspectRelationship, StepShapeDefinitionRepresentation, StepMeasureWithUnit, StepTypedMeasureWithUnit,
@@ -79,6 +79,8 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepPlusMinusTolerance, StepToleranceValue, StepMeasureRepresentationItemWithUnit,
         StepMeasureQualification,
         StepCsgVolume, StepBlockVolume,
+        // Advanced CSG volumes
+        StepCylinderVolume, StepSphereVolume, StepTorusVolume, StepPrismVolume,
         StepAngularLocation, StepAngularSize,
         StepDatumReferenceCompartment, StepDatumReferenceElement, StepCommonDatum,
         StepCompositeShapeAspect,
@@ -96,6 +98,11 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepCameraUsage, StepCameraImage, StepPlanarBox, StepPlanarExtent, StepViewVolume,
         StepMechanicalDesignShapeRepresentation,
         StepKinematicPair, StepKinematicJoint, StepKinematicLink, StepKinematicStructure,
+        StepPrismaticPair, StepRevolutePair, StepCylindricalPair,
+        StepSphericalPair, StepPlanarPair, StepUniversalPair, StepScrewPair,
+        StepGearPair, StepGearPairWithRange, StepRackAndPinionPair,
+        StepLowOrderKinematicPairWithRange, StepActuatedKinematicPair,
+        StepMechanismStateRepresentation, StepKinematicPath,
         StepPersonAndOrganizationAddress, StepOrganizationAddress, StepPersonAddress,
         StepGeneralizedDatum,
         StepActionDirective, StepActionMethod, StepAction,
@@ -112,6 +119,9 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepToroidalSurfaceWithCylindricalAxis, StepToroidalSurfaceWithEllipticalAxis,
         StepCylindricalSurfaceWithEllipticalAxis, StepConicalSurfaceWithEllipticalAxis,
         StepSphericalSurfaceWithEllipticalAxis,
+        // Advanced surfaces
+        StepSurfaceOfTranslation, StepSurfaceOfProjection,
+        StepParaboloidSurface, StepHyperboloidSurface,
         // Extended tolerance zone entities
         StepLinearToleranceZone, StepRadialToleranceZone, StepRectangularToleranceZone, StepCurvedToleranceZone,
         // Manufacturing feature definition entities
@@ -127,6 +137,13 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepGeometricToleranceWithDatumReference, StepPlusMinusToleranceWithModifiers,
         StepTolerancePair, StepDatumSystemReference, StepCompositeDatumReference,
         StepProjectedZoneDefinition, StepShapeDimensionRepresentationWithTolerance,
+        // GD&T extended types (OCCT Phase 3)
+        StepGeometricToleranceWithDefinedAreaUnit,
+        StepGeometricToleranceWithMaximumTolerance,
+        StepNonUniformZoneDefinition,
+        StepDatumReferenceModifierWithValue,
+        StepRunoutZoneDefinitionOrientation,
+        StepDatumReferenceModifier,
         StepAngularDimensionRepresentation, StepLinearDimensionRepresentation,
         StepChainDimensionRepresentation, StepOrdinateDimensionRepresentation,
         StepMaterialPropertyRepresentation,
@@ -159,8 +176,18 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         // Analysis and simulation entities
         StepAnalysisModel, StepFiniteElementMesh, StepBoundaryCondition, StepLoadCase,
         StepAnalysisResult, StepOptimizationCriteria, StepOptimizationResult, StepSimulationModel,
+        // FEA element types (OCCT Phase 5)
+        StepVolume3dElementRepresentation, StepVolume3dElementProperty,
+        StepCurve3dElementProperty, StepSurface3dElementProperty,
+        StepFeaMaterialPropertyRepresentation,
+        StepElementVolume2d, StepElementVolume3d,
+        StepNodeSet, StepElementSet,
+        StepFeaSecuredVariable, StepFeaConstantFunction3d,
+        StepFeaLinearAlgebraicMatrix, StepFeaLinearAlgebraicVector,
+        StepFeaAxis2Placement3d, StepFeaGroupRepresentation,
         // Kinematic and motion entities
         StepKinematicAnalysis, StepMotionPath, StepJointConfiguration, StepMechanismDefinition,
+        StepKinematicFrameBasedTransformation,
         // CNC and manufacturing entities
         StepCncProgram, StepCuttingTool, StepToolAssembly, StepWorkpiece,
         // Manufacturing process entities
@@ -403,7 +430,12 @@ public sealed interface StepEntity permits StepCartesianPoint, StepDirection, St
         StepQuasiUniformCurve2D, StepUniformCurve2D, StepPiecewiseBezierCurve2D,
         StepIndexedPolyCurve2D, StepDegenerateCurve2D,
         // Tessellation entities
-        StepSeamEdge, StepTessellatedFace, StepTessellatedTriangle {
+        StepSeamEdge, StepTessellatedFace, StepTessellatedTriangle,
+        // Tessellated triangulated types (OCCT Phase 4)
+        StepTriangulatedFace, StepComplexTriangulatedFace, StepCubicBezierTriangulatedFace,
+        // Validation and calculated geometry
+        StepValidationPropertyRepresentation,
+        StepCalculatedGeometricRepresentationItem {
 
     /**
      * Returns the original STEP instance id.

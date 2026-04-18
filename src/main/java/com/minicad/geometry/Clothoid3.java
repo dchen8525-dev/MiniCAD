@@ -148,21 +148,20 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
      * @param t parameter value
      * @return unit tangent vector
      */
+    @Override
     public Vector3 tangentAt(double t) {
         Preconditions.requireFinite(t, "t");
-        double eps = 1e-6;
-        double t1 = Math.max(0, t - eps);
-        double t2 = t + eps;
-
-        CartesianPoint p1 = pointAt(t1);
-        CartesianPoint p2 = pointAt(t2);
-        Vector3 tangent = p2.subtract(p1);
-
-        if (tangent.norm() <= Epsilon.EPS) {
-            // At t=0, the tangent is along X direction
+        // Analytical tangent: dC/dt = cos(pi*t^2/2), dS/dt = sin(pi*t^2/2)
+        double phase = Math.PI * t * t / 2.0;
+        double dx = Math.cos(phase);
+        double dy = Math.sin(phase);
+        Vector3 tangentInLocal = position.xDirection().asVector().scale(dx)
+                .add(position.yDirection().asVector().scale(dy));
+        double norm = tangentInLocal.norm();
+        if (norm <= Epsilon.EPS) {
             return position.xDirection().asVector();
         }
-        return tangent.normalize().asVector();
+        return tangentInLocal.normalize().asVector();
     }
 
     @Override
@@ -171,7 +170,11 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
         // Check if point lies on the clothoid plane
         Vector3 offset = point.subtract(position.location());
         double planeDistance = Math.abs(offset.dot(position.axis().asVector()));
-        return planeDistance <= Epsilon.EPS;
+        if (planeDistance > Epsilon.EPS) {
+            return false;
+        }
+        // Check if point is close enough to the curve
+        return distanceTo(point) <= Epsilon.EPS * 10;
     }
 
     /**
@@ -264,5 +267,38 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
      */
     public double intercept() {
         return xAxisIntercept;
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * Uses sampling to find the closest parameter in [0,1].
+     *
+     * @param point a point on or near the clothoid
+     * @return parameter value in [0,1]
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(position.location());
+        double planeDistance = offset.dot(position.axis().asVector());
+        Vector3 axialOffset = position.axis().asVector().scale(planeDistance);
+        CartesianPoint projected = new CartesianPoint(
+            point.x() - axialOffset.x(),
+            point.y() - axialOffset.y(),
+            point.z() - axialOffset.z()
+        );
+
+        double bestT = 0.0;
+        double minDist = Double.POSITIVE_INFINITY;
+        int n = 256;
+        for (int i = 0; i <= n; i++) {
+            double t = (double) i / n;
+            double dist = projected.distanceTo(pointAt(t));
+            if (dist < minDist) {
+                minDist = dist;
+                bestT = t;
+            }
+        }
+        return bestT;
     }
 }

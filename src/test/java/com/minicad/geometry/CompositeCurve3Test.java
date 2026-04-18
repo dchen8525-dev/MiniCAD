@@ -153,8 +153,8 @@ class CompositeCurve3Test {
         Line3 line = new Line3(new CartesianPoint(0, 0, 0), new Direction3(1, 0, 0));
         TrimmedCurve3 trimmed = new TrimmedCurve3(
             line,
-            new CartesianPoint(0, 0, 0),
-            new CartesianPoint(10, 0, 0),
+            0.0,
+            10.0,
             true
         );
 

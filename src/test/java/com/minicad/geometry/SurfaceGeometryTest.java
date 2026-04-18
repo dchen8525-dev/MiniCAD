@@ -127,7 +127,7 @@ class SurfaceGeometryTest {
         SurfaceOfLinearExtrusion3 extrusion = new SurfaceOfLinearExtrusion3(circle, extrusionVector);
 
         // Normal should be radial for a cylindrical extrusion
-        Vector3 n0 = extrusion.normalAt(0);
+        Vector3 n0 = extrusion.normalAt(0, 0);
         assertEquals(1.0, n0.x(), 1e-3);
         assertEquals(0.0, n0.y(), 1e-3);
         assertEquals(0.0, n0.z(), 1e-3);

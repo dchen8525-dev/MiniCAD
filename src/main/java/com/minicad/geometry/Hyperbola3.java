@@ -99,22 +99,20 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
      * @param t parameter value (t >= 1 for valid hyperbola points)
      * @return unit tangent vector
      */
+    @Override
     public Vector3 tangentAt(double t) {
         Preconditions.requireFinite(t, "t");
         double absT = Math.abs(t);
-        // Use numerical differentiation to avoid singularity at t=1
-        double eps = 1e-6;
-        double t1 = Math.max(1.0 + eps, absT - eps);
-        double t2 = absT + eps;
-
-        CartesianPoint p1 = pointAt(Math.signum(t) * t1);
-        CartesianPoint p2 = pointAt(Math.signum(t) * t2);
-        Vector3 tangent = p2.subtract(p1);
-
-        if (tangent.norm() <= Epsilon.EPS) {
+        if (absT <= 1.0 + Epsilon.EPS) {
             return position.xDirection().asVector();
         }
-        return tangent.normalize().asVector();
+        double sqrtTerm = Math.sqrt(absT * absT - 1.0);
+        // dx/dt = a*sign(t), dy/dt = b*t/sqrt(t^2-1)
+        double dx = semiAxisA * Math.signum(t);
+        double dy = semiAxisB * absT / sqrtTerm;
+        Vector3 tangentInLocal = position.xDirection().asVector().scale(dx)
+                .add(position.yDirection().asVector().scale(dy));
+        return tangentInLocal.normalize().asVector();
     }
 
     @Override
@@ -257,5 +255,21 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
      */
     public double eccentricity() {
         return Math.sqrt(1.0 + semiAxisB * semiAxisB / (semiAxisA * semiAxisA));
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * For the parametric form x = a*|t|, y = b*sqrt(t^2-1), the parameter t = x/a.
+     *
+     * @param point a point on or near the hyperbola
+     * @return parameter value t (positive for right branch, negative for left)
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(position.location());
+        double x = offset.dot(position.xDirection().asVector());
+        double tApprox = x / semiAxisA;
+        return Math.abs(tApprox) < 1.0 ? Math.signum(tApprox) : tApprox;
     }
 }

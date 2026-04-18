@@ -177,6 +177,8 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
             return getTangentOnCurveInternal(surfaceCurve.curve3d(), parameter);
         } else if (curve instanceof Clothoid3 clothoid) {
             return clothoid.tangentAt(parameter);
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.tangentAt(parameter);
         }
         // Default tangent using numerical differentiation
         return computeNumericalTangent(curve, parameter);
@@ -323,6 +325,16 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
             return composite.closestPointTo(point);
         } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
             return surfaceCurve.closestPointTo(point);
+        } else if (curve instanceof Line3 line) {
+            return line.closestPointTo(point);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.closestPointTo(point);
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.closestPointTo(point);
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.closestPointTo(point);
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.closestPointTo(point);
         }
         // For other curves, find closest by sampling
         java.util.List<CartesianPoint> samples = sampleCurveInternal(curve, 256);
@@ -366,5 +378,18 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
      */
     public Curve3 underlyingCurve() {
         return curve3d;
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * Delegates to the underlying 3D curve.
+     *
+     * @param point a point on or near the curve
+     * @return parameter value on the underlying curve
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return curve3d.parameterAt(point);
     }
 }

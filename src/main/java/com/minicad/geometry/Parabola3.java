@@ -220,4 +220,19 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
     public double focalLength() {
         return focalDistance;
     }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * For a parabola with parametric form x = 2*p*t, the parameter t = x / (2*p).
+     *
+     * @param point a point on or near the parabola
+     * @return parameter value t
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(position.location());
+        double x = offset.dot(position.xDirection().asVector());
+        return x / (2.0 * focalDistance);
+    }
 }

@@ -115,14 +115,7 @@ public record BSplineCurve3(
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Increased sampling density to better detect points on the curve
-        List<CartesianPoint> samples = sample(256);
-        for (CartesianPoint sample : samples) {
-            if (sample.distanceTo(point) <= 1.0e-6) {
-                return true;
-            }
-        }
-        return false;
+        return distanceTo(point) <= 1.0e-3;
     }
 
     /**
@@ -237,6 +230,7 @@ public record BSplineCurve3(
 
     /**
      * Returns the closest point on the curve to a given point.
+     * Uses sampling for initial guess then Newton-Raphson refinement.
      *
      * @param point target point
      * @return closest point on the curve
@@ -244,17 +238,33 @@ public record BSplineCurve3(
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
+        double start = startParameter();
+        double end = endParameter();
+        // Sampling-based initial guess
         java.util.List<CartesianPoint> samples = sample(256);
-        CartesianPoint closest = samples.get(0);
-        double minDistance = point.distanceTo(closest);
+        int bestIndex = 0;
+        double minDistance = point.distanceTo(samples.get(0));
         for (int i = 1; i < samples.size(); i++) {
             double distance = point.distanceTo(samples.get(i));
             if (distance < minDistance) {
                 minDistance = distance;
-                closest = samples.get(i);
+                bestIndex = i;
             }
         }
-        return closest;
+        double t = start + (end - start) * bestIndex / (samples.size() - 1);
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        // Update: dt = -(C(t)-P) . C'(t) / |C'(t)|^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(t);
+            Vector3 residual = cp.subtract(point);
+            Vector3 deriv = tangentAt(t);
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t = Math.max(start, Math.min(end, t + dt));
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(t);
     }
 
     /**
@@ -295,5 +305,43 @@ public record BSplineCurve3(
      */
     public int knotCount() {
         return knots.size();
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * Uses sampling for initial guess then Newton-Raphson refinement.
+     *
+     * @param point a point on or near the curve
+     * @return parameter value in knot-space [startParameter, endParameter]
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        double start = startParameter();
+        double end = endParameter();
+        // Sampling-based initial guess
+        java.util.List<CartesianPoint> samples = sample(256);
+        int bestIndex = 0;
+        double minDistance = point.distanceTo(samples.get(0));
+        for (int i = 1; i < samples.size(); i++) {
+            double distance = point.distanceTo(samples.get(i));
+            if (distance < minDistance) {
+                minDistance = distance;
+                bestIndex = i;
+            }
+        }
+        double t = start + (end - start) * bestIndex / (samples.size() - 1);
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(t);
+            Vector3 residual = cp.subtract(point);
+            Vector3 deriv = tangentAt(t);
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t = Math.max(start, Math.min(end, t + dt));
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return t;
     }
 }

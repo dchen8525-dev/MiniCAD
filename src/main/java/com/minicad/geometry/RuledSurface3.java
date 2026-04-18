@@ -160,7 +160,7 @@ public record RuledSurface3(Curve3 directrix1, Curve3 directrix2) implements Sur
 
     /**
      * Computes the normal at a given position on the ruled surface.
-     * The normal is computed from partial derivatives in U and V directions.
+     * The normal is computed analytically from curve tangents and ruling direction.
      *
      * @param u parameter along the directrix curves
      * @param v interpolation parameter between directrices
@@ -169,14 +169,16 @@ public record RuledSurface3(Curve3 directrix1, Curve3 directrix2) implements Sur
     public Vector3 normalAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        // Approximate normal using partial derivatives
-        double eps = 0.001;
-        CartesianPoint pu = pointAt(Math.max(0, u - eps), v);
-        CartesianPoint pu2 = pointAt(Math.min(1, u + eps), v);
-        CartesianPoint pv = pointAt(u, Math.max(0, v - eps));
-        CartesianPoint pv2 = pointAt(u, Math.min(1, v + eps));
-        Vector3 tangentU = pu2.subtract(pu);
-        Vector3 tangentV = pv2.subtract(pv);
+        // For ruled surface R(u,v) = (1-v)*C1(u) + v*C2(u):
+        // dR/du = (1-v)*C1'(u) + v*C2'(u)
+        // dR/dv = C2(u) - C1(u)
+        // normal = dR/du x dR/dv
+        Vector3 t1 = curveTangent(directrix1, u);
+        Vector3 t2 = curveTangent(directrix2, u);
+        Vector3 tangentU = t1.scale(1.0 - v).add(t2.scale(v));
+        CartesianPoint p1 = getPointOnCurve(directrix1, u);
+        CartesianPoint p2 = getPointOnCurve(directrix2, u);
+        Vector3 tangentV = p2.subtract(p1);
         if (tangentU.norm() <= Epsilon.EPS || tangentV.norm() <= Epsilon.EPS) {
             return new Vector3(0, 0, 1);
         }
@@ -185,6 +187,45 @@ public record RuledSurface3(Curve3 directrix1, Curve3 directrix2) implements Sur
             return new Vector3(0, 0, 1);
         }
         return normal.normalize().asVector();
+    }
+
+    private static Vector3 curveTangent(Curve3 curve, double parameter) {
+        if (curve instanceof BSplineCurve3 bspline) {
+            return bspline.tangentAt(parameter);
+        } else if (curve instanceof RationalBSplineCurve3 rational) {
+            return rational.tangentAt(parameter);
+        } else if (curve instanceof Circle circle) {
+            return circle.tangentAt(parameter);
+        } else if (curve instanceof Ellipse3 ellipse) {
+            return ellipse.tangentAt(parameter);
+        } else if (curve instanceof Line3 line) {
+            return line.tangentAt(parameter);
+        } else if (curve instanceof Polyline3 polyline) {
+            return polyline.tangentAt(parameter);
+        } else if (curve instanceof CompositeCurve3 composite) {
+            return composite.tangentAt(parameter);
+        } else if (curve instanceof TrimmedCurve3 trimmed) {
+            return trimmed.tangentAt(parameter);
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.tangentAt(parameter);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.tangentAt(parameter);
+        } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.tangentAt(parameter);
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.tangentAt(parameter);
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.tangentAt(parameter);
+        }
+        // Fallback: numerical differentiation
+        double eps = 0.001;
+        CartesianPoint p1 = getPointOnCurve(curve, parameter - eps);
+        CartesianPoint p2 = getPointOnCurve(curve, parameter + eps);
+        Vector3 tangent = p2.subtract(p1);
+        if (tangent.norm() <= Epsilon.EPS) {
+            return new Vector3(1, 0, 0);
+        }
+        return tangent.normalize().asVector();
     }
 
     /**
@@ -216,6 +257,18 @@ public record RuledSurface3(Curve3 directrix1, Curve3 directrix2) implements Sur
             return rational.boundingBox();
         } else if (curve instanceof CompositeCurve3 composite) {
             return composite.boundingBox();
+        } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.boundingBox();
+        } else if (curve instanceof Line3 line) {
+            return line.boundingBox(0.0, 1.0);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.boundingBox();
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.boundingBox();
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.boundingBox();
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.boundingBox();
         }
         // For other curves, sample and compute
         BoundingBox3 box = BoundingBox3.empty();

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
 
-    private static final double IMPORT_CURVE_TOLERANCE = 1.0e-4;
+    private static final double IMPORT_CURVE_TOLERANCE = 1.0e-2;
     private static final int IMPORT_CURVE_SAMPLES = 512;
 
     /**

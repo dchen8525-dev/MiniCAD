@@ -1076,7 +1076,507 @@ function rebuildParametricFaceGeometry(node) {
         });
         return;
     }
-    if (!Number.isFinite(surface.radius)) {
+    if (surface.type === 'spherical_surface' && Number.isFinite(surface.radius)) {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = vectorFromArray(surface.xDirection).normalize();
+        const yDirection = orthonormalY(axis, xDirection);
+        const center = vectorFromArray(surface.center);
+        const uMin = surface.trimU1 ?? 0;
+        const uMax = surface.trimU2 ?? Math.PI * 2;
+        const vMin = surface.trimV1 ?? -Math.PI / 2;
+        const vMax = surface.trimV2 ?? Math.PI / 2;
+        const uSpan = uMax - uMin;
+        const vSpan = vMax - vMin;
+        const radialSegments = Math.max(96, Math.ceil(Math.abs(uSpan) / (Math.PI / 180.0)));
+        const heightSegments = Math.max(48, Math.ceil(Math.abs(vSpan) / (Math.PI / 180.0)));
+        const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const lat = vMin + vSpan * v / heightSegments;
+            const cosLat = Math.cos(lat);
+            const sinLat = Math.sin(lat);
+            for (let u = 0; u <= radialSegments; u += 1) {
+                const lon = uMin + uSpan * u / radialSegments;
+                const cosLon = Math.cos(lon);
+                const sinLon = Math.sin(lon);
+                const offset = (v * (radialSegments + 1) + u) * 3;
+                const dir = xDirection.clone().multiplyScalar(cosLat * cosLon)
+                    .addScaledVector(yDirection, cosLat * sinLon)
+                    .addScaledVector(axis, sinLat);
+                positions[offset] = center.x + dir.x * surface.radius;
+                positions[offset + 1] = center.y + dir.y * surface.radius;
+                positions[offset + 2] = center.z + dir.z * surface.radius;
+                const n = sameSense ? dir : dir.multiplyScalar(-1);
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < radialSegments; u += 1) {
+                const a = v * (radialSegments + 1) + u;
+                const b = a + 1;
+                const c = a + radialSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            radialSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'surface_of_revolution') {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = vectorFromArray(surface.xDirection).normalize();
+        const yDirection = orthonormalY(axis, xDirection);
+        const center = vectorFromArray(surface.center);
+        const profileRadius = surface.radius || 1.0;
+        const sweep = surface.sweepAngle ?? Math.PI * 2;
+        const heightSpan = (surface.upperHeight ?? 0) - (surface.lowerHeight ?? 0);
+        const radialSegments = Math.max(192, Math.ceil(Math.abs(sweep) / (Math.PI / 360.0)));
+        const heightSegments = Math.max(12, Math.min(96, Math.ceil(Math.abs(heightSpan) / Math.max(profileRadius * 0.08, 1.0))));
+        const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const height = surface.lowerHeight + heightSpan * v / heightSegments;
+            for (let u = 0; u <= radialSegments; u += 1) {
+                const angle = surface.startAngle + sweep * u / radialSegments;
+                const radial = xDirection.clone().multiplyScalar(Math.cos(angle))
+                    .addScaledVector(yDirection, Math.sin(angle));
+                const offset = (v * (radialSegments + 1) + u) * 3;
+                positions[offset] = center.x + radial.x * profileRadius + axis.x * height;
+                positions[offset + 1] = center.y + radial.y * profileRadius + axis.y * height;
+                positions[offset + 2] = center.z + radial.z * profileRadius + axis.z * height;
+                const n = sameSense ? radial : radial.clone().multiplyScalar(-1);
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < radialSegments; u += 1) {
+                const a = v * (radialSegments + 1) + u;
+                const b = a + 1;
+                const c = a + radialSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            radialSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'surface_of_linear_extrusion') {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = surface.xDirection ? vectorFromArray(surface.xDirection).normalize() : null;
+        const heightSpan = (surface.upperHeight ?? 0) - (surface.lowerHeight ?? 0);
+        const uMin = surface.trimU1 ?? 0;
+        const uMax = surface.trimU2 ?? 1;
+        const uSpan = uMax - uMin;
+        const radialSegments = Math.max(96, Math.ceil(Math.abs(uSpan) * 48));
+        const heightSegments = Math.max(8, Math.min(48, Math.ceil(Math.abs(heightSpan))));
+        const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const h = surface.lowerHeight + heightSpan * v / heightSegments;
+            for (let u = 0; u <= radialSegments; u += 1) {
+                const t = uMin + uSpan * u / radialSegments;
+                const baseX = xDirection ? xDirection.x * t : t;
+                const baseY = xDirection ? xDirection.y * t : 0;
+                const baseZ = xDirection ? xDirection.z * t : 0;
+                const offset = (v * (radialSegments + 1) + u) * 3;
+                positions[offset] = (surface.center?.[0] ?? 0) + baseX + axis.x * h;
+                positions[offset + 1] = (surface.center?.[1] ?? 0) + baseY + axis.y * h;
+                positions[offset + 2] = (surface.center?.[2] ?? 0) + baseZ + axis.z * h;
+                let tangent = xDirection || new THREE.Vector3(1, 0, 0);
+                let n = tangent.clone().cross(axis).normalize();
+                if (n.length() < 0.001) {
+                    n = new THREE.Vector3(0, 1, 0).cross(axis).normalize();
+                }
+                if (!sameSense) {
+                    n.multiplyScalar(-1);
+                }
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < radialSegments; u += 1) {
+                const a = v * (radialSegments + 1) + u;
+                const b = a + 1;
+                const c = a + radialSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            radialSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'rational_bspline_surface' && Array.isArray(surface.controlPoints) && surface.controlPoints.length > 0) {
+        const uMin = surface.trimU1 ?? surface.uStart ?? 0;
+        const uMax = surface.trimU2 ?? surface.uEnd ?? 1;
+        const vMin = surface.trimV1 ?? surface.vStart ?? 0;
+        const vMax = surface.trimV2 ?? surface.vEnd ?? 1;
+        const uSegments = Math.min(96, Math.max(24, surface.controlPoints.length * 4));
+        const vSegments = Math.min(96, Math.max(24, (surface.controlPoints[0]?.length ?? 1) * 4));
+        const vertexCount = (uSegments + 1) * (vSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= vSegments; v += 1) {
+            const sv = vMin + (vMax - vMin) * v / vSegments;
+            for (let u = 0; u <= uSegments; u += 1) {
+                const su = uMin + (uMax - uMin) * u / uSegments;
+                const offset = (v * (uSegments + 1) + u) * 3;
+                const point = bsplineSurfacePoint(surface, su, sv);
+                positions[offset] = point.x;
+                positions[offset + 1] = point.y;
+                positions[offset + 2] = point.z;
+                const normal = bsplineSurfaceNormal(surface, su, sv);
+                const n = sameSense ? normal : normal.clone().multiplyScalar(-1);
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < vSegments; v += 1) {
+            for (let u = 0; u < uSegments; u += 1) {
+                const a = v * (uSegments + 1) + u;
+                const b = a + 1;
+                const c = a + uSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            uSegments,
+            vSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'paraboloid_surface') {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = vectorFromArray(surface.xDirection).normalize();
+        const yDirection = orthonormalY(axis, xDirection);
+        const center = vectorFromArray(surface.center);
+        const focalLength = surface.radius;
+        const uMin = surface.trimU1 ?? 0;
+        const uMax = surface.trimU2 ?? Math.PI * 2;
+        const vMin = surface.trimV1 ?? 0;
+        const vMax = surface.trimV2 ?? 1.0;
+        const uSpan = uMax - uMin;
+        const vSpan = vMax - vMin;
+        const radialSegments = Math.max(96, Math.ceil(Math.abs(uSpan) / (Math.PI / 180.0)));
+        const heightSegments = Math.max(24, Math.ceil(Math.abs(vSpan) * 48));
+        const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const vz = vMin + vSpan * v / heightSegments;
+            const r = Math.sqrt(4.0 * focalLength * Math.max(0.0, vz));
+            for (let u = 0; u <= radialSegments; u += 1) {
+                const angle = uMin + uSpan * u / radialSegments;
+                const offset = (v * (radialSegments + 1) + u) * 3;
+                const lx = r * Math.cos(angle);
+                const ly = r * Math.sin(angle);
+                const lz = vz;
+                positions[offset] = center.x + xDirection.x * lx + yDirection.x * ly + axis.x * lz;
+                positions[offset + 1] = center.y + xDirection.y * lx + yDirection.y * ly + axis.y * lz;
+                positions[offset + 2] = center.z + xDirection.z * lx + yDirection.z * ly + axis.z * lz;
+                // Gradient of F(x,y,z) = x^2 + y^2 - 4*f*z: (2x, 2y, -4f) in local
+                const nx = 2.0 * lx;
+                const ny = 2.0 * ly;
+                const nz = -4.0 * focalLength;
+                const localNormal = new THREE.Vector3(nx, ny, nz).normalize();
+                const n = new THREE.Vector3(
+                    xDirection.x * localNormal.x + yDirection.x * localNormal.y + axis.x * localNormal.z,
+                    xDirection.y * localNormal.x + yDirection.y * localNormal.y + axis.y * localNormal.z,
+                    xDirection.z * localNormal.x + yDirection.z * localNormal.y + axis.z * localNormal.z
+                ).normalize();
+                const finalN = sameSense ? n : n.multiplyScalar(-1);
+                normals[offset] = finalN.x;
+                normals[offset + 1] = finalN.y;
+                normals[offset + 2] = finalN.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < radialSegments; u += 1) {
+                const a = v * (radialSegments + 1) + u;
+                const b = a + 1;
+                const c = a + radialSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            radialSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'hyperboloid_surface') {
+        const axis = vectorFromArray(surface.axis).normalize();
+        const xDirection = vectorFromArray(surface.xDirection).normalize();
+        const yDirection = orthonormalY(axis, xDirection);
+        const center = vectorFromArray(surface.center);
+        const waistRadius = surface.radius;
+        const semiAxis = surface.semiAngle;
+        const uMin = surface.trimU1 ?? 0;
+        const uMax = surface.trimU2 ?? Math.PI * 2;
+        const vMin = surface.trimV1 ?? -1.0;
+        const vMax = surface.trimV2 ?? 1.0;
+        const uSpan = uMax - uMin;
+        const vSpan = vMax - vMin;
+        const radialSegments = Math.max(96, Math.ceil(Math.abs(uSpan) / (Math.PI / 180.0)));
+        const heightSegments = Math.max(24, Math.ceil(Math.abs(vSpan) * 48));
+        const vertexCount = (radialSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const z = vMin + vSpan * v / heightSegments;
+            const factor = Math.sqrt(1.0 + (z * z) / (semiAxis * semiAxis));
+            const r = waistRadius * factor;
+            for (let u = 0; u <= radialSegments; u += 1) {
+                const angle = uMin + uSpan * u / radialSegments;
+                const offset = (v * (radialSegments + 1) + u) * 3;
+                const lx = r * Math.cos(angle);
+                const ly = r * Math.sin(angle);
+                positions[offset] = center.x + xDirection.x * lx + yDirection.x * ly + axis.x * z;
+                positions[offset + 1] = center.y + xDirection.y * lx + yDirection.y * ly + axis.y * z;
+                positions[offset + 2] = center.z + xDirection.z * lx + yDirection.z * ly + axis.z * z;
+                // Gradient: (2x, 2y, -2*r0^2*z/b^2) in local
+                const nx = 2.0 * lx;
+                const ny = 2.0 * ly;
+                const nz = -2.0 * waistRadius * waistRadius * z / (semiAxis * semiAxis);
+                const localNormal = new THREE.Vector3(nx, ny, nz).normalize();
+                const n = new THREE.Vector3(
+                    xDirection.x * localNormal.x + yDirection.x * localNormal.y + axis.x * localNormal.z,
+                    xDirection.y * localNormal.x + yDirection.y * localNormal.y + axis.y * localNormal.z,
+                    xDirection.z * localNormal.x + yDirection.z * localNormal.y + axis.z * localNormal.z
+                ).normalize();
+                const finalN = sameSense ? n : n.multiplyScalar(-1);
+                normals[offset] = finalN.x;
+                normals[offset + 1] = finalN.y;
+                normals[offset + 2] = finalN.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < radialSegments; u += 1) {
+                const a = v * (radialSegments + 1) + u;
+                const b = a + 1;
+                const c = a + radialSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            radialSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (surface.type === 'surface_of_translation' || surface.type === 'surface_of_projection') {
+        const dir = vectorFromArray(surface.axis).normalize();
+        let xDirection = dir.clone().cross(new THREE.Vector3(1, 0, 0)).normalize();
+        if (xDirection.length() < 0.001) {
+            xDirection.copy(dir.clone().cross(new THREE.Vector3(0, 1, 0)).normalize());
+        }
+        const yDirection = dir.clone().cross(xDirection).normalize();
+        const center = surface.center ? vectorFromArray(surface.center) : new THREE.Vector3(0, 0, 0);
+        const uMin = surface.trimU1 ?? 0;
+        const uMax = surface.trimU2 ?? 1.0;
+        const vSpan = ((surface.upperHeight ?? 0) - (surface.lowerHeight ?? 0)) || 1.0;
+        const vStart = surface.lowerHeight ?? 0;
+        const uSpan = uMax - uMin;
+        const curveSegments = Math.max(48, Math.ceil(Math.abs(uSpan) * 48));
+        const heightSegments = Math.max(8, Math.min(48, Math.ceil(Math.abs(vSpan))));
+        const vertexCount = (curveSegments + 1) * (heightSegments + 1);
+        const positions = new Float32Array(vertexCount * 3);
+        const normals = new Float32Array(vertexCount * 3);
+        const indices = [];
+        const sameSense = node.userData?.sameSense !== false;
+
+        for (let v = 0; v <= heightSegments; v += 1) {
+            const t = vStart + vSpan * v / heightSegments;
+            for (let u = 0; u <= curveSegments; u += 1) {
+                const s = uMin + uSpan * u / curveSegments;
+                const offset = (v * (curveSegments + 1) + u) * 3;
+                const lx = s;
+                const ly = 0;
+                const lz = 0;
+                positions[offset] = center.x + xDirection.x * lx + yDirection.y * ly + dir.x * t;
+                positions[offset + 1] = center.y + xDirection.y * lx + yDirection.y * ly + dir.y * t;
+                positions[offset + 2] = center.z + xDirection.z * lx + yDirection.z * ly + dir.z * t;
+                const tangent = xDirection;
+                let n = tangent.clone().cross(dir).normalize();
+                if (n.length() < 0.001) {
+                    n = new THREE.Vector3(0, 1, 0).cross(dir).normalize();
+                }
+                if (!sameSense) {
+                    n.multiplyScalar(-1);
+                }
+                normals[offset] = n.x;
+                normals[offset + 1] = n.y;
+                normals[offset + 2] = n.z;
+            }
+        }
+
+        for (let v = 0; v < heightSegments; v += 1) {
+            for (let u = 0; u < curveSegments; u += 1) {
+                const a = v * (curveSegments + 1) + u;
+                const b = a + 1;
+                const c = a + curveSegments + 1;
+                const d = c + 1;
+                if (sameSense) {
+                    indices.push(a, c, d, a, d, b);
+                } else {
+                    indices.push(a, d, c, a, b, d);
+                }
+            }
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+        geometry.setIndex(indices);
+        node.geometry.dispose();
+        node.geometry = geometry;
+        logJson('parametricFace:rebuilt', {
+            ...faceLog,
+            parametricType: surface.type,
+            curveSegments,
+            heightSegments,
+            rebuiltVertexCount: vertexCount,
+            rebuiltIndexCount: indices.length
+        });
+        return;
+    }
+
+    if (!Number.isFinite(surface.radius) || surface.radius === 0.0) {
         logJson('parametricFace:skip', { ...faceLog, reason: 'missing-radius' });
         return;
     }
@@ -1108,14 +1608,14 @@ function rebuildParametricFaceGeometry(node) {
                 point = center.clone()
                     .addScaledVector(radial, surface.radius)
                     .addScaledVector(axis, height);
-                normal = sameSense ? radial : radial.multiplyScalar(-1);
+                normal = sameSense ? radial : radial.clone().multiplyScalar(-1);
             } else if (surface.type === 'conical_strip' && Number.isFinite(surface.semiAngle)) {
                 const radius = surface.radius + height * Math.tan(surface.semiAngle);
                 point = center.clone()
                     .addScaledVector(radial, radius)
                     .addScaledVector(axis, height);
                 const baseNormal = radial.clone().addScaledVector(axis, -Math.tan(surface.semiAngle)).normalize();
-                normal = sameSense ? baseNormal : baseNormal.multiplyScalar(-1);
+                normal = sameSense ? baseNormal : baseNormal.clone().multiplyScalar(-1);
             } else if (surface.type === 'toroidal_strip' && Number.isFinite(surface.minorRadius)) {
                 const minorAngle = height;
                 const ringRadius = surface.radius + surface.minorRadius * Math.cos(minorAngle);
@@ -1127,7 +1627,7 @@ function rebuildParametricFaceGeometry(node) {
                     .addScaledVector(yDirection, Math.sin(angle) * Math.cos(minorAngle))
                     .addScaledVector(axis, Math.sin(minorAngle))
                     .normalize();
-                normal = sameSense ? baseNormal : baseNormal.multiplyScalar(-1);
+                normal = sameSense ? baseNormal : baseNormal.clone().multiplyScalar(-1);
             } else {
                 logJson('parametricFace:skip', { ...faceLog, reason: 'unsupported-parametric-type' });
                 return;

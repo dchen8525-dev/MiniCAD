@@ -142,6 +142,16 @@ public record Circle2(Point2 center, Direction2 xDirection, double radius) imple
      *
      * @return circumference (2*PI*radius)
      */
+    @Override
+    public double length() {
+        return circumference();
+    }
+
+    /**
+     * Returns the circumference of the circle.
+     *
+     * @return circumference (2*PI*radius)
+     */
     public double circumference() {
         return 2.0 * Math.PI * radius;
     }

@@ -18,6 +18,13 @@ import java.util.List;
 public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean sameSense) {
 
     /**
+     * Tolerance for validating that loop vertices lie on the supporting plane
+     * during STEP import. Industrial CAD files often have coordinates rounded
+     * to 6-8 decimal places, producing offsets of 1e-6 to 1e-4 mm.
+     */
+    private static final double IMPORT_PLANE_TOLERANCE = 1.0e-2;
+
+    /**
      * Creates a face and validates that planar loop vertices lie on the plane.
      */
     public Face {
@@ -42,20 +49,20 @@ public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean same
             }
             if (surface instanceof Plane plane && bound.loop() instanceof EdgeLoop edgeLoop) {
                 for (OrientedEdge edge : edgeLoop.edges()) {
-                    if (!plane.contains(edge.startVertex().point())) {
+                    if (!planeContains(plane, edge.startVertex().point())) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
-                    if (!plane.contains(edge.endVertex().point())) {
+                    if (!planeContains(plane, edge.endVertex().point())) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
                 }
             } else if (surface instanceof Plane plane && bound.loop() instanceof VertexLoop vertexLoop) {
-                if (!plane.contains(vertexLoop.vertex().point())) {
+                if (!planeContains(plane, vertexLoop.vertex().point())) {
                     throw new TopologyException("all face vertices must lie on the plane");
                 }
             } else if (surface instanceof Plane plane && bound.loop() instanceof PolyLoop polyLoop) {
                 for (var point : polyLoop.points()) {
-                    if (!plane.contains(point)) {
+                    if (!planeContains(plane, point)) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
                 }
@@ -64,6 +71,10 @@ public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean same
         if (!hasOuter) {
             throw new TopologyException("face must contain an outer bound");
         }
+    }
+
+    private static boolean planeContains(Plane plane, CartesianPoint point) {
+        return Math.abs(plane.signedDistanceTo(point)) <= IMPORT_PLANE_TOLERANCE;
     }
 
     /**

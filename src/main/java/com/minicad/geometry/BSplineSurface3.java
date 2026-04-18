@@ -101,18 +101,60 @@ public record BSplineSurface3(
     }
 
     public Vector3 normalAt(double u, double v) {
-        double du = Math.max((uEnd() - uStart()) / 200.0, 1.0e-4);
-        double dv = Math.max((vEnd() - vStart()) / 200.0, 1.0e-4);
-        CartesianPoint p = pointAt(u, v);
-        CartesianPoint pu = pointAt(clamp(u + du, uStart(), uEnd()), v);
-        CartesianPoint pv = pointAt(u, clamp(v + dv, vStart(), vEnd()));
-        Vector3 tangentU = pu.subtract(p);
-        Vector3 tangentV = pv.subtract(p);
-        Vector3 normal = tangentU.cross(tangentV);
+        List<Double> uExpanded = expandedKnots(uKnots, uMultiplicities);
+        List<Double> vExpanded = expandedKnots(vKnots, vMultiplicities);
+        double clampedU = clamp(u, uStart(), uEnd());
+        double clampedV = clamp(v, vStart(), vEnd());
+
+        int uCount = controlPoints.size();
+        int vCount = controlPoints.getFirst().size();
+
+        int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExpanded);
+        int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExpanded);
+
+        // Compute partial derivatives analytically
+        // dS/du = Σ N_i'(u) * N_j(v) * P_ij
+        // dS/dv = Σ N_i(u) * N_j'(v) * P_ij
+        Vector3 dSdu = new Vector3(0.0, 0.0, 0.0);
+        Vector3 dSdv = new Vector3(0.0, 0.0, 0.0);
+        for (int i = 0; i <= uDegree; i++) {
+            int ui = uSpan - uDegree + i;
+            double nu = basisValue(ui, uDegree, clampedU, uExpanded);
+            double dNu = derivativeBasisValue(ui, uDegree, clampedU, uExpanded);
+            for (int j = 0; j <= vDegree; j++) {
+                int vj = vSpan - vDegree + j;
+                double nv = basisValue(vj, vDegree, clampedV, vExpanded);
+                double dNv = derivativeBasisValue(vj, vDegree, clampedV, vExpanded);
+                CartesianPoint cp = controlPoints.get(ui).get(vj);
+                Vector3 cpVec = new Vector3(cp.x(), cp.y(), cp.z());
+                dSdu = dSdu.add(cpVec.scale(dNu * nv));
+                dSdv = dSdv.add(cpVec.scale(nu * dNv));
+            }
+        }
+
+        Vector3 normal = dSdu.cross(dSdv);
         if (normal.norm() <= Epsilon.EPS) {
             return new Vector3(0.0, 0.0, 1.0);
         }
         return normal.normalize().asVector();
+    }
+
+    /**
+     * Computes the derivative of a B-spline basis function.
+     * N_i'(u) = p/(u_{i+p} - u_i) * N_{i,p-1}(u) - p/(u_{i+p+1} - u_{i+1}) * N_{i+1,p-1}(u)
+     */
+    private static double derivativeBasisValue(int i, int degree, double parameter, List<Double> knots) {
+        double left = 0.0;
+        double right = 0.0;
+        double leftDenom = knots.get(i + degree) - knots.get(i);
+        if (!Epsilon.isZero(leftDenom)) {
+            left = degree / leftDenom * basisValue(i, degree - 1, parameter, knots);
+        }
+        double rightDenom = knots.get(i + degree + 1) - knots.get(i + 1);
+        if (!Epsilon.isZero(rightDenom)) {
+            right = degree / rightDenom * basisValue(i + 1, degree - 1, parameter, knots);
+        }
+        return left - right;
     }
 
     public List<List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {

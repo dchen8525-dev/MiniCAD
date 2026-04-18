@@ -63,6 +63,14 @@ public record SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radi
             return offset.pointAt(u, v);
         } else if (sweptSurface instanceof SurfaceOfConstantRadius3 constant) {
             return constant.pointAt(u, v);
+        } else if (sweptSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.pointAt(u, v);
+        } else if (sweptSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.pointAt(u, v);
+        } else if (sweptSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.pointAt(u, v);
+        } else if (sweptSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.pointAt(u, v);
         }
         return new CartesianPoint(0, 0, 0);
     }
@@ -91,6 +99,18 @@ public record SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radi
             return getRevolutionNormal(revolution, u, v);
         } else if (sweptSurface instanceof RuledSurface3 ruled) {
             return getRuledNormal(ruled, u, v);
+        } else if (sweptSurface instanceof OffsetSurface3 offset) {
+            return offset.normalAt(u, v);
+        } else if (sweptSurface instanceof SurfaceOfConstantRadius3 constant) {
+            return constant.normalAt(u, v);
+        } else if (sweptSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.normalAt(u, v);
+        } else if (sweptSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.normalAt(u, v);
+        } else if (sweptSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.normalAt(u, v);
+        } else if (sweptSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.normalAt(u, v);
         }
         return new Vector3(0, 0, 1);
     }
@@ -250,6 +270,14 @@ public record SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radi
             return offset.sampleGrid(uSegments, vSegments);
         } else if (sweptSurface instanceof SurfaceOfConstantRadius3 constant) {
             return constant.sampleGrid(uSegments, vSegments);
+        } else if (sweptSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.sampleGrid(uSegments, vSegments);
+        } else if (sweptSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.sampleGrid(uSegments, vSegments);
+        } else if (sweptSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.sampleGrid(uSegments, vSegments);
+        } else if (sweptSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.sampleGrid(uSegments, vSegments);
         }
         return java.util.List.of();
     }
@@ -264,6 +292,17 @@ public record SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radi
         BoundingBox3 basisBox = getBasisBoundingBox();
         // Expand by radius in all directions
         return basisBox.expand(radius);
+    }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        Vector3 basisNormal = getNormalAt(u, v);
+        if (basisNormal.norm() <= Epsilon.EPS) {
+            return new Vector3(0, 0, 1);
+        }
+        return basisNormal.normalize().asVector();
     }
 
     /**
@@ -290,6 +329,8 @@ public record SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radi
             return ruled.boundingBox();
         } else if (sweptSurface instanceof OffsetSurface3 offset) {
             return offset.boundingBox();
+        } else if (sweptSurface instanceof SurfaceOfConstantRadius3 constant) {
+            return constant.boundingBox();
         }
         // For other surfaces, sample and compute
         BoundingBox3 box = BoundingBox3.empty();

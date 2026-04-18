@@ -488,6 +488,7 @@ public final class StepDumpApp {
         int standalonePathEntities = 0;
         int standaloneContainerEntities = 0;
         int unsupportedFaces = 0;
+        int skipped2DEntities = 0;
         Map<String, Integer> unsupportedReasons = new LinkedHashMap<>();
         Map<String, Integer> unsupportedReasonCodes = new LinkedHashMap<>();
         Set<Integer> shellFaceIds = collectShellFaceIds(resolved.values());
@@ -995,6 +996,11 @@ public final class StepDumpApp {
                     int itemCount = validateRepresentation(representation, builder);
                     lines.add("  " + stepEntityTypeName(representation) + " #" + representation.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
                 } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
+                    if (is2DPcurveEntity(entity)) {
+                        standaloneContainerEntities--;
+                        skipped2DEntities++;
+                        continue;
+                    }
                     String reason = normalizeReason(ex.getMessage());
                     String reasonCode = classifyReasonCode(ex, reason);
                     lines.add("  " + stepEntityTypeName(representation) + " #" + representation.id() + ": builtItems=0, unsupportedFaces=1");
@@ -1120,6 +1126,11 @@ public final class StepDumpApp {
                         standaloneContainerEntities--;
                         continue;
                     }
+                    if (is2DPcurveEntity(entity)) {
+                        standaloneContainerEntities--;
+                        skipped2DEntities++;
+                        continue;
+                    }
                     String reasonCode = classifyReasonCode(ex, reason);
                     lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": builtItems=0, unsupportedFaces=1");
                     appendUnsupportedReasons(lines, Map.of(reason, 1));
@@ -1128,6 +1139,11 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 } catch (GeometryException | TopologyException | StepResolutionException ex) {
+                    if (is2DPcurveEntity(entity)) {
+                        standaloneContainerEntities--;
+                        skipped2DEntities++;
+                        continue;
+                    }
                     String reason = normalizeReason(ex.getMessage());
                     String reasonCode = classifyReasonCode(ex, reason);
                     lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": builtItems=0, unsupportedFaces=1");
@@ -1147,6 +1163,7 @@ public final class StepDumpApp {
                 + ", standaloneLoopEntities=" + standaloneLoopEntities
                 + ", standalonePathEntities=" + standalonePathEntities
                 + ", standaloneContainerEntities=" + standaloneContainerEntities
+                + ", skipped2DEntities=" + skipped2DEntities
                 + ", unsupportedFaces=" + unsupportedFaces);
         appendUnsupportedReasons(lines, unsupportedReasons);
         appendUnsupportedReasonCodes(lines, unsupportedReasonCodes);
@@ -1671,6 +1688,30 @@ public final class StepDumpApp {
 
     private static boolean isGenericDumpUnsupported(StepEntity entity, String reason) {
         return reason.equals(stepEntityTypeName(entity) + " dump validation is unsupported");
+    }
+
+    /**
+     * Returns true if the entity is a 2D/pcurve/semantic support type that should
+     * not count toward unsupportedFaces when validation fails. These include 2D
+     * curves in surface parameter space, pcurves, and non-geometry support
+     * entities (directions, vectors, representation contexts).
+     */
+    private static boolean is2DPcurveEntity(StepEntity entity) {
+        return entity instanceof StepPcurve
+                || entity instanceof StepDegeneratePcurve
+                || entity instanceof StepOffsetCurve2D
+                || entity instanceof StepAxis2Placement2D
+                || entity instanceof com.minicad.step.model.StepCurve2D
+                || entity instanceof com.minicad.step.model.StepCircle2D
+                || entity instanceof com.minicad.step.model.StepEllipse2D
+                || entity instanceof com.minicad.step.model.StepHyperbola2D
+                || entity instanceof com.minicad.step.model.StepParabola2D
+                || entity instanceof com.minicad.step.model.StepTrimmedCurve2D
+                || entity instanceof StepTrimmedCurve
+                || entity instanceof StepRepresentation
+                || entity instanceof StepDirection
+                || entity instanceof StepVector
+                || entity instanceof StepRepresentationContext;
     }
 
     private static int validateSummaryEntity(StepEntity entity, StepCadBuilder builder) {

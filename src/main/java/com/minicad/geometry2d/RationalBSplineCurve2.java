@@ -200,6 +200,21 @@ public record RationalBSplineCurve2(
     }
 
     /**
+     * Returns the approximate arc length of the curve.
+     *
+     * @return arc length
+     */
+    @Override
+    public double length() {
+        List<Point2> samples = sample(128);
+        double total = 0.0;
+        for (int i = 1; i < samples.size(); i++) {
+            total += samples.get(i).distanceTo(samples.get(i - 1));
+        }
+        return total;
+    }
+
+    /**
      * Returns the closest point on the curve to a given point.
      *
      * @param point target point

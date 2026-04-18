@@ -176,6 +176,11 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
         return Math.PI * (a + b) * (1.0 + 3.0 * h / (10.0 + Math.sqrt(4.0 - 3.0 * h)));
     }
 
+    @Override
+    public double length() {
+        return perimeter();
+    }
+
     /**
      * Returns the bounding box of the full ellipse.
      *
@@ -261,5 +266,22 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = closestPointTo(point);
         return point.distanceTo(closest);
+    }
+
+    /**
+     * Returns the curve parameter (angle) corresponding to the given point.
+     * Projects the point onto the ellipse plane and computes the normalized angle.
+     *
+     * @param point a point on or near the ellipse
+     * @return angle in radians in [0, 2*pi)
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(position.location());
+        double x = offset.dot(position.xDirection().asVector()) / semiAxis1;
+        double y = offset.dot(position.yDirection().asVector()) / semiAxis2;
+        double angle = Math.atan2(y, x);
+        return angle >= 0.0 ? angle : angle + Math.PI * 2.0;
     }
 }

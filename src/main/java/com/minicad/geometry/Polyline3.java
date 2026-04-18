@@ -246,4 +246,35 @@ public record Polyline3(List<CartesianPoint> points) implements Curve3 {
         t = Math.max(0.0, Math.min(1.0, t));
         return start.add(segment.scale(t));
     }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * The parameter is in [0,1], distributed uniformly across segments.
+     *
+     * @param point a point on or near the polyline
+     * @return parameter value in [0,1]
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint closest = closestPointTo(point);
+        int n = points.size() - 1;
+        for (int i = 0; i < n; i++) {
+            CartesianPoint start = points.get(i);
+            CartesianPoint end = points.get(i + 1);
+            Vector3 seg = end.subtract(start);
+            double segLenSq = seg.dot(seg);
+            if (segLenSq <= Epsilon.EPS) {
+                if (closest.distanceTo(start) <= Epsilon.EPS) {
+                    return (double) i / n;
+                }
+                continue;
+            }
+            double t = closest.subtract(start).dot(seg) / segLenSq;
+            if (t >= -Epsilon.EPS && t <= 1.0 + Epsilon.EPS) {
+                return (double) (i + t) / n;
+            }
+        }
+        return 0.0;
+    }
 }

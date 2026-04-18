@@ -268,4 +268,31 @@ public record Circle(Axis2Placement3D position, double radius) implements Curve3
         CartesianPoint closest = closestPointTo(point);
         return point.distanceTo(closest);
     }
+
+    /**
+     * Returns the curve parameter (angle) corresponding to the given point.
+     * Projects the point onto the circle plane and computes the angle.
+     *
+     * @param point a point on or near the circle
+     * @return angle in radians in [0, 2*pi)
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(position.location());
+        double x = offset.dot(position.xDirection().asVector());
+        double y = offset.dot(position.yDirection().asVector());
+        double angle = Math.atan2(y, x);
+        return angle >= 0.0 ? angle : angle + Math.PI * 2.0;
+    }
+
+    /**
+     * Returns the circumference of the circle (2*pi*r).
+     *
+     * @return circumference
+     */
+    @Override
+    public double length() {
+        return circumference();
+    }
 }

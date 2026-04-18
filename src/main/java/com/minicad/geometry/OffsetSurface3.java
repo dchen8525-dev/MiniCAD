@@ -55,10 +55,25 @@ public record OffsetSurface3(SurfaceGeometry basisSurface, double distance) impl
             return revolution.pointAt(u, v);
         } else if (basisSurface instanceof RuledSurface3 ruled) {
             return ruled.pointAt(u, v);
+        } else if (basisSurface instanceof Plane plane) {
+            Vector3 n = plane.normal().asVector();
+            Vector3 xDir = n.cross(new Vector3(1, 0, 0)).normalize().asVector();
+            if (xDir.norm() < 0.01) xDir = n.cross(new Vector3(0, 1, 0)).normalize().asVector();
+            Vector3 yDir = n.cross(xDir).normalize().asVector();
+            Vector3 offset = xDir.scale(u).add(yDir.scale(v));
+            return plane.origin().add(offset);
         } else if (basisSurface instanceof OffsetSurface3 offset) {
             return offset.pointAt(u, v);
         } else if (basisSurface instanceof SurfaceOfConstantRadius3 constant) {
             return constant.pointAt(u, v);
+        } else if (basisSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.pointAt(u, v);
+        } else if (basisSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.pointAt(u, v);
+        } else if (basisSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.pointAt(u, v);
+        } else if (basisSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.pointAt(u, v);
         }
         return new CartesianPoint(0, 0, 0);
     }
@@ -87,6 +102,18 @@ public record OffsetSurface3(SurfaceGeometry basisSurface, double distance) impl
             return getRevolutionNormal(revolution, u, v);
         } else if (basisSurface instanceof RuledSurface3 ruled) {
             return getRuledNormal(ruled, u, v);
+        } else if (basisSurface instanceof OffsetSurface3 offset) {
+            return offset.normalAt(u, v);
+        } else if (basisSurface instanceof SurfaceOfConstantRadius3 constant) {
+            return constant.normalAt(u, v);
+        } else if (basisSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.normalAt(u, v);
+        } else if (basisSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.normalAt(u, v);
+        } else if (basisSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.normalAt(u, v);
+        } else if (basisSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.normalAt(u, v);
         }
         // Default fallback
         return new Vector3(0, 0, 1);
@@ -253,6 +280,14 @@ public record OffsetSurface3(SurfaceGeometry basisSurface, double distance) impl
             return offset.sampleGrid(uSegments, vSegments);
         } else if (basisSurface instanceof SurfaceOfConstantRadius3 constant) {
             return constant.sampleGrid(uSegments, vSegments);
+        } else if (basisSurface instanceof ParaboloidSurface paraboloid) {
+            return paraboloid.sampleGrid(uSegments, vSegments);
+        } else if (basisSurface instanceof HyperboloidSurface hyperboloid) {
+            return hyperboloid.sampleGrid(uSegments, vSegments);
+        } else if (basisSurface instanceof SurfaceOfTranslation3 translation) {
+            return translation.sampleGrid(uSegments, vSegments);
+        } else if (basisSurface instanceof SurfaceOfProjection3 projection) {
+            return projection.sampleGrid(uSegments, vSegments);
         }
         return java.util.List.of();
     }
@@ -267,6 +302,17 @@ public record OffsetSurface3(SurfaceGeometry basisSurface, double distance) impl
         BoundingBox3 basisBox = getBasisBoundingBox();
         // Expand by offset distance in all directions
         return basisBox.expand(Math.abs(distance));
+    }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        Vector3 basisNormal = getNormalAt(u, v);
+        if (basisNormal.norm() <= Epsilon.EPS) {
+            return new Vector3(0, 0, 1);
+        }
+        return basisNormal.normalize().asVector();
     }
 
     /**

@@ -89,6 +89,27 @@ public sealed interface Curve3 permits
     CartesianPoint closestPointTo(CartesianPoint point);
 
     /**
+     * Returns the curve parameter corresponding to the given point.
+     * Default implementation uses sampling to find the closest parameter.
+     *
+     * @param point a point on or near the curve
+     * @return parameter value (0..1 by default, interpretation depends on curve type)
+     */
+    default double parameterAt(CartesianPoint point) {
+        java.util.List<CartesianPoint> samples = sample(256);
+        double bestT = 0;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < samples.size(); i++) {
+            double d = point.distanceTo(samples.get(i));
+            if (d < minDist) {
+                minDist = d;
+                bestT = (double) i / (samples.size() - 1);
+            }
+        }
+        return bestT;
+    }
+
+    /**
      * Returns the minimum distance from this curve to the given point.
      *
      * @param point query point

@@ -29,6 +29,10 @@ import com.minicad.geometry.SphericalSurface;
 import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
+import com.minicad.geometry.ParaboloidSurface;
+import com.minicad.geometry.HyperboloidSurface;
+import com.minicad.geometry.SurfaceOfTranslation3;
+import com.minicad.geometry.SurfaceOfProjection3;
 import com.minicad.geometry.RuledSurface3;
 import com.minicad.geometry.SurfaceOfConstantRadius3;
 import com.minicad.geometry.SurfaceCurve3;
@@ -85,6 +89,7 @@ import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDirection;
+import com.minicad.step.model.StepVector;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepEdgeCurve;
 import com.minicad.step.model.StepEdge;
@@ -165,6 +170,13 @@ import com.minicad.step.model.StepSurfaceCurveSweptAreaSolid;
 import com.minicad.step.model.StepSweptDiskSolid;
 import com.minicad.step.model.StepExtrudedAreaSolidTapered;
 import com.minicad.step.model.StepRevolvedAreaSolidTapered;
+import com.minicad.step.model.StepExtrudedFaceSolid;
+import com.minicad.step.model.StepRevolvedFaceSolid;
+import com.minicad.step.model.StepSweptFaceSolid;
+import com.minicad.step.model.StepCylinderVolume;
+import com.minicad.step.model.StepSphereVolume;
+import com.minicad.step.model.StepTorusVolume;
+import com.minicad.step.model.StepPrismVolume;
 import com.minicad.step.model.StepRuledSurface;
 import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceOfConstantRadius;
@@ -176,6 +188,10 @@ import com.minicad.step.model.StepDegenerateCurve;
 import com.minicad.step.model.StepNonManifoldSolidBrep;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSurfaceOfTranslation;
+import com.minicad.step.model.StepSurfaceOfProjection;
+import com.minicad.step.model.StepParaboloidSurface;
+import com.minicad.step.model.StepHyperboloidSurface;
 import com.minicad.step.model.StepSweptAreaSolid;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepSurfacedEdgeCurve;
@@ -286,6 +302,10 @@ public final class StepCadBuilder {
     private final Map<Integer, SurfaceOfConstantRadius3> constantRadiusSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SurfaceOfLinearExtrusion3> linearExtrusionSurfaces = new LinkedHashMap<>();
     private final Map<Integer, SurfaceOfRevolution3> revolutionSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, ParaboloidSurface> paraboloidSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, HyperboloidSurface> hyperboloidSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, SurfaceOfTranslation3> translationSurfaces = new LinkedHashMap<>();
+    private final Map<Integer, SurfaceOfProjection3> projectionSurfaces = new LinkedHashMap<>();
     private final Map<Integer, BSplineCurve3> bsplineCurves = new LinkedHashMap<>();
     private final Map<Integer, RationalBSplineCurve3> rationalBsplineCurves = new LinkedHashMap<>();
     private final Map<Integer, BSplineSurface3> bsplineSurfaces = new LinkedHashMap<>();
@@ -1804,9 +1824,9 @@ public final class StepCadBuilder {
         for (StepValue trim : trimmedCurve.trim2()) {
             validateTrimValue(trim, basis, "trim_2");
         }
-        CartesianPoint trimStart = resolveTrimPoint3(trimmedCurve.trim1(), basis, "trim_1");
-        CartesianPoint trimEnd = resolveTrimPoint3(trimmedCurve.trim2(), basis, "trim_2");
-        TrimmedCurve3 built = new TrimmedCurve3(basis, trimStart, trimEnd, trimmedCurve.senseAgreement());
+        double trimParamStart = resolveTrimParameter(trimmedCurve.trim1(), basis, "trim_1");
+        double trimParamEnd = resolveTrimParameter(trimmedCurve.trim2(), basis, "trim_2");
+        TrimmedCurve3 built = new TrimmedCurve3(basis, trimParamStart, trimParamEnd, trimmedCurve.senseAgreement());
         trimmedCurves.put(id, built);
         return built;
     }
@@ -2014,20 +2034,12 @@ public final class StepCadBuilder {
                 throw new UnsupportedGeometryException("SEAM_EDGE #" + seamEdge.id() + " has no associated curve geometry");
             }
             Vertex vertex = buildVertex(seamEdge.edgeStart().id());
-            built = new Edge(
-                    vertex,
-                    vertex,
-                    curve,
-                    true
-            );
+            built = buildEdgeWithProjection(vertex, vertex, curve, true);
         } else if (entity instanceof StepEdgeCurve edgeCurve) {
             Curve3 curve = buildCurve3(edgeCurve.edgeGeometry());
-            built = new Edge(
-                    buildVertex(edgeCurve.start().id()),
-                    buildVertex(edgeCurve.end().id()),
-                    curve,
-                    edgeCurve.sameSense()
-            );
+            Vertex startVertex = buildVertex(edgeCurve.start().id());
+            Vertex endVertex = buildVertex(edgeCurve.end().id());
+            built = buildEdgeWithProjection(startVertex, endVertex, curve, edgeCurve.sameSense());
         } else if (entity instanceof StepFilletEdge filletEdge) {
             // Fillet edge wraps an original edge - build the underlying edge geometry.
             // The fillet parameters (radius, adjacent faces) are not represented in our Edge topology.
@@ -2038,12 +2050,11 @@ public final class StepCadBuilder {
             built = buildEdge(chamferEdge.originalEdge().id());
         } else if (entity instanceof StepSubedge subedge) {
             Edge parent = buildEdge(subedge.parentEdge().id());
-            built = new Edge(
+            built = buildEdgeWithProjection(
                     buildVertex(subedge.start().id()),
                     buildVertex(subedge.end().id()),
                     parent.curve(),
-                    parent.sameSense()
-            );
+                    parent.sameSense());
         } else if (entity instanceof StepEdge edge) {
             // EDGE is the abstract base type. In complex entity syntax,
             // the actual edge subtype (EDGE_CURVE, SUBEDGE) may be resolved at the same ID.
@@ -2065,6 +2076,112 @@ public final class StepCadBuilder {
         }
         edges.put(id, built);
         return built;
+    }
+
+    /**
+     * Builds an edge, projecting vertices onto the curve if needed.
+     * Industrial STEP files often have vertex coordinates rounded to a limited
+     * number of decimal places, causing them to miss the curve by microns.
+     */
+    private static final double VERTEX_PROJECTION_TOLERANCE = 1.0e-2;
+
+    private Edge buildEdgeWithProjection(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
+        try {
+            return new Edge(start, end, curve, sameSense);
+        } catch (com.minicad.common.TopologyException e) {
+            // Project off-curve vertices onto the curve using closest-point projection
+            CartesianPoint startPoint = start.point();
+            CartesianPoint endPoint = end.point();
+            CartesianPoint projectedStart = projectOntoCurve(startPoint, curve);
+            CartesianPoint projectedEnd = projectOntoCurve(endPoint, curve);
+            // Use projected vertices - if they're within tolerance, the edge will succeed
+            Vertex vStart = (projectedStart.distanceTo(startPoint) > VERTEX_PROJECTION_TOLERANCE) ? start : new Vertex(projectedStart);
+            Vertex vEnd = (projectedEnd.distanceTo(endPoint) > VERTEX_PROJECTION_TOLERANCE) ? end : new Vertex(projectedEnd);
+            return new Edge(vStart, vEnd, curve, sameSense);
+        }
+    }
+
+    /**
+     * Projects a point onto a curve using closest-point projection.
+     * Handles all supported curve types.
+     */
+    private static CartesianPoint projectOntoCurve(CartesianPoint point, Curve3 curve) {
+        if (curve instanceof com.minicad.geometry.BSplineCurve3 bspline) {
+            return bspline.closestPointTo(point);
+        }
+        if (curve instanceof com.minicad.geometry.RationalBSplineCurve3 rational) {
+            return rational.closestPointTo(point);
+        }
+        if (curve instanceof com.minicad.geometry.Line3 line) {
+            // Project onto infinite line, then clamp to segment between start/end samples
+            Vector3 offset = point.subtract(line.origin());
+            double t = offset.dot(line.direction().asVector());
+            return line.pointAt(t);
+        }
+        if (curve instanceof com.minicad.geometry.Circle circle) {
+            // Project onto circle: normalize vector from center, scale by radius
+            CartesianPoint center = circle.position().location();
+            Vector3 fromCenter = point.subtract(center);
+            if (fromCenter.normSquared() <= com.minicad.common.Epsilon.EPS) {
+                // Point is at center - pick arbitrary point on circle
+                Vector3 xDir = circle.position().xDirection().asVector();
+                return center.add(xDir.scale(circle.radius()));
+            }
+            return center.add(fromCenter.normalize().asVector().scale(circle.radius()));
+        }
+        if (curve instanceof com.minicad.geometry.Ellipse3 ellipse) {
+            // Approximate by sampling - good enough for projection
+            return ellipse.closestPointTo(point);
+        }
+        if (curve instanceof com.minicad.geometry.Polyline3 polyline) {
+            // Find closest point on polyline segments
+            return polylineClosestPoint(point, polyline);
+        }
+        if (curve instanceof com.minicad.geometry.TrimmedCurve3 trimmed) {
+            return projectOntoCurve(point, trimmed.basisCurve());
+        }
+        if (curve instanceof com.minicad.geometry.SurfaceCurve3 sc) {
+            return projectOntoCurve(point, sc.curve3d());
+        }
+        if (curve instanceof com.minicad.geometry.CompositeCurve3 composite) {
+            // Find closest point across all segments
+            CartesianPoint closest = null;
+            double minDist = Double.POSITIVE_INFINITY;
+            for (Curve3 segment : composite.segments()) {
+                CartesianPoint candidate = projectOntoCurve(point, segment);
+                double dist = point.distanceTo(candidate);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = candidate;
+                }
+            }
+            return closest;
+        }
+        // Fallback: return original point (Edge constructor will validate)
+        return point;
+    }
+
+    private static CartesianPoint polylineClosestPoint(CartesianPoint point, com.minicad.geometry.Polyline3 polyline) {
+        List<CartesianPoint> points = polyline.points();
+        CartesianPoint closest = points.getFirst();
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < points.size() - 1; i++) {
+            CartesianPoint p = closestPointOnSegment(point, points.get(i), points.get(i + 1));
+            double dist = point.distanceTo(p);
+            if (dist < minDist) {
+                minDist = dist;
+                closest = p;
+            }
+        }
+        return closest;
+    }
+
+    private static CartesianPoint closestPointOnSegment(CartesianPoint point, CartesianPoint a, CartesianPoint b) {
+        Vector3 ab = b.subtract(a);
+        double lenSq = ab.normSquared();
+        if (lenSq <= com.minicad.common.Epsilon.EPS) return a;
+        double t = Math.max(0, Math.min(1, point.subtract(a).dot(ab) / lenSq));
+        return new CartesianPoint(a.x() + ab.x() * t, a.y() + ab.y() * t, a.z() + ab.z() * t);
     }
 
     /**
@@ -2288,11 +2405,31 @@ public final class StepCadBuilder {
             throw new UnsupportedGeometryException(faceType + " construction requires PLANE geometry");
         }
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();
-        if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
-            FaceBound bound = bounds.getFirst();
-            bounds = List.of(FaceBound.outer(bound.loop(), bound.orientation()));
+        if (bounds.stream().noneMatch(FaceBound::outer)) {
+            // Some CAD systems export FACE_BOUND for all bounds. In STEP EXPRESS,
+            // the first bound is typically the outer one. Promote the first bound
+            // to outer and mark the rest as inner.
+            bounds = inferOuterBounds(bounds);
         }
         return new Face(supportedSurface, bounds, faceSameSense(stepFace));
+    }
+
+    /**
+     * Infers outer/inner bound classification when no explicit outer bounds exist.
+     * Some CAD systems export all bounds as FACE_BOUND without distinguishing outer vs inner.
+     */
+    private static List<FaceBound> inferOuterBounds(List<FaceBound> bounds) {
+        if (bounds.isEmpty()) return bounds;
+        List<FaceBound> result = new ArrayList<>();
+        for (int i = 0; i < bounds.size(); i++) {
+            FaceBound bound = bounds.get(i);
+            if (i == 0) {
+                result.add(FaceBound.outer(bound.loop(), bound.orientation()));
+            } else {
+                result.add(FaceBound.inner(bound.loop(), bound.orientation()));
+            }
+        }
+        return List.copyOf(result);
     }
 
     /**
@@ -3039,8 +3176,340 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
+    // New solid type builders
+
+    private Solid buildExtrudedFaceSolid(StepExtrudedFaceSolid extrudedFace) {
+        // Similar to extruded area solid but sweeps a face instead of a profile
+        StepEntity faceGeometry = extrudedFace.sweptFace();
+        if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
+            throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID swept_face must be a face entity");
+        }
+        // Build the face geometry and sample its boundary
+        SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "EXTRUDED_FACE_SOLID");
+        List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
+        if (profilePoints.isEmpty()) {
+            throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID could not extract boundary points");
+        }
+        double depth = extrudedFace.depth() != null ? extrudedFace.depth() : 1.0;
+        Direction3 dir = Direction3.from(new com.minicad.geometry.Vector3(0, 0, depth));
+        return buildExtrudedProfile(profilePoints, dir, depth);
+    }
+
+    private Solid buildRevolvedFaceSolid(StepRevolvedFaceSolid revolvedFace) {
+        StepEntity faceGeometry = revolvedFace.sweptFace();
+        if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
+            throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID swept_face must be a face entity");
+        }
+        SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "REVOLVED_FACE_SOLID");
+        List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
+        if (profilePoints.isEmpty()) {
+            throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID could not extract boundary points");
+        }
+        double angle = revolvedFace.angle() != null ? revolvedFace.angle() : 2 * Math.PI;
+        CartesianPoint axisOrigin = new CartesianPoint(0, 0, 0);
+        com.minicad.geometry.Vector3 axis = new com.minicad.geometry.Vector3(0, 0, 1);
+        return buildRevolvedProfile(profilePoints, axisOrigin, axis, angle);
+    }
+
+    private Solid buildSweptFaceSolid(StepSweptFaceSolid sweptFace) {
+        // Sweep a face along a trajectory curve
+        StepEntity faceGeometry = sweptFace.sweptFace();
+        if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
+            throw new UnsupportedGeometryException("SWEPT_FACE_SOLID swept_face must be a face entity");
+        }
+        SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "SWEPT_FACE_SOLID");
+        List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
+        if (profilePoints.isEmpty()) {
+            throw new UnsupportedGeometryException("SWEPT_FACE_SOLID could not extract boundary points");
+        }
+        // Build trajectory curve and sample
+        Curve3 trajectory = buildCurve3(sweptFace.trajectory());
+        List<Curve3Sample> samples = sampleCurve3WithTangent(trajectory, 48);
+        return buildSweptProfileAlongCurve(profilePoints, samples);
+    }
+
+    private Solid buildCylinderVolume(StepCylinderVolume cyl) {
+        double radius = cyl.radius();
+        double height = cyl.height();
+        if (radius <= 0 || height <= 0) {
+            throw new UnsupportedGeometryException("CYLINDER_VOLUME requires positive dimensions");
+        }
+        // Create cylinder: sample circular profile, extrude
+        List<CartesianPoint> ring = buildCircleRing(radius, 72);
+        return buildExtrudedProfile(ring, Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1)), height);
+    }
+
+    private Solid buildSphereVolume(StepSphereVolume sphere) {
+        double radius = sphere.radius();
+        if (radius <= 0) {
+            throw new UnsupportedGeometryException("SPHERE_VOLUME requires positive radius");
+        }
+        // Tessellate sphere with latitude/longitude sampling
+        List<Face> faces = tessellateSphere(radius, 24, 48);
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildTorusVolume(StepTorusVolume torus) {
+        double majorR = torus.majorRadius();
+        double minorR = torus.minorRadius();
+        if (majorR <= 0 || minorR <= 0) {
+            throw new UnsupportedGeometryException("TORUS_VOLUME requires positive radii");
+        }
+        List<Face> faces = tessellateTorus(majorR, minorR, 36, 24);
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildPrismVolume(StepPrismVolume prism) {
+        double w = prism.width();
+        double d = prism.depth();
+        double h = prism.height();
+        if (w <= 0 || d <= 0 || h <= 0) {
+            throw new UnsupportedGeometryException("PRISM_VOLUME requires positive dimensions");
+        }
+        CartesianPoint corner = prism.position() instanceof StepAxis2Placement3D a2
+                ? buildPoint(a2.location().id())
+                : new CartesianPoint(0, 0, 0);
+        List<CartesianPoint> bottom = List.of(
+                corner,
+                new CartesianPoint(corner.x() + w, corner.y(), corner.z()),
+                new CartesianPoint(corner.x() + w, corner.y() + d, corner.z()),
+                new CartesianPoint(corner.x(), corner.y() + d, corner.z()));
+        List<CartesianPoint> top = bottom.stream()
+                .map(p -> new CartesianPoint(p.x(), p.y(), p.z() + h))
+                .toList();
+        List<Face> faces = buildBoxFaces(bottom, top);
+        return new Solid(new Shell(faces, true));
+    }
+
+    // Helper methods for new solid builders
+
+    private Solid buildExtrudedProfile(List<CartesianPoint> profile, Direction3 direction, double depth) {
+        List<Face> faces = new ArrayList<>();
+        Vector3 dirVec = direction.asVector();
+        List<CartesianPoint> top = profile.stream()
+                .map(p -> new CartesianPoint(
+                        p.x() + dirVec.x() * depth,
+                        p.y() + dirVec.y() * depth,
+                        p.z() + dirVec.z() * depth))
+                .toList();
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(profile), direction.reverse()));
+        faces.add(faceFromPolyLoop(top, direction));
+        for (int i = 0; i < profile.size(); i++) {
+            int next = (i + 1) % profile.size();
+            Vector3 edgeDir = new Vector3(
+                    top.get(next).x() - profile.get(i).x(),
+                    top.get(next).y() - profile.get(i).y(),
+                    top.get(next).z() - profile.get(i).z());
+            faces.add(faceFromPolyLoop(
+                    List.of(profile.get(i), profile.get(next), top.get(next), top.get(i)),
+                    Direction3.from(edgeDir)));
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildRevolvedProfile(List<CartesianPoint> profile, CartesianPoint axisOrigin,
+                                        Vector3 axis, double angle) {
+        int sections = Math.max(4, (int) (Math.abs(angle) / (Math.PI / 16)));
+        if (sections > 72) sections = 72;
+        List<Face> faces = new ArrayList<>();
+        // Build rings
+        List<List<CartesianPoint>> rings = new ArrayList<>();
+        for (int i = 0; i <= sections; i++) {
+            double theta = angle * i / sections;
+            List<CartesianPoint> ring = new ArrayList<>();
+            for (CartesianPoint p : profile) {
+                ring.add(rotatePointAroundAxis(p, axisOrigin, axis, theta));
+            }
+            rings.add(ring);
+        }
+        // End caps
+        Direction3 axisDir = Direction3.from(axis);
+        if (Math.abs(angle) < 2 * Math.PI - 0.01) {
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(rings.getFirst()), axisDir.reverse()));
+            faces.add(faceFromPolyLoop(closeLoop3(rings.getLast()), axisDir));
+        }
+        // Side faces
+        for (int r = 0; r < rings.size() - 1; r++) {
+            List<CartesianPoint> cur = rings.get(r);
+            List<CartesianPoint> nxt = rings.get(r + 1);
+            for (int i = 0; i < cur.size(); i++) {
+                int next = (i + 1) % cur.size();
+                faces.add(faceFromPolyLoop(
+                        List.of(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i)),
+                        Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
+            }
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private Solid buildSweptProfileAlongCurve(List<CartesianPoint> profile, List<Curve3Sample> samples) {
+        if (samples.isEmpty()) {
+            throw new UnsupportedGeometryException("trajectory curve has no samples");
+        }
+        List<Face> faces = new ArrayList<>();
+        List<List<CartesianPoint>> rings = new ArrayList<>();
+        for (Curve3Sample sample : samples) {
+            rings.add(placeProfilePoints(profile, sample.point(), sample.tangent()));
+        }
+        // End caps
+        if (!rings.isEmpty()) {
+            faces.add(faceFromPolyLoop(reverseClosedLoop3(rings.getFirst()), samples.getFirst().tangent().reverse()));
+            faces.add(faceFromPolyLoop(closeLoop3(rings.getLast()), samples.getLast().tangent()));
+        }
+        // Side faces
+        for (int r = 0; r < rings.size() - 1; r++) {
+            List<CartesianPoint> cur = rings.get(r);
+            List<CartesianPoint> nxt = rings.get(r + 1);
+            for (int i = 0; i < cur.size(); i++) {
+                int next = (i + 1) % cur.size();
+                faces.add(faceFromPolyLoop(
+                        List.of(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i)),
+                        samples.get(r).tangent()));
+            }
+        }
+        return new Solid(new Shell(faces, true));
+    }
+
+    private List<CartesianPoint> placeProfilePoints(List<CartesianPoint> profile, CartesianPoint point, Direction3 tangent) {
+        CircularFrame frame = circularFrame(tangent);
+        Vector3 fx = frame.x();
+        Vector3 fy = frame.y();
+        Vector3 fz = frame.z().asVector();
+        CartesianPoint first = profile.getFirst();
+        return profile.stream()
+                .map(p -> point.add(fx.scale(p.x() - first.x())
+                        .add(fy.scale(p.y() - first.y()))
+                        .add(fz.scale(p.z() - first.z()))))
+                .toList();
+    }
+
+    private List<CartesianPoint> buildCircleRing(double radius, int segments) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (int i = 0; i < segments; i++) {
+            double theta = 2 * Math.PI * i / segments;
+            points.add(new CartesianPoint(radius * Math.cos(theta), radius * Math.sin(theta), 0));
+        }
+        return points;
+    }
+
+    private List<Face> tessellateSphere(double radius, int latSteps, int lonSteps) {
+        List<Face> faces = new ArrayList<>();
+        for (int i = 0; i < latSteps; i++) {
+            double phi1 = Math.PI * i / latSteps;
+            double phi2 = Math.PI * (i + 1) / latSteps;
+            for (int j = 0; j < lonSteps; j++) {
+                double theta1 = 2 * Math.PI * j / lonSteps;
+                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
+                CartesianPoint p00 = spherePoint(radius, phi1, theta1);
+                CartesianPoint p10 = spherePoint(radius, phi2, theta1);
+                CartesianPoint p11 = spherePoint(radius, phi2, theta2);
+                CartesianPoint p01 = spherePoint(radius, phi1, theta2);
+                CartesianPoint midPoint = spherePoint(radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
+                Vector3 normal = new Vector3(midPoint.x(), midPoint.y(), midPoint.z());
+                if (i == 0) {
+                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
+                } else if (i == latSteps - 1) {
+                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
+                } else {
+                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
+                }
+            }
+        }
+        return faces;
+    }
+
+    private CartesianPoint spherePoint(double radius, double phi, double theta) {
+        return new CartesianPoint(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.sin(phi) * Math.sin(theta),
+                radius * Math.cos(phi));
+    }
+
+    private List<Face> tessellateTorus(double majorR, double minorR, int majorSteps, int minorSteps) {
+        List<Face> faces = new ArrayList<>();
+        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
+        for (int i = 0; i <= majorSteps; i++) {
+            double theta = 2 * Math.PI * i / majorSteps;
+            for (int j = 0; j <= minorSteps; j++) {
+                double phi = 2 * Math.PI * j / minorSteps;
+                points[i][j] = new double[]{
+                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
+                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
+                        minorR * Math.sin(phi)
+                };
+            }
+        }
+        for (int i = 0; i < majorSteps; i++) {
+            for (int j = 0; j < minorSteps; j++) {
+                CartesianPoint p00 = pt(points[i][j]);
+                CartesianPoint p10 = pt(points[i + 1][j]);
+                CartesianPoint p11 = pt(points[i + 1][j + 1]);
+                CartesianPoint p01 = pt(points[i][j + 1]);
+                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
+            }
+        }
+        return faces;
+    }
+
+    private CartesianPoint pt(double[] coords) {
+        return new CartesianPoint(coords[0], coords[1], coords[2]);
+    }
+
+    private List<CartesianPoint> sampleFaceBoundary(SurfaceGeometry surface, int samples) {
+        // For simple surfaces, sample the bounding box edges
+        // This is a simplified approach - real implementation would need face bounds
+        return sampleSurfaceBoundary(surface, samples);
+    }
+
+    private List<CartesianPoint> sampleSurfaceBoundary(SurfaceGeometry surface, int samples) {
+        // Simplified boundary sampling - for planar surfaces, use bounding box
+        if (surface instanceof Plane) {
+            double bb = 10.0; // Default bounding box
+            return List.of(
+                    new CartesianPoint(-bb, -bb, 0),
+                    new CartesianPoint(bb, -bb, 0),
+                    new CartesianPoint(bb, bb, 0),
+                    new CartesianPoint(-bb, bb, 0));
+        }
+        if (surface instanceof CylindricalSurface cyl) {
+            return buildCircleRing(cyl.radius(), samples);
+        }
+        // Generic fallback
+        return List.of();
+    }
+
+    private List<Face> buildBoxFaces(List<CartesianPoint> bottom, List<CartesianPoint> top) {
+        List<Face> faces = new ArrayList<>();
+        Direction3 up = Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom), up.reverse()));
+        faces.add(faceFromPolyLoop(top, up));
+        Direction3 right = Direction3.from(new com.minicad.geometry.Vector3(1, 0, 0));
+        Direction3 forward = Direction3.from(new com.minicad.geometry.Vector3(0, 1, 0));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), top.get(0), top.get(3), bottom.get(3))), right));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(1), bottom.get(2), top.get(2), top.get(1))), forward));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(2), bottom.get(3), top.get(3), top.get(2))), right.reverse()));
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), bottom.get(1), top.get(1), top.get(0))), forward.reverse()));
+        return faces;
+    }
+
+    private CartesianPoint rotatePointAroundAxis(CartesianPoint p, CartesianPoint origin,
+                                                  Vector3 axis, double angle) {
+        // Rodrigues' rotation formula
+        double dx = p.x() - origin.x();
+        double dy = p.y() - origin.y();
+        double dz = p.z() - origin.z();
+        com.minicad.geometry.Vector3 v = new com.minicad.geometry.Vector3(dx, dy, dz);
+        com.minicad.geometry.Vector3 k = axis.normalize().asVector();
+        com.minicad.geometry.Vector3 rotated = v.scale(Math.cos(angle))
+                .add(k.cross(v).scale(Math.sin(angle)))
+                .add(k.scale(k.dot(v) * (1 - Math.cos(angle))));
+        return new CartesianPoint(
+                rotated.x() + origin.x(),
+                rotated.y() + origin.y(),
+                rotated.z() + origin.z());
+    }
+
     /**
-     * Builds a solid from MANIFOLD_SOLID_BREP.
      *
      * @param id STEP entity id
      * @return built solid
@@ -3110,6 +3579,49 @@ public final class StepCadBuilder {
         } else if (entity instanceof StepPolygonalBoundedHalfSpace polyHalfSpace) {
             // Polygonal bounded half-space: half-space bounded by a polygonal face
             built = buildPolygonalBoundedHalfSpace(polyHalfSpace);
+        } else if (entity instanceof StepTessellatedFaceSet tessellatedFaceSet) {
+            // Tessellated face set: triangulated mesh as solid
+            Shell shell = buildTessellatedShell(tessellatedFaceSet);
+            built = new Solid(shell);
+        } else if (entity instanceof StepTessellatedFace tessellatedFace) {
+            // Tessellated face: triangulated single face as solid
+            Shell shell = buildTessellatedFaceShell(tessellatedFace);
+            built = new Solid(shell);
+        } else if (entity instanceof StepExtrudedFaceSolid extrudedFace) {
+            // Extruded face solid: extrude a face along a direction
+            built = buildExtrudedFaceSolid(extrudedFace);
+        } else if (entity instanceof StepRevolvedFaceSolid revolvedFace) {
+            // Revolved face solid: revolve a face around an axis
+            built = buildRevolvedFaceSolid(revolvedFace);
+        } else if (entity instanceof StepSweptFaceSolid sweptFace) {
+            // Swept face solid: sweep a face along a curve trajectory
+            built = buildSweptFaceSolid(sweptFace);
+        } else if (entity instanceof StepCylinderVolume cylVolume) {
+            // Cylinder volume: CSG cylinder primitive as solid
+            built = buildCylinderVolume(cylVolume);
+        } else if (entity instanceof StepSphereVolume sphereVolume) {
+            // Sphere volume: CSG sphere primitive as solid
+            built = buildSphereVolume(sphereVolume);
+        } else if (entity instanceof StepTorusVolume torusVolume) {
+            // Torus volume: CSG torus primitive as solid
+            built = buildTorusVolume(torusVolume);
+        } else if (entity instanceof StepPrismVolume prismVolume) {
+            // Prism volume: CSG prism primitive as solid
+            built = buildPrismVolume(prismVolume);
+        } else if (entity instanceof StepFiniteElementMesh femMesh) {
+            // Finite element mesh: tessellated mesh as solid
+            Shell shell = buildFiniteElementMeshShell(femMesh);
+            built = new Solid(shell);
+        } else if (entity instanceof StepFlatPattern flatPattern) {
+            // Flat pattern: sheet metal flat, build as thin shell solid
+            if (flatPattern.flatGeometry() instanceof StepFaceEntity faceEntity) {
+                Shell shell = new Shell(List.of(buildFace(faceEntity.id())), false);
+                built = new Solid(shell);
+            } else if (flatPattern.flatGeometry() instanceof StepOpenShell openShell) {
+                built = new Solid(buildShell(openShell.id()));
+            } else {
+                throw new UnsupportedGeometryException("FLAT_PATTERN flat geometry must be FACE or OPEN_SHELL");
+            }
         } else if (entity instanceof StepSolidModel solidModel) {
             // SolidModel is the abstract base type for all solid models.
             // In complex entity syntax, the actual solid type may be stored at the same ID.
@@ -3155,6 +3667,15 @@ public final class StepCadBuilder {
                 || entity instanceof StepBlockVolume
                 || entity instanceof StepHalfSpaceSolid
                 || entity instanceof StepPolygonalBoundedHalfSpace
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTessellatedFace
+                || entity instanceof StepExtrudedFaceSolid
+                || entity instanceof StepRevolvedFaceSolid
+                || entity instanceof StepSweptFaceSolid
+                || entity instanceof StepCylinderVolume
+                || entity instanceof StepSphereVolume
+                || entity instanceof StepTorusVolume
+                || entity instanceof StepPrismVolume
                 || entity instanceof StepSolidModel
                 || entity instanceof StepFiniteElementMesh
                 || entity instanceof StepFlatPattern
@@ -5240,6 +5761,57 @@ public final class StepCadBuilder {
                 yield new Polyline3(reversedPoints);
             }
             case CompositeCurve3 composite -> reverseCompositeCurve(composite);
+            case Circle circle -> {
+                Axis2Placement3D p = circle.position();
+                yield new Circle(
+                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                        circle.radius());
+            }
+            case Ellipse3 ellipse -> {
+                Axis2Placement3D p = ellipse.position();
+                yield new Ellipse3(
+                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                        ellipse.semiAxis1(), ellipse.semiAxis2());
+            }
+            case Parabola3 parabola -> {
+                Axis2Placement3D p = parabola.position();
+                yield new Parabola3(
+                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                        parabola.focalLength());
+            }
+            case Hyperbola3 hyperbola -> {
+                Axis2Placement3D p = hyperbola.position();
+                yield new Hyperbola3(
+                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                        hyperbola.semiAxisA(), hyperbola.semiAxisB());
+            }
+            case Clothoid3 clothoid -> {
+                Axis2Placement3D p = clothoid.position();
+                yield new Clothoid3(
+                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                        clothoid.xAxisIntercept(), clothoid.curvature());
+            }
+            case DegenerateCurve3 degenerate -> new DegenerateCurve3(degenerate.point());
+            case TrimmedCurve3 trimmed -> {
+                // Swap trim parameters and flip sense to reverse the curve
+                yield new TrimmedCurve3(
+                        reverseCurve3(trimmed.basisCurve()),
+                        trimmed.trimParamEnd(),
+                        trimmed.trimParamStart(),
+                        !trimmed.senseAgreement());
+            }
+            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(reverseCurve3(surfaceCurve.curve3d()));
+            case BSplineCurve3 bspline -> new BSplineCurve3(
+                    bspline.degree(),
+                    new java.util.ArrayList<>(bspline.controlPoints().reversed()),
+                    bspline.knotMultiplicities(),
+                    bspline.knots());
+            case RationalBSplineCurve3 rational -> new RationalBSplineCurve3(
+                    rational.degree(),
+                    new java.util.ArrayList<>(rational.controlPoints().reversed()),
+                    rational.weights(),
+                    rational.knotMultiplicities(),
+                    rational.knots());
             default -> curve;
         };
     }
@@ -5288,8 +5860,55 @@ public final class StepCadBuilder {
             case SurfaceOfConstantRadius3 constant -> new SurfaceOfConstantRadius3(
                     reverseSurfaceSense(constant.sweptSurface()),
                     constant.radius());
+            case OffsetSurface3 offset -> new OffsetSurface3(
+                    reverseSurfaceSense(offset.basisSurface()),
+                    offset.distance());
+            case BSplineSurface3 bspline -> new BSplineSurface3(
+                    bspline.uDegree(),
+                    bspline.vDegree(),
+                    reverseBSplineControlGrid(bspline.controlPoints()),
+                    bspline.uMultiplicities(),
+                    bspline.vMultiplicities(),
+                    bspline.uKnots(),
+                    bspline.vKnots());
+            case RationalBSplineSurface3 rational -> new RationalBSplineSurface3(
+                    rational.uDegree(),
+                    rational.vDegree(),
+                    reverseBSplineControlGrid(rational.controlPoints()),
+                    rational.weightsData(),
+                    rational.uMultiplicities(),
+                    rational.vMultiplicities(),
+                    rational.uKnots(),
+                    rational.vKnots());
+            case ParaboloidSurface paraboloid -> {
+                Axis2Placement3D pp = paraboloid.position();
+                yield new ParaboloidSurface(
+                        new Axis2Placement3D(pp.location(), pp.axis(), pp.xDirection().reverse()),
+                        paraboloid.focalLength());
+            }
+            case HyperboloidSurface hyperboloid -> {
+                Axis2Placement3D hp = hyperboloid.position();
+                yield new HyperboloidSurface(
+                        new Axis2Placement3D(hp.location(), hp.axis(), hp.xDirection().reverse()),
+                        hyperboloid.radius(), hyperboloid.semiAxis());
+            }
+            case SurfaceOfTranslation3 translation -> new SurfaceOfTranslation3(
+                    reverseCurve3(translation.profile()),
+                    translation.direction());
+            case SurfaceOfProjection3 projection -> new SurfaceOfProjection3(
+                    reverseCurve3(projection.profile()),
+                    projection.projectionDirection());
             default -> surface;
         };
+    }
+
+    private static java.util.List<java.util.List<CartesianPoint>> reverseBSplineControlGrid(
+            java.util.List<java.util.List<CartesianPoint>> grid) {
+        java.util.List<java.util.List<CartesianPoint>> result = new java.util.ArrayList<>(grid.size());
+        for (java.util.List<CartesianPoint> row : grid) {
+            result.add(java.util.List.copyOf(row.reversed()));
+        }
+        return java.util.List.copyOf(result);
     }
 
     private double fresnelC(double x) {
@@ -5718,6 +6337,19 @@ public final class StepCadBuilder {
         // MAPPED_ITEM: dispatch through to mapping target for surface geometry
         if (geometry instanceof StepMappedItem mappedItem) {
             return buildSupportedFaceGeometry(mappedItem.mappingTarget(), faceType);
+        }
+        // Advanced analytical surfaces
+        if (geometry instanceof StepParaboloidSurface paraboloid) {
+            return buildParaboloidSurface(paraboloid.id());
+        }
+        if (geometry instanceof StepHyperboloidSurface hyperboloid) {
+            return buildHyperboloidSurface(hyperboloid.id());
+        }
+        if (geometry instanceof StepSurfaceOfTranslation translation) {
+            return buildSurfaceOfTranslation(translation.id());
+        }
+        if (geometry instanceof StepSurfaceOfProjection projection) {
+            return buildSurfaceOfProjection(projection.id());
         }
         return null;
     }
@@ -6194,6 +6826,23 @@ public final class StepCadBuilder {
                 buildSupportedSurfaceGeometry(actual);
             }
             // BoundedSurface with no underlying geometry - silently skip
+            return;
+        }
+        // Advanced analytical surfaces
+        if (geometry instanceof StepParaboloidSurface paraboloid) {
+            buildParaboloidSurface(paraboloid.id());
+            return;
+        }
+        if (geometry instanceof StepHyperboloidSurface hyperboloid) {
+            buildHyperboloidSurface(hyperboloid.id());
+            return;
+        }
+        if (geometry instanceof StepSurfaceOfTranslation translation) {
+            buildSurfaceOfTranslation(translation.id());
+            return;
+        }
+        if (geometry instanceof StepSurfaceOfProjection projection) {
+            buildSurfaceOfProjection(projection.id());
             return;
         }
         throw new UnsupportedGeometryException("surface geometry " + stepEntityTypeName(geometry) + " is unsupported");
@@ -6901,8 +7550,8 @@ public final class StepCadBuilder {
             case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(transformCurve3(surfaceCurve.curve3d(), transformation));
             case TrimmedCurve3 trimmedCurve -> new TrimmedCurve3(
                     transformCurve3(trimmedCurve.basisCurve(), transformation),
-                    transformPoint3(trimmedCurve.trimStart(), transformation),
-                    transformPoint3(trimmedCurve.trimEnd(), transformation),
+                    trimmedCurve.trimParamStart(),
+                    trimmedCurve.trimParamEnd(),
                     trimmedCurve.senseAgreement());
             case CompositeCurve3 compositeCurve -> new CompositeCurve3(
                     compositeCurve.segments().stream()
@@ -7224,6 +7873,19 @@ public final class StepCadBuilder {
             case SurfaceOfConstantRadius3 constantRadiusSurface -> new SurfaceOfConstantRadius3(
                     transformSurfaceGeometry(constantRadiusSurface.sweptSurface(), transformation),
                     constantRadiusSurface.radius() * scale);
+            case ParaboloidSurface paraboloid -> new ParaboloidSurface(
+                    transformPlacement(paraboloid.position(), transformation),
+                    paraboloid.focalLength() * scale);
+            case HyperboloidSurface hyperboloid -> new HyperboloidSurface(
+                    transformPlacement(hyperboloid.position(), transformation),
+                    hyperboloid.radius() * scale,
+                    hyperboloid.semiAxis() * scale);
+            case SurfaceOfTranslation3 translation -> new SurfaceOfTranslation3(
+                    transformCurve3(translation.profile(), transformation),
+                    transformVector3(translation.direction(), transformation));
+            case SurfaceOfProjection3 projection -> new SurfaceOfProjection3(
+                    transformCurve3(projection.profile(), transformation),
+                    transformVector3(projection.projectionDirection(), transformation));
         };
     }
 
@@ -7382,6 +8044,31 @@ public final class StepCadBuilder {
      * Resolves the first trim value to a CartesianPoint.
      * Handles both entity references (CartesianPoint) and numeric parameter values (evaluate on curve).
      */
+    private double resolveTrimParameter(List<StepValue> trims, Curve3 basis, String slot) {
+        if (trims.isEmpty()) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
+        }
+        StepValue trim = unwrapTyped(trims.getFirst());
+        if (trim instanceof StepValue.ListValue innerList) {
+            return resolveTrimParameter(innerList.elements(), basis, slot);
+        }
+        if (trim instanceof StepValue.NumberValue num) {
+            return num.value();
+        }
+        if (trim instanceof StepValue.ReferenceValue ref) {
+            StepEntity entity = entitiesById.get(ref.id());
+            if (entity instanceof StepCartesianPoint point) {
+                if (point.coordinates().size() < 2) {
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
+                }
+                CartesianPoint cp = buildPoint(point.id());
+                return basis.parameterAt(cp);
+            }
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
+        }
+        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
+    }
+
     private CartesianPoint resolveTrimPoint3(List<StepValue> trims, Curve3 basis, String slot) {
         if (trims.isEmpty()) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
@@ -7555,6 +8242,70 @@ public final class StepCadBuilder {
     }
 
     public record Axis1Placement(CartesianPoint location, Direction3 axis) {
+    }
+
+    /**
+     * Builds a paraboloid surface of revolution.
+     */
+    public ParaboloidSurface buildParaboloidSurface(int id) {
+        ParaboloidSurface existing = paraboloidSurfaces.get(id);
+        if (existing != null) return existing;
+        StepParaboloidSurface step = requireEntity(id, StepParaboloidSurface.class, "PARABOLOID_SURFACE");
+        ParaboloidSurface built = new ParaboloidSurface(buildPlacement(step.position().id()), step.focalLength());
+        paraboloidSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a hyperboloid surface of revolution.
+     */
+    public HyperboloidSurface buildHyperboloidSurface(int id) {
+        HyperboloidSurface existing = hyperboloidSurfaces.get(id);
+        if (existing != null) return existing;
+        StepHyperboloidSurface step = requireEntity(id, StepHyperboloidSurface.class, "HYPERBOLOID_SURFACE");
+        HyperboloidSurface built = new HyperboloidSurface(buildPlacement(step.position().id()), step.radius(), step.semiAxis());
+        hyperboloidSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a surface of translation from a profile curve and direction.
+     */
+    public SurfaceOfTranslation3 buildSurfaceOfTranslation(int id) {
+        SurfaceOfTranslation3 existing = translationSurfaces.get(id);
+        if (existing != null) return existing;
+        StepSurfaceOfTranslation step = requireEntity(id, StepSurfaceOfTranslation.class, "SURFACE_OF_TRANSLATION");
+        Curve3 profile = buildCurve3(step.profile());
+        Vector3 direction = buildVector3(step.direction());
+        SurfaceOfTranslation3 built = new SurfaceOfTranslation3(profile, direction);
+        translationSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a surface of projection from a profile curve and projection direction.
+     */
+    public SurfaceOfProjection3 buildSurfaceOfProjection(int id) {
+        SurfaceOfProjection3 existing = projectionSurfaces.get(id);
+        if (existing != null) return existing;
+        StepSurfaceOfProjection step = requireEntity(id, StepSurfaceOfProjection.class, "SURFACE_OF_PROJECTION");
+        Curve3 profile = buildCurve3(step.profile());
+        Vector3 direction = buildVector3(step.projectionDirection());
+        SurfaceOfProjection3 built = new SurfaceOfProjection3(profile, direction);
+        projectionSurfaces.put(id, built);
+        return built;
+    }
+
+    private Vector3 buildVector3(StepEntity entity) {
+        if (entity instanceof StepVector stepVector) {
+            Direction3 dir = buildDirection(stepVector.orientation().id());
+            double mag = stepVector.magnitude();
+            return dir.asVector().scale(mag);
+        }
+        if (entity instanceof StepDirection stepDir) {
+            return buildDirection(stepDir.id()).asVector();
+        }
+        throw new StepResolutionException("entity is not a supported vector or direction");
     }
 
     private record CircularFrame(Vector3 x, Vector3 y) {

@@ -78,6 +78,18 @@ public record Plane(CartesianPoint origin, Direction3 normal) implements Surface
         return normal.asVector();
     }
 
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        return normal.asVector();
+    }
+
+    @Override
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        return sampleGrid(1.0, 1.0, uSegments, vSegments);
+    }
+
     /**
      * Samples a rectangular patch on the plane.
      *

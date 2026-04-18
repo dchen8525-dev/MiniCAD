@@ -30,6 +30,17 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
         return pointAt(parameterOf(point));
     }
 
+    /**
+     * Returns the closest point on the line to a given point.
+     *
+     * @param point query point
+     * @return closest point on the line
+     */
+    @Override
+    public Point2 closestPointTo(Point2 point) {
+        return closestPoint(point);
+    }
+
     @Override
     public boolean contains(Point2 point) {
         Preconditions.requireNonNull(point, "point");
@@ -54,6 +65,17 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
             points.add(pointAt(parameter));
         }
         return java.util.List.copyOf(points);
+    }
+
+    /**
+     * Samples the line from parameter 0 to 1.
+     *
+     * @param segments number of segments
+     * @return list of sampled points
+     */
+    @Override
+    public java.util.List<Point2> sample(int segments) {
+        return sample(segments, 0.0, 1.0);
     }
 
     /**

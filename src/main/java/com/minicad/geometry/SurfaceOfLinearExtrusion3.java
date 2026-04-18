@@ -54,14 +54,15 @@ public record SurfaceOfLinearExtrusion3(Curve3 sweptCurve, Vector3 extrusionVect
         } else if (curve instanceof CompositeCurve3 composite) {
             return getPointOnCompositeInternal(composite, parameter);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
-            // For TrimmedCurve, interpolate between trim points
-            return interpolatePoint(trimmed.trimStart(), trimmed.trimEnd(), parameter);
+            return trimmed.pointAt(parameter);
         } else if (curve instanceof Hyperbola3 hyperbola) {
             return hyperbola.pointAt(parameter);
         } else if (curve instanceof Parabola3 parabola) {
             return parabola.pointAt(parameter);
         } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
             return getPointOnCurveInternal(surfaceCurve.curve3d(), parameter);
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.pointAt(parameter);
         } else if (curve instanceof DegenerateCurve3 degenerate) {
             return degenerate.pointAt(parameter);
         }
@@ -92,14 +93,6 @@ public record SurfaceOfLinearExtrusion3(Curve3 sweptCurve, Vector3 extrusionVect
         index = Math.max(0, Math.min(index, segments.size() - 1));
         double localT = parameter * segments.size() - index;
         return getPointOnCurveInternal(segments.get(index), localT);
-    }
-
-    private static CartesianPoint interpolatePoint(CartesianPoint start, CartesianPoint end, double t) {
-        return new CartesianPoint(
-            start.x() + (end.x() - start.x()) * t,
-            start.y() + (end.y() - start.y()) * t,
-            start.z() + (end.z() - start.z()) * t
-        );
     }
 
     /**
@@ -172,25 +165,64 @@ public record SurfaceOfLinearExtrusion3(Curve3 sweptCurve, Vector3 extrusionVect
      * Computes the normal at a given position on the extrusion surface.
      * The normal is perpendicular to both the curve tangent and extrusion direction.
      *
-     * @param curveParameter parameter along the swept curve
+     * @param u parameter along the swept curve
+     * @param v parameter along the extrusion (unused for normal)
      * @return unit normal vector (perpendicular to surface)
      */
-    public Vector3 normalAt(double curveParameter) {
-        Preconditions.requireFinite(curveParameter, "curveParameter");
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
         Vector3 extrusionDir = extrusionVector.normalize().asVector();
-        // Approximate tangent by small parameter change
-        double eps = 0.001;
-        CartesianPoint p1 = pointAt(Math.max(0, curveParameter - eps), 0);
-        CartesianPoint p2 = pointAt(Math.min(1, curveParameter + eps), 0);
-        Vector3 tangent = p2.subtract(p1);
-        if (tangent.norm() <= Epsilon.EPS) {
-            return extrusionDir.cross(new Vector3(1, 0, 0)).normalize().asVector();
-        }
-        Vector3 normal = tangent.cross(extrusionDir);
+        Vector3 curveTangent = getCurveTangentAt(sweptCurve, u);
+        Vector3 normal = curveTangent.cross(extrusionDir);
         if (normal.norm() <= Epsilon.EPS) {
-            return extrusionDir.cross(new Vector3(1, 0, 0)).normalize().asVector();
+            Vector3 fallback = extrusionDir.cross(new Vector3(1, 0, 0));
+            if (fallback.norm() <= Epsilon.EPS) {
+                fallback = extrusionDir.cross(new Vector3(0, 1, 0));
+            }
+            return fallback.normalize().asVector();
         }
         return normal.normalize().asVector();
+    }
+
+    private static Vector3 getCurveTangentAt(Curve3 curve, double parameter) {
+        if (curve instanceof BSplineCurve3 bspline) {
+            return bspline.tangentAt(parameter);
+        } else if (curve instanceof RationalBSplineCurve3 rational) {
+            return rational.tangentAt(parameter);
+        } else if (curve instanceof Circle circle) {
+            return circle.tangentAt(parameter);
+        } else if (curve instanceof Ellipse3 ellipse) {
+            return ellipse.tangentAt(parameter);
+        } else if (curve instanceof Line3 line) {
+            return line.tangentAt(parameter);
+        } else if (curve instanceof Polyline3 polyline) {
+            return polyline.tangentAt(parameter);
+        } else if (curve instanceof TrimmedCurve3 trimmed) {
+            return trimmed.tangentAt(parameter);
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.tangentAt(parameter);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.tangentAt(parameter);
+        } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.tangentAt(parameter);
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.tangentAt(parameter);
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.tangentAt(parameter);
+        } else if (curve instanceof CompositeCurve3 composite) {
+            return composite.tangentAt(parameter);
+        }
+        // Fallback: numerical differentiation
+        double eps = 0.001;
+        CartesianPoint p1 = getPointOnCurveInternal(curve, Math.max(0, parameter - eps));
+        CartesianPoint p2 = getPointOnCurveInternal(curve, parameter + eps);
+        Vector3 tangent = p2.subtract(p1);
+        if (tangent.norm() <= Epsilon.EPS) {
+            return new Vector3(1, 0, 0);
+        }
+        return tangent.normalize().asVector();
     }
 
     /**
@@ -226,6 +258,18 @@ public record SurfaceOfLinearExtrusion3(Curve3 sweptCurve, Vector3 extrusionVect
             return rational.boundingBox();
         } else if (curve instanceof CompositeCurve3 composite) {
             return composite.boundingBox();
+        } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.curve3d().boundingBox();
+        } else if (curve instanceof Line3 line) {
+            return line.boundingBox(0.0, 1.0);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.boundingBox();
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.boundingBox();
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.boundingBox();
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.boundingBox();
         }
         // For other curves, sample and compute
         BoundingBox3 box = BoundingBox3.empty();

@@ -30,10 +30,10 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
 ```
 
 **Layer sizes:**
-- `step.model`: 1062 entity model classes
+- `step.model`: 1115+ entity model classes
 - `step.semantic`: 9 resolver/builder classes
 - `step.syntax`: 3 tokenizer/parser classes
-- `geometry`: 30 curve/surface classes
+- `geometry`: 30 curve/surface classes (13 Curve3 permits, 16 SurfaceGeometry permits)
 - `geometry2d`: 16 2D parametric domain classes
 - `topology`: 11 B-Rep classes
 
@@ -48,11 +48,12 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
 - Java resolves STEP and exports preview JSON via StepPreviewJsonExporter
 - Browser (`src/main/resources/static`) renders with Three.js
 - No server-side triangulation; mesh generation in browser JavaScript
+- Parametric surface rebuild in viewer for: plane, sphere, cylinder, cone, torus, B-Spline, rational B-Spline, surface of revolution, surface of linear extrusion, paraboloid, hyperboloid, surface of translation, surface of projection
 
 ## Key Interfaces
 
-- `Curve3` (sealed): Line3, Circle, Ellipse3, BSplineCurve3, Polyline3, TrimmedCurve3, CompositeCurve3, etc. Default methods for `boundingBox()`, `sample()`, `length()`, `tangentAt()`.
-- `SurfaceGeometry` (sealed): Plane, CylindricalSurface, ConicalSurface, SphericalSurface, ToroidalSurface, BSplineSurface3, etc. Default methods for `boundingBox()`, `sampleGrid()`, `normalAt()`.
+- `Curve3` (sealed, 13 permits): Line3, Circle, Ellipse3, Parabola3, Hyperbola3, Clothoid3, BSplineCurve3, RationalBSplineCurve3, Polyline3, TrimmedCurve3, CompositeCurve3, SurfaceCurve3, DegenerateCurve3. Key methods: `pointAt()`, `sample()`, `tangentAt()`, `closestPointTo()`, `contains()`, `length()`, `boundingBox()`, `parameterAt()`.
+- `SurfaceGeometry` (sealed, 16 permits): Plane, CylindricalSurface, ConicalSurface, SphericalSurface, ToroidalSurface, BSplineSurface3, RationalBSplineSurface3, SurfaceOfLinearExtrusion3, SurfaceOfRevolution3, RuledSurface3, OffsetSurface3, SurfaceOfConstantRadius3, ParaboloidSurface, HyperboloidSurface, SurfaceOfTranslation3, SurfaceOfProjection3. Key methods: `pointAt()`, `sampleGrid()`, `normalAt()`, `closestPointTo()`, `boundingBox()`.
 - `StepEntity`: marker interface for all resolved STEP model classes.
 
 ## Testing Patterns
@@ -72,61 +73,72 @@ Tests mirror main package layout under `src/test/java/`. Use inline STEP snippet
 
 ## STEP Entity Coverage
 
-The resolver registers ~24000+ entity types via ~1559 direct registry.put() calls. Key categories:
+The resolver registers ~24000+ entity types via ~1635+ direct registry.put() calls. Key categories:
 
-**Geometry/Topology (fully parsed):**
-- All basic curves (LINE, CIRCLE, ELLIPSE, HYPERBOLA, PARABOLA, POLYLINE, TRIMMED_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, etc.)
-- All basic surfaces (PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, TOROIDAL_SURFACE, SPHERICAL_SURFACE, B_SPLINE_SURFACE_WITH_KNOTS, etc.)
+**Geometry/Topology (fully parsed with B-Rep generation):**
+- All basic curves (LINE, CIRCLE, ELLIPSE, HYPERBOLA, PARABOLA, POLYLINE, TRIMMED_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, etc.) — 13 Curve3 types
+- All basic surfaces (PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, TOROIDAL_SURFACE, SPHERICAL_SURFACE, B_SPLINE_SURFACE_WITH_KNOTS, etc.) — 16 SurfaceGeometry types
 - All topology (VERTEX_POINT, EDGE_CURVE, ORIENTED_EDGE, EDGE_LOOP, ADVANCED_FACE, CLOSED_SHELL, MANIFOLD_SOLID_BREP, etc.)
+- Advanced surfaces: PARABOLOID_SURFACE, HYPERBOLOID_SURFACE, SURFACE_OF_TRANSLATION, SURFACE_OF_PROJECTION
+
+**CSG/Swept (full B-Rep generation):**
+- Boolean operations: BOOLEAN_RESULT/BOOLEAN_CLIPPING_RESULT with half-space clipping (difference/intersection/union)
+- Swept solids: EXTRUDED_AREA_SOLID, REVOLVED_AREA_SOLID, SURFACE_CURVE_SWEPT_AREA_SOLID
+- Extruded/revolved tapered: EXTRUDED_AREA_SOLID_TAPERED, REVOLVED_AREA_SOLID_TAPERED
+- Half space: HALF_SPACE_SOLID, BOXED_HALF_SPACE, POLYGONAL_BOUNDED_HALF_SPACE
+- Swept disk solid: SWEPT_DISK_SOLID
+- CSG volumes: CYLINDER_VOLUME, SPHERE_VOLUME, TORUS_VOLUME, PRISM_VOLUME, CSG_SOLID
+- Face-based solids: EXTRUDED_FACE_SOLID, REVOLVED_FACE_SOLID, SWEPT_FACE_SOLID
+- Tessellated: TESSELLATED_FACE_SET, TESSELLATED_FACE → triangular mesh B-Rep
+- Profile definitions: CIRCLE_PROFILE_DEF, RECTANGLE_PROFILE_DEF, etc.
 
 **Assembly/Product structure:**
 - NEXT_ASSEMBLY_USAGE_OCCURRENCE, CONTEXT_DEPENDENT_SHAPE_REPRESENTATION
 - PRODUCT, PRODUCT_DEFINITION, PRODUCT_DEFINITION_SHAPE
 
-**CSG/Swept (parsed but limited geometric evaluation):**
-- BOOLEAN_RESULT, CSG_SOLID, EXTRUDED_AREA_SOLID, REVOLVED_AREA_SOLID
-- Profile definitions (CIRCLE_PROFILE_DEF, RECTANGLE_PROFILE_DEF, etc.)
+**PMI/Annotation (preview support):**
+- ANNOTATION_FILL_AREA, ANNOTATION_FILL_AREA_REGION, FILL_AREA_WITH_OUTLINE
+- DRAUGHTING_PRE_DEFINED_COLOUR, PRE_DEFINED_COLOUR
+- TERMINATOR_SYMBOL, DIMENSIONAL_EXPONENT
+
+**Kinematic (full support):**
+- 14 specific kinematic pair types (PRISMATIC_PAIR, REVOLUTE_PAIR, etc.)
+- MECHANISM_STATE_REPRESENTATION, KINEMATIC_PATH
+
+**FEA (full support):**
+- VOLUME_3D_ELEMENT_REPRESENTATION, FEA_MATERIAL_PROPERTY_REPRESENTATION
+- ELEMENT_VOLUME_2D, ELEMENT_VOLUME_3D, NODE_SET, ELEMENT_SET
+
+**GD&T (full support):**
+- GEOMETRIC_TOLERANCE with variants (max tolerance, defined area unit, non-uniform zone)
+- DATUM_REFERENCE_MODIFIER, DATUM_REFERENCE_MODIFIER_WITH_VALUE
+- RUNOUT_ZONE_DEFINITION_ORIENTATION
 
 ## Current Limitations
 
-### Geometry Evaluation Not Implemented
+### Geometry Evaluation Known Constraints
 
-These entities are fully parsed but geometric evaluation is not performed:
-- **CSG Boolean operations**: `BOOLEAN_RESULT`, `BOOLEAN_CLIPPING_RESULT`, `COMPLEX_CLIPPING_RESULT` parsed but no geometric boolean evaluation
-- **Swept solids**: `EXTRUDED_AREA_SOLID`, `REVOLVED_AREA_SOLID`, `SURFACE_CURVE_SWEPT_AREA_SOLID` parsed but no B-Rep generation
-- **Half space**: `HALF_SPACE_SOLID`, `BOXED_HALF_SPACE`, `POLYGONAL_BOUNDED_HALF_SPACE` parsed but no clipping evaluation
-- **Tessellated geometry**: `TESSELLATED_FACE_SET`, `TESSELLATED_FACE`, `TESSELLATED_TRIANGLE` parsed but not converted to analytical geometry
+- **CSG solid-solid Boolean**: `BOOLEAN_RESULT` with two bounded solids (e.g., sphere - cylinder) requires a mesh Boolean kernel — not supported. Only half-space clipping is implemented (difference/intersection/union with HALF_SPACE_SOLID or BOXED_HALF_SPACE).
+- **Degenerate edges**: Zero-length edges may fail during topology construction.
+- **B-Spline surface trimming**: Trimming curves on B-Spline surfaces use UV projection; complex multi-loop trims may produce artifacts.
 
 ### STEP Entity Parsing Not Yet Supported
 
-The following STEP AP214/AP242 entity types are not yet implemented:
+The following STEP AP214/AP242 entity types are registered but have no B-Rep generation:
 
 **Advanced geometry surfaces**:
-- `SURFACE_OF_TRANSLATION`, `SURFACE_OF_PROJECTION`
-- `PARABOLOID_SURFACE`, `HYPERBOLOID_SURFACE`
 - `TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS`
-
-**Advanced swept solids**:
-- `EXTRUDED_FACE_SOLID`, `REVOLVED_FACE_SOLID`
-- `SURFACE_CURVE_SWEPT_FACE_SOLID`
-
-**Advanced CSG primitives**:
-- `CYLINDER_VOLUME`, `SPHERE_VOLUME`, `TORUS_VOLUME`
-- `RIGHT_CIRCULAR_CYLINDER_VOLUME`, `RIGHT_CIRCULAR_CONE_VOLUME`
-- `PRISM_VOLUME`
 
 **Advanced PMI/tolerances**:
 - `GEOMETRIC_TOLERANCE_RELATIONSHIP`
 - `DATUM_SYSTEM` (multi-datum combination)
-- `PROJECTED_ZONE_DEFINITION`, `NON_UNIFORM_ZONE_DEFINITION`
 
 **Validation property framework**:
-- `VALIDATION_PROPERTY_REPRESENTATION`, `VALIDATION_RESULT_REPRESENTATION`
-- `CALCULATED_GEOMETRIC_REPRESENTATION_ITEM`
+- `VALIDATION_RESULT_REPRESENTATION`
 
-**Kinematic (partial support, these not implemented)**:
-- `KINEMATIC_PATH`, `KINEMATIC_FRAME_BASED_TRANSFORMATION`
+### Industrial File Import Status
 
-**Finite element/mesh (partial support, these not implemented)**:
-- `ELEMENT_VOLUME_2D`, `ELEMENT_VOLUME_3D`
-- `NODE_SET`, `ELEMENT_SET`
+| File | solids | unsupported faces | Notes |
+|---|---|---|---|
+| engine.stp | 31 | 0 | 93829 entities |
+| fan.stp | 1 | 0 | 41707 entities |

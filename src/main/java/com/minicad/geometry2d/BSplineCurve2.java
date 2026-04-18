@@ -134,6 +134,44 @@ public record BSplineCurve2(
     }
 
     /**
+     * Returns the closest point on the curve to a given point.
+     *
+     * @param point target point
+     * @return approximate closest point on the curve
+     */
+    @Override
+    public Point2 closestPointTo(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Point2 closest = null;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int resolution : new int[]{32, 64, 128}) {
+            for (Point2 sample : sample(resolution)) {
+                double d = sample.distanceTo(point);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = sample;
+                }
+            }
+        }
+        return closest != null ? closest : pointAt(startParameter());
+    }
+
+    /**
+     * Returns the approximate arc length of the curve.
+     *
+     * @return arc length
+     */
+    @Override
+    public double length() {
+        List<Point2> samples = sample(128);
+        double total = 0.0;
+        for (int i = 1; i < samples.size(); i++) {
+            total += samples.get(i).distanceTo(samples.get(i - 1));
+        }
+        return total;
+    }
+
+    /**
      * Computes the tangent vector at a given parameter.
      *
      * @param parameter parameter in the knot domain

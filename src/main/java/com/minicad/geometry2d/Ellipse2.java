@@ -149,6 +149,16 @@ public record Ellipse2(Point2 center, Direction2 xDirection, double semiAxis1, d
      *
      * @return approximate perimeter
      */
+    @Override
+    public double length() {
+        return perimeter();
+    }
+
+    /**
+     * Approximates the perimeter of the ellipse using Ramanujan's formula.
+     *
+     * @return approximate perimeter
+     */
     public double perimeter() {
         double a = semiAxis1;
         double b = semiAxis2;

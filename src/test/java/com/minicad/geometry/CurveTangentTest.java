@@ -139,8 +139,8 @@ class CurveTangentTest {
                 Direction3.from(new Vector3(1, 0, 0)));
         TrimmedCurve3 trimmed = new TrimmedCurve3(
                 basis,
-                new CartesianPoint(0, 0, 0),
-                new CartesianPoint(10, 0, 0),
+                0.0,
+                10.0,
                 true);
 
         // Tangent should point along +X (senseAgreement=true)
@@ -157,8 +157,8 @@ class CurveTangentTest {
                 Direction3.from(new Vector3(1, 0, 0)));
         TrimmedCurve3 trimmed = new TrimmedCurve3(
                 basis,
-                new CartesianPoint(0, 0, 0),
-                new CartesianPoint(10, 0, 0),
+                0.0,
+                10.0,
                 false); // senseAgreement=false means reversed
 
         // Tangent should point along -X (senseAgreement=false)

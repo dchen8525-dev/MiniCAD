@@ -58,6 +58,16 @@ public record DegenerateCurve3(CartesianPoint point) implements Curve3 {
     }
 
     /**
+     * Returns the length of the degenerate curve (always zero).
+     *
+     * @return 0.0
+     */
+    @Override
+    public double length() {
+        return 0.0;
+    }
+
+    /**
      * Returns the bounding box of the degenerate curve (a single point).
      *
      * @return bounding box containing just the degenerate point
@@ -89,5 +99,17 @@ public record DegenerateCurve3(CartesianPoint point) implements Curve3 {
     public double distanceTo(CartesianPoint other) {
         Preconditions.requireNonNull(other, "other");
         return other.distanceTo(point);
+    }
+
+    /**
+     * Returns the curve parameter for a degenerate curve.
+     * Since the curve is a single point, always returns 0.
+     *
+     * @param point query point (ignored)
+     * @return 0.0
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        return 0.0;
     }
 }

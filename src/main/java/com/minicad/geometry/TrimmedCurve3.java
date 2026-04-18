@@ -1,19 +1,22 @@
 package com.minicad.geometry;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
 
 /**
  * Minimal trimmed-curve wrapper over a supported basis curve.
+ * Trims are stored as parameter values on the basis curve; the geometric
+ * trim endpoints are derived by evaluating the basis curve at those parameters.
  *
  * @param basisCurve supported basis curve
- * @param trimStart first trim point
- * @param trimEnd second trim point
+ * @param trimParamStart parameter value for the first trim
+ * @param trimParamEnd parameter value for the second trim
  * @param senseAgreement trimming orientation agreement
  */
 public record TrimmedCurve3(
         Curve3 basisCurve,
-        CartesianPoint trimStart,
-        CartesianPoint trimEnd,
+        double trimParamStart,
+        double trimParamEnd,
         boolean senseAgreement
 ) implements Curve3 {
 
@@ -22,96 +25,121 @@ public record TrimmedCurve3(
      */
     public TrimmedCurve3 {
         Preconditions.requireNonNull(basisCurve, "basisCurve");
-        Preconditions.requireNonNull(trimStart, "trimStart");
-        Preconditions.requireNonNull(trimEnd, "trimEnd");
+        Preconditions.requireFinite(trimParamStart, "trimParamStart");
+        Preconditions.requireFinite(trimParamEnd, "trimParamEnd");
+    }
+
+    /**
+     * Returns the geometric trim start point.
+     */
+    public CartesianPoint trimStart() {
+        return basisCurve.pointAt(trimParamStart);
+    }
+
+    /**
+     * Returns the geometric trim end point.
+     */
+    public CartesianPoint trimEnd() {
+        return basisCurve.pointAt(trimParamEnd);
     }
 
     @Override
     public boolean contains(CartesianPoint point) {
-        return basisCurve.contains(point);
+        Preconditions.requireNonNull(point, "point");
+        // Find closest point on the trimmed segment
+        CartesianPoint closest = closestPointTo(point);
+        if (point.distanceTo(closest) > Epsilon.EPS * 10) {
+            return false;
+        }
+        // Find the parameter of the closest point on the basis curve
+        double param = basisCurve.parameterAt(closest);
+        double minP = Math.min(trimParamStart, trimParamEnd);
+        double maxP = Math.max(trimParamStart, trimParamEnd);
+        return param >= minP - Epsilon.EPS && param <= maxP + Epsilon.EPS;
     }
 
     /**
      * Evaluates a point on the trimmed curve at the given parameter.
-     * The parameter is mapped from the trim start to trim end.
+     * The parameter is linearly mapped from [0,1] to [trimParamStart, trimParamEnd].
      *
      * @param parameter parameter value (0 to 1)
-     * @return point on the trimmed curve
+     * @return point on the basis curve at the mapped parameter
      */
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        if (senseAgreement) {
-            return interpolate(trimStart, trimEnd, parameter);
-        } else {
-            return interpolate(trimEnd, trimStart, parameter);
-        }
+        double mapped = senseAgreement
+                ? trimParamStart + (trimParamEnd - trimParamStart) * parameter
+                : trimParamEnd + (trimParamStart - trimParamEnd) * parameter;
+        return basisCurve.pointAt(mapped);
     }
 
     /**
-     * Samples the trimmed curve by sampling the basis curve between trim points.
+     * Samples the trimmed curve by sampling the basis curve between trim parameters.
      *
      * @param segments number of segments to sample
-     * @return list of sampled points from trimStart to trimEnd
+     * @return list of sampled points
      */
+    @Override
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double t = (double) i / segments;
-            CartesianPoint point;
-            if (senseAgreement) {
-                point = interpolate(trimStart, trimEnd, t);
-            } else {
-                point = interpolate(trimEnd, trimStart, t);
-            }
-            points.add(point);
+            double mapped = senseAgreement
+                    ? trimParamStart + (trimParamEnd - trimParamStart) * t
+                    : trimParamEnd + (trimParamStart - trimParamEnd) * t;
+            points.add(basisCurve.pointAt(mapped));
         }
         return java.util.List.copyOf(points);
     }
 
     /**
      * Computes the tangent vector at a given parameter.
-     * The tangent direction depends on senseAgreement.
      *
      * @param parameter parameter value (0 to 1)
      * @return unit tangent vector
      */
+    @Override
     public Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        Vector3 direction = trimEnd.subtract(trimStart);
+        double mapped = senseAgreement
+                ? trimParamStart + (trimParamEnd - trimParamStart) * parameter
+                : trimParamEnd + (trimParamStart - trimParamEnd) * parameter;
+        Vector3 tangent = basisCurve.tangentAt(mapped);
         if (!senseAgreement) {
-            direction = trimStart.subtract(trimEnd);
+            tangent = tangent.negate();
         }
-        if (direction.norm() <= com.minicad.common.Epsilon.EPS) {
-            return new Vector3(1, 0, 0);
-        }
-        return direction.normalize().asVector();
+        return tangent;
     }
 
     /**
-     * Returns the bounding box enclosing the trimmed curve.
+     * Returns the bounding box enclosing the trimmed curve by sampling.
      *
-     * @return bounding box enclosing trim start and end
+     * @return bounding box enclosing the trimmed segment
      */
+    @Override
     public BoundingBox3 boundingBox() {
-        return BoundingBox3.of(trimStart, trimEnd);
+        BoundingBox3 box = BoundingBox3.empty();
+        java.util.List<CartesianPoint> samples = sample(64);
+        for (CartesianPoint point : samples) {
+            box = box.union(point);
+        }
+        return box;
     }
 
     /**
-     * Returns the length of the trimmed curve segment.
+     * Returns the approximate length of the trimmed curve segment.
      *
-     * @return length from trimStart to trimEnd
+     * @return length
      */
+    @Override
     public double length() {
-        return trimStart.distanceTo(trimEnd);
-    }
-
-    private static CartesianPoint interpolate(CartesianPoint start, CartesianPoint end, double t) {
-        return new CartesianPoint(
-                start.x() + (end.x() - start.x()) * t,
-                start.y() + (end.y() - start.y()) * t,
-                start.z() + (end.z() - start.z()) * t
-        );
+        java.util.List<CartesianPoint> samples = sample(256);
+        double total = 0.0;
+        for (int i = 0; i < samples.size() - 1; i++) {
+            total += samples.get(i).distanceTo(samples.get(i + 1));
+        }
+        return total;
     }
 
     /**
@@ -123,14 +151,20 @@ public record TrimmedCurve3(
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // For linear interpolation between trim points
-        Vector3 direction = trimEnd.subtract(trimStart);
-        if (direction.isZero()) {
-            return trimStart;
+        // Sample the trimmed curve at increasing resolution
+        CartesianPoint closest = null;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int res : new int[]{16, 32, 64}) {
+            java.util.List<CartesianPoint> samples = sample(res);
+            for (CartesianPoint s : samples) {
+                double d = point.distanceTo(s);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = s;
+                }
+            }
         }
-        double t = point.subtract(trimStart).dot(direction) / direction.dot(direction);
-        t = Math.max(0.0, Math.min(1.0, t));
-        return interpolate(trimStart, trimEnd, t);
+        return closest != null ? closest : pointAt(0);
     }
 
     /**
@@ -151,7 +185,7 @@ public record TrimmedCurve3(
      * @return midpoint
      */
     public CartesianPoint midpoint() {
-        return interpolate(trimStart, trimEnd, 0.5);
+        return pointAt(0.5);
     }
 
     /**
@@ -168,7 +202,7 @@ public record TrimmedCurve3(
         } else if (basisCurve instanceof Line3) {
             return 0.0;
         }
-        return 0.0;  // Default for other curves
+        return 0.0;
     }
 
     /**
@@ -179,5 +213,25 @@ public record TrimmedCurve3(
      */
     public double curvatureAt(double parameter) {
         return curvature();
+    }
+
+    /**
+     * Returns the curve parameter corresponding to the given point.
+     * Maps the basis curve parameter back to [0,1] range.
+     *
+     * @param point a point on or near the trimmed curve
+     * @return parameter value in [0,1]
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        double basisParam = basisCurve.parameterAt(point);
+        double minP = Math.min(trimParamStart, trimParamEnd);
+        double maxP = Math.max(trimParamStart, trimParamEnd);
+        double range = maxP - minP;
+        if (Math.abs(range) <= Epsilon.EPS) {
+            return 0.0;
+        }
+        return (basisParam - minP) / range;
     }
 }

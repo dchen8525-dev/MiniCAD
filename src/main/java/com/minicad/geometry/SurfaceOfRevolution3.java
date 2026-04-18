@@ -60,8 +60,7 @@ public record SurfaceOfRevolution3(
         } else if (curve instanceof CompositeCurve3 composite) {
             return getPointOnCompositeInternal(composite, parameter);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
-            // For TrimmedCurve, interpolate between trim points
-            return interpolatePoint(trimmed.trimStart(), trimmed.trimEnd(), parameter);
+            return trimmed.pointAt(parameter);
         } else if (curve instanceof Hyperbola3 hyperbola) {
             return hyperbola.pointAt(parameter);
         } else if (curve instanceof Parabola3 parabola) {
@@ -100,14 +99,6 @@ public record SurfaceOfRevolution3(
         index = Math.max(0, Math.min(index, segments.size() - 1));
         double localT = parameter * segments.size() - index;
         return getPointOnCurveInternal(segments.get(index), localT);
-    }
-
-    private static CartesianPoint interpolatePoint(CartesianPoint start, CartesianPoint end, double t) {
-        return new CartesianPoint(
-            start.x() + (end.x() - start.x()) * t,
-            start.y() + (end.y() - start.y()) * t,
-            start.z() + (end.z() - start.z()) * t
-        );
     }
 
     /**
@@ -250,6 +241,18 @@ public record SurfaceOfRevolution3(
             return rational.boundingBox();
         } else if (curve instanceof CompositeCurve3 composite) {
             return composite.boundingBox();
+        } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return surfaceCurve.curve3d().boundingBox();
+        } else if (curve instanceof Line3 line) {
+            return line.boundingBox(0.0, 1.0);
+        } else if (curve instanceof Parabola3 parabola) {
+            return parabola.boundingBox();
+        } else if (curve instanceof Hyperbola3 hyperbola) {
+            return hyperbola.boundingBox();
+        } else if (curve instanceof Clothoid3 clothoid) {
+            return clothoid.boundingBox();
+        } else if (curve instanceof DegenerateCurve3 degenerate) {
+            return degenerate.boundingBox();
         }
         // For other curves, sample and compute
         BoundingBox3 box = BoundingBox3.empty();
