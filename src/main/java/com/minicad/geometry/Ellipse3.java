@@ -246,12 +246,25 @@ public record Ellipse3(Axis2Placement3D position, double semiAxis1, double semiA
             point.z() - axialOffset.z()
         );
 
-        // Find the angle from center to projected point (approximate)
+        // Find initial angle from center to projected point
         Vector3 radialOffset = projected.subtract(position.location());
         double x = radialOffset.dot(position.xDirection().asVector());
         double y = radialOffset.dot(position.yDirection().asVector());
         double angle = Math.atan2(y / semiAxis2, x / semiAxis1);
 
+        // Newton-Raphson refinement: minimize ||C(angle) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(angle);
+            Vector3 residual = cp.subtract(projected);
+            // Tangent vector (unnormalized): C'(angle) = -a*sin(angle)*xDir + b*cos(angle)*yDir
+            Vector3 deriv = position.xDirection().asVector().scale(-Math.sin(angle) * semiAxis1)
+                    .add(position.yDirection().asVector().scale(Math.cos(angle) * semiAxis2));
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            angle += dt;
+            if (Math.abs(dt) < 1e-12) break;
+        }
         return pointAt(angle);
     }
 

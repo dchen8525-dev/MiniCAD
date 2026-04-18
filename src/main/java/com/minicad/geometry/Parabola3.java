@@ -178,8 +178,22 @@ public record Parabola3(Axis2Placement3D position, double focalDistance) impleme
         double y = radialOffset.dot(position.yDirection().asVector());
 
         // For parabola x = 2*p*t, y = p*t^2, solve t approximately
-        double tApprox = x / (2.0 * focalDistance);
-        return pointAt(tApprox);
+        double t = x / (2.0 * focalDistance);
+
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(t);
+            Vector3 residual = cp.subtract(projected);
+            // Tangent: C'(t) = 2p*xDir + 2p*t*yDir
+            Vector3 deriv = position.xDirection().asVector().scale(2.0 * focalDistance)
+                    .add(position.yDirection().asVector().scale(2.0 * focalDistance * t));
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t += dt;
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(t);
     }
 
     /**

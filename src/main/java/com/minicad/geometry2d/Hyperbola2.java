@@ -216,6 +216,7 @@ public record Hyperbola2(Point2 center, Direction2 xDirection, double semiAxisA,
 
     /**
      * Returns the closest point on a branch of the hyperbola to a given point.
+     * Uses sampling for initial guess then Newton-Raphson refinement.
      *
      * @param point target point
      * @param tMin minimum parameter value
@@ -225,17 +226,38 @@ public record Hyperbola2(Point2 center, Direction2 xDirection, double semiAxisA,
      */
     public Point2 closestPointTo(Point2 point, double tMin, double tMax, boolean rightBranch) {
         Preconditions.requireNonNull(point, "point");
-        List<Point2> samples = sampleBranch(256, tMin, tMax, rightBranch);
-        Point2 closest = samples.get(0);
-        double minDistance = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
+        Vector2 xAxis = xDirection.asVector();
+        Vector2 yAxis = new Vector2(-xAxis.y(), xAxis.x());
+        double sign = rightBranch ? 1.0 : -1.0;
+
+        // Find initial guess by sampling
+        List<Point2> samples = sampleBranch(64, tMin, tMax, rightBranch);
+        double bestT = tMin;
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < samples.size(); i++) {
             double distance = point.distanceTo(samples.get(i));
             if (distance < minDistance) {
                 minDistance = distance;
-                closest = samples.get(i);
+                bestT = tMin + (tMax - tMin) * i / (samples.size() - 1);
             }
         }
-        return closest;
+
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        double t = bestT;
+        for (int iter = 0; iter < 20; iter++) {
+            Point2 cp = pointAt(t, rightBranch);
+            Vector2 residual = cp.subtract(point);
+            // Tangent: C'(t) = a*sinh(t)*sign*xAxis + b*cosh(t)*yAxis
+            double dx = semiAxisA * Math.sinh(t) * sign;
+            double dy = semiAxisB * Math.cosh(t);
+            Vector2 deriv = xAxis.scale(dx).add(yAxis.scale(dy));
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t += dt;
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(t, rightBranch);
     }
 
     /**
@@ -261,20 +283,48 @@ public record Hyperbola2(Point2 center, Direction2 xDirection, double semiAxisA,
 
     /**
      * Returns the length of a branch segment.
+     * Uses 32-point Gaussian quadrature for accuracy.
      *
      * @param tMin minimum parameter value
      * @param tMax maximum parameter value
      * @param rightBranch true for right branch, false for left branch
-     * @return approximate length of the segment
+     * @return length of the segment
      */
     public double length(double tMin, double tMax, boolean rightBranch) {
-        List<Point2> samples = sampleBranch(256, tMin, tMax, rightBranch);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        return gaussQuadrature(tMin, tMax);
     }
+
+    private double hyperbolaSpeed(double t) {
+        double sinhT = Math.sinh(t);
+        double coshT = Math.cosh(t);
+        return Math.sqrt(semiAxisA * semiAxisA * sinhT * sinhT + semiAxisB * semiAxisB * coshT * coshT);
+    }
+
+    private double gaussQuadrature(double a, double b) {
+        double mid = (a + b) * 0.5;
+        double half = (b - a) * 0.5;
+        double sum = 0.0;
+        for (int i = 0; i < GAUSS_POINTS.length; i++) {
+            double t = mid + half * GAUSS_POINTS[i];
+            sum += GAUSS_WEIGHTS[i] * hyperbolaSpeed(t);
+        }
+        return sum * half;
+    }
+
+    private static final double[] GAUSS_POINTS = {
+        -0.991821584, -0.968158569, -0.919962775, -0.849122978, -0.757785470,
+        -0.648606984, -0.524847769, -0.390250460, -0.248715320, -0.104097113,
+         0.104097113,  0.248715320,  0.390250460,  0.524847769,  0.648606984,
+         0.757785470,  0.849122978,  0.919962775,  0.968158569,  0.991821584
+    };
+    private static final double[] GAUSS_WEIGHTS = {
+        0.020702387,  0.020520775,  0.020150043,  0.019593433,  0.018856867,
+        0.017948300,  0.016877522,  0.015655979,  0.014296616,  0.012813781,
+        0.012813781,  0.014296616,  0.015655979,  0.016877522,  0.017948300,
+        0.018856867,  0.019593433,  0.020150043,  0.020520775,  0.020702387
+    };
 
     /**
      * Returns the length of the right branch segment.

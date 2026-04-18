@@ -210,12 +210,35 @@ public record Hyperbola3(Axis2Placement3D position, double semiAxisA, double sem
 
         // Solve for t approximately: x = a*|t|, y = b*sqrt(t^2-1)
         double sign = x >= 0 ? 1.0 : -1.0;
-        double tApprox = Math.abs(x) / semiAxisA;
-        if (tApprox < 1.0) {
-            tApprox = 1.0;
+        double t = Math.abs(x) / semiAxisA;
+        if (t < 1.0) {
+            t = 1.0;
         }
 
-        return pointAt(sign * tApprox);
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(sign * t);
+            Vector3 residual = cp.subtract(projected);
+            // Tangent at parameter sign*t
+            double absT = t;
+            Vector3 deriv;
+            if (absT <= 1.0 + Epsilon.EPS) {
+                deriv = position.xDirection().asVector();
+            } else {
+                double sqrtTerm = Math.sqrt(absT * absT - 1.0);
+                double dx = semiAxisA * sign;
+                double dy = semiAxisB * absT / sqrtTerm;
+                deriv = position.xDirection().asVector().scale(dx)
+                        .add(position.yDirection().asVector().scale(dy));
+            }
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t += dt;
+            if (t < 1.0) t = 1.0;
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(sign * t);
     }
 
     /**

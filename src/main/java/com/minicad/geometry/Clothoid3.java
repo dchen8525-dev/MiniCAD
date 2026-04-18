@@ -208,9 +208,10 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
 
     /**
      * Returns the closest point on the clothoid to a given point.
+     * Uses sampling for initial guess then Newton-Raphson refinement.
      *
      * @param point target point
-     * @return closest point on the clothoid (approximately)
+     * @return closest point on the clothoid
      */
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
@@ -225,18 +226,30 @@ public record Clothoid3(Axis2Placement3D position, double xAxisIntercept, double
             point.z() - axialOffset.z()
         );
 
-        // Find closest by sampling
+        // Find initial guess by sampling
         java.util.List<CartesianPoint> samples = sample(256);
-        CartesianPoint closest = samples.get(0);
-        double minDistance = projected.distanceTo(closest);
+        int bestIndex = 0;
+        double minDistance = projected.distanceTo(samples.get(0));
         for (int i = 1; i < samples.size(); i++) {
             double distance = projected.distanceTo(samples.get(i));
             if (distance < minDistance) {
                 minDistance = distance;
-                closest = samples.get(i);
+                bestIndex = i;
             }
         }
-        return closest;
+        double t = (double) bestIndex / 256;
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = pointAt(t);
+            Vector3 residual = cp.subtract(projected);
+            Vector3 deriv = tangentAt(t);
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t = Math.max(0, Math.min(1, t + dt));
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(t);
     }
 
     /**

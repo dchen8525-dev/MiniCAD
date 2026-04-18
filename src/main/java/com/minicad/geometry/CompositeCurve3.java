@@ -282,6 +282,8 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             return cc.length();
         } else if (segment instanceof SurfaceCurve3 sc) {
             return sc.length();
+        } else if (segment instanceof DegenerateCurve3) {
+            return 0.0;
         }
         // Fallback: approximate by sampling
         java.util.List<CartesianPoint> samples = sampleSegment(segment, 64);
@@ -317,6 +319,8 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             return clothoid.tangentAt(parameter * 2 * Math.PI);
         } else if (segment instanceof DegenerateCurve3 degenerate) {
             return degenerate.tangentAt(parameter);
+        } else if (segment instanceof CompositeCurve3 composite) {
+            return composite.tangentAt(parameter);
         }
         return new Vector3(1, 0, 0);
     }

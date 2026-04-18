@@ -143,8 +143,22 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             return polyline.length();
         } else if (segment instanceof TrimmedCurve2 trimmed) {
             return trimmed.length();
+        } else if (segment instanceof Line2) {
+            return 1.0;
+        } else if (segment instanceof BSplineCurve2 bs) {
+            return bs.length();
+        } else if (segment instanceof RationalBSplineCurve2 rb) {
+            return rb.length();
+        } else if (segment instanceof Parabola2 p) {
+            return p.length();
+        } else if (segment instanceof Hyperbola2 h) {
+            return h.length();
+        } else if (segment instanceof DegenerateCurve2) {
+            return 0.0;
+        } else if (segment instanceof CompositeCurve2 cc) {
+            return cc.length();
         }
-        // For other curves, approximate by sampling
+        // Fallback: approximate by sampling
         java.util.List<Point2> samples = sampleSegment(segment, 64);
         double length = 0.0;
         for (int i = 0; i < samples.size() - 1; i++) {
@@ -209,6 +223,18 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             return polyline.tangentAt(parameter);
         } else if (segment instanceof TrimmedCurve2 trimmed) {
             return trimmed.tangentAt(parameter);
+        } else if (segment instanceof BSplineCurve2 bs) {
+            return bs.tangentAt(bs.startParameter() + parameter * (bs.endParameter() - bs.startParameter()));
+        } else if (segment instanceof RationalBSplineCurve2 rb) {
+            return rb.tangentAt(rb.startParameter() + parameter * (rb.endParameter() - rb.startParameter()));
+        } else if (segment instanceof Hyperbola2 hyperbola) {
+            return hyperbola.tangentAt(parameter);
+        } else if (segment instanceof Parabola2 parabola) {
+            return parabola.tangentAt(parameter);
+        } else if (segment instanceof DegenerateCurve2) {
+            return new Vector2(1, 0);
+        } else if (segment instanceof CompositeCurve2 composite) {
+            return composite.tangentAt(parameter);
         }
         // Default: numerical differentiation
         double eps = 1e-6;
@@ -253,8 +279,20 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             return trimmed.closestPointTo(point);
         } else if (segment instanceof Line2 line) {
             return line.closestPoint(point);
+        } else if (segment instanceof BSplineCurve2 bs) {
+            return bs.closestPointTo(point);
+        } else if (segment instanceof RationalBSplineCurve2 rb) {
+            return rb.closestPointTo(point);
+        } else if (segment instanceof Hyperbola2 hyperbola) {
+            return hyperbola.closestPointTo(point);
+        } else if (segment instanceof Parabola2 parabola) {
+            return parabola.closestPointTo(point);
+        } else if (segment instanceof DegenerateCurve2 deg) {
+            return deg.point();
+        } else if (segment instanceof CompositeCurve2 composite) {
+            return composite.closestPointTo(point);
         }
-        // For other curves, find closest by sampling
+        // Fallback: find closest by sampling
         java.util.List<Point2> samples = sampleSegment(segment, 256);
         Point2 closest = samples.get(0);
         double minDist = point.distanceTo(closest);

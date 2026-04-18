@@ -207,6 +207,19 @@ public record Ellipse2(Point2 center, Direction2 xDirection, double semiAxis1, d
         double px = offset.dot(x) / semiAxis1;
         double py = offset.dot(y) / semiAxis2;
         double angle = Math.atan2(py, px);
+
+        // Newton-Raphson refinement: minimize ||C(angle) - P||^2
+        for (int iter = 0; iter < 20; iter++) {
+            Point2 cp = pointAt(angle);
+            Vector2 residual = cp.subtract(point);
+            // Tangent vector (unnormalized): C'(angle) = -a*sin(angle)*xDir + b*cos(angle)*yDir
+            Vector2 deriv = x.scale(-Math.sin(angle) * semiAxis1).add(y.scale(Math.cos(angle) * semiAxis2));
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            angle += dt;
+            if (Math.abs(dt) < 1e-12) break;
+        }
         return pointAt(angle);
     }
 

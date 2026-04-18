@@ -154,6 +154,7 @@ public record Parabola2(Point2 vertex, Direction2 axisDirection, double focalDis
 
     /**
      * Returns the closest point on the parabola to a given point.
+     * Uses sampling for initial guess then Newton-Raphson refinement.
      *
      * @param point target point
      * @param tMin minimum parameter value
@@ -162,17 +163,35 @@ public record Parabola2(Point2 vertex, Direction2 axisDirection, double focalDis
      */
     public Point2 closestPointTo(Point2 point, double tMin, double tMax) {
         Preconditions.requireNonNull(point, "point");
-        List<Point2> samples = sample(256, tMin, tMax);
-        Point2 closest = samples.get(0);
-        double minDistance = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
+        Vector2 axis = axisDirection.asVector();
+        Vector2 perpendicular = new Vector2(-axis.y(), axis.x());
+
+        // Find initial guess by sampling
+        List<Point2> samples = sample(64, tMin, tMax);
+        double bestT = tMin;
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < samples.size(); i++) {
             double distance = point.distanceTo(samples.get(i));
             if (distance < minDistance) {
                 minDistance = distance;
-                closest = samples.get(i);
+                bestT = tMin + (tMax - tMin) * i / (samples.size() - 1);
             }
         }
-        return closest;
+
+        // Newton-Raphson refinement: minimize ||C(t) - P||^2
+        double t = bestT;
+        for (int iter = 0; iter < 20; iter++) {
+            Point2 cp = pointAt(t);
+            Vector2 residual = cp.subtract(point);
+            // Tangent: C'(t) = 2p*perp + 2p*t*axis
+            Vector2 deriv = perpendicular.scale(2.0 * focalDistance).add(axis.scale(2.0 * focalDistance * t));
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t += dt;
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return pointAt(t);
     }
 
     /**

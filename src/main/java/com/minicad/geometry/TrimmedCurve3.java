@@ -174,6 +174,9 @@ public record TrimmedCurve3(
                 yield tc.basisCurve().length() * basisFraction;
             }
             case Clothoid3 c -> c.length() * fraction;
+            case DegenerateCurve3 deg -> 0.0;
+            case CompositeCurve3 cc -> cc.length() * fraction;
+            case SurfaceCurve3 sc -> sc.length() * fraction;
             default -> {
                 java.util.List<CartesianPoint> samples = sample(256);
                 double total = 0.0;
@@ -194,20 +197,43 @@ public record TrimmedCurve3(
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Sample the trimmed curve at increasing resolution
+        // Sample the trimmed curve at increasing resolution to find initial guess
         CartesianPoint closest = null;
         double minDist = Double.POSITIVE_INFINITY;
+        double bestT = 0.0;
+        double tMin = Math.min(trimParamStart, trimParamEnd);
+        double tMax = Math.max(trimParamStart, trimParamEnd);
         for (int res : new int[]{16, 32, 64}) {
             java.util.List<CartesianPoint> samples = sample(res);
-            for (CartesianPoint s : samples) {
-                double d = point.distanceTo(s);
+            for (int i = 0; i < samples.size(); i++) {
+                double d = point.distanceTo(samples.get(i));
                 if (d < minDist) {
                     minDist = d;
-                    closest = s;
+                    closest = samples.get(i);
+                    double localT = (double) i / (samples.size() - 1);
+                    bestT = senseAgreement
+                            ? trimParamStart + (trimParamEnd - trimParamStart) * localT
+                            : trimParamEnd + (trimParamStart - trimParamEnd) * localT;
                 }
             }
         }
-        return closest != null ? closest : pointAt(0);
+
+        // Newton-Raphson refinement on basis curve: minimize ||C(t) - P||^2
+        double t = bestT;
+        for (int iter = 0; iter < 20; iter++) {
+            CartesianPoint cp = basisCurve.pointAt(t);
+            Vector3 residual = cp.subtract(point);
+            Vector3 deriv = basisCurve.tangentAt(t);
+            // Scale tangent by basis curve speed for proper Newton step
+            double derivNormSq = deriv.normSquared();
+            if (derivNormSq <= Epsilon.EPS) break;
+            double dt = -residual.dot(deriv) / derivNormSq;
+            t += dt;
+            // Clamp to trimmed range
+            t = Math.max(tMin, Math.min(tMax, t));
+            if (Math.abs(dt) < 1e-12) break;
+        }
+        return basisCurve.pointAt(t);
     }
 
     /**
