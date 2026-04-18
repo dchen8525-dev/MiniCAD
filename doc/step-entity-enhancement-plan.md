@@ -144,6 +144,21 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核：
 
 ## 下一步工作（近期优先级）
 
+### 已完成（2026-04-18 第十轮更新）
+
+**closestPointTo() Newton-Raphson 精化（全面覆盖曲线类型）**:
+- `Ellipse3.closestPointTo()`: atan2 初始猜测 + 20 次 Newton-Raphson 精化（基于解析切线）
+- `Ellipse2.closestPointTo()`: 同上（2D 版本）
+- `Parabola3.closestPointTo()`: 解析初始猜测 t=x/(2p) + Newton-Raphson 精化
+- `Hyperbola3.closestPointTo()`: 解析初始猜测 t=|x|/a + Newton-Raphson 精化（含 branch 判定）
+- `Parabola2.closestPointTo()`: 64 采样初始猜测 + Newton-Raphson 精化（替代 256 采样，性能提升 4x）
+- `Hyperbola2.closestPointTo()`: 64 采样初始猜测 + Newton-Raphson 精化（替代 256 采样）
+- `Clothoid3.closestPointTo()`: 256 采样初始猜测 + Newton-Raphson 精化
+- `TrimmedCurve3.closestPointTo()`: 多分辨率采样（16/32/64）+ 在 basisCurve 上 Newton-Raphson 精化
+
+**Hyperbola2.length() 解析化**:
+- 添加 32 点高斯积分（speed = sqrt(a^2*sinh^2(t) + b^2*cosh^2(t))），替代 256 采样链式累加
+
 ### 已完成（2026-04-18 第九轮更新）
 
 **Curve2 解析化补齐（对标 3D 对应类型）**:

@@ -95,4 +95,13 @@
 - Gauss-Legendre 32 点权重/节点修正（sum=2.0），修复 BSplineCurve3/RationalBSplineCurve3/BSplineCurve2/RationalBSplineCurve2 的 18% 长度偏差
 - 导数循环边界修正：`n-1` → `n`，四 B-spline 类全覆盖
 
+**几何方法解析化（2026-04-18 第十轮）**:
+- `Ellipse3.closestPointTo()` / `Ellipse2.closestPointTo()`: atan2 初始猜测 + 20 次 Newton-Raphson 精化（基于解析切线）
+- `Parabola3.closestPointTo()` / `Hyperbola3.closestPointTo()`: 解析初始猜测 + Newton-Raphson 精化
+- `Parabola2.closestPointTo()` / `Hyperbola2.closestPointTo()`: 64 采样初始猜测 + Newton-Raphson 精化（替代 256 采样，4x 加速）
+- `Clothoid3.closestPointTo()`: 256 采样 + Newton-Raphson 精化
+- `TrimmedCurve3.closestPointTo()`: 多分辨率采样（16/32/64）+ basisCurve Newton-Raphson 精化
+- `Hyperbola2.length()`: 32 点高斯积分替代 256 采样链式累加
+- 全部 1393 测试通过，编译零错误
+
 ---
