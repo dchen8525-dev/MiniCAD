@@ -87,4 +87,12 @@
 - viewer.js `constant_radius_surface` / `offset_surface` 参数化重建: 利用 basisSurface 嵌套载荷 + 法线偏移重建
 - 全部 1393 测试通过，编译零错误
 
+**几何方法解析化（2026-04-18 第九轮）**:
+- `BSplineCurve2` / `RationalBSplineCurve2`: 解析 tangentAt() + 高斯积分 length() + Newton-Raphson closestPointTo()，对标 3D 版本
+- `Parabola2.length()`: 闭式公式 L = p*[t*sqrt(1+t^2)+asinh(t)]，替代 256 采样
+- `TrimmedCurve3.length()`: 委托至底层曲线解析方法（Circle/Ellipse/BSpline/RationalBSpline/Parabola/Hyperbola/Clothoid）
+- `CompositeCurve3` / `SurfaceCurve3`: length() 新增 BSpline/RationalBSpline/Hyperbola/Parabola/Clothoid 解析分发
+- Gauss-Legendre 32 点权重/节点修正（sum=2.0），修复 BSplineCurve3/RationalBSplineCurve3/BSplineCurve2/RationalBSplineCurve2 的 18% 长度偏差
+- 导数循环边界修正：`n-1` → `n`，四 B-spline 类全覆盖
+
 ---

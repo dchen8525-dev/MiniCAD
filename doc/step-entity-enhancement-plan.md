@@ -144,6 +144,30 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核：
 
 ## 下一步工作（近期优先级）
 
+### 已完成（2026-04-18 第九轮更新）
+
+**Curve2 解析化补齐（对标 3D 对应类型）**:
+- `BSplineCurve2.length()`: 32 点高斯积分，替代 128 采样（与 BSplineCurve3 对齐）
+- `BSplineCurve2.tangentAt()`: 解析导数基函数 C'(u) = sum(N'_{i,p}(u) * P_i)，替代数值差分
+- `RationalBSplineCurve2.length()`: 32 点高斯积分，替代 128 采样（与 RationalBSplineCurve3 对齐）
+- `RationalBSplineCurve2.tangentAt()`: 有理商法则解析导数，替代数值差分
+- `Parabola2.length()`: 闭式公式 L = p * [t*sqrt(1+t^2) + asinh(t)]，替代 256 采样（与 Parabola3 对齐）
+
+**closestPointTo() Newton-Raphson 精化**:
+- `BSplineCurve2.closestPointTo()`: 256 采样 + 20 次 Newton-Raphson 精化（与 BSplineCurve3 对齐）
+- `RationalBSplineCurve2.closestPointTo()`: 同上（与 RationalBSplineCurve3 对齐）
+
+**复合曲线 length 分发补齐**:
+- `CompositeCurve3.segmentLength()`: 新增 BSplineCurve3/RationalBSplineCurve3/Hyperbola3/Parabola3/Clothoid3/CompositeCurve3/SurfaceCurve3 解析分发
+- `SurfaceCurve3.getCurveLength()`: 新增 Line3/Hyperbola3/Parabola3/Clothoid3/DegenerateCurve3 解析分发
+
+**TrimmedCurve3 length 委托**:
+- 针对 Circle/Ellipse/Line/Polyline/BSpline/RationalBSpline/Parabola/Hyperbola/TrimmedCurve/Clothoid 委托至底层解析方法
+
+**Gauss-Legendre 32 点权重修正**:
+- BSplineCurve3/RationalBSplineCurve3/BSplineCurve2/RationalBSplineCurve2 的 Gauss 权重从错误值（sum=2.36）修正为正确值（sum=2.0），修复约 18% 长度计算偏差
+- 导数循环边界修正：`n-1` → `n`，确保所有控制点参与导数计算
+
 ### 已完成（2026-04-18 第八轮更新）
 
 **SurfaceGeometry `normalAt` 接口缺失补全**:
