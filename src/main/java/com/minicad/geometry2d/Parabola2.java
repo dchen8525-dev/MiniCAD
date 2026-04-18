@@ -198,25 +198,30 @@ public record Parabola2(Point2 vertex, Direction2 axisDirection, double focalDis
 
     /**
      * Returns the length of a parabola segment.
+     * Closed-form integral: L = p * [t*sqrt(1+t^2) + asinh(t)] from tMin to tMax.
      *
      * @param tMin minimum parameter value
      * @param tMax maximum parameter value
-     * @return approximate length of the segment
+     * @return arc length of the segment
      */
     public double length(double tMin, double tMax) {
-        List<Point2> samples = sample(256, tMin, tMax);
-        double totalLength = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            totalLength += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return totalLength;
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        double a = asinhTerm(tMax);
+        double b = asinhTerm(tMin);
+        return focalDistance * (a - b);
+    }
+
+    private static double asinhTerm(double t) {
+        return t * Math.sqrt(1.0 + t * t) + Math.log(t + Math.sqrt(1.0 + t * t));
     }
 
     /**
      * Returns the length of the parabola.
      *
-     * @return approximate length
+     * @return arc length over the default parameter range [-1, 1]
      */
+    @Override
     public double length() {
         return length(-1.0, 1.0);
     }

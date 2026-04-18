@@ -128,18 +128,61 @@ public record TrimmedCurve3(
     }
 
     /**
-     * Returns the approximate length of the trimmed curve segment.
+     * Returns the arc length of the trimmed curve segment.
+     * Delegates to the basis curve's analytical length when available.
      *
-     * @return length
+     * @return arc length over the trimmed parameter range
      */
     @Override
     public double length() {
-        java.util.List<CartesianPoint> samples = sample(256);
-        double total = 0.0;
-        for (int i = 0; i < samples.size() - 1; i++) {
-            total += samples.get(i).distanceTo(samples.get(i + 1));
-        }
-        return total;
+        double tMin = Math.min(trimParamStart, trimParamEnd);
+        double tMax = Math.max(trimParamStart, trimParamEnd);
+        double fraction = tMax - tMin;
+        return switch (basisCurve) {
+            case Circle circle -> circle.circumference() * fraction;
+            case Ellipse3 ellipse -> ellipse.perimeter() * fraction;
+            case Line3 line3 -> {
+                yield trimEnd().distanceTo(trimStart());
+            }
+            case Polyline3 pl -> {
+                int n = pl.points().size();
+                if (n < 2) yield 0.0;
+                double total = 0.0;
+                for (int i = 0; i < n - 1; i++) {
+                    double segStart = (double) i / (n - 1);
+                    double segEnd = (double) (i + 1) / (n - 1);
+                    if (segEnd < tMin - Epsilon.EPS || segStart > tMax + Epsilon.EPS) continue;
+                    double overlapStart = Math.max(segStart, tMin);
+                    double overlapEnd = Math.min(segEnd, tMax);
+                    if (overlapEnd > overlapStart) {
+                        double segLen = pl.points().get(i).distanceTo(pl.points().get(i + 1));
+                        total += segLen * (overlapEnd - overlapStart) / (segEnd - segStart);
+                    }
+                }
+                yield total;
+            }
+            case BSplineCurve3 bs -> bs.length(tMin, tMax);
+            case RationalBSplineCurve3 rb -> rb.length(tMin, tMax);
+            case Parabola3 p -> p.length(tMin, tMax);
+            case Hyperbola3 h -> h.length(tMin, tMax);
+            case TrimmedCurve3 tc -> {
+                double outerMin = Math.min(tc.trimParamStart, tc.trimParamEnd);
+                double outerMax = Math.max(tc.trimParamStart, tc.trimParamEnd);
+                double mappedTMin = outerMin + (outerMax - outerMin) * tMin;
+                double mappedTMax = outerMin + (outerMax - outerMin) * tMax;
+                double basisFraction = mappedTMax - mappedTMin;
+                yield tc.basisCurve().length() * basisFraction;
+            }
+            case Clothoid3 c -> c.length() * fraction;
+            default -> {
+                java.util.List<CartesianPoint> samples = sample(256);
+                double total = 0.0;
+                for (int i = 0; i < samples.size() - 1; i++) {
+                    total += samples.get(i).distanceTo(samples.get(i + 1));
+                }
+                yield total;
+            }
+        };
     }
 
     /**

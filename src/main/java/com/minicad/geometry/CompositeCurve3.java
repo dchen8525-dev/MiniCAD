@@ -266,10 +266,24 @@ public record CompositeCurve3(List<Curve3> segments) implements Curve3 {
             return polyline.length();
         } else if (segment instanceof TrimmedCurve3 trimmed) {
             return trimmed.length();
-        } else if (segment instanceof Line3 line) {
+        } else if (segment instanceof Line3) {
             return 1.0;  // Default length for infinite line
+        } else if (segment instanceof BSplineCurve3 bs) {
+            return bs.length();
+        } else if (segment instanceof RationalBSplineCurve3 rb) {
+            return rb.length();
+        } else if (segment instanceof Hyperbola3 h) {
+            return h.length();
+        } else if (segment instanceof Parabola3 p) {
+            return p.length();
+        } else if (segment instanceof Clothoid3 c) {
+            return c.length();
+        } else if (segment instanceof CompositeCurve3 cc) {
+            return cc.length();
+        } else if (segment instanceof SurfaceCurve3 sc) {
+            return sc.length();
         }
-        // For other curves, approximate by sampling
+        // Fallback: approximate by sampling
         java.util.List<CartesianPoint> samples = sampleSegment(segment, 64);
         double length = 0.0;
         for (int i = 0; i < samples.size() - 1; i++) {

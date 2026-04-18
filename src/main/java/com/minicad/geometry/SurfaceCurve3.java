@@ -286,8 +286,18 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
             return composite.length();
         } else if (curve instanceof SurfaceCurve3 surfaceCurve) {
             return surfaceCurve.length();
+        } else if (curve instanceof Line3) {
+            return 1.0;
+        } else if (curve instanceof Hyperbola3 h) {
+            return h.length();
+        } else if (curve instanceof Parabola3 p) {
+            return p.length();
+        } else if (curve instanceof Clothoid3 c) {
+            return c.length();
+        } else if (curve instanceof DegenerateCurve3) {
+            return 0.0;
         }
-        // For other curves, approximate by sampling
+        // Fallback: approximate by sampling
         java.util.List<CartesianPoint> samples = sampleCurveInternal(curve, 256);
         double length = 0.0;
         for (int i = 0; i < samples.size() - 1; i++) {
