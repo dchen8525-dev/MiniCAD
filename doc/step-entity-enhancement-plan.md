@@ -144,6 +144,25 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核：
 
 ## 下一步工作（近期优先级）
 
+### 已完成（2026-04-19 第十一轮更新）
+
+**Surface 解析 boundingBox（Plane/ParaboloidSurface/HyperboloidSurface）**:
+- `Plane.boundingBox()`: 返回以定位点为中心的 2x2 正方形包围盒（平面无限延伸）
+- `ParaboloidSurface.boundingBox()`: 解析参数范围极值变换，替代 64x64 采样
+- `HyperboloidSurface.boundingBox()`: 解析因子 sqrt(1+z^2/b^2) 计算径向极值，替代采样
+
+**TrimmedCurve2 全面重写（参数化 trim + 基曲线委托）**:
+- record 签名从 `Point2 trimStart, Point2 trimEnd` 改为 `double trimParamStart, double trimParamEnd`
+- 所有方法（pointAt/tangentAt/closestPointTo/length/boundingBox/contains）通过 switch 委托到基曲线
+- `closestPointTo()`: 多分辨率采样 + Newton-Raphson 精化
+- `length()`: 解析委托（Circle/Ellipse/Line/BSpline/RationalBSpline/Parabola/Hyperbola/Polyline）
+- `TrimmedCurve2Test` 和 `CompositeCurve2Test` 同步更新
+
+**STEP trim 参数解析容错化**:
+- `resolveTrimParam2()`: 直接传递数值型 trim 参数，不再采样查找
+- `parameterOnCurve2()` Circle2/Ellipse2: 容错角度计算（atan2 投影），不再要求点严格在曲线上
+- 修复 `shouldSnapOffCurveTrimPointsFor2dTrimmedPcurve` 测试（浮点偏差 trim 点不再抛异常）
+
 ### 已完成（2026-04-18 第十轮更新）
 
 **closestPointTo() Newton-Raphson 精化（全面覆盖曲线类型）**:

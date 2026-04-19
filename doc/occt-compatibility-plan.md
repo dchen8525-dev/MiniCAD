@@ -95,6 +95,12 @@
 - Gauss-Legendre 32 点权重/节点修正（sum=2.0），修复 BSplineCurve3/RationalBSplineCurve3/BSplineCurve2/RationalBSplineCurve2 的 18% 长度偏差
 - 导数循环边界修正：`n-1` → `n`，四 B-spline 类全覆盖
 
+**几何方法解析化（2026-04-19 第十一轮）**:
+- `Plane.boundingBox()` / `ParaboloidSurface.boundingBox()` / `HyperboloidSurface.boundingBox()`: 解析计算替代 64x64 采样
+- `TrimmedCurve2` 全面重写：参数化 trim + 基曲线 switch 委托 + Newton-Raphson closestPointTo + 解析 length()
+- `StepCadBuilder.parameterOnCurve2()`: Circle2/Ellipse2 容错角度计算（atan2 投影），修复浮点偏差 trim 点抛异常
+- 全部 1393 测试通过，编译零错误
+
 **几何方法解析化（2026-04-18 第十轮）**:
 - `Ellipse3.closestPointTo()` / `Ellipse2.closestPointTo()`: atan2 初始猜测 + 20 次 Newton-Raphson 精化（基于解析切线）
 - `Parabola3.closestPointTo()` / `Hyperbola3.closestPointTo()`: 解析初始猜测 + Newton-Raphson 精化
