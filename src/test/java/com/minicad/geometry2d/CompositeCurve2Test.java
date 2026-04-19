@@ -115,8 +115,8 @@ class CompositeCurve2Test {
         Line2 line = new Line2(new Point2(0, 0), new Direction2(1, 0));
         TrimmedCurve2 trimmed = new TrimmedCurve2(
             line,
-            new Point2(0, 0),
-            new Point2(10, 0),
+            0.0,
+            10.0,
             true
         );
 

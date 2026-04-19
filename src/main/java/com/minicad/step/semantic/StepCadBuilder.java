@@ -1117,15 +1117,10 @@ public final class StepCadBuilder {
 
     private TrimmedCurve2 buildTrimmedCurve2D(StepTrimmedCurve2D trimmedCurve2D) {
         Curve2 basisCurve = (Curve2) buildCurve2(trimmedCurve2D.basisCurve());
-        // Sample the basis curve to find trim points at the given parameters
-        List<Point2> samples = basisCurve.sample(64);
-        if (samples.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE_2D basis curve has no sample points");
-        }
-        // Map trim parameters to points (simplified: assume params are in [0,1] range)
-        int startIdx = Math.max(0, Math.min((int)(trimmedCurve2D.trim1() * (samples.size() - 1)), samples.size() - 1));
-        int endIdx = Math.max(0, Math.min((int)(trimmedCurve2D.trim2() * (samples.size() - 1)), samples.size() - 1));
-        return new TrimmedCurve2(basisCurve, samples.get(startIdx), samples.get(endIdx), trimmedCurve2D.senseAgreement());
+        // Use trim parameters directly on the basis curve
+        double trim1 = trimmedCurve2D.trim1();
+        double trim2 = trimmedCurve2D.trim2();
+        return new TrimmedCurve2(basisCurve, trim1, trim2, trimmedCurve2D.senseAgreement());
     }
 
     private BSplineCurve2 buildBSplineCurve2D(StepBSplineCurve2D spline2D) {
@@ -1266,9 +1261,9 @@ public final class StepCadBuilder {
         if (!(basis instanceof Curve2 basisCurve)) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
         }
-        Point2 trimStart = resolveTrimPoint2(trimmedCurve.trim1(), basisCurve, "trim_1");
-        Point2 trimEnd = resolveTrimPoint2(trimmedCurve.trim2(), basisCurve, "trim_2");
-        TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimStart, trimEnd, trimmedCurve.senseAgreement());
+        double trimParamStart = resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
+        double trimParamEnd = resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
+        TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimParamStart, trimParamEnd, trimmedCurve.senseAgreement());
         trimmedCurves2d.put(id, built);
         return built;
     }
@@ -7605,8 +7600,8 @@ public final class StepCadBuilder {
                     spline.knots());
             case TrimmedCurve2 trimmedCurve -> new TrimmedCurve2(
                     transformCurve2(trimmedCurve.basisCurve(), transformation),
-                    transformPoint2(trimmedCurve.trimStart(), transformation),
-                    transformPoint2(trimmedCurve.trimEnd(), transformation),
+                    trimmedCurve.trimParamStart(),
+                    trimmedCurve.trimParamEnd(),
                     trimmedCurve.senseAgreement());
             case CompositeCurve2 compositeCurve -> new CompositeCurve2(
                     compositeCurve.segments().stream()
@@ -8149,6 +8144,111 @@ public final class StepCadBuilder {
             return evaluateCurve2AtParameter(basisCurve, num.value());
         }
         throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
+    }
+
+    /**
+     * Resolves a 2D trim value to a double parameter on the basis curve.
+     * Handles both entity references (CartesianPoint) and numeric parameter values.
+     */
+    private double resolveTrimParam2(List<StepValue> trims, Curve2 basisCurve, String slot) {
+        if (trims.isEmpty()) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
+        }
+        StepValue trim = unwrapTyped(trims.getFirst());
+        if (trim instanceof StepValue.ListValue innerList) {
+            return resolveTrimParam2(innerList.elements(), basisCurve, slot);
+        }
+        if (trim instanceof StepValue.ReferenceValue ref) {
+            StepEntity entity = entitiesById.get(ref.id());
+            if (entity instanceof StepCartesianPoint point) {
+                if (point.coordinates().size() < 2) {
+                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
+                }
+                Point2 result = buildPoint2(point.id());
+                return parameterOnCurve2(basisCurve, result);
+            }
+            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
+        }
+        if (trim instanceof StepValue.NumberValue num) {
+            return num.value();
+        }
+        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
+    }
+
+    private double parameterOnCurve2(Curve2 curve, Point2 point) {
+        return switch (curve) {
+            case Line2 line -> line.parameterOf(point);
+            case com.minicad.geometry2d.Circle2 circle -> {
+                // Tolerant angle computation — does not require point to be exactly on curve
+                Vector2 offset = point.subtract(circle.center());
+                Vector2 x = circle.xDirection().asVector();
+                Vector2 y = new Vector2(-x.y(), x.x());
+                double angle = Math.atan2(offset.dot(y) / circle.radius(), offset.dot(x) / circle.radius());
+                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
+            }
+            case com.minicad.geometry2d.Ellipse2 ellipse -> {
+                // Tolerant angle computation — projects point onto ellipse via atan2
+                Vector2 offset = point.subtract(ellipse.center());
+                Vector2 x = ellipse.xDirection().asVector();
+                Vector2 y = new Vector2(-x.y(), x.x());
+                double angle = Math.atan2(offset.dot(y) / ellipse.semiAxis2(), offset.dot(x) / ellipse.semiAxis1());
+                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
+            }
+            case com.minicad.geometry2d.BSplineCurve2 bspline -> parameterOnBSpline2(bspline, point);
+            case com.minicad.geometry2d.RationalBSplineCurve2 rational -> parameterOnRationalBSpline2(rational, point);
+            case Polyline2 polyline -> parameterOnPolyline2(polyline, point);
+            case com.minicad.geometry2d.TrimmedCurve2 trimmed -> parameterOnCurve2(trimmed.basisCurve(), point);
+            default -> 0.0;
+        };
+    }
+
+    private double parameterOnBSpline2(com.minicad.geometry2d.BSplineCurve2 bspline, Point2 point) {
+        double bestT = bspline.startParameter();
+        double minDist = Double.POSITIVE_INFINITY;
+        int n = 64;
+        double range = bspline.endParameter() - bspline.startParameter();
+        for (int i = 0; i <= n; i++) {
+            double t = bspline.startParameter() + range * i / n;
+            double d = point.distanceTo(bspline.pointAt(t));
+            if (d < minDist) {
+                minDist = d;
+                bestT = t;
+            }
+        }
+        return bestT;
+    }
+
+    private double parameterOnRationalBSpline2(com.minicad.geometry2d.RationalBSplineCurve2 rational, Point2 point) {
+        double bestT = rational.startParameter();
+        double minDist = Double.POSITIVE_INFINITY;
+        int n = 64;
+        double range = rational.endParameter() - rational.startParameter();
+        for (int i = 0; i <= n; i++) {
+            double t = rational.startParameter() + range * i / n;
+            double d = point.distanceTo(rational.pointAt(t));
+            if (d < minDist) {
+                minDist = d;
+                bestT = t;
+            }
+        }
+        return bestT;
+    }
+
+    private double parameterOnPolyline2(Polyline2 polyline, Point2 point) {
+        List<Point2> points = polyline.points();
+        if (points.size() < 2) return 0.0;
+        double bestT = 0.0;
+        double minDist = Double.POSITIVE_INFINITY;
+        int n = points.size() - 1;
+        for (int i = 0; i < n; i++) {
+            double t = (double) i / n;
+            double d = point.distanceTo(points.get(i));
+            if (d < minDist) {
+                minDist = d;
+                bestT = t;
+            }
+        }
+        return bestT;
     }
 
     private Point2 evaluateCurve2AtParameter(Curve2 curve, double param) {

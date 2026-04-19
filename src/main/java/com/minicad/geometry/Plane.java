@@ -162,6 +162,31 @@ public record Plane(CartesianPoint origin, Direction3 normal) implements Surface
     }
 
     /**
+     * Returns a default bounding box for visualization purposes.
+     * A plane is infinite; this returns a 2x2 square centered at the origin.
+     *
+     * @return bounding box for default visualization range
+     */
+    @Override
+    public BoundingBox3 boundingBox() {
+        Vector3 xDir = findPerpendicularDirection(normal).asVector();
+        Vector3 yDir = normal.asVector().cross(xDir).normalize().asVector();
+        Vector3 n = normal.asVector();
+
+        CartesianPoint min = new CartesianPoint(
+            origin.x() - Math.abs(xDir.x()) - Math.abs(yDir.x()) - Math.abs(n.x()),
+            origin.y() - Math.abs(xDir.y()) - Math.abs(yDir.y()) - Math.abs(n.y()),
+            origin.z() - Math.abs(xDir.z()) - Math.abs(yDir.z()) - Math.abs(n.z())
+        );
+        CartesianPoint max = new CartesianPoint(
+            origin.x() + Math.abs(xDir.x()) + Math.abs(yDir.x()) + Math.abs(n.x()),
+            origin.y() + Math.abs(xDir.y()) + Math.abs(yDir.y()) + Math.abs(n.y()),
+            origin.z() + Math.abs(xDir.z()) + Math.abs(yDir.z()) + Math.abs(n.z())
+        );
+        return BoundingBox3.of(min, max);
+    }
+
+    /**
      * Returns the closest point on the plane to a given point.
      *
      * @param point target point

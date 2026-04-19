@@ -93,8 +93,46 @@ public record ParaboloidSurface(Axis2Placement3D position, double focalLength) i
 
     @Override
     public BoundingBox3 boundingBox() {
-        // Sample the surface for a conservative bounding box
-        return SurfaceGeometry.super.boundingBox();
+        // Default parameter range: z in [0, 1], r = sqrt(4*f*v)
+        double vMax = 1.0;
+        double rMax = Math.sqrt(4.0 * focalLength * vMax);
+        return analyticalBoundingBox(rMax, vMax);
+    }
+
+    /**
+     * Returns the bounding box for a given parameter range.
+     *
+     * @param vMax maximum height parameter
+     * @return bounding box enclosing the surface patch
+     */
+    public BoundingBox3 boundingBox(double vMax) {
+        double effectiveVMax = Math.max(0.0, vMax);
+        double rMax = Math.sqrt(4.0 * focalLength * effectiveVMax);
+        return analyticalBoundingBox(rMax, effectiveVMax);
+    }
+
+    private BoundingBox3 analyticalBoundingBox(double rMax, double vMax) {
+        Vector3 xDir = position.xDirection().asVector();
+        Vector3 yDir = position.yDirection().asVector();
+        Vector3 zDir = position.axis().asVector();
+        CartesianPoint center = position.location();
+
+        // Surface extends: radius [0, rMax] in xy-plane, z in [0, vMax]
+        // Max extent in each axis = rMax * |direction_component|
+        double extentX = rMax * (Math.abs(xDir.x()) + Math.abs(yDir.x()));
+        double extentY = rMax * (Math.abs(xDir.y()) + Math.abs(yDir.y()));
+        double extentZ = Math.max(rMax * (Math.abs(xDir.z()) + Math.abs(yDir.z())),
+                                   vMax * Math.abs(zDir.z()));
+
+        // Also account for z-direction contribution
+        double zExtentX = vMax * Math.abs(zDir.x());
+        double zExtentY = vMax * Math.abs(zDir.y());
+        double zExtentZ = vMax * Math.abs(zDir.z());
+
+        return BoundingBox3.of(
+            new CartesianPoint(center.x() - extentX - zExtentX, center.y() - extentY - zExtentY, center.z() - extentZ - zExtentZ),
+            new CartesianPoint(center.x() + extentX + zExtentX, center.y() + extentY + zExtentY, center.z() + extentZ + zExtentZ)
+        );
     }
 
     public CartesianPoint closestPointTo(CartesianPoint point) {

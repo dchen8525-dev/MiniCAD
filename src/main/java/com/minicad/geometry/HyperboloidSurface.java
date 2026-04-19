@@ -99,7 +99,39 @@ public record HyperboloidSurface(Axis2Placement3D position, double radius, doubl
 
     @Override
     public BoundingBox3 boundingBox() {
-        return SurfaceGeometry.super.boundingBox();
+        // Default parameter range: z in [-1, 1]
+        return analyticalBoundingBox(1.0);
+    }
+
+    /**
+     * Returns the bounding box for a given z parameter range.
+     *
+     * @param zMax maximum z parameter
+     * @return bounding box enclosing the surface patch
+     */
+    public BoundingBox3 boundingBox(double zMax) {
+        return analyticalBoundingBox(Math.max(0.0, zMax));
+    }
+
+    private BoundingBox3 analyticalBoundingBox(double zMax) {
+        double factor = Math.sqrt(1.0 + zMax * zMax / (semiAxis * semiAxis));
+        double rMax = radius * factor;
+        Vector3 xDir = position.xDirection().asVector();
+        Vector3 yDir = position.yDirection().asVector();
+        Vector3 zDir = position.axis().asVector();
+        CartesianPoint center = position.location();
+
+        double extentX = rMax * (Math.abs(xDir.x()) + Math.abs(yDir.x()));
+        double extentY = rMax * (Math.abs(xDir.y()) + Math.abs(yDir.y()));
+        double extentZ = zMax * Math.abs(zDir.z());
+
+        double zExtentX = zMax * Math.abs(zDir.x());
+        double zExtentY = zMax * Math.abs(zDir.y());
+
+        return BoundingBox3.of(
+            new CartesianPoint(center.x() - extentX - zExtentX, center.y() - extentY - zExtentY, center.z() - extentZ - zExtentX - zExtentY),
+            new CartesianPoint(center.x() + extentX + zExtentX, center.y() + extentY + zExtentY, center.z() + extentZ + zExtentX + zExtentY)
+        );
     }
 
     public CartesianPoint closestPointTo(CartesianPoint point) {

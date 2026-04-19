@@ -12,10 +12,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurvePointAt() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         Point2 p0 = trimmed.pointAt(0);
         assertEquals(0.0, p0.x(), 1e-10);
@@ -30,10 +28,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurvePointAtReversed() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, false);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, false);
 
         Point2 p0 = trimmed.pointAt(0);
         assertEquals(10.0, p0.x(), 1e-10);
@@ -45,10 +41,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveContains() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         assertTrue(trimmed.contains(new Point2(5, 0)));
         assertTrue(trimmed.contains(new Point2(0, 0)));
@@ -57,10 +51,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveSample() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         java.util.List<Point2> samples = trimmed.sample(5);
         assertEquals(6, samples.size());
@@ -71,10 +63,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveTangentAt() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         Vector2 tangent = trimmed.tangentAt(0);
         assertEquals(1.0, tangent.x(), 1e-10);
@@ -84,10 +74,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveTangentAtReversed() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, false);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, false);
 
         Vector2 tangent = trimmed.tangentAt(0);
         assertEquals(-1.0, tangent.x(), 1e-10);
@@ -97,25 +85,21 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveBoundingBox() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(2, 3);
-        Point2 trimEnd = new Point2(8, 7);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 2.0, 8.0, true);
 
         BoundingBox2 box = trimmed.boundingBox();
         assertEquals(2.0, box.minX(), 1e-10);
-        assertEquals(3.0, box.minY(), 1e-10);
+        assertEquals(0.0, box.minY(), 1e-10);
         assertEquals(8.0, box.maxX(), 1e-10);
-        assertEquals(7.0, box.maxY(), 1e-10);
+        assertEquals(0.0, box.maxY(), 1e-10);
     }
 
     @Test
     void trimmedCurveLength() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         assertEquals(10.0, trimmed.length(), 1e-10);
     }
@@ -123,10 +107,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveClosestPointTo() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         Point2 onCurve = new Point2(5, 0);
         Point2 closest = trimmed.closestPointTo(onCurve);
@@ -145,10 +127,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveDistanceTo() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         Point2 offCurve = new Point2(5, 10);
         assertEquals(10.0, trimmed.distanceTo(offCurve), 1e-10);
@@ -157,10 +137,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveMidpoint() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         Point2 midpoint = trimmed.midpoint();
         assertEquals(5.0, midpoint.x(), 1e-10);
@@ -170,10 +148,8 @@ class TrimmedCurve2Test {
     @Test
     void trimmedCurveUnderlyingCurve() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-        Point2 trimStart = new Point2(0, 0);
-        Point2 trimEnd = new Point2(10, 0);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
 
         assertEquals(basisCurve, trimmed.underlyingCurve());
     }
@@ -183,12 +159,12 @@ class TrimmedCurve2Test {
         Point2 center = new Point2(0, 0);
         Direction2 xDir = new Direction2(1, 0);
         Circle2 circle = new Circle2(center, xDir, 5.0);
-        Point2 trimStart = circle.pointAt(0);
-        Point2 trimEnd = circle.pointAt(Math.PI / 2);
 
-        TrimmedCurve2 trimmed = new TrimmedCurve2(circle, trimStart, trimEnd, true);
+        TrimmedCurve2 trimmed = new TrimmedCurve2(circle, 0.0, Math.PI / 2, true);
 
         assertEquals(5.0, trimmed.trimStart().x(), 1e-10);
         assertEquals(0.0, trimmed.trimStart().y(), 1e-10);
+        assertEquals(0.0, trimmed.trimEnd().x(), 1e-10);
+        assertEquals(5.0, trimmed.trimEnd().y(), 1e-10);
     }
 }
