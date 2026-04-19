@@ -20,6 +20,9 @@
 | Plane 链路补全 | ✅ 已完成 | - | - | sampleGrid(int,int) + normalAt(double,double) 重写 |
 | Curve3 方法补全 | ✅ 已完成 | - | - | Line3.length() + Ellipse3.length() + DegenerateCurve3.length() |
 | viewer.js 修复 | ✅ 已完成 | - | - | surface_of_translation/projection const xDirection 修复 |
+| Curve2 方法补全 | ✅ 已完成 | - | - | Line2.boundingBox() 解析计算替代 64 采样 |
+| Curve2 参数反查方法补全 | ✅ 已完成 | - | - | Parabola2/Hyperbola2/Polyline2/CompositeCurve2/DegenerateCurve2 新增 parameterOf(Point2) |
+| TrimmedCurve2 方法覆盖修复 | ✅ 已完成 | - | - | parameterOnBasisCurve 从 5→11 种曲线全覆盖 + tangentOnBasisCurve fallback bug 修复 + pointOnBasisCurve fallback bug 修复 |
 | **总计** | **✅ 全部完成** | **56 新实体** | **56** | **~81** |
 
 ### Phase 2 交付物
@@ -86,7 +89,7 @@
 
 ---
 
-## 现状（2026-04-18 更新）
+## 现状（2026-04-19 更新）
 
 | 指标 | 数值 |
 |---|---|
@@ -145,6 +148,25 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核：
 ## 下一步工作（近期优先级）
 
 ### 已完成（2026-04-19 第十一轮更新）
+
+**Curve2 boundingBox 解析化补齐**:
+- `Line2.boundingBox()`: 解析计算参数范围 [-1, 1] 的包围盒，替代 64 采样默认实现
+
+**Curve2 parameterOf 解析化补齐（对标 Curve3 parameterAt）**:
+- `Parabola2.parameterOf(Point2)`: 解析从垂直分量反推 t = perpComponent / (2*p)
+- `Hyperbola2.parameterOf(Point2)`: 解析从 y 分量反推 t = ln(y/b + sqrt((y/b)^2 + 1))
+- `Polyline2.parameterOf(Point2)`: 逐段投影查找最近点并计算长度加权参数
+- `CompositeCurve2.parameterOf(Point2)`: 遍历所有 segment 查找最近点并计算分段参数
+- `DegenerateCurve2.parameterOf(Point2)`: 返回 0.0（退化曲线无参数概念）
+
+**TrimmedCurve2.parameterOnBasisCurve 从 5 种扩展到全部 11 种 Curve2 类型**:
+- 新增：Polyline2 / Parabola2 / Hyperbola2 / CompositeCurve2 / DegenerateCurve2 / TrimmedCurve2（递归嵌套）
+- 修复原 fallback 返回 0.0 的严重 bug（导致 contains() 对缺失类型静默错误）
+- 新增 fallback 改为 64 采样查找而非返回 0.0
+
+**TrimmedCurve2.tangentOnBasisCurve fallback bug 修复**:
+- 原 fallback 使用 `mappedParam()`（trim 中点）而非传入的 `parameter` 参数，导致数值差分静默错误
+- 修复为使用正确的 `parameter` 进行数值差分
 
 **Surface 解析 boundingBox（Plane/ParaboloidSurface/HyperboloidSurface）**:
 - `Plane.boundingBox()`: 返回以定位点为中心的 2x2 正方形包围盒（平面无限延伸）

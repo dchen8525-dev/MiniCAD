@@ -79,6 +79,20 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
     }
 
     /**
+     * Returns the bounding box for the default parameter range [-1, 1].
+     * For an infinite line this is a 2-unit segment centered at the origin.
+     *
+     * @return bounding box for default visualization range
+     */
+    @Override
+    public BoundingBox2 boundingBox() {
+        Vector2 dir = direction.asVector();
+        Point2 pNeg = origin.subtract(dir);
+        Point2 pPos = origin.add(dir);
+        return BoundingBox2.of(pNeg, pPos);
+    }
+
+    /**
      * Returns the length of the unit parameter segment [0,1].
      * For an infinite line this is the distance between parameter 0 and 1.
      *

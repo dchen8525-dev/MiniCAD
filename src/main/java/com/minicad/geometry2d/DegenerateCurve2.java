@@ -48,4 +48,15 @@ public record DegenerateCurve2(Point2 point) implements Curve2 {
         Preconditions.requireNonNull(query, "query");
         return point;
     }
+
+    /**
+     * Returns the parameter value for the degenerate curve.
+     * Always returns 0.0 as the curve collapses to a single point.
+     *
+     * @param query point to project (ignored)
+     * @return parameter value (always 0.0)
+     */
+    public double parameterOf(Point2 query) {
+        return 0.0;
+    }
 }

@@ -136,7 +136,6 @@ public record TrimmedCurve2(
 
     private double parameterOnBasisCurve(Point2 point) {
         if (basisCurve instanceof BSplineCurve2 bs) {
-            // Sampling-based parameter lookup
             Point2 closest = bs.closestPointTo(point);
             double bestT = bs.startParameter();
             double minDist = Double.POSITIVE_INFINITY;
@@ -152,7 +151,6 @@ public record TrimmedCurve2(
             }
             return bestT;
         } else if (basisCurve instanceof RationalBSplineCurve2 rb) {
-            // Sampling-based parameter lookup
             Point2 closest = rb.closestPointTo(point);
             double bestT = rb.startParameter();
             double minDist = Double.POSITIVE_INFINITY;
@@ -173,9 +171,36 @@ public record TrimmedCurve2(
             return ellipse.angleOf(point);
         } else if (basisCurve instanceof Line2 line) {
             return line.parameterOf(point);
+        } else if (basisCurve instanceof Polyline2 polyline) {
+            return polyline.parameterOf(point);
+        } else if (basisCurve instanceof Parabola2 parabola) {
+            return parabola.parameterOf(point);
+        } else if (basisCurve instanceof Hyperbola2 hyperbola) {
+            return hyperbola.parameterOf(point);
+        } else if (basisCurve instanceof CompositeCurve2 composite) {
+            return composite.parameterOf(point);
+        } else if (basisCurve instanceof DegenerateCurve2) {
+            return 0.0;
+        } else if (basisCurve instanceof TrimmedCurve2 trimmed) {
+            // Recursively resolve through nested trim
+            double innerParam = trimmed.parameterOnBasisCurve(point);
+            double tMin = Math.min(trimmed.trimParamStart, trimmed.trimParamEnd);
+            double tMax = Math.max(trimmed.trimParamStart, trimmed.trimParamEnd);
+            double range = tMax - tMin;
+            return range > Epsilon.EPS ? tMin + range * Math.max(0.0, Math.min(1.0, innerParam)) : tMin;
         }
-        // Fallback: return 0
-        return 0.0;
+        // Fallback: sampling-based
+        double bestT = 0.0;
+        double minDist = Double.POSITIVE_INFINITY;
+        java.util.List<Point2> samples = sample(64);
+        for (int i = 0; i < samples.size(); i++) {
+            double d = point.distanceTo(samples.get(i));
+            if (d < minDist) {
+                minDist = d;
+                bestT = trimParamStart + (trimParamEnd - trimParamStart) * (double) i / (samples.size() - 1);
+            }
+        }
+        return bestT;
     }
 
     private static Point2 interpolatePoint(Point2 start, Point2 end, double t) {
@@ -312,15 +337,15 @@ public record TrimmedCurve2(
         } else if (basisCurve instanceof CompositeCurve2 composite) {
             return composite.tangentAt(parameter);
         }
-        // Fallback: numerical differentiation
+        // Fallback: numerical differentiation using the given parameter
         double eps = 1e-6;
-        Point2 p1 = pointOnBasisCurve(Math.max(0, mappedParam() - eps));
-        Point2 p2 = pointOnBasisCurve(Math.min(1, mappedParam() + eps));
-        return p2.subtract(p1).normalize().asVector();
-    }
-
-    private double mappedParam() {
-        return (trimParamStart + trimParamEnd) * 0.5;
+        Point2 p1 = pointOnBasisCurve(parameter - eps);
+        Point2 p2 = pointOnBasisCurve(parameter + eps);
+        Vector2 tangent = p2.subtract(p1);
+        if (tangent.normSquared() <= Epsilon.EPS) {
+            return new Vector2(1, 0);
+        }
+        return tangent.normalize().asVector();
     }
 
     /**

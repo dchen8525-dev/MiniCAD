@@ -150,6 +150,42 @@ public record Polyline2(List<Point2> points) implements Curve2 {
     }
 
     /**
+     * Returns the parameter value (0 to 1) for the closest point on the polyline.
+     *
+     * @param point point to project
+     * @return parameter value in [0, 1]
+     */
+    public double parameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        int n = points.size();
+        int segments = n - 1;
+        double[] segLens = new double[segments];
+        double totalLength = 0.0;
+        for (int i = 0; i < segments; i++) {
+            segLens[i] = points.get(i).distanceTo(points.get(i + 1));
+            totalLength += segLens[i];
+        }
+        if (totalLength <= Epsilon.EPS) return 0.0;
+        double bestT = 0.0;
+        double minDist = Double.POSITIVE_INFINITY;
+        double cumulative = 0.0;
+        for (int i = 0; i < segments; i++) {
+            Point2 start = points.get(i);
+            Point2 end = points.get(i + 1);
+            Vector2 seg = end.subtract(start);
+            double t = seg.isZero() ? 0.0 : Math.max(0.0, Math.min(1.0, point.subtract(start).dot(seg) / seg.dot(seg)));
+            Point2 closest = start.add(seg.scale(t));
+            double d = point.distanceTo(closest);
+            if (d < minDist) {
+                minDist = d;
+                bestT = (cumulative + segLens[i] * t) / totalLength;
+            }
+            cumulative += segLens[i];
+        }
+        return bestT;
+    }
+
+    /**
      * Returns the closest point on the polyline to a given point.
      *
      * @param point target point

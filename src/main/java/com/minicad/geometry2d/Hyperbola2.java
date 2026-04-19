@@ -194,6 +194,23 @@ public record Hyperbola2(Point2 center, Direction2 xDirection, double semiAxisA,
     }
 
     /**
+     * Returns the parameter value for the given point projected onto the hyperbola.
+     * The parameter t is derived from the y component: t = arcsinh(y/b).
+     * Always returns the parameter on the right branch.
+     *
+     * @param point point to project
+     * @return parameter value of closest point on the right branch
+     */
+    public double parameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector2 offset = point.subtract(center);
+        Vector2 xAxis = xDirection.asVector();
+        Vector2 yAxis = new Vector2(-xAxis.y(), xAxis.x());
+        double y = offset.dot(yAxis);
+        return Math.log(y / semiAxisB + Math.sqrt(y * y / (semiAxisB * semiAxisB) + 1.0));
+    }
+
+    /**
      * Returns the approximate bounding box for a branch of the hyperbola.
      *
      * @param tMin minimum parameter value

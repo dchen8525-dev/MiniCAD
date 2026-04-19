@@ -2,7 +2,7 @@
 
 **基于 OpenCASCADE OCCT 8.0.0-rc5 分析**
 
-## 状态（2026-04-18 更新）
+## 状态（2026-04-19 更新）
 
 | Phase | 状态 | 交付物 |
 |-------|------|--------|
@@ -97,6 +97,11 @@
 
 **几何方法解析化（2026-04-19 第十一轮）**:
 - `Plane.boundingBox()` / `ParaboloidSurface.boundingBox()` / `HyperboloidSurface.boundingBox()`: 解析计算替代 64x64 采样
+- `Line2.boundingBox()`: 解析计算参数范围 [-1, 1] 的包围盒，替代 64 采样
+- `Parabola2.parameterOf()` / `Hyperbola2.parameterOf()`: 解析参数反查，对标 3D 对应方法
+- `Polyline2.parameterOf()` / `CompositeCurve2.parameterOf()` / `DegenerateCurve2.parameterOf()`: 计算参数反查
+- `TrimmedCurve2.parameterOnBasisCurve` 从 5→11 种曲线全覆盖（新增 Polyline2/Parabola2/Hyperbola2/CompositeCurve2/DegenerateCurve2/TrimmedCurve2 嵌套），修复原 fallback 返回 0.0 的严重 bug
+- `TrimmedCurve2.tangentOnBasisCurve` fallback bug 修复（mappedParam() → parameter 参数）
 - `TrimmedCurve2` 全面重写：参数化 trim + 基曲线 switch 委托 + Newton-Raphson closestPointTo + 解析 length()
 - `StepCadBuilder.parameterOnCurve2()`: Circle2/Ellipse2 容错角度计算（atan2 投影），修复浮点偏差 trim 点抛异常
 - 全部 1393 测试通过，编译零错误

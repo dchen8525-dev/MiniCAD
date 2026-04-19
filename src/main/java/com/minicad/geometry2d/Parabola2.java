@@ -133,6 +133,22 @@ public record Parabola2(Point2 vertex, Direction2 axisDirection, double focalDis
     }
 
     /**
+     * Returns the parameter value for the given point projected onto the parabola.
+     * The parameter t is derived from the perpendicular component: t = perpComponent / (2*p).
+     *
+     * @param point point to project
+     * @return parameter value of closest point on the parabola
+     */
+    public double parameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector2 offset = point.subtract(vertex);
+        Vector2 axis = axisDirection.asVector();
+        Vector2 perpendicular = new Vector2(-axis.y(), axis.x());
+        double perpComponent = offset.dot(perpendicular);
+        return perpComponent / (2.0 * focalDistance);
+    }
+
+    /**
      * Returns the bounding box for a parameter range.
      *
      * @param tMin minimum parameter value

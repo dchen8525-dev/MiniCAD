@@ -318,6 +318,65 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
     }
 
     /**
+     * Returns the parameter value (0 to 1) for the closest point on the composite curve.
+     * The parameter is distributed across all segments (each segment gets equal parameter range).
+     *
+     * @param point point to project
+     * @return parameter value in [0, 1]
+     */
+    public double parameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Point2 closest = null;
+        double minDistance = Double.POSITIVE_INFINITY;
+        double bestT = 0.0;
+        int n = segments.size();
+        for (Curve2 segment : segments) {
+            Point2 segmentClosest = segment.closestPointTo(point);
+            double distance = point.distanceTo(segmentClosest);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = segmentClosest;
+                double segmentT = parameterOfOnSegment(segment, closest);
+                bestT = ((double) segments.indexOf(segment) + segmentT) / n;
+            }
+        }
+        return bestT;
+    }
+
+    private static double parameterOfOnSegment(Curve2 segment, Point2 point) {
+        // Analytical cases for types with known parameter mappings
+        if (segment instanceof Line2 line) {
+            // Line2 parameterOf returns raw parameter; for composite [0,1] range, clamp
+            double raw = line.parameterOf(point);
+            return Math.max(0.0, Math.min(1.0, raw));
+        } else if (segment instanceof Circle2 circle) {
+            double angle = circle.angleOf(point);
+            return angle / (2.0 * Math.PI);
+        } else if (segment instanceof Ellipse2 ellipse) {
+            double angle = ellipse.angleOf(point);
+            return angle / (2.0 * Math.PI);
+        } else if (segment instanceof Polyline2 polyline) {
+            return polyline.parameterOf(point);
+        } else if (segment instanceof CompositeCurve2 composite) {
+            return composite.parameterOf(point);
+        } else if (segment instanceof DegenerateCurve2) {
+            return 0.0;
+        }
+        // Fallback: sampling-based parameter lookup
+        java.util.List<Point2> samples = sampleSegment(segment, 64);
+        double minD = Double.POSITIVE_INFINITY;
+        double bestT = 0.0;
+        for (int i = 0; i < samples.size(); i++) {
+            double d = point.distanceTo(samples.get(i));
+            if (d < minD) {
+                minD = d;
+                bestT = (double) i / (samples.size() - 1);
+            }
+        }
+        return bestT;
+    }
+
+    /**
      * Returns the segment count.
      *
      * @return number of segments
