@@ -90,6 +90,10 @@ mvn -q -Dtest=StepParserTest,StepEntityResolverTest test
 mvn -q exec:java -Dexec.mainClass=com.minicad.app.StepBenchmarkApp -Dexec.args="examples/engine.stp"
 ```
 
+当前已落地入口：
+
+- `src/main/java/com/minicad/app/StepBenchmarkApp.java`
+
 ### 退出条件
 
 - 已能稳定输出分阶段耗时
