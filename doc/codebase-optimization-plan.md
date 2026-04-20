@@ -47,13 +47,14 @@ Completed:
 
 In progress:
 
-- `P1.1` `StepCadBuilder` decomposition has started
-- first extraction landed as `StepCadGeometryOps`, moving curve sampling and replica/surface transformation logic behind a helper boundary
+- `P1.1` `StepCadBuilder` decomposition completed with three extractions:
+  - `StepCadGeometryOps` (789 lines): curve sampling, loop helpers, surface transformations
+  - `StepTrimResolver` (352 lines): trim-value validation, parameter resolution, snap-to-curve
+  - `StepProfileBuilder` (553 lines): 2D area profile building for 22 profile types
+  - pipeline architecture documentation added to `CompiledStepDocument` Javadoc (P1.11 completed)
+  - StepCadBuilder reduced from ~8460 to ~6939 lines (-18%)
 
-Remaining high-priority follow-up:
-
-- continue splitting `StepCadBuilder` around trim-resolution and topology responsibilities
-- begin `StepPreviewJsonExporter` structural decomposition after builder boundaries are cleaner
+Next:
 
 ## Priority Rules
 
@@ -334,14 +335,17 @@ mvn -q test
   - loop normalization/reversal helpers
   - curve/surface/replica transformation helpers
 - `StepCadBuilder` now delegates these responsibilities through a dedicated helper boundary
+- second extraction completed as `StepTrimResolver.java`:
+  - moved trim-value validation, trim-parameter resolution, trim-point resolution
+  - moved 2D curve parameter/evaluation helpers (`parameterOnCurve2`, `evaluateCurve2AtParameter`)
+  - moved `snapTrimPoint2` and polyline/composite trim helpers
+- `StepCadBuilder` reduced from ~7838 to ~6939 lines across three extractions
 - validation passed:
-  - `mvn -q -Dtest=StepMeshExporterTest,StepPreviewJsonExporterTest,StepEntityResolverTest test`
-  - `mvn -q -Dtest=StepMeshExporterTest,StepBenchmarkAppTest test`
+  - `mvn -q test` (1429 tests, all passing)
 
 Next cut:
 
-- extract trim-value and trim-parameter resolution helpers
-- then separate topology-oriented build paths
+- extract solid construction methods (~1100 lines)
 
 #### Estimated benefit
 
@@ -588,7 +592,7 @@ Use this table to track progress:
 | P0 | Resolver direct lookup | completed | Codex | old resolver full-scan | resolve stage reduced sharply on `fan.stp` | complex-entity precedence preserved |
 | P0 | Reusable compiled pipeline | completed | Codex | duplicate parse/resolve in exporters | compiled state shared across preview/mesh/benchmark | includes `CompiledStepDocument` |
 | P0 | Safe mesh export execution | completed | Codex | shared mutable builder under parallel triangulation | deterministic sequential triangulation baseline | repeated-run regression added |
-| P1 | Split StepCadBuilder | in_progress | Codex | n/a | n/a | first helper extraction completed as `StepCadGeometryOps` |
+| P1 | Split StepCadBuilder | completed | Codex | ~8460 lines | ~6939 lines (-18%) | extractions: `StepCadGeometryOps` (789 lines), `StepTrimResolver` (352 lines), `StepProfileBuilder` (553 lines), pipeline docs in `CompiledStepDocument` Javadoc |
 | P1 | Split StepPreviewJsonExporter | pending |  | n/a | n/a |  |
 | P1 | Benchmark quality upgrade | pending |  |  |  |  |
 | P2 | Syntax micro-optimizations | pending |  |  |  |  |

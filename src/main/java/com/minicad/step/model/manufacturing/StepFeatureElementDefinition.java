@@ -3,12 +3,11 @@ package com.minicad.step.model.manufacturing;
 import com.minicad.step.model.base.StepEntity;
 
 /**
- * Resolved PATTERN.
+ * Resolved FEATURE_ELEMENT_DEFINITION.
  */
-public record StepPattern(
+public record StepFeatureElementDefinition(
     int id,
     String name,
-    String patternType,
-    StepEntity seedElement
+    String featureType
 ) implements StepEntity {
 }

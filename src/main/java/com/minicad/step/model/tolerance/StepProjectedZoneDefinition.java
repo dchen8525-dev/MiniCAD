@@ -1,7 +1,6 @@
 package com.minicad.step.model.tolerance;
 
 import com.minicad.step.model.base.StepEntity;
-import java.util.List;
 
 /**
  * Resolved PROJECTED_ZONE_DEFINITION.
@@ -9,14 +8,14 @@ import java.util.List;
  *
  * @param id STEP instance id
  * @param name zone name
- * @param projectionLength projection length
- * @param projectionDirection projection direction
- * @param projectionUnit projection unit
+ * @param description zone description
+ * @param projectedZone the projected zone entity reference
+ * @param applied whether the projected zone is applied
  */
 public record StepProjectedZoneDefinition(
-    int id,
-    String name,
-    Double projectionLength,
-    StepEntity projectionDirection,
-    StepEntity projectionUnit) implements StepEntity {
+        int id,
+        String name,
+        String description,
+        StepEntity projectedZone,
+        boolean applied) implements StepEntity {
 }

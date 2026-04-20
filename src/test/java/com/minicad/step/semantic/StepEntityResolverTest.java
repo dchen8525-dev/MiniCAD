@@ -4,6 +4,8 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
 import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.geometry.StepAngularLocation;
+import com.minicad.step.model.tolerance.StepProjectedZoneDefinition;
 import com.minicad.step.model.annotation.StepCharacterGlyphStyleOutline;
 import com.minicad.step.model.annotation.StepCharacterGlyphStyleOutlineWithCharacteristics;
 import com.minicad.step.model.annotation.StepCharacterGlyphStyleStroke;
@@ -39,6 +41,7 @@ import com.minicad.step.model.classification.StepExternalSource;
 import com.minicad.step.model.classification.StepExternalIdentificationAssignment;
 import com.minicad.step.model.classification.StepExternalSourceRelationship;
 import com.minicad.step.model.annotation.StepExternallyDefinedItem;
+import com.minicad.step.model.annotation.StepExternallyDefinedHatchStyle;
 import com.minicad.step.model.geometry.StepBSplineCurve;
 import com.minicad.step.model.geometry.StepBSplineCurveWithKnots;
 import com.minicad.step.model.geometry.StepBSplineSurface;
@@ -266,6 +269,7 @@ import com.minicad.step.model.security.StepSecurityClassification;
 import com.minicad.step.model.security.StepSecurityClassificationAssignment;
 import com.minicad.step.model.security.StepSecurityClassificationLevel;
 import com.minicad.step.model.classification.StepShapeAspect;
+import com.minicad.step.model.classification.StepCompositeShapeAspect;
 import com.minicad.step.model.workflow.StepDatumSystem;
 import com.minicad.step.model.classification.StepShapeAspectOccurrence;
 import com.minicad.step.model.classification.StepShapeAspectRelationship;
@@ -8891,8 +8895,8 @@ class StepEntityResolverTest {
                 assertInstanceOf(StepEffectivityRelationship.class, resolved.get(45));
         StepExternallyDefinedItem externallyDefinedCurveFont =
                 assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(46));
-        StepExternallyDefinedItem externallyDefinedHatchStyle =
-                assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(47));
+        StepExternallyDefinedHatchStyle externallyDefinedHatchStyle =
+                assertInstanceOf(StepExternallyDefinedHatchStyle.class, resolved.get(47));
         StepExternallyDefinedItem externallyDefinedMarker =
                 assertInstanceOf(StepExternallyDefinedItem.class, resolved.get(48));
         StepExternallyDefinedItem externallyDefinedSymbol =
@@ -8959,7 +8963,7 @@ class StepEntityResolverTest {
         assertEquals(43, effectivityRelationship.relatingEffectivity().id());
         assertEquals(44, effectivityRelationship.relatedEffectivity().id());
         assertEquals("EXTERNALLY_DEFINED_CURVE_FONT", externallyDefinedCurveFont.entityName());
-        assertEquals("EXTERNALLY_DEFINED_HATCH_STYLE", externallyDefinedHatchStyle.entityName());
+        assertEquals("hatch-1", externallyDefinedHatchStyle.name());
         assertEquals("EXTERNALLY_DEFINED_MARKER", externallyDefinedMarker.entityName());
         assertEquals("EXTERNALLY_DEFINED_SYMBOL", externallyDefinedSymbol.entityName());
         assertEquals("EXTERNALLY_DEFINED_TEXT_FONT", externallyDefinedTextFont.entityName());
@@ -9039,11 +9043,15 @@ class StepEntityResolverTest {
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
-        // IDs 8-12, 16-36 are shape aspect subtypes; 13-15 are DATUM types with own resolvers
-        for (int id = 8; id <= 12; id++) {
+        // IDs 8-11, 16-36 are shape aspect subtypes; 13-15 are DATUM types with own resolvers
+        for (int id = 8; id <= 11; id++) {
             StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, resolved.get(id));
             assertEquals(7, aspect.ofShape().id());
         }
+        // #12 is COMPOSITE_SHAPE_ASPECT with its own resolver
+        StepCompositeShapeAspect compositeAspect = assertInstanceOf(StepCompositeShapeAspect.class, resolved.get(12));
+        assertEquals("CSA", compositeAspect.name());
+        assertEquals(7, compositeAspect.ofShape().id());
         for (int id = 16; id <= 36; id++) {
             StepShapeAspect aspect = assertInstanceOf(StepShapeAspect.class, resolved.get(id));
             assertEquals(7, aspect.ofShape().id());
@@ -9060,7 +9068,7 @@ class StepEntityResolverTest {
         assertEquals("U", ((StepShapeAspect) resolved.get(10)).productDefinitional());
         assertEquals("TANGENT", ((StepShapeAspect) resolved.get(36)).entityName());
         for (int id = 37; id <= 54; id++) {
-            if (id == 39 || id == 40) continue;
+            if (id == 39 || id == 40 || id == 46) continue;
             StepShapeAspectRelationship relationship =
                     assertInstanceOf(StepShapeAspectRelationship.class, resolved.get(id));
             assertInstanceOf(StepEntity.class, relationship.relatingShapeAspect());
@@ -9072,6 +9080,8 @@ class StepEntityResolverTest {
         assertEquals("SHAPE_ASPECT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(37)).entityName());
         assertEquals("DL", ((StepDimensionalLocation) resolved.get(39)).name());
         assertEquals("SHAPE_ASPECT_DERIVING_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(45)).entityName());
+        assertInstanceOf(StepAngularLocation.class, resolved.get(46));
+        assertEquals("AL", ((StepAngularLocation) resolved.get(46)).name());
         assertEquals("SHAPE_FEATURE_FIT_RELATIONSHIP", ((StepShapeAspectRelationship) resolved.get(54)).entityName());
     }
 
@@ -9138,6 +9148,10 @@ class StepEntityResolverTest {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
         for (int id = 8; id <= 36; id++) {
+            if (id == 31) {
+                // PROJECTED_ZONE_DEFINITION resolves to its own type
+                continue;
+            }
             StepEntity entity = resolved.get(id);
             if (entity instanceof StepShapeAspectOccurrence occurrence) {
                 assertEquals(7, occurrence.ofShape().id());
@@ -9153,6 +9167,8 @@ class StepEntityResolverTest {
                 ((StepShapeAspectOccurrence) resolved.get(9)).entityName());
         assertEquals(50, ((StepShapeAspectOccurrence) resolved.get(9)).definition().id());
         assertEquals("TOLERANCE_ZONE_DEFINITION", ((StepShapeAspect) resolved.get(36)).entityName());
+        assertInstanceOf(StepProjectedZoneDefinition.class, resolved.get(31));
+        assertEquals("PZD", ((StepProjectedZoneDefinition) resolved.get(31)).name());
         for (int id = 37; id <= 49; id++) {
             StepShapeAspectRelationship relationship =
                     assertInstanceOf(StepShapeAspectRelationship.class, resolved.get(id));
@@ -9252,6 +9268,11 @@ class StepEntityResolverTest {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
         for (int id = 1; id <= 46; id++) {
+            if (id == 45) {
+                // THREAD has its own specific resolver
+                assertInstanceOf(com.minicad.step.model.manufacturing.StepThread.class, resolved.get(id));
+                continue;
+            }
             StepCharacterizedObject object =
                     assertInstanceOf(StepCharacterizedObject.class, resolved.get(id));
             assertEquals(id, object.id());

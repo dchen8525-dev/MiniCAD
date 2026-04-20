@@ -30,9 +30,14 @@ Completed:
 
 In progress:
 
-- `P1` `StepCadBuilder` split has started with a first helper extraction:
+- `P1` `StepCadBuilder` split has three extractions:
   - [StepCadGeometryOps.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepCadGeometryOps.java)
-  - scope extracted so far: curve sampling, trimmed-curve helpers, loop helpers, replica/surface transformation helpers
+    - scope extracted so far: curve sampling, trimmed-curve helpers, loop helpers, replica/surface transformation helpers
+  - [StepTrimResolver.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTrimResolver.java)
+    - scope extracted: trim-value validation, trim-parameter resolution, trim-point resolution, 2D curve parameter/evaluation, snap-to-curve helpers
+  - [StepProfileBuilder.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepProfileBuilder.java)
+    - scope extracted: 2D area profile building for 22 profile types (rectangle, circle, ellipse, hollow, I/T/L/U/Z/hat shapes, arbitrary, parameterized)
+    - `StepCadBuilder` reduced from ~7838 to ~6939 lines (-11%)
 
 Recommended next issue:
 
@@ -548,6 +553,14 @@ This de-risks later extraction of geometry/topology-specific builders by proving
   - curve and surface transformation helpers
   - replica transformation helpers
 - `StepCadBuilder` now delegates these responsibilities through `geometryOps`
+- added [StepTrimResolver.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTrimResolver.java)
+- moved:
+  - trim-value validation (`validateTrimValue`)
+  - 3D trim-parameter resolution (`resolveTrimParameter`, `resolveTrimPoint3`)
+  - 2D trim resolution (`resolveTrimPoint2`, `resolveTrimParam2`, `requireTrimPoint2`)
+  - 2D curve parameter/evaluation (`parameterOnCurve2`, `evaluateCurve2AtParameter`)
+  - snap-to-curve (`snapTrimPoint2`) and polyline/composite trim helpers
+- `StepCadBuilder` reduced from ~7838 to ~7511 lines across two extractions
 
 ### Boundaries
 
@@ -777,7 +790,7 @@ mvn -q -Dtest=StepPreviewJsonExporterTest,ProductMetadataExtractorTest test
 
 ## P1-7: Extract `Geometry2Builder` from `StepCadBuilder`
 
-Status: not started
+Status: superseded by profile builder extraction approach
 
 ### Objective
 

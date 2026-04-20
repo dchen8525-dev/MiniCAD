@@ -5779,7 +5779,8 @@ class StepDumpAppTest {
                 "SHAPE_ASPECT_RELATIONSHIP #37: builtItems=4, unsupportedFaces=0",
                 "DIMENSIONAL_LOCATION: 1",
                 "SHAPE_ASPECT_DERIVING_RELATIONSHIP #45: builtItems=4, unsupportedFaces=0",
-                "SHAPE_FEATURE_FIT_RELATIONSHIP #54: builtItems=4, unsupportedFaces=0");
+                "COMPOSITE_SHAPE_ASPECT: 1",
+                "SHAPE_FEATURE_FIT_RELATIONSHIP #54: builtItems=0, unsupportedFaces=1");
     }
 
     @Test
@@ -7098,7 +7099,7 @@ class StepDumpAppTest {
         assertDumpContains(file,
                 "EXTERNALLY_DEFINED_CLASS #2: builtItems=1, unsupportedFaces=0",
                 "EXTERNALLY_DEFINED_GENERAL_PROPERTY #3: builtItems=1, unsupportedFaces=0",
-                "EXTERNALLY_DEFINED_HATCH_STYLE #4: builtItems=1, unsupportedFaces=0",
+                "EXTERNALLY_DEFINED_HATCH_STYLE: 1",
                 "EXTERNALLY_DEFINED_CHARACTER_GLYPH #5: builtItems=1, unsupportedFaces=0",
                 "EXTERNALLY_DEFINED_DIMENSION_DEFINITION #6: builtItems=1, unsupportedFaces=0",
                 "EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM #7: builtItems=1, unsupportedFaces=0",
