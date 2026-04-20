@@ -2925,7 +2925,80 @@ public final class StepPreviewJsonExporter {
                     null
             );
         }
-        // Non-planar: grid-based triangulation
+        // Cylindrical surface: parametric payload
+        if (surface instanceof CylindricalSurface cyl) {
+            Axis2Placement3D pos = cyl.position();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "CYLINDRICAL_SURFACE", "cylindrical_surface",
+                    pos, null, null, cyl.radius(), 0.0, 0.0, null);
+        }
+        // Conical surface: parametric payload
+        if (surface instanceof ConicalSurface cone) {
+            Axis2Placement3D pos = cone.position();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "CONICAL_SURFACE", "conical_surface",
+                    pos, null, null, cone.radius(), cone.semiAngle(), 0.0, null);
+        }
+        // Spherical surface: parametric payload
+        if (surface instanceof SphericalSurface sphere) {
+            Axis2Placement3D pos = sphere.position();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "SPHERICAL_SURFACE", "spherical_surface",
+                    pos, null, null, sphere.radius(), 0.0, 0.0, null);
+        }
+        // Toroidal surface: parametric payload
+        if (surface instanceof ToroidalSurface torus) {
+            Axis2Placement3D pos = torus.position();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "TOROIDAL_SURFACE", "toroidal_surface",
+                    pos, null, null, torus.majorRadius(), torus.minorRadius(), 0.0, null);
+        }
+        // B-Spline surface: parametric payload
+        if (surface instanceof BSplineSurface3 bspline) {
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "BSPLINE_SURFACE", "bspline_surface",
+                    null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, null);
+        }
+        // Rational B-Spline surface: parametric payload
+        if (surface instanceof RationalBSplineSurface3 rational) {
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
+                    null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, null);
+        }
+        // Surface of linear extrusion: parametric payload
+        if (surface instanceof SurfaceOfLinearExtrusion3 extrusion) {
+            Vector3 dir = extrusion.extrusionVector();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
+                    null, null, null, 0.0, 0.0, 0.0, dir);
+        }
+        // Surface of revolution: parametric payload
+        if (surface instanceof SurfaceOfRevolution3 revolution) {
+            CartesianPoint origin = revolution.axisOrigin();
+            Direction3 axis = revolution.axisDirection();
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "SURFACE_OF_REVOLUTION", "surface_of_revolution",
+                    null, null, null, 0.0, 0.0, 0.0, new double[]{origin.x(), origin.y(), origin.z(), axis.x(), axis.y(), axis.z()});
+        }
+        // Ruled surface: parametric payload
+        if (surface instanceof RuledSurface3 ruled) {
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "RULED_SURFACE", "ruled_surface",
+                    null, null, null, 0.0, 0.0, 0.0, null);
+        }
+        // Surface of constant radius: parametric payload
+        if (surface instanceof SurfaceOfConstantRadius3 constRadius) {
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
+                    null, null, null, constRadius.radius(), 0.0, 0.0, null);
+        }
+        // Offset surface: parametric payload
+        if (surface instanceof OffsetSurface3 offset) {
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    "OFFSET_SURFACE", "offset_surface",
+                    null, null, null, 0.0, offset.distance(), 0.0, null);
+        }
+        // Non-planar: generic grid-based triangulation
         int segments = 32;
         java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(segments, segments);
         if (grid.isEmpty()) {
@@ -2957,6 +3030,77 @@ public final class StepPreviewJsonExporter {
                 loops,
                 triangles,
                 null,
+                null
+        );
+    }
+
+    /**
+     * Creates a FacePayload by sampling the surface grid and populating parametric metadata.
+     */
+    private static FacePayload newFacePayloadFromGrid(
+            SurfaceGeometry surface,
+            int stepId,
+            String name,
+            boolean sameSense,
+            StepMetadataExtractor.DisplayMetadata metadata,
+            String displayName,
+            String surfaceType,
+            Axis2Placement3D position,
+            Integer uDegree,
+            Integer vDegree,
+            double scalarA,
+            double scalarB,
+            double scalarC,
+            Object extra
+    ) {
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+        if (grid.isEmpty()) return null;
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        if (triangles.isEmpty()) return null;
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) normal = normal.scale(-1.0);
+        List<LoopPayload> loops = new ArrayList<>();
+        PointPayload anchor = triangles.get(0);
+        List<Double> origin = null;
+        List<Double> axis = null;
+        List<Double> basisDir = null;
+        if (position != null) {
+            origin = List.of(position.location().x(), position.location().y(), position.location().z());
+            axis = List.of(position.axis().x(), position.axis().y(), position.axis().z());
+            basisDir = List.of(position.xDirection().x(), position.xDirection().y(), position.xDirection().z());
+            anchor = toPointPayload(position.location());
+        }
+        // Encode extra data for viewer use
+        Double offsetDist = null;
+        List<Double> extrusionVec = null;
+        List<Double> revolutionAxisData = null;
+        if (extra instanceof Vector3 v) {
+            extrusionVec = List.of(v.x(), v.y(), v.z());
+        } else if (extra instanceof double[] d && d.length == 6) {
+            revolutionAxisData = List.of(d[0], d[1], d[2], d[3], d[4], d[5]);
+        }
+        return new FacePayload(
+                stepId,
+                displayName,
+                displayName,
+                new PointPayload(anchor.x(), anchor.y(), anchor.z()),
+                new VectorPayload(normal.x(), normal.y(), normal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                loops,
+                triangles,
+                new FaceSurfacePayload(
+                        surfaceType,
+                        origin,
+                        axis,
+                        basisDir,
+                        scalarA,
+                        scalarB, scalarC, 0.0, 0.0, 0.0, 0.0,
+                        uDegree, vDegree, null, null, null, null, null
+                ),
                 null
         );
     }
