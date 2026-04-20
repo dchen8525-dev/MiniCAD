@@ -445,6 +445,7 @@ import com.minicad.step.model.annotation.StepTextStyleWithMirror;
 import com.minicad.step.model.annotation.StepTextStyleWithSpacing;
 import com.minicad.step.model.base.StepTopologicalRepresentationItem;
 import com.minicad.step.model.geometry.StepToroidalSurface;
+import com.minicad.step.model.geometry.StepToroidalSurfaceWithSpecifiedBends;
 import com.minicad.step.model.geometry.StepTrimmedCurve;
 import com.minicad.step.model.geometry.StepUniformCurve;
 import com.minicad.step.model.geometry.StepUniformSurface;
@@ -1710,6 +1711,18 @@ public final class StepPreviewJsonExporter {
             }
             return trimmed;
         }
+        if (previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends toroidalSurfaceWithBends) {
+            try {
+                if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
+                    FacePayload payload = toToroidalWithSpecifiedBendsFacePayload(stepFace, toroidalSurfaceWithBends, builder, metadata);
+                    if (payload != null) {
+                        logPreviewFacePayload("face_payload_built", payload);
+                        return new PreviewFaceResult(payload, null);
+                    }
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+        }
         if (previewGeometry instanceof StepToroidalSurface toroidalSurface) {
             try {
                 if (geometry instanceof StepToroidalSurface) {
@@ -1725,7 +1738,8 @@ public final class StepPreviewJsonExporter {
         if (previewGeometry instanceof StepCylindricalSurface
                 || previewGeometry instanceof StepConicalSurface
                 || previewGeometry instanceof StepDegenerateToroidalSurface
-                || previewGeometry instanceof StepToroidalSurface) {
+                || previewGeometry instanceof StepToroidalSurface
+                || previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
@@ -2930,73 +2944,70 @@ public final class StepPreviewJsonExporter {
             Axis2Placement3D pos = cyl.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "CYLINDRICAL_SURFACE", "cylindrical_surface",
-                    pos, null, null, cyl.radius(), 0.0, 0.0, null);
+                    pos, null, null, cyl.radius(), 0.0, 0.0, face.bounds());
         }
         // Conical surface: parametric payload
         if (surface instanceof ConicalSurface cone) {
             Axis2Placement3D pos = cone.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "CONICAL_SURFACE", "conical_surface",
-                    pos, null, null, cone.radius(), cone.semiAngle(), 0.0, null);
+                    pos, null, null, cone.radius(), cone.semiAngle(), 0.0, face.bounds());
         }
         // Spherical surface: parametric payload
         if (surface instanceof SphericalSurface sphere) {
             Axis2Placement3D pos = sphere.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SPHERICAL_SURFACE", "spherical_surface",
-                    pos, null, null, sphere.radius(), 0.0, 0.0, null);
+                    pos, null, null, sphere.radius(), 0.0, 0.0, face.bounds());
         }
         // Toroidal surface: parametric payload
         if (surface instanceof ToroidalSurface torus) {
             Axis2Placement3D pos = torus.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "TOROIDAL_SURFACE", "toroidal_surface",
-                    pos, null, null, torus.majorRadius(), torus.minorRadius(), 0.0, null);
+                    pos, null, null, torus.majorRadius(), torus.minorRadius(), 0.0, face.bounds());
         }
         // B-Spline surface: parametric payload
         if (surface instanceof BSplineSurface3 bspline) {
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "BSPLINE_SURFACE", "bspline_surface",
-                    null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, null);
+                    null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, face.bounds());
         }
         // Rational B-Spline surface: parametric payload
         if (surface instanceof RationalBSplineSurface3 rational) {
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
-                    null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, null);
+                    null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of linear extrusion: parametric payload
         if (surface instanceof SurfaceOfLinearExtrusion3 extrusion) {
-            Vector3 dir = extrusion.extrusionVector();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
-                    null, null, null, 0.0, 0.0, 0.0, dir);
+                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of revolution: parametric payload
         if (surface instanceof SurfaceOfRevolution3 revolution) {
-            CartesianPoint origin = revolution.axisOrigin();
-            Direction3 axis = revolution.axisDirection();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_REVOLUTION", "surface_of_revolution",
-                    null, null, null, 0.0, 0.0, 0.0, new double[]{origin.x(), origin.y(), origin.z(), axis.x(), axis.y(), axis.z()});
+                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Ruled surface: parametric payload
         if (surface instanceof RuledSurface3 ruled) {
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "RULED_SURFACE", "ruled_surface",
-                    null, null, null, 0.0, 0.0, 0.0, null);
+                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of constant radius: parametric payload
         if (surface instanceof SurfaceOfConstantRadius3 constRadius) {
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
-                    null, null, null, constRadius.radius(), 0.0, 0.0, null);
+                    null, null, null, constRadius.radius(), 0.0, 0.0, face.bounds());
         }
         // Offset surface: parametric payload
         if (surface instanceof OffsetSurface3 offset) {
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "OFFSET_SURFACE", "offset_surface",
-                    null, null, null, 0.0, offset.distance(), 0.0, null);
+                    null, null, null, 0.0, offset.distance(), 0.0, face.bounds());
         }
         // Non-planar: generic grid-based triangulation
         int segments = 32;
@@ -3051,7 +3062,7 @@ public final class StepPreviewJsonExporter {
             double scalarA,
             double scalarB,
             double scalarC,
-            Object extra
+            List<FaceBound> bounds
     ) {
         java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
         if (grid.isEmpty()) return null;
@@ -3059,7 +3070,6 @@ public final class StepPreviewJsonExporter {
         if (triangles.isEmpty()) return null;
         Vector3 normal = surface.normalAt(0.5, 0.5);
         if (!sameSense) normal = normal.scale(-1.0);
-        List<LoopPayload> loops = new ArrayList<>();
         PointPayload anchor = triangles.get(0);
         List<Double> origin = null;
         List<Double> axis = null;
@@ -3070,14 +3080,9 @@ public final class StepPreviewJsonExporter {
             basisDir = List.of(position.xDirection().x(), position.xDirection().y(), position.xDirection().z());
             anchor = toPointPayload(position.location());
         }
-        // Encode extra data for viewer use
-        Double offsetDist = null;
-        List<Double> extrusionVec = null;
-        List<Double> revolutionAxisData = null;
-        if (extra instanceof Vector3 v) {
-            extrusionVec = List.of(v.x(), v.y(), v.z());
-        } else if (extra instanceof double[] d && d.length == 6) {
-            revolutionAxisData = List.of(d[0], d[1], d[2], d[3], d[4], d[5]);
+        List<LoopPayload> loops = new ArrayList<>();
+        for (FaceBound bound : bounds) {
+            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepId,
@@ -3353,6 +3358,105 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
+                toPointPayload(toroidalSurfacePoint(surface, uValues.getFirst(), lowerV)),
+                new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                triangles,
+                new FaceSurfacePayload(
+                        "toroidal_strip",
+                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
+                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
+                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
+                        surface.majorRadius(),
+                        surface.minorRadius(),
+                        null,
+                        lowerV,
+                        upperV,
+                        uValues.getFirst(),
+                        uValues.getLast() - uValues.getFirst(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                null
+        );
+    }
+
+    private static FacePayload toToroidalWithSpecifiedBendsFacePayload(
+            StepFaceEntity stepFace,
+            StepToroidalSurfaceWithSpecifiedBends stepSurface,
+            StepCadBuilder builder,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) {
+        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
+        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+            return null;
+        }
+        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+            return null;
+        }
+
+        List<OrientedEdge> circleEdges = outerLoop.edges().stream()
+                .filter(edge -> edge.edge().curve() instanceof Circle)
+                .toList();
+        if (circleEdges.size() != 4) {
+            return null;
+        }
+
+        ToroidalSurface surface = builder.buildToroidalSurface(stepSurface.id());
+        List<OrientedEdge> varyingUEdges = new ArrayList<>();
+        List<OrientedEdge> varyingVEdges = new ArrayList<>();
+        for (OrientedEdge edge : circleEdges) {
+            List<CartesianPoint> points = sampleOrientedEdge(edge);
+            List<Double> uValues = unwrapToroidalU(surface, points);
+            List<Double> vValues = unwrapToroidalV(surface, points);
+            double uRange = Math.abs(uValues.getLast() - uValues.getFirst());
+            double vRange = Math.abs(vValues.getLast() - vValues.getFirst());
+            if (uRange >= vRange) {
+                varyingUEdges.add(edge);
+            } else {
+                varyingVEdges.add(edge);
+            }
+        }
+        if (varyingUEdges.size() != 2 || varyingVEdges.size() != 2) {
+            return null;
+        }
+
+        OrientedEdge lowerVEdge = varyingUEdges.getFirst();
+        OrientedEdge upperVEdge = varyingUEdges.getLast();
+        if (averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
+            lowerVEdge = varyingUEdges.getLast();
+            upperVEdge = varyingUEdges.getFirst();
+        }
+
+        List<CartesianPoint> lowerPoints = sampleOrientedEdge(lowerVEdge);
+        List<Double> uValues = unwrapToroidalU(surface, lowerPoints);
+        double lowerV = averageToroidalV(surface, lowerPoints);
+        double upperV = averageToroidalV(surface, sampleOrientedEdge(upperVEdge));
+        if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
+            return null;
+        }
+
+        boolean sameSense = faceSameSense(stepFace);
+        List<PointPayload> triangles = triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
+        if (triangles.isEmpty()) {
+            return null;
+        }
+
+        Vector3 startNormal = toroidalNormal(surface, uValues.getFirst(), lowerV, sameSense);
+        return new FacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS",
                 toPointPayload(toroidalSurfacePoint(surface, uValues.getFirst(), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,

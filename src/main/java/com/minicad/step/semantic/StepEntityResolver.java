@@ -85,6 +85,7 @@ import com.minicad.step.model.profile.StepAreaProfile;
 import com.minicad.step.model.profile.StepGeneralizedAreaProfile;
 import com.minicad.step.model.profile.StepSweptProfileAreaOutline;
 import com.minicad.step.model.profile.StepCenteredCircleProfileDef;
+import com.minicad.step.model.manufacturing.StepChamfer;
 import com.minicad.step.model.manufacturing.StepChamferEdge;
 import com.minicad.step.model.topology.StepClosedShell;
 import com.minicad.step.model.manufacturing.StepChamferDefinition;
@@ -92,6 +93,10 @@ import com.minicad.step.model.manufacturing.StepFilletDefinition;
 import com.minicad.step.model.manufacturing.StepFilletEdge;
 import com.minicad.step.model.manufacturing.StepFlatPattern;
 import com.minicad.step.model.manufacturing.StepThread;
+import com.minicad.step.model.manufacturing.StepBore;
+import com.minicad.step.model.manufacturing.StepCounterboreHole;
+import com.minicad.step.model.manufacturing.StepCountersinkHole;
+import com.minicad.step.model.manufacturing.StepPocket;
 import com.minicad.step.model.manufacturing.StepMachiningOperation;
 import com.minicad.step.model.manufacturing.StepMachiningOperationSequence;
 import com.minicad.step.model.manufacturing.StepRound;
@@ -3267,6 +3272,84 @@ public final class StepEntityResolver {
         edges,
         optionalNumberValue(instance, definition, 3),
         optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepChamfer resolveChamfer(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CHAMFER");
+    requireParameterCount(instance, definition, 5);
+    List<StepEntity> edges =
+        entityReferenceList(
+            instance, definition, 2,
+            "CHAMFER edges must contain entity references");
+    return new StepChamfer(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        edges,
+        optionalNumberValue(instance, definition, 3),
+        optionalNumberValue(instance, definition, 4));
+  }
+
+  private StepPocket resolvePocket(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "POCKET");
+    requireParameterCount(instance, definition, 6);
+    return new StepPocket(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepEntity.class,
+            "POCKET profile must reference a profile"),
+        optionalNumberValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepEntity.class,
+            "POCKET direction must reference a direction"),
+        stringValue(instance, definition, 4));
+  }
+
+  private StepBore resolveBore(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BORE");
+    requireParameterCount(instance, definition, 5);
+    return new StepBore(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepEntity.class,
+            "BORE profile must reference a profile"),
+        optionalNumberValue(instance, definition, 2),
+        requireEntity(
+            referenceId(instance, definition, 3),
+            StepEntity.class,
+            "BORE direction must reference a direction"));
+  }
+
+  private StepCounterboreHole resolveCounterboreHole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COUNTERBORE_HOLE");
+    requireParameterCount(instance, definition, 5);
+    return new StepCounterboreHole(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepEntity.class,
+            "COUNTERBORE_HOLE through_hole must reference a hole"),
+        optionalNumberValue(instance, definition, 2),
+        optionalNumberValue(instance, definition, 3));
+  }
+
+  private StepCountersinkHole resolveCountersinkHole(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COUNTERSINK_HOLE");
+    requireParameterCount(instance, definition, 5);
+    return new StepCountersinkHole(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepEntity.class,
+            "COUNTERSINK_HOLE through_hole must reference a hole"),
+        optionalNumberValue(instance, definition, 2),
+        optionalNumberValue(instance, definition, 3));
   }
 
   private StepRound resolveRound(StepEntityInstance instance) {
@@ -14811,7 +14894,7 @@ public final class StepEntityResolver {
     // Phase 3: Additional solid entities
     registry.put(
         "SWEPT_AREA_SOLID",
-        (resolver, instance) -> resolver.resolveExtrudedAreaSolid(instance));
+        (resolver, instance) -> resolver.resolveSweptAreaSolid(instance, "SWEPT_AREA_SOLID"));
     registry.put(
         "SWEPT_VOLUME_SOLID",
         (resolver, instance) -> resolver.resolveRepresentationItem(instance));
@@ -14820,7 +14903,7 @@ public final class StepEntityResolver {
         (resolver, instance) -> resolver.resolveRepresentationItem(instance));
     registry.put(
         "AREA_SOLID",
-        (resolver, instance) -> resolver.resolveExtrudedAreaSolid(instance));
+        (resolver, instance) -> resolver.resolveSweptAreaSolid(instance, "AREA_SOLID"));
     registry.put(
         "GEOMETRIC_REPRESENTATION_ITEM_WITH_GEOMETRY",
         (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
@@ -16216,9 +16299,30 @@ public final class StepEntityResolver {
     // Document types
     registry.put("TEXT_FILE_REPRESENTATION", StepEntityResolver::resolveTextFileRepresentation);
 
+    // Tolerance types
+    registry.put("TOLERANCE_MODIFIER", StepEntityResolver::resolveToleranceModifier);
+
+    // FEA types
+    registry.put("FEA_MATERIAL_PROPERTY_REPRESENTATION", StepEntityResolver::resolveFeaMaterialPropertyRepresentation);
+    registry.put("VOLUME_3D_ELEMENT_REPRESENTATION", StepEntityResolver::resolveVolume3dElementRepresentation);
+
+    // PMI/Annotation types
+    registry.put("PRESENTATION_LAYER_ASSIGNMENT", StepEntityResolver::resolvePresentationLayerAssignment);
+    registry.put("PRESENTATION_STYLE_ASSIGNMENT", StepEntityResolver::resolvePresentationStyleAssignment);
+
     // Manufacturing types (new)
     registry.put("FLAT_PATTERN", StepEntityResolver::resolveFlatPattern);
     registry.put("THREAD", StepEntityResolver::resolveThread);
+
+    // Product structure types (only types NOT already registered via alias handlers)
+    registry.put("PRODUCT_DEFINITION_RELATIONSHIP", StepEntityResolver::resolveProductDefinitionRelationship);
+    registry.put("PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP", StepEntityResolver::resolveProductDefinitionRelationshipRelationship);
+    registry.put("REPRESENTATION_RELATIONSHIP", StepEntityResolver::resolveRepresentationRelationship);
+
+    // Missing geometry types
+    registry.put("FEA_AXIS2_PLACEMENT_3D", StepEntityResolver::resolveFeaAxis2Placement3d);
+    registry.put("BSPLINE_CURVE_2D", StepEntityResolver::resolveBSplineCurve2D);
+    registry.put("RATIONAL_BSPLINE_CURVE_2D", StepEntityResolver::resolveRationalBSplineCurve2D);
 
     return registry;
   }

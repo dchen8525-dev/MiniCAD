@@ -124,11 +124,9 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
     }
 
     private static boolean liesOnCurve(CartesianPoint point, Curve3 curve) {
-        if (curve.contains(point)) {
-            return true;
-        }
-        // For B-spline curves, use the curve's own closestPointTo (Newton-Raphson)
-        // which is much more accurate than sample-based linear interpolation
+        // For B-spline and rational B-spline curves, use the curve's own
+        // closestPointTo (Newton-Raphson) which is much more accurate than
+        // sample-based linear interpolation.
         if (curve instanceof BSplineCurve3 bspline) {
             return bspline.distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
         }
@@ -142,16 +140,26 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         if (curve instanceof SurfaceCurve3 surfaceCurve) {
             return liesOnCurve(point, surfaceCurve.curve3d());
         }
-        // For other curves, fall back to sample-based check
+        // Fast path: try the curve's own contains() check first.
+        if (curve.contains(point)) {
+            return true;
+        }
+        // Industrial STEP files often have vertex coordinates rounded to limited
+        // precision, so use a tolerant distance check for all remaining curve types.
+        double distance = curve.distanceTo(point);
+        if (distance <= IMPORT_CURVE_TOLERANCE) {
+            return true;
+        }
+        // Fall back to sample-based check for complex curves
         List<CartesianPoint> sampled = sampleCurve(curve);
         if (sampled.size() < 2) {
             return false;
         }
         double nearestDistance = Double.POSITIVE_INFINITY;
         for (int index = 0; index < sampled.size() - 1; index++) {
-            double distance = distanceToSegment(point, sampled.get(index), sampled.get(index + 1));
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
+            double dist = distanceToSegment(point, sampled.get(index), sampled.get(index + 1));
+            if (dist < nearestDistance) {
+                nearestDistance = dist;
             }
         }
         return nearestDistance <= IMPORT_CURVE_TOLERANCE;
