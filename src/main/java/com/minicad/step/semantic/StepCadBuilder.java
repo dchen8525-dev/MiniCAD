@@ -7168,6 +7168,21 @@ public final class StepCadBuilder {
         return built;
     }
 
+    /**
+     * Builds a SurfaceGeometry from a surface entity ID.
+     * Dispatches to the appropriate typed builder for parametric surfaces.
+     */
+    public SurfaceGeometry buildSurfaceGeometry(int id) {
+        StepEntity entity = requireExistingEntity(id);
+        return switch (entity) {
+            case StepParaboloidSurface paraboloid -> buildParaboloidSurface(id);
+            case StepHyperboloidSurface hyperboloid -> buildHyperboloidSurface(id);
+            case StepSurfaceOfTranslation translation -> buildSurfaceOfTranslation(id);
+            case StepSurfaceOfProjection projection -> buildSurfaceOfProjection(id);
+            default -> throw new UnsupportedGeometryException("entity #" + id + " is not a supported parametric surface");
+        };
+    }
+
     private Vector3 buildVector3(StepEntity entity) {
         if (entity instanceof StepVector stepVector) {
             Direction3 dir = buildDirection(stepVector.orientation().id());

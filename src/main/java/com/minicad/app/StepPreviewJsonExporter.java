@@ -173,6 +173,10 @@ import com.minicad.step.model.geometry.StepToroidalSurfaceWithCylindricalAxis;
 import com.minicad.step.model.geometry.StepToroidalSurfaceWithEllipticalAxis;
 import com.minicad.step.model.geometry.StepRuledSurface;
 import com.minicad.step.model.geometry.StepSurfaceOfConstantRadius;
+import com.minicad.step.model.geometry.StepParaboloidSurface;
+import com.minicad.step.model.geometry.StepHyperboloidSurface;
+import com.minicad.step.model.geometry.StepSurfaceOfTranslation;
+import com.minicad.step.model.geometry.StepSurfaceOfProjection;
 import com.minicad.step.model.product.StepTessellatedFace;
 import com.minicad.step.model.product.StepTessellatedFaceSet;
 import com.minicad.step.model.product.StepTessellatedTriangle;
@@ -1774,6 +1778,50 @@ public final class StepPreviewJsonExporter {
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
+        }
+        if (previewGeometry instanceof StepParaboloidSurface paraboloidSurface) {
+            try {
+                FacePayload payload = toParametricSurfaceFacePayload(stepFace, paraboloidSurface, "PARABOLOID_SURFACE", builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "paraboloid surface preview failed"));
+        }
+        if (previewGeometry instanceof StepHyperboloidSurface hyperboloidSurface) {
+            try {
+                FacePayload payload = toParametricSurfaceFacePayload(stepFace, hyperboloidSurface, "HYPERBOLOID_SURFACE", builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "hyperboloid surface preview failed"));
+        }
+        if (previewGeometry instanceof StepSurfaceOfTranslation translationSurface) {
+            try {
+                FacePayload payload = toParametricSurfaceFacePayload(stepFace, translationSurface, "SURFACE_OF_TRANSLATION", builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of translation preview failed"));
+        }
+        if (previewGeometry instanceof StepSurfaceOfProjection projectionSurface) {
+            try {
+                FacePayload payload = toParametricSurfaceFacePayload(stepFace, projectionSurface, "SURFACE_OF_PROJECTION", builder, metadata);
+                if (payload != null) {
+                    logPreviewFacePayload("face_payload_built", payload);
+                    return new PreviewFaceResult(payload, null);
+                }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+            }
+            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of projection preview failed"));
         }
         if (previewGeometry instanceof StepBlendedSurface blended) {
             // Blended surface: approximate by rendering the primary surface with blend radius as metadata
@@ -3474,6 +3522,52 @@ public final class StepPreviewJsonExporter {
                         0.0, 0.0, 0.0, 0.0,
                         null, null, null, null, null, null, null
                 ),
+                null
+        );
+    }
+
+    /**
+     * Generic parametric surface preview for surfaces with sampleGrid:
+     * paraboloid, hyperboloid, surface of translation, surface of projection.
+     */
+    private static FacePayload toParametricSurfaceFacePayload(
+            StepFaceEntity stepFace,
+            StepEntity stepSurface,
+            String surfaceTypeName,
+            StepCadBuilder builder,
+            StepMetadataExtractor.DisplayMetadata metadata
+    ) throws TopologyException, StepResolutionException, UnsupportedGeometryException, GeometryException {
+        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
+        if (bounds.isEmpty()) {
+            return null;
+        }
+        SurfaceGeometry surface = builder.buildSurfaceGeometry(stepSurface.id());
+        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        if (triangles.isEmpty()) {
+            return null;
+        }
+        boolean sameSense = faceSameSense(stepFace);
+        Vector3 normal = surface.normalAt(0.5, 0.5);
+        if (!sameSense) normal = normal.scale(-1.0);
+        List<LoopPayload> loops = new ArrayList<>();
+        for (FaceBound bound : bounds) {
+            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+        }
+        return new FacePayload(
+                stepFace.id(),
+                faceDisplayName(stepFace),
+                surfaceTypeName,
+                triangles.get(0),
+                new VectorPayload(normal.x(), normal.y(), normal.z()),
+                sameSense,
+                toColorPayload(metadata.rgb()),
+                metadata.transparency(),
+                toPbrPayload(metadata.pbr()),
+                metadata.layers(),
+                loops,
+                triangles,
+                null,
                 null
         );
     }
