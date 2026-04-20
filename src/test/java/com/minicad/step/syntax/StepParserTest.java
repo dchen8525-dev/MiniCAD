@@ -116,7 +116,7 @@ class StepParserTest {
 
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
-        assertEquals("unexpected character ']' at position 37", exception.getMessage());
+        assertEquals("unexpected character ']' at position 42", exception.getMessage());
     }
 
     @Test

@@ -13,14 +13,17 @@ public final class StepParser {
     private static final String HEADER_SECTION = "HEADER;";
     private static final String DATA_SECTION = "DATA;";
     private static final String ENDSEC = "ENDSEC;";
-    private static final String COMMENT_START = "/*";
-    private static final String COMMENT_END = "*/";
 
     private final StepTokenizer tokenizer;
     private StepToken current;
 
     private StepParser(String sectionText) {
         this.tokenizer = new StepTokenizer(sectionText);
+        this.current = tokenizer.next();
+    }
+
+    private StepParser(String input, int start, int end) {
+        this.tokenizer = new StepTokenizer(input, start, end);
         this.current = tokenizer.next();
     }
 
@@ -183,11 +186,11 @@ public final class StepParser {
         List<StepHeaderEntry> headerEntries = List.of();
         if (headerStart >= 0) {
             int headerContentStart = headerStart + HEADER_SECTION.length();
-            int headerEnd = findOutsideStringsAndComments(upper, input, ENDSEC, headerContentStart);
+            int headerEnd = findEndsecOutsideStringsAndComments(upper, input, headerContentStart);
             if (headerEnd < 0) {
                 throw new StepParseException("missing ENDSEC for HEADER section");
             }
-            headerEntries = new StepParser(input.substring(headerContentStart, headerEnd)).parseHeaderEntries();
+            headerEntries = new StepParser(input, headerContentStart, headerEnd).parseHeaderEntries();
         }
 
         int dataStart = upper.indexOf(DATA_SECTION);
@@ -195,53 +198,48 @@ public final class StepParser {
             throw new StepParseException("missing DATA section");
         }
         int contentStart = dataStart + DATA_SECTION.length();
-        int endSec = findOutsideStringsAndComments(upper, input, ENDSEC, contentStart);
+        int endSec = findEndsecOutsideStringsAndComments(upper, input, contentStart);
         if (endSec < 0) {
             throw new StepParseException("missing ENDSEC for DATA section");
         }
-        StepFile dataFile = new StepParser(input.substring(contentStart, endSec)).parseFile();
+        StepFile dataFile = new StepParser(input, contentStart, endSec).parseFile();
         return new StepFile(headerEntries, dataFile.entities());
     }
 
-    private static int findOutsideStringsAndComments(String upper, String original, String target, int start) {
+    private static int findEndsecOutsideStringsAndComments(String upper, String original, int start) {
         int index = start;
-        while (index < upper.length()) {
-            if (matches(original, index, COMMENT_START)) {
-                int commentEnd = original.indexOf(COMMENT_END, index + COMMENT_START.length());
+        while (index < original.length()) {
+            // Skip comments
+            if (original.charAt(index) == '/' && index + 1 < original.length() && original.charAt(index + 1) == '*') {
+                int commentEnd = original.indexOf("*/", index + 2);
                 if (commentEnd < 0) {
                     throw new StepParseException("unterminated comment at position " + index);
                 }
-                index = commentEnd + COMMENT_END.length();
+                index = commentEnd + 2;
                 continue;
             }
+            // Skip strings
             if (original.charAt(index) == '\'') {
-                index = skipString(original, index);
+                index++;
+                while (index < original.length()) {
+                    if (original.charAt(index) == '\'') {
+                        if (index + 1 < original.length() && original.charAt(index + 1) == '\'') {
+                            index += 2;
+                            continue;
+                        }
+                        index++;
+                        break;
+                    }
+                    index++;
+                }
                 continue;
             }
-            if (matches(upper, index, target)) {
+            // Check for ENDSEC
+            if (upper.regionMatches(index, ENDSEC, 0, ENDSEC.length())) {
                 return index;
             }
             index++;
         }
         return -1;
-    }
-
-    private static int skipString(String input, int quoteIndex) {
-        int index = quoteIndex + 1;
-        while (index < input.length()) {
-            if (input.charAt(index) == '\'') {
-                if (index + 1 < input.length() && input.charAt(index + 1) == '\'') {
-                    index += 2;
-                    continue;
-                }
-                return index + 1;
-            }
-            index++;
-        }
-        throw new StepParseException("unterminated string at position " + quoteIndex);
-    }
-
-    private static boolean matches(String input, int index, String target) {
-        return index + target.length() <= input.length() && input.regionMatches(index, target, 0, target.length());
     }
 }

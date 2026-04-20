@@ -8,46 +8,56 @@ import java.util.Map;
 
 /**
  * Parsed STEP DATA section represented as raw entity instances.
- *
- * @param headerEntries optional HEADER section entries
- * @param entities entities in source order
  */
-public record StepFile(List<StepHeaderEntry> headerEntries, List<StepEntityInstance> entities) {
+public final class StepFile {
+
+    private final List<StepHeaderEntry> headerEntries;
+    private final List<StepEntityInstance> entities;
+    private volatile Map<Integer, StepEntityInstance> entitiesById;
 
     public StepFile(List<StepEntityInstance> entities) {
         this(List.of(), entities);
     }
 
-    /**
-     * Creates an immutable STEP file representation.
-     */
-    public StepFile {
+    public StepFile(List<StepHeaderEntry> headerEntries, List<StepEntityInstance> entities) {
         if (headerEntries == null) {
             throw new StepParseException("header entries must not be null");
         }
         if (entities == null) {
             throw new StepParseException("entities must not be null");
         }
-        headerEntries = List.copyOf(headerEntries);
-        entities = List.copyOf(entities);
-        for (StepHeaderEntry headerEntry : headerEntries) {
-            if (headerEntry == null) {
+        this.headerEntries = List.copyOf(headerEntries);
+        this.entities = List.copyOf(entities);
+        for (StepHeaderEntry entry : this.headerEntries) {
+            if (entry == null) {
                 throw new StepParseException("header entries must not contain null");
             }
         }
-        for (StepEntityInstance entity : entities) {
+        for (StepEntityInstance entity : this.entities) {
             if (entity == null) {
                 throw new StepParseException("entities must not contain null");
             }
         }
     }
 
-    /**
-     * Returns the entities indexed by id.
-     *
-     * @return ordered map from id to entity
-     */
+    public List<StepHeaderEntry> headerEntries() {
+        return headerEntries;
+    }
+
+    public List<StepEntityInstance> entities() {
+        return entities;
+    }
+
     public Map<Integer, StepEntityInstance> entitiesById() {
+        Map<Integer, StepEntityInstance> local = entitiesById;
+        if (local == null) {
+            local = buildEntitiesById();
+            entitiesById = local;
+        }
+        return local;
+    }
+
+    private Map<Integer, StepEntityInstance> buildEntitiesById() {
         Map<Integer, StepEntityInstance> byId = new LinkedHashMap<>();
         for (StepEntityInstance entity : entities) {
             StepEntityInstance previous = byId.put(entity.id(), entity);

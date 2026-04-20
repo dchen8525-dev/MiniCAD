@@ -7,24 +7,30 @@ import java.util.Locale;
 
 /**
  * Raw entity instance parsed from STEP syntax.
- *
- * @param id numeric instance id
- * @param definitions one or more simple entity definitions
  */
-public record StepEntityInstance(int id, List<StepEntityDefinition> definitions) {
+public final class StepEntityInstance {
+
+    private final int id;
+    private final List<StepEntityDefinition> definitions;
+
+    public StepEntityInstance(int id, List<StepEntityDefinition> definitions) {
+        if (definitions.isEmpty()) {
+            throw new StepParseException("entity #" + id + " must contain at least one definition");
+        }
+        this.id = id;
+        this.definitions = List.copyOf(definitions);
+    }
 
     public StepEntityInstance(int id, String name, List<StepValue> parameters) {
         this(id, List.of(new StepEntityDefinition(name, parameters)));
     }
 
-    /**
-     * Creates an immutable entity record.
-     */
-    public StepEntityInstance {
-        definitions = List.copyOf(definitions);
-        if (definitions.isEmpty()) {
-            throw new StepParseException("entity #" + id + " must contain at least one definition");
-        }
+    public int id() {
+        return id;
+    }
+
+    public List<StepEntityDefinition> definitions() {
+        return definitions;
     }
 
     public boolean isComplex() {
@@ -40,15 +46,35 @@ public record StepEntityInstance(int id, List<StepEntityDefinition> definitions)
     }
 
     public boolean hasDefinition(String entityName) {
-        return definitions.stream().anyMatch(definition -> definition.name().equalsIgnoreCase(entityName));
+        for (StepEntityDefinition def : definitions) {
+            if (equalsAsciiIgnoreCase(def.name(), entityName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public StepEntityDefinition requireDefinition(String entityName) {
-        return definitions.stream()
-                .filter(definition -> definition.name().equalsIgnoreCase(entityName))
-                .findFirst()
-                .orElseThrow(() -> new StepParseException(
-                        "entity #" + id + " does not contain definition " + entityName.toUpperCase(Locale.ROOT)
-                ));
+        for (StepEntityDefinition def : definitions) {
+            if (equalsAsciiIgnoreCase(def.name(), entityName)) {
+                return def;
+            }
+        }
+        throw new StepParseException(
+                "entity #" + id + " does not contain definition " + entityName.toUpperCase(Locale.ROOT)
+        );
+    }
+
+    private static boolean equalsAsciiIgnoreCase(String a, String b) {
+        if (a.length() != b.length()) return false;
+        for (int i = 0; i < a.length(); i++) {
+            char ca = a.charAt(i);
+            char cb = b.charAt(i);
+            if (ca != cb) {
+                // ASCII case-insensitive: letters differ by bit 5 (0x20)
+                if ((ca | 0x20) != (cb | 0x20)) return false;
+            }
+        }
+        return true;
     }
 }
