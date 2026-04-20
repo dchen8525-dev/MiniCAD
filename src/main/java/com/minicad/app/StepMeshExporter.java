@@ -8,7 +8,7 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
-import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
@@ -82,19 +82,33 @@ public final class StepMeshExporter {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
-        Triangulator t = new Triangulator();
+        // Collect face entities for parallel triangulation
+        List<com.minicad.step.model.base.StepFaceEntity> faceEntities = resolved.values().stream()
+                .filter(e -> e instanceof com.minicad.step.model.base.StepFaceEntity)
+                .map(e -> (com.minicad.step.model.base.StepFaceEntity) e)
+                .toList();
 
-        for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
-            StepEntity entity = entry.getValue();
-            if (entity instanceof com.minicad.step.model.StepFaceEntity faceEntity) {
-                try {
-                    t.triangulateSemanticFace(faceEntity, builder);
-                } catch (Exception e) {
-                    LOG.log(Level.FINE, "Skipping semantic face #{0}: {1}", new Object[]{entry.getKey(), e.getMessage()});
-                }
-            }
+        // Parallel triangulation of semantic faces
+        List<Triangulator> perFaceResults = faceEntities.parallelStream()
+                .map(faceEntity -> {
+                    Triangulator ft = new Triangulator();
+                    try {
+                        ft.triangulateSemanticFace(faceEntity, builder);
+                    } catch (Exception e) {
+                        LOG.log(Level.FINE, "Skipping semantic face #{0}: {1}",
+                                new Object[]{0, e.getMessage()});
+                    }
+                    return ft;
+                })
+                .toList();
+
+        // Merge all per-face results
+        Triangulator t = new Triangulator();
+        for (Triangulator ft : perFaceResults) {
+            t.merge(ft);
         }
 
+        // Sequential triangulation of solids/shells (complex dependencies)
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
             StepEntity entity = entry.getValue();
@@ -122,31 +136,31 @@ public final class StepMeshExporter {
     }
 
     private static boolean isSemanticFaceBackedEntity(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.StepFaceEntity
-                || entity instanceof com.minicad.step.model.StepOpenShell
-                || entity instanceof com.minicad.step.model.StepClosedShell
-                || entity instanceof com.minicad.step.model.StepSurfacedOpenShell
-                || entity instanceof com.minicad.step.model.StepOrientedOpenShell
-                || entity instanceof com.minicad.step.model.StepOrientedClosedShell
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSet
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSubSet
-                || entity instanceof com.minicad.step.model.StepFaceBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
-                || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSolidBrep
-                || entity instanceof com.minicad.step.model.StepBrepWithVoids;
+        return entity instanceof com.minicad.step.model.base.StepFaceEntity
+                || entity instanceof com.minicad.step.model.topology.StepOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepClosedShell
+                || entity instanceof com.minicad.step.model.geometry.StepSurfacedOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepOrientedOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepOrientedClosedShell
+                || entity instanceof com.minicad.step.model.topology.StepConnectedFaceSet
+                || entity instanceof com.minicad.step.model.topology.StepConnectedFaceSubSet
+                || entity instanceof com.minicad.step.model.product.StepFaceBasedSurfaceModel
+                || entity instanceof com.minicad.step.model.geometry.StepManifoldSurfaceModel
+                || entity instanceof com.minicad.step.model.product.StepShellBasedSurfaceModel
+                || entity instanceof com.minicad.step.model.product.StepManifoldSolidBrep
+                || entity instanceof com.minicad.step.model.product.StepBrepWithVoids;
     }
 
     private static boolean isShellCandidate(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.StepOpenShell
-                || entity instanceof com.minicad.step.model.StepClosedShell
-                || entity instanceof com.minicad.step.model.StepSurfacedOpenShell
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFace
-                || entity instanceof com.minicad.step.model.StepFaceBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
-                || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel;
+        return entity instanceof com.minicad.step.model.topology.StepOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepClosedShell
+                || entity instanceof com.minicad.step.model.geometry.StepSurfacedOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepConnectedFaceSet
+                || entity instanceof com.minicad.step.model.product.StepTessellatedFaceSet
+                || entity instanceof com.minicad.step.model.product.StepTessellatedFace
+                || entity instanceof com.minicad.step.model.product.StepFaceBasedSurfaceModel
+                || entity instanceof com.minicad.step.model.geometry.StepManifoldSurfaceModel
+                || entity instanceof com.minicad.step.model.product.StepShellBasedSurfaceModel;
     }
 
     // ── Triangulation ─────────────────────────────────────────────────────────
@@ -182,6 +196,28 @@ public final class StepMeshExporter {
             faceIndices.add(new int[]{v0, v1, v2});
         }
 
+        void merge(Triangulator other) {
+            for (Map.Entry<MeshVertex, Integer> entry : other.vertexIndex.entrySet()) {
+                MeshVertex key = entry.getKey();
+                if (!vertexIndex.containsKey(key)) {
+                    int idx = vertexIndex.size();
+                    vertexIndex.put(key, idx);
+                }
+            }
+            // Re-index triangles: build a remap for other's local indices
+            List<Integer> otherToLocal = new ArrayList<>(other.vertexIndex.size());
+            for (Map.Entry<MeshVertex, Integer> entry : other.vertexIndex.entrySet()) {
+                otherToLocal.add(vertexIndex.get(entry.getKey()));
+            }
+            for (int[] tri : other.faceIndices) {
+                faceIndices.add(new int[]{
+                        otherToLocal.get(tri[0]),
+                        otherToLocal.get(tri[1]),
+                        otherToLocal.get(tri[2])
+                });
+            }
+        }
+
         void triangulateSolid(Solid solid) {
             for (Shell shell : solid.allShells()) {
                 triangulateShell(shell);
@@ -207,7 +243,7 @@ public final class StepMeshExporter {
             }
         }
 
-        void triangulateSemanticFace(com.minicad.step.model.StepFaceEntity stepFace, StepCadBuilder builder) {
+        void triangulateSemanticFace(com.minicad.step.model.base.StepFaceEntity stepFace, StepCadBuilder builder) {
             StepEntity faceGeometry = semanticFaceGeometry(stepFace);
             boolean flipped = !semanticFaceSameSense(stepFace);
             SurfaceGeometry surface = buildSemanticSurfaceGeometry(faceGeometry, builder);
@@ -359,7 +395,7 @@ public final class StepMeshExporter {
         }
 
         private boolean triangulateSemanticParametricFace(
-                com.minicad.step.model.StepFaceEntity stepFace,
+                com.minicad.step.model.base.StepFaceEntity stepFace,
                 StepEntity faceGeometry,
                 SurfaceGeometry surface,
                 StepCadBuilder builder,
@@ -393,6 +429,7 @@ public final class StepMeshExporter {
                     if (!containsParametricLoops(normalizedLoops, center)) {
                         continue;
                     }
+
                     CartesianPoint p00 = mapper.pointAt(u0, v0);
                     CartesianPoint p10 = mapper.pointAt(u1, v0);
                     CartesianPoint p01 = mapper.pointAt(u0, v1);
@@ -1112,21 +1149,21 @@ public final class StepMeshExporter {
         }
 
         private List<ParametricLoop> buildSemanticParametricLoops(
-                com.minicad.step.model.StepFaceEntity stepFace,
+                com.minicad.step.model.base.StepFaceEntity stepFace,
                 StepEntity faceGeometry,
                 ParametricMapper mapper,
                 StepCadBuilder builder
         ) {
             List<ParametricLoop> loops = new ArrayList<>();
             boolean promoteSingleOuter = stepFace.bounds().size() == 1
-                    && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
-            for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
-                if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop edgeLoop)) {
+                    && stepFace.bounds().stream().noneMatch(com.minicad.step.model.topology.StepFaceBound::outer);
+            for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
+                if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop)) {
                     return List.of();
                 }
                 List<UvPoint> loopPoints = new ArrayList<>();
                 boolean firstEdge = true;
-                for (com.minicad.step.model.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
+                for (com.minicad.step.model.topology.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                     List<UvPoint> edgePoints = sampleSemanticOrientedEdge(orientedEdge, faceGeometry, mapper, builder);
                     if (edgePoints == null || edgePoints.size() < 2) {
                         return List.of();
@@ -1187,7 +1224,7 @@ public final class StepMeshExporter {
         }
 
         private List<UvPoint> sampleSemanticOrientedEdge(
-                com.minicad.step.model.StepOrientedEdge orientedEdge,
+                com.minicad.step.model.topology.StepOrientedEdge orientedEdge,
                 StepEntity faceGeometry,
                 ParametricMapper mapper,
                 StepCadBuilder builder
@@ -1251,23 +1288,23 @@ public final class StepMeshExporter {
             StepEntity current = faceGeometry;
             CartesianPoint mapped = point;
             for (int depth = 0; depth < 16 && current != null; depth++) {
-                if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepRectangularTrimmedSurface trimmedSurface) {
                     current = trimmedSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepCurveBoundedSurface boundedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepCurveBoundedSurface boundedSurface) {
                     current = boundedSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepOrientedSurface orientedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepOrientedSurface orientedSurface) {
                     current = orientedSurface.surfaceElement();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepOffsetSurface offsetSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepOffsetSurface offsetSurface) {
                     current = offsetSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepGeometricReplica replica
+                if (current instanceof com.minicad.step.model.product.StepGeometricReplica replica
                         && "SURFACE_REPLICA".equals(replica.entityName())) {
                     mapped = transformPoint3(mapped, replica.transformation(), builder);
                     current = replica.parent();
@@ -1281,11 +1318,11 @@ public final class StepMeshExporter {
         private StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
             StepEntity current = edgeGeometry;
             for (int depth = 0; depth < 16; depth++) {
-                if (current instanceof com.minicad.step.model.StepOrientedCurve orientedCurve) {
+                if (current instanceof com.minicad.step.model.geometry.StepOrientedCurve orientedCurve) {
                     current = orientedCurve.curveElement();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepGeometricReplica replica
+                if (current instanceof com.minicad.step.model.product.StepGeometricReplica replica
                         && "CURVE_REPLICA".equals(replica.entityName())) {
                     current = replica.parent();
                     continue;
@@ -1296,10 +1333,10 @@ public final class StepMeshExporter {
         }
 
         private List<StepEntity> associatedGeometry(StepEntity edgeGeometry) {
-            if (edgeGeometry instanceof com.minicad.step.model.StepSurfaceCurve surfaceCurve) {
+            if (edgeGeometry instanceof com.minicad.step.model.geometry.StepSurfaceCurve surfaceCurve) {
                 return surfaceCurve.associatedGeometry();
             }
-            if (edgeGeometry instanceof com.minicad.step.model.StepSeamCurve seamCurve) {
+            if (edgeGeometry instanceof com.minicad.step.model.geometry.StepSeamCurve seamCurve) {
                 return seamCurve.associatedGeometry();
             }
             return List.of();
@@ -1309,10 +1346,10 @@ public final class StepMeshExporter {
             Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
             List<StepEntity> matches = new ArrayList<>();
             for (StepEntity associated : associatedGeometry) {
-                if (associated instanceof com.minicad.step.model.StepPcurve pcurve
+                if (associated instanceof com.minicad.step.model.geometry.StepPcurve pcurve
                         && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
                     matches.add(pcurve);
-                } else if (associated instanceof com.minicad.step.model.StepDegeneratePcurve pcurve
+                } else if (associated instanceof com.minicad.step.model.geometry.StepDegeneratePcurve pcurve
                         && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
                     matches.add(pcurve);
                 }
@@ -1325,23 +1362,23 @@ public final class StepMeshExporter {
             StepEntity current = faceGeometry;
             for (int depth = 0; depth < 16 && current != null; depth++) {
                 ids.add(current.id());
-                if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepRectangularTrimmedSurface trimmedSurface) {
                     current = trimmedSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepCurveBoundedSurface boundedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepCurveBoundedSurface boundedSurface) {
                     current = boundedSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepOrientedSurface orientedSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepOrientedSurface orientedSurface) {
                     current = orientedSurface.surfaceElement();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepOffsetSurface offsetSurface) {
+                if (current instanceof com.minicad.step.model.geometry.StepOffsetSurface offsetSurface) {
                     current = offsetSurface.basisSurface();
                     continue;
                 }
-                if (current instanceof com.minicad.step.model.StepGeometricReplica replica
+                if (current instanceof com.minicad.step.model.product.StepGeometricReplica replica
                         && "SURFACE_REPLICA".equals(replica.entityName())) {
                     current = replica.parent();
                     continue;
@@ -1351,7 +1388,7 @@ public final class StepMeshExporter {
             return Set.copyOf(ids);
         }
 
-        private CartesianPoint pointFromStep(com.minicad.step.model.StepCartesianPoint point) {
+        private CartesianPoint pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint point) {
             return new CartesianPoint(
                     point.coordinates().get(0),
                     point.coordinates().get(1),
@@ -1359,27 +1396,27 @@ public final class StepMeshExporter {
             );
         }
 
-        private StepEntity semanticFaceGeometry(com.minicad.step.model.StepFaceEntity stepFace) {
-            if (stepFace instanceof com.minicad.step.model.StepAdvancedFace advancedFace) {
+        private StepEntity semanticFaceGeometry(com.minicad.step.model.base.StepFaceEntity stepFace) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace advancedFace) {
                 return advancedFace.faceGeometry();
             }
-            if (stepFace instanceof com.minicad.step.model.StepFaceSurface faceSurface) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepFaceSurface faceSurface) {
                 return faceSurface.faceGeometry();
             }
-            if (stepFace instanceof com.minicad.step.model.StepOrientedFace orientedFace) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepOrientedFace orientedFace) {
                 return semanticFaceGeometry(orientedFace.faceElement());
             }
             throw new IllegalArgumentException("unsupported face subtype");
         }
 
-        private boolean semanticFaceSameSense(com.minicad.step.model.StepFaceEntity stepFace) {
-            if (stepFace instanceof com.minicad.step.model.StepAdvancedFace advancedFace) {
+        private boolean semanticFaceSameSense(com.minicad.step.model.base.StepFaceEntity stepFace) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace advancedFace) {
                 return advancedFace.sameSense();
             }
-            if (stepFace instanceof com.minicad.step.model.StepFaceSurface faceSurface) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepFaceSurface faceSurface) {
                 return faceSurface.sameSense();
             }
-            if (stepFace instanceof com.minicad.step.model.StepOrientedFace orientedFace) {
+            if (stepFace instanceof com.minicad.step.model.topology.StepOrientedFace orientedFace) {
                 boolean base = semanticFaceSameSense(orientedFace.faceElement());
                 return orientedFace.orientation() ? base : !base;
             }
@@ -1387,67 +1424,67 @@ public final class StepMeshExporter {
         }
 
         private SurfaceGeometry buildSemanticSurfaceGeometry(StepEntity geometry, StepCadBuilder builder) {
-            if (geometry instanceof com.minicad.step.model.StepPlane plane) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepPlane plane) {
                 return builder.buildPlane(plane.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepCylindricalSurface cylindricalSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepCylindricalSurface cylindricalSurface) {
                 return builder.buildCylindricalSurface(cylindricalSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepConicalSurface conicalSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepConicalSurface conicalSurface) {
                 return builder.buildConicalSurface(conicalSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepSphericalSurface sphericalSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepSphericalSurface sphericalSurface) {
                 return builder.buildSphericalSurface(sphericalSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepToroidalSurface toroidalSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepToroidalSurface toroidalSurface) {
                 return builder.buildToroidalSurface(toroidalSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepDegenerateToroidalSurface degenerateToroidalSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepDegenerateToroidalSurface degenerateToroidalSurface) {
                 return builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepSurfaceOfLinearExtrusion extrusionSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepSurfaceOfLinearExtrusion extrusionSurface) {
                 return builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepSurfaceOfRevolution revolutionSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepSurfaceOfRevolution revolutionSurface) {
                 return builder.buildSurfaceOfRevolution(revolutionSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepRationalBSplineSurface rationalSplineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepRationalBSplineSurface rationalSplineSurface) {
                 return builder.buildRationalBSplineSurface(rationalSplineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepBSplineSurfaceWithKnots splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepBSplineSurfaceWithKnots splineSurface) {
                 return builder.buildBSplineSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepBSplineSurface splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepBSplineSurface splineSurface) {
                 return builder.buildGenericBSplineSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepBezierSurface splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepBezierSurface splineSurface) {
                 return builder.buildBezierSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepUniformSurface splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepUniformSurface splineSurface) {
                 return builder.buildUniformSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepQuasiUniformSurface splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepQuasiUniformSurface splineSurface) {
                 return builder.buildQuasiUniformSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepPiecewiseBezierSurface splineSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepPiecewiseBezierSurface splineSurface) {
                 return builder.buildPiecewiseBezierSurface(splineSurface.id());
             }
-            if (geometry instanceof com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepRectangularTrimmedSurface trimmedSurface) {
                 return buildSemanticSurfaceGeometry(trimmedSurface.basisSurface(), builder);
             }
-            if (geometry instanceof com.minicad.step.model.StepCurveBoundedSurface boundedSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepCurveBoundedSurface boundedSurface) {
                 return buildSemanticSurfaceGeometry(boundedSurface.basisSurface(), builder);
             }
-            if (geometry instanceof com.minicad.step.model.StepOrientedSurface orientedSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepOrientedSurface orientedSurface) {
                 builder.buildOrientedSurface(orientedSurface.id());
                 return buildSemanticSurfaceGeometry(orientedSurface.surfaceElement(), builder);
             }
-            if (geometry instanceof com.minicad.step.model.StepOffsetSurface offsetSurface) {
+            if (geometry instanceof com.minicad.step.model.geometry.StepOffsetSurface offsetSurface) {
                 builder.buildOffsetSurface(offsetSurface.id());
                 SurfaceGeometry base = buildSemanticSurfaceGeometry(offsetSurface.basisSurface(), builder);
                 return offsetSemanticSurfaceGeometry(base, offsetSurface.distance());
             }
-            if (geometry instanceof com.minicad.step.model.StepGeometricReplica replica
+            if (geometry instanceof com.minicad.step.model.product.StepGeometricReplica replica
                     && "SURFACE_REPLICA".equals(replica.entityName())) {
                 builder.buildSurfaceReplica(replica.id());
                 SurfaceGeometry base = buildSemanticSurfaceGeometry(replica.parent(), builder);
@@ -1503,7 +1540,7 @@ public final class StepMeshExporter {
 
         private SurfaceGeometry transformSemanticSurfaceGeometry(
                 SurfaceGeometry surface,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             if (surface == null) {
@@ -1561,7 +1598,7 @@ public final class StepMeshExporter {
 
         private Curve3 transformSemanticCurve3(
                 Curve3 curve,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             double scale = transformationScale(transformation);
@@ -1640,7 +1677,7 @@ public final class StepMeshExporter {
 
         private Axis2Placement3D transformPlacement(
                 Axis2Placement3D placement,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             return new Axis2Placement3D(
@@ -1651,7 +1688,7 @@ public final class StepMeshExporter {
 
         private CartesianPoint transformPoint3(
                 CartesianPoint point,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             Vector3 basisX = transformAxis1_3(transformation, builder);
@@ -1666,7 +1703,7 @@ public final class StepMeshExporter {
 
         private Direction3 transformDirection3(
                 Direction3 direction,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             Vector3 basisX = transformAxis1_3(transformation, builder);
@@ -1681,7 +1718,7 @@ public final class StepMeshExporter {
 
         private Vector3 transformVector3(
                 Vector3 vector,
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             Vector3 basisX = transformAxis1_3(transformation, builder);
@@ -1694,7 +1731,7 @@ public final class StepMeshExporter {
         }
 
         private Vector3 transformAxis1_3(
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
         ) {
             return transformation.axis1() == null
@@ -1703,7 +1740,7 @@ public final class StepMeshExporter {
         }
 
         private Vector3 transformAxis2OrDefault3(
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 Vector3 axis1,
                 StepCadBuilder builder
         ) {
@@ -1715,7 +1752,7 @@ public final class StepMeshExporter {
         }
 
         private Vector3 transformAxis3OrDefault3(
-                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 Vector3 axis1,
                 Vector3 axis2,
                 StepCadBuilder builder
@@ -1727,7 +1764,7 @@ public final class StepMeshExporter {
             return cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
         }
 
-        private double transformationScale(com.minicad.step.model.StepCartesianTransformationOperator transformation) {
+        private double transformationScale(com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation) {
             return transformation.scale() == null ? 1.0 : transformation.scale();
         }
 
@@ -2207,15 +2244,47 @@ public final class StepMeshExporter {
 
         private boolean containsParametricLoops(List<ParametricLoop> loops, UvPoint point) {
             ParametricLoop outer = loops.stream().filter(ParametricLoop::outer).findFirst().orElse(null);
-            if (outer == null || !containsUvPolygon(outer.points(), point)) {
+            if (outer == null) {
+                return false;
+            }
+            // Bounding-box pre-filter: skip expensive ray cast if point is outside loop AABB
+            UvBounds outerBox = loopBoundingBox(outer);
+            if (point.u() < outerBox.minU() || point.u() > outerBox.maxU()
+                    || point.v() < outerBox.minV() || point.v() > outerBox.maxV()) {
+                return false;
+            }
+            if (!containsUvPolygon(outer.points(), point)) {
                 return false;
             }
             for (ParametricLoop hole : loops) {
-                if (!hole.outer() && containsUvPolygon(hole.points(), point)) {
-                    return false;
+                if (!hole.outer()) {
+                    UvBounds holeBox = loopBoundingBox(hole);
+                    if (point.u() < holeBox.minU() || point.u() > holeBox.maxU()
+                            || point.v() < holeBox.minV() || point.v() > holeBox.maxV()) {
+                        continue; // point outside hole bbox → cannot be inside hole
+                    }
+                    if (containsUvPolygon(hole.points(), point)) {
+                        return false;
+                    }
                 }
             }
             return true;
+        }
+
+        private UvBounds loopBoundingBox(ParametricLoop loop) {
+            double minU = Double.POSITIVE_INFINITY;
+            double maxU = Double.NEGATIVE_INFINITY;
+            double minV = Double.POSITIVE_INFINITY;
+            double maxV = Double.NEGATIVE_INFINITY;
+            for (UvPoint p : loop.points()) {
+                double pu = p.u();
+                double pv = p.v();
+                if (pu < minU) minU = pu;
+                if (pu > maxU) maxU = pu;
+                if (pv < minV) minV = pv;
+                if (pv > maxV) maxV = pv;
+            }
+            return new UvBounds(minU, maxU, minV, maxV);
         }
 
         private boolean containsUvPolygon(List<UvPoint> polygon, UvPoint point) {
@@ -2334,22 +2403,35 @@ public final class StepMeshExporter {
     // ── OBJ Format ────────────────────────────────────────────────────────────
 
     private static String formatObj(MeshData mesh) {
-        StringBuilder sb = new StringBuilder();
+        int vCount = mesh.vertices.size();
+        int nCount = mesh.normals.size();
+        int fCount = mesh.triangles.size();
+        // Estimate: "v " + 3 doubles (~15 each) + "\n" = ~50 per vertex
+        // "vn " + 3 doubles = ~50 per normal, "f 1//1 2//2 3//3\n" = ~30 per face
+        StringBuilder sb = new StringBuilder(vCount * 50 + nCount * 50 + fCount * 30);
         sb.append("# Generated by MiniCAD STEP Mesh Exporter\n");
 
         for (double[] v : mesh.vertices) {
-            sb.append(String.format(Locale.US, "v %.6f %.6f %.6f\n", v[0], v[1], v[2]));
+            sb.append("v ");
+            append6(sb, v[0]); sb.append(' ');
+            append6(sb, v[1]); sb.append(' ');
+            append6(sb, v[2]); sb.append('\n');
         }
 
         for (double[] n : mesh.normals) {
-            sb.append(String.format(Locale.US, "vn %.6f %.6f %.6f\n", n[0], n[1], n[2]));
+            sb.append("vn ");
+            append6(sb, n[0]); sb.append(' ');
+            append6(sb, n[1]); sb.append(' ');
+            append6(sb, n[2]); sb.append('\n');
         }
 
         for (int[] tri : mesh.triangles) {
             int v0 = tri[0] + 1;
             int v1 = tri[1] + 1;
             int v2 = tri[2] + 1;
-            sb.append(String.format(Locale.US, "f %d//%d %d//%d %d//%d\n", v0, v0, v1, v1, v2, v2));
+            sb.append("f ").append(v0).append("//").append(v0).append(' ')
+                    .append(v1).append("//").append(v1).append(' ')
+                    .append(v2).append("//").append(v2).append('\n');
         }
 
         return sb.toString();
@@ -2395,11 +2477,17 @@ public final class StepMeshExporter {
 
         for (int[] tri : mesh.triangles) {
             double[] n = mesh.normals.get(tri[0]);
-            sb.append(String.format(Locale.US, "  facet normal %.6f %.6f %.6f\n", n[0], n[1], n[2]));
+            sb.append("  facet normal ");
+            append6(sb, n[0]); sb.append(' ');
+            append6(sb, n[1]); sb.append(' ');
+            append6(sb, n[2]); sb.append('\n');
             sb.append("    outer loop\n");
             for (int vi : tri) {
                 double[] v = mesh.vertices.get(vi);
-                sb.append(String.format(Locale.US, "      vertex %.6f %.6f %.6f\n", v[0], v[1], v[2]));
+                sb.append("      vertex ");
+                append6(sb, v[0]); sb.append(' ');
+                append6(sb, v[1]); sb.append(' ');
+                append6(sb, v[2]); sb.append('\n');
             }
             sb.append("    endloop\n");
             sb.append("  endfacet\n");
@@ -2407,5 +2495,24 @@ public final class StepMeshExporter {
 
         sb.append("endsolid MiniCAD\n");
         return sb.toString();
+    }
+
+    /** Fast double-to-string with 6 decimal places, avoiding String.format overhead. */
+    private static void append6(StringBuilder sb, double d) {
+        // Handle sign
+        if (d < 0) {
+            sb.append('-');
+            d = -d;
+        }
+        long scaled = Math.round(d * 1_000_000.0);
+        long intPart = scaled / 1_000_000;
+        long fracPart = scaled % 1_000_000;
+        sb.append(intPart).append('.');
+        if (fracPart < 100_000) sb.append('0');
+        if (fracPart < 10_000) sb.append('0');
+        if (fracPart < 1_000) sb.append('0');
+        if (fracPart < 100) sb.append('0');
+        if (fracPart < 10) sb.append('0');
+        sb.append(fracPart);
     }
 }

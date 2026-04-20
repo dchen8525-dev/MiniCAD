@@ -1,6 +1,6 @@
 package com.minicad.app;
 
-import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -126,7 +126,7 @@ public final class StepBenchmarkApp {
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
             StepEntity entity = entry.getValue();
-            if (entity instanceof com.minicad.step.model.StepFaceEntity) {
+            if (entity instanceof com.minicad.step.model.base.StepFaceEntity) {
                 try {
                     builder.buildFace(id);
                     facesBuilt++;
@@ -165,15 +165,15 @@ public final class StepBenchmarkApp {
     }
 
     private static boolean isShellCandidate(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.StepOpenShell
-                || entity instanceof com.minicad.step.model.StepClosedShell
-                || entity instanceof com.minicad.step.model.StepSurfacedOpenShell
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFace
-                || entity instanceof com.minicad.step.model.StepFaceBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
-                || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel;
+        return entity instanceof com.minicad.step.model.topology.StepOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepClosedShell
+                || entity instanceof com.minicad.step.model.geometry.StepSurfacedOpenShell
+                || entity instanceof com.minicad.step.model.topology.StepConnectedFaceSet
+                || entity instanceof com.minicad.step.model.product.StepTessellatedFaceSet
+                || entity instanceof com.minicad.step.model.product.StepTessellatedFace
+                || entity instanceof com.minicad.step.model.product.StepFaceBasedSurfaceModel
+                || entity instanceof com.minicad.step.model.geometry.StepManifoldSurfaceModel
+                || entity instanceof com.minicad.step.model.product.StepShellBasedSurfaceModel;
     }
 
     private static double formatMillis(long nanos) {

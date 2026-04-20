@@ -35,11 +35,11 @@ import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.TrimmedCurve2;
-import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepProfileDef;
-import com.minicad.step.model.StepCenteredCircleProfileDef;
-import com.minicad.step.model.StepRectangleHollowProfileDef;
-import com.minicad.step.model.StepCsgPrimitive;
+import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.profile.StepProfileDef;
+import com.minicad.step.model.profile.StepCenteredCircleProfileDef;
+import com.minicad.step.model.profile.StepRectangleHollowProfileDef;
+import com.minicad.step.model.product.StepCsgPrimitive;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.Edge;
 import com.minicad.topology.Face;
@@ -3391,8 +3391,8 @@ class StepCadBuilderTest {
 
         StepEntity curveEntity = resolved.get(5);
         assertNotNull(curveEntity);
-        assertInstanceOf(com.minicad.step.model.StepOrientedCurve.class, curveEntity);
-        com.minicad.step.model.StepOrientedCurve oc = (com.minicad.step.model.StepOrientedCurve) curveEntity;
+        assertInstanceOf(com.minicad.step.model.geometry.StepOrientedCurve.class, curveEntity);
+        com.minicad.step.model.geometry.StepOrientedCurve oc = (com.minicad.step.model.geometry.StepOrientedCurve) curveEntity;
         assertEquals(false, oc.orientation());
     }
 

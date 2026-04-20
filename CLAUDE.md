@@ -24,13 +24,13 @@ Industrial-oriented CAD kernel and STEP parser with comprehensive AP214/AP242 en
 
 ```
 STEP text → syntax (StepTokenizer → StepParser → StepFile)
-         → semantic model (StepEntityResolver → 1062 StepXxx model classes)
+         → semantic model (StepEntityResolver → 1114 StepXxx model classes)
          → internal geometry/topology (Curve3, SurfaceGeometry, Vertex, Edge, Face, Shell, Solid)
          → preview/export (StepPreviewJsonExporter → browser Three.js)
 ```
 
 **Layer sizes:**
-- `step.model`: 1115+ entity model classes
+- `step.model`: 1114 entity model classes across 26 sub-packages
 - `step.semantic`: 9 resolver/builder classes
 - `step.syntax`: 3 tokenizer/parser classes
 - `geometry`: 30 curve/surface classes (13 Curve3 permits, 16 SurfaceGeometry permits)
@@ -39,8 +39,14 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
 
 **Key packages:**
 - `step.syntax`: StepTokenizer and StepParser produce raw AST. No semantic interpretation.
-- `step.model`: ~1062 immutable record classes for resolved STEP entities. All implement `StepEntity`.
-- `step.semantic`: StepEntityResolver maps raw definitions to model classes (~24000+ entity types registered).
+- `step.model`: 1114 immutable record classes for resolved STEP entities, organized into sub-packages:
+  - `geometry` (113), `topology` (31), `product` (95), `annotation` (98), `manufacturing` (115),
+  - `tolerance` (30), `unit` (13), `kinematic` (24), `fea` (17), `approval` (13),
+  - `classification` (28), `organization` (19), `date_time` (11), `document` (20),
+  - `action` (49), `config_mgmt` (23), `security` (22), `resource` (67),
+  - `workflow` (199), `validation` (50), `log_audit` (23), `backup_recovery` (14),
+  - `system` (10), `analysis` (15), `profile` (4), `base` (11)
+- `step.semantic`: StepEntityResolver maps raw definitions to model classes (1214 entity types registered).
 - `geometry`/`geometry2d`: 3D/2D geometry types with sealed interfaces and default sampling methods.
 - `topology`: B-Rep topology (Vertex, Edge, OrientedEdge, EdgeLoop, FaceBound, Face, Shell, Solid).
 
@@ -73,7 +79,7 @@ Tests mirror main package layout under `src/test/java/`. Use inline STEP snippet
 
 ## STEP Entity Coverage
 
-The resolver registers ~24000+ entity types via ~1635+ direct registry.put() calls. Key categories:
+The resolver registers 1214 entity types. Key categories:
 
 **Geometry/Topology (fully parsed with B-Rep generation):**
 - All basic curves (LINE, CIRCLE, ELLIPSE, HYPERBOLA, PARABOLA, POLYLINE, TRIMMED_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, etc.) — 13 Curve3 types

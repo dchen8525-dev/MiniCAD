@@ -1,0 +1,30 @@
+package com.minicad.step.model.topology;
+
+import java.util.List;
+
+import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.base.StepFaceEntity;
+
+/**
+ * Resolved ADVANCED_FACE.
+ *
+ * @param id step id
+ * @param name step label
+ * @param bounds face bounds
+ * @param faceGeometry supporting surface
+ * @param sameSense orientation flag
+ */
+public record StepAdvancedFace(
+        int id,
+        String name,
+        List<StepFaceBound> bounds,
+        StepEntity faceGeometry,
+        boolean sameSense
+) implements StepFaceEntity {
+    /**
+     * Creates an immutable advanced-face record.
+     */
+    public StepAdvancedFace {
+        bounds = List.copyOf(bounds);
+    }
+}

@@ -1,19 +1,19 @@
 package com.minicad.app;
 
 import com.minicad.geometry.Vector3;
-import com.minicad.step.model.StepAxis2Placement3D;
-import com.minicad.step.model.StepContextDependentShapeRepresentation;
-import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepItemDefinedTransformation;
-import com.minicad.step.model.StepNextAssemblyUsageOccurrence;
-import com.minicad.step.model.StepProduct;
-import com.minicad.step.model.StepProductDefinition;
-import com.minicad.step.model.StepProductDefinitionShape;
-import com.minicad.step.model.StepRepresentation;
-import com.minicad.step.model.StepRepresentationRelationship;
-import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
-import com.minicad.step.model.StepShapeDefinitionRepresentation;
-import com.minicad.step.model.StepShapeRepresentationRelationship;
+import com.minicad.step.model.geometry.StepAxis2Placement3D;
+import com.minicad.step.model.product.StepContextDependentShapeRepresentation;
+import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.product.StepItemDefinedTransformation;
+import com.minicad.step.model.product.StepNextAssemblyUsageOccurrence;
+import com.minicad.step.model.product.StepProduct;
+import com.minicad.step.model.product.StepProductDefinition;
+import com.minicad.step.model.product.StepProductDefinitionShape;
+import com.minicad.step.model.workflow.StepRepresentation;
+import com.minicad.step.model.product.StepRepresentationRelationship;
+import com.minicad.step.model.product.StepRepresentationRelationshipWithTransformation;
+import com.minicad.step.model.product.StepShapeDefinitionRepresentation;
+import com.minicad.step.model.workflow.StepShapeRepresentationRelationship;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -251,7 +251,7 @@ public final class StepAssemblyGraphBuilder {
         };
     }
 
-    private static Vector3 directionVector(com.minicad.step.model.StepDirection direction) {
+    private static Vector3 directionVector(com.minicad.step.model.geometry.StepDirection direction) {
         List<Double> ratios = direction.directionRatios();
         return new Vector3(ratios.get(0), ratios.get(1), ratios.get(2));
     }

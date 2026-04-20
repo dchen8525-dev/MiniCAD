@@ -1,11 +1,11 @@
 package com.minicad.app;
 
-import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepProduct;
-import com.minicad.step.model.StepProductDefinition;
-import com.minicad.step.model.StepProductDefinitionShape;
-import com.minicad.step.model.StepProductDefinitionFormation;
-import com.minicad.step.model.StepProductRelationship;
+import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.product.StepProduct;
+import com.minicad.step.model.product.StepProductDefinition;
+import com.minicad.step.model.product.StepProductDefinitionShape;
+import com.minicad.step.model.product.StepProductDefinitionFormation;
+import com.minicad.step.model.product.StepProductRelationship;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepHeaderEntry;
 import com.minicad.step.syntax.StepValue;

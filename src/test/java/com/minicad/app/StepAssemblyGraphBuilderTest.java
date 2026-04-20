@@ -2,7 +2,7 @@ package com.minicad.app;
 
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyNode;
-import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.api.Test;

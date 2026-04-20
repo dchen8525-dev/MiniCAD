@@ -1,0 +1,20 @@
+package com.minicad.step.model.annotation;
+
+import com.minicad.step.model.base.StepEntity;
+
+import com.minicad.step.model.product.StepRepresentationMap;
+/**
+ * Minimal USER_DEFINED_TERMINATOR_SYMBOL.
+ *
+ * @param id STEP instance id
+ * @param name symbol name
+ * @param mappingSource representation map
+ * @param mappingTarget placement target
+ */
+public record StepUserDefinedTerminatorSymbol(
+        int id,
+        String name,
+        StepRepresentationMap mappingSource,
+        StepEntity mappingTarget
+) implements StepEntity {
+}

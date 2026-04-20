@@ -1,2 +1,0 @@
-package com.minicad.step.model;
-public record StepViewVolume(int id, String name, double clippingBack, double clippingFront, double viewPlaneDistance, double viewPlaneWidth, double viewPlaneHeight) implements StepEntity {}
