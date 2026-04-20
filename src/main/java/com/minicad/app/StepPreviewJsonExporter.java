@@ -8463,6 +8463,25 @@ public final class StepPreviewJsonExporter {
                         arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
                 );
             }
+            if (edgeGeometry instanceof StepBSplineCurveWithKnots bspline) {
+                BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
+                return newBSplineCurvePayload(edgeGeometry.id(), geometry);
+            }
+            if (edgeGeometry instanceof StepBSplineCurve bspline) {
+                BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
+                return newBSplineCurvePayload(edgeGeometry.id(), geometry);
+            }
+            if (edgeGeometry instanceof StepRationalBSplineCurve rational) {
+                RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve3(rational.id());
+                return newRationalBSplineCurvePayload(edgeGeometry.id(), geometry);
+            }
+            if (edgeGeometry instanceof StepPolyline polyline) {
+                Polyline3 geometry = builder.buildPolyline(polyline.id());
+                return newPolylineCurvePayload(edgeGeometry.id(), geometry, start, end);
+            }
+            if (edgeGeometry instanceof StepLine line) {
+                return newLineCurvePayload(edgeGeometry.id(), builder, line, start, end);
+            }
             EdgeCurvePayload generic = sampledCurvePayload(edgeGeometry, builder);
             if (generic != null) {
                 return generic;
@@ -8483,6 +8502,31 @@ public final class StepPreviewJsonExporter {
         }
         return delta > 0.0 ? delta - Math.PI * 2.0 : delta;
     }
+
+    private static EdgeCurvePayload newBSplineCurvePayload(int stepId, BSplineCurve3 geometry) {
+        return new EdgeCurvePayload(
+                stepId, "bspline_curve", null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
+    }
+
+    private static EdgeCurvePayload newRationalBSplineCurvePayload(int stepId, RationalBSplineCurve3 geometry) {
+        return new EdgeCurvePayload(
+                stepId, "rational_bspline_curve", null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
+    }
+
+    private static EdgeCurvePayload newPolylineCurvePayload(int stepId, Polyline3 geometry, CartesianPoint start, CartesianPoint end) {
+        return new EdgeCurvePayload(
+                stepId, "polyline", null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
+    }
+
+    private static EdgeCurvePayload newLineCurvePayload(int stepId, StepCadBuilder builder, StepLine line, CartesianPoint start, CartesianPoint end) {
+        return new EdgeCurvePayload(
+                stepId, "line", null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
+    }
+
 
     private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
         if (curve instanceof TrimmedCurve3 trimmedCurve) {
