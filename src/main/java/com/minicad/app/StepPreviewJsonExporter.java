@@ -179,6 +179,9 @@ import com.minicad.step.model.product.StepTessellatedTriangle;
 import com.minicad.step.model.action.StepForwardChainingRulePremise;
 import com.minicad.step.model.product.StepGeometricCurveSet;
 import com.minicad.step.model.product.StepGeometricReplica;
+import com.minicad.step.model.workflow.StepDatum;
+import com.minicad.step.model.workflow.StepDatumFeature;
+import com.minicad.step.model.workflow.StepDatumTarget;
 import com.minicad.step.model.workflow.StepGeometricRepresentationContext;
 import com.minicad.step.model.base.StepGeometricRepresentationItem;
 import com.minicad.step.model.product.StepGeometricSurfaceSet;
@@ -243,7 +246,14 @@ import com.minicad.step.model.geometry.StepDegenerateCurve2D;
 import com.minicad.step.model.geometry.StepDegeneratePcurve;
 import com.minicad.step.model.geometry.StepDegenerateToroidalSurface;
 import com.minicad.step.model.base.StepDescriptiveRepresentationItem;
+import com.minicad.step.model.tolerance.StepDimensionalLocation;
 import com.minicad.step.model.tolerance.StepDimensionCurve;
+import com.minicad.step.model.tolerance.StepGeometricTolerance;
+import com.minicad.step.model.tolerance.StepGeometricToleranceWithDatumReference;
+import com.minicad.step.model.tolerance.StepGeometricToleranceWithDefinedAreaUnit;
+import com.minicad.step.model.tolerance.StepGeometricToleranceWithMaximumTolerance;
+import com.minicad.step.model.tolerance.StepToleranceZone;
+import com.minicad.step.model.tolerance.StepToleranceZoneForm;
 import com.minicad.step.model.unit.StepDimensionalExponents;
 import com.minicad.step.model.document.StepDocument;
 import com.minicad.step.model.document.StepDocumentReference;
@@ -9320,6 +9330,22 @@ public final class StepPreviewJsonExporter {
                 }
             } else if (entity instanceof StepFillAreaWithOutline fillArea) {
                 appendFillAreaWithOutlinePmi(fillArea, pmi, builder);
+            } else if (entity instanceof StepGeometricTolerance tolerance) {
+                appendGeometricTolerancePmi(tolerance, pmi, builder);
+            } else if (entity instanceof StepGeometricToleranceWithDatumReference tolerance) {
+                appendGeometricToleranceWithDatumPmi(tolerance, pmi, builder);
+            } else if (entity instanceof StepGeometricToleranceWithDefinedAreaUnit tolerance) {
+                appendGeometricToleranceWithAreaUnitPmi(tolerance, pmi, builder);
+            } else if (entity instanceof StepGeometricToleranceWithMaximumTolerance tolerance) {
+                appendGeometricToleranceWithMaxPmi(tolerance, pmi, builder);
+            } else if (entity instanceof StepDimensionalLocation location) {
+                appendDimensionalLocationPmi(location, pmi, builder);
+            } else if (entity instanceof StepToleranceZone zone) {
+                appendToleranceZonePmi(zone, pmi, builder);
+            } else if (entity instanceof StepDatum datum) {
+                appendDatumPmi(datum, pmi, builder);
+            } else if (entity instanceof StepDatumTarget datumTarget) {
+                appendDatumTargetPmi(datumTarget, pmi, builder);
             }
         }
         return List.copyOf(pmi);
@@ -9459,6 +9485,124 @@ public final class StepPreviewJsonExporter {
         if (!points.isEmpty()) {
             CartesianPoint center = points.get(points.size() / 2);
             pmi.add(toStandalonePointPmi(fillArea.id(), fillArea.name(), center));
+        }
+    }
+
+    private static void appendGeometricTolerancePmi(
+            StepGeometricTolerance tolerance,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(tolerance.toleratedShape(), builder);
+        if (position != null) {
+            String label = tolerance.name() != null ? tolerance.name() : "GEOMETRIC_TOLERANCE";
+            if (tolerance.magnitude() != 0.0) {
+                label += ": " + String.format("%.3f", tolerance.magnitude());
+            }
+            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
+        }
+    }
+
+    private static void appendGeometricToleranceWithDatumPmi(
+            StepGeometricToleranceWithDatumReference tolerance,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        if (position != null) {
+            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
+            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
+                label += ": " + String.format("%.3f", tolerance.magnitude());
+            }
+            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
+        }
+    }
+
+    private static void appendGeometricToleranceWithAreaUnitPmi(
+            StepGeometricToleranceWithDefinedAreaUnit tolerance,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        if (position != null) {
+            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
+            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
+                label += ": " + String.format("%.3f", tolerance.magnitude());
+            }
+            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
+        }
+    }
+
+    private static void appendGeometricToleranceWithMaxPmi(
+            StepGeometricToleranceWithMaximumTolerance tolerance,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        if (position != null) {
+            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
+            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
+                label += ": " + String.format("%.3f", tolerance.magnitude());
+            }
+            if (tolerance.maximumTolerance() != null) {
+                label += " / " + String.format("%.3f", tolerance.maximumTolerance());
+            }
+            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
+        }
+    }
+
+    private static void appendDimensionalLocationPmi(
+            StepDimensionalLocation location,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(location.relatedShape(), builder);
+        if (position != null) {
+            String label = location.name() != null ? location.name() : "DIMENSIONAL_LOCATION";
+            pmi.add(toStandalonePointPmi(location.id(), label, position));
+        }
+    }
+
+    private static void appendToleranceZonePmi(
+            StepToleranceZone zone,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        String zoneShape = null;
+        if (zone.form() instanceof StepToleranceZoneForm form) {
+            zoneShape = form.zoneShape();
+        }
+        CartesianPoint position = pointFromAnnotationPoint(zone.form(), builder);
+        if (position != null) {
+            String label = zone.name() != null ? zone.name() : "TOLERANCE_ZONE";
+            if (zoneShape != null) {
+                label += " (" + zoneShape + ")";
+            }
+            pmi.add(toStandalonePointPmi(zone.id(), label, position));
+        }
+    }
+
+    private static void appendDatumPmi(
+            StepDatum datum,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(datum.target(), builder);
+        if (position != null) {
+            String label = datum.name() != null ? datum.name() : "DATUM";
+            pmi.add(toStandalonePointPmi(datum.id(), label, position));
+        }
+    }
+
+    private static void appendDatumTargetPmi(
+            StepDatumTarget datumTarget,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(datumTarget.targetShape(), builder);
+        if (position != null) {
+            String label = datumTarget.name() != null ? datumTarget.name() : "DATUM_TARGET";
+            pmi.add(toStandalonePointPmi(datumTarget.id(), label, position));
         }
     }
 
