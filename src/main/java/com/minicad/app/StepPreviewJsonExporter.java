@@ -63,6 +63,7 @@ import com.minicad.step.model.topology.StepAdvancedFace;
 import com.minicad.step.syntax.StepValue;
 import com.minicad.step.model.annotation.StepAnnotationCurveOccurrence;
 import com.minicad.step.model.annotation.StepAnnotationFillArea;
+import com.minicad.step.model.annotation.StepFillAreaWithOutline;
 import com.minicad.step.model.annotation.StepAnnotationFillAreaOccurrence;
 import com.minicad.step.model.annotation.StepAnnotationOccurrenceRelationship;
 import com.minicad.step.model.annotation.StepAnnotationPlane;
@@ -9317,6 +9318,8 @@ public final class StepPreviewJsonExporter {
                 if (position != null) {
                     pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
                 }
+            } else if (entity instanceof StepFillAreaWithOutline fillArea) {
+                appendFillAreaWithOutlinePmi(fillArea, pmi, builder);
             }
         }
         return List.copyOf(pmi);
@@ -9438,6 +9441,24 @@ public final class StepPreviewJsonExporter {
                 pmi.add(toStandalonePointPmi(measurement.id() * 1000 + measurement.measurementPoints().indexOf(pt),
                         measurement.name() + " point", mp));
             }
+        }
+    }
+
+    private static void appendFillAreaWithOutlinePmi(
+            StepFillAreaWithOutline fillArea,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (StepEntity outline : fillArea.outlines()) {
+            List<CartesianPoint> sampled = sampleLooseEdgePoints(outline, builder);
+            if (sampled != null && !sampled.isEmpty()) {
+                points.addAll(sampled);
+            }
+        }
+        if (!points.isEmpty()) {
+            CartesianPoint center = points.get(points.size() / 2);
+            pmi.add(toStandalonePointPmi(fillArea.id(), fillArea.name(), center));
         }
     }
 
