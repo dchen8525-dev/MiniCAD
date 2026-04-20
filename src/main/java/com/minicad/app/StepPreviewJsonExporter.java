@@ -499,16 +499,16 @@ public final class StepPreviewJsonExporter {
     public static String export(String stepText) {
         long startedAt = System.nanoTime();
         log.info("stage={} textLength={}", "export_start", stepText.length());
-        long parseStartedAt = System.nanoTime();
-        StepFile stepFile = StepParser.parse(stepText);
-        log.info("stage={} elapsedMs={}, entityCount={}", "parse_done", elapsedMillis(parseStartedAt), stepFile.entities().size());
-        long resolveStartedAt = System.nanoTime();
-        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        log.info("stage={} elapsedMs={}, resolvedCount={}", "resolve_done", elapsedMillis(resolveStartedAt), resolved.size());
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        return export(compileForExport(stepText, "parse_done", "resolve_done"), startedAt, "export_done");
+    }
 
+    static String export(CompiledStepDocument compiled) {
+        return export(compiled, System.nanoTime(), "export_done");
+    }
+
+    private static String export(CompiledStepDocument compiled, long startedAt, String doneStageName) {
         long payloadStartedAt = System.nanoTime();
-        PreviewPayload payload = buildPayload(stepFile, resolved, builder);
+        PreviewPayload payload = buildPayload(compiled.stepFile(), compiled.resolved(), compiled.builder());
         log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
                 "payload_geometry_summary",
                 countTrianglePoints(payload),
@@ -527,23 +527,23 @@ public final class StepPreviewJsonExporter {
         long jsonStartedAt = System.nanoTime();
         String json = toJson(payload);
         log.info("stage={} elapsedMs={}, jsonLength={}", "json_done", elapsedMillis(jsonStartedAt), json.length());
-        log.info("stage={} totalElapsedMs={}", "export_done", elapsedMillis(startedAt));
+        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
         return json;
     }
 
     public static byte[] exportBinary(String stepText) {
         long startedAt = System.nanoTime();
         log.info("stage={} textLength={}", "binary_export_start", stepText.length());
-        long parseStartedAt = System.nanoTime();
-        StepFile stepFile = StepParser.parse(stepText);
-        log.info("stage={} elapsedMs={}, entityCount={}", "binary_parse_done", elapsedMillis(parseStartedAt), stepFile.entities().size());
-        long resolveStartedAt = System.nanoTime();
-        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        log.info("stage={} elapsedMs={}, resolvedCount={}", "binary_resolve_done", elapsedMillis(resolveStartedAt), resolved.size());
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        return exportBinary(compileForExport(stepText, "binary_parse_done", "binary_resolve_done"), startedAt, "binary_export_done");
+    }
 
+    static byte[] exportBinary(CompiledStepDocument compiled) {
+        return exportBinary(compiled, System.nanoTime(), "binary_export_done");
+    }
+
+    private static byte[] exportBinary(CompiledStepDocument compiled, long startedAt, String doneStageName) {
         long payloadStartedAt = System.nanoTime();
-        PreviewPayload payload = reducePayloadGeometry(buildPayload(stepFile, resolved, builder));
+        PreviewPayload payload = reducePayloadGeometry(buildPayload(compiled.stepFile(), compiled.resolved(), compiled.builder()));
         log.info("stage={} trianglePoints={}, loopPoints={}, edgePoints={}, pmiPoints={}, representationFaceCount={}, representationEdgeCount={}",
                 "binary_payload_geometry_summary",
                 countTrianglePoints(payload),
@@ -562,24 +562,24 @@ public final class StepPreviewJsonExporter {
         long binaryStartedAt = System.nanoTime();
         byte[] binary = toBinary(payload);
         log.info("stage={} elapsedMs={}, binaryLength={}", "binary_encode_done", elapsedMillis(binaryStartedAt), binary.length);
-        log.info("stage={} totalElapsedMs={}", "binary_export_done", elapsedMillis(startedAt));
+        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
         return binary;
     }
 
     public static byte[] exportGlb(String stepText) {
         long startedAt = System.nanoTime();
         log.info("stage={} textLength={}", "glb_export_start", stepText.length());
-        long parseStartedAt = System.nanoTime();
-        StepFile stepFile = StepParser.parse(stepText);
-        log.info("stage={} elapsedMs={}, entityCount={}", "glb_parse_done", elapsedMillis(parseStartedAt), stepFile.entities().size());
-        long resolveStartedAt = System.nanoTime();
-        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        log.info("stage={} elapsedMs={}, resolvedCount={}", "glb_resolve_done", elapsedMillis(resolveStartedAt), resolved.size());
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        return exportGlb(compileForExport(stepText, "glb_parse_done", "glb_resolve_done"), startedAt, "glb_export_done");
+    }
 
+    static byte[] exportGlb(CompiledStepDocument compiled) {
+        return exportGlb(compiled, System.nanoTime(), "glb_export_done");
+    }
+
+    private static byte[] exportGlb(CompiledStepDocument compiled, long startedAt, String doneStageName) {
         long payloadStartedAt = System.nanoTime();
         PreviewPayload payload = reducePayloadGeometry(
-                buildPayload(stepFile, resolved, builder),
+                buildPayload(compiled.stepFile(), compiled.resolved(), compiled.builder()),
                 GLB_MAX_TOTAL_TRIANGLE_POINTS,
                 MAX_TOTAL_LOOP_POINTS,
                 "glb_payload_geometry_reduced"
@@ -602,8 +602,18 @@ public final class StepPreviewJsonExporter {
         long glbStartedAt = System.nanoTime();
         byte[] glb = toGlb(payload);
         log.info("stage={} elapsedMs={}, glbLength={}", "glb_encode_done", elapsedMillis(glbStartedAt), glb.length);
-        log.info("stage={} totalElapsedMs={}", "glb_export_done", elapsedMillis(startedAt));
+        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
         return glb;
+    }
+
+    private static CompiledStepDocument compileForExport(String stepText, String parseStageName, String resolveStageName) {
+        long parseStartedAt = System.nanoTime();
+        StepFile stepFile = StepParser.parse(stepText);
+        log.info("stage={} elapsedMs={}, entityCount={}", parseStageName, elapsedMillis(parseStartedAt), stepFile.entities().size());
+        long resolveStartedAt = System.nanoTime();
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+        log.info("stage={} elapsedMs={}, resolvedCount={}", resolveStageName, elapsedMillis(resolveStartedAt), resolved.size());
+        return CompiledStepDocument.of(stepText, stepFile, resolved);
     }
 
     private static PreviewPayload buildPayload(

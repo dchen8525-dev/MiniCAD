@@ -583,6 +583,7 @@ import java.util.stream.Collectors;
 public final class StepEntityResolver {
 
   private static final Map<String, EntityFactory> REGISTRY = createRegistry();
+  private static final Map<String, Integer> REGISTRY_ORDER = createRegistryOrder(REGISTRY);
 
   private final Map<Integer, StepEntityInstance> instancesById;
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
@@ -619,24 +620,32 @@ public final class StepEntityResolver {
       throw new StepResolutionException("missing referenced entity #" + id);
     }
 
-    List<StepEntityDefinition> defs = instance.definitions();
-    String[] defNames = new String[defs.size()];
-    for (int i = 0; i < defs.size(); i++) {
-      defNames[i] = asciiUpper(defs.get(i).name());
-    }
-
-    // Iterate registry in order, check against pre-normalized definition names
-    for (Map.Entry<String, EntityFactory> entry : REGISTRY.entrySet()) {
-      for (String defName : defNames) {
-        if (entry.getKey().equals(defName)) {
-          StepEntity entity = entry.getValue().create(this, instance);
-          resolved.put(id, entity);
-          return entity;
-        }
-      }
+    EntityFactory factory = resolveFactory(instance);
+    if (factory != null) {
+      StepEntity entity = factory.create(this, instance);
+      resolved.put(id, entity);
+      return entity;
     }
 
     throw new UnsupportedStepEntityException("unsupported STEP entity " + instance.name());
+  }
+
+  private static EntityFactory resolveFactory(StepEntityInstance instance) {
+    EntityFactory selectedFactory = null;
+    int selectedRank = Integer.MAX_VALUE;
+    for (StepEntityDefinition definition : instance.definitions()) {
+      String normalizedName = asciiUpper(definition.name());
+      EntityFactory candidate = REGISTRY.get(normalizedName);
+      if (candidate == null) {
+        continue;
+      }
+      int candidateRank = REGISTRY_ORDER.getOrDefault(normalizedName, Integer.MAX_VALUE);
+      if (candidateRank < selectedRank) {
+        selectedFactory = candidate;
+        selectedRank = candidateRank;
+      }
+    }
+    return selectedFactory;
   }
 
   private static String asciiUpper(String s) {
@@ -648,6 +657,15 @@ public final class StepEntityResolver {
       }
     }
     return new String(chars);
+  }
+
+  private static Map<String, Integer> createRegistryOrder(Map<String, EntityFactory> registry) {
+    Map<String, Integer> order = new HashMap<>();
+    int index = 0;
+    for (String entityName : registry.keySet()) {
+      order.put(entityName, index++);
+    }
+    return Map.copyOf(order);
   }
 
   private StepCartesianPoint resolveCartesianPoint(StepEntityInstance instance) {

@@ -10,9 +10,6 @@ import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
-import com.minicad.step.semantic.StepEntityResolver;
-import com.minicad.step.syntax.StepFile;
-import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.*;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +52,12 @@ public final class StepMeshExporter {
      * Exports STEP text to OBJ format.
      */
     public static String exportObj(String stepText) {
-        MeshData mesh = buildMesh(stepText);
+        MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
+        return formatObj(mesh);
+    }
+
+    static String exportObj(CompiledStepDocument compiled) {
+        MeshData mesh = buildMesh(compiled);
         return formatObj(mesh);
     }
 
@@ -63,7 +65,12 @@ public final class StepMeshExporter {
      * Exports STEP text to binary STL format.
      */
     public static byte[] exportStlBinary(String stepText) {
-        MeshData mesh = buildMesh(stepText);
+        MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
+        return formatStlBinary(mesh);
+    }
+
+    static byte[] exportStlBinary(CompiledStepDocument compiled) {
+        MeshData mesh = buildMesh(compiled);
         return formatStlBinary(mesh);
     }
 
@@ -71,41 +78,35 @@ public final class StepMeshExporter {
      * Exports STEP text to text STL format.
      */
     public static String exportStlText(String stepText) {
-        MeshData mesh = buildMesh(stepText);
+        MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
+        return formatStlText(mesh);
+    }
+
+    static String exportStlText(CompiledStepDocument compiled) {
+        MeshData mesh = buildMesh(compiled);
         return formatStlText(mesh);
     }
 
     // ── Pipeline ──────────────────────────────────────────────────────────────
 
-    private static MeshData buildMesh(String stepText) {
-        StepFile stepFile = StepParser.parse(stepText);
-        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+    private static MeshData buildMesh(CompiledStepDocument compiled) {
+        Map<Integer, StepEntity> resolved = compiled.resolved();
+        StepCadBuilder builder = compiled.builder();
 
-        // Collect face entities for parallel triangulation
+        // Collect face entities for deterministic triangulation.
         List<com.minicad.step.model.base.StepFaceEntity> faceEntities = resolved.values().stream()
                 .filter(e -> e instanceof com.minicad.step.model.base.StepFaceEntity)
                 .map(e -> (com.minicad.step.model.base.StepFaceEntity) e)
                 .toList();
 
-        // Parallel triangulation of semantic faces
-        List<Triangulator> perFaceResults = faceEntities.parallelStream()
-                .map(faceEntity -> {
-                    Triangulator ft = new Triangulator();
-                    try {
-                        ft.triangulateSemanticFace(faceEntity, builder);
-                    } catch (Exception e) {
-                        LOG.log(Level.FINE, "Skipping semantic face #{0}: {1}",
-                                new Object[]{0, e.getMessage()});
-                    }
-                    return ft;
-                })
-                .toList();
-
-        // Merge all per-face results
         Triangulator t = new Triangulator();
-        for (Triangulator ft : perFaceResults) {
-            t.merge(ft);
+        for (com.minicad.step.model.base.StepFaceEntity faceEntity : faceEntities) {
+            try {
+                t.triangulateSemanticFace(faceEntity, builder);
+            } catch (Exception e) {
+                LOG.log(Level.FINE, "Skipping semantic face #{0}: {1}",
+                        new Object[]{faceEntity.id(), e.getMessage()});
+            }
         }
 
         // Sequential triangulation of solids/shells (complex dependencies)

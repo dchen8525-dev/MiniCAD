@@ -78,6 +78,25 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldExportSameObjFromCompiledDocument() {
+        CompiledStepDocument compiled = CompiledStepDocument.compile(MINIMAL_SQUARE);
+
+        String direct = StepMeshExporter.exportObj(MINIMAL_SQUARE);
+        String fromCompiled = StepMeshExporter.exportObj(compiled);
+
+        assertEquals(direct, fromCompiled);
+    }
+
+    @Test
+    void shouldExportObjDeterministicallyAcrossRepeatedRuns() {
+        String first = StepMeshExporter.exportObj(MINIMAL_SQUARE);
+
+        for (int i = 0; i < 5; i++) {
+            assertEquals(first, StepMeshExporter.exportObj(MINIMAL_SQUARE));
+        }
+    }
+
+    @Test
     void shouldExportStlBinary() {
         byte[] stl = StepMeshExporter.exportStlBinary(MINIMAL_SQUARE);
 

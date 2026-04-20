@@ -5893,6 +5893,22 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldPreserveRegistryPrecedenceForComplexEntityDefinitionOrder() {
+        String step = """
+                DATA;
+                #1=(REPRESENTATION_ITEM('p') GEOMETRIC_REPRESENTATION_ITEM() POINT());
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepEntity entity = resolved.get(1);
+        assertSame(StepPoint.class, entity.getClass());
+        StepPoint point = assertInstanceOf(StepPoint.class, entity);
+        assertEquals("p", point.name());
+    }
+
+    @Test
     void shouldResolveCurveMarker() {
         String step = """
                 DATA;

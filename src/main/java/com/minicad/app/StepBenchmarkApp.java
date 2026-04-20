@@ -58,12 +58,14 @@ public final class StepBenchmarkApp {
         BuildSummary buildSummary = benchmarkBuild(resolved);
         long buildElapsedNanos = System.nanoTime() - buildStartedAt;
 
+        CompiledStepDocument compiled = CompiledStepDocument.of(stepText, stepFile, resolved);
+
         long previewExportStartedAt = System.nanoTime();
-        String previewJson = StepPreviewJsonExporter.export(stepText);
+        String previewJson = StepPreviewJsonExporter.export(compiled);
         long previewExportElapsedNanos = System.nanoTime() - previewExportStartedAt;
 
         long meshExportStartedAt = System.nanoTime();
-        String meshObj = StepMeshExporter.exportObj(stepText);
+        String meshObj = StepMeshExporter.exportObj(compiled);
         long meshExportElapsedNanos = System.nanoTime() - meshExportStartedAt;
 
         return new BenchmarkResult(
