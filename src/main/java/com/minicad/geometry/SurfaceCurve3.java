@@ -2,19 +2,35 @@ package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
+import com.minicad.geometry2d.Curve2;
+
+import java.util.List;
 
 /**
  * Minimal surface-curve wrapper over a supported 3D curve.
  *
  * @param curve3d supported 3D curve
+ * @param parametricCurves optional parameter-space curves associated with supporting surfaces
  */
-public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
+public record SurfaceCurve3(Curve3 curve3d, List<ParametricCurve> parametricCurves) implements Curve3 {
+
+    public record ParametricCurve(SurfaceGeometry surface, Curve2 curve2) {
+        public ParametricCurve {
+            Preconditions.requireNonNull(surface, "surface");
+            Preconditions.requireNonNull(curve2, "curve2");
+        }
+    }
 
     /**
      * Creates a surface curve.
      */
     public SurfaceCurve3 {
         Preconditions.requireNonNull(curve3d, "curve3d");
+        parametricCurves = List.copyOf(parametricCurves);
+    }
+
+    public SurfaceCurve3(Curve3 curve3d) {
+        this(curve3d, List.of());
     }
 
     @Override
@@ -57,7 +73,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
         } else if (curve instanceof Polyline3 polyline) {
             return polyline.points();
         } else if (curve instanceof CompositeCurve3 composite) {
-            return sampleCompositeCurveInternal(composite, segments);
+            return composite.sample(segments);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
             return trimmed.sample(segments);
         } else if (curve instanceof Hyperbola3 hyperbola) {
@@ -88,7 +104,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
         } else if (curve instanceof Polyline3 polyline) {
             return getPointOnPolyline(polyline, parameter);
         } else if (curve instanceof CompositeCurve3 composite) {
-            return getPointOnCompositeInternal(composite, parameter);
+            return composite.pointAt(parameter);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
             return trimmed.pointAt(parameter);
         } else if (curve instanceof Hyperbola3 hyperbola) {
@@ -120,27 +136,6 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
         return p1.add(p2.subtract(p1).scale(localT));
     }
 
-    private static CartesianPoint getPointOnCompositeInternal(CompositeCurve3 composite, double parameter) {
-        java.util.List<Curve3> segments = composite.segments();
-        if (segments.isEmpty()) {
-            return new CartesianPoint(0, 0, 0);
-        }
-        int index = (int) (parameter * segments.size());
-        index = Math.max(0, Math.min(index, segments.size() - 1));
-        double localT = parameter * segments.size() - index;
-        return getPointOnCurveInternal(segments.get(index), localT);
-    }
-
-    private static java.util.List<CartesianPoint> sampleCompositeCurveInternal(CompositeCurve3 composite, int segments) {
-        java.util.List<CartesianPoint> allPoints = new java.util.ArrayList<>();
-        int segmentsPerSegment = Math.max(1, segments / composite.segments().size());
-        for (Curve3 segment : composite.segments()) {
-            java.util.List<CartesianPoint> segmentPoints = sampleCurveInternal(segment, segmentsPerSegment);
-            allPoints.addAll(segmentPoints);
-        }
-        return java.util.List.copyOf(allPoints);
-    }
-
     /**
      * Computes the tangent vector at a given parameter by delegating to the underlying curve.
      *
@@ -166,7 +161,7 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
         } else if (curve instanceof Polyline3 polyline) {
             return getTangentOnPolyline(polyline, parameter);
         } else if (curve instanceof CompositeCurve3 composite) {
-            return getTangentOnCompositeInternal(composite, parameter);
+            return composite.tangentAt(parameter);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
             return trimmed.tangentAt(parameter);
         } else if (curve instanceof Hyperbola3 hyperbola) {
@@ -198,17 +193,6 @@ public record SurfaceCurve3(Curve3 curve3d) implements Curve3 {
             return new Vector3(1, 0, 0);
         }
         return tangent.normalize().asVector();
-    }
-
-    private static Vector3 getTangentOnCompositeInternal(CompositeCurve3 composite, double parameter) {
-        java.util.List<Curve3> segments = composite.segments();
-        if (segments.isEmpty()) {
-            return new Vector3(1, 0, 0);
-        }
-        int index = (int) (parameter * segments.size());
-        index = Math.max(0, Math.min(index, segments.size() - 1));
-        double localT = parameter * segments.size() - index;
-        return getTangentOnCurveInternal(segments.get(index), localT);
     }
 
     private static Vector3 computeNumericalTangent(Curve3 curve, double parameter) {

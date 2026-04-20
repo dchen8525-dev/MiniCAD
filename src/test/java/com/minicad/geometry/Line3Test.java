@@ -29,4 +29,18 @@ class Line3Test {
         assertTrue(line.contains(new CartesianPoint(3.0, 0.0, 0.0)));
         assertFalse(line.contains(new CartesianPoint(3.0, 1.0, 0.0)));
     }
+
+    @Test
+    void shouldRespectParameterScale() {
+        Line3 line = new Line3(
+                new CartesianPoint(0.0, 0.0, 0.0),
+                Direction3.from(new Vector3(0.0, 0.0, 1.0)),
+                Math.PI
+        );
+
+        assertEquals(new CartesianPoint(0.0, 0.0, Math.PI), line.pointAt(1.0));
+        assertEquals(1.0, line.parameterAt(new CartesianPoint(0.0, 0.0, Math.PI)), 1.0e-12);
+        assertEquals(Math.PI, line.length(), 1.0e-12);
+        assertEquals(2.0 * Math.PI, line.length(-1.0, 1.0), 1.0e-12);
+    }
 }

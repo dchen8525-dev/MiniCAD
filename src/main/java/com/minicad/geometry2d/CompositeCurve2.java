@@ -44,42 +44,37 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
         if (segments.isEmpty()) {
             return new Point2(0, 0);
         }
-        int index = (int) (parameter * segments.size());
+        double normalized = Math.max(0.0, Math.min(1.0, parameter));
+        int index = (int) (normalized * segments.size());
         index = Math.max(0, Math.min(index, segments.size() - 1));
-        double localT = parameter * segments.size() - index;
+        double localT = normalized * segments.size() - index;
         return getPointOnSegment(segments.get(index), localT);
     }
 
     private static Point2 getPointOnSegment(Curve2 segment, double parameter) {
+        double normalized = Math.max(0.0, Math.min(1.0, parameter));
         if (segment instanceof BSplineCurve2 bspline) {
-            return bspline.pointAt(parameter);
+            return bspline.pointAt(mapNormalizedParameter(bspline.startParameter(), bspline.endParameter(), normalized));
         } else if (segment instanceof RationalBSplineCurve2 rational) {
-            return rational.pointAt(parameter);
+            return rational.pointAt(mapNormalizedParameter(rational.startParameter(), rational.endParameter(), normalized));
         } else if (segment instanceof Circle2 circle) {
-            return circle.pointAt(parameter);
+            return circle.pointAt(normalized * 2.0 * Math.PI);
         } else if (segment instanceof Ellipse2 ellipse) {
-            return ellipse.pointAt(parameter);
+            return ellipse.pointAt(normalized * 2.0 * Math.PI);
         } else if (segment instanceof Line2 line) {
-            return line.pointAt(parameter);
+            return line.pointAt(normalized);
         } else if (segment instanceof Polyline2 polyline) {
-            return polyline.pointAt(parameter);
+            return polyline.pointAt(normalized);
         } else if (segment instanceof TrimmedCurve2 trimmed) {
-            return interpolatePoint(trimmed.trimStart(), trimmed.trimEnd(), parameter);
+            return trimmed.pointAt(normalized);
         } else if (segment instanceof Hyperbola2 hyperbola) {
-            return hyperbola.pointAt(parameter);
+            return hyperbola.pointAt(normalized);
         } else if (segment instanceof Parabola2 parabola) {
-            return parabola.pointAt(parameter);
+            return parabola.pointAt(normalized);
         } else if (segment instanceof CompositeCurve2 composite) {
-            return composite.pointAt(parameter);
+            return composite.pointAt(normalized);
         }
         return new Point2(0, 0);
-    }
-
-    private static Point2 interpolatePoint(Point2 start, Point2 end, double t) {
-        return new Point2(
-            start.x() + (end.x() - start.x()) * t,
-            start.y() + (end.y() - start.y()) * t
-        );
     }
 
     /**
@@ -143,8 +138,8 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             return polyline.length();
         } else if (segment instanceof TrimmedCurve2 trimmed) {
             return trimmed.length();
-        } else if (segment instanceof Line2) {
-            return 1.0;
+        } else if (segment instanceof Line2 line) {
+            return line.length();
         } else if (segment instanceof BSplineCurve2 bs) {
             return bs.length();
         } else if (segment instanceof RationalBSplineCurve2 rb) {
@@ -206,40 +201,42 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
         if (segments.isEmpty()) {
             return new Vector2(1, 0);
         }
-        int index = (int) (parameter * segments.size());
+        double normalized = Math.max(0.0, Math.min(1.0, parameter));
+        int index = (int) (normalized * segments.size());
         index = Math.max(0, Math.min(index, segments.size() - 1));
-        double localT = parameter * segments.size() - index;
+        double localT = normalized * segments.size() - index;
         return getTangentOnSegment(segments.get(index), localT);
     }
 
     private static Vector2 getTangentOnSegment(Curve2 segment, double parameter) {
+        double normalized = Math.max(0.0, Math.min(1.0, parameter));
         if (segment instanceof Line2 line) {
-            return line.tangentAt(parameter);
+            return line.tangentAt(normalized);
         } else if (segment instanceof Circle2 circle) {
-            return circle.tangentAt(parameter * 2 * Math.PI);
+            return circle.tangentAt(normalized * 2 * Math.PI);
         } else if (segment instanceof Ellipse2 ellipse) {
-            return ellipse.tangentAt(parameter * 2 * Math.PI);
+            return ellipse.tangentAt(normalized * 2 * Math.PI);
         } else if (segment instanceof Polyline2 polyline) {
-            return polyline.tangentAt(parameter);
+            return polyline.tangentAt(normalized);
         } else if (segment instanceof TrimmedCurve2 trimmed) {
-            return trimmed.tangentAt(parameter);
+            return trimmed.tangentAt(normalized);
         } else if (segment instanceof BSplineCurve2 bs) {
-            return bs.tangentAt(bs.startParameter() + parameter * (bs.endParameter() - bs.startParameter()));
+            return bs.tangentAt(mapNormalizedParameter(bs.startParameter(), bs.endParameter(), normalized));
         } else if (segment instanceof RationalBSplineCurve2 rb) {
-            return rb.tangentAt(rb.startParameter() + parameter * (rb.endParameter() - rb.startParameter()));
+            return rb.tangentAt(mapNormalizedParameter(rb.startParameter(), rb.endParameter(), normalized));
         } else if (segment instanceof Hyperbola2 hyperbola) {
-            return hyperbola.tangentAt(parameter);
+            return hyperbola.tangentAt(normalized);
         } else if (segment instanceof Parabola2 parabola) {
-            return parabola.tangentAt(parameter);
+            return parabola.tangentAt(normalized);
         } else if (segment instanceof DegenerateCurve2) {
             return new Vector2(1, 0);
         } else if (segment instanceof CompositeCurve2 composite) {
-            return composite.tangentAt(parameter);
+            return composite.tangentAt(normalized);
         }
         // Default: numerical differentiation
         double eps = 1e-6;
-        Point2 p1 = getPointOnSegment(segment, Math.max(0, parameter - eps));
-        Point2 p2 = getPointOnSegment(segment, Math.min(1, parameter + eps));
+        Point2 p1 = getPointOnSegment(segment, Math.max(0, normalized - eps));
+        Point2 p2 = getPointOnSegment(segment, Math.min(1, normalized + eps));
         Vector2 tangent = p2.subtract(p1);
         if (tangent.isZero()) {
             return new Vector2(1, 0);
@@ -336,19 +333,16 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             if (distance < minDistance) {
                 minDistance = distance;
                 closest = segmentClosest;
-                double segmentT = parameterOfOnSegment(segment, closest);
+                double segmentT = normalizedParameterOnSegment(segment, segmentClosest);
                 bestT = ((double) segments.indexOf(segment) + segmentT) / n;
             }
         }
         return bestT;
     }
 
-    private static double parameterOfOnSegment(Curve2 segment, Point2 point) {
-        // Analytical cases for types with known parameter mappings
+    private static double normalizedParameterOnSegment(Curve2 segment, Point2 point) {
         if (segment instanceof Line2 line) {
-            // Line2 parameterOf returns raw parameter; for composite [0,1] range, clamp
-            double raw = line.parameterOf(point);
-            return Math.max(0.0, Math.min(1.0, raw));
+            return Math.max(0.0, Math.min(1.0, line.parameterOf(point)));
         } else if (segment instanceof Circle2 circle) {
             double angle = circle.angleOf(point);
             return angle / (2.0 * Math.PI);
@@ -357,6 +351,12 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             return angle / (2.0 * Math.PI);
         } else if (segment instanceof Polyline2 polyline) {
             return polyline.parameterOf(point);
+        } else if (segment instanceof TrimmedCurve2 trimmed) {
+            return normalizedTrimmedParameter(trimmed, point);
+        } else if (segment instanceof BSplineCurve2 bs) {
+            return approximateNormalizedParameter(bs.sample(128), point);
+        } else if (segment instanceof RationalBSplineCurve2 rb) {
+            return approximateNormalizedParameter(rb.sample(128), point);
         } else if (segment instanceof CompositeCurve2 composite) {
             return composite.parameterOf(point);
         } else if (segment instanceof DegenerateCurve2) {
@@ -374,6 +374,51 @@ public record CompositeCurve2(List<Curve2> segments) implements Curve2 {
             }
         }
         return bestT;
+    }
+
+    private static double normalizedTrimmedParameter(TrimmedCurve2 trimmed, Point2 point) {
+        return trimmed.parameterOnTrimmedCurve(point);
+    }
+
+    private static double parameterOnCurve(Curve2 curve, Point2 point) {
+        if (curve instanceof Line2 line) {
+            return line.parameterOf(point);
+        } else if (curve instanceof Circle2 circle) {
+            return circle.angleOf(point);
+        } else if (curve instanceof Ellipse2 ellipse) {
+            return ellipse.angleOf(point);
+        } else if (curve instanceof Polyline2 polyline) {
+            return polyline.parameterOf(point);
+        } else if (curve instanceof BSplineCurve2 bs) {
+            return mapNormalizedParameter(bs.startParameter(), bs.endParameter(), approximateNormalizedParameter(bs.sample(128), point));
+        } else if (curve instanceof RationalBSplineCurve2 rb) {
+            return mapNormalizedParameter(rb.startParameter(), rb.endParameter(), approximateNormalizedParameter(rb.sample(128), point));
+        } else if (curve instanceof TrimmedCurve2 trimmed) {
+            return trimmed.parameterOnUnderlyingCurve(point);
+        } else if (curve instanceof CompositeCurve2 composite) {
+            return composite.parameterOf(point);
+        }
+        return 0.0;
+    }
+
+    private static double approximateNormalizedParameter(List<Point2> samples, Point2 point) {
+        if (samples.isEmpty()) {
+            return 0.0;
+        }
+        double bestParameter = 0.0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int index = 0; index < samples.size(); index++) {
+            double distance = samples.get(index).distanceTo(point);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestParameter = samples.size() == 1 ? 0.0 : (double) index / (samples.size() - 1);
+            }
+        }
+        return bestParameter;
+    }
+
+    private static double mapNormalizedParameter(double start, double end, double normalized) {
+        return start + (end - start) * normalized;
     }
 
     /**

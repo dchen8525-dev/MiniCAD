@@ -58,7 +58,7 @@ public record SurfaceOfRevolution3(
         } else if (curve instanceof Polyline3 polyline) {
             return getPointOnPolyline(polyline, parameter);
         } else if (curve instanceof CompositeCurve3 composite) {
-            return getPointOnCompositeInternal(composite, parameter);
+            return composite.pointAt(parameter);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
             return trimmed.pointAt(parameter);
         } else if (curve instanceof Hyperbola3 hyperbola) {
@@ -88,17 +88,6 @@ public record SurfaceOfRevolution3(
         CartesianPoint p1 = points.get(index);
         CartesianPoint p2 = points.get(index + 1);
         return p1.add(p2.subtract(p1).scale(localT));
-    }
-
-    private static CartesianPoint getPointOnCompositeInternal(CompositeCurve3 composite, double parameter) {
-        java.util.List<Curve3> segments = composite.segments();
-        if (segments.isEmpty()) {
-            return new CartesianPoint(0, 0, 0);
-        }
-        int index = (int) (parameter * segments.size());
-        index = Math.max(0, Math.min(index, segments.size() - 1));
-        double localT = parameter * segments.size() - index;
-        return getPointOnCurveInternal(segments.get(index), localT);
     }
 
     /**
@@ -159,7 +148,7 @@ public record SurfaceOfRevolution3(
         } else if (curve instanceof Polyline3 polyline) {
             return polyline.points();
         } else if (curve instanceof CompositeCurve3 composite) {
-            return sampleCompositeCurveInternal(composite, segments);
+            return composite.sample(segments);
         } else if (curve instanceof TrimmedCurve3 trimmed) {
             return trimmed.sample(segments);
         } else if (curve instanceof Hyperbola3 hyperbola) {
@@ -174,16 +163,6 @@ public record SurfaceOfRevolution3(
             return degenerate.sample(segments);
         }
         return java.util.List.of();
-    }
-
-    private static java.util.List<CartesianPoint> sampleCompositeCurveInternal(CompositeCurve3 composite, int segments) {
-        java.util.List<CartesianPoint> allPoints = new java.util.ArrayList<>();
-        int segmentsPerSegment = Math.max(1, segments / composite.segments().size());
-        for (Curve3 segment : composite.segments()) {
-            java.util.List<CartesianPoint> segmentPoints = sampleCurveInternal(segment, segmentsPerSegment);
-            allPoints.addAll(segmentPoints);
-        }
-        return java.util.List.copyOf(allPoints);
     }
 
     /**

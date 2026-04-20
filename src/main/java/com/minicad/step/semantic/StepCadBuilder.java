@@ -581,7 +581,8 @@ public final class StepCadBuilder {
         StepLine line = requireEntity(id, StepLine.class, "LINE");
         Line3 built = new Line3(
                 buildPoint(line.point().id()),
-                buildDirection(line.vector().orientation().id())
+                buildDirection(line.vector().orientation().id()),
+                line.vector().magnitude()
         );
         lines.put(id, built);
         return built;
@@ -598,7 +599,8 @@ public final class StepCadBuilder {
         }
         Line2 built = new Line2(
                 buildPoint2(line.point().id()),
-                buildDirection2(line.vector().orientation().id())
+                buildDirection2(line.vector().orientation().id()),
+                line.vector().magnitude()
         );
         lines2d.put(id, built);
         return built;
@@ -1839,7 +1841,7 @@ public final class StepCadBuilder {
         }
         StepSurfaceCurve surfaceCurve = requireEntity(id, StepSurfaceCurve.class, "SURFACE_CURVE");
         Curve3 curve3d = buildCurve3(surfaceCurve.curve3d());
-        SurfaceCurve3 built = new SurfaceCurve3(curve3d);
+        SurfaceCurve3 built = new SurfaceCurve3(curve3d, buildSurfaceCurveBindings(surfaceCurve.associatedGeometry()));
         surfaceCurves.put(id, built);
         return built;
     }
@@ -1847,7 +1849,29 @@ public final class StepCadBuilder {
     public SurfaceCurve3 buildSeamCurve(int id) {
         StepSeamCurve seamCurve = requireEntity(id, StepSeamCurve.class, "SEAM_CURVE");
         Curve3 curve3d = buildCurve3(seamCurve.curve3d());
-        return new SurfaceCurve3(curve3d);
+        return new SurfaceCurve3(curve3d, buildSurfaceCurveBindings(seamCurve.associatedGeometry()));
+    }
+
+    private List<SurfaceCurve3.ParametricCurve> buildSurfaceCurveBindings(List<StepEntity> associatedGeometry) {
+        List<SurfaceCurve3.ParametricCurve> bindings = new ArrayList<>();
+        for (StepEntity geometry : associatedGeometry) {
+            StepEntity basisSurfaceEntity = null;
+            if (geometry instanceof StepPcurve pcurve) {
+                basisSurfaceEntity = pcurve.basisSurface();
+            } else if (geometry instanceof StepDegeneratePcurve pcurve) {
+                basisSurfaceEntity = pcurve.basisSurface();
+            }
+            if (basisSurfaceEntity == null) {
+                continue;
+            }
+            Object builtCurve = buildPcurveCurve2(geometry);
+            if (!(builtCurve instanceof Curve2 curve2)) {
+                continue;
+            }
+            SurfaceGeometry surface = buildSupportedFaceGeometry(basisSurfaceEntity, "PCURVE");
+            bindings.add(new SurfaceCurve3.ParametricCurve(surface, curve2));
+        }
+        return List.copyOf(bindings);
     }
 
     /**
@@ -5750,7 +5774,7 @@ public final class StepCadBuilder {
      */
     private Curve3 reverseCurve3(Curve3 curve) {
         return switch (curve) {
-            case Line3 line -> new Line3(line.origin(), line.direction().reverse());
+            case Line3 line -> new Line3(line.origin(), line.direction().reverse(), line.parameterScale());
             case Polyline3 polyline -> {
                 List<CartesianPoint> reversedPoints = new java.util.ArrayList<>(polyline.points().reversed());
                 yield new Polyline3(reversedPoints);
@@ -5795,7 +5819,9 @@ public final class StepCadBuilder {
                         trimmed.trimParamStart(),
                         !trimmed.senseAgreement());
             }
-            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(reverseCurve3(surfaceCurve.curve3d()));
+            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(
+                    reverseCurve3(surfaceCurve.curve3d()),
+                    surfaceCurve.parametricCurves());
             case BSplineCurve3 bspline -> new BSplineCurve3(
                     bspline.degree(),
                     new java.util.ArrayList<>(bspline.controlPoints().reversed()),
@@ -7520,7 +7546,8 @@ public final class StepCadBuilder {
         return switch (curve) {
             case Line3 line -> new Line3(
                     transformPoint3(line.origin(), transformation),
-                    transformDirection3(line.direction(), transformation));
+                    transformDirection3(line.direction(), transformation),
+                    line.parameterScale() * Math.abs(scale));
             case Circle circle -> new Circle(
                     transformPlacement(circle.position(), transformation),
                     circle.radius() * scale);
@@ -7542,7 +7569,13 @@ public final class StepCadBuilder {
                     spline.weights(),
                     spline.knotMultiplicities(),
                     spline.knots());
-            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(transformCurve3(surfaceCurve.curve3d(), transformation));
+            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(
+                    transformCurve3(surfaceCurve.curve3d(), transformation),
+                    surfaceCurve.parametricCurves().stream()
+                            .map(binding -> new SurfaceCurve3.ParametricCurve(
+                                    transformSurfaceGeometry(binding.surface(), transformation),
+                                    binding.curve2()))
+                            .toList());
             case TrimmedCurve3 trimmedCurve -> new TrimmedCurve3(
                     transformCurve3(trimmedCurve.basisCurve(), transformation),
                     trimmedCurve.trimParamStart(),
@@ -7574,7 +7607,8 @@ public final class StepCadBuilder {
         return switch (curve) {
             case Line2 line -> new Line2(
                     transformPoint2(line.origin(), transformation),
-                    transformDirection2(line.direction(), transformation));
+                    transformDirection2(line.direction(), transformation),
+                    line.parameterScale() * Math.abs(scale));
             case Circle2 circle -> new Circle2(
                     transformPoint2(circle.center(), transformation),
                     transformDirection2(circle.xDirection(), transformation),

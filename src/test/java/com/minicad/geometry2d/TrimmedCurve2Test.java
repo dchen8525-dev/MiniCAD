@@ -39,6 +39,16 @@ class TrimmedCurve2Test {
     }
 
     @Test
+    void trimmedCurveParameterOnUnderlyingCurveRespectsReverseSense() {
+        Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
+        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 2.0, 8.0, false);
+
+        assertEquals(8.0, trimmed.parameterOnUnderlyingCurve(trimmed.pointAt(0.0)), 1e-10);
+        assertEquals(5.0, trimmed.parameterOnUnderlyingCurve(trimmed.pointAt(0.5)), 1e-10);
+        assertEquals(2.0, trimmed.parameterOnUnderlyingCurve(trimmed.pointAt(1.0)), 1e-10);
+    }
+
+    @Test
     void trimmedCurveContains() {
         Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
 
@@ -166,5 +176,20 @@ class TrimmedCurve2Test {
         assertEquals(0.0, trimmed.trimStart().y(), 1e-10);
         assertEquals(0.0, trimmed.trimEnd().x(), 1e-10);
         assertEquals(5.0, trimmed.trimEnd().y(), 1e-10);
+    }
+
+    @Test
+    void nestedTrimmedCurveResolvesUnderlyingParameter() {
+        TrimmedCurve2 inner = new TrimmedCurve2(
+                new Line2(new Point2(0, 0), new Direction2(1, 0)),
+                0.2,
+                0.8,
+                false
+        );
+        TrimmedCurve2 outer = new TrimmedCurve2(inner, 0.25, 0.75, false);
+
+        assertEquals(0.35, outer.parameterOnUnderlyingCurve(outer.pointAt(0.0)), 1e-10);
+        assertEquals(0.5, outer.parameterOnUnderlyingCurve(outer.pointAt(0.5)), 1e-10);
+        assertEquals(0.65, outer.parameterOnUnderlyingCurve(outer.pointAt(1.0)), 1e-10);
     }
 }

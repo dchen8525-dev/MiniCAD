@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -174,5 +176,481 @@ class StepMeshExporterTest {
         String obj = StepMeshExporter.exportObj(stepText);
         assertTrue(obj.contains("v "));
         assertTrue(obj.contains("f "));
+    }
+
+    @Test
+    void shouldPreservePlanarHoleInObjExport() {
+        String stepText = """
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(4.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(4.0,4.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,4.0,0.0));
+                #5=CARTESIAN_POINT('H0',(1.0,1.0,0.0));
+                #6=CARTESIAN_POINT('H1',(3.0,1.0,0.0));
+                #7=CARTESIAN_POINT('H2',(3.0,3.0,0.0));
+                #8=CARTESIAN_POINT('H3',(1.0,3.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #24=VERTEX_POINT('V4',#5);
+                #25=VERTEX_POINT('V5',#6);
+                #26=VERTEX_POINT('V6',#7);
+                #27=VERTEX_POINT('V7',#8);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #42=LINE('L5',#5,#31);
+                #43=LINE('L6',#6,#34);
+                #44=LINE('L7',#7,#37);
+                #45=LINE('L8',#8,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #54=EDGE_CURVE('E5',#24,#25,#42,.T.);
+                #55=EDGE_CURVE('E6',#25,#26,#43,.T.);
+                #56=EDGE_CURVE('E7',#26,#27,#44,.T.);
+                #57=EDGE_CURVE('E8',#27,#24,#45,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #64=ORIENTED_EDGE('OE5',$,$,#54,.T.);
+                #65=ORIENTED_EDGE('OE6',$,$,#55,.T.);
+                #66=ORIENTED_EDGE('OE7',$,$,#56,.T.);
+                #67=ORIENTED_EDGE('OE8',$,$,#57,.T.);
+                #70=EDGE_LOOP('OUTER',(#60,#61,#62,#63));
+                #71=EDGE_LOOP('INNER',(#64,#65,#66,#67));
+                #72=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #73=FACE_BOUND('FB',#71,.T.);
+                #80=ADVANCED_FACE('F0',(#72,#73),#13,.T.);
+                #90=OPEN_SHELL('OS',(#80));
+                ENDSEC;
+                END-ISO-10303-21;
+                """;
+
+        String obj = StepMeshExporter.exportObj(stepText);
+
+        assertTrue(obj.contains("f "));
+        assertEquals(12.0, planarAreaFromObj(obj), 1e-6);
+    }
+
+    @Test
+    void shouldTrimCylindricalFaceToFaceBounds() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-band.step")));
+        assertTrue(obj.contains("f "));
+        assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.35);
+    }
+
+    @Test
+    void shouldTrimConicalFaceToFaceBounds() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/conical-band.step")));
+        double expectedSlant = Math.sqrt(2.0 * 2.0 + 0.4 * 0.4);
+        double expectedArea = Math.PI * (2.0 + 2.4) * expectedSlant / 4.0;
+        assertTrue(obj.contains("f "));
+        assertEquals(expectedArea, planarAreaFromObj(obj), 0.45);
+    }
+
+    @Test
+    void shouldTrimToroidalFaceToFaceBounds() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/toroidal-band.step")));
+        double expectedArea = 15.0 * Math.PI * Math.PI / 4.0;
+        assertTrue(obj.contains("f "));
+        assertEquals(expectedArea, planarAreaFromObj(obj), 2.5);
+    }
+
+    @Test
+    void shouldPreserveCylindricalPcurveHoleArea() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-hole-ellipse-pcurve.step")));
+        double expectedArea = (1.0 + Math.PI / 16.0) - (0.4 * 0.3);
+        assertTrue(obj.contains("f "));
+        assertEquals(expectedArea, planarAreaFromObj(obj), 0.1);
+    }
+
+    @Test
+    void shouldPreserveCylindricalTrimmedLoopsWithHoleArea() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-trimmed-loops-with-hole.step")));
+        double outerArea = 0.8 - 0.05 * Math.PI;
+        double innerArea = 0.08 - 0.012 * Math.PI;
+        assertTrue(obj.contains("f "));
+        assertEquals(outerArea - innerArea, planarAreaFromObj(obj), 0.05);
+    }
+
+    @Test
+    void shouldPreserveConicalHoleArea() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/conical-hole.step")));
+        double slantHeight = Math.sqrt(1.0 + 0.5 * 0.5);
+        double outerArea = Math.PI * (1.0 + 1.5) * slantHeight / 2.0;
+        double innerArea = (2.0 - 1.0) * (0.7 - 0.3) * slantHeight;
+        assertTrue(obj.contains("f "));
+        assertEquals(outerArea - innerArea, planarAreaFromObj(obj), 0.35);
+    }
+
+    @Test
+    void shouldExportOffsetCylindricalSurfaceFace() {
+        String obj = StepMeshExporter.exportObj(cylindricalFaceStep(
+                "#14=OFFSET_SURFACE('OFS0',#13,1.0,.F.);",
+                "#14"
+        ));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(3.0 * Math.PI, planarAreaFromObj(obj), 0.35);
+    }
+
+    @Test
+    void shouldExportSurfaceReplicaCylindricalFace() {
+        String obj = StepMeshExporter.exportObj(cylindricalFaceStep(
+                """
+                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
+                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
+                #92=SURFACE_REPLICA('SR0',#13,#91);
+                """,
+                "#92"
+        ));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.35);
+    }
+
+    @Test
+    void shouldTrimSurfaceOfRevolutionFaceToBounds() {
+        String obj = StepMeshExporter.exportObj(surfaceOfRevolutionFaceStep("", "#14"));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.4);
+    }
+
+    @Test
+    void shouldTrimSurfaceOfLinearExtrusionFaceToBounds() {
+        String obj = StepMeshExporter.exportObj(surfaceOfLinearExtrusionFaceStep("", "#14"));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(4.0, planarAreaFromObj(obj), 0.1);
+    }
+
+    @Test
+    void shouldExportSurfaceReplicaRevolutionFace() {
+        String obj = StepMeshExporter.exportObj(surfaceOfRevolutionFaceStep("""
+                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
+                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
+                #92=SURFACE_REPLICA('SR0',#14,#91);
+                """, "#92"));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.4);
+    }
+
+    @Test
+    void shouldExportSurfaceReplicaLinearExtrusionFace() {
+        String obj = StepMeshExporter.exportObj(surfaceOfLinearExtrusionFaceStep("""
+                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
+                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
+                #92=SURFACE_REPLICA('SR0',#14,#91);
+                """, "#92"));
+
+        assertTrue(obj.contains("f "));
+        assertEquals(4.0, planarAreaFromObj(obj), 0.1);
+    }
+
+    @Test
+    void shouldExportSurfaceReplicaLinearExtrusionFaceWithCompositeGeneratrix() {
+        String obj = StepMeshExporter.exportObj("""
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));
+                #4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));
+                #5=CARTESIAN_POINT('P4',(1.0,2.0,0.0));
+                #6=CARTESIAN_POINT('P5',(1.0,2.0,1.0));
+                #10=DIRECTION('DX',(1.0,0.0,0.0));
+                #11=DIRECTION('DY',(0.0,1.0,0.0));
+                #12=DIRECTION('DZ',(0.0,0.0,1.0));
+                #13=VECTOR('VX',#10,1.0);
+                #14=VECTOR('VZ',#12,1.0);
+                #15=VECTOR('VY',#11,2.0);
+                #20=LINE('L0',#1,#13);
+                #21=LINE('L1',#2,#14);
+                #22=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#20);
+                #23=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#21);
+                #24=COMPOSITE_CURVE('GEN',(#22,#23),.F.);
+                #25=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#24,#15);
+                #30=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
+                #31=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#30,1.0,$);
+                #32=SURFACE_REPLICA('SR0',#25,#31);
+                #40=VERTEX_POINT('V0',#1);
+                #41=VERTEX_POINT('V1',#3);
+                #42=VERTEX_POINT('V2',#6);
+                #43=VERTEX_POINT('V3',#4);
+                #44=POLYLINE('PL0',(#1,#2,#3));
+                #45=POLYLINE('PL1',(#4,#5,#6));
+                #46=LINE('SIDE0',#1,#15);
+                #47=LINE('SIDE1',#3,#15);
+                #50=EDGE_CURVE('E0',#40,#41,#44,.T.);
+                #51=EDGE_CURVE('E1',#41,#42,#47,.T.);
+                #52=EDGE_CURVE('E2',#43,#42,#45,.T.);
+                #53=EDGE_CURVE('E3',#40,#43,#46,.T.);
+                #60=ORIENTED_EDGE('OE0',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE1',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE2',$,$,#52,.F.);
+                #63=ORIENTED_EDGE('OE3',$,$,#53,.F.);
+                #70=EDGE_LOOP('L0',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('B0',#70,.T.);
+                #72=ADVANCED_FACE('F0',(#71),#32,.T.);
+                #73=OPEN_SHELL('OS',(#72));
+                ENDSEC;
+                END-ISO-10303-21;
+                """);
+
+        assertTrue(obj.contains("f "));
+        assertEquals(4.0, planarAreaFromObj(obj), 0.15);
+    }
+
+    @Test
+    void shouldExportSurfaceReplicaRevolutionFaceWithCompositeGeneratrix() {
+        String obj = StepMeshExporter.exportObj("""
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('P0',(2.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(2.0,0.0,1.0));
+                #3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));
+                #4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));
+                #5=CARTESIAN_POINT('P4',(0.0,2.0,1.0));
+                #6=CARTESIAN_POINT('P5',(0.0,1.0,1.0));
+                #10=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
+                #66=CARTESIAN_POINT('O1',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=DIRECTION('DY',(0.0,1.0,0.0));
+                #13=DIRECTION('DZ',(0.0,0.0,1.0));
+                #14=VECTOR('VZ',#13,1.0);
+                #15=DIRECTION('DNX',(-1.0,0.0,0.0));
+                #16=VECTOR('VNX',#15,1.0);
+                #17=LINE('L0',#1,#14);
+                #18=LINE('L1',#2,#16);
+                #19=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#17);
+                #20=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#18);
+                #21=COMPOSITE_CURVE('GEN',(#19,#20),.F.);
+                #22=AXIS1_PLACEMENT('AX0',#10,#13);
+                #23=SURFACE_OF_REVOLUTION('SOR0',#21,#22);
+                #24=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
+                #25=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#24,1.0,$);
+                #26=SURFACE_REPLICA('SR0',#23,#25);
+                #30=VERTEX_POINT('V0',#1);
+                #31=VERTEX_POINT('V1',#3);
+                #32=VERTEX_POINT('V2',#6);
+                #33=VERTEX_POINT('V3',#4);
+                #34=POLYLINE('PL0',(#1,#2,#3));
+                #35=POLYLINE('PL1',(#4,#5,#6));
+                #36=AXIS2_PLACEMENT_3D('AX1',#10,#13,#11);
+                #37=AXIS2_PLACEMENT_3D('AX2',#66,#13,#11);
+                #38=CIRCLE('C0',#36,2.0);
+                #39=CIRCLE('C1',#37,1.0);
+                #40=EDGE_CURVE('E0',#30,#33,#38,.T.);
+                #41=EDGE_CURVE('E1',#33,#32,#35,.T.);
+                #42=EDGE_CURVE('E2',#31,#32,#39,.T.);
+                #43=EDGE_CURVE('E3',#30,#31,#34,.T.);
+                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
+                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
+                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
+                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
+                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
+                #61=FACE_OUTER_BOUND('B0',#60,.T.);
+                #62=ADVANCED_FACE('F0',(#61),#26,.T.);
+                #63=OPEN_SHELL('OS',(#62));
+                ENDSEC;
+                END-ISO-10303-21;
+                """);
+
+        assertTrue(obj.contains("f "));
+        assertEquals(7.0 * Math.PI / 4.0, planarAreaFromObj(obj), 0.35);
+    }
+
+    private static String cylindricalFaceStep(String surfaceDeclarations, String faceGeometryRef) {
+        return """
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));
+                #4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));
+                #5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));
+                #6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);
+                #13=CYLINDRICAL_SURFACE('CY0',#12,2.0);
+                %s
+                #15=CIRCLE('C0',#12,2.0);
+                #16=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);
+                #17=CIRCLE('C1',#16,2.0);
+                #20=VERTEX_POINT('V0',#2);
+                #21=VERTEX_POINT('V1',#3);
+                #22=VERTEX_POINT('V2',#6);
+                #23=VERTEX_POINT('V3',#5);
+                #30=VECTOR('VZ0',#10,2.0);
+                #31=LINE('L0',#3,#30);
+                #32=LINE('L1',#2,#30);
+                #40=EDGE_CURVE('E0',#20,#21,#15,.T.);
+                #41=EDGE_CURVE('E1',#21,#22,#31,.T.);
+                #42=EDGE_CURVE('E2',#23,#22,#17,.T.);
+                #43=EDGE_CURVE('E3',#20,#23,#32,.T.);
+                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
+                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
+                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
+                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
+                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
+                #61=FACE_OUTER_BOUND('B0',#60,.T.);
+                #70=ADVANCED_FACE('F0',(#61),%s,.T.);
+                #80=OPEN_SHELL('OS',(#70));
+                ENDSEC;
+                END-ISO-10303-21;
+                """.formatted(surfaceDeclarations, faceGeometryRef);
+    }
+
+    private static String surfaceOfRevolutionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
+        return """
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));
+                #4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));
+                #5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));
+                #6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS1_PLACEMENT('AX1',#1,#10);
+                #13=LINE('GEN',#2,#30);
+                #14=SURFACE_OF_REVOLUTION('SOR0',#13,#12);
+                %s
+                #20=VERTEX_POINT('V0',#2);
+                #21=VERTEX_POINT('V1',#3);
+                #22=VERTEX_POINT('V2',#6);
+                #23=VERTEX_POINT('V3',#5);
+                #30=VECTOR('VZ0',#10,2.0);
+                #31=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);
+                #32=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);
+                #33=CIRCLE('C0',#31,2.0);
+                #34=CIRCLE('C1',#32,2.0);
+                #35=LINE('L0',#3,#30);
+                #36=LINE('L1',#2,#30);
+                #40=EDGE_CURVE('E0',#20,#21,#33,.T.);
+                #41=EDGE_CURVE('E1',#21,#22,#35,.T.);
+                #42=EDGE_CURVE('E2',#23,#22,#34,.T.);
+                #43=EDGE_CURVE('E3',#20,#23,#36,.T.);
+                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
+                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
+                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
+                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
+                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
+                #61=FACE_OUTER_BOUND('B0',#60,.T.);
+                #70=ADVANCED_FACE('F0',(#61),%s,.T.);
+                #80=OPEN_SHELL('OS',(#70));
+                ENDSEC;
+                END-ISO-10303-21;
+                """.formatted(surfaceDeclarations, faceGeometryRef);
+    }
+
+    private static String surfaceOfLinearExtrusionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
+        return """
+                ISO-10303-21;
+                HEADER;
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(2.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(2.0,0.0,2.0));
+                #4=CARTESIAN_POINT('P3',(0.0,0.0,2.0));
+                #10=DIRECTION('DX',(1.0,0.0,0.0));
+                #11=DIRECTION('DZ',(0.0,0.0,1.0));
+                #12=VECTOR('VX',#10,2.0);
+                #13=LINE('GEN',#1,#12);
+                #14=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#13,#25);
+                %s
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #24=LINE('L0',#1,#12);
+                #25=VECTOR('VZ',#11,2.0);
+                #26=LINE('L1',#2,#25);
+                #27=LINE('L2',#4,#12);
+                #28=LINE('L3',#1,#25);
+                #30=EDGE_CURVE('E0',#20,#21,#24,.T.);
+                #31=EDGE_CURVE('E1',#21,#22,#26,.T.);
+                #32=EDGE_CURVE('E2',#23,#22,#27,.T.);
+                #33=EDGE_CURVE('E3',#20,#23,#28,.T.);
+                #40=ORIENTED_EDGE('OE0',$,$,#30,.T.);
+                #41=ORIENTED_EDGE('OE1',$,$,#31,.T.);
+                #42=ORIENTED_EDGE('OE2',$,$,#32,.F.);
+                #43=ORIENTED_EDGE('OE3',$,$,#33,.F.);
+                #50=EDGE_LOOP('L0',(#40,#41,#42,#43));
+                #51=FACE_OUTER_BOUND('B0',#50,.T.);
+                #60=ADVANCED_FACE('F0',(#51),%s,.T.);
+                #70=OPEN_SHELL('OS',(#60));
+                ENDSEC;
+                END-ISO-10303-21;
+                """.formatted(surfaceDeclarations, faceGeometryRef);
+    }
+
+    private static double planarAreaFromObj(String obj) {
+        List<double[]> vertices = new ArrayList<>();
+        double area = 0.0;
+        for (String line : obj.lines().toList()) {
+            if (line.startsWith("v ")) {
+                String[] parts = line.trim().split("\\s+");
+                vertices.add(new double[]{
+                        Double.parseDouble(parts[1]),
+                        Double.parseDouble(parts[2]),
+                        Double.parseDouble(parts[3])
+                });
+            } else if (line.startsWith("f ")) {
+                String[] parts = line.trim().split("\\s+");
+                int a = Integer.parseInt(parts[1].split("/")[0]) - 1;
+                int b = Integer.parseInt(parts[2].split("/")[0]) - 1;
+                int c = Integer.parseInt(parts[3].split("/")[0]) - 1;
+                area += triangleArea(vertices.get(a), vertices.get(b), vertices.get(c));
+            }
+        }
+        return area;
+    }
+
+    private static double triangleArea(double[] a, double[] b, double[] c) {
+        double abx = b[0] - a[0];
+        double aby = b[1] - a[1];
+        double abz = b[2] - a[2];
+        double acx = c[0] - a[0];
+        double acy = c[1] - a[1];
+        double acz = c[2] - a[2];
+        double cx = aby * acz - abz * acy;
+        double cy = abz * acx - abx * acz;
+        double cz = abx * acy - aby * acx;
+        return 0.5 * Math.sqrt(cx * cx + cy * cy + cz * cz);
     }
 }

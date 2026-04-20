@@ -82,6 +82,15 @@ class Line2Test {
     }
 
     @Test
+    void lineRespectsParameterScale() {
+        Line2 line = new Line2(new Point2(0, 0), new Direction2(1, 0), Math.PI);
+
+        assertEquals(Math.PI, line.pointAt(1.0).x(), 1e-10);
+        assertEquals(1.0, line.parameterOf(new Point2(Math.PI, 0)), 1e-10);
+        assertEquals(Math.PI, line.length(), 1e-10);
+    }
+
+    @Test
     void lineTangentAt() {
         Point2 origin = new Point2(0, 0);
         Direction2 direction = new Direction2(1, 0);

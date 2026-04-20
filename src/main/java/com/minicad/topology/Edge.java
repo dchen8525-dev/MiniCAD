@@ -228,7 +228,60 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
      * @return list of sampled points along the curve
      */
     public List<CartesianPoint> sample(int segments) {
-        return sampleCurveWithSegments(curve, segments);
+        int safeSegments = Math.max(1, segments);
+        if (curve instanceof Line3) {
+            List<CartesianPoint> samples = new ArrayList<>(safeSegments + 1);
+            for (int i = 0; i <= safeSegments; i++) {
+                double t = (double) i / safeSegments;
+                samples.add(start.point().interpolate(end.point(), t));
+            }
+            return List.copyOf(samples);
+        }
+        if (curve instanceof Circle circle) {
+            double startAngle = circle.parameterAt(start.point());
+            double endAngle = circle.parameterAt(end.point());
+            double delta = sameSense ? endAngle - startAngle : startAngle - endAngle;
+            if (sameSense && delta < 0.0) {
+                delta += Math.PI * 2.0;
+            } else if (!sameSense && delta < 0.0) {
+                delta += Math.PI * 2.0;
+            }
+            if (start.point().distanceTo(end.point()) <= Epsilon.EPS) {
+                delta = Math.PI * 2.0;
+            }
+            List<CartesianPoint> samples = new ArrayList<>(safeSegments + 1);
+            for (int i = 0; i <= safeSegments; i++) {
+                double fraction = (double) i / safeSegments;
+                double angle = sameSense
+                        ? startAngle + delta * fraction
+                        : startAngle - delta * fraction;
+                samples.add(circle.pointAt(angle));
+            }
+            return List.copyOf(samples);
+        }
+        if (curve instanceof Ellipse3 ellipse) {
+            double startAngle = ellipse.parameterAt(start.point());
+            double endAngle = ellipse.parameterAt(end.point());
+            double delta = sameSense ? endAngle - startAngle : startAngle - endAngle;
+            if (sameSense && delta < 0.0) {
+                delta += Math.PI * 2.0;
+            } else if (!sameSense && delta < 0.0) {
+                delta += Math.PI * 2.0;
+            }
+            if (start.point().distanceTo(end.point()) <= Epsilon.EPS) {
+                delta = Math.PI * 2.0;
+            }
+            List<CartesianPoint> samples = new ArrayList<>(safeSegments + 1);
+            for (int i = 0; i <= safeSegments; i++) {
+                double fraction = (double) i / safeSegments;
+                double angle = sameSense
+                        ? startAngle + delta * fraction
+                        : startAngle - delta * fraction;
+                samples.add(ellipse.pointAt(angle));
+            }
+            return List.copyOf(samples);
+        }
+        return sampleCurveWithSegments(curve, safeSegments);
     }
 
     /**

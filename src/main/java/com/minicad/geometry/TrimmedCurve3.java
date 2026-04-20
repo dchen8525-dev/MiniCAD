@@ -301,6 +301,8 @@ public record TrimmedCurve3(
         if (Math.abs(range) <= Epsilon.EPS) {
             return 0.0;
         }
-        return (basisParam - minP) / range;
+        double normalized = (basisParam - minP) / range;
+        normalized = Math.max(0.0, Math.min(1.0, normalized));
+        return senseAgreement ? normalized : 1.0 - normalized;
     }
 }

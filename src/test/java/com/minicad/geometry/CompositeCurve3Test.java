@@ -199,4 +199,37 @@ class CompositeCurve3Test {
         assertNotNull(composite.pointAt(0));
         assertTrue(composite.length() > 0);
     }
+
+    @Test
+    void compositeCurveMapsNormalizedParameterIntoBsplineDomain() {
+        BSplineCurve3 bspline = new BSplineCurve3(
+            1,
+            List.of(
+                new CartesianPoint(0, 0, 0),
+                new CartesianPoint(1, 0, 0),
+                new CartesianPoint(2, 0, 0)
+            ),
+            List.of(2, 1, 2),
+            List.of(0.0, 1.0, 2.0)
+        );
+
+        CompositeCurve3 composite = new CompositeCurve3(List.of(bspline));
+
+        CartesianPoint midpoint = composite.pointAt(0.5);
+        assertEquals(1.0, midpoint.x(), 1e-10);
+        assertEquals(0.5, composite.parameterAt(new CartesianPoint(1.0, 0.0, 0.0)), 1e-10);
+    }
+
+    @Test
+    void compositeCurveLengthRespectsLineScale() {
+        Line3 scaledLine = new Line3(
+            new CartesianPoint(0, 0, 0),
+            new Direction3(1, 0, 0),
+            2.0
+        );
+
+        CompositeCurve3 composite = new CompositeCurve3(List.of(scaledLine));
+
+        assertEquals(2.0, composite.length(), 1e-10);
+    }
 }

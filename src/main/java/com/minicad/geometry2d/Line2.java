@@ -8,22 +8,31 @@ import com.minicad.common.Preconditions;
  *
  * @param origin line origin
  * @param direction line direction
+ * @param parameterScale world-space distance covered by one unit of line parameter
  */
-public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
+public record Line2(Point2 origin, Direction2 direction, double parameterScale) implements Curve2 {
 
     public Line2 {
         Preconditions.requireNonNull(origin, "origin");
         Preconditions.requireNonNull(direction, "direction");
+        Preconditions.requireFinite(parameterScale, "parameterScale");
+        if (parameterScale <= Epsilon.EPS) {
+            throw new IllegalArgumentException("parameterScale must be greater than epsilon");
+        }
+    }
+
+    public Line2(Point2 origin, Direction2 direction) {
+        this(origin, direction, 1.0);
     }
 
     public Point2 pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        return origin.add(direction.asVector().scale(parameter));
+        return origin.add(direction.asVector().scale(parameter * parameterScale));
     }
 
     public double parameterOf(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        return point.subtract(origin).dot(direction.asVector());
+        return point.subtract(origin).dot(direction.asVector()) / parameterScale;
     }
 
     public Point2 closestPoint(Point2 point) {
@@ -86,7 +95,7 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
      */
     @Override
     public BoundingBox2 boundingBox() {
-        Vector2 dir = direction.asVector();
+        Vector2 dir = direction.asVector().scale(parameterScale);
         Point2 pNeg = origin.subtract(dir);
         Point2 pPos = origin.add(dir);
         return BoundingBox2.of(pNeg, pPos);
@@ -100,7 +109,7 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
      */
     @Override
     public double length() {
-        return 1.0;
+        return parameterScale;
     }
 
     /**
@@ -190,7 +199,7 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
      */
     public Line2 parallelThrough(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        return new Line2(point, direction);
+        return new Line2(point, direction, parameterScale);
     }
 
     /**
@@ -202,7 +211,7 @@ public record Line2(Point2 origin, Direction2 direction) implements Curve2 {
     public Line2 perpendicularThrough(Point2 point) {
         Preconditions.requireNonNull(point, "point");
         Direction2 perpDir = new Direction2(-direction.y(), direction.x());
-        return new Line2(point, perpDir);
+        return new Line2(point, perpDir, parameterScale);
     }
 
     /**

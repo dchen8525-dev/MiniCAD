@@ -159,4 +159,31 @@ class CompositeCurve2Test {
         assertNotNull(composite.pointAt(0));
         assertTrue(composite.length() > 0);
     }
+
+    @Test
+    void compositeCurveLengthRespectsLineScale() {
+        CompositeCurve2 composite = new CompositeCurve2(List.of(
+                new Line2(new Point2(0, 0), new Direction2(1, 0), 2.5)
+        ));
+
+        assertEquals(2.5, composite.length(), 1e-10);
+    }
+
+    @Test
+    void compositeCurveMapsNormalizedParameterIntoTrimmedCurve() {
+        TrimmedCurve2 trimmed = new TrimmedCurve2(
+                new Line2(new Point2(0, 0), new Direction2(1, 0)),
+                2.0,
+                6.0,
+                false
+        );
+        CompositeCurve2 composite = new CompositeCurve2(List.of(trimmed));
+
+        assertEquals(6.0, composite.pointAt(0.0).x(), 1e-10);
+        assertEquals(4.0, composite.pointAt(0.5).x(), 1e-10);
+        assertEquals(2.0, composite.pointAt(1.0).x(), 1e-10);
+        assertEquals(0.0, composite.parameterOf(new Point2(6.0, 0.0)), 1e-10);
+        assertEquals(0.5, composite.parameterOf(new Point2(4.0, 0.0)), 1e-10);
+        assertEquals(1.0, composite.parameterOf(new Point2(2.0, 0.0)), 1e-10);
+    }
 }

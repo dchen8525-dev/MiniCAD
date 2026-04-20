@@ -8,8 +8,9 @@ import com.minicad.common.Preconditions;
  *
  * @param origin point on the line
  * @param direction unit direction of the line
+ * @param parameterScale world-space distance covered by one unit of line parameter
  */
-public record Line3(CartesianPoint origin, Direction3 direction) implements Curve3 {
+public record Line3(CartesianPoint origin, Direction3 direction, double parameterScale) implements Curve3 {
 
     /**
      * Creates a line and validates its fields.
@@ -18,6 +19,14 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
     public Line3 {
         Preconditions.requireNonNull(origin, "origin");
         Preconditions.requireNonNull(direction, "direction");
+        Preconditions.requireFinite(parameterScale, "parameterScale");
+        if (parameterScale <= com.minicad.common.Epsilon.EPS) {
+            throw new GeometryException("parameterScale must be greater than epsilon");
+        }
+    }
+
+    public Line3(CartesianPoint origin, Direction3 direction) {
+        this(origin, direction, 1.0);
     }
 
     /**
@@ -29,7 +38,7 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        return origin.add(direction.asVector().scale(parameter));
+        return origin.add(direction.asVector().scale(parameter * parameterScale));
     }
 
     /**
@@ -124,14 +133,14 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
     public double length(double start, double end) {
         Preconditions.requireFinite(start, "start");
         Preconditions.requireFinite(end, "end");
-        return Math.abs(end - start);
+        return Math.abs(end - start) * parameterScale;
     }
 
     @Override
     public double length() {
-        // Line3 is infinite; default samples [0,1] which gives unit length.
+        // Line3 is infinite; default samples [0,1] which gives parameterScale length.
         // Prefer length(start, end) for finite segments.
-        return 1.0;
+        return parameterScale;
     }
 
     /**
@@ -169,7 +178,7 @@ public record Line3(CartesianPoint origin, Direction3 direction) implements Curv
     public double parameterOfClosestPoint(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         Vector3 offset = point.subtract(origin);
-        return offset.dot(direction.asVector());
+        return offset.dot(direction.asVector()) / parameterScale;
     }
 
     /**

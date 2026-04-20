@@ -129,6 +129,8 @@ public record TrimmedCurve2(
             return parabola.pointAt(parameter);
         } else if (basisCurve instanceof CompositeCurve2 composite) {
             return composite.pointAt(parameter);
+        } else if (basisCurve instanceof TrimmedCurve2 trimmed) {
+            return trimmed.pointAt(parameter);
         }
         // Fallback: linear interpolation between trim points
         return interpolatePoint(trimStart(), trimEnd(), parameter);
@@ -182,12 +184,7 @@ public record TrimmedCurve2(
         } else if (basisCurve instanceof DegenerateCurve2) {
             return 0.0;
         } else if (basisCurve instanceof TrimmedCurve2 trimmed) {
-            // Recursively resolve through nested trim
-            double innerParam = trimmed.parameterOnBasisCurve(point);
-            double tMin = Math.min(trimmed.trimParamStart, trimmed.trimParamEnd);
-            double tMax = Math.max(trimmed.trimParamStart, trimmed.trimParamEnd);
-            double range = tMax - tMin;
-            return range > Epsilon.EPS ? tMin + range * Math.max(0.0, Math.min(1.0, innerParam)) : tMin;
+            return trimmed.parameterOnTrimmedCurve(point);
         }
         // Fallback: sampling-based
         double bestT = 0.0;
@@ -201,6 +198,24 @@ public record TrimmedCurve2(
             }
         }
         return bestT;
+    }
+
+    double parameterOnTrimmedCurve(Point2 point) {
+        double basisParam = parameterOnBasisCurve(point);
+        double minP = Math.min(trimParamStart, trimParamEnd);
+        double maxP = Math.max(trimParamStart, trimParamEnd);
+        double range = maxP - minP;
+        if (range <= Epsilon.EPS) {
+            return 0.0;
+        }
+        double normalized = Math.max(0.0, Math.min(1.0, (basisParam - minP) / range));
+        return senseAgreement ? normalized : 1.0 - normalized;
+    }
+
+    double parameterOnUnderlyingCurve(Point2 point) {
+        return basisCurve instanceof TrimmedCurve2 trimmed
+                ? trimmed.parameterOnUnderlyingCurve(point)
+                : parameterOnBasisCurve(point);
     }
 
     private static Point2 interpolatePoint(Point2 start, Point2 end, double t) {
@@ -336,6 +351,8 @@ public record TrimmedCurve2(
             return parabola.tangentAt(parameter);
         } else if (basisCurve instanceof CompositeCurve2 composite) {
             return composite.tangentAt(parameter);
+        } else if (basisCurve instanceof TrimmedCurve2 trimmed) {
+            return trimmed.tangentAt(parameter);
         }
         // Fallback: numerical differentiation using the given parameter
         double eps = 1e-6;

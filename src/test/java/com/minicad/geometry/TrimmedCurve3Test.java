@@ -39,6 +39,16 @@ class TrimmedCurve3Test {
     }
 
     @Test
+    void trimmedCurveParameterAtReversed() {
+        Line3 line = new Line3(new CartesianPoint(0, 0, 0), new Direction3(1, 0, 0));
+        TrimmedCurve3 trimmed = new TrimmedCurve3(line, 0.0, 10.0, false);
+
+        assertEquals(0.0, trimmed.parameterAt(new CartesianPoint(10, 0, 0)), 1e-10);
+        assertEquals(0.5, trimmed.parameterAt(new CartesianPoint(5, 0, 0)), 1e-10);
+        assertEquals(1.0, trimmed.parameterAt(new CartesianPoint(0, 0, 0)), 1e-10);
+    }
+
+    @Test
     void trimmedCurveContains() {
         Line3 line = new Line3(new CartesianPoint(0, 0, 0), new Direction3(1, 0, 0));
         TrimmedCurve3 trimmed = new TrimmedCurve3(line, 0.0, 10.0, true);
@@ -184,5 +194,24 @@ class TrimmedCurve3Test {
         BoundingBox3 box = trimmed.boundingBox();
         assertTrue(box.contains(new CartesianPoint(5, 0, 0)));
         assertTrue(box.contains(new CartesianPoint(0, 5, 0)));
+    }
+
+    @Test
+    void trimmedSurfaceCompositeParameterAtRespectsSense() {
+        SurfaceCurve3 surfaceCurve = new SurfaceCurve3(new CompositeCurve3(java.util.List.of(
+                new Line3(
+                        new CartesianPoint(0, 0, 0),
+                        new Direction3(1, 0, 0)
+                ),
+                new Line3(
+                        new CartesianPoint(1, 0, 0),
+                        new Direction3(0, 0, 1)
+                )
+        )));
+        TrimmedCurve3 trimmed = new TrimmedCurve3(surfaceCurve, 0.25, 0.75, false);
+
+        assertEquals(0.0, trimmed.parameterAt(trimmed.pointAt(0.0)), 1e-10);
+        assertEquals(0.5, trimmed.parameterAt(trimmed.pointAt(0.5)), 1e-10);
+        assertEquals(1.0, trimmed.parameterAt(trimmed.pointAt(1.0)), 1e-10);
     }
 }
