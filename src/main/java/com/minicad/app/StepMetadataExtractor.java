@@ -2,6 +2,7 @@ package com.minicad.app;
 
 import com.minicad.step.model.annotation.StepColourRgb;
 import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.annotation.StepCurveStyle;
 import com.minicad.step.model.annotation.StepFillAreaStyle;
 import com.minicad.step.model.annotation.StepFillAreaStyleColour;
 import com.minicad.step.model.annotation.StepDraughtingPreDefinedColour;
@@ -77,6 +78,12 @@ public final class StepMetadataExtractor {
     private static void extractStyle(List<StepPresentationStyleAssignment> assignments, MutableMetadata metadata) {
         for (StepPresentationStyleAssignment assignment : assignments) {
             for (StepEntity style : assignment.styles()) {
+                if (style instanceof StepCurveStyle curveStyle) {
+                    int[] rgb = colourToRgb(curveStyle.colour());
+                    if (rgb != null) {
+                        metadata.rgb = rgb;
+                    }
+                }
                 if (!(style instanceof StepSurfaceStyleUsage usage)) {
                     continue;
                 }

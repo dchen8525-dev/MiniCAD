@@ -112,6 +112,7 @@ import com.minicad.step.model.geometry.StepCurveBoundedSurface;
 import com.minicad.step.model.geometry.StepCartesianTransformationOperator;
 import com.minicad.step.model.product.StepItemDefinedTransformation;
 import com.minicad.step.model.product.StepCsgPrimitive;
+import com.minicad.step.model.product.StepCsgPrimitive3D;
 import com.minicad.step.model.topology.StepConnectedFaceSubSet;
 import com.minicad.step.model.topology.StepConnectedFaceSet;
 import com.minicad.step.model.topology.StepConnectedEdgeSet;
@@ -130,14 +131,19 @@ import com.minicad.step.model.geometry.StepOffsetCurve3D;
 import com.minicad.step.model.geometry.StepOffsetSurface;
 import com.minicad.step.model.topology.StepOpenShell;
 import com.minicad.step.model.product.StepTessellatedFace;
-import com.minicad.step.model.product.StepTessellatedFace;
 import com.minicad.step.model.product.StepTessellatedFaceSet;
 import com.minicad.step.model.product.StepTessellatedTriangle;
 import com.minicad.step.model.geometry.StepSeamEdge;
+import com.minicad.step.model.profile.StepAreaProfile;
 import com.minicad.step.model.profile.StepCenteredCircleProfileDef;
 import com.minicad.step.model.profile.StepCentreLineArcProfileDef;
+import com.minicad.step.model.profile.StepGeneralizedAreaProfile;
 import com.minicad.step.model.profile.StepRectangleHollowProfileDef;
+import com.minicad.step.model.profile.StepSweptProfileAreaOutline;
 import com.minicad.step.model.topology.StepWireShell;
+import com.minicad.step.model.topology.StepTriangulatedFace;
+import com.minicad.step.model.topology.StepComplexTriangulatedFace;
+import com.minicad.step.model.topology.StepCubicBezierTriangulatedFace;
 import com.minicad.step.model.topology.StepOrientedClosedShell;
 import com.minicad.step.model.topology.StepOrientedOpenShell;
 import com.minicad.step.model.topology.StepOrientedEdge;
@@ -184,6 +190,8 @@ import com.minicad.step.model.geometry.StepSurfacePatch;
 import com.minicad.step.model.geometry.StepRectangularCompositeSurface;
 import com.minicad.step.model.geometry.StepClothoid;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve;
+import com.minicad.step.model.geometry.StepIndexedPolycurve;
+import com.minicad.step.model.geometry.StepPolyline3D;
 import com.minicad.step.model.geometry.StepDegenerateCurve;
 import com.minicad.step.model.product.StepNonManifoldSolidBrep;
 import com.minicad.step.model.geometry.StepSurfaceOfLinearExtrusion;
@@ -200,6 +208,7 @@ import com.minicad.step.model.geometry.StepSphericalSurface;
 import com.minicad.step.model.annotation.StepTerminatorSymbol;
 import com.minicad.step.model.geometry.StepTrimmedCurve;
 import com.minicad.step.model.geometry.StepToroidalSurface;
+import com.minicad.step.model.geometry.StepToroidalSurfaceWithSpecifiedBends;
 import com.minicad.step.model.topology.StepSubedge;
 import com.minicad.step.model.topology.StepSubface;
 import com.minicad.step.model.geometry.StepUniformCurve;
@@ -273,6 +282,8 @@ public final class StepCadBuilder {
 
     private final Map<Integer, StepEntity> entitiesById;
     private final StepCadGeometryOps geometryOps;
+    private final StepTrimResolver trimResolver;
+    private final StepProfileBuilder profileBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
@@ -331,6 +342,8 @@ public final class StepCadBuilder {
     private StepCadBuilder(Map<Integer, StepEntity> entitiesById) {
         this.entitiesById = Map.copyOf(entitiesById);
         this.geometryOps = new StepCadGeometryOps(this);
+        this.trimResolver = new StepTrimResolver(entitiesById, this::buildPoint, this::buildPoint2);
+        this.profileBuilder = new StepProfileBuilder(geometryOps, e -> (Curve2) buildCurve2(e));
     }
 
     /**
@@ -1265,8 +1278,8 @@ public final class StepCadBuilder {
         if (!(basis instanceof Curve2 basisCurve)) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
         }
-        double trimParamStart = resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
-        double trimParamEnd = resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
+        double trimParamStart = trimResolver.resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
+        double trimParamEnd = trimResolver.resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
         TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimParamStart, trimParamEnd, trimmedCurve.senseAgreement());
         trimmedCurves2d.put(id, built);
         return built;
@@ -1436,6 +1449,21 @@ public final class StepCadBuilder {
         StepDegenerateToroidalSurface surface = requireEntity(id, StepDegenerateToroidalSurface.class, "DEGENERATE_TOROIDAL_SURFACE");
         ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.position().id()), surface.majorRadius(), surface.minorRadius());
         toroidalSurfaces.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a toroidal surface from TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS.
+     * Uses the position, major radius, and minor radius parameters; the optional
+     * axis curves are ignored for B-Rep generation.
+     */
+    private ToroidalSurface buildToroidalSurfaceFromSpecifiedBends(StepToroidalSurfaceWithSpecifiedBends surface) {
+        ToroidalSurface existing = toroidalSurfaces.get(surface.id());
+        if (existing != null) {
+            return existing;
+        }
+        ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.position().id()), surface.majorRadius(), surface.minorRadius());
+        toroidalSurfaces.put(surface.id(), built);
         return built;
     }
 
@@ -1818,13 +1846,13 @@ public final class StepCadBuilder {
         StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
         Curve3 basis = buildCurve3(trimmedCurve.basisCurve());
         for (StepValue trim : trimmedCurve.trim1()) {
-            validateTrimValue(trim, basis, "trim_1");
+            trimResolver.validateTrimValue(trim, basis, "trim_1");
         }
         for (StepValue trim : trimmedCurve.trim2()) {
-            validateTrimValue(trim, basis, "trim_2");
+            trimResolver.validateTrimValue(trim, basis, "trim_2");
         }
-        double trimParamStart = resolveTrimParameter(trimmedCurve.trim1(), basis, "trim_1");
-        double trimParamEnd = resolveTrimParameter(trimmedCurve.trim2(), basis, "trim_2");
+        double trimParamStart = trimResolver.resolveTrimParameter(trimmedCurve.trim1(), basis, "trim_1");
+        double trimParamEnd = trimResolver.resolveTrimParameter(trimmedCurve.trim2(), basis, "trim_2");
         TrimmedCurve3 built = new TrimmedCurve3(basis, trimParamStart, trimParamEnd, trimmedCurve.senseAgreement());
         trimmedCurves.put(id, built);
         return built;
@@ -2134,10 +2162,10 @@ public final class StepCadBuilder {
             return rational.closestPointTo(point);
         }
         if (curve instanceof com.minicad.geometry.Line3 line) {
-            // Project onto infinite line, then clamp to segment between start/end samples
+            // Project onto infinite line: t is signed distance along direction
             Vector3 offset = point.subtract(line.origin());
             double t = offset.dot(line.direction().asVector());
-            return line.pointAt(t);
+            return line.origin().add(line.direction().asVector().scale(t));
         }
         if (curve instanceof com.minicad.geometry.Circle circle) {
             // Project onto circle: normalize vector from center, scale by radius
@@ -2482,6 +2510,15 @@ public final class StepCadBuilder {
         } else if (entity instanceof StepTessellatedFaceSet tessellated) {
             // Convert tessated mesh (coordinates + face index triplets) to Shell of triangular faces
             built = buildTessellatedShell(tessellated);
+        } else if (entity instanceof StepTriangulatedFace triangulated) {
+            // Triangulated face: vertex list + index triplets
+            built = buildTriangulatedFaceShell(triangulated);
+        } else if (entity instanceof StepComplexTriangulatedFace complex) {
+            // Complex triangulated face: boundaries + vertices
+            built = buildComplexTriangulatedFaceShell(complex);
+        } else if (entity instanceof StepCubicBezierTriangulatedFace bezier) {
+            // Cubic Bezier triangulated face: control points + index triplets
+            built = buildCubicBezierTriangulatedFaceShell(bezier);
         } else if (entity instanceof StepVertexShell vertexShell) {
             // Vertex shell: a shell containing only a single vertex loop (degenerate wireframe)
             built = buildVertexShell(vertexShell);
@@ -2657,6 +2694,127 @@ public final class StepCadBuilder {
         }
         if (faces.isEmpty()) {
             throw new UnsupportedGeometryException("TESSELLATED_FACE #" + tessellated.id() + " has no valid triangular faces");
+        }
+        return new Shell(faces, true);
+    }
+
+    /**
+     * Builds a shell from a TRIANGULATED_FACE.
+     * A triangulated face with vertex list and index triplets.
+     */
+    private Shell buildTriangulatedFaceShell(StepTriangulatedFace triangulated) {
+        List<CartesianPoint> points = new ArrayList<>(triangulated.vertices().size());
+        for (StepEntity v : triangulated.vertices()) {
+            if (v instanceof StepCartesianPoint cp) {
+                points.add(buildPoint(cp.id()));
+            } else if (v instanceof StepVertexPoint vp) {
+                points.add(buildPoint(vp.point().id()));
+            }
+        }
+        List<Integer> indices = triangulated.indices();
+        List<Face> faces = new ArrayList<>(indices.size() / 3);
+        for (int i = 0; i + 2 < indices.size(); i += 3) {
+            int a = indices.get(i), b = indices.get(i + 1), c = indices.get(i + 2);
+            if (a < 0 || a >= points.size() || b < 0 || b >= points.size() || c < 0 || c >= points.size()) {
+                continue; // invalid index
+            }
+            CartesianPoint p1 = points.get(a), p2 = points.get(b), p3 = points.get(c);
+            Vector3 v1 = p2.subtract(p1);
+            Vector3 v2 = p3.subtract(p1);
+            Vector3 normal = v1.cross(v2);
+            if (normal.norm() < Epsilon.EPS) {
+                continue; // degenerate triangle
+            }
+            Plane plane = new Plane(p1, Direction3.from(normal));
+            PolyLoop polyLoop = new PolyLoop(List.of(p1, p2, p3));
+            faces.add(new Face(plane, List.of(FaceBound.outer(polyLoop, true)), true));
+        }
+        if (faces.isEmpty()) {
+            throw new UnsupportedGeometryException("TRIANGULATED_FACE #" + triangulated.id() + " has no valid triangular faces");
+        }
+        return new Shell(faces, true);
+    }
+
+    /**
+     * Builds a shell from a COMPLEX_TRIANGULATED_FACE.
+     * A triangulated face with boundaries and vertices.
+     */
+    private Shell buildComplexTriangulatedFaceShell(StepComplexTriangulatedFace complex) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (StepEntity v : complex.vertices()) {
+            if (v instanceof StepCartesianPoint cp) {
+                points.add(buildPoint(cp.id()));
+            } else if (v instanceof StepVertexPoint vp) {
+                points.add(buildPoint(vp.point().id()));
+            }
+        }
+        List<Face> faces = new ArrayList<>();
+        for (StepEntity boundary : complex.boundaries()) {
+            if (boundary instanceof StepEdgeLoop loop) {
+                List<CartesianPoint> loopPoints = buildLoopPoints(loop);
+                if (loopPoints.size() >= 3) {
+                    CartesianPoint first = loopPoints.get(0);
+                    CartesianPoint second = loopPoints.get(1);
+                    CartesianPoint third = loopPoints.get(2);
+                    Vector3 normal = second.subtract(first).cross(third.subtract(first));
+                    if (normal.norm() > Epsilon.EPS) {
+                        Plane plane = new Plane(first, Direction3.from(normal));
+                        PolyLoop polyLoop = new PolyLoop(loopPoints);
+                        faces.add(new Face(plane, List.of(FaceBound.outer(polyLoop, true)), true));
+                    }
+                }
+            }
+        }
+        if (faces.isEmpty()) {
+            throw new UnsupportedGeometryException("COMPLEX_TRIANGULATED_FACE #" + complex.id() + " has no valid boundary faces");
+        }
+        return new Shell(faces, true);
+    }
+
+    private List<CartesianPoint> buildLoopPoints(StepEdgeLoop loop) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (StepOrientedEdge orientedEdge : loop.edges()) {
+            StepEdgeCurve edge = orientedEdge.edgeElement();
+            if (edge.start() instanceof StepVertexPoint startV) {
+                points.add(buildPoint(startV.point().id()));
+            }
+        }
+        return points;
+    }
+
+    /**
+     * Builds a shell from a CUBIC_BEZIER_TRIANGULATED_FACE.
+     * Treated as a triangulated face - control points define vertices.
+     */
+    private Shell buildCubicBezierTriangulatedFaceShell(StepCubicBezierTriangulatedFace bezier) {
+        List<CartesianPoint> points = new ArrayList<>(bezier.controlPoints().size());
+        for (StepEntity cp : bezier.controlPoints()) {
+            if (cp instanceof StepCartesianPoint cartesianPoint) {
+                points.add(buildPoint(cartesianPoint.id()));
+            } else if (cp instanceof StepVertexPoint vertexPoint) {
+                points.add(buildPoint(vertexPoint.point().id()));
+            }
+        }
+        List<Integer> indices = bezier.indices();
+        List<Face> faces = new ArrayList<>(indices.size() / 3);
+        for (int i = 0; i + 2 < indices.size(); i += 3) {
+            int a = indices.get(i), b = indices.get(i + 1), c = indices.get(i + 2);
+            if (a < 0 || a >= points.size() || b < 0 || b >= points.size() || c < 0 || c >= points.size()) {
+                continue;
+            }
+            CartesianPoint p1 = points.get(a), p2 = points.get(b), p3 = points.get(c);
+            Vector3 v1 = p2.subtract(p1);
+            Vector3 v2 = p3.subtract(p1);
+            Vector3 normal = v1.cross(v2);
+            if (normal.norm() < Epsilon.EPS) {
+                continue;
+            }
+            Plane plane = new Plane(p1, Direction3.from(normal));
+            PolyLoop polyLoop = new PolyLoop(List.of(p1, p2, p3));
+            faces.add(new Face(plane, List.of(FaceBound.outer(polyLoop, true)), true));
+        }
+        if (faces.isEmpty()) {
+            throw new UnsupportedGeometryException("CUBIC_BEZIER_TRIANGULATED_FACE #" + bezier.id() + " has no valid triangular faces");
         }
         return new Shell(faces, true);
     }
@@ -3608,6 +3766,18 @@ public final class StepCadBuilder {
             // Tessellated face: triangulated single face as solid
             Shell shell = buildTessellatedFaceShell(tessellatedFace);
             built = new Solid(shell);
+        } else if (entity instanceof StepTriangulatedFace triangulatedFace) {
+            // Triangulated face: vertex list + index triplets as solid
+            Shell shell = buildTriangulatedFaceShell(triangulatedFace);
+            built = new Solid(shell);
+        } else if (entity instanceof StepComplexTriangulatedFace complexFace) {
+            // Complex triangulated face: boundaries + vertices as solid
+            Shell shell = buildComplexTriangulatedFaceShell(complexFace);
+            built = new Solid(shell);
+        } else if (entity instanceof StepCubicBezierTriangulatedFace bezierFace) {
+            // Cubic Bezier triangulated face: control points + indices as solid
+            Shell shell = buildCubicBezierTriangulatedFaceShell(bezierFace);
+            built = new Solid(shell);
         } else if (entity instanceof StepExtrudedFaceSolid extrudedFace) {
             // Extruded face solid: extrude a face along a direction
             built = buildExtrudedFaceSolid(extrudedFace);
@@ -4062,7 +4232,7 @@ public final class StepCadBuilder {
     private Solid buildExtrudedAreaSolidTapered(StepExtrudedAreaSolidTapered tapered) {
         // Get the profile from sweptArea (which is StepEntity, need to cast to StepProfileDef)
         StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
-        ProfileLoops baseProfile = buildAreaProfileLoops(profileDef);
+        StepProfileBuilder.ProfileLoops baseProfile = profileBuilder.buildAreaProfileLoops(profileDef);
         Vector3 direction = buildDirection(tapered.direction().id()).asVector();
         double depth = tapered.depth();
         double taperAngle = tapered.taperAngle();
@@ -4107,7 +4277,7 @@ public final class StepCadBuilder {
 
     private Solid buildRevolvedAreaSolidTapered(StepRevolvedAreaSolidTapered tapered) {
         StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
-        ProfileLoops baseProfile = buildAreaProfileLoops(profileDef);
+        StepProfileBuilder.ProfileLoops baseProfile = profileBuilder.buildAreaProfileLoops(profileDef);
         Axis1Placement axis = buildAxis1Placement(tapered.axis().id());
         double angle = tapered.angle();
         double taperAngle = tapered.taperAngle();
@@ -4149,7 +4319,7 @@ public final class StepCadBuilder {
 
     private Solid buildSurfaceCurveSweptAreaSolid(StepSurfaceCurveSweptAreaSolid swept) {
         StepProfileDef profileDef = asProfileDef(swept.sweptArea());
-        ProfileLoops profile = buildAreaProfileLoops(profileDef);
+        StepProfileBuilder.ProfileLoops profile = profileBuilder.buildAreaProfileLoops(profileDef);
         Curve3 trajectory = buildCurve3(swept.trajectory());
         double startPoint = swept.startPoint();
         double endPoint = swept.endPoint();
@@ -4213,6 +4383,16 @@ public final class StepCadBuilder {
                 entity.id(), "AREA", "", null, List.of(),
                 List.of(def.xDim(), def.yDim(), def.wallThickness(), def.innerRadius()),
                 "RECTANGLE_HOLLOW_PROFILE_DEF");
+        }
+        // Profile wrappers that delegate to inner profileDef
+        if (entity instanceof StepAreaProfile areaProfile) {
+            return asProfileDef(areaProfile.profileDef());
+        }
+        if (entity instanceof StepGeneralizedAreaProfile generalizedProfile) {
+            return asProfileDef(generalizedProfile.profileDef());
+        }
+        if (entity instanceof StepSweptProfileAreaOutline outline) {
+            return asProfileDef(outline.profileDef());
         }
         throw new UnsupportedGeometryException("swept area must be a profile definition");
     }
@@ -4421,6 +4601,14 @@ public final class StepCadBuilder {
             case StepNonManifoldSolidBrep nonManifold -> buildSolid(nonManifold.id());
             case StepAdvancedBrep advancedBrep -> buildSolid(advancedBrep.id());
             case StepCsgPrimitive csgPrimitive -> buildCsgPrimitive(csgPrimitive);
+            case StepCsgPrimitive3D csg3D -> {
+                // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
+                StepEntity actual = entitiesById.get(csg3D.position().id());
+                if (actual != null && actual instanceof StepCsgPrimitive primitive) {
+                    yield buildCsgPrimitive(primitive);
+                }
+                throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
+            }
             case StepCsgVolume csgVolume -> buildCsgVolumeSolid(csgVolume);
             case StepCsgSolid csgSolid -> buildBooleanOperandSolid(csgSolid.treeRootExpression());
             case StepSolidReplica solidReplica -> buildSolid(solidReplica.id());
@@ -4609,7 +4797,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildExtrudedAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
-        ProfileLoops profileLoops = buildAreaProfileLoops(sweptAreaSolid.sweptArea());
+        StepProfileBuilder.ProfileLoops profileLoops = profileBuilder.buildAreaProfileLoops(sweptAreaSolid.sweptArea());
         List<Point2> profile = profileLoops.outer();
         if (profile.size() < 3) {
             throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID requires at least 3 profile points");
@@ -4671,7 +4859,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildRevolvedAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
-        ProfileLoops profileLoops = buildAreaProfileLoops(sweptAreaSolid.sweptArea());
+        StepProfileBuilder.ProfileLoops profileLoops = profileBuilder.buildAreaProfileLoops(sweptAreaSolid.sweptArea());
         List<List<Point2>> profileRings = new ArrayList<>();
         profileRings.add(profileLoops.outer());
         profileRings.addAll(profileLoops.inner());
@@ -4762,552 +4950,6 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private ProfileLoops buildAreaProfileLoops(StepProfileDef profile) {
-        if (!"AREA".equals(profile.profileType())) {
-            throw new UnsupportedGeometryException(profile.entityName() + " must be an AREA profile");
-        }
-        return switch (profile.entityName()) {
-            case "RECTANGLE_PROFILE_DEF", "CENTERED_RECTANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(rectangleProfile(profile)), List.of());
-            case "CIRCLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(circleProfile(profile)), List.of());
-            case "ELLIPSE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(ellipseProfile(profile)), List.of());
-            case "ROUNDED_RECTANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(roundedRectangleProfile(profile)), List.of());
-            case "CIRCULAR_HOLLOW_PROFILE_DEF" ->
-                    circularHollowProfile(profile);
-            case "RECTANGLE_HOLLOW_PROFILE_DEF" ->
-                    rectangleHollowProfile(profile);
-            case "CENTERED_CIRCLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(centeredCircleProfile(profile)), List.of());
-            case "CENTRE_LINE_ARC_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(centreLineArcProfile(profile)), List.of());
-            case "ARBITRARY_CLOSED_PROFILE_DEF", "ARBITRARY_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
-            case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" ->
-                    arbitraryProfileWithVoids(profile);
-            // Standard structural steel profiles (Phase 2E)
-            case "I_SHAPE_PROFILE_DEF", "I_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(iShapeProfile(profile)), List.of());
-            case "T_SHAPE_PROFILE_DEF", "T_PROFILE_DEF", "TEE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(tShapeProfile(profile)), List.of());
-            case "L_SHAPE_PROFILE_DEF", "L_PROFILE_DEF", "ANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(lShapeProfile(profile)), List.of());
-            case "U_SHAPE_PROFILE_DEF", "U_PROFILE_DEF", "CHANNEL_PROFILE_DEF", "C_SHAPE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(uShapeProfile(profile)), List.of());
-            case "Z_SHAPE_PROFILE_DEF", "Z_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(zShapeProfile(profile)), List.of());
-            case "HAT_SHAPE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(hatShapeProfile(profile)), List.of());
-            case "FLAT_BAR_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(flatBarProfile(profile)), List.of());
-            case "DOVE_TAIL_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(doveTailProfile(profile)), List.of());
-            case "ARBITRARY_OPEN_PROFILE_DEF" ->
-                    // Open profile: treat as a path of points (useful for wireframe/extrusion along a curve)
-                    buildArbitraryOpenProfile(profile);
-            case "PARAMETERIZED_PROFILE_DEF" ->
-                    // Parameterized profile: generic 3-param profile, attempt to extract geometry
-                    buildParameterizedProfile(profile);
-            default -> throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
-        };
-    }
-
-    private List<Point2> rectangleProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires x and y dimensions");
-        }
-        double halfX = profile.parameters().get(0) * 0.5;
-        double halfY = profile.parameters().get(1) * 0.5;
-        return List.of(
-                new Point2(-halfX, -halfY),
-                new Point2(halfX, -halfY),
-                new Point2(halfX, halfY),
-                new Point2(-halfX, halfY),
-                new Point2(-halfX, -halfY)
-        );
-    }
-
-    private List<Point2> circleProfile(StepProfileDef profile) {
-        if (profile.parameters().isEmpty()) {
-            throw new UnsupportedGeometryException("CIRCLE_PROFILE_DEF requires a radius");
-        }
-        double radius = profile.parameters().getFirst();
-        if (radius <= 0.0) {
-            throw new UnsupportedGeometryException("CIRCLE_PROFILE_DEF radius must be positive");
-        }
-        Circle2 circle = new Circle2(new Point2(0.0, 0.0), new Direction2(1.0, 0.0), radius);
-        return sampleCurve2(circle, 72);
-    }
-
-    private List<Point2> ellipseProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException("ELLIPSE_PROFILE_DEF requires semi axes");
-        }
-        double semiAxis1 = profile.parameters().get(0);
-        double semiAxis2 = profile.parameters().get(1);
-        if (semiAxis1 <= 0.0 || semiAxis2 <= 0.0) {
-            throw new UnsupportedGeometryException("ELLIPSE_PROFILE_DEF semi axes must be positive");
-        }
-        Ellipse2 ellipse = new Ellipse2(new Point2(0.0, 0.0), new Direction2(1.0, 0.0), semiAxis1, semiAxis2);
-        return sampleCurve2(ellipse, 72);
-    }
-
-    private List<Point2> roundedRectangleProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 3) {
-            throw new UnsupportedGeometryException("ROUNDED_RECTANGLE_PROFILE_DEF requires x, y and radius");
-        }
-        double width = profile.parameters().get(0);
-        double height = profile.parameters().get(1);
-        double radius = profile.parameters().get(2);
-        if (width <= 0.0 || height <= 0.0 || radius <= 0.0) {
-            throw new UnsupportedGeometryException("ROUNDED_RECTANGLE_PROFILE_DEF dimensions must be positive");
-        }
-        if (radius * 2.0 >= width || radius * 2.0 >= height) {
-            throw new UnsupportedGeometryException("ROUNDED_RECTANGLE_PROFILE_DEF radius must be smaller than half dimensions");
-        }
-        List<Point2> points = new ArrayList<>();
-        appendArc(points, new Point2(width * 0.5 - radius, height * 0.5 - radius), radius, 0.0, Math.PI * 0.5, 12, true);
-        appendArc(points, new Point2(-width * 0.5 + radius, height * 0.5 - radius), radius, Math.PI * 0.5, Math.PI, 12, false);
-        appendArc(points, new Point2(-width * 0.5 + radius, -height * 0.5 + radius), radius, Math.PI, Math.PI * 1.5, 12, false);
-        appendArc(points, new Point2(width * 0.5 - radius, -height * 0.5 + radius), radius, Math.PI * 1.5, Math.PI * 2.0, 12, false);
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private void appendArc(
-            List<Point2> points,
-            Point2 center,
-            double radius,
-            double startAngle,
-            double endAngle,
-            int segments,
-            boolean includeStart
-    ) {
-        int startIndex = includeStart ? 0 : 1;
-        for (int index = startIndex; index <= segments; index++) {
-            double angle = startAngle + (endAngle - startAngle) * index / segments;
-            points.add(new Point2(
-                    center.x() + Math.cos(angle) * radius,
-                    center.y() + Math.sin(angle) * radius
-            ));
-        }
-    }
-
-    private ProfileLoops circularHollowProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException("CIRCULAR_HOLLOW_PROFILE_DEF requires radius and wall thickness");
-        }
-        double outerRadius = profile.parameters().get(0);
-        double wallThickness = profile.parameters().get(1);
-        double innerRadius = outerRadius - wallThickness;
-        if (outerRadius <= 0.0 || wallThickness <= 0.0 || innerRadius <= 0.0) {
-            throw new UnsupportedGeometryException("CIRCULAR_HOLLOW_PROFILE_DEF dimensions must define a positive inner radius");
-        }
-        return new ProfileLoops(
-                normalizeOuterLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(outerRadius), "CIRCLE_PROFILE_DEF"))),
-                List.of(normalizeInnerLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(innerRadius), "CIRCLE_PROFILE_DEF"))))
-        );
-    }
-
-    private ProfileLoops rectangleHollowProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException("RECTANGLE_HOLLOW_PROFILE_DEF requires xDim, yDim, wallThickness and innerRadius");
-        }
-        double xDim = profile.parameters().get(0);
-        double yDim = profile.parameters().get(1);
-        double wallThickness = profile.parameters().get(2);
-        double innerRadius = profile.parameters().get(3);
-        double innerXDim = xDim - 2.0 * wallThickness;
-        double innerYDim = yDim - 2.0 * wallThickness;
-        if (xDim <= 0.0 || yDim <= 0.0 || wallThickness <= 0.0 || innerXDim <= 0.0 || innerYDim <= 0.0) {
-            throw new UnsupportedGeometryException("RECTANGLE_HOLLOW_PROFILE_DEF dimensions must define a positive inner rectangle");
-        }
-        double halfOuterX = xDim * 0.5;
-        double halfOuterY = yDim * 0.5;
-        double halfInnerX = innerXDim * 0.5;
-        double halfInnerY = innerYDim * 0.5;
-        List<Point2> outer = List.of(
-                new Point2(-halfOuterX, -halfOuterY),
-                new Point2(halfOuterX, -halfOuterY),
-                new Point2(halfOuterX, halfOuterY),
-                new Point2(-halfOuterX, halfOuterY),
-                new Point2(-halfOuterX, -halfOuterY)
-        );
-        List<Point2> inner = List.of(
-                new Point2(-halfInnerX, -halfInnerY),
-                new Point2(-halfInnerX, halfInnerY),
-                new Point2(halfInnerX, halfInnerY),
-                new Point2(halfInnerX, -halfInnerY),
-                new Point2(-halfInnerX, -halfInnerY)
-        );
-        return new ProfileLoops(normalizeOuterLoop(outer), List.of(normalizeInnerLoop(inner)));
-    }
-
-    private List<Point2> centeredCircleProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException("CENTERED_CIRCLE_PROFILE_DEF requires radius and centerOffset");
-        }
-        double radius = profile.parameters().get(0);
-        double centerOffset = profile.parameters().get(1);
-        if (radius <= 0.0) {
-            throw new UnsupportedGeometryException("CENTERED_CIRCLE_PROFILE_DEF radius must be positive");
-        }
-        // Circle centered at (centerOffset, 0)
-        Circle2 circle = new Circle2(new Point2(centerOffset, 0.0), new Direction2(1.0, 0.0), radius);
-        return sampleCurve2(circle, 72);
-    }
-
-    private List<Point2> centreLineArcProfile(StepProfileDef profile) {
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException("CENTRE_LINE_ARC_PROFILE_DEF requires radius and angle");
-        }
-        double radius = profile.parameters().get(0);
-        double angle = profile.parameters().get(1);
-        if (radius <= 0.0 || angle <= 0.0) {
-            throw new UnsupportedGeometryException("CENTRE_LINE_ARC_PROFILE_DEF radius and angle must be positive");
-        }
-        // Arc centered at origin, from -angle/2 to +angle/2
-        List<Point2> points = new ArrayList<>();
-        int segments = Math.max(12, (int) (Math.abs(angle) / (Math.PI / 36.0)));
-        double startAngle = -angle / 2.0;
-        double endAngle = angle / 2.0;
-        for (int i = 0; i <= segments; i++) {
-            double a = startAngle + (endAngle - startAngle) * i / segments;
-            points.add(new Point2(radius * Math.cos(a), radius * Math.sin(a)));
-        }
-        return List.copyOf(points);
-    }
-
-    // Standard structural steel profile implementations (Phase 2E)
-    private List<Point2> iShapeProfile(StepProfileDef profile) {
-        // I-beam/I-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters (flangeWidth, webDepth, flangeThickness, webThickness)");
-        }
-        double flangeWidth = profile.parameters().get(0);
-        double webDepth = profile.parameters().get(1);
-        double flangeThickness = profile.parameters().get(2);
-        double webThickness = profile.parameters().get(3);
-        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
-        double halfFlange = flangeWidth / 2.0;
-        double halfWeb = webThickness / 2.0;
-        double halfDepth = webDepth / 2.0;
-        List<Point2> points = new ArrayList<>();
-        // Upper flange (left to right)
-        points.add(new Point2(-halfFlange, halfDepth));
-        points.add(new Point2(-halfWeb, halfDepth));
-        if (filletRadius > 0.0) {
-            appendFillet(points, -halfWeb, halfDepth - filletRadius, filletRadius, Math.PI/2, 0, 6);
-        }
-        points.add(new Point2(-halfWeb, -halfDepth + flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, -halfWeb, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI, Math.PI/2, 6);
-        }
-        // Lower flange left
-        points.add(new Point2(-halfFlange, -halfDepth));
-        // Lower flange right
-        points.add(new Point2(halfFlange, -halfDepth));
-        // Web right side
-        if (filletRadius > 0.0) {
-            appendFillet(points, halfWeb, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI/2, 0, 6);
-        }
-        points.add(new Point2(halfWeb, -halfDepth + flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, halfWeb, halfDepth - filletRadius, filletRadius, 0, -Math.PI/2, 6);
-        }
-        points.add(new Point2(halfWeb, halfDepth));
-        // Upper flange right
-        points.add(new Point2(halfFlange, halfDepth));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> tShapeProfile(StepProfileDef profile) {
-        // T-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
-        }
-        double flangeWidth = profile.parameters().get(0);
-        double webDepth = profile.parameters().get(1);
-        double flangeThickness = profile.parameters().get(2);
-        double webThickness = profile.parameters().get(3);
-        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
-        double halfFlange = flangeWidth / 2.0;
-        double halfWeb = webThickness / 2.0;
-        double halfDepth = webDepth / 2.0;
-        List<Point2> points = new ArrayList<>();
-        // Top flange
-        points.add(new Point2(-halfFlange, halfDepth));
-        points.add(new Point2(halfFlange, halfDepth));
-        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, halfWeb, halfDepth - flangeThickness + filletRadius, filletRadius, Math.PI/2, 0, 6);
-        }
-        points.add(new Point2(halfWeb, halfDepth - flangeThickness));
-        points.add(new Point2(halfWeb, -halfDepth));
-        points.add(new Point2(-halfWeb, -halfDepth));
-        points.add(new Point2(-halfWeb, halfDepth - flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, -halfWeb, halfDepth - flangeThickness + filletRadius, filletRadius, Math.PI, Math.PI/2, 6);
-        }
-        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> lShapeProfile(StepProfileDef profile) {
-        // L-shape/Angle profile: width, depth, thickness, filletRadius
-        if (profile.parameters().size() < 3) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 3 parameters");
-        }
-        double width = profile.parameters().get(0);
-        double depth = profile.parameters().get(1);
-        double thickness = profile.parameters().get(2);
-        double filletRadius = profile.parameters().size() > 3 ? profile.parameters().get(3) : 0.0;
-        double innerRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
-        List<Point2> points = new ArrayList<>();
-        // Outer contour
-        points.add(new Point2(0.0, 0.0));
-        points.add(new Point2(width, 0.0));
-        points.add(new Point2(width, thickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, thickness - filletRadius, thickness - filletRadius, filletRadius, 0, -Math.PI/2, 6);
-        } else {
-            points.add(new Point2(thickness, thickness));
-        }
-        points.add(new Point2(thickness, depth));
-        points.add(new Point2(0.0, depth));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> uShapeProfile(StepProfileDef profile) {
-        // U-shape/Channel profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
-        }
-        double flangeWidth = profile.parameters().get(0);
-        double webDepth = profile.parameters().get(1);
-        double flangeThickness = profile.parameters().get(2);
-        double webThickness = profile.parameters().get(3);
-        double filletRadius = profile.parameters().size() > 4 ? profile.parameters().get(4) : 0.0;
-        double halfFlange = flangeWidth / 2.0;
-        double halfDepth = webDepth / 2.0;
-        List<Point2> points = new ArrayList<>();
-        // Outer contour of U-shape
-        points.add(new Point2(-halfFlange, -halfDepth));
-        points.add(new Point2(halfFlange, -halfDepth));
-        points.add(new Point2(halfFlange, -halfDepth + flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, halfFlange - webThickness - filletRadius, -halfDepth + flangeThickness + filletRadius, filletRadius, 0, -Math.PI/2, 6);
-        }
-        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
-        points.add(new Point2(halfFlange - webThickness, halfDepth - flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, halfFlange - webThickness - filletRadius, halfDepth - flangeThickness - filletRadius, filletRadius, Math.PI/2, Math.PI, 6);
-        }
-        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
-        points.add(new Point2(halfFlange, halfDepth));
-        points.add(new Point2(-halfFlange, halfDepth));
-        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, -halfFlange + webThickness + filletRadius, halfDepth - flangeThickness - filletRadius, filletRadius, Math.PI, Math.PI*1.5, 6);
-        }
-        points.add(new Point2(-halfFlange + webThickness, halfDepth - flangeThickness));
-        points.add(new Point2(-halfFlange + webThickness, -halfDepth + flangeThickness));
-        if (filletRadius > 0.0) {
-            appendFillet(points, -halfFlange + webThickness + filletRadius, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI*1.5, Math.PI*2, 6);
-        }
-        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> zShapeProfile(StepProfileDef profile) {
-        // Z-shape profile: flangeWidth, webDepth, flangeThickness, webThickness, filletRadius
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
-        }
-        double flangeWidth = profile.parameters().get(0);
-        double webDepth = profile.parameters().get(1);
-        double flangeThickness = profile.parameters().get(2);
-        double webThickness = profile.parameters().get(3);
-        double halfFlange = flangeWidth / 2.0;
-        double halfWeb = webThickness / 2.0;
-        double halfDepth = webDepth / 2.0;
-        List<Point2> points = new ArrayList<>();
-        // Upper flange right
-        points.add(new Point2(halfFlange, halfDepth));
-        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
-        points.add(new Point2(halfWeb, halfDepth - flangeThickness));
-        points.add(new Point2(halfWeb, -halfDepth + flangeThickness));
-        // Lower flange left
-        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
-        points.add(new Point2(-halfFlange, -halfDepth));
-        points.add(new Point2(halfFlange - webThickness, -halfDepth));
-        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
-        points.add(new Point2(-halfWeb, -halfDepth + flangeThickness));
-        points.add(new Point2(-halfWeb, halfDepth - flangeThickness));
-        // Upper flange left
-        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        points.add(new Point2(-halfFlange, halfDepth));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> hatShapeProfile(StepProfileDef profile) {
-        // Hat-shape profile: similar to U-shape but inverted
-        if (profile.parameters().size() < 4) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 4 parameters");
-        }
-        double flangeWidth = profile.parameters().get(0);
-        double webDepth = profile.parameters().get(1);
-        double flangeThickness = profile.parameters().get(2);
-        double webThickness = profile.parameters().get(3);
-        double halfFlange = flangeWidth / 2.0;
-        double halfDepth = webDepth / 2.0;
-        List<Point2> points = new ArrayList<>();
-        points.add(new Point2(-halfFlange, halfDepth));
-        points.add(new Point2(halfFlange, halfDepth));
-        points.add(new Point2(halfFlange, halfDepth - flangeThickness));
-        points.add(new Point2(halfFlange - webThickness, halfDepth - flangeThickness));
-        points.add(new Point2(halfFlange - webThickness, -halfDepth + flangeThickness));
-        points.add(new Point2(halfFlange, -halfDepth + flangeThickness));
-        points.add(new Point2(halfFlange, -halfDepth));
-        points.add(new Point2(-halfFlange, -halfDepth));
-        points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
-        points.add(new Point2(-halfFlange + webThickness, -halfDepth + flangeThickness));
-        points.add(new Point2(-halfFlange + webThickness, halfDepth - flangeThickness));
-        points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private List<Point2> flatBarProfile(StepProfileDef profile) {
-        // Flat bar: simple rectangle
-        if (profile.parameters().size() < 2) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires width and thickness");
-        }
-        double width = profile.parameters().get(0);
-        double thickness = profile.parameters().get(1);
-        double halfWidth = width / 2.0;
-        double halfThickness = thickness / 2.0;
-        return List.of(
-                new Point2(-halfWidth, -halfThickness),
-                new Point2(halfWidth, -halfThickness),
-                new Point2(halfWidth, halfThickness),
-                new Point2(-halfWidth, halfThickness),
-                new Point2(-halfWidth, -halfThickness)
-        );
-    }
-
-    private List<Point2> doveTailProfile(StepProfileDef profile) {
-        // Dove tail profile: width, depth, angle, neckWidth
-        if (profile.parameters().size() < 3) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 3 parameters");
-        }
-        double width = profile.parameters().get(0);
-        double depth = profile.parameters().get(1);
-        double angle = profile.parameters().size() > 2 ? profile.parameters().get(2) : 60.0; // degrees
-        double neckWidth = profile.parameters().size() > 3 ? profile.parameters().get(3) : width * 0.5;
-        double halfWidth = width / 2.0;
-        double halfNeck = neckWidth / 2.0;
-        double angleRad = Math.toRadians(angle);
-        double sideOffset = (width - neckWidth) / 2.0;
-        List<Point2> points = new ArrayList<>();
-        points.add(new Point2(-halfWidth, 0.0));
-        points.add(new Point2(halfWidth, 0.0));
-        points.add(new Point2(halfNeck, depth));
-        points.add(new Point2(-halfNeck, depth));
-        points.add(points.getFirst());
-        return List.copyOf(points);
-    }
-
-    private ProfileLoops buildArbitraryOpenProfile(StepProfileDef profile) {
-        // Arbitrary open profile: a sequence of curves that don't form a closed loop
-        // Returns empty loops since open profiles are typically wireframe, not solid extrusion
-        if (profile.curves().isEmpty()) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires a profile curve");
-        }
-        return new ProfileLoops(List.of(), List.of());
-    }
-
-    private ProfileLoops buildParameterizedProfile(StepProfileDef profile) {
-        // Parameterized profile: generic profile with 3 parameters
-        // Falls back to a simple rectangle based on first two parameters
-        if (profile.parameters().size() < 3) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires at least 3 parameters");
-        }
-        double p1 = profile.parameters().get(0);
-        double p2 = profile.parameters().get(1);
-        double halfX = p1 / 2.0;
-        double halfY = p2 / 2.0;
-        List<Point2> rect = List.of(
-                new Point2(-halfX, -halfY),
-                new Point2(halfX, -halfY),
-                new Point2(halfX, halfY),
-                new Point2(-halfX, halfY)
-        );
-        return new ProfileLoops(rect, List.of());
-    }
-
-    private void appendFillet(List<Point2> points, double centerX, double centerY, double radius, double startAngle, double endAngle, int segments) {
-        for (int i = 1; i <= segments; i++) {
-            double angle = startAngle + (endAngle - startAngle) * i / segments;
-            points.add(new Point2(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)));
-        }
-    }
-
-    private List<Point2> arbitraryClosedProfile(StepProfileDef profile) {
-        if (profile.curves().isEmpty()) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires a profile curve");
-        }
-        return arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst());
-    }
-
-    private ProfileLoops arbitraryProfileWithVoids(StepProfileDef profile) {
-        if (profile.curves().isEmpty()) {
-            throw new UnsupportedGeometryException(profile.entityName() + " requires an outer profile curve");
-        }
-        List<Point2> outer = normalizeOuterLoop(arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst()));
-        List<List<Point2>> inner = profile.curves().stream()
-                .skip(1)
-                .map(curve -> normalizeInnerLoop(arbitraryProfileCurve(profile.entityName(), curve)))
-                .toList();
-        return new ProfileLoops(outer, inner);
-    }
-
-    private List<Point2> arbitraryProfileCurve(String entityName, StepEntity curveEntity) {
-        Object curve = buildCurve2(curveEntity);
-        if (!(curve instanceof Curve2 curve2)) {
-            throw new UnsupportedGeometryException(entityName + " profile curve is not 2D");
-        }
-        return sampleCurve2(curve2, 72);
-    }
-
-    private List<Point2> normalizeOuterLoop(List<Point2> points) {
-        List<Point2> normalized = normalizeClosedLoop2(points);
-        if (Math.abs(signedArea2(normalized)) <= 1.0e-9) {
-            throw new UnsupportedGeometryException("profile area must be non-zero");
-        }
-        if (signedArea2(normalized) < 0.0) {
-            normalized = reverseClosedLoop2(normalized);
-        }
-        return List.copyOf(normalized.subList(0, normalized.size() - 1));
-    }
-
-    private List<Point2> normalizeInnerLoop(List<Point2> points) {
-        List<Point2> normalized = normalizeClosedLoop2(points);
-        if (Math.abs(signedArea2(normalized)) <= 1.0e-9) {
-            throw new UnsupportedGeometryException("profile hole area must be non-zero");
-        }
-        if (signedArea2(normalized) > 0.0) {
-            normalized = reverseClosedLoop2(normalized);
-        }
-        return List.copyOf(normalized.subList(0, normalized.size() - 1));
-    }
 
     private CartesianPoint mapProfilePoint(StepProfileDef profile, Axis2Placement3D solidPlacement, Point2 point) {
         Point2 local = point;
@@ -5682,6 +5324,8 @@ public final class StepCadBuilder {
             case StepTerminatorSymbol terminatorSymbol -> buildCurve3(terminatorSymbol.annotatedCurve());
             case StepClothoid clothoid -> buildClothoidCurve(clothoid);
             case StepIndexedPolyCurve polyCurve -> buildIndexedPolyCurve3(polyCurve);
+            case StepIndexedPolycurve polycurve -> buildIndexedPolycurve3(polycurve);
+            case StepPolyline3D polyline3D -> buildPolyline3D(polyline3D);
             case StepDegenerateCurve degenerateCurve -> buildDegenerateCurve3(degenerateCurve);
             case StepLineSegment lineSegment -> {
                 CartesianPoint startPoint = buildPoint(lineSegment.startPoint().id());
@@ -5962,6 +5606,35 @@ public final class StepCadBuilder {
         return new Polyline3(points);
     }
 
+    private Curve3 buildIndexedPolycurve3(StepIndexedPolycurve polycurve) {
+        // Indexed polycurve with explicit segments: build polyline from indexed points
+        List<StepEntity> stepPoints = polycurve.points();
+        List<Integer> indices = polycurve.indices();
+        List<CartesianPoint> points = indices.stream()
+                .map(index -> {
+                    StepEntity pt = stepPoints.get(index);
+                    if (pt instanceof StepCartesianPoint cartesian) {
+                        return buildPoint(cartesian.id());
+                    }
+                    throw new UnsupportedGeometryException("INDEXED_POLYCURVE point #" + pt.id() + " is not a CARTESIAN_POINT");
+                })
+                .toList();
+        return points.isEmpty() ? new Polyline3(List.of()) : new Polyline3(points);
+    }
+
+    private Curve3 buildPolyline3D(StepPolyline3D polyline3D) {
+        // Polyline defined by entity references to Cartesian points
+        List<CartesianPoint> points = polyline3D.points().stream()
+                .map(pt -> {
+                    if (pt instanceof StepCartesianPoint cartesian) {
+                        return buildPoint(cartesian.id());
+                    }
+                    throw new UnsupportedGeometryException("POLYLINE_3D point #" + pt.id() + " is not a CARTESIAN_POINT");
+                })
+                .toList();
+        return points.isEmpty() ? new Polyline3(List.of()) : new Polyline3(points);
+    }
+
     private Curve3 buildDegenerateCurve3(StepDegenerateCurve degenerateCurve) {
         // Degenerate curve collapses to a point
         Curve3 basis = buildCurve3(degenerateCurve.basisCurve());
@@ -6207,6 +5880,9 @@ public final class StepCadBuilder {
         }
         if (geometry instanceof StepToroidalSurface toroidalSurface) {
             return buildToroidalSurface(toroidalSurface.id());
+        }
+        if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends toroidalSpecBends) {
+            return buildToroidalSurfaceFromSpecifiedBends(toroidalSpecBends);
         }
         if (geometry instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
             return buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
@@ -6730,6 +6406,10 @@ public final class StepCadBuilder {
             buildToroidalSurface(toroidalSurface.id());
             return;
         }
+        if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends toroidalSpecBends) {
+            buildToroidalSurfaceFromSpecifiedBends(toroidalSpecBends);
+            return;
+        }
         if (geometry instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
             buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             return;
@@ -6942,6 +6622,10 @@ public final class StepCadBuilder {
         if (geometry instanceof StepToroidalSurface toroidalSurface) {
             buildToroidalSurface(toroidalSurface.id());
             return "TOROIDAL_SURFACE";
+        }
+        if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends toroidalSpecBends) {
+            buildToroidalSurfaceFromSpecifiedBends(toroidalSpecBends);
+            return "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS";
         }
         if (geometry instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
             buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
@@ -7207,17 +6891,6 @@ public final class StepCadBuilder {
         return geometryOps.approximateOffsetCurve3(basisCurve, distance, refDirection);
     }
 
-    private List<Point2> sampleCurve2(Curve2 curve, int segments) {
-        return geometryOps.sampleCurve2(curve, segments);
-    }
-
-    private List<Point2> normalizeClosedLoop2(List<Point2> points) {
-        return geometryOps.normalizeClosedLoop2(points);
-    }
-
-    private List<Point2> reverseClosedLoop2(List<Point2> points) {
-        return geometryOps.reverseClosedLoop2(points);
-    }
 
     private List<CartesianPoint> closeLoop3(List<CartesianPoint> points) {
         return geometryOps.closeLoop3(points);
@@ -7225,16 +6898,6 @@ public final class StepCadBuilder {
 
     private List<CartesianPoint> reverseClosedLoop3(List<CartesianPoint> points) {
         return geometryOps.reverseClosedLoop3(points);
-    }
-
-    private double signedArea2(List<Point2> points) {
-        double area = 0.0;
-        for (int index = 0; index < points.size() - 1; index++) {
-            Point2 current = points.get(index);
-            Point2 next = points.get(index + 1);
-            area += current.x() * next.y() - next.x() * current.y();
-        }
-        return area * 0.5;
     }
 
     private List<CartesianPoint> sampleCurve3(Curve3 curve, int segments) {
@@ -7423,335 +7086,6 @@ public final class StepCadBuilder {
         return geometryOps.unsupportedReplicaSurfaceTransformation(transformation);
     }
 
-    /**
-     * Validates a trim value which can be an entity reference or a parameter value.
-     */
-    private static void validateTrimValue(StepValue trim, Curve3 basis, String slot) {
-        StepValue unwrapped = unwrapTyped(trim);
-        // STEP TRIMMED_CURVE wraps trim values in nested lists: ((1.0))
-        // The resolver extracts elements of the outer list, each still a ListValue.
-        if (unwrapped instanceof StepValue.ListValue innerList) {
-            validateTrimValue(innerList.elements().getFirst(), basis, slot);
-            return;
-        }
-        if (unwrapped instanceof StepValue.ReferenceValue ref) {
-            // Will be validated when resolved as a Cartesian point in resolveTrimPoint3
-            if (ref.id() == 0) {
-                throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference is invalid");
-            }
-        } else if (unwrapped instanceof StepValue.NumberValue num) {
-            // Parameter-value trim — accepted; point-on-curve validation deferred to evaluation
-            // since not all curve types support a general contains() check for arbitrary parameters.
-        } else {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims, got " + unwrapped.getClass().getSimpleName());
-        }
-    }
-
-    /**
-     * Resolves the first trim value to a CartesianPoint.
-     * Handles both entity references (CartesianPoint) and numeric parameter values (evaluate on curve).
-     */
-    private double resolveTrimParameter(List<StepValue> trims, Curve3 basis, String slot) {
-        if (trims.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
-        }
-        StepValue trim = unwrapTyped(trims.getFirst());
-        if (trim instanceof StepValue.ListValue innerList) {
-            return resolveTrimParameter(innerList.elements(), basis, slot);
-        }
-        if (trim instanceof StepValue.NumberValue num) {
-            return num.value();
-        }
-        if (trim instanceof StepValue.ReferenceValue ref) {
-            StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
-                if (point.coordinates().size() < 2) {
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
-                }
-                CartesianPoint cp = buildPoint(point.id());
-                return basis.parameterAt(cp);
-            }
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
-        }
-        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
-    }
-
-    private CartesianPoint resolveTrimPoint3(List<StepValue> trims, Curve3 basis, String slot) {
-        if (trims.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
-        }
-        StepValue trim = unwrapTyped(trims.getFirst());
-        // STEP TRIMMED_CURVE wraps trim values in nested lists: ((1.0))
-        // Unwrap the inner list to get the actual trim values.
-        if (trim instanceof StepValue.ListValue innerList) {
-            return resolveTrimPoint3(innerList.elements(), basis, slot);
-        }
-        if (trim instanceof StepValue.ReferenceValue ref) {
-            // Resolve as entity reference — could be a CartesianPoint or an entity wrapping a point
-            StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
-                if (point.coordinates().size() < 2) {
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
-                }
-                return buildPoint(point.id());
-            }
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
-        }
-        if (trim instanceof StepValue.NumberValue num) {
-            // Evaluate curve at the given parameter to get the trim point
-            return evaluateCurveAtParameter(basis, num.value(), slot);
-        }
-        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
-    }
-
-    /**
-     * Evaluates a curve at a given parameter value to produce a CartesianPoint for parameter-based trims.
-     */
-    private static CartesianPoint evaluateCurveAtParameter(Curve3 curve, double param, String slot) {
-        return curve.pointAt(param);
-    }
-
-    /**
-     * Unwraps a StepValue.TypedValue to get the inner value.
-     */
-    private static StepValue unwrapTyped(StepValue value) {
-        return value instanceof StepValue.TypedValue typed ? typed.value() : value;
-    }
-
-    private Point2 requireTrimPoint2(List<StepEntity> trims, String slot) {
-        if (trims.isEmpty() || !(trims.getFirst() instanceof StepCartesianPoint point)) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
-        }
-        if (point.coordinates().size() != 2) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must be 2D for PCURVE");
-        }
-        return buildPoint2(point.id());
-    }
-
-    /**
-     * Resolves a 2D trim value to a Point2.
-     * Handles both entity references (CartesianPoint) and numeric parameter values.
-     */
-    private Point2 resolveTrimPoint2(List<StepValue> trims, Curve2 basisCurve, String slot) {
-        if (trims.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
-        }
-        StepValue trim = unwrapTyped(trims.getFirst());
-        // STEP TRIMMED_CURVE wraps trim values in nested lists: ((1.0))
-        if (trim instanceof StepValue.ListValue innerList) {
-            return resolveTrimPoint2(innerList.elements(), basisCurve, slot);
-        }
-        if (trim instanceof StepValue.ReferenceValue ref) {
-            StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
-                if (point.coordinates().size() < 2) {
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
-                }
-                Point2 result = buildPoint2(point.id());
-                return snapTrimPoint2(result, basisCurve);
-            }
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
-        }
-        if (trim instanceof StepValue.NumberValue num) {
-            return evaluateCurve2AtParameter(basisCurve, num.value());
-        }
-        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
-    }
-
-    /**
-     * Resolves a 2D trim value to a double parameter on the basis curve.
-     * Handles both entity references (CartesianPoint) and numeric parameter values.
-     */
-    private double resolveTrimParam2(List<StepValue> trims, Curve2 basisCurve, String slot) {
-        if (trims.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
-        }
-        StepValue trim = unwrapTyped(trims.getFirst());
-        if (trim instanceof StepValue.ListValue innerList) {
-            return resolveTrimParam2(innerList.elements(), basisCurve, slot);
-        }
-        if (trim instanceof StepValue.ReferenceValue ref) {
-            StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
-                if (point.coordinates().size() < 2) {
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
-                }
-                Point2 result = buildPoint2(point.id());
-                return parameterOnCurve2(basisCurve, result);
-            }
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
-        }
-        if (trim instanceof StepValue.NumberValue num) {
-            return num.value();
-        }
-        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
-    }
-
-    private double parameterOnCurve2(Curve2 curve, Point2 point) {
-        return switch (curve) {
-            case Line2 line -> line.parameterOf(point);
-            case com.minicad.geometry2d.Circle2 circle -> {
-                // Tolerant angle computation — does not require point to be exactly on curve
-                Vector2 offset = point.subtract(circle.center());
-                Vector2 x = circle.xDirection().asVector();
-                Vector2 y = new Vector2(-x.y(), x.x());
-                double angle = Math.atan2(offset.dot(y) / circle.radius(), offset.dot(x) / circle.radius());
-                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
-            }
-            case com.minicad.geometry2d.Ellipse2 ellipse -> {
-                // Tolerant angle computation — projects point onto ellipse via atan2
-                Vector2 offset = point.subtract(ellipse.center());
-                Vector2 x = ellipse.xDirection().asVector();
-                Vector2 y = new Vector2(-x.y(), x.x());
-                double angle = Math.atan2(offset.dot(y) / ellipse.semiAxis2(), offset.dot(x) / ellipse.semiAxis1());
-                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
-            }
-            case com.minicad.geometry2d.BSplineCurve2 bspline -> parameterOnBSpline2(bspline, point);
-            case com.minicad.geometry2d.RationalBSplineCurve2 rational -> parameterOnRationalBSpline2(rational, point);
-            case Polyline2 polyline -> parameterOnPolyline2(polyline, point);
-            case com.minicad.geometry2d.TrimmedCurve2 trimmed -> parameterOnCurve2(trimmed.basisCurve(), point);
-            default -> 0.0;
-        };
-    }
-
-    private double parameterOnBSpline2(com.minicad.geometry2d.BSplineCurve2 bspline, Point2 point) {
-        double bestT = bspline.startParameter();
-        double minDist = Double.POSITIVE_INFINITY;
-        int n = 64;
-        double range = bspline.endParameter() - bspline.startParameter();
-        for (int i = 0; i <= n; i++) {
-            double t = bspline.startParameter() + range * i / n;
-            double d = point.distanceTo(bspline.pointAt(t));
-            if (d < minDist) {
-                minDist = d;
-                bestT = t;
-            }
-        }
-        return bestT;
-    }
-
-    private double parameterOnRationalBSpline2(com.minicad.geometry2d.RationalBSplineCurve2 rational, Point2 point) {
-        double bestT = rational.startParameter();
-        double minDist = Double.POSITIVE_INFINITY;
-        int n = 64;
-        double range = rational.endParameter() - rational.startParameter();
-        for (int i = 0; i <= n; i++) {
-            double t = rational.startParameter() + range * i / n;
-            double d = point.distanceTo(rational.pointAt(t));
-            if (d < minDist) {
-                minDist = d;
-                bestT = t;
-            }
-        }
-        return bestT;
-    }
-
-    private double parameterOnPolyline2(Polyline2 polyline, Point2 point) {
-        List<Point2> points = polyline.points();
-        if (points.size() < 2) return 0.0;
-        double bestT = 0.0;
-        double minDist = Double.POSITIVE_INFINITY;
-        int n = points.size() - 1;
-        for (int i = 0; i < n; i++) {
-            double t = (double) i / n;
-            double d = point.distanceTo(points.get(i));
-            if (d < minDist) {
-                minDist = d;
-                bestT = t;
-            }
-        }
-        return bestT;
-    }
-
-    private Point2 evaluateCurve2AtParameter(Curve2 curve, double param) {
-        return switch (curve) {
-            case Line2 line -> line.pointAt(param);
-            case com.minicad.geometry2d.Circle2 circle -> circle.pointAt(param);
-            case com.minicad.geometry2d.Ellipse2 ellipse -> ellipse.pointAt(param);
-            case Polyline2 polyline -> evaluatePolyline2AtParameter(polyline, param);
-            case com.minicad.geometry2d.TrimmedCurve2 trimmed -> evaluateCurve2AtParameter(trimmed.basisCurve(), param);
-            case com.minicad.geometry2d.BSplineCurve2 bspline -> bspline.pointAt(param);
-            case com.minicad.geometry2d.RationalBSplineCurve2 rational -> rational.pointAt(param);
-            case com.minicad.geometry2d.CompositeCurve2 composite -> evaluateComposite2AtParameter(composite, param);
-            default -> throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim not supported for 2D curve type " + curve.getClass().getSimpleName());
-        };
-    }
-
-    private Point2 evaluatePolyline2AtParameter(Polyline2 polyline, double param) {
-        List<Point2> points = polyline.points();
-        if (points.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim on empty polyline");
-        }
-        int segments = points.size() - 1;
-        double t = param * segments;
-        int index = (int) Math.max(0, Math.min(Math.floor(t), segments - 1));
-        double localT = t - index;
-        Point2 p1 = points.get(index);
-        Point2 p2 = points.get(index + 1);
-        return new Point2(p1.x() + (p2.x() - p1.x()) * localT, p1.y() + (p2.y() - p1.y()) * localT);
-    }
-
-    private Point2 evaluateComposite2AtParameter(com.minicad.geometry2d.CompositeCurve2 composite, double param) {
-        List<Curve2> segments = composite.segments();
-        if (segments.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim on empty composite curve");
-        }
-        int segIndex = Math.min((int) param, segments.size() - 1);
-        segIndex = Math.max(0, segIndex);
-        double localT = param - segIndex;
-        return evaluateCurve2AtParameter(segments.get(segIndex), localT);
-    }
-
-    private Point2 snapTrimPoint2(Point2 point, Curve2 basisCurve) {
-        if (basisCurve.contains(point)) {
-            return point;
-        }
-        if (basisCurve instanceof Line2 line) {
-            return line.closestPoint(point);
-        }
-        if (basisCurve instanceof Circle2 circle) {
-            Vector2 offset = point.subtract(circle.center());
-            double norm = offset.norm();
-            if (norm <= Epsilon.EPS) {
-                return circle.pointAt(0.0);
-            }
-            return circle.center().add(offset.scale(circle.radius() / norm));
-        }
-        if (basisCurve instanceof Ellipse2 ellipse) {
-            Vector2 offset = point.subtract(ellipse.center());
-            if (offset.norm() <= Epsilon.EPS) {
-                return ellipse.pointAt(0.0);
-            }
-            Vector2 x = ellipse.xDirection().asVector();
-            Vector2 y = new Vector2(-x.y(), x.x());
-            double nx = offset.dot(x) / ellipse.semiAxis1();
-            double ny = offset.dot(y) / ellipse.semiAxis2();
-            double norm = Math.hypot(nx, ny);
-            if (norm <= Epsilon.EPS) {
-                return ellipse.pointAt(0.0);
-            }
-            double angle = Math.atan2(ny / norm, nx / norm);
-            return ellipse.pointAt(angle);
-        }
-        if (basisCurve instanceof BSplineCurve2 spline) {
-            Point2 best = null;
-            double bestDistance = Double.POSITIVE_INFINITY;
-            for (Point2 sample : spline.sample(192)) {
-                double distance = sample.subtract(point).norm();
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    best = sample;
-                }
-            }
-            if (best != null) {
-                return best;
-            }
-        }
-        if (basisCurve instanceof TrimmedCurve2 trimmed) {
-            return snapTrimPoint2(point, trimmed.basisCurve());
-        }
-        return point;
-    }
 
     public record Axis1Placement(CartesianPoint location, Direction3 axis) {
     }
@@ -7826,13 +7160,6 @@ public final class StepCadBuilder {
         }
         Direction3 z() {
             return Direction3.from(x.cross(y));
-        }
-    }
-
-    private record ProfileLoops(List<Point2> outer, List<List<Point2>> inner) {
-        private ProfileLoops {
-            outer = List.copyOf(outer);
-            inner = inner.stream().map(List::copyOf).toList();
         }
     }
 }

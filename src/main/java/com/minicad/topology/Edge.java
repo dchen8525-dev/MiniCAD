@@ -127,6 +127,22 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         if (curve.contains(point)) {
             return true;
         }
+        // For B-spline curves, use the curve's own closestPointTo (Newton-Raphson)
+        // which is much more accurate than sample-based linear interpolation
+        if (curve instanceof BSplineCurve3 bspline) {
+            return bspline.distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+        }
+        if (curve instanceof RationalBSplineCurve3 rational) {
+            return rational.distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+        }
+        // For wrapped curves, delegate to the underlying curve
+        if (curve instanceof TrimmedCurve3 trimmed) {
+            return liesOnCurve(point, trimmed.basisCurve());
+        }
+        if (curve instanceof SurfaceCurve3 surfaceCurve) {
+            return liesOnCurve(point, surfaceCurve.curve3d());
+        }
+        // For other curves, fall back to sample-based check
         List<CartesianPoint> sampled = sampleCurve(curve);
         if (sampled.size() < 2) {
             return false;

@@ -30,7 +30,7 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
 ```
 
 **Layer sizes:**
-- `step.model`: 1114 entity model classes across 26 sub-packages
+- `step.model`: 1176 entity model classes across 26 sub-packages
 - `step.semantic`: 9 resolver/builder classes
 - `step.syntax`: 3 tokenizer/parser classes
 - `geometry`: 30 curve/surface classes (13 Curve3 permits, 16 SurfaceGeometry permits)
@@ -46,7 +46,7 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
   - `action` (49), `config_mgmt` (23), `security` (22), `resource` (67),
   - `workflow` (199), `validation` (50), `log_audit` (23), `backup_recovery` (14),
   - `system` (10), `analysis` (15), `profile` (4), `base` (11)
-- `step.semantic`: StepEntityResolver maps raw definitions to model classes (1214 entity types registered).
+- `step.semantic`: StepEntityResolver maps raw definitions to model classes (1302 entity types registered).
 - `geometry`/`geometry2d`: 3D/2D geometry types with sealed interfaces and default sampling methods.
 - `topology`: B-Rep topology (Vertex, Edge, OrientedEdge, EdgeLoop, FaceBound, Face, Shell, Solid).
 
@@ -96,6 +96,7 @@ The resolver registers 1214 entity types. Key categories:
 - CSG volumes: CYLINDER_VOLUME, SPHERE_VOLUME, TORUS_VOLUME, PRISM_VOLUME, CSG_SOLID
 - Face-based solids: EXTRUDED_FACE_SOLID, REVOLVED_FACE_SOLID, SWEPT_FACE_SOLID
 - Tessellated: TESSELLATED_FACE_SET, TESSELLATED_FACE → triangular mesh B-Rep
+- Triangulated: TRIANGULATED_FACE, COMPLEX_TRIANGULATED_FACE, CUBIC_BEZIER_TRIANGULATED_FACE → triangular mesh B-Rep
 - Profile definitions: CIRCLE_PROFILE_DEF, RECTANGLE_PROFILE_DEF, etc.
 
 **Assembly/Product structure:**
@@ -132,9 +133,6 @@ The resolver registers 1214 entity types. Key categories:
 
 The following STEP AP214/AP242 entity types are registered but have no B-Rep generation:
 
-**Advanced geometry surfaces**:
-- `TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS`
-
 **Advanced PMI/tolerances**:
 - `GEOMETRIC_TOLERANCE_RELATIONSHIP`
 - `DATUM_SYSTEM` (multi-datum combination)
@@ -146,5 +144,5 @@ The following STEP AP214/AP242 entity types are registered but have no B-Rep gen
 
 | File | solids | unsupported faces | Notes |
 |---|---|---|---|
-| engine.stp | 31 | 0 | 93829 entities |
+| engine.stp | 31 | 0 | 93829 entities; vertex projection tolerance handles ~1mm source data precision issues |
 | fan.stp | 1 | 0 | 41707 entities |
