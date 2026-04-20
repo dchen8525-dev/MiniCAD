@@ -3,15 +3,19 @@ package com.minicad.app;
 import com.minicad.step.model.annotation.StepColourRgb;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.annotation.StepCurveStyle;
+import com.minicad.step.model.annotation.StepCurveStyleRendering;
+import com.minicad.step.model.annotation.StepCurveStyleWithFont;
 import com.minicad.step.model.annotation.StepFillAreaStyle;
 import com.minicad.step.model.annotation.StepFillAreaStyleColour;
 import com.minicad.step.model.annotation.StepDraughtingPreDefinedColour;
 import com.minicad.step.model.annotation.StepOverRidingStyledItem;
 import com.minicad.step.model.annotation.StepPresentationLayerAssignment;
 import com.minicad.step.model.annotation.StepPresentationStyleAssignment;
+import com.minicad.step.model.annotation.StepPreDefinedSurfaceStyle;
 import com.minicad.step.model.annotation.StepStyledItem;
 import com.minicad.step.model.annotation.StepSurfaceSideStyle;
 import com.minicad.step.model.annotation.StepSurfaceStyleFillArea;
+import com.minicad.step.model.annotation.StepSurfaceStyleParameterLines;
 import com.minicad.step.model.annotation.StepSurfaceStyleRendering;
 import com.minicad.step.model.annotation.StepSurfaceStyleReflectanceAmbient;
 import com.minicad.step.model.annotation.StepSurfaceStyleReflectanceAmbientDiffuse;
@@ -83,6 +87,21 @@ public final class StepMetadataExtractor {
                     if (rgb != null) {
                         metadata.rgb = rgb;
                     }
+                } else if (style instanceof StepCurveStyleRendering curveRendering) {
+                    int[] rgb = colourToRgb(curveRendering.colour());
+                    if (rgb != null) {
+                        metadata.rgb = rgb;
+                    }
+                    metadata.transparency = clamp01(curveRendering.transparency());
+                } else if (style instanceof StepPreDefinedSurfaceStyle predefined) {
+                    int[] rgb = namedSurfaceColor(predefined.identifier());
+                    if (rgb != null) {
+                        metadata.rgb = rgb;
+                    }
+                } else if (style instanceof StepSurfaceStyleParameterLines) {
+                    // Parameter lines visualization hint - no color data
+                } else if (style instanceof StepCurveStyleWithFont) {
+                    // Font styling for curves - no color data
                 }
                 if (!(style instanceof StepSurfaceStyleUsage usage)) {
                     continue;
@@ -159,24 +178,29 @@ public final class StepMetadataExtractor {
             };
         }
         if (colour instanceof StepDraughtingPreDefinedColour predefined) {
-            return switch (predefined.name().toLowerCase()) {
-                case "blue" -> new int[]{0, 0, 255};
-                case "red" -> new int[]{255, 0, 0};
-                case "green" -> new int[]{0, 128, 0};
-                case "yellow" -> new int[]{255, 255, 0};
-                case "black" -> new int[]{0, 0, 0};
-                case "white" -> new int[]{255, 255, 255};
-                case "cyan" -> new int[]{0, 255, 255};
-                case "magenta" -> new int[]{255, 0, 255};
-                case "orange" -> new int[]{255, 165, 0};
-                case "brown" -> new int[]{165, 42, 42};
-                case "pink" -> new int[]{255, 192, 203};
-                case "grey", "gray" -> new int[]{128, 128, 128};
-                case "purple", "violet" -> new int[]{128, 0, 128};
-                default -> null;
-            };
+            return namedSurfaceColor(predefined.name());
         }
         return null;
+    }
+
+    private static int[] namedSurfaceColor(String name) {
+        if (name == null) return null;
+        return switch (name.toLowerCase()) {
+            case "blue" -> new int[]{0, 0, 255};
+            case "red" -> new int[]{255, 0, 0};
+            case "green" -> new int[]{0, 128, 0};
+            case "yellow" -> new int[]{255, 255, 0};
+            case "black" -> new int[]{0, 0, 0};
+            case "white" -> new int[]{255, 255, 255};
+            case "cyan" -> new int[]{0, 255, 255};
+            case "magenta" -> new int[]{255, 0, 255};
+            case "orange" -> new int[]{255, 165, 0};
+            case "brown" -> new int[]{165, 42, 42};
+            case "pink" -> new int[]{255, 192, 203};
+            case "grey", "gray" -> new int[]{128, 128, 128};
+            case "purple", "violet" -> new int[]{128, 0, 128};
+            default -> null;
+        };
     }
 
     private static double clamp01(double value) {
