@@ -157,6 +157,8 @@ import com.minicad.step.model.geometry.StepPlane;
 import com.minicad.step.model.annotation.StepPlanarBox;
 import com.minicad.step.model.annotation.StepPlanarExtent;
 import com.minicad.step.model.geometry.StepPointSet;
+import com.minicad.step.model.geometry.StepPoint;
+import com.minicad.step.model.geometry.StepFeaAxis2Placement3d;
 import com.minicad.step.model.geometry.StepPcurve;
 import com.minicad.step.model.profile.StepProfileDef;
 import com.minicad.step.model.geometry.StepProjectionCurve;
@@ -367,14 +369,26 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepCartesianPoint point = requireEntity(id, StepCartesianPoint.class, "CARTESIAN_POINT");
-        CartesianPoint built = new CartesianPoint(
-                point.coordinates().get(0),
-                point.coordinates().get(1),
-                point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0
-        );
-        points.put(id, built);
-        return built;
+        StepEntity entity = requireExistingEntity(id);
+        if (entity instanceof StepCartesianPoint point) {
+            CartesianPoint built = new CartesianPoint(
+                    point.coordinates().get(0),
+                    point.coordinates().get(1),
+                    point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0
+            );
+            points.put(id, built);
+            return built;
+        }
+        if (entity instanceof StepPoint) {
+            // POINT has no coordinates; return origin
+            CartesianPoint built = new CartesianPoint(0.0, 0.0, 0.0);
+            points.put(id, built);
+            return built;
+        }
+        if (entity instanceof StepVertexPoint vertexPoint) {
+            return buildVertex(vertexPoint.id()).point();
+        }
+        throw new UnsupportedGeometryException("entity #" + id + " is not a supported 3D point");
     }
 
     public Point2 buildPoint2(int id) {
@@ -484,14 +498,26 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepAxis2Placement3D placement = requireEntity(id, StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D");
-        Axis2Placement3D built = new Axis2Placement3D(
-                buildPoint(placement.location().id()),
-                buildDirection(placement.axis().id()),
-                buildDirection(placement.refDirection().id())
-        );
-        placements.put(id, built);
-        return built;
+        StepEntity entity = requireExistingEntity(id);
+        if (entity instanceof StepAxis2Placement3D placement) {
+            Axis2Placement3D built = new Axis2Placement3D(
+                    buildPoint(placement.location().id()),
+                    buildDirection(placement.axis().id()),
+                    buildDirection(placement.refDirection().id())
+            );
+            placements.put(id, built);
+            return built;
+        }
+        if (entity instanceof StepFeaAxis2Placement3d feaPlacement) {
+            Axis2Placement3D built = new Axis2Placement3D(
+                    buildPoint(feaPlacement.location().id()),
+                    buildDirection(feaPlacement.axis().id()),
+                    buildDirection(feaPlacement.refDirection().id())
+            );
+            placements.put(id, built);
+            return built;
+        }
+        throw new UnsupportedGeometryException("entity #" + id + " is not a supported placement");
     }
 
     public Axis1Placement buildAxis1Placement(int id) {

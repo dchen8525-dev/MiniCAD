@@ -310,6 +310,7 @@ import com.minicad.step.model.workflow.StepPlacedDatumTargetFeature;
 import com.minicad.step.model.workflow.StepPlacedTarget;
 import com.minicad.step.model.geometry.StepPoint;
 import com.minicad.step.model.geometry.StepPointSet;
+import com.minicad.step.model.geometry.StepGeometricMeasurement;
 import com.minicad.step.model.annotation.StepPointStyle;
 import com.minicad.step.model.annotation.StepPmiRequirementItemAssociation;
 import com.minicad.step.model.annotation.StepPresentationLayerAssignment;
@@ -9303,6 +9304,8 @@ public final class StepPreviewJsonExporter {
                 appendAnnotationOccurrenceRelationshipPmi(relationship, pmi, builder);
             } else if (entity instanceof StepPointSet pointSet) {
                 appendPointSetPmi(pointSet, pmi, builder);
+            } else if (entity instanceof StepGeometricMeasurement measurement) {
+                appendGeometricMeasurementPmi(measurement, pmi, builder);
             } else if (entity instanceof StepVertexShell vertexShell) {
                 pmi.add(toStandalonePointPmi(
                         vertexShell.id(),
@@ -9413,6 +9416,28 @@ public final class StepPreviewJsonExporter {
                     : pointSet.name() + "[" + pointIndex + "]";
             pmi.add(toStandalonePointPmi(pointSet.id() * 1000 + pointIndex, pointName, position));
             pointIndex++;
+        }
+    }
+
+    private static void appendGeometricMeasurementPmi(
+            StepGeometricMeasurement measurement,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = pointFromAnnotationPoint(measurement.measurementGeometry(), builder);
+        if (position != null) {
+            String label = measurement.name() + " (" + measurement.geometricType() + ")";
+            if (measurement.measuredValue() != 0.0) {
+                label += ": " + String.format("%.3f", measurement.measuredValue());
+            }
+            pmi.add(toStandalonePointPmi(measurement.id(), label, position));
+        }
+        for (StepEntity pt : measurement.measurementPoints()) {
+            CartesianPoint mp = pointFromAnnotationPoint(pt, builder);
+            if (mp != null) {
+                pmi.add(toStandalonePointPmi(measurement.id() * 1000 + measurement.measurementPoints().indexOf(pt),
+                        measurement.name() + " point", mp));
+            }
         }
     }
 
