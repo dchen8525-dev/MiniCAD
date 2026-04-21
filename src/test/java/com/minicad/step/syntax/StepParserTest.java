@@ -7,6 +7,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -133,6 +134,21 @@ class StepParserTest {
         assertEquals(2, instance.definitions().size());
         assertTrue(instance.hasDefinition("GEOMETRIC_REPRESENTATION_CONTEXT"));
         assertTrue(instance.hasDefinition("REPRESENTATION_CONTEXT"));
+    }
+
+    @Test
+    void shouldCacheNormalizedDefinitionNamesForCaseInsensitiveQueries() {
+        String step = """
+                DATA;
+                #1=(geometric_representation_context(3) representation_context('ID','MODEL'));
+                ENDSEC;
+                """;
+
+        StepEntityInstance instance = StepParser.parse(step).entities().getFirst();
+
+        assertEquals(List.of("GEOMETRIC_REPRESENTATION_CONTEXT", "REPRESENTATION_CONTEXT"), instance.normalizedDefinitionNames());
+        assertTrue(instance.hasDefinition("representation_context"));
+        assertSame(instance.definitions().getFirst(), instance.requireDefinition("GEOMETRIC_REPRESENTATION_CONTEXT"));
     }
 
     @Test

@@ -47,12 +47,13 @@ Completed:
 
 In progress:
 
-- `P1.1` `StepCadBuilder` decomposition completed with three extractions:
+- `P1.1` `StepCadBuilder` decomposition completed with four extractions:
   - `StepCadGeometryOps` (789 lines): curve sampling, loop helpers, surface transformations
   - `StepTrimResolver` (352 lines): trim-value validation, parameter resolution, snap-to-curve
   - `StepProfileBuilder` (553 lines): 2D area profile building for 22 profile types
+  - `StepTopologyBuilder` (198 lines): oriented-edge, loop, path, face-bound, and face assembly delegation
   - pipeline architecture documentation added to `CompiledStepDocument` Javadoc (P1.11 completed)
-  - StepCadBuilder reduced from ~8460 to ~6939 lines (-18%)
+  - `StepCadBuilder` reduced to ~7076 lines with topology assembly extracted behind the existing facade
 
 Next:
 
@@ -339,9 +340,12 @@ mvn -q test
   - moved trim-value validation, trim-parameter resolution, trim-point resolution
   - moved 2D curve parameter/evaluation helpers (`parameterOnCurve2`, `evaluateCurve2AtParameter`)
   - moved `snapTrimPoint2` and polyline/composite trim helpers
-- `StepCadBuilder` reduced from ~7838 to ~6939 lines across three extractions
+- third extraction completed as [StepTopologyBuilder.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTopologyBuilder.java):
+  - moved oriented-edge, edge-loop, vertex-loop, poly-loop, path, face-bound, and face assembly
+  - preserved `StepCadBuilder` cache ownership and public API by delegating through the existing facade
+- `StepCadBuilder` now measures ~7076 lines after four helper extractions
 - validation passed:
-  - `mvn -q test` (1429 tests, all passing)
+  - `mvn -q -Dtest=StepCadBuilderTest test`
 
 Next cut:
 
@@ -592,7 +596,7 @@ Use this table to track progress:
 | P0 | Resolver direct lookup | completed | Codex | old resolver full-scan | resolve stage reduced sharply on `fan.stp` | complex-entity precedence preserved |
 | P0 | Reusable compiled pipeline | completed | Codex | duplicate parse/resolve in exporters | compiled state shared across preview/mesh/benchmark | includes `CompiledStepDocument` |
 | P0 | Safe mesh export execution | completed | Codex | shared mutable builder under parallel triangulation | deterministic sequential triangulation baseline | repeated-run regression added |
-| P1 | Split StepCadBuilder | completed | Codex | ~8460 lines | ~6939 lines (-18%) | extractions: `StepCadGeometryOps` (789 lines), `StepTrimResolver` (352 lines), `StepProfileBuilder` (553 lines), pipeline docs in `CompiledStepDocument` Javadoc |
+| P1 | Split StepCadBuilder | completed | Codex | ~8460 lines | ~7076 lines (-16%) | extractions: `StepCadGeometryOps` (789 lines), `StepTrimResolver` (352 lines), `StepProfileBuilder` (553 lines), `StepTopologyBuilder` (198 lines), pipeline docs in `CompiledStepDocument` Javadoc |
 | P1 | Split StepPreviewJsonExporter | pending |  | n/a | n/a |  |
 | P1 | Benchmark quality upgrade | pending |  |  |  |  |
 | P2 | Syntax micro-optimizations | pending |  |  |  |  |

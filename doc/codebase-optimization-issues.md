@@ -30,19 +30,21 @@ Completed:
 
 In progress:
 
-- `P1` `StepCadBuilder` split has three extractions:
+- `P1` `StepCadBuilder` split has four extractions:
   - [StepCadGeometryOps.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepCadGeometryOps.java)
     - scope extracted so far: curve sampling, trimmed-curve helpers, loop helpers, replica/surface transformation helpers
   - [StepTrimResolver.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTrimResolver.java)
     - scope extracted: trim-value validation, trim-parameter resolution, trim-point resolution, 2D curve parameter/evaluation, snap-to-curve helpers
   - [StepProfileBuilder.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepProfileBuilder.java)
     - scope extracted: 2D area profile building for 22 profile types (rectangle, circle, ellipse, hollow, I/T/L/U/Z/hat shapes, arbitrary, parameterized)
-    - `StepCadBuilder` reduced from ~7838 to ~6939 lines (-11%)
+  - [StepTopologyBuilder.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTopologyBuilder.java)
+    - scope extracted: oriented-edge, edge-loop, vertex-loop, poly-loop, path, face-bound, and face assembly
+    - `StepCadBuilder` now measures ~7076 lines while keeping cache ownership in the facade
 
 Recommended next issue:
 
-- extract trim-value and trim-parameter resolution from `StepCadBuilder`
-- then continue toward topology-focused extraction
+- continue with solid-focused extraction from `StepCadBuilder`
+- or start `StepPreviewJsonExporter` stage separation
 
 ---
 
@@ -891,7 +893,7 @@ mvn -q -Dtest=SurfaceUtilityTest,StepPreviewJsonExporterTest,FaceTest test
 
 ## P1-10: Extract `TopologyBuilder` from `StepCadBuilder`
 
-Status: not started
+Status: completed
 
 ### Objective
 
@@ -910,6 +912,17 @@ After geometry and surface extraction are stable, move topology construction int
 
 ```bash
 mvn -q -Dtest=FaceTest,SolidTest,TopologyBoundingBoxTest,StepMeshExporterTest test
+```
+
+### Progress result
+
+- added [StepTopologyBuilder.java](/root/work/MiniCAD/src/main/java/com/minicad/step/semantic/StepTopologyBuilder.java)
+- moved oriented-edge, loop, path, face-bound, and face assembly behind a dedicated helper
+- preserved `StepCadBuilder` as the public facade and cache owner
+- validation passed:
+
+```bash
+mvn -q -Dtest=StepCadBuilderTest test
 ```
 
 ### Expected payoff
