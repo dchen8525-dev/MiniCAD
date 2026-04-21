@@ -8,6 +8,8 @@ This file provides guidance to Claude Code when working with code in this reposi
 mvn test                                    # Run all tests
 mvn -q test                                 # Quieter test run
 mvn clean test                              # Rebuild from scratch
+mvn test -Dtest=ClassName                   # Run a single test class
+mvn test -Dtest=ClassName#methodName        # Run a single test method
 mvn exec:java -Dexec.args="examples/minimal-square.step"  # CLI demo on a STEP file
 mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp exec:java  # Start web viewer at http://127.0.0.1:8080
 ```
@@ -24,31 +26,35 @@ Industrial-oriented CAD kernel and STEP parser with comprehensive AP214/AP242 en
 
 ```
 STEP text → syntax (StepTokenizer → StepParser → StepFile)
-         → semantic model (StepEntityResolver → 1114 StepXxx model classes)
+         → semantic model (StepEntityResolver → 1175 StepXxx model classes)
          → internal geometry/topology (Curve3, SurfaceGeometry, Vertex, Edge, Face, Shell, Solid)
          → preview/export (StepPreviewJsonExporter → browser Three.js)
 ```
 
 **Layer sizes:**
-- `step.model`: 1176 entity model classes across 26 sub-packages
-- `step.semantic`: 9 resolver/builder classes
-- `step.syntax`: 3 tokenizer/parser classes
-- `geometry`: 30 curve/surface classes (13 Curve3 permits, 16 SurfaceGeometry permits)
+- `step.model`: 1175 entity model classes across 26 sub-packages
+- `step.semantic`: 6 个 resolver/builder 类，注册 1231 种唯一实体类型（1324 次 `registry.put` 调用）
+- `step.syntax`: 9 classes (tokenizer, parser, AST models)
+- `geometry`: 37 classes (Curve3 sealed: 13 permits, SurfaceGeometry sealed: 16 permits)
 - `geometry2d`: 16 2D parametric domain classes
 - `topology`: 11 B-Rep classes
+- `app`: 13 application classes (CLI, web server, exporters, extractors)
+- `common`: 8 shared exceptions and utilities
+- Total: 1275 Java source files, 60 tests, 45 example STEP files
 
 **Key packages:**
-- `step.syntax`: StepTokenizer and StepParser produce raw AST. No semantic interpretation.
-- `step.model`: 1114 immutable record classes for resolved STEP entities, organized into sub-packages:
-  - `geometry` (113), `topology` (31), `product` (95), `annotation` (98), `manufacturing` (115),
-  - `tolerance` (30), `unit` (13), `kinematic` (24), `fea` (17), `approval` (13),
-  - `classification` (28), `organization` (19), `date_time` (11), `document` (20),
-  - `action` (49), `config_mgmt` (23), `security` (22), `resource` (67),
+- `step.syntax`: StepTokenizer and StepParser produce raw AST. AST model classes include StepEntityInstance, StepEntityDefinition, StepFile, StepHeaderEntry, StepToken, StepTokenType, StepValue. No semantic interpretation.
+- `step.model`: 1175 immutable record classes for resolved STEP entities, organized into 26 sub-packages:
+  - `geometry` (115), `topology` (31), `product` (107), `annotation` (117), `manufacturing` (117),
+  - `tolerance` (32), `unit` (19), `kinematic` (26), `fea` (24), `approval` (13),
+  - `classification` (28), `organization` (19), `date_time` (11), `document` (21),
+  - `action` (49), `config_mgmt` (28), `security` (22), `resource` (67),
   - `workflow` (199), `validation` (50), `log_audit` (23), `backup_recovery` (14),
-  - `system` (10), `analysis` (15), `profile` (4), `base` (11)
-- `step.semantic`: StepEntityResolver maps raw definitions to model classes (1302 entity types registered).
+  - `system` (10), `analysis` (15), `profile` (7), `base` (11)
+- `step.semantic`: StepEntityResolver maps raw definitions to model classes (1231 种唯一实体类型，1324 次注册调用)。EntityFactory 创建实例。StepCadBuilder/StepCadGeometryOps 从已解析实体组装 B-Rep。
 - `geometry`/`geometry2d`: 3D/2D geometry types with sealed interfaces and default sampling methods.
 - `topology`: B-Rep topology (Vertex, Edge, OrientedEdge, EdgeLoop, FaceBound, Face, Shell, Solid).
+- `app`: StepViewerApp (Jetty web server), StepPreviewJsonExporter (Java→Three.js JSON), StepDumpApp (CLI text reader), StepMeshExporter, StepAssemblyGraphBuilder, StepValidationMatcher, etc.
 
 **Viewer architecture:**
 - Java resolves STEP and exports preview JSON via StepPreviewJsonExporter
@@ -64,7 +70,7 @@ STEP text → syntax (StepTokenizer → StepParser → StepFile)
 
 ## Testing Patterns
 
-Tests mirror main package layout under `src/test/java/`. Use inline STEP snippets for parser/resolver tests unless a reusable file in `examples/` is clearer. Cover:
+Tests mirror main package layout under `src/test/java/`. Test distribution: geometry (29), geometry2d (14), app (10), topology (4), step (3). Use inline STEP snippets for parser/resolver tests unless a reusable file in `examples/` is clearer. Cover:
 - Forward references, missing references, illegal syntax
 - Unsupported entities/forms, partial-support boundaries
 - Both happy path and failure path
@@ -79,7 +85,13 @@ Tests mirror main package layout under `src/test/java/`. Use inline STEP snippet
 
 ## STEP Entity Coverage
 
-The resolver registers 1214 entity types. Key categories:
+The resolver registers 1324 entity types (1231 unique names, ~735 match ISO standard entities). Key categories:
+
+**Standard coverage vs AP242 Ed2 (2122 entities)**: 735/2122 (34.6%)
+**Standard coverage vs AP203 Ed2 (1006 entities)**: 578/1006 (57.5%)
+**Standard coverage vs AP214 (929 entities)**: 525/929 (56.5%)
+
+The ~487 non-standard entity names in the registry are MiniCAD aliases/variants (e.g., `B_SPLINE_CURVE_2D`, `ARBITRARY_CLOSED_PROFILE_DEF`) that don't correspond to any ISO 10303 entity.
 
 **Geometry/Topology (fully parsed with B-Rep generation):**
 - All basic curves (LINE, CIRCLE, ELLIPSE, HYPERBOLA, PARABOLA, POLYLINE, TRIMMED_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, etc.) — 13 Curve3 types
@@ -143,6 +155,6 @@ The following STEP AP214/AP242 entity types are registered but have no B-Rep gen
 ### Industrial File Import Status
 
 | File | solids | unsupported faces | Notes |
-|---|---|---|---|
+|------|--------|-------------------|-------|
 | engine.stp | 31 | 0 | 93829 entities; vertex projection tolerance handles ~1mm source data precision issues |
 | fan.stp | 1 | 0 | 41707 entities |

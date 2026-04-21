@@ -4,24 +4,19 @@ import com.minicad.step.model.base.StepEntity;
 import java.util.List;
 
 /**
- * Resolved INDEXED_POLY_CURVE.
- * A polygonal curve defined by indices into a point list.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param points ordered list of cartesian points
- * @param indices indices into the points list defining the curve path
- * @param closed whether the curve is closed
+ * Resolved INDEXED_POLYCURVE.
  */
-public record StepIndexedPolyCurve(
+public record StepIndexedPolycurve(
     int id,
     String name,
-    List<StepCartesianPoint> points,
+    List<StepEntity> points,
     List<Integer> indices,
-    boolean closed) implements StepEntity {
+    List<StepEntity> segments
+) implements StepEntity {
 
-  public StepIndexedPolyCurve {
-    points = List.copyOf(points);
-    indices = List.copyOf(indices);
-  }
+    public StepIndexedPolycurve {
+        points = List.copyOf(points);
+        indices = List.copyOf(indices);
+        segments = List.copyOf(segments);
+    }
 }
