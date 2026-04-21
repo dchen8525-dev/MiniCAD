@@ -129,6 +129,10 @@ import com.minicad.step.model.annotation.StepColourSpecification;
 import com.minicad.step.model.annotation.StepColourRgb;
 import com.minicad.step.model.annotation.StepColorSpecification;
 import com.minicad.step.model.config_mgmt.StepConfigurationEffectivity;
+import com.minicad.step.model.config_mgmt.StepChange;
+import com.minicad.step.model.config_mgmt.StepStartRequest;
+import com.minicad.step.model.config_mgmt.StepStartWork;
+import com.minicad.step.model.config_mgmt.StepWorkItem;
 import com.minicad.step.model.config_mgmt.StepConfigurationItem;
 import com.minicad.step.model.config_mgmt.StepExclusionAssignment;
 import com.minicad.step.model.config_mgmt.StepDateTimeEffectivity;
@@ -215,6 +219,19 @@ import com.minicad.step.model.kinematic.StepCylindricalPair;
 import com.minicad.step.model.kinematic.StepSphericalPair;
 import com.minicad.step.model.kinematic.StepPlanarPair;
 import com.minicad.step.model.kinematic.StepUniversalPair;
+import com.minicad.step.model.kinematic.StepRevoluteJoint;
+import com.minicad.step.model.kinematic.StepPrismaticJoint;
+import com.minicad.step.model.kinematic.StepSphericalJoint;
+import com.minicad.step.model.kinematic.StepCylindricalJoint;
+import com.minicad.step.model.kinematic.StepPlanarJoint;
+import com.minicad.step.model.kinematic.StepScrewJoint;
+import com.minicad.step.model.kinematic.StepGeneralJoint;
+import com.minicad.step.model.kinematic.StepDirectionSense;
+import com.minicad.step.model.kinematic.StepJointValue;
+import com.minicad.step.model.kinematic.StepKinematicChain;
+import com.minicad.step.model.kinematic.StepKinematicModel;
+import com.minicad.step.model.kinematic.StepKinematicProperty;
+import com.minicad.step.model.kinematic.StepMotionConstraint;
 import com.minicad.step.model.kinematic.StepScrewPair;
 import com.minicad.step.model.kinematic.StepGearPair;
 import com.minicad.step.model.kinematic.StepGearPairWithRange;
@@ -244,6 +261,12 @@ import com.minicad.step.model.product.StepModelDefinition;
 import com.minicad.step.model.workflow.StepModelInstance;
 import com.minicad.step.model.validation.StepSimulationDefinition;
 import com.minicad.step.model.validation.StepSimulationInstance;
+import com.minicad.step.model.tolerance.StepCompositeGroupTolerance;
+import com.minicad.step.model.tolerance.StepDatumReferenceModifierWithSign;
+import com.minicad.step.model.tolerance.StepGeometricToleranceTarget;
+import com.minicad.step.model.tolerance.StepModifier;
+import com.minicad.step.model.tolerance.StepQualifiedRepresentationItem;
+import com.minicad.step.model.tolerance.StepRunoutZoneDefinition;
 import com.minicad.step.model.tolerance.StepRunoutToleranceZone;
 import com.minicad.step.model.workflow.StepShapeDimensionRepresentation;
 import com.minicad.step.model.tolerance.StepToleranceValue;
@@ -497,6 +520,52 @@ import com.minicad.step.model.topology.StepCubicBezierTriangulatedFace;
 import com.minicad.step.model.product.StepTessellatedTriangle;
 import com.minicad.step.model.fea.StepFiniteElementMesh;
 import com.minicad.step.model.fea.StepVolume3dElementRepresentation;
+import com.minicad.step.model.fea.StepFeaNode;
+import com.minicad.step.model.fea.StepFeaElement;
+import com.minicad.step.model.fea.StepFeaLoad;
+import com.minicad.step.model.fea.StepFeaModel;
+import com.minicad.step.model.fea.StepMaterial;
+import com.minicad.step.model.fea.StepFeaLinearMaterial;
+import com.minicad.step.model.fea.StepFeaNonLinearMaterial;
+import com.minicad.step.model.fea.StepFeaMassDensity;
+import com.minicad.step.model.fea.StepFeaYieldStress;
+import com.minicad.step.model.fea.StepFeaUltimateStress;
+import com.minicad.step.model.fea.StepDisplacementBoundaryCondition;
+import com.minicad.step.model.fea.StepVelocityBoundaryCondition;
+import com.minicad.step.model.fea.StepAccelerationBoundaryCondition;
+import com.minicad.step.model.fea.StepForceBoundaryCondition;
+import com.minicad.step.model.fea.StepPressureBoundaryCondition;
+import com.minicad.step.model.fea.StepThermalBoundaryCondition;
+import com.minicad.step.model.fea.StepStressAnalysis;
+import com.minicad.step.model.fea.StepBucklingAnalysis;
+import com.minicad.step.model.fea.StepModalAnalysis;
+import com.minicad.step.model.fea.StepThermalAnalysis;
+import com.minicad.step.model.fea.StepStructuralAnalysisModel;
+import com.minicad.step.model.element.StepElementVolume;
+import com.minicad.step.model.element.StepVolumeElement;
+import com.minicad.step.model.element.StepSurfaceElement;
+import com.minicad.step.model.element.StepLineElement;
+import com.minicad.step.model.element.StepMassElement;
+import com.minicad.step.model.element.StepConnectivityElement;
+import com.minicad.step.model.element.StepElementGeometricDescription;
+import com.minicad.step.model.element.StepUniformSurfaceElement;
+import com.minicad.step.model.element.StepUniformVolumeElement;
+import com.minicad.step.model.element.StepNodeRepresentation;
+import com.minicad.step.model.product.StepSpecificHigherUsageOccurrence;
+import com.minicad.step.model.product.StepUsageOccurrence;
+import com.minicad.step.model.product.StepShapeRepresentationTransformation;
+import com.minicad.step.model.workflow.StepRepresentationContext3d;
+import com.minicad.step.model.classification.StepAppliedAttributeClassification;
+import com.minicad.step.model.classification.StepAttributeClassification;
+import com.minicad.step.model.fea.StepStructuralAnalysisRepresentation;
+import com.minicad.step.model.fea.StepStructuralAnalysisRepresentationParameters;
+import com.minicad.step.model.workflow.StepValueReasonPair;
+import com.minicad.step.model.geometry.StepBoundingBox;
+import com.minicad.step.model.annotation.StepFillAreaShapeUse;
+import com.minicad.step.model.topology.StepPointOnFace;
+import com.minicad.step.model.product.StepTessellatedCoordinateSet;
+import com.minicad.step.model.validation.StepUncertaintyMeasure;
+import com.minicad.step.model.fea.StepStructAnalysisModel;
 import com.minicad.step.model.fea.StepVolume3dElementProperty;
 import com.minicad.step.model.fea.StepCurve3dElementProperty;
 import com.minicad.step.model.fea.StepSurface3dElementProperty;
@@ -2822,6 +2891,63 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 2)));
   }
 
+  private StepModifier resolveModifier(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MODIFIER");
+    requireParameterCount(instance, definition, 2);
+    return new StepModifier(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepCompositeGroupTolerance resolveCompositeGroupTolerance(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "COMPOSITE_GROUP_TOLERANCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepCompositeGroupTolerance(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepGeometricToleranceTarget resolveGeometricToleranceTarget(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GEOMETRIC_TOLERANCE_TARGET");
+    requireParameterCount(instance, definition, 3);
+    return new StepGeometricToleranceTarget(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2));
+  }
+
+  private StepQualifiedRepresentationItem resolveQualifiedRepresentationItem(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "QUALIFIED_REPRESENTATION_ITEM");
+    requireParameterCount(instance, definition, 2);
+    return new StepQualifiedRepresentationItem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepDatumReferenceModifierWithSign resolveDatumReferenceModifierWithSign(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_MODIFIER_WITH_SIGN");
+    requireParameterCount(instance, definition, 4);
+    return new StepDatumReferenceModifierWithSign(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepRunoutZoneDefinition resolveRunoutZoneDefinition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RUNOUT_ZONE_DEFINITION");
+    requireParameterCount(instance, definition, 2);
+    return new StepRunoutZoneDefinition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
   private StepConfigurationEffectivity resolveConfigurationEffectivity(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CONFIGURATION_EFFECTIVITY");
     requireParameterCount(instance, definition, 3);
@@ -4350,6 +4476,651 @@ public final class StepEntityResolver {
         entityReferenceList(instance, definition, 1,
             "VOLUME_3D_ELEMENT_REPRESENTATION elements must contain entity references"),
         resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepFeaNode resolveFeaNode(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "NODE");
+    requireParameterCount(instance, definition, 4);
+    return new StepFeaNode(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepFeaElement resolveFeaElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    StepEntity elementProperty = tryResolveReference(definition.parameters().get(3));
+    return new StepFeaElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        entityReferenceList(instance, definition, 2, "ELEMENT nodes must contain entity references"),
+        elementProperty);
+  }
+
+  private StepFeaLoad resolveFeaLoad(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LOAD");
+    requireParameterCount(instance, definition, 4);
+    return new StepFeaLoad(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepFeaModel resolveFeaModel(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_MODEL");
+    requireParameterCount(instance, definition, 5);
+    return new StepFeaModel(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        entityReferenceList(instance, definition, 2, "FEA_MODEL elements must contain entity references"),
+        entityReferenceList(instance, definition, 3, "FEA_MODEL loads must contain entity references"),
+        entityReferenceList(instance, definition, 4, "FEA_MODEL boundary conditions must contain entity references"));
+  }
+
+  private StepMaterial resolveMaterial(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MATERIAL");
+    requireParameterCount(instance, definition, 5);
+    return new StepMaterial(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepFeaLinearMaterial resolveFeaLinearMaterial(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_LINEAR_MATERIAL");
+    requireParameterCount(instance, definition, 4);
+    return new StepFeaLinearMaterial(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepFeaNonLinearMaterial resolveFeaNonLinearMaterial(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_NON_LINEAR_MATERIAL");
+    requireParameterCount(instance, definition, 3);
+    return new StepFeaNonLinearMaterial(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepFeaMassDensity resolveFeaMassDensity(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_MASS_DENSITY");
+    requireParameterCount(instance, definition, 2);
+    return new StepFeaMassDensity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1));
+  }
+
+  private StepFeaYieldStress resolveFeaYieldStress(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_YIELD_STRESS");
+    requireParameterCount(instance, definition, 2);
+    return new StepFeaYieldStress(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1));
+  }
+
+  private StepFeaUltimateStress resolveFeaUltimateStress(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FEA_ULTIMATE_STRESS");
+    requireParameterCount(instance, definition, 2);
+    return new StepFeaUltimateStress(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1));
+  }
+
+  private StepDisplacementBoundaryCondition resolveDisplacementBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DISPLACEMENT_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 5);
+    return new StepDisplacementBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepVelocityBoundaryCondition resolveVelocityBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "VELOCITY_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 5);
+    return new StepVelocityBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepAccelerationBoundaryCondition resolveAccelerationBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ACCELERATION_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 5);
+    return new StepAccelerationBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepForceBoundaryCondition resolveForceBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FORCE_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 5);
+    return new StepForceBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepPressureBoundaryCondition resolvePressureBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRESSURE_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 3);
+    return new StepPressureBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2));
+  }
+
+  private StepThermalBoundaryCondition resolveThermalBoundaryCondition(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "THERMAL_BOUNDARY_CONDITION");
+    requireParameterCount(instance, definition, 4);
+    return new StepThermalBoundaryCondition(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepStressAnalysis resolveStressAnalysis(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STRESS_ANALYSIS");
+    requireParameterCount(instance, definition, 2);
+    return new StepStressAnalysis(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepBucklingAnalysis resolveBucklingAnalysis(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BUCKLING_ANALYSIS");
+    requireParameterCount(instance, definition, 2);
+    return new StepBucklingAnalysis(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        (int) numberValue(instance, definition, 1));
+  }
+
+  private StepModalAnalysis resolveModalAnalysis(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MODAL_ANALYSIS");
+    requireParameterCount(instance, definition, 2);
+    return new StepModalAnalysis(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        (int) numberValue(instance, definition, 1));
+  }
+
+  private StepThermalAnalysis resolveThermalAnalysis(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "THERMAL_ANALYSIS");
+    requireParameterCount(instance, definition, 2);
+    return new StepThermalAnalysis(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepStructuralAnalysisModel resolveStructuralAnalysisModel(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_MODEL");
+    requireParameterCount(instance, definition, 5);
+    return new StepStructuralAnalysisModel(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        entityReferenceList(instance, definition, 2, "STRUCTURAL_ANALYSIS_MODEL elements must contain entity references"),
+        entityReferenceList(instance, definition, 3, "STRUCTURAL_ANALYSIS_MODEL loads must contain entity references"),
+        entityReferenceList(instance, definition, 4, "STRUCTURAL_ANALYSIS_MODEL boundary conditions must contain entity references"));
+  }
+
+  private StepRevoluteJoint resolveRevoluteJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "REVOLUTE_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepRevoluteJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepPrismaticJoint resolvePrismaticJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PRISMATIC_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepPrismaticJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepSphericalJoint resolveSphericalJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SPHERICAL_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepSphericalJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepCylindricalJoint resolveCylindricalJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CYLINDRICAL_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepCylindricalJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepPlanarJoint resolvePlanarJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "PLANAR_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepPlanarJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  private StepScrewJoint resolveScrewJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SCREW_JOINT");
+    requireParameterCount(instance, definition, 5);
+    return new StepScrewJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        numberValue(instance, definition, 4));
+  }
+
+  private StepGeneralJoint resolveGeneralJoint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "GENERAL_JOINT");
+    requireParameterCount(instance, definition, 4);
+    return new StepGeneralJoint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)));
+  }
+
+  private StepDirectionSense resolveDirectionSense(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "DIRECTION_SENSE");
+    requireParameterCount(instance, definition, 2);
+    return new StepDirectionSense(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepJointValue resolveJointValue(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "JOINT_VALUE");
+    requireParameterCount(instance, definition, 3);
+    return new StepJointValue(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepKinematicChain resolveKinematicChain(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "KINEMATIC_CHAIN");
+    requireParameterCount(instance, definition, 3);
+    return new StepKinematicChain(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepKinematicModel resolveKinematicModel(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "KINEMATIC_MODEL");
+    requireParameterCount(instance, definition, 3);
+    return new StepKinematicModel(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepKinematicProperty resolveKinematicProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "KINEMATIC_PROPERTY");
+    requireParameterCount(instance, definition, 3);
+    return new StepKinematicProperty(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepMotionConstraint resolveMotionConstraint(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MOTION_CONSTRAINT");
+    requireParameterCount(instance, definition, 4);
+    return new StepMotionConstraint(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepChange resolveChange(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CHANGE");
+    requireParameterCount(instance, definition, 3);
+    return new StepChange(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepStartRequest resolveStartRequest(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "START_REQUEST");
+    requireParameterCount(instance, definition, 3);
+    return new StepStartRequest(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepStartWork resolveStartWork(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "START_WORK");
+    requireParameterCount(instance, definition, 3);
+    return new StepStartWork(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepWorkItem resolveWorkItem(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "WORK_ITEM");
+    requireParameterCount(instance, definition, 3);
+    return new StepWorkItem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepSpecificHigherUsageOccurrence resolveSpecificHigherUsageOccurrence(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SPECIFIC_HIGHER_USAGE_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepSpecificHigherUsageOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepUsageOccurrence resolveUsageOccurrence(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "USAGE_OCCURRENCE");
+    requireParameterCount(instance, definition, 3);
+    return new StepUsageOccurrence(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepShapeRepresentationTransformation resolveShapeRepresentationTransformation(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SHAPE_REPRESENTATION_TRANSFORMATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepShapeRepresentationTransformation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepRepresentationContext3d resolveRepresentationContext3d(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "REPRESENTATION_CONTEXT_3D");
+    requireParameterCount(instance, definition, 3);
+    return new StepRepresentationContext3d(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        doubleList(instance, definition, 2));
+  }
+
+  private StepAppliedAttributeClassification resolveAppliedAttributeClassification(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "APPLIED_ATTRIBUTE_CLASSIFICATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepAppliedAttributeClassification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepAttributeClassification resolveAttributeClassification(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ATTRIBUTE_CLASSIFICATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepAttributeClassification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepStructuralAnalysisRepresentation resolveStructuralAnalysisRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_REPRESENTATION");
+    requireParameterCount(instance, definition, 3);
+    return new StepStructuralAnalysisRepresentation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        entityReferenceList(instance, definition, 2, "STRUCTURAL_ANALYSIS_REPRESENTATION items must contain entity references"));
+  }
+
+  private StepStructuralAnalysisRepresentationParameters resolveStructuralAnalysisRepresentationParameters(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS");
+    requireParameterCount(instance, definition, 2);
+    return new StepStructuralAnalysisRepresentationParameters(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepValueReasonPair resolveValueReasonPair(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "VALUE_REASON_PAIR");
+    requireParameterCount(instance, definition, 3);
+    return new StepValueReasonPair(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepBoundingBox resolveBoundingBox(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "BOUNDING_BOX");
+    requireParameterCount(instance, definition, 3);
+    return new StepBoundingBox(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepFillAreaShapeUse resolveFillAreaShapeUse(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FILL_AREA_SHAPE_USE");
+    requireParameterCount(instance, definition, 2);
+    return new StepFillAreaShapeUse(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)));
+  }
+
+  private StepPointOnFace resolvePointOnFace(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "POINT_ON_FACE");
+    requireParameterCount(instance, definition, 4);
+    return new StepPointOnFace(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3));
+  }
+
+  private StepTessellatedCoordinateSet resolveTessellatedCoordinateSet(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "TESSELLATED_COORDINATE_SET");
+    requireParameterCount(instance, definition, 2);
+    return new StepTessellatedCoordinateSet(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "TESSELLATED_COORDINATE_SET coordinates must contain entity references"));
+  }
+
+  private StepUncertaintyMeasure resolveUncertaintyMeasure(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "UNCERTAINTY_MEASURE");
+    requireParameterCount(instance, definition, 3);
+    return new StepUncertaintyMeasure(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1),
+        stringValue(instance, definition, 2));
+  }
+
+  private StepStructAnalysisModel resolveStructAnalysisModel(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "STRUCT_ANALYSIS_MODEL");
+    requireParameterCount(instance, definition, 3);
+    return new StepStructAnalysisModel(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1));
+  }
+
+  private StepElementVolume resolveElementVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ELEMENT_VOLUME");
+    requireParameterCount(instance, definition, 2);
+    return new StepElementVolume(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        numberValue(instance, definition, 1));
+  }
+
+  private StepVolumeElement resolveVolumeElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "VOLUME_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepVolumeElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "VOLUME_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepSurfaceElement resolveSurfaceElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "SURFACE_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepSurfaceElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "SURFACE_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepLineElement resolveLineElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "LINE_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepLineElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "LINE_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepMassElement resolveMassElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "MASS_ELEMENT");
+    requireParameterCount(instance, definition, 3);
+    return new StepMassElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "MASS_ELEMENT nodes must contain entity references"),
+        numberValue(instance, definition, 2));
+  }
+
+  private StepConnectivityElement resolveConnectivityElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "CONNECTIVITY_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepConnectivityElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "CONNECTIVITY_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepElementGeometricDescription resolveElementGeometricDescription(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "ELEMENT_GEOMETRIC_DESCRIPTION");
+    requireParameterCount(instance, definition, 3);
+    return new StepElementGeometricDescription(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  private StepUniformSurfaceElement resolveUniformSurfaceElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "UNIFORM_SURFACE_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepUniformSurfaceElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "UNIFORM_SURFACE_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepUniformVolumeElement resolveUniformVolumeElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "UNIFORM_VOLUME_ELEMENT");
+    requireParameterCount(instance, definition, 4);
+    return new StepUniformVolumeElement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "UNIFORM_VOLUME_ELEMENT nodes must contain entity references"),
+        tryResolveReference(definition.parameters().get(2)));
+  }
+
+  private StepNodeRepresentation resolveNodeRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "NODE_REPRESENTATION");
+    requireParameterCount(instance, definition, 2);
+    return new StepNodeRepresentation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityReferenceList(instance, definition, 1, "NODE_REPRESENTATION representedNodes must contain entity references"));
   }
 
   private StepVolume3dElementProperty resolveVolume3dElementProperty(StepEntityInstance instance) {
@@ -11319,9 +12090,40 @@ public final class StepEntityResolver {
         definition.name() + " parameter " + index + " must be a reference");
   }
 
+  private StepEntity tryResolveReference(StepValue value) {
+    value = unwrapTyped(value);
+    if (value instanceof StepValue.OmittedValue || value instanceof StepValue.NotProvidedValue) {
+      return null;
+    }
+    if (value instanceof StepValue.ReferenceValue referenceValue) {
+      return resolve(referenceValue.id());
+    }
+    throw new StepResolutionException("parameter must be a reference or omit/not-provided");
+  }
+
   private List<Double> coordinateTriple(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     return coordinateList(instance, definition, index, 3, 3);
+  }
+
+  private List<Double> doubleList(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = unwrapTyped(definition.parameters().get(index));
+    if (!(value instanceof StepValue.ListValue listValue)) {
+      throw new StepResolutionException(
+          definition.name() + " parameter " + index + " must be a list");
+    }
+    return listValue.elements().stream()
+        .map(v -> numberValueFrom(v, definition, index))
+        .toList();
+  }
+
+  private double numberValueFrom(StepValue value, StepEntityDefinition definition, int index) {
+    value = unwrapTyped(value);
+    if (!(value instanceof StepValue.NumberValue numberValue)) {
+      throw new StepResolutionException(
+          definition.name() + " parameter " + index + " must be a number");
+    }
+    return numberValue.value();
   }
 
   private List<Double> coordinateList(
@@ -14024,6 +14826,12 @@ public final class StepEntityResolver {
         StepEntityResolver::resolveRunoutZoneDefinitionOrientation);
     registry.put("DATUM_REFERENCE_MODIFIER", StepEntityResolver::resolveDatumReferenceModifier);
     registry.put("DATUM_SYSTEM_REFERENCE", StepEntityResolver::resolveDatumSystemReference);
+    registry.put("COMPOSITE_GROUP_TOLERANCE", StepEntityResolver::resolveCompositeGroupTolerance);
+    registry.put("GEOMETRIC_TOLERANCE_TARGET", StepEntityResolver::resolveGeometricToleranceTarget);
+    registry.put("QUALIFIED_REPRESENTATION_ITEM", StepEntityResolver::resolveQualifiedRepresentationItem);
+    registry.put("MODIFIER", StepEntityResolver::resolveModifier);
+    registry.put("DATUM_REFERENCE_MODIFIER_WITH_SIGN", StepEntityResolver::resolveDatumReferenceModifierWithSign);
+    registry.put("RUNOUT_ZONE_DEFINITION", StepEntityResolver::resolveRunoutZoneDefinition);
     // Note: DATUM_SYSTEM is already registered earlier as a Shape Aspect alias via registerShapeAspectAliases
     registry.put("TOLERANCE_PAIR", StepEntityResolver::resolveTolerancePair);
     registry.put("TOLERANCE_SET", StepEntityResolver::resolveToleranceSet);
@@ -14091,6 +14899,35 @@ public final class StepEntityResolver {
     registry.put("GEAR_PAIR", StepEntityResolver::resolveGearPair);
     registry.put("GEAR_PAIR_WITH_RANGE", StepEntityResolver::resolveGearPairWithRange);
     registry.put("RACK_AND_PINION_PAIR", StepEntityResolver::resolveRackAndPinionPair);
+    // Kinematic joint types (Joint variants)
+    registry.put("REVOLUTE_JOINT", StepEntityResolver::resolveRevoluteJoint);
+    registry.put("PRISMATIC_JOINT", StepEntityResolver::resolvePrismaticJoint);
+    registry.put("SPHERICAL_JOINT", StepEntityResolver::resolveSphericalJoint);
+    registry.put("CYLINDRICAL_JOINT", StepEntityResolver::resolveCylindricalJoint);
+    registry.put("PLANAR_JOINT", StepEntityResolver::resolvePlanarJoint);
+    registry.put("SCREW_JOINT", StepEntityResolver::resolveScrewJoint);
+    registry.put("GENERAL_JOINT", StepEntityResolver::resolveGeneralJoint);
+    registry.put("DIRECTION_SENSE", StepEntityResolver::resolveDirectionSense);
+    registry.put("JOINT_VALUE", StepEntityResolver::resolveJointValue);
+    registry.put("KINEMATIC_CHAIN", StepEntityResolver::resolveKinematicChain);
+    registry.put("KINEMATIC_MODEL", StepEntityResolver::resolveKinematicModel);
+    registry.put("KINEMATIC_PROPERTY", StepEntityResolver::resolveKinematicProperty);
+    registry.put("MOTION_CONSTRAINT", StepEntityResolver::resolveMotionConstraint);
+    // AP203 change management
+    registry.put("CHANGE", StepEntityResolver::resolveChange);
+    registry.put("START_REQUEST", StepEntityResolver::resolveStartRequest);
+    registry.put("START_WORK", StepEntityResolver::resolveStartWork);
+    registry.put("WORK_ITEM", StepEntityResolver::resolveWorkItem);
+    // StepRepr advanced entities
+    registry.put("SPECIFIC_HIGHER_USAGE_OCCURRENCE", StepEntityResolver::resolveSpecificHigherUsageOccurrence);
+    registry.put("USAGE_OCCURRENCE", StepEntityResolver::resolveUsageOccurrence);
+    registry.put("SHAPE_REPRESENTATION_TRANSFORMATION", StepEntityResolver::resolveShapeRepresentationTransformation);
+    registry.put("REPRESENTATION_CONTEXT_3D", StepEntityResolver::resolveRepresentationContext3d);
+    registry.put("APPLIED_ATTRIBUTE_CLASSIFICATION", StepEntityResolver::resolveAppliedAttributeClassification);
+    registry.put("ATTRIBUTE_CLASSIFICATION", StepEntityResolver::resolveAttributeClassification);
+    registry.put("STRUCTURAL_ANALYSIS_REPRESENTATION", StepEntityResolver::resolveStructuralAnalysisRepresentation);
+    registry.put("STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS", StepEntityResolver::resolveStructuralAnalysisRepresentationParameters);
+    registry.put("VALUE_REASON_PAIR", StepEntityResolver::resolveValueReasonPair);
     registry.put("LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE",
         StepEntityResolver::resolveLowOrderKinematicPairWithRange);
     registry.put("ACTUATED_KINEMATIC_PAIR", StepEntityResolver::resolveActuatedKinematicPair);
@@ -14461,6 +15298,39 @@ public final class StepEntityResolver {
         StepEntityResolver::resolveFeaMaterialPropertyRepresentation);
     registry.put("ELEMENT_VOLUME_2D", StepEntityResolver::resolveElementVolume2d);
     registry.put("ELEMENT_VOLUME_3D", StepEntityResolver::resolveElementVolume3d);
+    // FEA base entities
+    registry.put("NODE", StepEntityResolver::resolveFeaNode);
+    registry.put("ELEMENT", StepEntityResolver::resolveFeaElement);
+    registry.put("LOAD", StepEntityResolver::resolveFeaLoad);
+    registry.put("MATERIAL", StepEntityResolver::resolveMaterial);
+    registry.put("FEA_LINEAR_MATERIAL", StepEntityResolver::resolveFeaLinearMaterial);
+    registry.put("FEA_NON_LINEAR_MATERIAL", StepEntityResolver::resolveFeaNonLinearMaterial);
+    registry.put("FEA_MASS_DENSITY", StepEntityResolver::resolveFeaMassDensity);
+    registry.put("FEA_YIELD_STRESS", StepEntityResolver::resolveFeaYieldStress);
+    registry.put("FEA_ULTIMATE_STRESS", StepEntityResolver::resolveFeaUltimateStress);
+    registry.put("DISPLACEMENT_BOUNDARY_CONDITION", StepEntityResolver::resolveDisplacementBoundaryCondition);
+    registry.put("VELOCITY_BOUNDARY_CONDITION", StepEntityResolver::resolveVelocityBoundaryCondition);
+    registry.put("ACCELERATION_BOUNDARY_CONDITION", StepEntityResolver::resolveAccelerationBoundaryCondition);
+    registry.put("FORCE_BOUNDARY_CONDITION", StepEntityResolver::resolveForceBoundaryCondition);
+    registry.put("PRESSURE_BOUNDARY_CONDITION", StepEntityResolver::resolvePressureBoundaryCondition);
+    registry.put("THERMAL_BOUNDARY_CONDITION", StepEntityResolver::resolveThermalBoundaryCondition);
+    registry.put("STRESS_ANALYSIS", StepEntityResolver::resolveStressAnalysis);
+    registry.put("BUCKLING_ANALYSIS", StepEntityResolver::resolveBucklingAnalysis);
+    registry.put("MODAL_ANALYSIS", StepEntityResolver::resolveModalAnalysis);
+    registry.put("THERMAL_ANALYSIS", StepEntityResolver::resolveThermalAnalysis);
+    registry.put("STRUCTURAL_ANALYSIS_MODEL", StepEntityResolver::resolveStructuralAnalysisModel);
+    // StepElement entities
+    registry.put("ELEMENT_VOLUME", StepEntityResolver::resolveElementVolume);
+    registry.put("VOLUME_ELEMENT", StepEntityResolver::resolveVolumeElement);
+    registry.put("SURFACE_ELEMENT", StepEntityResolver::resolveSurfaceElement);
+    registry.put("LINE_ELEMENT", StepEntityResolver::resolveLineElement);
+    registry.put("MASS_ELEMENT", StepEntityResolver::resolveMassElement);
+    registry.put("CONNECTIVITY_ELEMENT", StepEntityResolver::resolveConnectivityElement);
+    registry.put("ELEMENT_GEOMETRIC_DESCRIPTION", StepEntityResolver::resolveElementGeometricDescription);
+    registry.put("UNIFORM_SURFACE_ELEMENT", StepEntityResolver::resolveUniformSurfaceElement);
+    registry.put("UNIFORM_VOLUME_ELEMENT", StepEntityResolver::resolveUniformVolumeElement);
+    registry.put("NODE_REPRESENTATION", StepEntityResolver::resolveNodeRepresentation);
+    // Existing FEA entities
     registry.put("NODE_SET", StepEntityResolver::resolveNodeSet);
     registry.put("ELEMENT_SET", StepEntityResolver::resolveElementSet);
     registry.put("FEA_SECURED_VARIABLE", StepEntityResolver::resolveFeaSecuredVariable);
