@@ -395,7 +395,7 @@ import com.minicad.step.model.classification.StepIdentificationAssignment;
 import com.minicad.step.model.classification.StepIdentificationRole;
 import com.minicad.step.model.product.StepItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve;
-import com.minicad.step.model.geometry.StepIndexedPolycurve;
+import com.minicad.step.model.geometry.StepIndexedPolyCurve;
 import com.minicad.step.model.geometry.StepPolyline3D;
 import com.minicad.step.model.product.StepItemDefinedTransformation;
 import com.minicad.step.model.kinematic.StepKinematicPropertyDefinitionRepresentation;
@@ -4864,17 +4864,18 @@ public final class StepEntityResolver {
   }
 
   // Geometry resolvers
-  private StepIndexedPolycurve resolveIndexedPolycurve(StepEntityInstance instance) {
+  private StepIndexedPolyCurve resolveIndexedPolycurve(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "INDEXED_POLYCURVE");
     requireParameterCount(instance, definition, 5);
-    return new StepIndexedPolycurve(
+    @SuppressWarnings("unchecked")
+    List<StepCartesianPoint> points = (List<StepCartesianPoint>) (List<?>) entityReferenceList(instance, definition, 1,
+        "INDEXED_POLYCURVE points must contain entity references");
+    return new StepIndexedPolyCurve(
         instance.id(),
         stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "INDEXED_POLYCURVE points must contain entity references"),
+        points,
         intList(instance, definition, 2),
-        entityReferenceList(instance, definition, 3,
-            "INDEXED_POLYCURVE segments must contain entity references"));
+        booleanValue(instance, definition, 4));
   }
 
   private StepPolyline3D resolvePolyline3D(StepEntityInstance instance) {

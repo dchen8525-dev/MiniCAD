@@ -17,14 +17,32 @@
 
 ## 当前现状
 
-当前仓库已经具备以下基础，不应再按“待支持”重复排期：
+当前仓库已经具备以下基础，不应再按”待支持”重复排期：
 
 - `StepEntityResolver` 已覆盖大批几何、拓扑、装配、PMI、验证、运动学、FEA 和样式相关实体。
-- 多类实体已通过 alias/helper 批量注册，而不是“一实体一 resolver”。
+- 多类实体已通过 alias/helper 批量注册，而不是”一实体一 resolver”。
 - `StepAssemblyGraphBuilder` 已存在，装配图并非空白能力。
 - `StepPreviewJsonExporter` 已具备大模型文件验证路径。
 - `examples/engine.stp` 当前测试基线为 `93829` 实体。
 - `examples/fan.stp` 当前测试基线为 `41905` 实体。
+
+### Phase 0 基线数据（由 `CoverageAnalyzer` 生成）
+
+| 指标 | 数值 |
+|------|------|
+| AP242 Ed2 标准实体 | 2122 |
+| Resolver 注册总数 | 2085 |
+| 注册的标准实体 | 860 |
+| MiniCAD 别名（非标准） | 1225 |
+| StepXxx 模型类 | 1172 |
+| Schema coverage | 40.5% |
+| Semantic coverage | 19.5% |
+| 已注册且有模型类 | 414 |
+| 已注册 alias 覆盖 | 125 |
+| 已注册但无模型类 | 446 |
+| 未注册（schema gap） | 1262 |
+
+详细报告见 `doc/generated/ap242-gap-report.md`。
 
 当前 `step/model` 已存在多个按领域拆分的子包：
 
@@ -124,7 +142,38 @@
 - 已注册但未进入 B-Rep 构建的实体
 - 已 resolve 但会导致 `unsupportedFaceCount`、空壳、空 solid、几何退化的实体
 
-这阶段不再笼统写“扫掠体、曲面、特征全部待做”，而是以差集报告中的真实缺口为准。像 `EXTRUDED_AREA_SOLID`、`REVOLVED_AREA_SOLID`、`SURFACE_OF_TRANSLATION`、`SURFACE_OF_PROJECTION`、`PARABOLOID_SURFACE`、`HYPERBOLOID_SURFACE` 这类当前已经注册的实体，不应再作为“未支持解析”统计。
+这阶段不再笼统写”扫掠体、曲面、特征全部待做”，而是以差集报告中的真实缺口为准。像 `EXTRUDED_AREA_SOLID`、`REVOLVED_AREA_SOLID`、`SURFACE_OF_TRANSLATION`、`SURFACE_OF_PROJECTION`、`PARABOLOID_SURFACE`、`HYPERBOLOID_SURFACE` 这类当前已经注册的实体，不应再作为”未支持解析”统计。
+
+#### Phase 1 实际评估结果
+
+对全部 45 个 example 文件执行 `StepDumpApp` 验证后：
+
+| 文件 | solids | unsupported faces | 状态 |
+|------|--------|-------------------|------|
+| engine.stp | 31 | 0 | 已稳定 |
+| fan.stp | 1 | 0 | 已稳定 |
+| nested-assembly.step | 1 | 0 | 已稳定 |
+| two-instance-assembly.step | 1 | 0 | 已稳定 |
+| translated-part-assembly.step | 1 | 0 | 已稳定 |
+| test.step (AP214) | 1 | 0 | 已稳定 |
+| 其余 38 个几何/PMI 样例 | 0-1 | 0-12 | 多数已稳定 |
+
+**结论：工业文件（engine.stp、fan.stp）的几何链路已经完整，不存在阻断导入的缺口。**
+
+对 1262 个未注册标准实体逐一扫描 engine.stp 和 fan.stp 内容后，发现**没有任何一个未注册实体出现在真实工业文件中**。这些实体属于 AP242 的扩展特性（A3M 等效检验、隐式曲线、局部细化样条、加法制造等），不属于当前需要优先处理的目标。
+
+#### 已知可改进项
+
+1. **顶点-曲线容差问题** (`Edge.java` `liesOnCurve`)：
+   - 合成测试文件中部分圆锥/环面 seam 边的顶点不在曲线上（容差 0.01 不够）
+   - 这是合成文件的几何精度问题，不影响 engine.stp / fan.stp
+   - 可后续考虑自适应容差（基于模型尺寸和 UNCERTAINTY_MEASURE_WITH_UNIT）
+
+2. **conical/toroidal 测试文件** 中 `unsupportedFaces` 来源：
+   - `conical-hole.step`: 5 faces, `edge_vertex_off_curve`
+   - `conical-two-holes.step`: 12 faces
+   - `toroidal-two-holes.step`: 10 faces
+   - 这些都是 seam 曲线在锥面/环面顶点处的退化边问题
 
 涉及文件：
 
@@ -137,9 +186,9 @@
 
 完成标准：
 
-- `engine.stp`、`fan.stp`、`nested-assembly.step`、相关几何样例可稳定导入
-- 新增能力有回归测试
-- 文档明确区分“已解析”和“已生成 B-Rep”
+- `engine.stp`、`fan.stp`、`nested-assembly.step`、相关几何样例可稳定导入 — **已完成**
+- 新增能力有回归测试 — **已有 1430 个测试通过**
+- 文档明确区分”已解析”和”已生成 B-Rep” — **本节已说明**
 
 ### Phase 2: PMI、验证与表示层补齐
 

@@ -178,7 +178,6 @@ import com.minicad.step.model.geometry.StepSurfacePatch;
 import com.minicad.step.model.geometry.StepRectangularCompositeSurface;
 import com.minicad.step.model.geometry.StepClothoid;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve;
-import com.minicad.step.model.geometry.StepIndexedPolycurve;
 import com.minicad.step.model.geometry.StepPolyline3D;
 import com.minicad.step.model.geometry.StepDegenerateCurve;
 import com.minicad.step.model.product.StepNonManifoldSolidBrep;
@@ -4630,7 +4629,6 @@ public final class StepCadBuilder {
             case StepTerminatorSymbol terminatorSymbol -> buildCurve3(terminatorSymbol.annotatedCurve());
             case StepClothoid clothoid -> buildClothoidCurve(clothoid);
             case StepIndexedPolyCurve polyCurve -> buildIndexedPolyCurve3(polyCurve);
-            case StepIndexedPolycurve polycurve -> buildIndexedPolycurve3(polycurve);
             case StepPolyline3D polyline3D -> buildPolyline3D(polyline3D);
             case StepDegenerateCurve degenerateCurve -> buildDegenerateCurve3(degenerateCurve);
             case StepLineSegment lineSegment -> {
@@ -4910,22 +4908,6 @@ public final class StepCadBuilder {
             points = List.copyOf(points);
         }
         return new Polyline3(points);
-    }
-
-    private Curve3 buildIndexedPolycurve3(StepIndexedPolycurve polycurve) {
-        // Indexed polycurve with explicit segments: build polyline from indexed points
-        List<StepEntity> stepPoints = polycurve.points();
-        List<Integer> indices = polycurve.indices();
-        List<CartesianPoint> points = indices.stream()
-                .map(index -> {
-                    StepEntity pt = stepPoints.get(index);
-                    if (pt instanceof StepCartesianPoint cartesian) {
-                        return buildPoint(cartesian.id());
-                    }
-                    throw new UnsupportedGeometryException("INDEXED_POLYCURVE point #" + pt.id() + " is not a CARTESIAN_POINT");
-                })
-                .toList();
-        return points.isEmpty() ? new Polyline3(List.of()) : new Polyline3(points);
     }
 
     private Curve3 buildPolyline3D(StepPolyline3D polyline3D) {
