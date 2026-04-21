@@ -171,6 +171,7 @@ import com.minicad.step.model.product.StepCylinderVolume;
 import com.minicad.step.model.product.StepSphereVolume;
 import com.minicad.step.model.product.StepTorusVolume;
 import com.minicad.step.model.product.StepPrismVolume;
+import com.minicad.step.model.product.StepRightCircularConeVolume;
 import com.minicad.step.model.geometry.StepRuledSurface;
 import com.minicad.step.model.geometry.StepSurfaceModel;
 import com.minicad.step.model.geometry.StepSurfaceOfConstantRadius;
@@ -2910,9 +2911,18 @@ public final class StepCadBuilder {
         if (radius <= 0 || height <= 0) {
             throw new UnsupportedGeometryException("CYLINDER_VOLUME requires positive dimensions");
         }
-        // Create cylinder: sample circular profile, extrude
-        List<CartesianPoint> ring = buildCircleRing(radius, 72);
-        return buildExtrudedProfile(ring, Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1)), height);
+        Axis2Placement3D placement = cyl.position() instanceof StepAxis2Placement3D a2
+                ? buildPlacement(a2.id())
+                : null;
+        // Create cylinder: sample circular profile in local XY plane, extrude along local Z
+        List<CartesianPoint> localRing = buildCircleRing(radius, 72);
+        List<CartesianPoint> ring = placement != null
+                ? localRing.stream().map(placement::transformToWorld).toList()
+                : localRing;
+        Direction3 direction = placement != null
+                ? placement.transformDirectionToWorld(Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1)))
+                : Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1));
+        return buildExtrudedProfile(ring, direction, height);
     }
 
     Solid buildSphereVolume(StepSphereVolume sphere) {
@@ -2920,8 +2930,11 @@ public final class StepCadBuilder {
         if (radius <= 0) {
             throw new UnsupportedGeometryException("SPHERE_VOLUME requires positive radius");
         }
-        // Tessellate sphere with latitude/longitude sampling
-        List<Face> faces = tessellateSphere(radius, 24, 48);
+        CartesianPoint center = sphere.center() instanceof StepCartesianPoint cp
+                ? buildPoint(cp.id())
+                : new CartesianPoint(0, 0, 0);
+        // Tessellate sphere centered at the specified center point
+        List<Face> faces = tessellateSphereAt(center, radius, 24, 48);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2931,7 +2944,12 @@ public final class StepCadBuilder {
         if (majorR <= 0 || minorR <= 0) {
             throw new UnsupportedGeometryException("TORUS_VOLUME requires positive radii");
         }
-        List<Face> faces = tessellateTorus(majorR, minorR, 36, 24);
+        Axis2Placement3D placement = torus.position() instanceof StepAxis2Placement3D a2
+                ? buildPlacement(a2.id())
+                : null;
+        List<Face> faces = placement != null
+                ? tessellateTorusAt(placement, majorR, minorR, 36, 24)
+                : tessellateTorus(majorR, minorR, 36, 24);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2942,18 +2960,64 @@ public final class StepCadBuilder {
         if (w <= 0 || d <= 0 || h <= 0) {
             throw new UnsupportedGeometryException("PRISM_VOLUME requires positive dimensions");
         }
-        CartesianPoint corner = prism.position() instanceof StepAxis2Placement3D a2
-                ? buildPoint(a2.location().id())
-                : new CartesianPoint(0, 0, 0);
+        Axis2Placement3D placement = prism.position() instanceof StepAxis2Placement3D a2
+                ? buildPlacement(a2.id())
+                : null;
+        // Build prism in local coordinate system: XY rectangle, extrude along local Z
+        CartesianPoint origin = placement != null ? placement.location() : new CartesianPoint(0, 0, 0);
+        com.minicad.geometry.Vector3 xDir = placement != null ? placement.xDirection().asVector() : new com.minicad.geometry.Vector3(1, 0, 0);
+        com.minicad.geometry.Vector3 yDir = placement != null ? placement.yDirection().asVector() : new com.minicad.geometry.Vector3(0, 1, 0);
+        com.minicad.geometry.Vector3 zDir = placement != null ? placement.axis().asVector() : new com.minicad.geometry.Vector3(0, 0, 1);
         List<CartesianPoint> bottom = List.of(
-                corner,
-                new CartesianPoint(corner.x() + w, corner.y(), corner.z()),
-                new CartesianPoint(corner.x() + w, corner.y() + d, corner.z()),
-                new CartesianPoint(corner.x(), corner.y() + d, corner.z()));
+                origin,
+                origin.add(xDir.scale(w)),
+                origin.add(xDir.scale(w)).add(yDir.scale(d)),
+                origin.add(yDir.scale(d)));
         List<CartesianPoint> top = bottom.stream()
-                .map(p -> new CartesianPoint(p.x(), p.y(), p.z() + h))
+                .map(p -> p.add(zDir.scale(h)))
                 .toList();
         List<Face> faces = buildBoxFaces(bottom, top);
+        return new Solid(new Shell(faces, true));
+    }
+
+    Solid buildRightCircularConeVolume(StepRightCircularConeVolume cone) {
+        double height = cone.height();
+        double bottomRadius = cone.bottomRadius();
+        double topRadius = cone.topRadius() != null ? cone.topRadius() : 0.0;
+        if (bottomRadius <= 0 || height <= 0) {
+            throw new UnsupportedGeometryException("CONE_VOLUME requires positive dimensions");
+        }
+        if (topRadius < 0) {
+            throw new UnsupportedGeometryException("CONE_VOLUME topRadius must be non-negative");
+        }
+        // Build cone: bottom ring at z=0, top ring at z=height
+        int segments = 72;
+        List<CartesianPoint> bottomRing = buildCircleRing(bottomRadius, segments);
+        List<CartesianPoint> topRing = topRadius > 0
+                ? buildCircleRingAtZ(topRadius, height, segments)
+                : List.of(new CartesianPoint(0, 0, height)); // apex point
+
+        List<Face> faces = new ArrayList<>();
+        // Bottom cap
+        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottomRing), Direction3.from(new com.minicad.geometry.Vector3(0, 0, -1))));
+        // Side faces (triangles for apex, quads for truncated cone)
+        for (int i = 0; i < segments; i++) {
+            int next = (i + 1) % segments;
+            if (topRadius > 0) {
+                faces.add(faceFromPolyLoop(
+                        List.of(bottomRing.get(i), bottomRing.get(next), topRing.get(next), topRing.get(i)),
+                        quadNormal(bottomRing.get(i), bottomRing.get(next), topRing.get(next), topRing.get(i))));
+            } else {
+                CartesianPoint apex = topRing.getFirst();
+                faces.add(faceFromPolyLoop(
+                        List.of(bottomRing.get(i), bottomRing.get(next), apex),
+                        triangleNormal(bottomRing.get(i), bottomRing.get(next), apex)));
+            }
+        }
+        // Top cap for truncated cone
+        if (topRadius > 0) {
+            faces.add(faceFromPolyLoop(closeLoop3(topRing), Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
+        }
         return new Solid(new Shell(faces, true));
     }
 
@@ -3080,6 +3144,21 @@ public final class StepCadBuilder {
         return points;
     }
 
+    private List<CartesianPoint> buildCircleRingAtZ(double radius, double z, int segments) {
+        List<CartesianPoint> points = new ArrayList<>();
+        for (int i = 0; i < segments; i++) {
+            double theta = 2 * Math.PI * i / segments;
+            points.add(new CartesianPoint(radius * Math.cos(theta), radius * Math.sin(theta), z));
+        }
+        return points;
+    }
+
+    private Direction3 triangleNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c) {
+        Vector3 ab = new Vector3(b.x() - a.x(), b.y() - a.y(), b.z() - a.z());
+        Vector3 ac = new Vector3(c.x() - a.x(), c.y() - a.y(), c.z() - a.z());
+        return Direction3.from(ab.cross(ac));
+    }
+
     private List<Face> tessellateSphere(double radius, int latSteps, int lonSteps) {
         List<Face> faces = new ArrayList<>();
         for (int i = 0; i < latSteps; i++) {
@@ -3134,6 +3213,70 @@ public final class StepCadBuilder {
                 CartesianPoint p11 = pt(points[i + 1][j + 1]);
                 CartesianPoint p01 = pt(points[i][j + 1]);
                 faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
+            }
+        }
+        return faces;
+    }
+
+    private List<Face> tessellateSphereAt(CartesianPoint center, double radius, int latSteps, int lonSteps) {
+        List<Face> faces = new ArrayList<>();
+        for (int i = 0; i < latSteps; i++) {
+            double phi1 = Math.PI * i / latSteps;
+            double phi2 = Math.PI * (i + 1) / latSteps;
+            for (int j = 0; j < lonSteps; j++) {
+                double theta1 = 2 * Math.PI * j / lonSteps;
+                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
+                CartesianPoint p00 = spherePointAt(center, radius, phi1, theta1);
+                CartesianPoint p10 = spherePointAt(center, radius, phi2, theta1);
+                CartesianPoint p11 = spherePointAt(center, radius, phi2, theta2);
+                CartesianPoint p01 = spherePointAt(center, radius, phi1, theta2);
+                CartesianPoint midPoint = spherePointAt(center, radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
+                Vector3 normal = new Vector3(midPoint.x() - center.x(), midPoint.y() - center.y(), midPoint.z() - center.z());
+                if (i == 0) {
+                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
+                } else if (i == latSteps - 1) {
+                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
+                } else {
+                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
+                }
+            }
+        }
+        return faces;
+    }
+
+    private CartesianPoint spherePointAt(CartesianPoint center, double radius, double phi, double theta) {
+        return new CartesianPoint(
+                center.x() + radius * Math.sin(phi) * Math.cos(theta),
+                center.y() + radius * Math.sin(phi) * Math.sin(theta),
+                center.z() + radius * Math.cos(phi));
+    }
+
+    private List<Face> tessellateTorusAt(Axis2Placement3D placement, double majorR, double minorR, int majorSteps, int minorSteps) {
+        List<Face> faces = new ArrayList<>();
+        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
+        for (int i = 0; i <= majorSteps; i++) {
+            double theta = 2 * Math.PI * i / majorSteps;
+            for (int j = 0; j <= minorSteps; j++) {
+                double phi = 2 * Math.PI * j / minorSteps;
+                points[i][j] = new double[]{
+                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
+                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
+                        minorR * Math.sin(phi)
+                };
+            }
+        }
+        for (int i = 0; i < majorSteps; i++) {
+            for (int j = 0; j < minorSteps; j++) {
+                CartesianPoint p00 = placement.transformToWorld(pt(points[i][j]));
+                CartesianPoint p10 = placement.transformToWorld(pt(points[i + 1][j]));
+                CartesianPoint p11 = placement.transformToWorld(pt(points[i + 1][j + 1]));
+                CartesianPoint p01 = placement.transformToWorld(pt(points[i][j + 1]));
+                CartesianPoint mid = placement.transformToWorld(new CartesianPoint(
+                        (points[i][j][0] + points[i + 1][j][0] + points[i + 1][j + 1][0] + points[i][j + 1][0]) / 4,
+                        (points[i][j][1] + points[i + 1][j][1] + points[i + 1][j + 1][1] + points[i][j + 1][1]) / 4,
+                        (points[i][j][2] + points[i + 1][j][2] + points[i + 1][j + 1][2] + points[i][j + 1][2]) / 4));
+                Vector3 normal = new Vector3(mid.x() - placement.location().x(), mid.y() - placement.location().y(), mid.z() - placement.location().z());
+                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
             }
         }
         return faces;

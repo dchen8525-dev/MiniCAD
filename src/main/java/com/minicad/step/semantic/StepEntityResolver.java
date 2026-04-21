@@ -309,6 +309,7 @@ import com.minicad.step.model.product.StepCsgPrimitive3D;
 import com.minicad.step.model.product.StepCompoundRepresentationItem;
 import com.minicad.step.model.product.StepContextDependentGeometricShapeRepresentation;
 import com.minicad.step.model.product.StepCylinderVolume;
+import com.minicad.step.model.product.StepRightCircularConeVolume;
 import com.minicad.step.model.product.StepSphereVolume;
 import com.minicad.step.model.product.StepTorusVolume;
 import com.minicad.step.model.product.StepPrismVolume;
@@ -10257,6 +10258,21 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
+  private StepRightCircularConeVolume resolveRightCircularConeVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "RIGHT_CIRCULAR_CONE_VOLUME");
+    requireParameterCount(instance, definition, 6);
+    return new StepRightCircularConeVolume(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireEntity(
+            referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "RIGHT_CIRCULAR_CONE_VOLUME position must reference AXIS2_PLACEMENT_3D"),
+        numberValue(instance, definition, 2),
+        numberValue(instance, definition, 3),
+        numberValue(instance, definition, 4));
+  }
+
   private StepSphereVolume resolveSphereVolume(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SPHERE_VOLUME");
     requireParameterCount(instance, definition, 4);
@@ -12051,7 +12067,7 @@ public final class StepEntityResolver {
     registry.put("TORUS_VOLUME", StepEntityResolver::resolveTorusVolume);
     registry.put("PRISM_VOLUME", StepEntityResolver::resolvePrismVolume);
     registry.put("RIGHT_CIRCULAR_CYLINDER_VOLUME", StepEntityResolver::resolveCylinderVolume);
-    registry.put("RIGHT_CIRCULAR_CONE_VOLUME", StepEntityResolver::resolveCylinderVolume);
+    registry.put("RIGHT_CIRCULAR_CONE_VOLUME", StepEntityResolver::resolveRightCircularConeVolume);
     registry.put("SOLID_REPLICA", StepEntityResolver::resolveSolidReplica);
     registry.put(
         "BLOCK",

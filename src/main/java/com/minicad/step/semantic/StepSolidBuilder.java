@@ -25,6 +25,7 @@ import com.minicad.step.model.product.StepMappedItem;
 import com.minicad.step.model.product.StepNonManifoldSolidBrep;
 import com.minicad.step.model.product.StepPolygonalBoundedHalfSpace;
 import com.minicad.step.model.product.StepPrismVolume;
+import com.minicad.step.model.product.StepRightCircularConeVolume;
 import com.minicad.step.model.product.StepRevolvedAreaSolidTapered;
 import com.minicad.step.model.product.StepRevolvedFaceSolid;
 import com.minicad.step.model.product.StepSolidModel;
@@ -177,6 +178,9 @@ final class StepSolidBuilder {
         if (entity instanceof StepPrismVolume prismVolume) {
             return builder.buildPrismVolume(prismVolume);
         }
+        if (entity instanceof StepRightCircularConeVolume coneVolume) {
+            return builder.buildRightCircularConeVolume(coneVolume);
+        }
         if (entity instanceof StepFiniteElementMesh femMesh) {
             return new Solid(builder.buildFiniteElementMeshShell(femMesh));
         }
@@ -249,6 +253,7 @@ final class StepSolidBuilder {
                 || entity instanceof StepSphereVolume
                 || entity instanceof StepTorusVolume
                 || entity instanceof StepPrismVolume
+                || entity instanceof StepRightCircularConeVolume
                 || entity instanceof StepSolidModel
                 || entity instanceof StepFiniteElementMesh
                 || entity instanceof StepFlatPattern

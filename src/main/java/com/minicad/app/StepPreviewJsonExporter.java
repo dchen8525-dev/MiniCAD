@@ -136,6 +136,14 @@ import com.minicad.step.model.geometry.StepCartesianTransformationOperator;
 import com.minicad.step.model.product.StepCsgPrimitive;
 import com.minicad.step.model.product.StepCsgSolid;
 import com.minicad.step.model.product.StepCsgVolume;
+import com.minicad.step.model.product.StepCylinderVolume;
+import com.minicad.step.model.product.StepExtrudedFaceSolid;
+import com.minicad.step.model.product.StepPrismVolume;
+import com.minicad.step.model.product.StepRevolvedFaceSolid;
+import com.minicad.step.model.product.StepRightCircularConeVolume;
+import com.minicad.step.model.product.StepSphereVolume;
+import com.minicad.step.model.product.StepSweptFaceSolid;
+import com.minicad.step.model.product.StepTorusVolume;
 import com.minicad.step.model.product.StepBlockVolume;
 import com.minicad.step.model.geometry.StepConicalSurface;
 import com.minicad.step.model.product.StepContextDependentShapeRepresentation;
@@ -302,6 +310,9 @@ import com.minicad.step.model.classification.StepNameAssignment;
 import com.minicad.step.model.classification.StepNameAttribute;
 import com.minicad.step.model.product.StepNextAssemblyUsageOccurrence;
 import com.minicad.step.model.topology.StepOpenShell;
+import com.minicad.step.model.topology.StepComplexTriangulatedFace;
+import com.minicad.step.model.topology.StepCubicBezierTriangulatedFace;
+import com.minicad.step.model.topology.StepTriangulatedFace;
 import com.minicad.step.model.geometry.StepOpenPath;
 import com.minicad.step.model.organization.StepOrganization;
 import com.minicad.step.model.organization.StepOrganizationAssignment;
@@ -800,7 +811,20 @@ public final class StepPreviewJsonExporter {
                     || entity instanceof StepAdvancedBrep
                     || entity instanceof StepMappedItem
                     || entity instanceof StepSolidModel
-                    || entity instanceof StepSurfacePatch) {
+                    || entity instanceof StepSurfacePatch
+                    || entity instanceof StepExtrudedFaceSolid
+                    || entity instanceof StepRevolvedFaceSolid
+                    || entity instanceof StepSweptFaceSolid
+                    || entity instanceof StepCylinderVolume
+                    || entity instanceof StepSphereVolume
+                    || entity instanceof StepTorusVolume
+                    || entity instanceof StepPrismVolume
+                    || entity instanceof StepRightCircularConeVolume
+                    || entity instanceof StepTessellatedFace
+                    || entity instanceof StepTessellatedFaceSet
+                    || entity instanceof StepTriangulatedFace
+                    || entity instanceof StepComplexTriangulatedFace
+                    || entity instanceof StepCubicBezierTriangulatedFace) {
                 solidIds.add(entity.id());
             }
             if (isStandaloneEdgeSource(entity)) {
