@@ -77,7 +77,6 @@ import com.minicad.step.model.geometry.StepBSplineCurveWithKnotsAndBreakpoints;
 import com.minicad.step.model.geometry.StepBSplineCurveWithKnots;
 import com.minicad.step.model.geometry.StepBSplineSurfaceWithKnots;
 import com.minicad.step.model.geometry.StepCircle;
-import com.minicad.step.model.topology.StepClosedShell;
 import com.minicad.step.model.geometry.StepCompositeCurve;
 import com.minicad.step.model.geometry.StepCompositeCurveOnSurface3D;
 import com.minicad.step.model.geometry.StepCompositeCurveOnSurface;
@@ -94,8 +93,6 @@ import com.minicad.step.model.annotation.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.topology.StepEdgeCurve;
 import com.minicad.step.model.topology.StepEdge;
 import com.minicad.step.model.topology.StepEdgeLoop;
-import com.minicad.step.model.topology.StepEdgeWire;
-import com.minicad.step.model.product.StepEdgeBasedWireframeModel;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepEllipse;
 import com.minicad.step.model.product.StepFacettedBrep;
@@ -109,13 +106,9 @@ import com.minicad.step.model.fea.StepFiniteElementMesh;
 import com.minicad.step.model.manufacturing.StepFlatPattern;
 import com.minicad.step.model.geometry.StepCurve;
 import com.minicad.step.model.geometry.StepCurveBoundedSurface;
-import com.minicad.step.model.geometry.StepCartesianTransformationOperator;
 import com.minicad.step.model.product.StepItemDefinedTransformation;
 import com.minicad.step.model.product.StepCsgPrimitive;
 import com.minicad.step.model.product.StepCsgPrimitive3D;
-import com.minicad.step.model.topology.StepConnectedFaceSubSet;
-import com.minicad.step.model.topology.StepConnectedFaceSet;
-import com.minicad.step.model.topology.StepConnectedEdgeSet;
 import com.minicad.step.model.product.StepCsgSolid;
 import com.minicad.step.model.product.StepCsgVolume;
 import com.minicad.step.model.product.StepGeometricReplica;
@@ -129,7 +122,6 @@ import com.minicad.step.model.product.StepManifoldSolidBrep;
 import com.minicad.step.model.geometry.StepOffsetCurve2D;
 import com.minicad.step.model.geometry.StepOffsetCurve3D;
 import com.minicad.step.model.geometry.StepOffsetSurface;
-import com.minicad.step.model.topology.StepOpenShell;
 import com.minicad.step.model.product.StepTessellatedFace;
 import com.minicad.step.model.product.StepTessellatedFaceSet;
 import com.minicad.step.model.product.StepTessellatedTriangle;
@@ -140,12 +132,9 @@ import com.minicad.step.model.profile.StepCentreLineArcProfileDef;
 import com.minicad.step.model.profile.StepGeneralizedAreaProfile;
 import com.minicad.step.model.profile.StepRectangleHollowProfileDef;
 import com.minicad.step.model.profile.StepSweptProfileAreaOutline;
-import com.minicad.step.model.topology.StepWireShell;
 import com.minicad.step.model.topology.StepTriangulatedFace;
 import com.minicad.step.model.topology.StepComplexTriangulatedFace;
 import com.minicad.step.model.topology.StepCubicBezierTriangulatedFace;
-import com.minicad.step.model.topology.StepOrientedClosedShell;
-import com.minicad.step.model.topology.StepOrientedOpenShell;
 import com.minicad.step.model.topology.StepOrientedEdge;
 import com.minicad.step.model.topology.StepOrientedFace;
 import com.minicad.step.model.topology.StepOrientedSubface;
@@ -154,9 +143,6 @@ import com.minicad.step.model.geometry.StepOrientedSurface;
 import com.minicad.step.model.geometry.StepPiecewiseBezierCurve;
 import com.minicad.step.model.geometry.StepPiecewiseBezierSurface;
 import com.minicad.step.model.geometry.StepPlane;
-import com.minicad.step.model.annotation.StepPlanarBox;
-import com.minicad.step.model.annotation.StepPlanarExtent;
-import com.minicad.step.model.geometry.StepPointSet;
 import com.minicad.step.model.geometry.StepPoint;
 import com.minicad.step.model.geometry.StepFeaAxis2Placement3d;
 import com.minicad.step.model.geometry.StepPcurve;
@@ -203,9 +189,7 @@ import com.minicad.step.model.geometry.StepSurfaceOfProjection;
 import com.minicad.step.model.geometry.StepParaboloidSurface;
 import com.minicad.step.model.geometry.StepHyperboloidSurface;
 import com.minicad.step.model.product.StepSweptAreaSolid;
-import com.minicad.step.model.geometry.StepSurfacePatch;
 import com.minicad.step.model.geometry.StepSurfacedEdgeCurve;
-import com.minicad.step.model.geometry.StepSurfacedOpenShell;
 import com.minicad.step.model.geometry.StepSphericalSurface;
 import com.minicad.step.model.annotation.StepTerminatorSymbol;
 import com.minicad.step.model.geometry.StepTrimmedCurve;
@@ -218,7 +202,6 @@ import com.minicad.step.model.geometry.StepUniformSurface;
 import com.minicad.step.model.topology.StepVertexLoop;
 import com.minicad.step.model.topology.StepVertexPoint;
 import com.minicad.step.model.topology.StepVertex;
-import com.minicad.step.model.topology.StepVertexShell;
 import com.minicad.step.model.geometry.StepOrientedPath;
 import com.minicad.step.model.geometry.StepOpenPath;
 import com.minicad.step.model.geometry.StepPath;
@@ -243,15 +226,7 @@ import com.minicad.step.model.geometry.StepCurve2D;
 import com.minicad.step.model.geometry.StepEllipse2D;
 import com.minicad.step.model.geometry.StepBSplineSurfaceWithKnotsAndBreakpoints;
 import com.minicad.step.model.geometry.StepOffsetSurface2;
-import com.minicad.step.model.product.StepShellBasedSurfaceModel;
-import com.minicad.step.model.product.StepFaceBasedSurfaceModel;
 import com.minicad.step.model.geometry.StepFreeFormSurface;
-import com.minicad.step.model.product.StepGeometricSurfaceSet;
-import com.minicad.step.model.product.StepGeometricCurveSet;
-import com.minicad.step.model.product.StepGeometricSet;
-import com.minicad.step.model.geometry.StepManifoldSurfaceModel;
-import com.minicad.step.model.product.StepShellBasedSurfaceModel;
-import com.minicad.step.model.product.StepShellBasedWireframeModel;
 import com.minicad.step.model.geometry.StepCylindricalSurfaceWithEllipticalAxis;
 import com.minicad.step.model.geometry.StepConicalSurfaceWithEllipticalAxis;
 import com.minicad.step.model.geometry.StepSphericalSurfaceWithEllipticalAxis;
@@ -286,6 +261,9 @@ public final class StepCadBuilder {
     private final StepCadGeometryOps geometryOps;
     private final StepTrimResolver trimResolver;
     private final StepProfileBuilder profileBuilder;
+    private final StepTopologyBuilder topologyBuilder;
+    private final StepShellBuilder shellBuilder;
+    private final StepSolidBuilder solidBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
@@ -346,6 +324,9 @@ public final class StepCadBuilder {
         this.geometryOps = new StepCadGeometryOps(this);
         this.trimResolver = new StepTrimResolver(entitiesById, this::buildPoint, this::buildPoint2);
         this.profileBuilder = new StepProfileBuilder(geometryOps, e -> (Curve2) buildCurve2(e));
+        this.topologyBuilder = new StepTopologyBuilder(this);
+        this.shellBuilder = new StepShellBuilder(this);
+        this.solidBuilder = new StepSolidBuilder(this);
     }
 
     /**
@@ -2270,8 +2251,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepOrientedEdge stepOrientedEdge = requireEntity(id, StepOrientedEdge.class, "ORIENTED_EDGE");
-        OrientedEdge built = new OrientedEdge(buildEdge(stepOrientedEdge.edgeElement().id()), stepOrientedEdge.orientation());
+        OrientedEdge built = topologyBuilder.buildOrientedEdge(id);
         orientedEdges.put(id, built);
         return built;
     }
@@ -2287,8 +2267,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepEdgeLoop loop = requireEntity(id, StepEdgeLoop.class, "EDGE_LOOP");
-        EdgeLoop built = new EdgeLoop(loop.edges().stream().map(edge -> buildOrientedEdge(edge.id())).toList());
+        EdgeLoop built = topologyBuilder.buildEdgeLoop(id);
         loops.put(id, built);
         return built;
     }
@@ -2304,8 +2283,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepVertexLoop loop = requireEntity(id, StepVertexLoop.class, "VERTEX_LOOP");
-        VertexLoop built = new VertexLoop(buildVertex(loop.loopVertex().id()));
+        VertexLoop built = topologyBuilder.buildVertexLoop(id);
         vertexLoops.put(id, built);
         return built;
     }
@@ -2321,9 +2299,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        com.minicad.step.model.topology.StepPolyLoop loop = requireEntity(id, com.minicad.step.model.topology.StepPolyLoop.class, "POLY_LOOP");
-        com.minicad.topology.PolyLoop built = new com.minicad.topology.PolyLoop(
-                loop.polygon().stream().map(point -> buildPoint(point.id())).toList());
+        com.minicad.topology.PolyLoop built = topologyBuilder.buildPolyLoop(id);
         polyLoops.put(id, built);
         return built;
     }
@@ -2339,43 +2315,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepEntity entity = requireExistingEntity(id);
-        List<StepOrientedEdge> edges;
-        boolean needsEdgeOrientationFlip = false;
-        if (entity instanceof StepPath path) {
-            edges = path.edges();
-        } else if (entity instanceof StepOpenPath openPath) {
-            edges = openPath.edges();
-        } else if (entity instanceof StepSubpath subpath) {
-            edges = subpath.edges();
-        } else if (entity instanceof StepOrientedPath orientedPath) {
-            edges = orientedPath.edges();
-            // Resolver reverses list order, but edge orientations must also be flipped.
-            needsEdgeOrientationFlip = !orientedPath.orientation();
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a PATH, OPEN_PATH, SUBPATH, or ORIENTED_PATH");
-        }
-        if (edges.isEmpty()) {
-            throw new StepResolutionException("entity #" + id + " path has no edges");
-        }
-        List<Curve3> curves;
-        if (needsEdgeOrientationFlip) {
-            // When path orientation disagrees with referenced path orientation,
-            // each edge's orientation must be negated (list order already reversed by resolver).
-            curves = edges.stream()
-                    .map(oe -> buildOrientedEdge(oe.id()))
-                    .map(oe -> new OrientedEdge(oe.edge(), !oe.orientation()))
-                    .map(OrientedEdge::edge)
-                    .map(Edge::curve)
-                    .toList();
-        } else {
-            curves = edges.stream()
-                    .map(oe -> buildOrientedEdge(oe.id()))
-                    .map(OrientedEdge::edge)
-                    .map(Edge::curve)
-                    .toList();
-        }
-        CompositeCurve3 built = new CompositeCurve3(curves);
+        CompositeCurve3 built = topologyBuilder.buildPath(id);
         paths.put(id, built);
         return built;
     }
@@ -2391,17 +2331,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepFaceBound stepFaceBound = requireEntity(id, StepFaceBound.class, "FACE_BOUND");
-        Loop builtLoop = switch (stepFaceBound.loop()) {
-            case StepEdgeLoop edgeLoop -> buildEdgeLoop(edgeLoop.id());
-            case StepVertexLoop vertexLoop -> buildVertexLoop(vertexLoop.id());
-            case com.minicad.step.model.topology.StepPolyLoop polyLoop -> buildPolyLoop(polyLoop.id());
-            default -> throw new UnsupportedGeometryException(
-                    "FACE_BOUND construction requires EDGE_LOOP, VERTEX_LOOP, or POLY_LOOP");
-        };
-        FaceBound built = stepFaceBound.outer()
-                ? FaceBound.outer(builtLoop, stepFaceBound.orientation())
-                : FaceBound.inner(builtLoop, stepFaceBound.orientation());
+        FaceBound built = topologyBuilder.buildFaceBound(id);
         faceBounds.put(id, built);
         return built;
     }
@@ -2417,94 +2347,9 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepEntity entity = requireExistingEntity(id);
-        Face built;
-        if (entity instanceof StepOrientedFace orientedFace) {
-            Face baseFace = buildFace(orientedFace.faceElement().id());
-            built = new Face(
-                    baseFace.surface(),
-                    baseFace.bounds(),
-                    orientedFace.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
-            );
-        } else if (entity instanceof StepAdvancedFace advancedFace) {
-            built = buildFaceSurface(advancedFace, "ADVANCED_FACE");
-        } else if (entity instanceof StepFaceSurface faceSurface) {
-            built = buildFaceSurface(faceSurface, "FACE_SURFACE");
-        } else if (entity instanceof StepSubface subface) {
-            // Subface delegates to its faceElement
-            built = buildFace(subface.faceElement().id());
-        } else if (entity instanceof StepOrientedSubface orientedSubface) {
-            // OrientedSubface delegates to its faceElement with orientation flag
-            Face baseFace = buildFace(orientedSubface.faceElement().id());
-            built = new Face(
-                    baseFace.surface(),
-                    baseFace.bounds(),
-                    orientedSubface.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
-            );
-        } else if (entity instanceof StepMachinedSurface machinedSurface) {
-            // MachinedSurface wraps a face that has been machined; delegate to the underlying face
-            built = buildFace(machinedSurface.face().id());
-        } else if (entity instanceof StepFace face) {
-            // FACE is the abstract base type. In complex entity syntax,
-            // the actual face subtype (ADVANCED_FACE, FACE_SURFACE, etc.) may be resolved at the same ID.
-            StepEntity actual = entitiesById.get(face.id());
-            if (actual != null && actual != face) {
-                if (actual instanceof StepOrientedFace || actual instanceof StepAdvancedFace
-                        || actual instanceof StepFaceSurface || actual instanceof StepSubface
-                        || actual instanceof StepOrientedSubface || actual instanceof StepMachinedSurface) {
-                    built = buildFace(actual.id());
-                } else {
-                    throw new StepResolutionException("entity #" + id + " is an abstract FACE with unsupported subtype " + stepEntityTypeName(actual));
-                }
-            } else {
-                throw new StepResolutionException("entity #" + id + " is an abstract FACE with no concrete subtype");
-            }
-        } else if (entity instanceof StepMappedItem mappedItem) {
-            // MAPPED_ITEM: dispatch through to mapping target for face geometry
-            built = buildFace(mappedItem.mappingTarget().id());
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a FACE");
-        }
+        Face built = topologyBuilder.buildFace(id);
         faces.put(id, built);
         return built;
-    }
-
-    private Face buildFaceSurface(StepFaceEntity stepFace, String faceType) {
-        SurfaceGeometry supportedSurface = buildSupportedFaceGeometry(faceGeometry(stepFace), faceType);
-        if (supportedSurface == null) {
-            StepEntity geometry = faceGeometry(stepFace);
-            String unsupportedSurfaceType = describeUnsupportedFaceGeometry(geometry);
-            if (unsupportedSurfaceType != null) {
-                throw new UnsupportedGeometryException(faceType + " construction for " + unsupportedSurfaceType + " is unsupported");
-            }
-            throw new UnsupportedGeometryException(faceType + " construction requires PLANE geometry");
-        }
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> buildFaceBound(bound.id())).toList();
-        if (bounds.stream().noneMatch(FaceBound::outer)) {
-            // Some CAD systems export FACE_BOUND for all bounds. In STEP EXPRESS,
-            // the first bound is typically the outer one. Promote the first bound
-            // to outer and mark the rest as inner.
-            bounds = inferOuterBounds(bounds);
-        }
-        return new Face(supportedSurface, bounds, faceSameSense(stepFace));
-    }
-
-    /**
-     * Infers outer/inner bound classification when no explicit outer bounds exist.
-     * Some CAD systems export all bounds as FACE_BOUND without distinguishing outer vs inner.
-     */
-    private static List<FaceBound> inferOuterBounds(List<FaceBound> bounds) {
-        if (bounds.isEmpty()) return bounds;
-        List<FaceBound> result = new ArrayList<>();
-        for (int i = 0; i < bounds.size(); i++) {
-            FaceBound bound = bounds.get(i);
-            if (i == 0) {
-                result.add(FaceBound.outer(bound.loop(), bound.orientation()));
-            } else {
-                result.add(FaceBound.inner(bound.loop(), bound.orientation()));
-            }
-        }
-        return List.copyOf(result);
     }
 
     /**
@@ -2518,114 +2363,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepEntity entity = requireExistingEntity(id);
-        Shell built;
-        if (entity instanceof StepOpenShell openShell) {
-            built = new Shell(openShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
-        } else if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
-            built = new Shell(surfacedOpenShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
-        } else if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
-            built = new Shell(orientedOpenShell.faces().stream().map(face -> buildFace(face.id())).toList(), false);
-        } else if (entity instanceof StepClosedShell closedShell) {
-            built = new Shell(closedShell.faces().stream().map(face -> buildFace(face.id())).toList(), true);
-        } else if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
-            built = new Shell(orientedClosedShell.faces().stream().map(face -> buildFace(face.id())).toList(), true);
-        } else if (entity instanceof StepTessellatedFace tessellated) {
-            // Individual tessellated face: convert to shell of triangular faces
-            built = buildTessellatedFaceShell(tessellated);
-        } else if (entity instanceof StepTessellatedFaceSet tessellated) {
-            // Convert tessated mesh (coordinates + face index triplets) to Shell of triangular faces
-            built = buildTessellatedShell(tessellated);
-        } else if (entity instanceof StepTriangulatedFace triangulated) {
-            // Triangulated face: vertex list + index triplets
-            built = buildTriangulatedFaceShell(triangulated);
-        } else if (entity instanceof StepComplexTriangulatedFace complex) {
-            // Complex triangulated face: boundaries + vertices
-            built = buildComplexTriangulatedFaceShell(complex);
-        } else if (entity instanceof StepCubicBezierTriangulatedFace bezier) {
-            // Cubic Bezier triangulated face: control points + index triplets
-            built = buildCubicBezierTriangulatedFaceShell(bezier);
-        } else if (entity instanceof StepVertexShell vertexShell) {
-            // Vertex shell: a shell containing only a single vertex loop (degenerate wireframe)
-            built = buildVertexShell(vertexShell);
-        } else if (entity instanceof StepWireShell wireShell) {
-            // Wire shell: a shell containing edge loops without faces (wireframe representation)
-            built = buildWireShell(wireShell);
-        } else if (entity instanceof StepConnectedFaceSet connectedFaces) {
-            // Connected face set: a set of topologically connected faces
-            built = buildConnectedFaceSet(connectedFaces);
-        } else if (entity instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
-            // Connected face sub-set: a subset of faces from a parent face set
-            built = buildConnectedFaceSubSet(connectedFaceSubSet);
-        } else if (entity instanceof StepGeometricCurveSet curveSet) {
-            // Geometric curve set: collection of curves, not a surface shell
-            built = buildGeometricCurveSetShell(curveSet);
-        } else if (entity instanceof StepGeometricSet geometricSet) {
-            // Geometric set: collection of points, curves, surfaces
-            built = buildGeometricSetShell(geometricSet);
-        } else if (entity instanceof StepGeometricSurfaceSet surfaceSet) {
-            // Geometric surface set: collection of surfaces
-            built = buildGeometricSurfaceSetShell(surfaceSet);
-        } else if (entity instanceof StepFaceBasedSurfaceModel faceModel) {
-            // Face-based surface model: collection of faces forming a surface model
-            built = buildFaceBasedSurfaceModel(faceModel);
-        } else if (entity instanceof StepManifoldSurfaceModel manifoldModel) {
-            // Manifold surface model: collection of faces forming a manifold surface
-            built = buildManifoldSurfaceModel(manifoldModel);
-        } else if (entity instanceof StepShellBasedSurfaceModel shellModel) {
-            // Shell-based surface model: collection of shells forming a surface model
-            built = buildShellBasedSurfaceModel(shellModel);
-        } else if (entity instanceof StepShellBasedWireframeModel wireframeModel) {
-            // Shell-based wireframe model: collection of shells forming wireframe
-            built = buildShellBasedWireframeModel(wireframeModel);
-        } else if (entity instanceof StepSurfacePatch surfacePatch) {
-            // Surface patch: a bounded portion of a surface, treated as a single-face shell
-            built = buildSurfacePatchShell(surfacePatch);
-        } else if (entity instanceof StepEdgeBasedWireframeModel edgeWireframe) {
-            // Edge-based wireframe model: collection of connected edge sets
-            built = buildEdgeBasedWireframeModel(edgeWireframe);
-        } else if (entity instanceof StepConnectedEdgeSet connectedEdges) {
-            // Connected edge set: collection of connected edges (wireframe)
-            built = buildConnectedEdgeSetShell(connectedEdges);
-        } else if (entity instanceof StepEdgeWire edgeWire) {
-            // Edge wire: sequence of edges forming a wire
-            built = buildEdgeWireShell(edgeWire);
-        } else if (entity instanceof StepPlanarBox planarBox) {
-            // PlanarBox: a rectangular planar face with placement and dimensions
-            built = buildPlanarBoxShell(planarBox);
-        } else if (entity instanceof StepPlanarExtent planarExtent) {
-            // PlanarExtent: a rectangular planar extent (no placement, centered at origin)
-            built = buildPlanarExtentShell(planarExtent);
-        } else if (entity instanceof StepPointSet pointSet) {
-            // PointSet: collection of points (wireframe, no face geometry)
-            built = buildPointSetShell(pointSet);
-        } else if (entity instanceof StepFiniteElementMesh femMesh) {
-            // Finite element mesh: tessellated mesh with nodes and elements
-            built = buildFiniteElementMeshShell(femMesh);
-        } else if (entity instanceof StepFlatPattern flatPattern) {
-            // Flat pattern: sheet metal flat pattern, delegate to flat geometry
-            if (flatPattern.flatGeometry() instanceof StepFaceEntity faceEntity) {
-                built = new Shell(List.of(buildFace(faceEntity.id())), false);
-            } else if (flatPattern.flatGeometry() instanceof StepOpenShell
-                    || flatPattern.flatGeometry() instanceof StepClosedShell) {
-                built = buildShell(flatPattern.flatGeometry().id());
-            } else {
-                built = new Shell(List.of(), false);
-            }
-        } else if (entity instanceof StepMappedItem mappedItem) {
-            // MAPPED_ITEM: dispatch through to mapping target for shell geometry
-            built = buildShell(mappedItem.mappingTarget().id());
-        } else if (entity instanceof StepSurfaceModel surfaceModel) {
-            // SurfaceModel is an abstract base type. Check for concrete subtype at same ID.
-            StepEntity actual = entitiesById.get(surfaceModel.id());
-            if (actual != null && actual != surfaceModel) {
-                built = buildShell(actual.id());
-            } else {
-                throw new StepResolutionException("entity #" + id + " is an abstract SURFACE_MODEL with no concrete subtype");
-            }
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not an OPEN_SHELL, SURFACED_OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
-        }
+        Shell built = shellBuilder.buildShell(id);
         shells.put(id, built);
         return built;
     }
@@ -2637,7 +2375,7 @@ public final class StepCadBuilder {
      * @param tessellated tessellated face set
      * @return built shell
      */
-    private Shell buildTessellatedShell(StepTessellatedFaceSet tessellated) {
+    Shell buildTessellatedShell(StepTessellatedFaceSet tessellated) {
         List<StepCartesianPoint> coords = tessellated.coordinates();
         List<CartesianPoint> points = new ArrayList<>(coords.size());
         for (StepCartesianPoint cp : coords) {
@@ -2694,7 +2432,7 @@ public final class StepCadBuilder {
         throw new UnsupportedGeometryException("Expected vertex entity but got " + vertexEntity.getClass().getSimpleName());
     }
 
-    private Shell buildTessellatedFaceShell(StepTessellatedFace tessellated) {
+    Shell buildTessellatedFaceShell(StepTessellatedFace tessellated) {
         List<Face> faces = new ArrayList<>(tessellated.triangles().size());
         for (StepEntity triangleRef : tessellated.triangles()) {
             if (triangleRef instanceof StepTessellatedTriangle triangle) {
@@ -2728,7 +2466,7 @@ public final class StepCadBuilder {
      * Builds a shell from a TRIANGULATED_FACE.
      * A triangulated face with vertex list and index triplets.
      */
-    private Shell buildTriangulatedFaceShell(StepTriangulatedFace triangulated) {
+    Shell buildTriangulatedFaceShell(StepTriangulatedFace triangulated) {
         List<CartesianPoint> points = new ArrayList<>(triangulated.vertices().size());
         for (StepEntity v : triangulated.vertices()) {
             if (v instanceof StepCartesianPoint cp) {
@@ -2765,7 +2503,7 @@ public final class StepCadBuilder {
      * Builds a shell from a COMPLEX_TRIANGULATED_FACE.
      * A triangulated face with boundaries and vertices.
      */
-    private Shell buildComplexTriangulatedFaceShell(StepComplexTriangulatedFace complex) {
+    Shell buildComplexTriangulatedFaceShell(StepComplexTriangulatedFace complex) {
         List<CartesianPoint> points = new ArrayList<>();
         for (StepEntity v : complex.vertices()) {
             if (v instanceof StepCartesianPoint cp) {
@@ -2812,7 +2550,7 @@ public final class StepCadBuilder {
      * Builds a shell from a CUBIC_BEZIER_TRIANGULATED_FACE.
      * Treated as a triangulated face - control points define vertices.
      */
-    private Shell buildCubicBezierTriangulatedFaceShell(StepCubicBezierTriangulatedFace bezier) {
+    Shell buildCubicBezierTriangulatedFaceShell(StepCubicBezierTriangulatedFace bezier) {
         List<CartesianPoint> points = new ArrayList<>(bezier.controlPoints().size());
         for (StepEntity cp : bezier.controlPoints()) {
             if (cp instanceof StepCartesianPoint cartesianPoint) {
@@ -2846,306 +2584,10 @@ public final class StepCadBuilder {
     }
 
     /**
-     * Builds a shell from a VERTEX_SHELL.
-     * A vertex shell contains only a single vertex loop (degenerate wireframe).
-     *
-     * @param vertexShell vertex shell entity
-     * @return built shell (empty since vertex loops don't produce faces)
-     */
-    private Shell buildVertexShell(StepVertexShell vertexShell) {
-        // VertexShell contains a single StepVertexLoop which represents a point, not a surface.
-        // This is a wireframe construct that cannot be represented as a Shell of faces.
-        // Return an empty shell rather than failing.
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a WIRE_SHELL.
-     * A wire shell contains edge loops without face surfaces (wireframe representation).
-     *
-     * @param wireShell wire shell entity
-     * @return built shell (empty since wireframe loops don't produce faces)
-     */
-    private Shell buildWireShell(StepWireShell wireShell) {
-        // WireShell contains StepLoop entities (EdgeLoop, PolyLoop, VertexLoop) that define
-        // wireframe geometry without surface patches. These cannot be represented as a Shell
-        // of faces. Return an empty shell rather than failing.
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a CONNECTED_FACE_SET.
-     * A connected face set is a collection of topologically connected faces.
-     */
-    private Shell buildConnectedFaceSet(StepConnectedFaceSet connectedFaces) {
-        List<Face> faces = connectedFaces.faces().stream()
-                .map(face -> buildFace(face.id()))
-                .toList();
-        // Assume closed if all faces reference each other (heuristic: use true for non-empty sets)
-        return new Shell(faces, !faces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a CONNECTED_FACE_SUB_SET.
-     * A connected face sub-set is a subset of faces from a parent face set.
-     */
-    private Shell buildConnectedFaceSubSet(StepConnectedFaceSubSet connectedFaceSubSet) {
-        List<Face> faces = connectedFaceSubSet.faces().stream()
-                .map(face -> buildFace(face.id()))
-                .toList();
-        return new Shell(faces, !faces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a GEOMETRIC_CURVE_SET.
-     * A geometric curve set contains curve and point entities, not faces.
-     * Returns empty shell since curves cannot be represented as face shells.
-     */
-    private Shell buildGeometricCurveSetShell(StepGeometricCurveSet curveSet) {
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a GEOMETRIC_SET.
-     * A geometric set contains points, curves, and surfaces, not faces.
-     * Returns empty shell since mixed geometry cannot be represented as face shells.
-     */
-    private Shell buildGeometricSetShell(StepGeometricSet geometricSet) {
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a GEOMETRIC_SURFACE_SET.
-     * A geometric surface set contains surface entities. Attempts to build faces from surfaces.
-     */
-    private Shell buildGeometricSurfaceSetShell(StepGeometricSurfaceSet surfaceSet) {
-        List<Face> faces = new ArrayList<>();
-        for (StepEntity element : surfaceSet.elements()) {
-            SurfaceGeometry surface = buildSupportedFaceGeometry(element, "SURFACE");
-            if (surface != null) {
-                // Create an unbounded face from the surface (approximation)
-                // Proper bounded surfaces would require boundary loops
-                try {
-                    faces.add(new Face(surface, List.of(), true));
-                } catch (Exception e) {
-                    // Skip surfaces that can't form valid faces without bounds
-                }
-            }
-        }
-        return new Shell(faces, !faces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a FACE_BASED_SURFACE_MODEL.
-     * A face-based surface model is a collection of faces forming a surface model.
-     */
-    private Shell buildFaceBasedSurfaceModel(StepFaceBasedSurfaceModel faceModel) {
-        // Face-based surface model contains face sets (e.g., connected face sets)
-        List<Face> faces = new ArrayList<>();
-        for (StepEntity faceSet : faceModel.faceSets()) {
-            if (faceSet instanceof StepConnectedFaceSet connectedFaces) {
-                Shell shell = buildConnectedFaceSet(connectedFaces);
-                faces.addAll(shell.faces());
-            }
-        }
-        return new Shell(faces, !faces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a MANIFOLD_SURFACE_MODEL.
-     * A manifold surface model is a collection of shells forming a manifold surface.
-     */
-    private Shell buildManifoldSurfaceModel(StepManifoldSurfaceModel manifoldModel) {
-        List<Face> allFaces = new ArrayList<>();
-        for (StepEntity shellEntity : manifoldModel.shells()) {
-            // Shell references can be open shells, closed shells, etc.
-            if (shellEntity instanceof StepOpenShell
-                    || shellEntity instanceof StepClosedShell
-                    || shellEntity instanceof StepOrientedOpenShell
-                    || shellEntity instanceof StepOrientedClosedShell) {
-                Shell shell = buildShell(shellEntity.id());
-                allFaces.addAll(shell.faces());
-            }
-        }
-        return new Shell(allFaces, !allFaces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a SHELL_BASED_SURFACE_MODEL.
-     * A shell-based surface model contains shells that form a surface representation.
-     */
-    private Shell buildShellBasedSurfaceModel(StepShellBasedSurfaceModel shellModel) {
-        List<Face> allFaces = new ArrayList<>();
-        for (StepEntity shellEntity : shellModel.shells()) {
-            Shell shell = buildShell(shellEntity.id());
-            allFaces.addAll(shell.faces());
-        }
-        return new Shell(allFaces, !allFaces.isEmpty());
-    }
-
-    /**
-     * Builds a shell from a SURFACE_PATCH.
-     * A surface patch is a bounded portion of a surface, treated as a single-face shell.
-     */
-    private Shell buildSurfacePatchShell(StepSurfacePatch surfacePatch) {
-        SurfaceGeometry surface = buildSupportedFaceGeometry(surfacePatch.basisSurface(), "SURFACE_PATCH");
-        if (surface == null) {
-            return new Shell(List.of(), false);
-        }
-        // SurfacePatch model doesn't capture face_bounds; create a minimal face
-        // using a synthetic triangular bound based on the surface geometry
-        CartesianPoint p1, p2, p3;
-        if (surface instanceof Plane plane) {
-            // For a plane, create a small triangle around the origin
-            p1 = plane.origin();
-            Vector3 xDir = plane.normal().asVector().cross(new Vector3(1, 0, 0));
-            if (xDir.norm() < Epsilon.EPS) {
-                xDir = plane.normal().asVector().cross(new Vector3(0, 1, 0));
-            }
-            xDir = xDir.normalize().asVector().scale(1.0);
-            Vector3 yDir = plane.normal().asVector().cross(xDir).normalize().asVector().scale(1.0);
-            p2 = new CartesianPoint(p1.x() + xDir.x() + yDir.x(), p1.y() + xDir.y() + yDir.y(), p1.z() + xDir.z() + yDir.z());
-            p3 = new CartesianPoint(p1.x() + xDir.x() - yDir.x(), p1.y() + xDir.y() - yDir.y(), p1.z() + xDir.z() - yDir.z());
-        } else {
-            // For other surfaces, try bounding box
-            BoundingBox3 box = surface.boundingBox();
-            if (box == null || box.isEmpty()) {
-                return new Shell(List.of(), false);
-            }
-            p1 = new CartesianPoint(box.minX(), box.minY(), box.minZ());
-            p2 = new CartesianPoint(box.maxX(), box.minY(), box.minZ());
-            p3 = new CartesianPoint(box.minX(), box.maxY(), box.minZ());
-        }
-        if (p1.distanceTo(p2) < Epsilon.EPS || p1.distanceTo(p3) < Epsilon.EPS || p2.distanceTo(p3) < Epsilon.EPS) {
-            return new Shell(List.of(), false);
-        }
-        PolyLoop loop = new PolyLoop(List.of(p1, p2, p3));
-        Face face = new Face(surface, List.of(FaceBound.outer(loop, true)), surfacePatch.sameSense());
-        return new Shell(List.of(face), false);
-    }
-
-    /**
-     * Builds a shell from a SHELL_BASED_WIREFRAME_MODEL.
-     * A shell-based wireframe model contains shells that form a wireframe representation.
-     */
-    private Shell buildShellBasedWireframeModel(StepShellBasedWireframeModel wireframeModel) {
-        // Wireframe model contains shell entities (open/closed shells, vertex shells, wire shells)
-        // Merge all referenced shells into a single shell
-        List<Face> allFaces = new ArrayList<>();
-        for (StepEntity boundary : wireframeModel.boundaries()) {
-            if (boundary instanceof StepOpenShell
-                    || boundary instanceof StepClosedShell
-                    || boundary instanceof StepOrientedOpenShell
-                    || boundary instanceof StepOrientedClosedShell
-                    || boundary instanceof StepTessellatedFaceSet
-                    || boundary instanceof StepConnectedFaceSet
-                    || boundary instanceof StepConnectedFaceSubSet
-                    || boundary instanceof StepPlanarBox
-                    || boundary instanceof StepPlanarExtent) {
-                Shell shell = buildShell(boundary.id());
-                allFaces.addAll(shell.faces());
-            }
-            // VertexShell and WireShell boundaries produce empty shells (handled above)
-        }
-        return new Shell(allFaces, false);
-    }
-
-    /**
-     * Builds a shell from an EDGE_BASED_WIREFRAME_MODEL.
-     * An edge-based wireframe model contains connected edge sets.
-     */
-    private Shell buildEdgeBasedWireframeModel(StepEdgeBasedWireframeModel wireframeModel) {
-        // Edge-based wireframe models contain connected edge sets which are wireframe
-        // Return empty shell since edges don't produce face shells
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a CONNECTED_EDGE_SET.
-     * A connected edge set is a collection of connected edges (wireframe).
-     */
-    private Shell buildConnectedEdgeSetShell(StepConnectedEdgeSet connectedEdges) {
-        // Connected edge sets define wireframe geometry without faces
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from an EDGE_WIRE.
-     * An edge wire is a sequence of edges forming a wire.
-     */
-    private Shell buildEdgeWireShell(StepEdgeWire edgeWire) {
-        // Edge wires define wireframe geometry without faces
-        return new Shell(List.of(), false);
-    }
-
-    /**
-     * Builds a shell from a PLANAR_BOX.
-     * A planar box is a rectangular face with placement and dimensions.
-     */
-    private Shell buildPlanarBoxShell(StepPlanarBox planarBox) {
-        CartesianPoint corner = new CartesianPoint(0.0, 0.0, 0.0);
-        Direction3 normal = new Direction3(0.0, 0.0, 1.0);
-        Direction3 xDir = new Direction3(1.0, 0.0, 0.0);
-
-        // Try to extract placement if available
-        if (planarBox.placement() instanceof StepAxis2Placement3D placement) {
-            corner = buildPoint(placement.location().id());
-            if (placement.axis() != null) {
-                normal = buildDirection(placement.axis().id());
-            }
-            if (placement.refDirection() != null) {
-                xDir = buildDirection(placement.refDirection().id());
-            }
-        }
-
-        double width = planarBox.width();
-        double height = planarBox.height();
-        Vector3 xVec = xDir.asVector().scale(width);
-        Vector3 yVec = normal.cross(xDir).scale(height);
-
-        CartesianPoint p1 = corner;
-        CartesianPoint p2 = new CartesianPoint(p1.x() + xVec.x(), p1.y() + xVec.y(), p1.z() + xVec.z());
-        CartesianPoint p3 = new CartesianPoint(p2.x() + yVec.x(), p2.y() + yVec.y(), p2.z() + yVec.z());
-        CartesianPoint p4 = new CartesianPoint(p1.x() + yVec.x(), p1.y() + yVec.y(), p1.z() + yVec.z());
-
-        Plane plane = new Plane(p1, normal);
-        PolyLoop polyLoop = new PolyLoop(List.of(p1, p2, p3, p4));
-        Face face = new Face(plane, List.of(FaceBound.outer(polyLoop, true)), true);
-        return new Shell(List.of(face), false);
-    }
-
-    /**
-     * Builds a shell from a PLANAR_EXTENT.
-     * A planar extent is a rectangular face centered at origin.
-     */
-    private Shell buildPlanarExtentShell(StepPlanarExtent planarExtent) {
-        double halfW = planarExtent.width() * 0.5;
-        double halfH = planarExtent.height() * 0.5;
-
-        CartesianPoint p1 = new CartesianPoint(-halfW, -halfH, 0.0);
-        CartesianPoint p2 = new CartesianPoint(halfW, -halfH, 0.0);
-        CartesianPoint p3 = new CartesianPoint(halfW, halfH, 0.0);
-        CartesianPoint p4 = new CartesianPoint(-halfW, halfH, 0.0);
-
-        Plane plane = new Plane(p1, new Direction3(0.0, 0.0, 1.0));
-        PolyLoop polyLoop = new PolyLoop(List.of(p1, p2, p3, p4));
-        Face face = new Face(plane, List.of(FaceBound.outer(polyLoop, true)), true);
-        return new Shell(List.of(face), false);
-    }
-
-    /**
-     * Builds a shell from a POINT_SET.
-     * A point set is a collection of points (wireframe, no face geometry).
-     */
-    private Shell buildPointSetShell(StepPointSet pointSet) {
-        throw new UnsupportedGeometryException("POINT_SET cannot be converted to a B-Rep shell");
-    }
-
-    /**
      * Builds a shell from a FINITE_ELEMENT_MESH.
      * Attempts to triangulate mesh nodes and elements.
      */
-    private Shell buildFiniteElementMeshShell(StepFiniteElementMesh femMesh) {
+    Shell buildFiniteElementMeshShell(StepFiniteElementMesh femMesh) {
         List<StepEntity> nodes = femMesh.nodes();
         List<CartesianPoint> points = new ArrayList<>(nodes.size());
         for (StepEntity node : nodes) {
@@ -3183,7 +2625,7 @@ public final class StepCadBuilder {
      * @param csgVolume CSG volume entity
      * @return built solid
      */
-    private Solid buildCsgVolumeSolid(StepCsgVolume csgVolume) {
+    Solid buildCsgVolumeSolid(StepCsgVolume csgVolume) {
         // CSG_VOLUME has a treeRoot that may be a boolean result, primitive, or replica
         return buildBooleanOperandSolid(csgVolume.treeRoot());
     }
@@ -3192,7 +2634,7 @@ public final class StepCadBuilder {
      * Builds a solid from a BLOCK_VOLUME.
      * Similar to BLOCK CSG primitive but with explicit StepBlockVolume entity.
      */
-    private Solid buildBlockVolume(StepBlockVolume blockVolume) {
+    Solid buildBlockVolume(StepBlockVolume blockVolume) {
         if (!(blockVolume.position() instanceof StepAxis2Placement3D placement)) {
             throw new UnsupportedGeometryException("BLOCK_VOLUME position must be an AXIS2_PLACEMENT_3D");
         }
@@ -3243,7 +2685,7 @@ public final class StepCadBuilder {
      * Builds a half-space solid as a standalone solid.
      * Since half-spaces are infinite, we approximate with a large box on the agreement side.
      */
-    private Solid buildHalfSpaceSolid(StepHalfSpaceSolid halfSpace) {
+    Solid buildHalfSpaceSolid(StepHalfSpaceSolid halfSpace) {
         Plane plane = buildSupportedPlaneGeometry(halfSpace.baseSurface(), halfSpace.entityName());
         if (plane == null) {
             throw new UnsupportedGeometryException(halfSpace.entityName() + " requires PLANE geometry");
@@ -3294,7 +2736,7 @@ public final class StepCadBuilder {
      * Builds a polygonal bounded half-space as a standalone solid.
      * Creates a capped solid bounded by the polygon and the plane.
      */
-    private Solid buildPolygonalBoundedHalfSpace(StepPolygonalBoundedHalfSpace polyHalfSpace) {
+    Solid buildPolygonalBoundedHalfSpace(StepPolygonalBoundedHalfSpace polyHalfSpace) {
         SurfaceGeometry basisSurface = buildSupportedFaceGeometry(polyHalfSpace.basisSurface(), "SURFACE");
         if (!(basisSurface instanceof Plane plane)) {
             throw new UnsupportedGeometryException("POLYGONAL_BOUNDED_HALF_SPACE requires a planar basis surface");
@@ -3383,7 +2825,7 @@ public final class StepCadBuilder {
 
     // New solid type builders
 
-    private Solid buildExtrudedFaceSolid(StepExtrudedFaceSolid extrudedFace) {
+    Solid buildExtrudedFaceSolid(StepExtrudedFaceSolid extrudedFace) {
         // Similar to extruded area solid but sweeps a face instead of a profile
         StepEntity faceGeometry = extrudedFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
@@ -3400,7 +2842,7 @@ public final class StepCadBuilder {
         return buildExtrudedProfile(profilePoints, dir, depth);
     }
 
-    private Solid buildRevolvedFaceSolid(StepRevolvedFaceSolid revolvedFace) {
+    Solid buildRevolvedFaceSolid(StepRevolvedFaceSolid revolvedFace) {
         StepEntity faceGeometry = revolvedFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID swept_face must be a face entity");
@@ -3416,7 +2858,7 @@ public final class StepCadBuilder {
         return buildRevolvedProfile(profilePoints, axisOrigin, axis, angle);
     }
 
-    private Solid buildSweptFaceSolid(StepSweptFaceSolid sweptFace) {
+    Solid buildSweptFaceSolid(StepSweptFaceSolid sweptFace) {
         // Sweep a face along a trajectory curve
         StepEntity faceGeometry = sweptFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
@@ -3433,7 +2875,7 @@ public final class StepCadBuilder {
         return buildSweptProfileAlongCurve(profilePoints, samples);
     }
 
-    private Solid buildCylinderVolume(StepCylinderVolume cyl) {
+    Solid buildCylinderVolume(StepCylinderVolume cyl) {
         double radius = cyl.radius();
         double height = cyl.height();
         if (radius <= 0 || height <= 0) {
@@ -3444,7 +2886,7 @@ public final class StepCadBuilder {
         return buildExtrudedProfile(ring, Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1)), height);
     }
 
-    private Solid buildSphereVolume(StepSphereVolume sphere) {
+    Solid buildSphereVolume(StepSphereVolume sphere) {
         double radius = sphere.radius();
         if (radius <= 0) {
             throw new UnsupportedGeometryException("SPHERE_VOLUME requires positive radius");
@@ -3454,7 +2896,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildTorusVolume(StepTorusVolume torus) {
+    Solid buildTorusVolume(StepTorusVolume torus) {
         double majorR = torus.majorRadius();
         double minorR = torus.minorRadius();
         if (majorR <= 0 || minorR <= 0) {
@@ -3464,7 +2906,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildPrismVolume(StepPrismVolume prism) {
+    Solid buildPrismVolume(StepPrismVolume prism) {
         double w = prism.width();
         double d = prism.depth();
         double h = prism.height();
@@ -3724,137 +3166,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        StepEntity entity = requireExistingEntity(id);
-        Solid built;
-        if (entity instanceof StepManifoldSolidBrep solidBrep) {
-            built = new Solid(buildShell(solidBrep.outer().id()));
-        } else if (entity instanceof StepFacettedBrep facettedBrep) {
-            // Facetted B-rep: polyhedral solid defined by a closed shell of planar faces
-            built = new Solid(buildShell(facettedBrep.outer().id()));
-        } else if (entity instanceof StepBrepWithVoids brepWithVoids) {
-            Shell outerShell = buildShell(brepWithVoids.outer().id());
-            List<Shell> voidShells = brepWithVoids.voids().stream().map(voidShell -> buildShell(voidShell.id())).toList();
-            built = new Solid(outerShell, voidShells);
-        } else if (entity instanceof StepCsgPrimitive csgPrimitive) {
-            built = buildCsgPrimitive(csgPrimitive);
-        } else if (entity instanceof StepCsgSolid csgSolid) {
-            built = buildBooleanOperandSolid(csgSolid.treeRootExpression());
-        } else if (entity instanceof StepSolidReplica solidReplica) {
-            built = transformSolid(buildSolid(solidReplica.parentSolid().id()), solidReplica.transformation());
-        } else if (entity instanceof StepSweptAreaSolid sweptAreaSolid) {
-            built = buildSweptAreaSolid(sweptAreaSolid);
-        } else if (entity instanceof StepSweptDiskSolid sweptDiskSolid) {
-            built = buildSweptDiskSolid(sweptDiskSolid);
-        } else if (entity instanceof StepExtrudedAreaSolidTapered taperedExtrusion) {
-            built = buildExtrudedAreaSolidTapered(taperedExtrusion);
-        } else if (entity instanceof StepRevolvedAreaSolidTapered taperedRevolution) {
-            built = buildRevolvedAreaSolidTapered(taperedRevolution);
-        } else if (entity instanceof StepSurfaceCurveSweptAreaSolid surfaceCurveSweep) {
-            built = buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
-        } else if (entity instanceof StepBooleanClippingResult clippingResult) {
-            built = buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
-        } else if (entity instanceof StepBooleanResult booleanResult) {
-            built = buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
-        } else if (entity instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
-            // Non-manifold solid brep has an open shell boundary
-            // This is used for sheet bodies (e.g., unfolded sheet metal)
-            // Build the shell - it may be an open shell which is valid for non-manifold
-            Shell outerShell = buildShell(nonManifoldBrep.outer().id());
-            // Non-manifold solids have open shells as boundaries
-            built = new Solid(outerShell);
-        } else if (entity instanceof StepAdvancedBrep advancedBrep) {
-            // Advanced B-rep with generic entity references for outer and void shells
-            Shell outerShell = buildShell(advancedBrep.outer().id());
-            List<Shell> voidShells = advancedBrep.voids().stream()
-                .map(v -> buildShell(v.id()))
-                .toList();
-            built = new Solid(outerShell, voidShells);
-        } else if (entity instanceof StepComplexClippingResult clippingResult) {
-            // Complex clipping result from boolean operation tree
-            built = buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
-        } else if (entity instanceof StepCsgVolume csgVolume) {
-            // CSG volume: build from tree root expression
-            built = buildCsgVolumeSolid(csgVolume);
-        } else if (entity instanceof StepBlockVolume blockVolume) {
-            // Block volume: CSG-like block primitive with direct position and dimensions
-            built = buildBlockVolume(blockVolume);
-        } else if (entity instanceof StepHalfSpaceSolid halfSpace) {
-            // Half-space solid: infinite volume bounded by a plane
-            built = buildHalfSpaceSolid(halfSpace);
-        } else if (entity instanceof StepPolygonalBoundedHalfSpace polyHalfSpace) {
-            // Polygonal bounded half-space: half-space bounded by a polygonal face
-            built = buildPolygonalBoundedHalfSpace(polyHalfSpace);
-        } else if (entity instanceof StepTessellatedFaceSet tessellatedFaceSet) {
-            // Tessellated face set: triangulated mesh as solid
-            Shell shell = buildTessellatedShell(tessellatedFaceSet);
-            built = new Solid(shell);
-        } else if (entity instanceof StepTessellatedFace tessellatedFace) {
-            // Tessellated face: triangulated single face as solid
-            Shell shell = buildTessellatedFaceShell(tessellatedFace);
-            built = new Solid(shell);
-        } else if (entity instanceof StepTriangulatedFace triangulatedFace) {
-            // Triangulated face: vertex list + index triplets as solid
-            Shell shell = buildTriangulatedFaceShell(triangulatedFace);
-            built = new Solid(shell);
-        } else if (entity instanceof StepComplexTriangulatedFace complexFace) {
-            // Complex triangulated face: boundaries + vertices as solid
-            Shell shell = buildComplexTriangulatedFaceShell(complexFace);
-            built = new Solid(shell);
-        } else if (entity instanceof StepCubicBezierTriangulatedFace bezierFace) {
-            // Cubic Bezier triangulated face: control points + indices as solid
-            Shell shell = buildCubicBezierTriangulatedFaceShell(bezierFace);
-            built = new Solid(shell);
-        } else if (entity instanceof StepExtrudedFaceSolid extrudedFace) {
-            // Extruded face solid: extrude a face along a direction
-            built = buildExtrudedFaceSolid(extrudedFace);
-        } else if (entity instanceof StepRevolvedFaceSolid revolvedFace) {
-            // Revolved face solid: revolve a face around an axis
-            built = buildRevolvedFaceSolid(revolvedFace);
-        } else if (entity instanceof StepSweptFaceSolid sweptFace) {
-            // Swept face solid: sweep a face along a curve trajectory
-            built = buildSweptFaceSolid(sweptFace);
-        } else if (entity instanceof StepCylinderVolume cylVolume) {
-            // Cylinder volume: CSG cylinder primitive as solid
-            built = buildCylinderVolume(cylVolume);
-        } else if (entity instanceof StepSphereVolume sphereVolume) {
-            // Sphere volume: CSG sphere primitive as solid
-            built = buildSphereVolume(sphereVolume);
-        } else if (entity instanceof StepTorusVolume torusVolume) {
-            // Torus volume: CSG torus primitive as solid
-            built = buildTorusVolume(torusVolume);
-        } else if (entity instanceof StepPrismVolume prismVolume) {
-            // Prism volume: CSG prism primitive as solid
-            built = buildPrismVolume(prismVolume);
-        } else if (entity instanceof StepFiniteElementMesh femMesh) {
-            // Finite element mesh: tessellated mesh as solid
-            Shell shell = buildFiniteElementMeshShell(femMesh);
-            built = new Solid(shell);
-        } else if (entity instanceof StepFlatPattern flatPattern) {
-            // Flat pattern: sheet metal flat, build as thin shell solid
-            if (flatPattern.flatGeometry() instanceof StepFaceEntity faceEntity) {
-                Shell shell = new Shell(List.of(buildFace(faceEntity.id())), false);
-                built = new Solid(shell);
-            } else if (flatPattern.flatGeometry() instanceof StepOpenShell openShell) {
-                built = new Solid(buildShell(openShell.id()));
-            } else {
-                throw new UnsupportedGeometryException("FLAT_PATTERN flat geometry must be FACE or OPEN_SHELL");
-            }
-        } else if (entity instanceof StepSolidModel solidModel) {
-            // SolidModel is the abstract base type for all solid models.
-            // In complex entity syntax, the actual solid type may be stored at the same ID.
-            // Check if another entity was resolved at this ID.
-            StepEntity actual = entitiesById.get(solidModel.id());
-            if (actual != null && actual != solidModel && canBuildAsSolid(actual)) {
-                built = buildSolid(solidModel.id());
-            } else {
-                throw new StepResolutionException("entity #" + id + " is an abstract SOLID_MODEL with no concrete subtype");
-            }
-        } else if (entity instanceof StepMappedItem mappedItem) {
-            // MAPPED_ITEM: dispatch through to mapping target for solid geometry
-            built = buildSolid(mappedItem.mappingTarget().id());
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a supported SOLID");
-        }
+        Solid built = solidBuilder.buildSolid(id);
         solids.put(id, built);
         return built;
     }
@@ -3864,42 +3176,10 @@ public final class StepCadBuilder {
      * Used for abstract base type resolution.
      */
     public boolean canBuildAsSolid(StepEntity entity) {
-        return entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepFacettedBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepExtrudedAreaSolidTapered
-                || entity instanceof StepRevolvedAreaSolidTapered
-                || entity instanceof StepSurfaceCurveSweptAreaSolid
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepNonManifoldSolidBrep
-                || entity instanceof StepAdvancedBrep
-                || entity instanceof StepComplexClippingResult
-                || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume
-                || entity instanceof StepHalfSpaceSolid
-                || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepExtrudedFaceSolid
-                || entity instanceof StepRevolvedFaceSolid
-                || entity instanceof StepSweptFaceSolid
-                || entity instanceof StepCylinderVolume
-                || entity instanceof StepSphereVolume
-                || entity instanceof StepTorusVolume
-                || entity instanceof StepPrismVolume
-                || entity instanceof StepSolidModel
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepMappedItem;
+        return solidBuilder.canBuildAsSolid(entity);
     }
 
-    private StepEntity requireExistingEntity(int id) {
+    StepEntity requireExistingEntity(int id) {
         StepEntity entity = entitiesById.get(id);
         if (entity == null) {
             throw new StepResolutionException("missing resolved entity #" + id);
@@ -3907,7 +3187,7 @@ public final class StepCadBuilder {
         return entity;
     }
 
-    private <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
+    <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
         StepEntity entity = requireExistingEntity(id);
         if (!type.isInstance(entity)) {
             throw new StepResolutionException("entity #" + id + " is not a " + expectedName);
@@ -3915,7 +3195,7 @@ public final class StepCadBuilder {
         return type.cast(entity);
     }
 
-    private static StepEntity faceGeometry(StepFaceEntity stepFace) {
+    static StepEntity faceGeometry(StepFaceEntity stepFace) {
         if (stepFace instanceof StepAdvancedFace advancedFace) {
             return advancedFace.faceGeometry();
         }
@@ -3928,7 +3208,7 @@ public final class StepCadBuilder {
         throw new UnsupportedGeometryException("unsupported face subtype");
     }
 
-    private static boolean faceSameSense(StepFaceEntity stepFace) {
+    static boolean faceSameSense(StepFaceEntity stepFace) {
         if (stepFace instanceof StepAdvancedFace advancedFace) {
             return advancedFace.sameSense();
         }
@@ -3942,7 +3222,7 @@ public final class StepCadBuilder {
         throw new UnsupportedGeometryException("unsupported face subtype");
     }
 
-    private Solid buildSweptAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
+    Solid buildSweptAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
         if ("EXTRUDED_AREA_SOLID".equals(sweptAreaSolid.entityName())) {
             return buildExtrudedAreaSolid(sweptAreaSolid);
         }
@@ -3952,7 +3232,7 @@ public final class StepCadBuilder {
         throw new UnsupportedGeometryException(sweptAreaSolid.entityName() + " construction is unsupported");
     }
 
-    private Solid buildCsgPrimitive(StepCsgPrimitive csgPrimitive) {
+    Solid buildCsgPrimitive(StepCsgPrimitive csgPrimitive) {
         return switch (csgPrimitive.entityName()) {
             case "BLOCK" -> buildBlockPrimitive(csgPrimitive);
             case "SPHERE" -> buildSpherePrimitive(csgPrimitive);
@@ -4190,7 +3470,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildSweptDiskSolid(StepSweptDiskSolid sweptDiskSolid) {
+    Solid buildSweptDiskSolid(StepSweptDiskSolid sweptDiskSolid) {
         Curve3 sweptCurve = buildCurve3(sweptDiskSolid.sweptCurve());
         double radius = sweptDiskSolid.radius();
         Double innerRadius = sweptDiskSolid.innerRadius();
@@ -4255,7 +3535,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildExtrudedAreaSolidTapered(StepExtrudedAreaSolidTapered tapered) {
+    Solid buildExtrudedAreaSolidTapered(StepExtrudedAreaSolidTapered tapered) {
         // Get the profile from sweptArea (which is StepEntity, need to cast to StepProfileDef)
         StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
         StepProfileBuilder.ProfileLoops baseProfile = profileBuilder.buildAreaProfileLoops(profileDef);
@@ -4301,7 +3581,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildRevolvedAreaSolidTapered(StepRevolvedAreaSolidTapered tapered) {
+    Solid buildRevolvedAreaSolidTapered(StepRevolvedAreaSolidTapered tapered) {
         StepProfileDef profileDef = asProfileDef(tapered.sweptArea());
         StepProfileBuilder.ProfileLoops baseProfile = profileBuilder.buildAreaProfileLoops(profileDef);
         Axis1Placement axis = buildAxis1Placement(tapered.axis().id());
@@ -4343,7 +3623,7 @@ public final class StepCadBuilder {
         return new Solid(new Shell(faces, true));
     }
 
-    private Solid buildSurfaceCurveSweptAreaSolid(StepSurfaceCurveSweptAreaSolid swept) {
+    Solid buildSurfaceCurveSweptAreaSolid(StepSurfaceCurveSweptAreaSolid swept) {
         StepProfileDef profileDef = asProfileDef(swept.sweptArea());
         StepProfileBuilder.ProfileLoops profile = profileBuilder.buildAreaProfileLoops(profileDef);
         Curve3 trajectory = buildCurve3(swept.trajectory());
@@ -4574,7 +3854,7 @@ public final class StepCadBuilder {
         return vector.isZero() ? new Vector3(0.0, 0.0, 1.0) : vector;
     }
 
-    private Solid buildBooleanResult(String operator, StepEntity first, StepEntity second) {
+    Solid buildBooleanResult(String operator, StepEntity first, StepEntity second) {
         String normalizedOperator = operator == null ? "" : operator.replace(".", "").trim().toUpperCase();
         return switch (normalizedOperator) {
             case "DIFFERENCE" -> {
@@ -4619,7 +3899,7 @@ public final class StepCadBuilder {
         return operand instanceof StepHalfSpaceSolid halfSpaceSolid ? halfSpaceSolid : null;
     }
 
-    private Solid buildBooleanOperandSolid(StepEntity operand) {
+    Solid buildBooleanOperandSolid(StepEntity operand) {
         return switch (operand) {
             case StepManifoldSolidBrep solidBrep -> buildSolid(solidBrep.id());
             case StepFacettedBrep facettedBrep -> buildSolid(facettedBrep.id());
@@ -5227,7 +4507,7 @@ public final class StepCadBuilder {
         return normal.normalize();
     }
 
-    private Solid transformSolid(Solid solid, StepCartesianTransformationOperator transformation) {
+    Solid transformSolid(Solid solid, StepCartesianTransformationOperator transformation) {
         return new Solid(
                 transformShell(solid.outerShell(), transformation),
                 solid.voidShells().stream()
@@ -5891,7 +5171,7 @@ public final class StepCadBuilder {
         return surface instanceof Plane plane ? plane : null;
     }
 
-    private SurfaceGeometry buildSupportedFaceGeometry(StepEntity geometry, String faceType) {
+    SurfaceGeometry buildSupportedFaceGeometry(StepEntity geometry, String faceType) {
         if (geometry instanceof StepPlane plane) {
             return buildPlane(plane.id());
         }
@@ -6600,7 +5880,7 @@ public final class StepCadBuilder {
         buildCurve3(boundary);
     }
 
-    private String describeUnsupportedFaceGeometry(StepEntity geometry) {
+    String describeUnsupportedFaceGeometry(StepEntity geometry) {
         if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
             buildCylindricalSurface(cylindricalSurface.id());
             return "CYLINDRICAL_SURFACE";
@@ -6957,7 +6237,7 @@ public final class StepCadBuilder {
     ) {
     }
 
-    private static String stepEntityTypeName(StepEntity entity) {
+    static String stepEntityTypeName(StepEntity entity) {
         if (entity instanceof StepGeometricReplica replica) {
             return replica.entityName();
         }
@@ -7041,6 +6321,10 @@ public final class StepCadBuilder {
             simpleName = simpleName.substring(4);
         }
         return camelToUpperSnake(simpleName);
+    }
+
+    StepEntity resolvedEntity(int id) {
+        return entitiesById.get(id);
     }
 
     private static String camelToUpperSnake(String value) {

@@ -740,8 +740,7 @@ public final class StepEntityResolver {
   private static EntityFactory resolveFactory(StepEntityInstance instance) {
     EntityFactory selectedFactory = null;
     int selectedRank = Integer.MAX_VALUE;
-    for (StepEntityDefinition definition : instance.definitions()) {
-      String normalizedName = asciiUpper(definition.name());
+    for (String normalizedName : instance.normalizedDefinitionNames()) {
       EntityFactory candidate = REGISTRY.get(normalizedName);
       if (candidate == null) {
         continue;
@@ -753,17 +752,6 @@ public final class StepEntityResolver {
       }
     }
     return selectedFactory;
-  }
-
-  private static String asciiUpper(String s) {
-    char[] chars = s.toCharArray();
-    for (int i = 0; i < chars.length; i++) {
-      char c = chars[i];
-      if (c >= 'a' && c <= 'z') {
-        chars[i] = (char) (c - 32);
-      }
-    }
-    return new String(chars);
   }
 
   private static Map<String, Integer> createRegistryOrder(Map<String, EntityFactory> registry) {

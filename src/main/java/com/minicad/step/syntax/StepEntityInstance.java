@@ -12,6 +12,7 @@ public final class StepEntityInstance {
 
     private final int id;
     private final List<StepEntityDefinition> definitions;
+    private final List<String> normalizedDefinitionNames;
 
     public StepEntityInstance(int id, List<StepEntityDefinition> definitions) {
         if (definitions.isEmpty()) {
@@ -19,6 +20,9 @@ public final class StepEntityInstance {
         }
         this.id = id;
         this.definitions = List.copyOf(definitions);
+        this.normalizedDefinitionNames = this.definitions.stream()
+                .map(definition -> asciiUpper(definition.name()))
+                .toList();
     }
 
     public StepEntityInstance(int id, String name, List<StepValue> parameters) {
@@ -31,6 +35,10 @@ public final class StepEntityInstance {
 
     public List<StepEntityDefinition> definitions() {
         return definitions;
+    }
+
+    public List<String> normalizedDefinitionNames() {
+        return normalizedDefinitionNames;
     }
 
     public boolean isComplex() {
@@ -46,8 +54,9 @@ public final class StepEntityInstance {
     }
 
     public boolean hasDefinition(String entityName) {
-        for (StepEntityDefinition def : definitions) {
-            if (equalsAsciiIgnoreCase(def.name(), entityName)) {
+        String normalizedEntityName = asciiUpper(entityName);
+        for (String normalizedDefinitionName : normalizedDefinitionNames) {
+            if (normalizedDefinitionName.equals(normalizedEntityName)) {
                 return true;
             }
         }
@@ -55,9 +64,10 @@ public final class StepEntityInstance {
     }
 
     public StepEntityDefinition requireDefinition(String entityName) {
-        for (StepEntityDefinition def : definitions) {
-            if (equalsAsciiIgnoreCase(def.name(), entityName)) {
-                return def;
+        String normalizedEntityName = asciiUpper(entityName);
+        for (int i = 0; i < definitions.size(); i++) {
+            if (normalizedDefinitionNames.get(i).equals(normalizedEntityName)) {
+                return definitions.get(i);
             }
         }
         throw new StepParseException(
@@ -65,16 +75,14 @@ public final class StepEntityInstance {
         );
     }
 
-    private static boolean equalsAsciiIgnoreCase(String a, String b) {
-        if (a.length() != b.length()) return false;
-        for (int i = 0; i < a.length(); i++) {
-            char ca = a.charAt(i);
-            char cb = b.charAt(i);
-            if (ca != cb) {
-                // ASCII case-insensitive: letters differ by bit 5 (0x20)
-                if ((ca | 0x20) != (cb | 0x20)) return false;
+    private static String asciiUpper(String value) {
+        char[] chars = value.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (ch >= 'a' && ch <= 'z') {
+                chars[i] = (char) (ch - ('a' - 'A'));
             }
         }
-        return true;
+        return new String(chars);
     }
 }
