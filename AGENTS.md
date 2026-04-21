@@ -55,19 +55,27 @@
 - ~24000+ STEP entity types registered via ~1559 registry.put() calls
 - 1062 `StepXxx` model classes in `step.model`
 - `ADVANCED_FACE` resolution accepts PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, TOROIDAL_SURFACE, SPHERICAL_SURFACE, B_SPLINE_SURFACE_WITH_KNOTS
-- Web preview supports planar faces, cylindrical/conical/toroidal/spherical patches, and some B-spline surfaces
-- CSG/Swept entities are parsed but geometric evaluation is limited
+- Web preview supports planar faces, cylindrical/conical/toroidal/spherical patches, some B-spline surfaces, and several newer parametric/tessellated surface families
+- Many CSG/Swept/Tessellated entities are now resolved and at least partially built/exported; the main remaining gap is correctness/completeness rather than raw registration count
 
 ## Current STEP Entity Coverage
 
-The resolver handles these categories with full parsing support:
+The resolver handles these categories with broad parsing support. For planning work, distinguish resolver coverage from builder/exporter coverage:
 
 **Geometry (1062 model classes):**
 - Basic curves: LINE, CIRCLE, ELLIPSE, HYPERBOLA, PARABOLA, POLYLINE, TRIMMED_CURVE, COMPOSITE_CURVE, B_SPLINE_CURVE_WITH_KNOTS, RATIONAL_B_SPLINE_CURVE, SURFACE_CURVE, SEAM_CURVE, PCURVE, OFFSET_CURVE_3D
 - Basic surfaces: PLANE, CYLINDRICAL_SURFACE, CONICAL_SURFACE, TOROIDAL_SURFACE, SPHERICAL_SURFACE, B_SPLINE_SURFACE_WITH_KNOTS, RATIONAL_B_SPLINE_SURFACE, SURFACE_OF_LINEAR_EXTRUSION, SURFACE_OF_REVOLUTION, OFFSET_SURFACE
+- Advanced surfaces already wired into resolver and builder paths include SURFACE_OF_TRANSLATION, SURFACE_OF_PROJECTION, PARABOLOID_SURFACE, HYPERBOLOID_SURFACE, TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS
 
 **Topology:**
 - VERTEX_POINT, EDGE_CURVE, ORIENTED_EDGE, EDGE_LOOP, VERTEX_LOOP, POLY_LOOP, FACE_BOUND, ADVANCED_FACE, CLOSED_SHELL, OPEN_SHELL, MANIFOLD_SOLID_BREP, BREP_WITH_VOIDS
+- Tessellated topology entities are also resolved: TESSELLATED_FACE_SET, TESSELLATED_FACE, TESSELLATED_TRIANGLE, TRIANGULATED_FACE, COMPLEX_TRIANGULATED_FACE
+
+**Swept / CSG / Volumes:**
+- EXTRUDED_AREA_SOLID, REVOLVED_AREA_SOLID, EXTRUDED_FACE_SOLID, REVOLVED_FACE_SOLID, SURFACE_CURVE_SWEPT_AREA_SOLID
+- BOOLEAN_RESULT, BOOLEAN_CLIPPING_RESULT, COMPLEX_CLIPPING_RESULT
+- HALF_SPACE_SOLID, BOXED_HALF_SPACE, POLYGONAL_BOUNDED_HALF_SPACE
+- CYLINDER_VOLUME, SPHERE_VOLUME, TORUS_VOLUME, PRISM_VOLUME
 
 **Assembly:**
 - NEXT_ASSEMBLY_USAGE_OCCURRENCE, CONTEXT_DEPENDENT_SHAPE_REPRESENTATION, MAPPED_ITEM, ITEM_DEFINED_TRANSFORMATION
@@ -77,37 +85,29 @@ The resolver handles these categories with full parsing support:
 
 ## Limitations to Document
 
-### Geometry Evaluation Not Implemented
+### Geometry Evaluation Needs Completion
 
-These entities are fully parsed but geometric evaluation is not performed:
+These entities are no longer simply "unimplemented"; they are resolved and at least partially built/exported, but still need correctness and completeness work:
 - CSG Boolean operations: `BOOLEAN_RESULT`, `BOOLEAN_CLIPPING_RESULT`, `COMPLEX_CLIPPING_RESULT`
-- Swept solids: `EXTRUDED_AREA_SOLID`, `REVOLVED_AREA_SOLID`, `SURFACE_CURVE_SWEPT_AREA_SOLID`
+- Swept solids: `EXTRUDED_AREA_SOLID`, `REVOLVED_AREA_SOLID`, `SURFACE_CURVE_SWEPT_AREA_SOLID`, `EXTRUDED_FACE_SOLID`, `REVOLVED_FACE_SOLID`, `SURFACE_CURVE_SWEPT_FACE_SOLID`
 - Half space: `HALF_SPACE_SOLID`, `BOXED_HALF_SPACE`, `POLYGONAL_BOUNDED_HALF_SPACE`
 - Tessellated geometry: `TESSELLATED_FACE_SET`, `TESSELLATED_FACE`, `TESSELLATED_TRIANGLE`
+- Advanced volumes: `CYLINDER_VOLUME`, `SPHERE_VOLUME`, `TORUS_VOLUME`, `RIGHT_CIRCULAR_CYLINDER_VOLUME`, `RIGHT_CIRCULAR_CONE_VOLUME`, `PRISM_VOLUME`
 
-### STEP Entity Parsing Not Yet Supported
+### STEP Entity Areas Still Incomplete
 
-**Advanced geometry surfaces**:
-- `SURFACE_OF_TRANSLATION`, `SURFACE_OF_PROJECTION`
-- `PARABOLOID_SURFACE`, `HYPERBOLOID_SURFACE`
-- `TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS`
-
-**Advanced swept solids**:
-- `EXTRUDED_FACE_SOLID`, `REVOLVED_FACE_SOLID`
-- `SURFACE_CURVE_SWEPT_FACE_SOLID`
-
-**Advanced CSG primitives**:
-- `CYLINDER_VOLUME`, `SPHERE_VOLUME`, `TORUS_VOLUME`
-- `RIGHT_CIRCULAR_CYLINDER_VOLUME`, `RIGHT_CIRCULAR_CONE_VOLUME`, `PRISM_VOLUME`
-
-**Advanced PMI/tolerances**:
+**PMI/tolerances still need end-to-end metadata/export support**:
 - `GEOMETRIC_TOLERANCE_RELATIONSHIP`, `DATUM_SYSTEM`
 - `PROJECTED_ZONE_DEFINITION`, `NON_UNIFORM_ZONE_DEFINITION`
 
-**Validation property framework**:
+**Validation property framework remains partial**:
 - `VALIDATION_PROPERTY_REPRESENTATION`, `VALIDATION_RESULT_REPRESENTATION`
 - `CALCULATED_GEOMETRIC_REPRESENTATION_ITEM`
 
-**Kinematic (partial)**: `KINEMATIC_PATH`, `KINEMATIC_FRAME_BASED_TRANSFORMATION`
+**Kinematic remains partial**: `KINEMATIC_PATH`, `KINEMATIC_FRAME_BASED_TRANSFORMATION`
 
-**Finite element (partial)**: `ELEMENT_VOLUME_2D`, `ELEMENT_VOLUME_3D`, `NODE_SET`, `ELEMENT_SET`
+**Finite element remains partial**: `ELEMENT_VOLUME_2D`, `ELEMENT_VOLUME_3D`, `NODE_SET`, `ELEMENT_SET`
+
+### Planning Reference
+
+- Use `doc/step_entity_completion_plan.md` as the source of truth for staged STEP entity completion work.
