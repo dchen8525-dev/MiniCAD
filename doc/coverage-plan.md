@@ -1,172 +1,330 @@
-# MiniCAD STEP AP242 Ed2 100% 覆盖计划
+# MiniCAD STEP AP242 Ed2 覆盖推进计划
 
-## Context
+## 目标
 
-当前 MiniCAD 覆盖 AP242 Ed2 标准 735/2122 实体（34.6%），缺失 1387 个实体。
-数据来源：ISO 官方 EXPRESS schema（[ISO SMRL v8](https://standards.iso.org/iso/10303/smrl/v8/tech/smrlv8.zip)）。
+这份计划用于推进 MiniCAD 对 AP242 Ed2 的覆盖，但当前仓库已经明显超出旧版文档描述的支持范围，因此后续工作不能再基于“735/2122、缺失 1387”这一类静态数字直接排期。
 
-**关键发现**：
-- 1387 个缺失实体全部需要新建 `StepXxx.java` 记录类（无现有匹配）
-- 约 246 个实体可复用已有 resolver 模式，1141 个需要全新 resolver 方法
-- 大部分缺失实体是 EXPRESS SUBTYPE（属性从父类继承）
-- 147 个表达式/函数实体构成独立的表达式语言，需要特殊处理
+后续一律按以下三层口径区分“覆盖”：
 
-## 工作分 6 个阶段，按优先级递减
+1. `schema coverage`
+   `mim_lf.exp` 中的标准实体，MiniCAD 能识别并分派到 resolver。
+2. `semantic coverage`
+   实体不仅已注册，而且能稳定 resolve 成内部 `StepEntity` 模型。
+3. `runtime coverage`
+   实体在真实文件中可进一步参与装配、PMI、预览导出或 B-Rep 构建，而不是仅停留在透传解析。
 
-### Phase 1: 核心几何与拓扑（~180 实体，B-Rep 生成）
+计划目标不是机械追求 `registry.put()` 数量，而是优先提升真实工业文件的可导入性和可预览性，同时用脚本持续收敛标准实体差集。
 
-**目标**：让真实 STEP 文件的几何/拓扑能正确解析和渲染
+## 当前现状
 
-| 子领域 | 数量 | 说明 | B-Rep |
-|--------|------|------|-------|
-| B-Spline 曲线变体 | 25 | B_SPLINE_CURVE_SEGMENT, POLY_CURVE, BEZIER_VOLUME 等 | 部分 |
-| B-Spline 曲面变体 | 20 | B_SPLINE_SURFACE_PATCH, STRIP, KNOT_LOCATOR 等 | 部分 |
-| 高级拓扑 | 40 | 复杂壳、拓扑检查、边/面关系 | 部分 |
-| 扫掠曲面 | 10 | SWEEPED_SURFACE, SWEEPING_SURFACE 等 | 是 |
-| 扫掠体 | 15 | CSG_SOLID_2D, ELLIPSOID_VOLUME, 锥体等 | 是 |
-| 截面轮廓 | 15 | CIRCULAR_CLOSED_PROFILE, RECTANGULAR_CLOSED_PROFILE 等 | 是 |
-| 加工特征实体 | 50 | HOLE, BOSS, SLOT, POCKET, CHAMFER 等 | 是 |
-| 矩阵类型 | 5 | 各种矩阵定义 | 否 |
+当前仓库已经具备以下基础，不应再按“待支持”重复排期：
 
-**关键文件**：
-- `src/main/java/com/minicad/step/model/geometry/` — 新建 Step 记录
-- `src/main/java/com/minicad/step/model/topology/` — 新建 Step 记录
-- `src/main/java/com/minicad/geometry/` — 可能需要新 domain class
-- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java` — 新增 resolver 方法
-- `src/main/java/com/minicad/step/semantic/StepCadBuilder.java` — 新增 build 方法
-- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java` — 新增导出支持
+- `StepEntityResolver` 已覆盖大批几何、拓扑、装配、PMI、验证、运动学、FEA 和样式相关实体。
+- 多类实体已通过 alias/helper 批量注册，而不是“一实体一 resolver”。
+- `StepAssemblyGraphBuilder` 已存在，装配图并非空白能力。
+- `StepPreviewJsonExporter` 已具备大模型文件验证路径。
+- `examples/engine.stp` 当前测试基线为 `93829` 实体。
+- `examples/fan.stp` 当前测试基线为 `41905` 实体。
 
-### Phase 2: PMI 标注与公差（~150 实体，无需 B-Rep）
+当前 `step/model` 已存在多个按领域拆分的子包：
 
-**目标**：支持制造标注、尺寸公差、几何公差的解析和预览
+- `action`
+- `analysis`
+- `annotation`
+- `approval`
+- `classification`
+- `config_mgmt`
+- `date_time`
+- `document`
+- `fea`
+- `geometry`
+- `kinematic`
+- `manufacturing`
+- `organization`
+- `product`
+- `profile`
+- `resource`
+- `tolerance`
+- `topology`
+- `unit`
+- `validation`
+- `workflow`
 
-| 子领域 | 数量 | 说明 |
-|--------|------|------|
-| 具体公差类型 | 35 | ANGULARITY_TOLERANCE, FLATNESS_TOLERANCE 等 |
-| 尺寸标注 | 30 | ANGULAR_DIMENSION, DIAMETER_DIMENSION 等 |
-| PMI 注释 | 25 | ANNOTATION_OCCURRENCE 等 |
-| 样式/颜色 | 50 | 曲线样式、填充样式、颜色、字体等 |
-| 文本 | 10 | 复合文本、标注文本等 |
+因此，这份计划的第一原则是：
 
-**关键文件**：
-- `src/main/java/com/minicad/step/model/tolerance/` — 新建记录
-- `src/main/java/com/minicad/step/model/annotation/` — 新建记录
-- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java` — 批量注册（扩展现有 `registerGeometricToleranceAliases` 等）
-- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java` — PMI 预览
+- 先生成“标准 schema 差集”
+- 再决定是否需要新增 model 类、复用现有 model、扩展 alias 注册，还是补运行时几何能力
 
-### Phase 3: 产品与装配结构（~120 实体，无需 B-Rep）
+## 基线重建
 
-**目标**：支持装配层次结构、产品定义、配置管理
+旧计划的问题不在于方向，而在于基线已过期。后续所有数字必须由脚本生成，不再手工维护。
 
-| 子领域 | 数量 | 说明 |
-|--------|------|------|
-| 产品定义链 | 30 | PRODUCT 变体、PRODUCT_DEFINITION 变体 |
-| 装配组件 | 40 | ASSEMBLY_COMPONENT, ASSEMBLY_JOINT 等 |
-| 配置管理 | 25 | EFFECTIVITY, CHANGE 等 |
-| 表示与映射 | 15 | REPRESENTATION 变体、REPRESENTATION_MAP 等 |
-| 几何约束 | 10 | 装配约束、几何约束 |
+### 必做产物
 
-**关键文件**：
-- `src/main/java/com/minicad/step/model/product/` — 新建记录
-- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java` — 批量注册
-- `src/main/java/com/minicad/app/StepAssemblyGraphBuilder.java` — 装配图构建
+新增一个覆盖统计脚本，输入 AP242 Ed2 `mim_lf.exp`，输出以下 4 份结果：
 
-### Phase 4: 元数据与领域扩展（~300 实体，纯解析）
+1. 标准实体全集
+2. 当前 resolver 已注册的标准实体集合
+3. 当前已有 `StepXxx` 模型集合
+4. 差集分类报告
 
-**目标**：覆盖各业务领域的元数据实体
+差集分类至少分成以下几类：
 
-| 子领域 | 数量 | 说明 |
-|--------|------|------|
-| 运动学扩展 | 50 | 额外运动副类型、机构分析 |
-| 元数据 | 30 | 分组、分类、标识 |
-| 单位扩展 | 25 | SI 单位变体、换算单位 |
-| 时间 | 15 | 日期时间赋值、时间区间 |
-| 组织 | 12 | 项目、地址 |
-| 动作 | 20 | 动作变体 |
-| 文档 | 5 | 文档标识 |
-| 审批 | 3 | 审批关系 |
-| 资源 | 10 | 属性、分析 |
-| 验证 | 3 | 验证实体 |
-| 工作流 | 5 | 工艺计划 |
-| 制造 | 5 | 增材制造 |
-| 材料 | 5 | 材料指定 |
-| 数据结构 | 15 | 集合、聚合 |
-| A3M 等效性 | 40 | AP242 Ed2 专属 |
-| 质量检查 | 5 | 几何质量标记 |
+- `unregistered`: schema 中存在，但 resolver 未注册
+- `registered-no-runtime`: 已注册但没有 B-Rep/PMI/装配导出能力
+- `alias-covered`: 通过通用 resolver 或 alias 已覆盖，不需要新增独立类
+- `runtime-gap`: resolve 成功，但真实文件导出或构建仍缺能力
 
-**关键文件**：
-- 各 `step/model/` 子包 — 新建记录
-- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java` — 批量注册
-- 可能需新增 `step/model/a3m/` 等子包
+### 建议输出文件
 
-### Phase 5: 表达式语言（~150 实体，特殊处理）
+- `doc/generated/ap242-entities.txt`
+- `doc/generated/ap242-registered-standard-entities.txt`
+- `doc/generated/ap242-model-classes.txt`
+- `doc/generated/ap242-gap-report.md`
 
-**目标**：解析 EXPRESS 表达式语言（函数、变量、运算符）
+### 判定规则
 
-**策略**：先做 AST 透传（Opaque Pass-Through），不做求值引擎
-- 每个表达式实体映射为 StepXxx 记录，保存操作数引用
-- 不做求值，仅保留结构
-- 足够应对工业 STEP 文件中的参数化约束
+- 覆盖率分母固定为 AP242 Ed2 `mim_lf.exp` 中的标准实体名集合
+- MiniCAD 自定义别名不计入分母
+- 一个实体是否“已支持”，以它能否落到稳定 resolver 为准
+- 一个实体是否“已完成”，取决于所在阶段目标，不默认要求 B-Rep
 
-**关键文件**：
-- `src/main/java/com/minicad/step/model/expression/` — 新建子包（~50 个记录类）
-- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java` — 表达式解析方法
-- `src/main/java/com/minicad/step/semantic/ExpressionOps.java` — 可选，未来求值引擎
+## 分阶段执行
 
-### Phase 6: 其他与清理（~487 实体，纯解析）
+### Phase 0: 基线与自动化
 
-**目标**：扫尾剩余实体
+目标：让后续计划建立在可复算数据上。
 
-主要是各种关系、分配、特殊用途实体。大部分是 3-6 个参数的透传。
+交付：
 
-## 自动化方案
+- 生成 AP242 Ed2 标准实体清单
+- 生成 resolver 注册清单
+- 生成 model 类清单
+- 生成差集报告和分阶段候选列表
+- 在文档中固定统计口径
 
-编写 Python 脚本从 EXPRESS schema 批量生成代码：
+涉及文件：
 
-```
-generate_from_schema.py
-  输入: ap242e2_schema.exp (49943 行)
-  输出:
-    - StepXxx.java 记录类 (每个实体 5-15 行)
-    - resolveXxx() 方法 (每个实体 5-10 行)
-    - registry.put("XXX", ...) 注册行
-```
+- `tools/` 或 `scripts/` 下新增覆盖统计脚本
+- `doc/generated/` 下新增报告产物
+- `doc/coverage-plan.md`
 
-**自动化范围**：
-- Phase 1 中不需要 B-Rep 的实体（约 40%）→ 完全自动生成
-- Phase 2-4 的纯解析实体（约 570 个）→ 完全自动生成
-- Phase 5 的表达式实体 → 部分生成（需手动设计 AST 结构）
-- Phase 1 中需要 B-Rep 的实体 → 需手动编写 build 方法
+完成标准：
 
-**预计效果**：自动化可覆盖约 70% 的工作量（~970/1387 实体）
+- 任意一次代码变更后都能重新生成差集
+- 文档中的数字全部来自脚本输出
 
-## 执行顺序
+### Phase 1: 真实文件优先的几何与 B-Rep 缺口
 
-```
-Phase 1（几何拓扑）     ← 最高优先级，直接影响 STEP 文件渲染
-  ↓
-Phase 2（PMI/公差）     ← 制造场景关键
-  ↓
-Phase 3（装配结构）     ← 装配体支持
-  ↓
-Phase 4（元数据）       ← 批量生成，快速覆盖
-  ↓
-Phase 5（表达式）       ← 特殊处理，可延后
-  ↓
-Phase 6（扫尾）         ← 自动化批量处理
-```
+目标：优先解决会阻断真实 STEP 文件导入、装配浏览、GLB 导出和网格预览的实体。
+
+优先级：
+
+- 高优先级几何/拓扑实体
+- 已注册但未进入 B-Rep 构建的实体
+- 已 resolve 但会导致 `unsupportedFaceCount`、空壳、空 solid、几何退化的实体
+
+这阶段不再笼统写“扫掠体、曲面、特征全部待做”，而是以差集报告中的真实缺口为准。像 `EXTRUDED_AREA_SOLID`、`REVOLVED_AREA_SOLID`、`SURFACE_OF_TRANSLATION`、`SURFACE_OF_PROJECTION`、`PARABOLOID_SURFACE`、`HYPERBOLOID_SURFACE` 这类当前已经注册的实体，不应再作为“未支持解析”统计。
+
+涉及文件：
+
+- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java`
+- `src/main/java/com/minicad/step/semantic/StepCadBuilder.java`
+- `src/main/java/com/minicad/geometry/`
+- `src/main/java/com/minicad/topology/`
+- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java`
+- 对应测试
+
+完成标准：
+
+- `engine.stp`、`fan.stp`、`nested-assembly.step`、相关几何样例可稳定导入
+- 新增能力有回归测试
+- 文档明确区分“已解析”和“已生成 B-Rep”
+
+### Phase 2: PMI、验证与表示层补齐
+
+目标：补齐制造标注、公差、验证属性、表示关系和样式导出的缺口。
+
+重点对象：
+
+- 几何公差变体
+- 尺寸与注释表示
+- `VALIDATION_PROPERTY_REPRESENTATION` 一类验证相关对象
+- presentation/style/text/font/fill/curve style 家族
+
+策略：
+
+- 优先复用现有 alias 注册模式
+- 对纯语义透传实体，优先保证 resolve 稳定
+- 仅在预览确有消费路径时扩展 exporter
+
+涉及文件：
+
+- `src/main/java/com/minicad/step/model/tolerance/`
+- `src/main/java/com/minicad/step/model/annotation/`
+- `src/main/java/com/minicad/step/model/validation/`
+- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java`
+- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java`
+
+完成标准：
+
+- PMI/验证样例可稳定解析
+- 纯语义实体不会因缺 exporter 而阻断整个文件
+- 文档标明哪些 PMI 仅解析，哪些已预览
+
+### Phase 3: 产品结构、装配与配置管理缺口
+
+目标：补齐当前装配链路中尚未覆盖的标准实体，而不是重复建设已存在的装配图能力。
+
+重点对象：
+
+- 产品定义与关系变体
+- effectivity / configuration management
+- 表示映射和上下文依赖关系
+- 装配约束和几何关系
+
+策略：
+
+- 以 `StepAssemblyGraphBuilder` 已有能力为基础扩展
+- 优先修补“resolve 成功但未进入装配图”的差集
+- 避免为单个标准名重复创建等价模型
+
+涉及文件：
+
+- `src/main/java/com/minicad/step/model/product/`
+- `src/main/java/com/minicad/step/model/config_mgmt/`
+- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java`
+- `src/main/java/com/minicad/app/StepAssemblyGraphBuilder.java`
+- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java`
+
+完成标准：
+
+- 典型多实例装配样例可稳定形成装配树
+- 变换、引用关系、effectivity 不再导致装配丢失
+
+### Phase 4: 纯解析领域批量收敛
+
+目标：用生成器收敛不影响运行时几何的标准实体缺口。
+
+候选领域：
+
+- `organization`
+- `approval`
+- `document`
+- `date_time`
+- `workflow`
+- `resource`
+- `classification`
+- `unit`
+- `analysis`
+- `manufacturing`
+- `kinematic`
+- `fea`
+
+策略：
+
+- 先尝试复用现有通用模型或基类
+- 能 alias 的不强制生成独立类
+- 仅在 schema 属性结构确有区别时新增专用 `StepXxx`
+
+这阶段的目标是提高 `schema coverage` 和 `semantic coverage`，不是追求运行时几何能力。
+
+### Phase 5: 表达式与参数化语言
+
+目标：对 EXPRESS 表达式相关实体建立稳定的结构化表示。
+
+当前原则：
+
+- 先做 AST/引用结构透传
+- 不在本阶段实现求值引擎
+- 不因为缺少求值而阻断文件整体解析
+
+注意事项：
+
+- 这里不能简单按“一个标准实体对应一个新 record”规划
+- 部分表达式实体更适合归入统一 AST 层次，而不是生成大量彼此重复的记录类
+
+涉及文件：
+
+- `src/main/java/com/minicad/step/model/`
+- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java`
+- 可选新增表达式专用子包或抽象层
+
+### Phase 6: 收尾与口径维护
+
+目标：让覆盖工作可持续，而不是写完一次文档后再次过期。
+
+交付：
+
+- 覆盖统计脚本纳入日常使用
+- 文档引用脚本输出，而不是手填数字
+- 为新增领域补最小验证样例
+- 定期清理“已完成但仍在待办列表”的条目
+
+## 自动化原则
+
+自动化应该生成的是“候选实现”，不是未经筛选的大量样板代码。
+
+生成器职责：
+
+- 解析 schema 实体名、继承关系、参数列表
+- 给出推荐实现方式
+- 区分“新建模型类”“复用现有模型”“alias 注册”“仅需 runtime 补齐”
+
+不建议默认生成：
+
+- 所有 `resolveXxx()` 方法
+- 所有 `StepXxx.java` 记录类
+- 所有 `registry.put()` 行
+
+原因：
+
+- 当前仓库已经广泛使用通用 resolver 和批量 alias 注册
+- 直接铺开生成会放大冗余类型和维护成本
+- 对许多 SUBTYPE 来说，运行时能力缺口比“是否缺一个 record 类”更关键
 
 ## 验证方式
 
-每个阶段完成后：
-1. `mvn test` — 确保所有测试通过
-2. 用 `engine.stp`（93829 实体）验证解析无错误
-3. 用 `fan.stp`（41707 实体）验证解析无错误
-4. 统计覆盖率：`已注册实体数 / 2122`
+每个阶段完成后至少执行：
+
+1. `mvn test`
+2. `mvn -q -Dtest=StepEntityResolverTest test`
+3. `mvn -q -Dtest=StepPreviewJsonExporterTest test`
+4. 用 `examples/engine.stp` 验证解析与导出稳定，当前实体基线为 `93829`
+5. 用 `examples/fan.stp` 验证解析与导出稳定，当前实体基线为 `41905`
+6. 用针对该阶段的最小样例验证新增实体
+
+当阶段目标涉及几何导出时，还应记录：
+
+- `solidCount`
+- `unsupportedFaceCount`
+- 是否出现空 mesh、空 assembly node、空 representation
+
+## 近期执行顺序
+
+建议按以下顺序推进：
+
+1. Phase 0，先把差集报告做出来
+2. Phase 1，处理真实文件仍有影响的几何/B-Rep 缺口
+3. Phase 2，补齐 PMI、验证和表示层
+4. Phase 3，收敛装配与配置管理缺口
+5. Phase 4，批量提升纯解析覆盖
+6. Phase 5，最后处理表达式语言
 
 ## 关键参考
 
-- AP242 Ed2 schema: ISO STEP Module Repository (`mim_lf.exp`)
-- 已注册实体列表: `StepEntityResolver.java` 中的 `registry.put()` 调用
-- 现有 resolver 模式: 674 个方法，15 个批量注册辅助方法
-- 现有 model 记录: 1172 个 `StepXxx.java` 文件
+- AP242 Ed2 schema: ISO STEP Module Repository `mim_lf.exp`
+- `src/main/java/com/minicad/step/semantic/StepEntityResolver.java`
+- `src/main/java/com/minicad/app/StepAssemblyGraphBuilder.java`
+- `src/main/java/com/minicad/app/StepPreviewJsonExporter.java`
+- `src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java`
+- `src/test/java/com/minicad/app/StepPreviewJsonExporterTest.java`
+
+## 维护约定
+
+更新这份计划时，必须同时满足：
+
+- 不把已注册实体重新写回“未支持列表”
+- 不混淆“已注册”“已 resolve”“已导出/已构建 B-Rep”三种状态
+- 所有数字都能通过脚本或测试基线回溯
+- 示例文件实体数使用当前测试断言值，而不是手工估计值
