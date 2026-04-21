@@ -18,6 +18,8 @@ import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.geometry.StepCircle;
 import com.minicad.step.model.topology.StepEdgeCurve;
 import com.minicad.step.model.product.StepEdgeBasedWireframeModel;
+import com.minicad.step.model.product.StepExtrudedFaceSolid;
+import com.minicad.step.model.product.StepRevolvedFaceSolid;
 import com.minicad.step.model.topology.StepEdgeLoop;
 import com.minicad.step.model.geometry.StepEllipse;
 import com.minicad.step.model.base.StepEntity;
@@ -578,6 +580,36 @@ public final class StepDumpApp {
                     Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
                     Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.swept_area", 1);
                     lines.add("  " + stepEntityTypeName(sweptAreaSolid) + " #" + sweptAreaSolid.id() + ": shellFaces=0, unsupportedFaces=1");
+                    appendUnsupportedReasons(lines, reasonCounts);
+                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
+                    unsupportedFaces++;
+                    mergeReasonCounts(unsupportedReasons, reasonCounts);
+                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
+                }
+                solids++;
+            } else if (entity instanceof StepExtrudedFaceSolid extrudedFaceSolid) {
+                try {
+                    int faceCount = builder.buildSolid(extrudedFaceSolid.id()).outerShell().faces().size();
+                    lines.add("  " + stepEntityTypeName(extrudedFaceSolid) + " #" + extrudedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
+                } catch (UnsupportedGeometryException ex) {
+                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
+                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.extruded_face", 1);
+                    lines.add("  " + stepEntityTypeName(extrudedFaceSolid) + " #" + extrudedFaceSolid.id() + ": shellFaces=0, unsupportedFaces=1");
+                    appendUnsupportedReasons(lines, reasonCounts);
+                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
+                    unsupportedFaces++;
+                    mergeReasonCounts(unsupportedReasons, reasonCounts);
+                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
+                }
+                solids++;
+            } else if (entity instanceof StepRevolvedFaceSolid revolvedFaceSolid) {
+                try {
+                    int faceCount = builder.buildSolid(revolvedFaceSolid.id()).outerShell().faces().size();
+                    lines.add("  " + stepEntityTypeName(revolvedFaceSolid) + " #" + revolvedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
+                } catch (UnsupportedGeometryException ex) {
+                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
+                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.revolved_face", 1);
+                    lines.add("  " + stepEntityTypeName(revolvedFaceSolid) + " #" + revolvedFaceSolid.id() + ": shellFaces=0, unsupportedFaces=1");
                     appendUnsupportedReasons(lines, reasonCounts);
                     appendUnsupportedReasonCodes(lines, reasonCodeCounts);
                     unsupportedFaces++;
@@ -1452,6 +1484,8 @@ public final class StepDumpApp {
                     || element instanceof StepManifoldSolidBrep
                     || element instanceof StepBrepWithVoids
                     || element instanceof StepSweptAreaSolid
+                    || element instanceof StepExtrudedFaceSolid
+                    || element instanceof StepRevolvedFaceSolid
                     || element instanceof StepSolidReplica
                     || element instanceof StepCsgSolid
                     || element instanceof StepCsgPrimitive
@@ -1991,6 +2025,8 @@ public final class StepDumpApp {
         if (entity instanceof StepManifoldSolidBrep
                 || entity instanceof StepBrepWithVoids
                 || entity instanceof StepSweptAreaSolid
+                || entity instanceof StepExtrudedFaceSolid
+                || entity instanceof StepRevolvedFaceSolid
                 || entity instanceof StepSolidReplica
                 || entity instanceof StepCsgSolid
                 || entity instanceof StepCsgPrimitive

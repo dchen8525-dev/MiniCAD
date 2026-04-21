@@ -7526,6 +7526,110 @@ class StepDumpAppTest {
     }
 
     @Test
+    void shouldReportExtrudedFaceSolidAsBuildableItem() throws IOException {
+        Path file = Files.createTempFile("minicad-extruded-face-solid", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('FACE_AX',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
+                #90=CARTESIAN_POINT('SOLID_ORIGIN',(3.0,4.0,5.0));
+                #91=DIRECTION('SOLID_AXIS',(0.0,1.0,0.0));
+                #92=DIRECTION('SOLID_X',(1.0,0.0,0.0));
+                #93=AXIS2_PLACEMENT_3D('SOLID_POS',#90,#91,#92);
+                #94=DIRECTION('LOCAL_EXTRUDE',(0.0,0.0,1.0));
+                #95=EXTRUDED_FACE_SOLID('EXF',#80,#93,#94,5.0);
+                ENDSEC;
+                """);
+
+        assertDumpContains(file, "EXTRUDED_FACE_SOLID #95: shellFaces=6, unsupportedFaces=0");
+    }
+
+    @Test
+    void shouldReportRevolvedFaceSolidAsBuildableItem() throws IOException {
+        Path file = Files.createTempFile("minicad-revolved-face-solid", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('FACE_AX',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
+                #90=CARTESIAN_POINT('SOLID_ORIGIN',(3.0,4.0,5.0));
+                #91=AXIS2_PLACEMENT_3D('SOLID_POS',#90,#10,#11);
+                #92=CARTESIAN_POINT('AXIS_ORIGIN',(20.0,0.0,0.0));
+                #93=DIRECTION('AXIS_DIR',(0.0,1.0,0.0));
+                #94=AXIS1_PLACEMENT('REV_AXIS',#92,#93);
+                #95=REVOLVED_FACE_SOLID('RVF',#80,#91,#94,1.57079632679);
+                ENDSEC;
+                """);
+
+        assertDumpContains(file, "REVOLVED_FACE_SOLID #95: shellFaces=34, unsupportedFaces=0");
+    }
+
+    @Test
     void shouldReportRevolvedAreaSolidAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-revolved-solid", ".step");
         Files.writeString(file, """

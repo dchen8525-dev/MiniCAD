@@ -395,7 +395,6 @@ import com.minicad.step.model.classification.StepIdentificationAssignment;
 import com.minicad.step.model.classification.StepIdentificationRole;
 import com.minicad.step.model.product.StepItemIdentifiedRepresentationUsage;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve;
-import com.minicad.step.model.geometry.StepIndexedPolyCurve;
 import com.minicad.step.model.geometry.StepPolyline3D;
 import com.minicad.step.model.product.StepItemDefinedTransformation;
 import com.minicad.step.model.kinematic.StepKinematicPropertyDefinitionRepresentation;
@@ -10304,7 +10303,7 @@ public final class StepEntityResolver {
 
   private StepExtrudedFaceSolid resolveExtrudedFaceSolid(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "EXTRUDED_FACE_SOLID");
-    requireParameterCount(instance, definition, 7);
+    requireParameterCount(instance, definition, 5);
     return new StepExtrudedFaceSolid(
         instance.id(),
         stringValue(instance, definition, 0),
@@ -10316,7 +10315,7 @@ public final class StepEntityResolver {
 
   private StepRevolvedFaceSolid resolveRevolvedFaceSolid(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "REVOLVED_FACE_SOLID");
-    requireParameterCount(instance, definition, 7);
+    requireParameterCount(instance, definition, 5);
     return new StepRevolvedFaceSolid(
         instance.id(),
         stringValue(instance, definition, 0),

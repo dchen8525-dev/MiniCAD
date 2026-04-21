@@ -2825,20 +2825,30 @@ public final class StepCadBuilder {
     // New solid type builders
 
     Solid buildExtrudedFaceSolid(StepExtrudedFaceSolid extrudedFace) {
-        // Similar to extruded area solid but sweeps a face instead of a profile
         StepEntity faceGeometry = extrudedFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID swept_face must be a face entity");
         }
-        // Build the face geometry and sample its boundary
-        SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "EXTRUDED_FACE_SOLID");
-        List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
-        if (profilePoints.isEmpty()) {
+        SurfaceGeometry surface = buildSupportedFaceGeometry(faceGeometry(stepFace), "EXTRUDED_FACE_SOLID");
+        List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
+        if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID could not extract boundary points");
         }
+        if (!(extrudedFace.position() instanceof StepAxis2Placement3D placement)) {
+            throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
+        }
+        Axis2Placement3D solidPlacement = buildPlacement(placement.id());
         double depth = extrudedFace.depth() != null ? extrudedFace.depth() : 1.0;
-        Direction3 dir = Direction3.from(new com.minicad.geometry.Vector3(0, 0, depth));
-        return buildExtrudedProfile(profilePoints, dir, depth);
+        if (depth <= 0.0) {
+            throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID requires positive depth");
+        }
+
+        Direction3 localDirection = buildExtrusionDirection(extrudedFace.direction(), "EXTRUDED_FACE_SOLID");
+        Direction3 worldDirection = solidPlacement.transformDirectionToWorld(localDirection);
+        List<CartesianPoint> profilePoints = localProfilePoints.stream()
+                .map(solidPlacement::transformToWorld)
+                .toList();
+        return buildExtrudedProfile(profilePoints, worldDirection, depth);
     }
 
     Solid buildRevolvedFaceSolid(StepRevolvedFaceSolid revolvedFace) {
@@ -2846,14 +2856,34 @@ public final class StepCadBuilder {
         if (!(faceGeometry instanceof StepFaceEntity stepFace)) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID swept_face must be a face entity");
         }
-        SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "REVOLVED_FACE_SOLID");
-        List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
-        if (profilePoints.isEmpty()) {
+        SurfaceGeometry surface = buildSupportedFaceGeometry(faceGeometry(stepFace), "REVOLVED_FACE_SOLID");
+        List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
+        if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID could not extract boundary points");
         }
+        if (!(revolvedFace.position() instanceof StepAxis2Placement3D placement)) {
+            throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
+        }
+        Axis2Placement3D solidPlacement = buildPlacement(placement.id());
         double angle = revolvedFace.angle() != null ? revolvedFace.angle() : 2 * Math.PI;
-        CartesianPoint axisOrigin = new CartesianPoint(0, 0, 0);
-        com.minicad.geometry.Vector3 axis = new com.minicad.geometry.Vector3(0, 0, 1);
+        if (Math.abs(angle) <= 1.0e-9) {
+            throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID requires a non-zero revolution angle");
+        }
+        if (Math.abs(angle) > Math.PI * 2.0 + 1.0e-9) {
+            throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID revolution angle must not exceed 2*PI");
+        }
+
+        Axis1Placement revolutionAxis = buildRevolutionAxis(revolvedFace.axis(), solidPlacement, "REVOLVED_FACE_SOLID");
+        List<CartesianPoint> profilePoints = localProfilePoints.stream()
+                .map(solidPlacement::transformToWorld)
+                .toList();
+        for (CartesianPoint point : profilePoints) {
+            if (distanceToAxis(point, revolutionAxis) <= 1.0e-9) {
+                throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID profile must not intersect the revolution axis");
+            }
+        }
+        CartesianPoint axisOrigin = revolutionAxis.location();
+        com.minicad.geometry.Vector3 axis = revolutionAxis.axis().asVector();
         return buildRevolvedProfile(profilePoints, axisOrigin, axis, angle);
     }
 
@@ -2942,47 +2972,59 @@ public final class StepCadBuilder {
         faces.add(faceFromPolyLoop(top, direction));
         for (int i = 0; i < profile.size(); i++) {
             int next = (i + 1) % profile.size();
-            Vector3 edgeDir = new Vector3(
-                    top.get(next).x() - profile.get(i).x(),
-                    top.get(next).y() - profile.get(i).y(),
-                    top.get(next).z() - profile.get(i).z());
             faces.add(faceFromPolyLoop(
-                    List.of(profile.get(i), profile.get(next), top.get(next), top.get(i)),
-                    Direction3.from(edgeDir)));
+                    List.of(profile.get(i), profile.get(next), top.get(next), top.get(i), profile.get(i)),
+                    quadNormal(profile.get(i), profile.get(next), top.get(next), top.get(i))));
         }
         return new Solid(new Shell(faces, true));
     }
 
     private Solid buildRevolvedProfile(List<CartesianPoint> profile, CartesianPoint axisOrigin,
                                         Vector3 axis, double angle) {
-        int sections = Math.max(4, (int) (Math.abs(angle) / (Math.PI / 16)));
-        if (sections > 72) sections = 72;
+        int sections = Math.max(1, (int) Math.ceil(Math.abs(angle) / (Math.PI / 16.0)));
+        boolean closedRevolution = Math.abs(Math.abs(angle) - Math.PI * 2.0) <= 1.0e-9;
+        int sectionCount = closedRevolution ? sections : sections + 1;
         List<Face> faces = new ArrayList<>();
-        // Build rings
+        Axis1Placement revolutionAxis = new Axis1Placement(axisOrigin, Direction3.from(axis));
         List<List<CartesianPoint>> rings = new ArrayList<>();
-        for (int i = 0; i <= sections; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             double theta = angle * i / sections;
             List<CartesianPoint> ring = new ArrayList<>();
             for (CartesianPoint p : profile) {
-                ring.add(rotatePointAroundAxis(p, axisOrigin, axis, theta));
+                ring.add(rotateAroundAxis(p, revolutionAxis, theta));
             }
             rings.add(ring);
         }
-        // End caps
-        Direction3 axisDir = Direction3.from(axis);
-        if (Math.abs(angle) < 2 * Math.PI - 0.01) {
-            faces.add(faceFromPolyLoop(reverseClosedLoop3(rings.getFirst()), axisDir.reverse()));
-            faces.add(faceFromPolyLoop(closeLoop3(rings.getLast()), axisDir));
+        if (!closedRevolution) {
+            Vector3 startSweep = sweepDirectionAtSection(rings.getFirst(), revolutionAxis, angle >= 0.0);
+            Vector3 endSweep = sweepDirectionAtSection(rings.getLast(), revolutionAxis, angle >= 0.0);
+            faces.add(faceFromPolyLoop(
+                    closeLoop3(rings.getFirst()),
+                    polygonNormal(rings.getFirst(), startSweep.scale(-1.0))
+            ));
+            faces.add(faceFromPolyLoop(
+                    reverseClosedLoop3(rings.getLast()),
+                    polygonNormal(rings.getLast(), endSweep)
+            ));
         }
-        // Side faces
         for (int r = 0; r < rings.size() - 1; r++) {
             List<CartesianPoint> cur = rings.get(r);
             List<CartesianPoint> nxt = rings.get(r + 1);
             for (int i = 0; i < cur.size(); i++) {
                 int next = (i + 1) % cur.size();
                 faces.add(faceFromPolyLoop(
-                        List.of(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i)),
-                        Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
+                        List.of(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i), cur.get(i)),
+                        quadNormal(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i))));
+            }
+        }
+        if (closedRevolution) {
+            List<CartesianPoint> cur = rings.getLast();
+            List<CartesianPoint> nxt = rings.getFirst();
+            for (int i = 0; i < cur.size(); i++) {
+                int next = (i + 1) % cur.size();
+                faces.add(faceFromPolyLoop(
+                        List.of(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i), cur.get(i)),
+                        quadNormal(cur.get(i), cur.get(next), nxt.get(next), nxt.get(i))));
             }
         }
         return new Solid(new Shell(faces, true));
@@ -6459,6 +6501,35 @@ public final class StepCadBuilder {
             return buildDirection(stepDir.id()).asVector();
         }
         throw new StepResolutionException("entity is not a supported vector or direction");
+    }
+
+    private Direction3 buildExtrusionDirection(StepEntity entity, String context) {
+        if (entity instanceof StepDirection stepDirection) {
+            return buildDirection(stepDirection.id());
+        }
+        if (entity instanceof StepVector stepVector) {
+            return buildDirection(stepVector.orientation().id());
+        }
+        throw new UnsupportedGeometryException(context + " direction must be a DIRECTION or VECTOR");
+    }
+
+    private Axis1Placement buildRevolutionAxis(StepEntity entity, Axis2Placement3D solidPlacement, String context) {
+        CartesianPoint location;
+        Direction3 axis;
+        if (entity instanceof StepAxis1Placement axisPlacement) {
+            Axis1Placement localAxis = buildAxis1Placement(axisPlacement.id());
+            location = solidPlacement.transformToWorld(localAxis.location());
+            axis = solidPlacement.transformDirectionToWorld(localAxis.axis());
+        } else if (entity instanceof StepDirection stepDirection) {
+            location = solidPlacement.location();
+            axis = solidPlacement.transformDirectionToWorld(buildDirection(stepDirection.id()));
+        } else if (entity instanceof StepVector stepVector) {
+            location = solidPlacement.location();
+            axis = solidPlacement.transformDirectionToWorld(buildDirection(stepVector.orientation().id()));
+        } else {
+            throw new UnsupportedGeometryException(context + " axis must be an AXIS1_PLACEMENT, DIRECTION or VECTOR");
+        }
+        return new Axis1Placement(location, axis);
     }
 
     private record CircularFrame(Vector3 x, Vector3 y) {
