@@ -4,19 +4,18 @@ import com.minicad.step.model.base.StepEntity;
 import java.util.List;
 
 /**
- * Resolved INDEXED_POLYCURVE.
+ * Resolved INDEXED_POLY_CURVE / INDEXED_POLYCURVE (MiniCAD alias).
  */
-public record StepIndexedPolycurve(
+public record StepIndexedPolyCurve(
     int id,
     String name,
-    List<StepEntity> points,
+    List<StepCartesianPoint> points,
     List<Integer> indices,
-    List<StepEntity> segments
+    boolean closed
 ) implements StepEntity {
 
-    public StepIndexedPolycurve {
+    public StepIndexedPolyCurve {
         points = List.copyOf(points);
         indices = List.copyOf(indices);
-        segments = List.copyOf(segments);
     }
 }
