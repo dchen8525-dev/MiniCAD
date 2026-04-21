@@ -83,8 +83,8 @@
 
 #### 工作项
 
-- 扩展 `CoverageAnalyzer`，除 resolver 注册外，再扫描 `StepCadBuilder` 的几何/实体构建入口
-- 扩展 `CoverageAnalyzer`，补充扫描 `StepPreviewJsonExporter` 的面/实体导出入口
+- 基于代码静态盘点，维护 resolver / builder / exporter / tests 四层支持矩阵
+- 对照 `StepEntityResolver`、`StepCadBuilder`、`StepPreviewJsonExporter` 和测试代码，整理“已注册但未构建”“已构建但未导出”“已导出但未覆盖测试”的差集清单
 - 生成 `doc/generated/step-support-matrix.md`
 - 生成“已注册但未构建”和“已构建但未导出”的差集报告
 - 将报告输出加入文档工作流或本地维护流程
@@ -97,7 +97,7 @@
 
 #### 风险
 
-- 当前仓库存在编译阻塞，`CoverageAnalyzer` 暂时无法运行
+- 当前仓库中可能存在未清理的重复类或过时文档，容易干扰静态盘点结果
 - 已发现 `StepIndexedPolycurve.java` / `StepIndexedPolyCurve.java` 重复类定义问题，需先解除编译错误
 
 ### Phase 1：修复“假支持”实体
@@ -224,13 +224,12 @@
 
 建议按以下顺序推进：
 
-1. 修复编译阻塞，跑通 `CoverageAnalyzer`
-2. 生成真实支持矩阵
-3. 修 swept face solids 和 advanced volumes 的语义正确性
-4. 扩一般化 boolean
-5. 补 preview/export 一致化
-6. 补 PMI/GD&T 元数据链路
-7. 最后补 kinematic / validation / FEA
+1. 生成真实支持矩阵和差异清单
+2. 修 swept face solids 和 advanced volumes 的语义正确性
+3. 扩一般化 boolean
+4. 补 preview/export 一致化
+5. 补 PMI/GD&T 元数据链路
+6. 最后补 kinematic / validation / FEA
 
 ## 5. 测试策略
 
