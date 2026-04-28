@@ -6726,7 +6726,7 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    private static String surfaceTypeName(StepEntity geometry) {
+    static String surfaceTypeName(StepEntity geometry) {
         if (geometry instanceof StepLine) {
             return "LINE";
         }
@@ -7179,7 +7179,7 @@ public final class StepPreviewJsonExporter {
         return reversed;
     }
 
-    private static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
+    static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
         Edge edge = orientedEdge.edge();
         boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
         return sampleEdge(orientedEdge.startVertex().point(), orientedEdge.endVertex().point(), edge.curve(), naturalForward);
@@ -8891,7 +8891,7 @@ public final class StepPreviewJsonExporter {
         return points;
     }
 
-    private static PointPayload toPointPayload(CartesianPoint point) {
+    static PointPayload toPointPayload(CartesianPoint point) {
         return new PointPayload(point.x(), point.y(), point.z());
     }
 
