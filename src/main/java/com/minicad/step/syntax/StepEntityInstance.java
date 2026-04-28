@@ -13,6 +13,7 @@ public final class StepEntityInstance {
     private final int id;
     private final List<StepEntityDefinition> definitions;
     private final List<String> normalizedDefinitionNames;
+    private final String name;
 
     public StepEntityInstance(int id, List<StepEntityDefinition> definitions) {
         if (definitions.isEmpty()) {
@@ -23,6 +24,7 @@ public final class StepEntityInstance {
         this.normalizedDefinitionNames = this.definitions.stream()
                 .map(definition -> asciiUpper(definition.name()))
                 .toList();
+        this.name = buildName(this.definitions);
     }
 
     public StepEntityInstance(int id, String name, List<StepValue> parameters) {
@@ -46,7 +48,7 @@ public final class StepEntityInstance {
     }
 
     public String name() {
-        return definitions.stream().map(StepEntityDefinition::name).reduce((left, right) -> left + "+" + right).orElse("");
+        return name;
     }
 
     public List<StepValue> parameters() {
@@ -84,5 +86,19 @@ public final class StepEntityInstance {
             }
         }
         return new String(chars);
+    }
+
+    private static String buildName(List<StepEntityDefinition> definitions) {
+        if (definitions.size() == 1) {
+            return definitions.getFirst().name();
+        }
+        StringBuilder builder = new StringBuilder();
+        for (StepEntityDefinition definition : definitions) {
+            if (!builder.isEmpty()) {
+                builder.append('+');
+            }
+            builder.append(definition.name());
+        }
+        return builder.toString();
     }
 }

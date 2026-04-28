@@ -2,6 +2,7 @@ package com.minicad.step.syntax;
 
 import com.minicad.common.StepParseException;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +59,23 @@ public final class StepFile {
     }
 
     private Map<Integer, StepEntityInstance> buildEntitiesById() {
-        Map<Integer, StepEntityInstance> byId = new LinkedHashMap<>();
+        Map<Integer, StepEntityInstance> byId = new LinkedHashMap<>(hashCapacity(entities.size()));
         for (StepEntityInstance entity : entities) {
             StepEntityInstance previous = byId.put(entity.id(), entity);
             if (previous != null) {
                 throw new StepParseException("duplicate entity id #" + entity.id());
             }
         }
-        return byId;
+        return Collections.unmodifiableMap(byId);
+    }
+
+    private static int hashCapacity(int expectedSize) {
+        if (expectedSize < 3) {
+            return expectedSize + 1;
+        }
+        if (expectedSize < 1 << 30) {
+            return (int) (expectedSize / 0.75f + 1.0f);
+        }
+        return Integer.MAX_VALUE;
     }
 }

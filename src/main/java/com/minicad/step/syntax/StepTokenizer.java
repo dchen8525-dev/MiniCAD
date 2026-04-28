@@ -7,7 +7,6 @@ import com.minicad.common.StepParseException;
  */
 public final class StepTokenizer {
 
-    private static final StepTokenType[] UNUSED = null;
     private static final String HASH_TEXT = "#";
     private static final String EQUALS_TEXT = "=";
     private static final String LPAREN_TEXT = "(";

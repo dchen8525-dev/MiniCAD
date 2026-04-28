@@ -520,6 +520,7 @@ public final class StepPreviewJsonExporter {
     private static final int MAX_TOTAL_TRIANGLE_POINTS = 6_000_000;
     private static final int GLB_MAX_TOTAL_TRIANGLE_POINTS = 12_000_000;
     private static final int MAX_TOTAL_LOOP_POINTS = 250_000;
+    private static final int TOPOLOGY_SURFACE_GRID_SEGMENTS = 16;
 
     private StepPreviewJsonExporter() {
     }
@@ -2822,7 +2823,7 @@ public final class StepPreviewJsonExporter {
             for (FaceBound bound : face.bounds()) {
                 loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
             }
-            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
@@ -2860,7 +2861,7 @@ public final class StepPreviewJsonExporter {
             for (FaceBound bound : face.bounds()) {
                 loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
             }
-            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
@@ -2898,7 +2899,7 @@ public final class StepPreviewJsonExporter {
             for (FaceBound bound : face.bounds()) {
                 loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
             }
-            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
@@ -2936,7 +2937,7 @@ public final class StepPreviewJsonExporter {
             for (FaceBound bound : face.bounds()) {
                 loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
             }
-            java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
@@ -3034,8 +3035,7 @@ public final class StepPreviewJsonExporter {
                     null, null, null, 0.0, offset.distance(), 0.0, face.bounds());
         }
         // Non-planar: generic grid-based triangulation
-        int segments = 32;
-        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(segments, segments);
+        java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
         if (grid.isEmpty()) {
             throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " produced no sample grid");
         }
@@ -3088,7 +3088,7 @@ public final class StepPreviewJsonExporter {
             double scalarC,
             List<FaceBound> bounds
     ) {
-        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
+        java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
         if (grid.isEmpty()) return null;
         List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
         if (triangles.isEmpty()) return null;
@@ -3132,6 +3132,10 @@ public final class StepPreviewJsonExporter {
                 ),
                 null
         );
+    }
+
+    private static List<List<CartesianPoint>> sampleTopologySurfaceGrid(SurfaceGeometry surface) {
+        return surface.sampleGrid(TOPOLOGY_SURFACE_GRID_SEGMENTS, TOPOLOGY_SURFACE_GRID_SEGMENTS);
     }
 
     private static FacePayload toCylindricalFacePayload(
