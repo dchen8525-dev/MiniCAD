@@ -181,24 +181,25 @@ public final class StepParser {
             throw new StepParseException("STEP input must not be blank");
         }
 
-        String upper = input.toUpperCase();
-        int headerStart = upper.indexOf(HEADER_SECTION);
+        int headerStart = findKeywordOutsideStringsAndComments(input, HEADER_SECTION, 0);
         List<StepHeaderEntry> headerEntries = List.of();
+        int dataSearchStart = 0;
         if (headerStart >= 0) {
             int headerContentStart = headerStart + HEADER_SECTION.length();
-            int headerEnd = findEndsecOutsideStringsAndComments(upper, input, headerContentStart);
+            int headerEnd = findEndsecOutsideStringsAndComments(input, headerContentStart);
             if (headerEnd < 0) {
                 throw new StepParseException("missing ENDSEC for HEADER section");
             }
             headerEntries = new StepParser(input, headerContentStart, headerEnd).parseHeaderEntries();
+            dataSearchStart = headerEnd + ENDSEC.length();
         }
 
-        int dataStart = upper.indexOf(DATA_SECTION);
+        int dataStart = findKeywordOutsideStringsAndComments(input, DATA_SECTION, dataSearchStart);
         if (dataStart < 0) {
             throw new StepParseException("missing DATA section");
         }
         int contentStart = dataStart + DATA_SECTION.length();
-        int endSec = findEndsecOutsideStringsAndComments(upper, input, contentStart);
+        int endSec = findEndsecOutsideStringsAndComments(input, contentStart);
         if (endSec < 0) {
             throw new StepParseException("missing ENDSEC for DATA section");
         }
@@ -206,12 +207,16 @@ public final class StepParser {
         return new StepFile(headerEntries, dataFile.entities());
     }
 
-    private static int findEndsecOutsideStringsAndComments(String upper, String original, int start) {
+    private static int findEndsecOutsideStringsAndComments(String input, int start) {
+        return findKeywordOutsideStringsAndComments(input, ENDSEC, start);
+    }
+
+    private static int findKeywordOutsideStringsAndComments(String input, String keyword, int start) {
         int index = start;
-        while (index < original.length()) {
+        while (index < input.length()) {
             // Skip comments
-            if (original.charAt(index) == '/' && index + 1 < original.length() && original.charAt(index + 1) == '*') {
-                int commentEnd = original.indexOf("*/", index + 2);
+            if (input.charAt(index) == '/' && index + 1 < input.length() && input.charAt(index + 1) == '*') {
+                int commentEnd = input.indexOf("*/", index + 2);
                 if (commentEnd < 0) {
                     throw new StepParseException("unterminated comment at position " + index);
                 }
@@ -219,11 +224,11 @@ public final class StepParser {
                 continue;
             }
             // Skip strings
-            if (original.charAt(index) == '\'') {
+            if (input.charAt(index) == '\'') {
                 index++;
-                while (index < original.length()) {
-                    if (original.charAt(index) == '\'') {
-                        if (index + 1 < original.length() && original.charAt(index + 1) == '\'') {
+                while (index < input.length()) {
+                    if (input.charAt(index) == '\'') {
+                        if (index + 1 < input.length() && input.charAt(index + 1) == '\'') {
                             index += 2;
                             continue;
                         }
@@ -234,8 +239,7 @@ public final class StepParser {
                 }
                 continue;
             }
-            // Check for ENDSEC
-            if (upper.regionMatches(index, ENDSEC, 0, ENDSEC.length())) {
+            if (input.regionMatches(true, index, keyword, 0, keyword.length())) {
                 return index;
             }
             index++;

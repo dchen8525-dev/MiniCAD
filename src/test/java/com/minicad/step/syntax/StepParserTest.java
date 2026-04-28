@@ -95,6 +95,28 @@ class StepParserTest {
     }
 
     @Test
+    void shouldFindSectionsOutsideStringsAndComments() {
+        String step = """
+                ISO-10303-21;
+                /* HEADER; DATA; ENDSEC; */
+                HEADER;
+                FILE_DESCRIPTION(('mentions DATA; and ENDSEC; before real data'),'1');
+                ENDSEC;
+                /* DATA; */
+                DATA;
+                #1=EXAMPLE('payload');
+                ENDSEC;
+                END-ISO-10303-21;
+                """;
+
+        StepFile file = StepParser.parse(step);
+
+        assertEquals(1, file.headerEntries().size());
+        assertEquals(1, file.entities().size());
+        assertEquals("EXAMPLE", file.entities().getFirst().name());
+    }
+
+    @Test
     void shouldRejectMissingSemicolon() {
         String step = """
                 DATA;
@@ -164,5 +186,18 @@ class StepParserTest {
 
         assertEquals(List.of(1, 2), file.entitiesById().keySet().stream().toList());
         assertEquals("B", file.entitiesById().get(2).name());
+    }
+
+    @Test
+    void shouldExposeImmutableEntityIndex() {
+        String step = """
+                DATA;
+                #1=A();
+                ENDSEC;
+                """;
+
+        StepFile file = StepParser.parse(step);
+
+        assertThrows(UnsupportedOperationException.class, () -> file.entitiesById().clear());
     }
 }
