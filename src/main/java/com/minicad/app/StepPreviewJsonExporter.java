@@ -2453,7 +2453,7 @@ public final class StepPreviewJsonExporter {
         return new StepMetadataExtractor.DisplayMetadata(rgb, List.copyOf(layers), transparency, pbr);
     }
 
-    private static String faceDisplayName(StepFaceEntity stepFace) {
+    static String faceDisplayName(StepFaceEntity stepFace) {
         if (stepFace instanceof StepOrientedFace orientedFace) {
             return faceDisplayName(orientedFace.faceElement());
         }
@@ -7841,7 +7841,7 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    private static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
+    static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
         if (item instanceof StepAnnotationFillArea fillArea) {
             return sampleAnnotationFillAreaPoints(fillArea, builder);
         }
@@ -7994,7 +7994,7 @@ public final class StepPreviewJsonExporter {
         return points.isEmpty() ? null : List.copyOf(points);
     }
 
-    private static List<CartesianPoint> sampleAnnotationFillAreaPoints(
+    static List<CartesianPoint> sampleAnnotationFillAreaPoints(
             StepAnnotationFillArea fillArea,
             StepCadBuilder builder
     ) {
@@ -8268,7 +8268,7 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(points);
     }
 
-    private static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
+    static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
         if (curve instanceof TrimmedCurve3 trimmedCurve) {
             return sampleTrimmedCurve3(trimmedCurve, 72);
         }
@@ -14560,7 +14560,7 @@ public final class StepPreviewJsonExporter {
         return builder.toString();
     }
 
-    private static String definitionTypeName(StepEntity definition) {
+    static String definitionTypeName(StepEntity definition) {
         String entityName = tryEntityName(definition);
         if (entityName != null) {
             return entityName;
@@ -16365,7 +16365,7 @@ public final class StepPreviewJsonExporter {
         return Set.copyOf(targets);
     }
 
-    private static CartesianPoint pointFromStep(StepCartesianPoint point) {
+    static CartesianPoint pointFromStep(StepCartesianPoint point) {
         double x = point.coordinates().get(0);
         double y = point.coordinates().size() > 1 ? point.coordinates().get(1) : 0.0;
         double z = point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0;
