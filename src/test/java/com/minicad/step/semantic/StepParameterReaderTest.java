@@ -86,6 +86,33 @@ class StepParameterReaderTest {
     assertTrue(StepParameterReader.isUnset(typedOmitted));
   }
 
+  @Test
+  void isOmittedDistinguishesDollarFromStar() {
+    StepValue omitted = new StepValue.OmittedValue();
+    StepValue notProvided = new StepValue.NotProvidedValue();
+
+    assertTrue(StepParameterReader.isOmitted(omitted));
+    assertFalse(StepParameterReader.isOmitted(notProvided));
+  }
+
+  @Test
+  void isNotProvidedDistinguishesStarFromDollar() {
+    StepValue omitted = new StepValue.OmittedValue();
+    StepValue notProvided = new StepValue.NotProvidedValue();
+
+    assertTrue(StepParameterReader.isNotProvided(notProvided));
+    assertFalse(StepParameterReader.isNotProvided(omitted));
+  }
+
+  @Test
+  void unsetPredicatesUnwrapTypedValues() {
+    StepValue typedOmitted = new StepValue.TypedValue("WRAP", new StepValue.OmittedValue());
+    StepValue typedNotProvided = new StepValue.TypedValue("WRAP", new StepValue.NotProvidedValue());
+
+    assertTrue(StepParameterReader.isOmitted(typedOmitted));
+    assertTrue(StepParameterReader.isNotProvided(typedNotProvided));
+  }
+
   // ---------------------------------------------------------------------------
   // literalText
   // ---------------------------------------------------------------------------
@@ -489,8 +516,11 @@ class StepParameterReaderTest {
     var inst = instanceWithDef("TEST", List.of(
         new StepValue.NumberValue(1.0, "1")));
     var def = def(inst, "TEST");
-    assertThrows(StepResolutionException.class,
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
         () -> StepParameterReader.requireParameterCount(inst, def, 3));
+    assertEquals(
+        "entity #1 TEST parameter count mismatch: expected 3, actual 1",
+        exception.getMessage());
   }
 
   @Test
@@ -507,8 +537,24 @@ class StepParameterReaderTest {
         new StepValue.NumberValue(1.0, "1"),
         new StepValue.NumberValue(2.0, "2")));
     var def = def(inst, "TEST");
-    assertThrows(StepResolutionException.class,
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
         () -> StepParameterReader.requireParameterCountIn(inst, def, 4, 5));
+    assertEquals(
+        "entity #1 TEST parameter count mismatch: expected 4 or 5, actual 2",
+        exception.getMessage());
+  }
+
+  @Test
+  void parameterTypeMismatchIncludesEntityAndActualType() {
+    var inst = instanceWithDef("TEST", List.of(new StepValue.StringValue("bad")));
+    var def = def(inst, "TEST");
+
+    StepResolutionException exception =
+        StepParameterReader.parameterTypeMismatch(inst, def, 0, "number");
+
+    assertEquals(
+        "entity #1 TEST parameter 0 type mismatch: expected number, actual string",
+        exception.getMessage());
   }
 
   // ---------------------------------------------------------------------------

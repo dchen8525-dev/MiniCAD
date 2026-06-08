@@ -2,6 +2,9 @@ package com.minicad.step.syntax;
 
 import com.minicad.common.StepParseException;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * Minimal tokenizer for a restricted subset of STEP syntax.
  */
@@ -80,6 +83,7 @@ public final class StepTokenizer {
         int start = index;
         index++;
         StringBuilder value = new StringBuilder();
+        Charset stringCharset = StandardCharsets.ISO_8859_1;
         while (index < end) {
             char c = input.charAt(index);
             if (c == '\'') {
@@ -91,10 +95,169 @@ public final class StepTokenizer {
                 index++;
                 return new StepToken(StepTokenType.STRING, value.toString(), start);
             }
+            if (c == '\\') {
+                stringCharset = appendStringEscape(value, stringCharset, start);
+                continue;
+            }
             value.append(c);
             index++;
         }
         throw new StepParseException("unterminated string at position " + start);
+    }
+
+    private Charset appendStringEscape(StringBuilder value, Charset stringCharset, int stringStart) {
+        int escapeStart = index;
+        if (index + 1 >= end) {
+            throw new StepParseException("malformed string escape at position " + escapeStart);
+        }
+        char escapeType = input.charAt(index + 1);
+        if (escapeType == 'X' || escapeType == 'x') {
+            return appendHexStringEscape(value, stringCharset, escapeStart, stringStart);
+        }
+        if (index + 2 >= end) {
+            throw new StepParseException("malformed string escape at position " + escapeStart);
+        }
+        if (input.charAt(index + 2) != '\\') {
+            throw new StepParseException("malformed string escape at position " + escapeStart);
+        }
+        index += 3;
+        return switch (escapeType) {
+            case 'S', 's' -> {
+                appendSingleByteEscape(value, stringCharset, escapeStart);
+                yield stringCharset;
+            }
+            case 'P', 'p' -> parseCodePageEscape(stringCharset, escapeStart);
+            default -> throw new StepParseException("unsupported string escape '\\" + escapeType
+                    + "\\' at position " + escapeStart);
+        };
+    }
+
+    private Charset appendHexStringEscape(
+            StringBuilder value, Charset stringCharset, int escapeStart, int stringStart) {
+        if (index + 2 >= end) {
+            throw new StepParseException("malformed \\X\\ string escape at position " + escapeStart);
+        }
+        char mode = input.charAt(index + 2);
+        if (mode == '\\') {
+            index += 3;
+            int code = parseHexByte(escapeStart, "\\X\\");
+            value.append(new String(new byte[] {(byte) code}, stringCharset));
+            return stringCharset;
+        }
+        if (mode == '2' || mode == '4') {
+            index += 2;
+            return parseHexEscape(value, stringCharset, escapeStart, stringStart);
+        }
+        throw new StepParseException("malformed \\X\\ string escape at position " + escapeStart);
+    }
+
+    private void appendSingleByteEscape(StringBuilder value, Charset stringCharset, int escapeStart) {
+        if (index >= end) {
+            throw new StepParseException("malformed \\S\\ string escape at position " + escapeStart);
+        }
+        char encoded = input.charAt(index);
+        if (encoded > 0x7F) {
+            throw new StepParseException("malformed \\S\\ string escape at position " + escapeStart);
+        }
+        index++;
+        value.append(new String(new byte[] {(byte) (encoded + 0x80)}, stringCharset));
+    }
+
+    private Charset parseCodePageEscape(Charset current, int escapeStart) {
+        if (index >= end) {
+            throw new StepParseException("malformed \\P\\ string escape at position " + escapeStart);
+        }
+        char page = Character.toUpperCase(input.charAt(index));
+        index++;
+        String charsetName = switch (page) {
+            case 'A' -> "ISO-8859-1";
+            case 'B' -> "ISO-8859-2";
+            case 'C' -> "ISO-8859-3";
+            case 'D' -> "ISO-8859-4";
+            case 'E' -> "ISO-8859-5";
+            case 'F' -> "ISO-8859-6";
+            case 'G' -> "ISO-8859-7";
+            case 'H' -> "ISO-8859-8";
+            case 'I' -> "ISO-8859-9";
+            default -> null;
+        };
+        if (charsetName == null || !Charset.isSupported(charsetName)) {
+            throw new StepParseException("unsupported \\P\\ string escape code page '" + page
+                    + "' at position " + escapeStart);
+        }
+        return Charset.forName(charsetName);
+    }
+
+    private Charset parseHexEscape(StringBuilder value, Charset stringCharset, int escapeStart, int stringStart) {
+        if (index >= end) {
+            throw new StepParseException("malformed \\X\\ string escape at position " + escapeStart);
+        }
+        char mode = input.charAt(index);
+        if (mode == '2') {
+            consumeLongHexModeBackslash(escapeStart, "\\X2\\");
+            parseLongHexEscape(value, 4, escapeStart, stringStart);
+            return stringCharset;
+        }
+        if (mode == '4') {
+            consumeLongHexModeBackslash(escapeStart, "\\X4\\");
+            parseLongHexEscape(value, 8, escapeStart, stringStart);
+            return stringCharset;
+        }
+        int code = parseHexByte(escapeStart, "\\X\\");
+        value.append(new String(new byte[] {(byte) code}, stringCharset));
+        return stringCharset;
+    }
+
+    private void consumeLongHexModeBackslash(int escapeStart, String escapeName) {
+        if (index + 1 >= end || input.charAt(index + 1) != '\\') {
+            throw new StepParseException("malformed " + escapeName + " string escape at position " + escapeStart);
+        }
+        index += 2;
+    }
+
+    private int parseHexByte(int escapeStart, String escapeName) {
+        if (index + 1 >= end || !isHex(input.charAt(index)) || !isHex(input.charAt(index + 1))) {
+            throw new StepParseException("malformed " + escapeName + " string escape at position " + escapeStart);
+        }
+        int code = Integer.parseInt(input.substring(index, index + 2), 16);
+        index += 2;
+        return code;
+    }
+
+    private void parseLongHexEscape(StringBuilder value, int hexDigitsPerCodePoint, int escapeStart, int stringStart) {
+        int digitsStart = index;
+        while (index < end) {
+            if (index + 3 < end
+                    && input.charAt(index) == '\\'
+                    && (input.charAt(index + 1) == 'X' || input.charAt(index + 1) == 'x')
+                    && input.charAt(index + 2) == '0'
+                    && input.charAt(index + 3) == '\\') {
+                int hexDigitCount = index - digitsStart;
+                if (hexDigitCount == 0 || hexDigitCount % hexDigitsPerCodePoint != 0) {
+                    throw new StepParseException("malformed long string escape at position " + escapeStart);
+                }
+                appendLongHexCodePoints(value, digitsStart, index, hexDigitsPerCodePoint, escapeStart);
+                index += 4;
+                return;
+            }
+            if (!isHex(input.charAt(index))) {
+                throw new StepParseException("malformed long string escape at position " + escapeStart);
+            }
+            index++;
+        }
+        throw new StepParseException("unterminated long string escape opened at position " + escapeStart
+                + " in string at position " + stringStart);
+    }
+
+    private void appendLongHexCodePoints(
+            StringBuilder value, int start, int limit, int hexDigitsPerCodePoint, int escapeStart) {
+        for (int i = start; i < limit; i += hexDigitsPerCodePoint) {
+            int codePoint = (int) Long.parseLong(input.substring(i, i + hexDigitsPerCodePoint), 16);
+            if (!Character.isValidCodePoint(codePoint)) {
+                throw new StepParseException("invalid Unicode code point in string escape at position " + escapeStart);
+            }
+            value.appendCodePoint(codePoint);
+        }
     }
 
     private StepToken enumToken() {
@@ -202,5 +365,11 @@ public final class StepTokenizer {
 
     private static boolean isIdentifierPart(char c) {
         return Character.isLetterOrDigit(c) || c == '_';
+    }
+
+    private static boolean isHex(char c) {
+        return (c >= '0' && c <= '9')
+                || (c >= 'A' && c <= 'F')
+                || (c >= 'a' && c <= 'f');
     }
 }

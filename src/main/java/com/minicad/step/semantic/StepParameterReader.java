@@ -38,13 +38,14 @@ public final class StepParameterReader {
       StepEntityInstance instance, StepEntityDefinition definition, int expected) {
     if (definition.parameters().size() != expected) {
       throw new StepResolutionException(
-          definition.name()
-              + " expects "
+          "entity #"
+              + instance.id()
+              + " "
+              + definition.name()
+              + " parameter count mismatch: expected "
               + expected
-              + " parameters but got "
-              + definition.parameters().size()
-              + " in entity #"
-              + instance.id());
+              + ", actual "
+              + definition.parameters().size());
     }
   }
 
@@ -67,13 +68,47 @@ public final class StepParameterReader {
       expectedText.append(expectedCounts[i]);
     }
     throw new StepResolutionException(
-        definition.name()
-            + " expects "
+        "entity #"
+            + instance.id()
+            + " "
+            + definition.name()
+            + " parameter count mismatch: expected "
             + expectedText
-            + " parameters but got "
+            + ", actual "
             + actual
-            + " in entity #"
-            + instance.id());
+        );
+  }
+
+  /**
+   * Creates a consistent diagnostic for a parameter whose STEP value has the wrong type.
+   */
+  public static StepResolutionException parameterTypeMismatch(
+      StepEntityInstance instance, StepEntityDefinition definition, int index, String expected) {
+    return new StepResolutionException(
+        "entity #"
+            + instance.id()
+            + " "
+            + definition.name()
+            + " parameter "
+            + index
+            + " type mismatch: expected "
+            + expected
+            + ", actual "
+            + valueType(definition.parameters().get(index)));
+  }
+
+  public static String valueType(StepValue value) {
+    StepValue unwrapped = unwrapTyped(value);
+    return switch (unwrapped) {
+      case StepValue.StringValue ignored -> "string";
+      case StepValue.NumberValue ignored -> "number";
+      case StepValue.EnumValue ignored -> "enum";
+      case StepValue.ReferenceValue ignored -> "reference";
+      case StepValue.OmittedValue ignored -> "omitted";
+      case StepValue.NotProvidedValue ignored -> "not-provided";
+      case StepValue.ListValue ignored -> "list";
+      case StepValue.TypedValue typedValue -> "typed " + typedValue.typeName();
+    };
   }
 
   // ---------------------------------------------------------------------------
@@ -84,9 +119,21 @@ public final class StepParameterReader {
    * Returns true if the value is omitted ($) or not-provided (*).
    */
   public static boolean isUnset(StepValue value) {
-    StepValue unwrapped = unwrapTyped(value);
-    return unwrapped instanceof StepValue.OmittedValue
-        || unwrapped instanceof StepValue.NotProvidedValue;
+    return isOmitted(value) || isNotProvided(value);
+  }
+
+  /**
+   * Returns true if the value is explicitly omitted ($).
+   */
+  public static boolean isOmitted(StepValue value) {
+    return unwrapTyped(value) instanceof StepValue.OmittedValue;
+  }
+
+  /**
+   * Returns true if the value is explicitly not provided (*).
+   */
+  public static boolean isNotProvided(StepValue value) {
+    return unwrapTyped(value) instanceof StepValue.NotProvidedValue;
   }
 
   /**

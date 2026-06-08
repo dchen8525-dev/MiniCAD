@@ -74,6 +74,132 @@ class StepParserTest {
     }
 
     @Test
+    void shouldDecodeStepStringEscapes() {
+        String step = """
+                DATA;
+                #1=EXAMPLE('A''B','\\S\\D','\\P\\A\\S\\|','\\X\\E9','\\X2\\4F60597D\\X0\\','\\X2\\65E5672C\\X0\\','\\X4\\0001F600\\X0\\');
+                ENDSEC;
+                """;
+
+        StepEntityInstance entity = StepParser.parse(step).entities().getFirst();
+
+        assertEquals("A'B", stringParameter(entity, 0));
+        assertEquals("\u00C4", stringParameter(entity, 1));
+        assertEquals("\u00FC", stringParameter(entity, 2));
+        assertEquals("\u00E9", stringParameter(entity, 3));
+        assertEquals("\u4F60\u597D", stringParameter(entity, 4));
+        assertEquals("\u65E5\u672C", stringParameter(entity, 5));
+        assertEquals("\uD83D\uDE00", stringParameter(entity, 6));
+    }
+
+    @Test
+    void shouldRejectMalformedStepStringEscapes() {
+        StepParseException invalidHex = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE('\\X\\ZZ');
+                ENDSEC;
+                """));
+        assertTrue(invalidHex.getMessage().startsWith("malformed \\X\\ string escape at position "));
+
+        StepParseException unterminatedLong = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE('\\X2\\4F60');
+                ENDSEC;
+                """));
+        assertTrue(unterminatedLong.getMessage().startsWith("malformed long string escape at position "));
+    }
+
+    @Test
+    void shouldPreserveOriginalNumberLiteral() {
+        String step = """
+                DATA;
+                #1=EXAMPLE(1.25E-3);
+                ENDSEC;
+                """;
+
+        StepValue.NumberValue number = assertInstanceOf(
+                StepValue.NumberValue.class,
+                StepParser.parse(step).entities().getFirst().parameters().getFirst());
+
+        assertEquals(0.00125, number.value());
+        assertEquals("1.25E-3", number.raw());
+    }
+
+    @Test
+    void shouldRejectNonFiniteNumbers() {
+        StepParseException hugeExponent = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE(1E9999);
+                ENDSEC;
+                """));
+        assertEquals("non-finite number '1E9999' at position 17", hugeExponent.getMessage());
+
+        StepParseException nan = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE(NaN);
+                ENDSEC;
+                """));
+        assertEquals("invalid number 'NaN' at position 17", nan.getMessage());
+
+        StepParseException infinity = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE(Infinity);
+                ENDSEC;
+                """));
+        assertEquals("invalid number 'Infinity' at position 17", infinity.getMessage());
+    }
+
+    @Test
+    void shouldRejectUnsupportedEntityIds() {
+        StepParseException zero = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #0=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(zero.getMessage().startsWith("entity id '#0' must be positive at position "));
+
+        StepParseException negative = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #-1=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(negative.getMessage().startsWith("entity id '#-1' must be positive at position "));
+
+        StepParseException explicitPlus = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #+1=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(explicitPlus.getMessage().startsWith("invalid entity id '#+1' at position "));
+
+        StepParseException overflow = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #2147483648=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(overflow.getMessage().startsWith(
+                "entity id '#2147483648' exceeds supported maximum #2147483647 at position "));
+    }
+
+    @Test
+    void shouldRejectUnsupportedReferenceIds() {
+        StepParseException zero = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE(#0);
+                ENDSEC;
+                """));
+        assertTrue(zero.getMessage().startsWith("referenced entity id '#0' must be positive at position "));
+
+        StepParseException overflow = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE(#2147483648);
+                ENDSEC;
+                """));
+        assertTrue(overflow.getMessage().startsWith(
+                "referenced entity id '#2147483648' exceeds supported maximum #2147483647 at position "));
+    }
+
+    @Test
     void shouldNotTreatEndsecInsideStringAsSectionTerminator() {
         String step = """
                 ISO-10303-21;
@@ -117,6 +243,31 @@ class StepParserTest {
     }
 
     @Test
+    void shouldNotMatchSectionKeywordsInsideLongerWords() {
+        StepParseException noData = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                ISO-10303-21;
+                SOMEDATA;
+                #1=EXAMPLE('payload');
+                ENDSEC;
+                END-ISO-10303-21;
+                """));
+        assertEquals("missing DATA section", noData.getMessage());
+
+        String valid = """
+                ISO-10303-21;
+                DATA;
+                #1=EXAMPLE('SOMEENDSEC; text');
+                ENDSEC;
+                END-ISO-10303-21;
+                """;
+
+        StepFile file = StepParser.parse(valid);
+
+        assertEquals(1, file.entities().size());
+        assertEquals("SOMEENDSEC; text", ((StepValue.StringValue) file.entities().getFirst().parameters().getFirst()).value());
+    }
+
+    @Test
     void shouldRejectMissingSemicolon() {
         String step = """
                 DATA;
@@ -127,6 +278,55 @@ class StepParserTest {
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
         assertTrue(exception.getMessage().startsWith("expected ';' after entity instance at position "));
+    }
+
+    @Test
+    void shouldRejectMissingDataEndsec() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE();
+                """));
+
+        assertEquals("missing ENDSEC for DATA section", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectUnterminatedString() {
+        StepParseException inData = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """));
+        assertTrue(inData.getMessage().startsWith("unterminated string at position "));
+
+        StepParseException beforeData = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                ISO-10303-21;
+                'unterminated
+                DATA;
+                #1=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(beforeData.getMessage().startsWith("unterminated string at position "));
+    }
+
+    @Test
+    void shouldRejectUnterminatedComment() {
+        StepParseException beforeData = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                ISO-10303-21;
+                /* unterminated
+                DATA;
+                #1=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(beforeData.getMessage().startsWith("unterminated comment at position "));
+
+        StepParseException inData = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                /* unterminated
+                #1=EXAMPLE();
+                ENDSEC;
+                """));
+        assertTrue(inData.getMessage().startsWith("unterminated comment at position "));
     }
 
     @Test
@@ -156,6 +356,45 @@ class StepParserTest {
         assertEquals(2, instance.definitions().size());
         assertTrue(instance.hasDefinition("GEOMETRIC_REPRESENTATION_CONTEXT"));
         assertTrue(instance.hasDefinition("REPRESENTATION_CONTEXT"));
+    }
+
+    @Test
+    void shouldReportEofInsideComplexEntityWithOpeningPosition() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
+                ENDSEC;
+                """));
+
+        assertEquals("unterminated complex entity opened at position 9", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectMultipleDataSectionsExplicitly() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=A();
+                ENDSEC;
+                DATA;
+                #2=B();
+                ENDSEC;
+                """));
+
+        assertEquals("multiple DATA sections are not supported", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectDuplicateEntityIdsDuringParse() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse("""
+                DATA;
+                #1=A();
+                #2=B();
+                #1=C();
+                ENDSEC;
+                """));
+
+        assertTrue(exception.getMessage().startsWith("duplicate entity id #1 at position "));
+        assertTrue(exception.getMessage().contains("; first declared at position "));
     }
 
     @Test
@@ -199,5 +438,9 @@ class StepParserTest {
         StepFile file = StepParser.parse(step);
 
         assertThrows(UnsupportedOperationException.class, () -> file.entitiesById().clear());
+    }
+
+    private static String stringParameter(StepEntityInstance entity, int index) {
+        return assertInstanceOf(StepValue.StringValue.class, entity.parameters().get(index)).value();
     }
 }

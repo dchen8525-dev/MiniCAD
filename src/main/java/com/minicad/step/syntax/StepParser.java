@@ -2,8 +2,11 @@ package com.minicad.step.syntax;
 
 import com.minicad.common.StepParseException;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Minimal parser for the STEP DATA section.
@@ -13,9 +16,11 @@ public final class StepParser {
     private static final String HEADER_SECTION = "HEADER;";
     private static final String DATA_SECTION = "DATA;";
     private static final String ENDSEC = "ENDSEC;";
+    private static final BigInteger MAX_SUPPORTED_ENTITY_ID = BigInteger.valueOf(Integer.MAX_VALUE);
 
     private final StepTokenizer tokenizer;
     private StepToken current;
+    private int lastEntityIdPosition;
 
     private StepParser(String sectionText) {
         this.tokenizer = new StepTokenizer(sectionText);
@@ -39,8 +44,16 @@ public final class StepParser {
 
     private StepFile parseFile() {
         List<StepEntityInstance> entities = new ArrayList<>();
+        Map<Integer, Integer> idPositions = new LinkedHashMap<>();
         while (current.type() != StepTokenType.EOF) {
-            entities.add(parseEntityInstance());
+            StepEntityInstance entity = parseEntityInstance();
+            Integer previousPosition = idPositions.putIfAbsent(entity.id(), lastEntityIdPosition);
+            if (previousPosition != null) {
+                throw new StepParseException("duplicate entity id #" + entity.id()
+                        + " at position " + lastEntityIdPosition
+                        + "; first declared at position " + previousPosition);
+            }
+            entities.add(entity);
         }
         return new StepFile(entities);
     }
@@ -60,7 +73,9 @@ public final class StepParser {
 
     private StepEntityInstance parseEntityInstance() {
         expect(StepTokenType.HASH, "expected '#'");
-        int id = parseInteger(expect(StepTokenType.INTEGER, "expected entity id"));
+        StepToken idToken = expect(StepTokenType.INTEGER, "expected entity id");
+        int id = parseEntityId(idToken, "entity id");
+        lastEntityIdPosition = idToken.position();
         expect(StepTokenType.EQUALS, "expected '='");
         List<StepEntityDefinition> definitions = current.type() == StepTokenType.LPAREN
                 ? parseComplexEntity()
@@ -70,9 +85,12 @@ public final class StepParser {
     }
 
     private List<StepEntityDefinition> parseComplexEntity() {
-        expect(StepTokenType.LPAREN, "expected '(' to open complex entity");
+        int openPosition = expect(StepTokenType.LPAREN, "expected '(' to open complex entity").position();
         List<StepEntityDefinition> definitions = new ArrayList<>();
         while (current.type() != StepTokenType.RPAREN) {
+            if (current.type() == StepTokenType.EOF) {
+                throw new StepParseException("unterminated complex entity opened at position " + openPosition);
+            }
             definitions.add(parseEntityDefinition());
         }
         expect(StepTokenType.RPAREN, "expected ')' to close complex entity");
@@ -115,7 +133,10 @@ public final class StepParser {
                 yield new StepValue.OmittedValue();
             }
             case LPAREN -> parseList();
-            case IDENTIFIER -> parseTypedValue();
+            case IDENTIFIER -> {
+                rejectSpecialFloatingLiteral(current);
+                yield parseTypedValue();
+            }
             default -> throw new StepParseException(
                     "unexpected token " + current.type() + " at position " + current.position()
             );
@@ -133,12 +154,21 @@ public final class StepParser {
     private StepValue.ReferenceValue parseReference() {
         consume();
         StepToken idToken = expect(StepTokenType.INTEGER, "expected referenced entity id");
-        return new StepValue.ReferenceValue(parseInteger(idToken));
+        return new StepValue.ReferenceValue(parseEntityId(idToken, "referenced entity id"));
     }
 
     private StepValue.NumberValue parseNumber() {
         StepToken token = consume();
-        return new StepValue.NumberValue(Double.parseDouble(token.text()), token.text());
+        double value;
+        try {
+            value = Double.parseDouble(token.text());
+        } catch (NumberFormatException ex) {
+            throw new StepParseException("invalid number '" + token.text() + "' at position " + token.position());
+        }
+        if (!Double.isFinite(value)) {
+            throw new StepParseException("non-finite number '" + token.text() + "' at position " + token.position());
+        }
+        return new StepValue.NumberValue(value, token.text());
     }
 
     private StepValue.ListValue parseList() {
@@ -168,11 +198,33 @@ public final class StepParser {
         return token;
     }
 
-    private static int parseInteger(StepToken token) {
+    private static int parseEntityId(StepToken token, String label) {
+        String text = token.text();
+        if (text.startsWith("+")) {
+            throw new StepParseException("invalid " + label + " '#" + text + "' at position " + token.position());
+        }
+        BigInteger value;
         try {
-            return Integer.parseInt(token.text());
+            value = new BigInteger(text);
         } catch (NumberFormatException ex) {
-            throw new StepParseException("invalid integer '" + token.text() + "' at position " + token.position());
+            throw new StepParseException("invalid " + label + " '#" + text + "' at position " + token.position());
+        }
+        if (value.signum() <= 0) {
+            throw new StepParseException(label + " '#" + text + "' must be positive at position " + token.position());
+        }
+        if (value.compareTo(MAX_SUPPORTED_ENTITY_ID) > 0) {
+            throw new StepParseException(label + " '#" + text
+                    + "' exceeds supported maximum #2147483647 at position " + token.position());
+        }
+        return value.intValue();
+    }
+
+    private static void rejectSpecialFloatingLiteral(StepToken token) {
+        String text = token.text();
+        if ("NAN".equalsIgnoreCase(text)
+                || "INF".equalsIgnoreCase(text)
+                || "INFINITY".equalsIgnoreCase(text)) {
+            throw new StepParseException("invalid number '" + text + "' at position " + token.position());
         }
     }
 
@@ -203,6 +255,10 @@ public final class StepParser {
         if (endSec < 0) {
             throw new StepParseException("missing ENDSEC for DATA section");
         }
+        int nextDataStart = findKeywordOutsideStringsAndComments(input, DATA_SECTION, endSec + ENDSEC.length());
+        if (nextDataStart >= 0) {
+            throw new StepParseException("multiple DATA sections are not supported");
+        }
         StepFile dataFile = new StepParser(input, contentStart, endSec).parseFile();
         return new StepFile(headerEntries, dataFile.entities());
     }
@@ -225,7 +281,9 @@ public final class StepParser {
             }
             // Skip strings
             if (input.charAt(index) == '\'') {
+                int stringStart = index;
                 index++;
+                boolean closed = false;
                 while (index < input.length()) {
                     if (input.charAt(index) == '\'') {
                         if (index + 1 < input.length() && input.charAt(index + 1) == '\'') {
@@ -233,17 +291,35 @@ public final class StepParser {
                             continue;
                         }
                         index++;
+                        closed = true;
                         break;
                     }
                     index++;
                 }
+                if (!closed) {
+                    throw new StepParseException("unterminated string at position " + stringStart);
+                }
                 continue;
             }
-            if (input.regionMatches(true, index, keyword, 0, keyword.length())) {
+            if (isKeywordAt(input, keyword, index)) {
                 return index;
             }
             index++;
         }
         return -1;
+    }
+
+    private static boolean isKeywordAt(String input, String keyword, int index) {
+        if (!input.regionMatches(true, index, keyword, 0, keyword.length())) {
+            return false;
+        }
+        int before = index - 1;
+        int after = index + keyword.length();
+        return (before < 0 || !isSectionIdentifierPart(input.charAt(before)))
+                && (after >= input.length() || !isSectionIdentifierPart(input.charAt(after)));
+    }
+
+    private static boolean isSectionIdentifierPart(char c) {
+        return Character.isLetterOrDigit(c) || c == '_';
     }
 }

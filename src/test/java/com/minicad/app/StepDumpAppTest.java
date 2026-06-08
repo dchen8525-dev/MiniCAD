@@ -4,11 +4,16 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StepDumpAppTest {
@@ -7928,6 +7933,156 @@ class StepDumpAppTest {
                 "RIGHT_ANGULAR_WEDGE #17: shellFaces=7, unsupportedFaces=0");
     }
 
+    @Test
+    void shouldReturnUsageExitCodeForInvalidArguments() {
+        DumpRunResult result = runDumpRaw();
+
+        assertEquals(2, result.exitCode());
+        assertTrue(result.stderr().contains("Usage: StepDumpApp [--debug] [--validate-only] [--json] <step-file>..."));
+        assertEquals("", result.stdout());
+    }
+
+    @Test
+    void shouldSupportValidateOnlyModeWithConciseSummary() throws IOException {
+        Path file = writePointFile("minicad-validate-only");
+
+        DumpRunResult result = runDumpRaw("--validate-only", file.toString());
+
+        assertEquals(0, result.exitCode());
+        assertEquals("", result.stderr());
+        assertTrue(result.stdout().contains("File: " + file), result.stdout());
+        assertTrue(result.stdout().contains("Validation Summary"), result.stdout());
+        assertTrue(result.stdout().contains("  status: ok"), result.stdout());
+        assertTrue(result.stdout().contains("  entityCount: 1"), result.stdout());
+        assertTrue(result.stdout().contains("  resolvedCount: 1"), result.stdout());
+        assertFalse(result.stdout().contains("Build Summary"), result.stdout());
+        assertFalse(result.stdout().contains("Semantic Summary"), result.stdout());
+    }
+
+    @Test
+    void shouldSupportJsonSummaryOutput() throws IOException {
+        Path file = writePointFile("minicad-json");
+
+        DumpRunResult result = runDumpRaw("--json", file.toString());
+
+        assertEquals(0, result.exitCode());
+        assertEquals("", result.stderr());
+        assertTrue(result.stdout().contains("\"status\":\"ok\""), result.stdout());
+        assertTrue(result.stdout().contains("\"exitCode\":0"), result.stdout());
+        assertTrue(result.stdout().contains("\"path\":\"" + jsonEscaped(file.toString()) + "\""), result.stdout());
+        assertTrue(result.stdout().contains("\"entityCount\":1"), result.stdout());
+        assertTrue(result.stdout().contains("\"resolvedCount\":1"), result.stdout());
+        assertTrue(result.stdout().contains("\"unsupportedCount\":0"), result.stdout());
+        assertTrue(result.stdout().contains("\"bbox\":{\"min\":[0.0,0.0,0.0],\"max\":[0.0,0.0,0.0]}"), result.stdout());
+        assertFalse(result.stdout().contains("Syntax Summary"), result.stdout());
+        assertFalse(result.stdout().contains("Build Summary"), result.stdout());
+    }
+
+    @Test
+    void shouldReportJsonFailuresWithoutWritingToStderr() throws IOException {
+        Path bad = Files.createTempFile("minicad-json-bad", ".step");
+        Files.writeString(bad, """
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """);
+
+        DumpRunResult result = runDumpRaw("--json", bad.toString());
+
+        assertEquals(1, result.exitCode());
+        assertEquals("", result.stderr());
+        assertTrue(result.stdout().contains("\"status\":\"failed\""), result.stdout());
+        assertTrue(result.stdout().contains("\"exitCode\":1"), result.stdout());
+        assertTrue(result.stdout().contains("\"path\":\"" + jsonEscaped(bad.toString()) + "\""), result.stdout());
+        assertTrue(result.stdout().contains("\"error\":\"unterminated string"), result.stdout());
+        assertFalse(result.stdout().contains("StepParseException"), result.stdout());
+    }
+
+    @Test
+    void shouldProcessMultipleFilesAndReturnSuccessWhenAllSucceed() throws IOException {
+        Path first = writePointFile("minicad-multi-first");
+        Path second = writePointFile("minicad-multi-second");
+
+        DumpRunResult result = runDumpRaw(first.toString(), second.toString());
+
+        assertEquals(0, result.exitCode());
+        assertEquals("", result.stderr());
+        assertTrue(result.stdout().contains("File: " + first), result.stdout());
+        assertTrue(result.stdout().contains("File: " + second), result.stdout());
+        assertTrue(result.stdout().contains("  entityCount: 1"), result.stdout());
+    }
+
+    @Test
+    void shouldContinueMultipleFileProcessingAfterOneFileFails() throws IOException {
+        Path bad = Files.createTempFile("minicad-multi-bad", ".step");
+        Files.writeString(bad, """
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """);
+        Path good = writePointFile("minicad-multi-good");
+
+        DumpRunResult result = runDumpRaw(bad.toString(), good.toString());
+
+        assertEquals(1, result.exitCode());
+        assertTrue(result.stderr().contains("STEP processing failed for " + bad + ": unterminated string"));
+        assertFalse(result.stderr().contains("StepParseException"));
+        assertTrue(result.stdout().contains("File: " + good), result.stdout());
+        assertTrue(result.stdout().contains("  entityCount: 1"), result.stdout());
+    }
+
+    @Test
+    void shouldReturnNonZeroForParseErrorsWithoutStackTraceByDefault() throws IOException {
+        Path file = Files.createTempFile("minicad-bad-step", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """);
+
+        DumpRunResult result = runDumpRaw(file.toString());
+
+        assertEquals(1, result.exitCode());
+        assertEquals("", result.stdout());
+        assertTrue(result.stderr().contains("STEP processing failed for " + file + ": unterminated string"));
+        assertFalse(result.stderr().contains("StepParseException"));
+        assertFalse(result.stderr().contains("at com.minicad."));
+    }
+
+    @Test
+    void shouldPrintStackTraceOnlyWhenDebugIsEnabled() throws IOException {
+        Path file = Files.createTempFile("minicad-bad-step-debug", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """);
+
+        DumpRunResult result = runDumpRaw("--debug", file.toString());
+
+        assertEquals(1, result.exitCode());
+        assertTrue(result.stderr().contains("STEP processing failed for " + file + ": unterminated string"));
+        assertTrue(result.stderr().contains("StepParseException"));
+        assertTrue(result.stderr().contains("at com.minicad."));
+    }
+
+    @Test
+    void shouldReturnNonZeroProcessExitCodeForCliParseErrors() throws Exception {
+        Path file = Files.createTempFile("minicad-bad-step-process", ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=EXAMPLE('unterminated);
+                ENDSEC;
+                """);
+
+        ProcessResult result = runMainProcess(file.toString());
+
+        assertEquals(1, result.exitCode());
+        String output = result.stdout() + result.stderr();
+        assertTrue(output.contains("STEP processing failed for " + file + ": unterminated string"), output);
+        assertFalse(output.contains("StepParseException"), output);
+    }
+
     private static Consumer<String> sink(ByteArrayOutputStream output) {
         return line -> {
             try {
@@ -7936,6 +8091,29 @@ class StepDumpAppTest {
                 throw new RuntimeException(ex);
             }
         };
+    }
+
+    private static DumpRunResult runDumpRaw(String... args) {
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+        int exitCode = StepDumpApp.run(args, sink(stdout), sink(stderr));
+
+        return new DumpRunResult(exitCode, stdout.toString(), stderr.toString());
+    }
+
+    private static Path writePointFile(String prefix) throws IOException {
+        Path file = Files.createTempFile(prefix, ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                ENDSEC;
+                """);
+        return file;
+    }
+
+    private static String jsonEscaped(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private static String runDump(Path file) throws IOException {
@@ -7958,5 +8136,32 @@ class StepDumpAppTest {
         for (String fragment : expectedFragments) {
             assertTrue(output.contains(fragment), output);
         }
+    }
+
+    private static ProcessResult runMainProcess(String... args) throws Exception {
+        Path java = Path.of(System.getProperty("java.home"), "bin", isWindows() ? "java.exe" : "java");
+        List<String> command = new ArrayList<>();
+        command.add(java.toString());
+        command.add("-cp");
+        command.add(System.getProperty("java.class.path"));
+        command.add("com.minicad.app.StepDumpApp");
+        command.addAll(List.of(args));
+
+        Process process = new ProcessBuilder(command).start();
+        boolean completed = process.waitFor(30, TimeUnit.SECONDS);
+        assertTrue(completed, "StepDumpApp process did not exit");
+        String stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        String stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+        return new ProcessResult(process.exitValue(), stdout, stderr);
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+
+    private record DumpRunResult(int exitCode, String stdout, String stderr) {
+    }
+
+    private record ProcessResult(int exitCode, String stdout, String stderr) {
     }
 }

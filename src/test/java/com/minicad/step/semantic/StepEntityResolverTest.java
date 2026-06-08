@@ -373,6 +373,32 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldResolveForwardReferencesInsideReferenceLists() {
+        String step = """
+                DATA;
+                #20=EDGE_LOOP('L0',(#10,#11));
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=DIRECTION('D0',(1.0,0.0,0.0));
+                #4=VECTOR('VEC0',#3,1.0);
+                #5=LINE('LINE0',#1,#4);
+                #6=VERTEX_POINT('VP0',#1);
+                #7=VERTEX_POINT('VP1',#2);
+                #8=EDGE_CURVE('E0',#6,#7,#5,.T.);
+                #10=ORIENTED_EDGE('',*,*,#8,.T.);
+                #11=ORIENTED_EDGE('',*,*,#8,.F.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepEdgeLoop loop = assertInstanceOf(StepEdgeLoop.class, resolved.get(20));
+        assertEquals(2, loop.edges().size());
+        assertEquals(10, loop.edges().get(0).id());
+        assertEquals(11, loop.edges().get(1).id());
+    }
+
+    @Test
     void shouldResolveMinimalSolidSemanticGraph() {
         String step = """
                 DATA;
@@ -445,7 +471,7 @@ class StepEntityResolverTest {
         assertEquals("DERIVED_UNIT", derivedUnit.unitKind());
 
         StepDescriptiveRepresentationItem item = assertInstanceOf(StepDescriptiveRepresentationItem.class, resolved.get(308));
-        assertEquals("\\X2\\94A2\\X0\\", item.name());
+        assertEquals("\u94A2", item.name());
 
         StepPropertyDefinition propertyDefinition = assertInstanceOf(StepPropertyDefinition.class, resolved.get(309));
         assertEquals(527, propertyDefinition.definition().id());
@@ -479,7 +505,95 @@ class StepEntityResolverTest {
                 () -> StepEntityResolver.resolveAll(StepParser.parse(step))
         );
 
-        assertEquals("missing referenced entity #99", exception.getMessage());
+        assertEquals("missing referenced entity #99 referenced from entity #1", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectMissingReferenceInsideReferenceListWithReferringEntity() {
+        String step = """
+                DATA;
+                #1=EDGE_LOOP('',(#99));
+                ENDSEC;
+                """;
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals("missing referenced entity #99 referenced from entity #1", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectWrongParameterCountWithEntityContext() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0');
+                ENDSEC;
+                """;
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "entity #1 CARTESIAN_POINT parameter count mismatch: expected 2, actual 1",
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectWrongStringParameterTypeWithEntityContext() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT(1.0,(0.0,0.0,0.0));
+                ENDSEC;
+                """;
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "entity #1 CARTESIAN_POINT parameter 0 type mismatch: expected string, actual number",
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectWrongListParameterTypeWithEntityContext() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0','not-a-list');
+                ENDSEC;
+                """;
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "entity #1 CARTESIAN_POINT parameter 1 type mismatch: expected list, actual string",
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectWrongReferenceParameterTypeWithEntityContext() {
+        String step = """
+                DATA;
+                #1=VECTOR('V0',1.0,2.0);
+                ENDSEC;
+                """;
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "entity #1 VECTOR parameter 1 type mismatch: expected reference, actual number",
+                exception.getMessage());
     }
 
     @Test
@@ -525,6 +639,22 @@ class StepEntityResolverTest {
                 "ADVANCED_FACE geometry must reference a supported surface but got StepCircle",
                 exception.getMessage()
         );
+    }
+
+    @Test
+    void shouldRejectUnknownEntityWithEntityContext() {
+        String step = """
+                DATA;
+                #42=UNKNOWN_ENTITY('x');
+                ENDSEC;
+                """;
+
+        UnsupportedStepEntityException exception = assertThrows(
+                UnsupportedStepEntityException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals("unsupported STEP entity #42 UNKNOWN_ENTITY", exception.getMessage());
     }
 
     @Test
@@ -4643,6 +4773,33 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldTreatOmittedAndNotProvidedOrientedEdgeEndpointsAsInherited() {
+        String step = """
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=VERTEX_POINT('V0',#1);
+                #4=VERTEX_POINT('V1',#2);
+                #5=DIRECTION('DX',(1.0,0.0,0.0));
+                #6=VECTOR('VX',#5,1.0);
+                #7=LINE('L0',#1,#6);
+                #8=EDGE_CURVE('E0',#3,#4,#7,.T.);
+                #9=ORIENTED_EDGE('',*,*,#8,.T.);
+                #10=ORIENTED_EDGE('',$,$,#8,.T.);
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepOrientedEdge notProvided = assertInstanceOf(StepOrientedEdge.class, resolved.get(9));
+        StepOrientedEdge omitted = assertInstanceOf(StepOrientedEdge.class, resolved.get(10));
+        assertEquals(3, notProvided.edgeElement().start().id());
+        assertEquals(4, notProvided.edgeElement().end().id());
+        assertEquals(3, omitted.edgeElement().start().id());
+        assertEquals(4, omitted.edgeElement().end().id());
+    }
+
+    @Test
     void shouldRejectDuplicateIdsAtSyntaxLayer() {
         String step = """
                 DATA;
@@ -4651,12 +4808,10 @@ class StepEntityResolverTest {
                 ENDSEC;
                 """;
 
-        StepParseException exception = assertThrows(StepParseException.class, () -> {
-            StepFile file = StepParser.parse(step);
-            file.entitiesById();
-        });
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
-        assertEquals("duplicate entity id #1", exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("duplicate entity id #1 at position "));
+        assertTrue(exception.getMessage().contains("; first declared at position "));
     }
 
     @Test
@@ -4775,6 +4930,39 @@ class StepEntityResolverTest {
         assertEquals(0.0, dimensions.massExponent());
         assertEquals("LENGTH_UNIT", unit.unitKind());
         assertEquals("METRE", unit.unitName());
+    }
+
+    @Test
+    void shouldResolveNamedUnitWithOmittedDimensions() {
+        String step = """
+                DATA;
+                #1=(LENGTH_UNIT() NAMED_UNIT($) SI_UNIT($,.METRE.));
+                ENDSEC;
+                """;
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+
+        StepSiUnit unit = assertInstanceOf(StepSiUnit.class, resolved.get(1));
+        assertEquals("LENGTH_UNIT", unit.unitKind());
+        assertEquals("METRE", unit.unitName());
+    }
+
+    @Test
+    void shouldRejectNamedUnitDimensionsWithWrongType() {
+        String step = """
+                DATA;
+                #1=(LENGTH_UNIT() NAMED_UNIT('bad') SI_UNIT($,.METRE.));
+                ENDSEC;
+                """;
+
+        UnsupportedStepEntityException exception = assertThrows(
+                UnsupportedStepEntityException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "NAMED_UNIT dimensions must be omitted, not provided or reference DIMENSIONAL_EXPONENTS",
+                exception.getMessage());
     }
 
     @Test

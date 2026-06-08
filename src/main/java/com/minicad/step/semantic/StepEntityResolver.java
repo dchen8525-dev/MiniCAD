@@ -763,6 +763,7 @@ public final class StepEntityResolver {
 
   final Map<Integer, StepEntityInstance> instancesById;
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
+  private final Deque<Integer> resolutionStack = new ArrayDeque<>();
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -793,17 +794,28 @@ public final class StepEntityResolver {
 
     StepEntityInstance instance = instancesById.get(id);
     if (instance == null) {
+      Integer referringId = resolutionStack.peek();
+      if (referringId != null) {
+        throw new StepResolutionException(
+            "missing referenced entity #" + id + " referenced from entity #" + referringId);
+      }
       throw new StepResolutionException("missing referenced entity #" + id);
     }
 
     EntityFactory factory = resolveFactory(instance);
     if (factory != null) {
-      StepEntity entity = factory.create(this, instance);
-      resolved.put(id, entity);
-      return entity;
+      resolutionStack.push(id);
+      try {
+        StepEntity entity = factory.create(this, instance);
+        resolved.put(id, entity);
+        return entity;
+      } finally {
+        resolutionStack.pop();
+      }
     }
 
-    throw new UnsupportedStepEntityException("unsupported STEP entity " + instance.name());
+    throw new UnsupportedStepEntityException(
+        "unsupported STEP entity #" + instance.id() + " " + instance.name());
   }
 
   static EntityFactory resolveFactory(StepEntityInstance instance) {
@@ -1773,8 +1785,8 @@ public final class StepEntityResolver {
     }
     // Trims can be entity references (e.g., #5) or parameter values (e.g., 0.0).
     // Pass through raw StepValues so the builder can handle both.
-    List<StepValue> trim1 = trimValues(definition, 2, "TRIMMED_CURVE trim_1");
-    List<StepValue> trim2 = trimValues(definition, 3, "TRIMMED_CURVE trim_2");
+    List<StepValue> trim1 = trimValues(instance, definition, 2, "TRIMMED_CURVE trim_1");
+    List<StepValue> trim2 = trimValues(instance, definition, 3, "TRIMMED_CURVE trim_2");
     return new StepTrimmedCurve(
         instance.id(),
         stringValue(instance, definition, 0),
@@ -1785,11 +1797,11 @@ public final class StepEntityResolver {
         enumValue(instance, definition, 5));
   }
 
-  private List<StepValue> trimValues(StepEntityDefinition definition, int index, String message) {
+  private List<StepValue> trimValues(
+      StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     return List.copyOf(listValue.elements());
   }
@@ -8642,17 +8654,7 @@ public final class StepEntityResolver {
   StepNamedUnit resolveNamedUnit(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
     requireParameterCount(instance, definition, 1);
-    StepValue dimensions = unwrapTyped(definition.parameters().getFirst());
-    if (!isUnset(dimensions)) {
-      if (!(dimensions instanceof StepValue.ReferenceValue referenceValue)) {
-        throw new UnsupportedStepEntityException(
-            "NAMED_UNIT dimensions must be omitted, not provided or reference DIMENSIONAL_EXPONENTS");
-      }
-      requireEntity(
-          referenceValue.id(),
-          StepDimensionalExponents.class,
-          "NAMED_UNIT dimensions must reference DIMENSIONAL_EXPONENTS");
-    }
+    validateNamedUnitDimensions(instance);
     return new StepNamedUnit(instance.id(), deriveUnitKind(instance));
   }
 
@@ -8680,6 +8682,7 @@ public final class StepEntityResolver {
   StepContextDependentUnit resolveContextDependentUnit(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CONTEXT_DEPENDENT_UNIT");
     requireParameterCount(instance, definition, 1);
+    validateNamedUnitDimensions(instance);
     return new StepContextDependentUnit(
         instance.id(),
         stringValue(instance, definition, 0),
@@ -8689,6 +8692,7 @@ public final class StepEntityResolver {
   StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT");
     requireParameterCount(instance, definition, 2);
+    validateNamedUnitDimensions(instance);
     StepEntity conversionFactor = resolve(referenceId(instance, definition, 1));
     if (!(conversionFactor instanceof StepMeasureWithUnit measureWithUnit)) {
       throw new StepResolutionException(
@@ -8724,12 +8728,33 @@ public final class StepEntityResolver {
   StepSiUnit resolveSiUnit(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SI_UNIT");
     requireParameterCount(instance, definition, 2);
+    validateNamedUnitDimensions(instance);
     String prefix = null;
     if (!isUnset(definition.parameters().get(0))) {
       prefix = enumValue(instance, definition, 0);
     }
     return new StepSiUnit(
         instance.id(), deriveUnitKind(instance), prefix, enumValue(instance, definition, 1));
+  }
+
+  private void validateNamedUnitDimensions(StepEntityInstance instance) {
+    if (!instance.hasDefinition("NAMED_UNIT")) {
+      return;
+    }
+    StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
+    requireParameterCount(instance, definition, 1);
+    StepValue dimensions = unwrapTyped(definition.parameters().getFirst());
+    if (isUnset(dimensions)) {
+      return;
+    }
+    if (!(dimensions instanceof StepValue.ReferenceValue referenceValue)) {
+      throw new UnsupportedStepEntityException(
+          "NAMED_UNIT dimensions must be omitted, not provided or reference DIMENSIONAL_EXPONENTS");
+    }
+    requireEntity(
+        referenceValue.id(),
+        StepDimensionalExponents.class,
+        "NAMED_UNIT dimensions must reference DIMENSIONAL_EXPONENTS");
   }
 
   StepRepresentation resolveRepresentation(
@@ -11913,41 +11938,12 @@ public final class StepEntityResolver {
 
   private static void requireParameterCount(
       StepEntityInstance instance, StepEntityDefinition definition, int expected) {
-    if (definition.parameters().size() != expected) {
-      throw new StepResolutionException(
-          definition.name()
-              + " expects "
-              + expected
-              + " parameters but got "
-              + definition.parameters().size()
-              + " in entity #"
-              + instance.id());
-    }
+    StepParameterReader.requireParameterCount(instance, definition, expected);
   }
 
   private static void requireParameterCountIn(
       StepEntityInstance instance, StepEntityDefinition definition, int... expectedCounts) {
-    int actual = definition.parameters().size();
-    for (int expected : expectedCounts) {
-      if (actual == expected) {
-        return;
-      }
-    }
-    StringBuilder expectedText = new StringBuilder();
-    for (int i = 0; i < expectedCounts.length; i++) {
-      if (i > 0) {
-        expectedText.append(i == expectedCounts.length - 1 ? " or " : ", ");
-      }
-      expectedText.append(expectedCounts[i]);
-    }
-    throw new StepResolutionException(
-        definition.name()
-            + " expects "
-            + expectedText
-            + " parameters but got "
-            + actual
-            + " in entity #"
-            + instance.id());
+    StepParameterReader.requireParameterCountIn(instance, definition, expectedCounts);
   }
 
   private String stringValue(
@@ -11956,8 +11952,7 @@ public final class StepEntityResolver {
     if (value instanceof StepValue.StringValue stringValue) {
       return stringValue.value();
     }
-    throw new StepResolutionException(
-        definition.name() + " parameter " + index + " must be a string");
+    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "string");
   }
 
   private String optionalStringValue(
@@ -11977,8 +11972,7 @@ public final class StepEntityResolver {
     }
     StepValue unwrapped = unwrapTyped(value);
     if (!(unwrapped instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a string list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "string list");
     }
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
@@ -11998,8 +11992,7 @@ public final class StepEntityResolver {
     if (value instanceof StepValue.NumberValue numberValue) {
       return numberValue.value();
     }
-    throw new StepResolutionException(
-        definition.name() + " parameter " + index + " must be a number");
+    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "number");
   }
 
   private int integerValue(
@@ -12007,7 +12000,13 @@ public final class StepEntityResolver {
     double value = numberValue(instance, definition, index);
     if (value != Math.rint(value)) {
       throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be an integer");
+          "entity #"
+              + instance.id()
+              + " "
+              + definition.name()
+              + " parameter "
+              + index
+              + " type mismatch: expected integer, actual number");
     }
     return (int) value;
   }
@@ -12045,8 +12044,7 @@ public final class StepEntityResolver {
     if (value instanceof StepValue.EnumValue enumValue) {
       return enumValue.value();
     }
-    throw new StepResolutionException(
-        definition.name() + " parameter " + index + " must be an enum");
+    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "enum");
   }
 
   private boolean booleanValue(
@@ -12056,7 +12054,15 @@ public final class StepEntityResolver {
       case "F" -> false;
       default ->
           throw new StepResolutionException(
-              definition.name() + " parameter " + index + " must be .T. or .F.");
+              "entity #"
+                  + instance.id()
+                  + " "
+                  + definition.name()
+                  + " parameter "
+                  + index
+                  + " type mismatch: expected boolean .T. or .F., actual enum ."
+                  + enumValue(instance, definition, index)
+                  + ".");
     };
   }
 
@@ -12065,8 +12071,7 @@ public final class StepEntityResolver {
     if (value instanceof StepValue.ReferenceValue referenceValue) {
       return referenceValue.id();
     }
-    throw new StepResolutionException(
-        definition.name() + " parameter " + index + " must be a reference");
+    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "reference");
   }
 
   private StepEntity tryResolveReference(StepValue value) {
@@ -12088,19 +12093,18 @@ public final class StepEntityResolver {
   private List<Double> doubleList(StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     return listValue.elements().stream()
-        .map(v -> numberValueFrom(v, definition, index))
+        .map(v -> numberValueFrom(instance, v, definition, index))
         .toList();
   }
 
-  private double numberValueFrom(StepValue value, StepEntityDefinition definition, int index) {
+  private double numberValueFrom(
+      StepEntityInstance instance, StepValue value, StepEntityDefinition definition, int index) {
     value = unwrapTyped(value);
     if (!(value instanceof StepValue.NumberValue numberValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a number");
+      throw parameterElementTypeMismatch(instance, definition, index, "number", value);
     }
     return numberValue.value();
   }
@@ -12113,8 +12117,7 @@ public final class StepEntityResolver {
       int maxSize) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     if (listValue.elements().size() < minSize || listValue.elements().size() > maxSize) {
       throw new UnsupportedStepEntityException(
@@ -12126,8 +12129,7 @@ public final class StepEntityResolver {
       if (unwrapped instanceof StepValue.NumberValue numberValue) {
         result.add(numberValue.value());
       } else {
-        throw new StepResolutionException(
-            definition.name() + " coordinate list must contain only numbers");
+        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
       }
     }
     return List.copyOf(result);
@@ -12137,15 +12139,13 @@ public final class StepEntityResolver {
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-        throw new StepResolutionException(
-            definition.name() + " numeric list must contain only numbers");
+        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
       }
       result.add(numberValue.value());
     }
@@ -12156,15 +12156,13 @@ public final class StepEntityResolver {
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     List<Integer> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-        throw new StepResolutionException(
-            definition.name() + " integer list must contain only numbers");
+        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
       }
       result.add((int) numberValue.value());
     }
@@ -12175,15 +12173,13 @@ public final class StepEntityResolver {
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
     }
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.StringValue strValue)) {
-        throw new StepResolutionException(
-            definition.name() + " string list must contain only strings");
+        throw parameterElementTypeMismatch(instance, definition, index, "string", element);
       }
       result.add(strValue.value());
     }
@@ -12198,8 +12194,8 @@ public final class StepEntityResolver {
     if (value instanceof StepValue.StringValue strValue) {
       return strValue.value();
     }
-    throw new StepResolutionException(
-        definition.name() + " parameter " + index + " must be a LOGICAL value (.T., .F., or .U.)");
+    throw StepParameterReader.parameterTypeMismatch(
+        instance, definition, index, "LOGICAL value (.T., .F., or .U.)");
   }
 
   /**
@@ -12239,22 +12235,19 @@ public final class StepEntityResolver {
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue outerList)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a nested list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "nested list");
     }
     List<List<Double>> grid = new ArrayList<>(outerList.elements().size());
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
       if (!(row instanceof StepValue.ListValue rowList)) {
-        throw new StepResolutionException(
-            definition.name() + " numeric grid must contain only nested numeric lists");
+        throw parameterElementTypeMismatch(instance, definition, index, "nested numeric list", rowValue);
       }
       List<Double> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
         if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-          throw new StepResolutionException(
-              definition.name() + " numeric grid must contain only numbers");
+          throw parameterElementTypeMismatch(instance, definition, index, "number", element);
         }
         entries.add(numberValue.value());
       }
@@ -12271,20 +12264,19 @@ public final class StepEntityResolver {
       String message) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue outerList)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a nested list");
+      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "nested list");
     }
     List<List<T>> grid = new ArrayList<>(outerList.elements().size());
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
       if (!(row instanceof StepValue.ListValue rowList)) {
-        throw new StepResolutionException(message);
+        throw parameterElementTypeMismatch(instance, definition, index, "nested reference list", rowValue);
       }
       List<T> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
         if (!(unwrapped instanceof StepValue.ReferenceValue referenceValue)) {
-          throw new StepResolutionException(message);
+          throw parameterElementTypeMismatch(instance, definition, index, "reference", element);
         }
         entries.add(requireEntity(referenceValue.id(), type, message));
       }
@@ -12300,17 +12292,40 @@ public final class StepEntityResolver {
     for (double value : values) {
       if (value != Math.rint(value)) {
         throw new StepResolutionException(
-            definition.name() + " integer list must contain only integers");
+            "entity #"
+                + instance.id()
+                + " "
+                + definition.name()
+                + " parameter "
+                + index
+                + " element type mismatch: expected integer, actual number");
       }
       result.add((int) value);
     }
     return List.copyOf(result);
   }
 
+  private StepResolutionException parameterElementTypeMismatch(
+      StepEntityInstance instance,
+      StepEntityDefinition definition,
+      int index,
+      String expected,
+      StepValue actualValue) {
+    return new StepResolutionException(
+        "entity #"
+            + instance.id()
+            + " "
+            + definition.name()
+            + " parameter "
+            + index
+            + " element type mismatch: expected "
+            + expected
+            + ", actual "
+            + StepParameterReader.valueType(actualValue));
+  }
+
   private boolean isUnset(StepValue value) {
-    StepValue unwrapped = unwrapTyped(value);
-    return unwrapped instanceof StepValue.OmittedValue
-        || unwrapped instanceof StepValue.NotProvidedValue;
+    return StepParameterReader.isUnset(value);
   }
 
   private StepValue unwrapTyped(StepValue value) {

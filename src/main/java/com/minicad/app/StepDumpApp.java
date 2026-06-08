@@ -4,6 +4,8 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.geometry.BoundingBox3;
+import com.minicad.geometry.CartesianPoint;
 import com.minicad.step.model.product.StepBooleanClippingResult;
 import com.minicad.common.GeometryException;
 import com.minicad.step.model.product.StepBrepWithVoids;
@@ -339,6 +341,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -363,43 +367,284 @@ public final class StepDumpApp {
      * CLI entry point.
      *
      * @param args command-line arguments
-     * @throws IOException if reading the file fails
      */
-    public static void main(String[] args) throws IOException {
-        int exitCode = run(args, log::info, log::error);
+    public static void main(String[] args) {
+        int exitCode = run(args, System.out::println, System.err::println);
         if (exitCode != 0) {
             System.exit(exitCode);
         }
     }
 
-    static int run(String[] args, Consumer<String> out, Consumer<String> err) throws IOException {
-        if (args.length != 1) {
-            err.accept("Usage: StepDumpApp <step-file>");
+    static int run(String[] args, Consumer<String> out, Consumer<String> err) {
+        CliOptions options = parseArgs(args, err);
+        if (options == null) {
             return 2;
         }
 
-        Path path = Path.of(args[0]);
-        String text = StepTextReader.read(path);
+        int exitCode = 0;
+        List<DumpFileResult> results = new ArrayList<>();
+        for (Path path : options.paths()) {
+            DumpFileResult result = processFile(path, options.debug());
+            results.add(result);
+            if (!result.success()) {
+                exitCode = 1;
+            }
+        }
+        if (options.json()) {
+            out.accept(toJson(results, exitCode));
+            return exitCode;
+        }
+        boolean first = true;
+        for (DumpFileResult result : results) {
+            if (!first) {
+                out.accept("");
+            }
+            first = false;
+            if (result.success()) {
+                renderText(result, options.validateOnly()).forEach(out);
+            } else {
+                emitFailure(result, err);
+            }
+        }
+        return exitCode;
+    }
 
+    private static DumpFileResult processFile(Path path, boolean debug) {
         try {
+            String text = StepTextReader.read(path);
             StepFile stepFile = StepParser.parse(text);
             Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
             StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
 
-            List<String> lines = new ArrayList<>();
-            lines.add("File: " + path);
-            lines.add("");
-            appendSyntaxSummary(stepFile, lines);
-            lines.add("");
-            appendSemanticSummary(resolved, lines);
-            lines.add("");
-            appendBuildSummary(resolved, builder, lines);
-            lines.forEach(out);
-            return 0;
+            List<String> buildLines = new ArrayList<>();
+            appendBuildSummary(resolved, builder, buildLines);
+            return DumpFileResult.success(
+                    path,
+                    stepFile,
+                    resolved,
+                    buildLines,
+                    extractUnsupportedCount(buildLines),
+                    calculatePointBoundingBox(resolved, builder));
+        } catch (IOException ex) {
+            return DumpFileResult.failure(path, "cannot read file: " + ex.getMessage(), ex, debug);
         } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-            err.accept("STEP processing failed: " + ex.getMessage());
-            return 1;
+            return DumpFileResult.failure(path, ex.getMessage(), ex, debug);
         }
+    }
+
+    private static CliOptions parseArgs(String[] args, Consumer<String> err) {
+        boolean debug = false;
+        boolean validateOnly = false;
+        boolean json = false;
+        List<String> paths = new ArrayList<>();
+        for (String arg : args) {
+            if ("--debug".equals(arg)) {
+                debug = true;
+            } else if ("--validate-only".equals(arg)) {
+                validateOnly = true;
+            } else if ("--json".equals(arg)) {
+                json = true;
+            } else {
+                paths.add(arg);
+            }
+        }
+        if (paths.isEmpty()) {
+            err.accept("Usage: StepDumpApp [--debug] [--validate-only] [--json] <step-file>...");
+            return null;
+        }
+        return new CliOptions(paths.stream().map(Path::of).toList(), debug, validateOnly, json);
+    }
+
+    private static void emitFailure(DumpFileResult result, Consumer<String> err) {
+        err.accept("STEP processing failed for " + result.path() + ": " + result.errorMessage());
+        if (result.stackTrace() != null) {
+            result.stackTrace().lines().forEach(err);
+        }
+    }
+
+    private record CliOptions(List<Path> paths, boolean debug, boolean validateOnly, boolean json) {
+    }
+
+    private static List<String> renderText(DumpFileResult result, boolean validateOnly) {
+        List<String> lines = new ArrayList<>();
+        lines.add("File: " + result.path());
+        lines.add("");
+        if (validateOnly) {
+            appendValidationSummary(result, lines);
+        } else {
+            appendSyntaxSummary(result.stepFile(), lines);
+            lines.add("");
+            appendSemanticSummary(result.resolved(), lines);
+            lines.add("");
+            lines.addAll(result.buildLines());
+        }
+        return lines;
+    }
+
+    private static void appendValidationSummary(DumpFileResult result, List<String> lines) {
+        lines.add("Validation Summary");
+        lines.add("  status: ok");
+        lines.add("  entityCount: " + result.entityCount());
+        lines.add("  resolvedCount: " + result.resolvedCount());
+        extractBuildTotals(result.buildLines()).ifPresent(total -> lines.add("  " + total));
+    }
+
+    private static java.util.Optional<String> extractBuildTotals(List<String> buildValidationLines) {
+        return buildValidationLines.stream()
+                .map(String::strip)
+                .filter(line -> line.startsWith("totals: "))
+                .findFirst();
+    }
+
+    private static int extractUnsupportedCount(List<String> buildLines) {
+        return extractBuildTotals(buildLines)
+                .map(total -> total.substring(total.lastIndexOf("unsupportedFaces=") + "unsupportedFaces=".length()))
+                .map(Integer::parseInt)
+                .orElse(0);
+    }
+
+    private static BoundingBox3 calculatePointBoundingBox(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        BoundingBox3.Box box = BoundingBox3.mutable();
+        for (StepEntity entity : resolved.values()) {
+            if (entity instanceof StepCartesianPoint point && point.coordinates().size() == 3) {
+                try {
+                    box.expand(builder.buildPoint(point.id()));
+                } catch (GeometryException | StepResolutionException ex) {
+                    box.expand(new CartesianPoint(point.coordinates().get(0), point.coordinates().get(1), point.coordinates().get(2)));
+                }
+            }
+        }
+        return box.toImmutable();
+    }
+
+    private static String toJson(List<DumpFileResult> results, int exitCode) {
+        StringBuilder json = new StringBuilder();
+        json.append("{\"status\":\"")
+                .append(exitCode == 0 ? "ok" : "failed")
+                .append("\",\"exitCode\":")
+                .append(exitCode)
+                .append(",\"files\":[");
+        for (int i = 0; i < results.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            appendFileJson(json, results.get(i));
+        }
+        json.append("]}");
+        return json.toString();
+    }
+
+    private static void appendFileJson(StringBuilder json, DumpFileResult result) {
+        json.append("{\"path\":");
+        appendJsonString(json, result.path().toString());
+        json.append(",\"status\":\"").append(result.success() ? "ok" : "failed").append('"');
+        if (result.success()) {
+            json.append(",\"entityCount\":").append(result.entityCount());
+            json.append(",\"resolvedCount\":").append(result.resolvedCount());
+            json.append(",\"unsupportedCount\":").append(result.unsupportedCount());
+            json.append(",\"bbox\":");
+            appendBoundingBoxJson(json, result.bbox());
+        } else {
+            json.append(",\"error\":");
+            appendJsonString(json, result.errorMessage());
+        }
+        json.append('}');
+    }
+
+    private static void appendBoundingBoxJson(StringBuilder json, BoundingBox3 box) {
+        if (box == null || box.isEmpty()) {
+            json.append("null");
+            return;
+        }
+        json.append("{\"min\":[")
+                .append(box.minX()).append(',')
+                .append(box.minY()).append(',')
+                .append(box.minZ()).append("],\"max\":[")
+                .append(box.maxX()).append(',')
+                .append(box.maxY()).append(',')
+                .append(box.maxZ()).append("]}");
+    }
+
+    private static void appendJsonString(StringBuilder json, String value) {
+        json.append('"');
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '"' -> json.append("\\\"");
+                case '\\' -> json.append("\\\\");
+                case '\b' -> json.append("\\b");
+                case '\f' -> json.append("\\f");
+                case '\n' -> json.append("\\n");
+                case '\r' -> json.append("\\r");
+                case '\t' -> json.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        json.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        json.append(c);
+                    }
+                }
+            }
+        }
+        json.append('"');
+    }
+
+    private record DumpFileResult(
+            Path path,
+            boolean success,
+            StepFile stepFile,
+            Map<Integer, StepEntity> resolved,
+            List<String> buildLines,
+            int unsupportedCount,
+            BoundingBox3 bbox,
+            String errorMessage,
+            String stackTrace) {
+
+        static DumpFileResult success(
+                Path path,
+                StepFile stepFile,
+                Map<Integer, StepEntity> resolved,
+                List<String> buildLines,
+                int unsupportedCount,
+                BoundingBox3 bbox) {
+            return new DumpFileResult(
+                    path,
+                    true,
+                    stepFile,
+                    Map.copyOf(resolved),
+                    List.copyOf(buildLines),
+                    unsupportedCount,
+                    bbox,
+                    null,
+                    null);
+        }
+
+        static DumpFileResult failure(Path path, String message, Exception exception, boolean debug) {
+            return new DumpFileResult(
+                    path,
+                    false,
+                    null,
+                    Map.of(),
+                    List.of(),
+                    0,
+                    null,
+                    message,
+                    debug ? StepDumpApp.stackTrace(exception) : null);
+        }
+
+        int entityCount() {
+            return stepFile.entities().size();
+        }
+
+        int resolvedCount() {
+            return resolved.size();
+        }
+    }
+
+    private static String stackTrace(Exception exception) {
+        StringWriter writer = new StringWriter();
+        exception.printStackTrace(new PrintWriter(writer));
+        return writer.toString();
     }
 
     private static void appendSyntaxSummary(StepFile file, List<String> lines) {
