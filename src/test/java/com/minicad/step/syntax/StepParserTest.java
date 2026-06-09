@@ -69,8 +69,25 @@ class StepParserTest {
         assertEquals("T", ((StepValue.EnumValue) entity.parameters().get(3)).value());
         StepValue.TypedValue typedValue = assertInstanceOf(StepValue.TypedValue.class, entity.parameters().get(4));
         assertEquals("LENGTH_MEASURE", typedValue.typeName());
+        assertInstanceOf(StepValue.NumberValue.class, typedValue.value());
         StepValue.ListValue list = (StepValue.ListValue) entity.parameters().get(5);
         assertEquals(3, list.elements().size());
+    }
+
+    @Test
+    void shouldParseTypedValueParameterLists() {
+        String step = """
+                DATA;
+                #1=EXAMPLE(AP242_SELECT(#2,'name',.T.));
+                ENDSEC;
+                """;
+
+        StepEntityInstance entity = StepParser.parse(step).entities().getFirst();
+
+        StepValue.TypedValue typedValue = assertInstanceOf(StepValue.TypedValue.class, entity.parameters().getFirst());
+        assertEquals("AP242_SELECT", typedValue.typeName());
+        StepValue.ListValue payload = assertInstanceOf(StepValue.ListValue.class, typedValue.value());
+        assertEquals(3, payload.elements().size());
     }
 
     @Test

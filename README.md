@@ -1,22 +1,24 @@
-# MiniCAD
+﻿# MiniCAD
 
-面向工业应用的 CAD 内核与 STEP 文件解析器，使用 Java 21 实现。
+实验性的 Java CAD 内核与 STEP 文件解析器，使用 Java 21 实现。
 
 ## 项目定位
 
-MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303) 文件的完整解析能力，支持 AP214/AP242 协议的核心实体类型。项目的目标是：
+MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目重点验证从 STEP 文本到语法 AST、语义模型、几何/拓扑构建和 Web 预览的端到端链路，但不宣称完整兼容 AP214/AP242。
 
-- **完整 STEP 解析**: 支持所有主流 STEP 实体类型的解析和语义理解
-- **B-Rep 几何内核**: 支持完整的边界表示 (Boundary Representation) 拓扑结构
-- **可视化预览**: 提供基于 Web 的三维模型预览能力
-- **工业级兼容**: 支持主流 CAD 软件 (CATIA、NX、SolidWorks、Creo 等) 导出的 STEP 文件
+当前目标是：
 
-项目已实现：
+- **STEP 子集解析**: 覆盖常见机械 CAD 文件中的核心语法、HEADER、DATA 实体和部分 AP214/AP242 实体。
+- **B-Rep 几何实验内核**: 支持常见边界表示、曲线、曲面和装配变换路径，但仍需要更多拓扑和几何正确性验证。
+- **可视化预览**: 提供基于 Web 的三维模型预览能力，并显式报告无法构建或无法预览的内容。
+- **真实兼容性推进**: 通过 schema 覆盖报告、示例回归和后续真实 CAD 文件语料库逐步验证 FreeCAD、OpenCascade、SolidWorks、Creo、NX、CATIA 等来源文件。
 
-- **1175 个 STEP 实体模型类** (`step/model`)
-- **1324 种 STEP 实体类型注册**（`registry.put()` 调用次数）
-- **完整的语法解析链**：STEP 文本 → syntax AST → semantic model → geometry/topology
-- **Web 预览器**：基于 Three.js 的浏览器可视化，支持平面、圆柱面、圆锥面、球面、环面、B-Spline 曲面、有理 B-Spline 曲面等 16 种曲面类型
+当前能力统计以生成文件为准：
+
+- [STEP capability report](doc/generated/coverage.md) 区分 model、registered、builder、exporter、tested。
+- 该报告是能力信号，不是几何正确性或规范完整性的证明。
+- AP214/AP242 的规范级覆盖仍在建设中，跟踪见 [STEP AP214/AP242 support workflow](doc/step-ap214-ap242-workflow.md)。
+- AP214/AP242 的第一批核心实体和验收标准见 [core entity priorities](doc/ap214-ap242-core-entity-priorities.md)。
 
 ## 包说明
 
@@ -28,7 +30,7 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 | `com.minicad.topology` | 11 | B-Rep 拓扑类型（Vertex、Edge、Face、Shell、Solid 等） |
 | `com.minicad.step.syntax` | 5 | STEP 语法解析器（Tokenizer、Parser、AST 模型） |
 | `com.minicad.step.semantic` | 6 | STEP 语义解析器（EntityResolver、EntityFactory、CadBuilder 等） |
-| `com.minicad.step.model` | 1175 | STEP 实体模型类，分 26 个子包（见下表） |
+| `com.minicad.step.model` | 1246 | STEP 实体模型类，分 26 个子包（见下表） |
 | `com.minicad.app` | 13 | 应用入口：CLI 解析器、Web 预览器、JSON 导出器、装配图构建器等 |
 
 ### `step.model` 子包明细
@@ -66,25 +68,24 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 
 ### 国际标准对比
 
-以下协议覆盖表目前仅保留为历史统计基线。
+以下数据来自当前 `HEAD` 的生成报告，不把 `registry.put()` 次数或静态类数量直接等同于完整规范兼容。
 
-- 表内百分比的算术本身是对的：
-  `578 / 1006 = 57.5%`，`525 / 929 = 56.5%`，`735 / 2122 = 34.6%`
-- 但这些“MiniCAD 支持”数量不是当前 `HEAD` 的权威统计结果，不能再视为最新覆盖率声明
-- 当前仓库已经明显超出这组旧数字，覆盖口径正在按 [doc/coverage-plan.md](/root/work/MiniCAD/doc/coverage-plan.md) 的脚本化方案重建
+| 覆盖口径 | Schema 实体数 | Model | Registered | Builder | Exporter | Tested | Full signal | 说明 |
+|----------|--------------:|------:|-----------:|--------:|---------:|-------:|------------:|------|
+| **AP214 Curated** | 64 | 59 | 64 | 59 | 59 | 51 | 51 | 基于仓库 AP214/automotive_design 示例抽取的 curated baseline，不是完整 AP214 schema |
+| **AP242 Ed2** | 2122 | 428 | 740 | 417 | 334 | 441 | 301 | 基于 `schemas/ap242ed2_dis2_mim_lf_v1.101.exp` 的 schema 覆盖扫描 |
+| **All scanned entities** | 1844 | 1246 | 1293 | 734 | 425 | 495 | - | 见 [doc/generated/coverage.md](doc/generated/coverage.md) |
 
-来源口径：
+覆盖等级：
 
-- AP242 Ed2 / AP203 Ed2：ISO 10303 官方 EXPRESS schema
-- AP214：NIST STEP File Analyzer 实体列表
+- `L0`: 有模型类信号
+- `L1`: 已注册/可语义解析
+- `L2`: builder 路径引用
+- `L3`: exporter 或 preview 路径引用
+- `L4`: 测试引用
+- `L5`: 预留给真实 CAD 语料验证
 
-| 标准协议 | 标准实体数 | 历史支持数 | 历史覆盖率 | 说明 |
-|----------|-----------|-----------|-----------|------|
-| **AP203 Ed2** | 1006 | 578 | 57.5% | 历史基线；当前仓库待脚本重算 |
-| **AP214** | 929 | 525 | 56.5% | 历史基线；当前仓库待脚本重算 |
-| **AP242 Ed2** | 2122 | 735 | 34.6% | 历史基线；当前仓库待脚本重算 |
-
-> **注意**：README 不再把 `registry.put()` 次数或静态实体计数直接当作当前覆盖率结论。后续覆盖统计将以脚本生成的“标准 schema 实体集合 / 已注册标准实体集合 / 运行时能力差集”为准，并与 `doc/coverage-plan.md` 保持一致。
+> **注意**：这些报告是能力信号，不是几何正确性或规范完整性的证明。完整数据见 [AP214 coverage](doc/generated/ap214-coverage.md) 和 [AP242 coverage](doc/generated/ap242-coverage.md)。
 
 ### 已支持的实体类型（按领域）
 
@@ -93,55 +94,55 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 
 | 标准实体名 | 支持状态 |
 |-----------|---------|
-| `ADVANCED_FACE` | ✅ 完全支持 |
-| `AXIS2_PLACEMENT_2D` | ✅ 完全支持 |
-| `AXIS2_PLACEMENT_3D` | ✅ 完全支持 |
-| `BREP_WITH_VOIDS` | ✅ 完全支持 |
-| `B_SPLINE_CURVE` | ✅ 完全支持 |
-| `B_SPLINE_CURVE_WITH_KNOTS` | ✅ 完全支持 |
-| `B_SPLINE_SURFACE` | ✅ 完全支持 |
-| `B_SPLINE_SURFACE_WITH_KNOTS` | ✅ 完全支持 |
-| `CARTESIAN_POINT` | ✅ 完全支持 |
-| `CIRCLE` | ✅ 完全支持 |
-| `CLOSED_SHELL` | ✅ 完全支持 |
-| `CLOTHOID` | ✅ 完全支持 |
-| `COMPOSITE_CURVE` | ✅ 完全支持 |
-| `COMPOSITE_CURVE_ON_SURFACE` | ✅ 完全支持 |
-| `COMPOSITE_CURVE_SEGMENT` | ✅ 完全支持 |
-| `CONICAL_SURFACE` | ✅ 完全支持 |
-| `CYLINDRICAL_SURFACE` | ✅ 完全支持 |
-| `DIRECTION` | ✅ 完全支持 |
-| `EDGE_CURVE` | ✅ 完全支持 |
-| `EDGE_LOOP` | ✅ 完全支持 |
-| `ELLIPSE` | ✅ 完全支持 |
-| `FACETED_BREP` | ✅ 完全支持 |
-| `FACE_BOUND` | ✅ 完全支持 |
-| `HYPERBOLA` | ✅ 完全支持 |
-| `LINE` | ✅ 完全支持 |
-| `MANIFOLD_SOLID_BREP` | ✅ 完全支持 |
-| `OFFSET_CURVE_2D` | ✅ 完全支持 |
-| `OFFSET_CURVE_3D` | ✅ 完全支持 |
-| `OFFSET_SURFACE` | ✅ 完全支持 |
-| `OPEN_SHELL` | ✅ 完全支持 |
-| `ORIENTED_CLOSED_SHELL` | ✅ 完全支持 |
-| `ORIENTED_EDGE` | ✅ 完全支持 |
-| `ORIENTED_OPEN_SHELL` | ✅ 完全支持 |
-| `PARABOLA` | ✅ 完全支持 |
-| `PCURVE` | ✅ 完全支持 |
-| `PLANE` | ✅ 完全支持 |
-| `POLYLINE` | ✅ 完全支持 |
-| `RATIONAL_B_SPLINE_CURVE` | ✅ 完全支持 |
-| `RATIONAL_B_SPLINE_SURFACE` | ✅ 完全支持 |
-| `SEAM_CURVE` | ✅ 完全支持 |
-| `SPHERICAL_SURFACE` | ✅ 完全支持 |
-| `SURFACE_CURVE` | ✅ 完全支持 |
+| `ADVANCED_FACE` | ✅ 已接入（需持续验证） |
+| `AXIS2_PLACEMENT_2D` | ✅ 已接入（需持续验证） |
+| `AXIS2_PLACEMENT_3D` | ✅ 已接入（需持续验证） |
+| `BREP_WITH_VOIDS` | ✅ 已接入（需持续验证） |
+| `B_SPLINE_CURVE` | ✅ 已接入（需持续验证） |
+| `B_SPLINE_CURVE_WITH_KNOTS` | ✅ 已接入（需持续验证） |
+| `B_SPLINE_SURFACE` | ✅ 已接入（需持续验证） |
+| `B_SPLINE_SURFACE_WITH_KNOTS` | ✅ 已接入（需持续验证） |
+| `CARTESIAN_POINT` | ✅ 已接入（需持续验证） |
+| `CIRCLE` | ✅ 已接入（需持续验证） |
+| `CLOSED_SHELL` | ✅ 已接入（需持续验证） |
+| `CLOTHOID` | ✅ 已接入（需持续验证） |
+| `COMPOSITE_CURVE` | ✅ 已接入（需持续验证） |
+| `COMPOSITE_CURVE_ON_SURFACE` | ✅ 已接入（需持续验证） |
+| `COMPOSITE_CURVE_SEGMENT` | ✅ 已接入（需持续验证） |
+| `CONICAL_SURFACE` | ✅ 已接入（需持续验证） |
+| `CYLINDRICAL_SURFACE` | ✅ 已接入（需持续验证） |
+| `DIRECTION` | ✅ 已接入（需持续验证） |
+| `EDGE_CURVE` | ✅ 已接入（需持续验证） |
+| `EDGE_LOOP` | ✅ 已接入（需持续验证） |
+| `ELLIPSE` | ✅ 已接入（需持续验证） |
+| `FACETED_BREP` | ✅ 已接入（需持续验证） |
+| `FACE_BOUND` | ✅ 已接入（需持续验证） |
+| `HYPERBOLA` | ✅ 已接入（需持续验证） |
+| `LINE` | ✅ 已接入（需持续验证） |
+| `MANIFOLD_SOLID_BREP` | ✅ 已接入（需持续验证） |
+| `OFFSET_CURVE_2D` | ✅ 已接入（需持续验证） |
+| `OFFSET_CURVE_3D` | ✅ 已接入（需持续验证） |
+| `OFFSET_SURFACE` | ✅ 已接入（需持续验证） |
+| `OPEN_SHELL` | ✅ 已接入（需持续验证） |
+| `ORIENTED_CLOSED_SHELL` | ✅ 已接入（需持续验证） |
+| `ORIENTED_EDGE` | ✅ 已接入（需持续验证） |
+| `ORIENTED_OPEN_SHELL` | ✅ 已接入（需持续验证） |
+| `PARABOLA` | ✅ 已接入（需持续验证） |
+| `PCURVE` | ✅ 已接入（需持续验证） |
+| `PLANE` | ✅ 已接入（需持续验证） |
+| `POLYLINE` | ✅ 已接入（需持续验证） |
+| `RATIONAL_B_SPLINE_CURVE` | ✅ 已接入（需持续验证） |
+| `RATIONAL_B_SPLINE_SURFACE` | ✅ 已接入（需持续验证） |
+| `SEAM_CURVE` | ✅ 已接入（需持续验证） |
+| `SPHERICAL_SURFACE` | ✅ 已接入（需持续验证） |
+| `SURFACE_CURVE` | ✅ 已接入（需持续验证） |
 | `SURFACE_CURVE_SWEPT_AREA_SOLID` | ✅ 部分支持（B-Rep 生成） |
-| `SURFACE_OF_LINEAR_EXTRUSION` | ✅ 完全支持 |
-| `SURFACE_OF_REVOLUTION` | ✅ 完全支持 |
-| `TOROIDAL_SURFACE` | ✅ 完全支持 |
-| `TRIMMED_CURVE` | ✅ 完全支持 |
-| `VECTOR` | ✅ 完全支持 |
-| `VERTEX_POINT` | ✅ 完全支持 |
+| `SURFACE_OF_LINEAR_EXTRUSION` | ✅ 已接入（需持续验证） |
+| `SURFACE_OF_REVOLUTION` | ✅ 已接入（需持续验证） |
+| `TOROIDAL_SURFACE` | ✅ 已接入（需持续验证） |
+| `TRIMMED_CURVE` | ✅ 已接入（需持续验证） |
+| `VECTOR` | ✅ 已接入（需持续验证） |
+| `VERTEX_POINT` | ✅ 已接入（需持续验证） |
 </details>
 
 <details>
@@ -150,12 +151,12 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 | 标准实体名 | 支持状态 |
 |-----------|---------|
 | `BOOLEAN_RESULT` | ✅ 半空间裁剪 |
-| `BLOCK` | ✅ 完全支持 |
-| `SPHERE` | ✅ 完全支持 |
-| `ELLIPSOID` | ✅ 完全支持 |
-| `TORUS` | ✅ 完全支持 |
-| `EXTRUDED_AREA_SOLID` | ✅ 完全支持 |
-| `REVOLVED_AREA_SOLID` | ✅ 完全支持 |
+| `BLOCK` | ✅ 已接入（需持续验证） |
+| `SPHERE` | ✅ 已接入（需持续验证） |
+| `ELLIPSOID` | ✅ 已接入（需持续验证） |
+| `TORUS` | ✅ 已接入（需持续验证） |
+| `EXTRUDED_AREA_SOLID` | ✅ 已接入（需持续验证） |
+| `REVOLVED_AREA_SOLID` | ✅ 已接入（需持续验证） |
 | `HALF_SPACE_SOLID` | ✅ 裁剪支持 |
 | `BOXED_HALF_SPACE` | ✅ 裁剪支持 |
 | `TESSELLATED_FACE_SET` | ✅ 三角网格 B-Rep |
@@ -168,18 +169,18 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 
 | 标准实体名 | 支持状态 |
 |-----------|---------|
-| `PRODUCT` | ✅ 完全支持 |
-| `PRODUCT_DEFINITION` | ✅ 完全支持 |
-| `PRODUCT_DEFINITION_FORMATION` | ✅ 完全支持 |
-| `PRODUCT_DEFINITION_SHAPE` | ✅ 完全支持 |
-| `NEXT_ASSEMBLY_USAGE_OCCURRENCE` | ✅ 完全支持 |
-| `CONTEXT_DEPENDENT_SHAPE_REPRESENTATION` | ✅ 完全支持 |
-| `APPLICATION_CONTEXT` | ✅ 完全支持 |
-| `REPRESENTATION` | ✅ 完全支持 |
-| `SHAPE_REPRESENTATION` | ✅ 完全支持 |
-| `REPRESENTATION_MAP` | ✅ 完全支持 |
-| `MAPPED_ITEM` | ✅ 完全支持 |
-| `ITEM_DEFINED_TRANSFORMATION` | ✅ 完全支持 |
+| `PRODUCT` | ✅ 已接入（需持续验证） |
+| `PRODUCT_DEFINITION` | ✅ 已接入（需持续验证） |
+| `PRODUCT_DEFINITION_FORMATION` | ✅ 已接入（需持续验证） |
+| `PRODUCT_DEFINITION_SHAPE` | ✅ 已接入（需持续验证） |
+| `NEXT_ASSEMBLY_USAGE_OCCURRENCE` | ✅ 已接入（需持续验证） |
+| `CONTEXT_DEPENDENT_SHAPE_REPRESENTATION` | ✅ 已接入（需持续验证） |
+| `APPLICATION_CONTEXT` | ✅ 已接入（需持续验证） |
+| `REPRESENTATION` | ✅ 已接入（需持续验证） |
+| `SHAPE_REPRESENTATION` | ✅ 已接入（需持续验证） |
+| `REPRESENTATION_MAP` | ✅ 已接入（需持续验证） |
+| `MAPPED_ITEM` | ✅ 已接入（需持续验证） |
+| `ITEM_DEFINED_TRANSFORMATION` | ✅ 已接入（需持续验证） |
 </details>
 
 <details>
@@ -188,15 +189,15 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 | 标准实体名 | 支持状态 |
 |-----------|---------|
 | `ANNOTATION_FILL_AREA` | ✅ 预览支持 |
-| `ANNOTATION_PLANE` | ✅ 完全支持 |
-| `DRAUGHTING_CALLOUT` | ✅ 完全支持 |
-| `DRAUGHTING_PRE_DEFINED_COLOUR` | ✅ 完全支持 |
-| `COLOUR_RGB` | ✅ 完全支持 |
-| `STYLED_ITEM` | ✅ 完全支持 |
-| `PRESENTATION_STYLE_ASSIGNMENT` | ✅ 完全支持 |
-| `PRESENTATION_LAYER_ASSIGNMENT` | ✅ 完全支持 |
+| `ANNOTATION_PLANE` | ✅ 已接入（需持续验证） |
+| `DRAUGHTING_CALLOUT` | ✅ 已接入（需持续验证） |
+| `DRAUGHTING_PRE_DEFINED_COLOUR` | ✅ 已接入（需持续验证） |
+| `COLOUR_RGB` | ✅ 已接入（需持续验证） |
+| `STYLED_ITEM` | ✅ 已接入（需持续验证） |
+| `PRESENTATION_STYLE_ASSIGNMENT` | ✅ 已接入（需持续验证） |
+| `PRESENTATION_LAYER_ASSIGNMENT` | ✅ 已接入（需持续验证） |
 | `TERMINATOR_SYMBOL` | ✅ 预览支持 |
-| `MEASURE_REPRESENTATION_ITEM` | ✅ 完全支持 |
+| `MEASURE_REPRESENTATION_ITEM` | ✅ 已接入（需持续验证） |
 </details>
 
 <details>
@@ -205,13 +206,13 @@ MiniCAD 致力于构建一个完整的工业 CAD 内核，提供 STEP (ISO 10303
 | 标准实体名 | 支持状态 |
 |-----------|---------|
 | `GEOMETRIC_TOLERANCE` | ✅ 预览支持（含变体） |
-| `DATUM_REFERENCE_MODIFIER` | ✅ 完全支持 |
-| `RUNOUT_ZONE_DEFINITION_ORIENTATION` | ✅ 完全支持 |
-| `FLATNESS_TOLERANCE` | ✅ 完全支持 |
-| `CYLINDRICITY_TOLERANCE` | ✅ 完全支持 |
-| `CIRCULAR_RUNOUT_TOLERANCE` | ✅ 完全支持 |
-| `PERPENDICULARITY_TOLERANCE` | ✅ 完全支持 |
-| `POSITION_TOLERANCE` | ✅ 完全支持 |
+| `DATUM_REFERENCE_MODIFIER` | ✅ 已接入（需持续验证） |
+| `RUNOUT_ZONE_DEFINITION_ORIENTATION` | ✅ 已接入（需持续验证） |
+| `FLATNESS_TOLERANCE` | ✅ 已接入（需持续验证） |
+| `CYLINDRICITY_TOLERANCE` | ✅ 已接入（需持续验证） |
+| `CIRCULAR_RUNOUT_TOLERANCE` | ✅ 已接入（需持续验证） |
+| `PERPENDICULARITY_TOLERANCE` | ✅ 已接入（需持续验证） |
+| `POSITION_TOLERANCE` | ✅ 已接入（需持续验证） |
 </details>
 
 ### 未支持的 AP242 Ed2 实体（按领域分类，1387 种）
@@ -432,7 +433,7 @@ src/main/java/com/minicad/
 ├── step/
 │   ├── syntax/       -- STEP 语法解析器 (5 个)
 │   ├── semantic/     -- STEP 语义解析器 (6 个)
-│   └── model/        -- STEP 实体模型类 (1175 个, 26 个子包)
+│   └── model/        -- STEP 实体模型类 (1246 个, 26 个子包)
 │       ├── base/         -- 基础抽象 (11)
 │       ├── geometry/     -- 几何实体 (115)
 │       ├── topology/     -- 拓扑实体 (31)
@@ -521,7 +522,7 @@ mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp exec:java  # 启动
 
 ## 开发原则
 
-- **工业级可靠性**: 所有支持必须真实可运行，经过实际 STEP 文件测试
+- **可靠性目标**: 所有支持必须真实可运行，经过实际 STEP 文件测试
 - **显式失败**: 所有不支持必须显式失败（抛出 `UnsupportedStepEntityException` 或 `UnsupportedGeometryException`），不静默忽略
 - **代码显式优于泛化框架**: 保持代码清晰可读，避免过度抽象
 - **渐进式支持**: 优先支持最常见的 STEP 实体类型，逐步扩展支持范围
@@ -539,6 +540,7 @@ mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp exec:java  # 启动
 - 添加拓扑修复/healing 功能
 
 ### 远期目标
-- 支持所有 STEP AP214/AP242 核心实体
-- 实现完整的几何内核功能
+- 逐步覆盖 STEP AP214/AP242 核心实体
+- 持续完善几何内核功能
 - 支持 STEP 文件导出能力
+

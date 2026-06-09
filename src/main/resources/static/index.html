@@ -445,6 +445,11 @@
             height: 100dvh;
         }
 
+        #scene.drag-over {
+            outline: 3px solid rgba(196, 95, 53, 0.72);
+            outline-offset: -0.75rem;
+        }
+
         #scene canvas {
             display: block;
             width: 100%;
@@ -517,7 +522,7 @@
 
         <section class="controls">
             <label for="file-input" class="file-trigger">选择文件并渲染</label>
-            <input id="file-input" type="file" accept=".step,.stp,.txt">
+            <input id="file-input" type="file" accept=".step,.stp,.p21">
         </section>
 
         <section class="stats" id="stats">

@@ -66,6 +66,29 @@ class StepParameterReaderTest {
   }
 
   @Test
+  void typedSelectionPreservesOuterTypeAndUnwrapsPayload() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("AP242_SELECT",
+            new StepValue.TypedValue("INNER", new StepValue.ReferenceValue(7)))));
+    var def = def(inst, "TEST");
+
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.typedSelection(def, 0, "TEST");
+
+    assertEquals("AP242_SELECT", selection.typeName());
+    assertInstanceOf(StepValue.ReferenceValue.class, selection.value());
+  }
+
+  @Test
+  void typedSelectionRejectsPlainPayload() {
+    var inst = instanceWithDef("TEST", List.of(new StepValue.ReferenceValue(7)));
+    var def = def(inst, "TEST");
+
+    assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.typedSelection(def, 0, "TEST"));
+  }
+
+  @Test
   void isUnsetOmittedValue() {
     assertTrue(StepParameterReader.isUnset(new StepValue.OmittedValue()));
   }

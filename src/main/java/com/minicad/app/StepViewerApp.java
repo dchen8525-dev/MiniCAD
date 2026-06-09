@@ -520,7 +520,7 @@ public final class StepViewerApp {
         response.setHeader("Referrer-Policy", "no-referrer");
         response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
         response.setHeader("Content-Security-Policy",
-                "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+                "default-src 'self'; script-src 'self' 'sha256-jineBDmjBt81WPjXTP3GlHJ740C7ojpcHhfp2/uAlHw='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
     }
 
     private static void logDiagnosticContext(long requestId, String stepText, String message) {

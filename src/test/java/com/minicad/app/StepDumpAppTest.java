@@ -7973,9 +7973,21 @@ class StepDumpAppTest {
         assertTrue(result.stdout().contains("\"entityCount\":1"), result.stdout());
         assertTrue(result.stdout().contains("\"resolvedCount\":1"), result.stdout());
         assertTrue(result.stdout().contains("\"unsupportedCount\":0"), result.stdout());
+        assertTrue(result.stdout().contains("\"issues\":[]"), result.stdout());
         assertTrue(result.stdout().contains("\"bbox\":{\"min\":[0.0,0.0,0.0],\"max\":[0.0,0.0,0.0]}"), result.stdout());
         assertFalse(result.stdout().contains("Syntax Summary"), result.stdout());
         assertFalse(result.stdout().contains("Build Summary"), result.stdout());
+    }
+
+    @Test
+    void shouldReportUnitNormalizationWarningInJsonOutput() throws IOException {
+        Path file = writeInchUnitFile("minicad-json-inch");
+
+        DumpRunResult result = runDumpRaw("--json", file.toString());
+
+        assertEquals(0, result.exitCode());
+        assertEquals("", result.stderr());
+        assertTrue(result.stdout().contains("\"code\":\"units.coordinates_not_normalized\""), result.stdout());
     }
 
     @Test
@@ -7995,6 +8007,7 @@ class StepDumpAppTest {
         assertTrue(result.stdout().contains("\"exitCode\":1"), result.stdout());
         assertTrue(result.stdout().contains("\"path\":\"" + jsonEscaped(bad.toString()) + "\""), result.stdout());
         assertTrue(result.stdout().contains("\"error\":\"unterminated string"), result.stdout());
+        assertTrue(result.stdout().contains("\"issues\":[{\"severity\":\"ERROR\",\"code\":\"step.parse\""), result.stdout());
         assertFalse(result.stdout().contains("StepParseException"), result.stdout());
     }
 
@@ -8107,6 +8120,22 @@ class StepDumpAppTest {
         Files.writeString(file, """
                 DATA;
                 #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                ENDSEC;
+                """);
+        return file;
+    }
+
+    private static Path writeInchUnitFile(String prefix) throws IOException {
+        Path file = Files.createTempFile(prefix, ".step");
+        Files.writeString(file, """
+                DATA;
+                #1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
+                #2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);
+                #3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());
+                #4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
+                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))
+                    REPRESENTATION_CONTEXT('ID','MODEL'));
+                #5=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
                 ENDSEC;
                 """);
         return file;

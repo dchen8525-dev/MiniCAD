@@ -1,5 +1,7 @@
 package com.minicad.app;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -7,9 +9,12 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StepPreviewJsonExporterTest {
@@ -121,6 +126,7 @@ class StepPreviewJsonExporterTest {
         int jsonChunkType = header.getInt(16);
         String metadata = metadataFromGlb(binary);
 
+        PreviewSerializers.validateGlb(binary);
         assertEquals(binary.length, totalLength);
         assertEquals(0x4E4F534A, jsonChunkType);
         assertMetadataContains(metadata,
@@ -133,6 +139,100 @@ class StepPreviewJsonExporterTest {
                 "\"surfaceLoops\":[",
                 "\"meshes\":[",
                 "\"materials\":[");
+    }
+
+    @Test
+    void glbValidatorShouldRejectMalformedHeadersAndChunks() {
+        byte[] binary = StepPreviewJsonExporter.exportGlb("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
+                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
+                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
+                #10=DIRECTION('DZ',(0.0,0.0,1.0));
+                #11=DIRECTION('DX',(1.0,0.0,0.0));
+                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
+                #13=PLANE('PL0',#12);
+                #20=VERTEX_POINT('V0',#1);
+                #21=VERTEX_POINT('V1',#2);
+                #22=VERTEX_POINT('V2',#3);
+                #23=VERTEX_POINT('V3',#4);
+                #30=DIRECTION('D1',(1.0,0.0,0.0));
+                #31=VECTOR('VE1',#30,1.0);
+                #32=LINE('L1',#1,#31);
+                #33=DIRECTION('D2',(0.0,1.0,0.0));
+                #34=VECTOR('VE2',#33,1.0);
+                #35=LINE('L2',#2,#34);
+                #36=DIRECTION('D3',(-1.0,0.0,0.0));
+                #37=VECTOR('VE3',#36,1.0);
+                #38=LINE('L3',#3,#37);
+                #39=DIRECTION('D4',(0.0,-1.0,0.0));
+                #40=VECTOR('VE4',#39,1.0);
+                #41=LINE('L4',#4,#40);
+                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
+                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
+                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
+                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
+                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
+                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
+                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
+                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
+                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
+                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
+                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
+                #90=CLOSED_SHELL('CS',(#80));
+                #100=MANIFOLD_SOLID_BREP('S0',#90);
+                ENDSEC;
+                """);
+        PreviewSerializers.validateGlb(binary);
+
+        byte[] badLength = binary.clone();
+        writeIntLE(badLength, 8, binary.length + 4);
+        assertThrows(IllegalArgumentException.class, () -> PreviewSerializers.validateGlb(badLength));
+
+        byte[] badJsonType = binary.clone();
+        writeIntLE(badJsonType, 16, 0x004E4942);
+        assertThrows(IllegalArgumentException.class, () -> PreviewSerializers.validateGlb(badJsonType));
+
+        byte[] badJsonLength = binary.clone();
+        writeIntLE(badJsonLength, 12, binary.length);
+        assertThrows(IllegalArgumentException.class, () -> PreviewSerializers.validateGlb(badJsonLength));
+    }
+
+    @Test
+    void glbMeshesShouldIncludeNormalizedNormalsMatchingPositions() {
+        byte[] binary = PreviewSerializers.toGlb(nonEmptyTrianglePreviewPayload());
+
+        JSONObject gltf = JSONObject.parseObject(metadataFromGlb(binary));
+        JSONObject primitive = gltf.getJSONArray("meshes")
+                .getJSONObject(0)
+                .getJSONArray("primitives")
+                .getJSONObject(0);
+        JSONObject attributes = primitive.getJSONObject("attributes");
+        Integer positionAccessorIndex = attributes.getInteger("POSITION");
+        Integer normalAccessorIndex = attributes.getInteger("NORMAL");
+        assertNotNull(positionAccessorIndex);
+        assertNotNull(normalAccessorIndex);
+
+        JSONObject positionAccessor = gltf.getJSONArray("accessors").getJSONObject(positionAccessorIndex);
+        JSONObject normalAccessor = gltf.getJSONArray("accessors").getJSONObject(normalAccessorIndex);
+        assertEquals(positionAccessor.getIntValue("count"), normalAccessor.getIntValue("count"));
+        assertEquals("VEC3", normalAccessor.getString("type"));
+        assertEquals(5126, normalAccessor.getIntValue("componentType"));
+
+        ByteBuffer bin = glbBinChunk(binary).order(ByteOrder.LITTLE_ENDIAN);
+        float[] normals = readVec3Accessor(bin, gltf, normalAccessor);
+        for (int i = 0; i < normals.length; i += 3) {
+            double nx = normals[i];
+            double ny = normals[i + 1];
+            double nz = normals[i + 2];
+            double length = Math.sqrt(nx * nx + ny * ny + nz * nz);
+            assertEquals(1.0, length, 1.0e-5, "normal at vertex " + (i / 3) + " must be normalized");
+        }
+
+        JSONArray indices = gltf.getJSONArray("accessors");
+        JSONObject indexAccessor = indices.getJSONObject(primitive.getIntValue("indices"));
+        assertEquals(0, indexAccessor.getIntValue("count") % 3);
     }
 
     @Test
@@ -10465,10 +10565,90 @@ class StepPreviewJsonExporterTest {
         return new String(binary, 20, jsonChunkLength, StandardCharsets.UTF_8).trim();
     }
 
+    private static ByteBuffer glbBinChunk(byte[] binary) {
+        ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
+        int jsonChunkLength = header.getInt(12);
+        int binHeaderOffset = 20 + jsonChunkLength;
+        int binLength = header.getInt(binHeaderOffset);
+        int binType = header.getInt(binHeaderOffset + 4);
+        assertEquals(0x004E4942, binType);
+        return ByteBuffer.wrap(binary, binHeaderOffset + 8, binLength).slice().order(ByteOrder.LITTLE_ENDIAN);
+    }
+
+    private static float[] readVec3Accessor(ByteBuffer bin, JSONObject gltf, JSONObject accessor) {
+        JSONArray bufferViews = gltf.getJSONArray("bufferViews");
+        JSONObject bufferView = bufferViews.getJSONObject(accessor.getIntValue("bufferView"));
+        int offset = bufferView.getIntValue("byteOffset") + accessor.getIntValue("byteOffset");
+        int count = accessor.getIntValue("count");
+        float[] values = new float[count * 3];
+        ByteBuffer view = bin.duplicate().order(ByteOrder.LITTLE_ENDIAN);
+        view.position(offset);
+        for (int i = 0; i < values.length; i++) {
+            values[i] = view.getFloat();
+        }
+        return values;
+    }
+
+    private static PreviewPayload nonEmptyTrianglePreviewPayload() {
+        PointPayload p0 = new PointPayload(0.0, 0.0, 0.0);
+        PointPayload p1 = new PointPayload(1.0, 0.0, 0.0);
+        PointPayload p2 = new PointPayload(1.0, 1.0, 0.0);
+        PointPayload p3 = new PointPayload(0.0, 1.0, 0.0);
+        FacePayload face = new FacePayload(
+                42,
+                "square",
+                "plane",
+                p0,
+                new VectorPayload(0.0, 0.0, 1.0),
+                true,
+                new ColorPayload(180, 110, 70),
+                0.0,
+                null,
+                List.of(),
+                List.of(new LoopPayload(true, List.of(p0, p1, p2, p3, p0))),
+                List.of(p0, p1, p2, p0, p2, p3),
+                null,
+                List.of()
+        );
+        ValidationReportPayload report = new ValidationReportPayload("ok", 0, 0, List.of());
+        ValidationPayload validation = new ValidationPayload(
+                0,
+                0,
+                1,
+                0,
+                1.0,
+                0.0,
+                new PointPayload(0.5, 0.5, 0.0),
+                report
+        );
+        return new PreviewPayload(
+                new PreviewStats(1, 0, 0, 1, 0, 0, 0),
+                new BoundsPayload(p0, p2),
+                validation,
+                null,
+                null,
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(face),
+                List.of(),
+                List.of()
+        );
+    }
+
     private static String metadataFromBinary(byte[] binary) {
         ByteBuffer header = ByteBuffer.wrap(binary).order(ByteOrder.LITTLE_ENDIAN);
         int metadataLength = header.getInt(8);
         return new String(binary, 16, metadataLength, StandardCharsets.UTF_8).trim();
+    }
+
+    private static void writeIntLE(byte[] bytes, int offset, int value) {
+        bytes[offset] = (byte) (value & 0xff);
+        bytes[offset + 1] = (byte) ((value >>> 8) & 0xff);
+        bytes[offset + 2] = (byte) ((value >>> 16) & 0xff);
+        bytes[offset + 3] = (byte) ((value >>> 24) & 0xff);
     }
 
     private static String surfaceOfRevolutionFaceStep(
@@ -10553,5 +10733,22 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"unsupportedFaceCount\":0"), "toroidal-seam should have 0 unsupported faces");
         assertTrue(json.contains("\"product\":"), "should include product metadata");
         assertTrue(json.contains("\"units\":"), "should include unit metadata");
+    }
+
+    @Test
+    void shouldExportInchUnitScaleInJsonMetadata() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
+                #2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);
+                #3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());
+                #4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
+                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))
+                    REPRESENTATION_CONTEXT('ID','MODEL'));
+                ENDSEC;
+                """);
+
+        assertTrue(json.contains("\"units\":{\"lengthUnit\":\"INCH\",\"scaleToMeters\":0.0254"), json);
+        assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
     }
 }

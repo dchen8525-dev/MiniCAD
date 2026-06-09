@@ -1,6 +1,7 @@
 package com.minicad.app;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.MiniCadIssue;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Vector3;
 
@@ -13,6 +14,7 @@ record PreviewPayload(
         ProductMetadataExtractor.ProductMetadata product,
         UnitExtractor.UnitInfo units,
         List<PmiPayload> pmi,
+        List<MiniCadIssue> issues,
         List<UnsupportedBooleanPayload> unsupportedBooleans,
         List<UnsupportedFacePayload> unsupportedFaces,
         List<EdgePayload> edges,
@@ -162,6 +164,7 @@ record BinaryPreviewPayload(
         ProductMetadataExtractor.ProductMetadata product,
         UnitExtractor.UnitInfo units,
         List<PmiPayload> pmi,
+        List<MiniCadIssue> issues,
         List<UnsupportedBooleanPayload> unsupportedBooleans,
         List<UnsupportedFacePayload> unsupportedFaces,
         List<BinaryEdgePayload> edges,

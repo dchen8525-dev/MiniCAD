@@ -52,4 +52,72 @@ class StepAssemblyGraphBuilderTest {
         assertEquals(4.0, part.worldMatrix()[7]);
         assertNotNull(graph.representations().stream().filter(rep -> rep.representationId() == 63).findFirst().orElse(null));
     }
+
+    @Test
+    void shouldBuildMultiplePartInstancesWithRotationAndTranslation() {
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
+                StepParser.parse("""
+                        DATA;
+                        #1=APPLICATION_CONTEXT('mechanical design');
+                        #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
+                        #3=PRODUCT('ASM','Assembly','',(#2));
+                        #4=PRODUCT('PART','Repeated Part','',(#2));
+                        #5=PRODUCT_DEFINITION_FORMATION('asm-v1','',#3);
+                        #6=PRODUCT_DEFINITION_FORMATION('part-v1','',#4);
+                        #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                        #8=PRODUCT_DEFINITION('asm-def','assembly',#5,#7);
+                        #9=PRODUCT_DEFINITION('part-def','part',#6,#7);
+                        #10=PRODUCT_DEFINITION_SHAPE('asm-shape','',#8);
+                        #11=PRODUCT_DEFINITION_SHAPE('part-shape','',#9);
+                        #12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
+                        #13=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                        #14=CARTESIAN_POINT('T1',(2.0,0.0,0.0));
+                        #15=CARTESIAN_POINT('T2',(5.0,0.0,0.0));
+                        #16=DIRECTION('DZ',(0.0,0.0,1.0));
+                        #17=DIRECTION('DX',(1.0,0.0,0.0));
+                        #18=DIRECTION('DY',(0.0,1.0,0.0));
+                        #19=AXIS2_PLACEMENT_3D('AX0',#13,#16,#17);
+                        #20=AXIS2_PLACEMENT_3D('MOVE',#14,#16,#17);
+                        #21=AXIS2_PLACEMENT_3D('ROT90_MOVE',#15,#16,#18);
+                        #22=ITEM_DEFINED_TRANSFORMATION('move','translate x',#19,#20);
+                        #23=ITEM_DEFINED_TRANSFORMATION('rotate-move','rotate z and translate',#19,#21);
+                        #24=SHAPE_REPRESENTATION('ASM_REP',(),#12);
+                        #25=SHAPE_REPRESENTATION('PART_REP',(),#12);
+                        #26=SHAPE_DEFINITION_REPRESENTATION(#10,#24);
+                        #27=SHAPE_DEFINITION_REPRESENTATION(#11,#25);
+                        #28=(REPRESENTATION_RELATIONSHIP('rr1','first instance',#24,#25)
+                             REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));
+                        #29=(REPRESENTATION_RELATIONSHIP('rr2','second instance',#24,#25)
+                             REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#23));
+                        #30=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','first part','',#8,#9);
+                        #31=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-2','second part','',#8,#9);
+                        #32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#28,#30);
+                        #33=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#29,#31);
+                        ENDSEC;
+                        """)
+        );
+
+        AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);
+
+        assertEquals(3, graph.nodes().size());
+        assertEquals(2, graph.representations().size());
+
+        AssemblyNode first = graph.nodes().stream()
+                .filter(node -> Integer.valueOf(30).equals(node.occurrenceId()))
+                .findFirst()
+                .orElseThrow();
+        AssemblyNode second = graph.nodes().stream()
+                .filter(node -> Integer.valueOf(31).equals(node.occurrenceId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(List.of(25), first.representationIds());
+        assertEquals(List.of(25), second.representationIds());
+        assertEquals(2.0, first.worldMatrix()[3], 1.0e-9);
+        assertEquals(5.0, second.worldMatrix()[3], 1.0e-9);
+        assertEquals(0.0, second.worldMatrix()[0], 1.0e-9);
+        assertEquals(-1.0, second.worldMatrix()[1], 1.0e-9);
+        assertEquals(1.0, second.worldMatrix()[4], 1.0e-9);
+        assertEquals(0.0, second.worldMatrix()[5], 1.0e-9);
+    }
 }

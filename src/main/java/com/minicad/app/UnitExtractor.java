@@ -82,13 +82,17 @@ final class UnitExtractor {
                     } else if (unit instanceof StepConversionBasedUnit conv) {
                         if ("LENGTH_UNIT".equals(conv.unitKind())) {
                             lengthUnit = conv.name() != null ? conv.name() : "conversion_unit";
+                            scaleToMeters = computeScaleToMeters(conv);
                         } else if ("PLANE_ANGLE_UNIT".equals(conv.unitKind())) {
                             angleUnit = conv.name() != null ? conv.name() : "conversion_unit";
                         }
                     }
                 }
             }
-            // Also scan standalone units not referenced by GLOBAL_UNIT_ASSIGNED_CONTEXT
+        }
+
+        for (StepEntity entity : resolved.values()) {
+            // Also scan standalone units not referenced by GLOBAL_UNIT_ASSIGNED_CONTEXT.
             if (entity instanceof StepSiUnit si) {
                 if (lengthUnit == null && "LENGTH_UNIT".equals(si.unitKind())) {
                     lengthUnit = formatSiUnit(si);
@@ -97,10 +101,32 @@ final class UnitExtractor {
                 if (angleUnit == null && "PLANE_ANGLE_UNIT".equals(si.unitKind())) {
                     angleUnit = formatSiUnit(si);
                 }
+            } else if (entity instanceof StepConversionBasedUnit conv) {
+                if ("LENGTH_UNIT".equals(conv.unitKind())) {
+                    lengthUnit = conv.name() != null ? conv.name() : "conversion_unit";
+                    scaleToMeters = computeScaleToMeters(conv);
+                }
+                if (angleUnit == null && "PLANE_ANGLE_UNIT".equals(conv.unitKind())) {
+                    angleUnit = conv.name() != null ? conv.name() : "conversion_unit";
+                }
             }
         }
 
         return new UnitInfo(lengthUnit, scaleToMeters, angleUnit);
+    }
+
+    private static Double computeScaleToMeters(StepConversionBasedUnit unit) {
+        if (unit.conversionFactor() == null || unit.conversionFactor().unitComponent() == null) {
+            return null;
+        }
+        StepEntity baseUnit = unit.conversionFactor().unitComponent();
+        Double baseScale = null;
+        if (baseUnit instanceof StepSiUnit si) {
+            baseScale = computeScaleToMeters(si);
+        } else if (baseUnit instanceof StepConversionBasedUnit conversionBasedUnit) {
+            baseScale = computeScaleToMeters(conversionBasedUnit);
+        }
+        return baseScale == null ? null : unit.conversionFactor().valueComponent() * baseScale;
     }
 
     private static String formatSiUnit(StepSiUnit si) {

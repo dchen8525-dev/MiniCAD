@@ -4,6 +4,7 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.common.MiniCadIssue;
 import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.step.model.product.StepBooleanClippingResult;
@@ -424,12 +425,33 @@ public final class StepDumpApp {
                     resolved,
                     buildLines,
                     extractUnsupportedCount(buildLines),
-                    calculatePointBoundingBox(resolved, builder));
+                    calculatePointBoundingBox(resolved, builder),
+                    successIssues(extractUnsupportedCount(buildLines), UnitExtractor.extract(resolved)));
         } catch (IOException ex) {
             return DumpFileResult.failure(path, "cannot read file: " + ex.getMessage(), ex, debug);
         } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
             return DumpFileResult.failure(path, ex.getMessage(), ex, debug);
         }
+    }
+
+    private static List<MiniCadIssue> successIssues(int unsupportedCount, UnitExtractor.UnitInfo units) {
+        List<MiniCadIssue> issues = new ArrayList<>();
+        if (units != null && units.scaleToMeters() != null
+                && Math.abs(units.scaleToMeters() - 1.0) > 1.0e-12) {
+            issues.add(MiniCadIssue.warning(
+                    "units.coordinates_not_normalized",
+                    null,
+                    null,
+                    "geometry coordinates are emitted in source STEP units; scaleToMeters is metadata only"));
+        }
+        if (unsupportedCount > 0) {
+            issues.add(MiniCadIssue.warning(
+                    "step.unsupported",
+                    null,
+                    null,
+                    "build summary reported " + unsupportedCount + " unsupported face(s)"));
+        }
+        return List.copyOf(issues);
     }
 
     private static CliOptions parseArgs(String[] args, Consumer<String> err) {
@@ -548,7 +570,34 @@ public final class StepDumpApp {
             json.append(",\"error\":");
             appendJsonString(json, result.errorMessage());
         }
+        json.append(",\"issues\":");
+        appendIssuesJson(json, result.issues());
         json.append('}');
+    }
+
+    private static void appendIssuesJson(StringBuilder json, List<MiniCadIssue> issues) {
+        json.append('[');
+        for (int i = 0; i < issues.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            MiniCadIssue issue = issues.get(i);
+            json.append("{\"severity\":");
+            appendJsonString(json, issue.severity().name());
+            json.append(",\"code\":");
+            appendJsonString(json, issue.code());
+            if (issue.entityId() != null) {
+                json.append(",\"entityId\":").append(issue.entityId());
+            }
+            if (issue.entityType() != null) {
+                json.append(",\"entityType\":");
+                appendJsonString(json, issue.entityType());
+            }
+            json.append(",\"message\":");
+            appendJsonString(json, issue.message());
+            json.append('}');
+        }
+        json.append(']');
     }
 
     private static void appendBoundingBoxJson(StringBuilder json, BoundingBox3 box) {
@@ -597,6 +646,7 @@ public final class StepDumpApp {
             List<String> buildLines,
             int unsupportedCount,
             BoundingBox3 bbox,
+            List<MiniCadIssue> issues,
             String errorMessage,
             String stackTrace) {
 
@@ -606,7 +656,8 @@ public final class StepDumpApp {
                 Map<Integer, StepEntity> resolved,
                 List<String> buildLines,
                 int unsupportedCount,
-                BoundingBox3 bbox) {
+                BoundingBox3 bbox,
+                List<MiniCadIssue> issues) {
             return new DumpFileResult(
                     path,
                     true,
@@ -615,6 +666,7 @@ public final class StepDumpApp {
                     List.copyOf(buildLines),
                     unsupportedCount,
                     bbox,
+                    List.copyOf(issues),
                     null,
                     null);
         }
@@ -628,6 +680,7 @@ public final class StepDumpApp {
                     List.of(),
                     0,
                     null,
+                    List.of(failureIssue(exception, message)),
                     message,
                     debug ? StepDumpApp.stackTrace(exception) : null);
         }
@@ -639,6 +692,19 @@ public final class StepDumpApp {
         int resolvedCount() {
             return resolved.size();
         }
+    }
+
+    private static MiniCadIssue failureIssue(Exception exception, String message) {
+        String code = switch (exception) {
+            case StepParseException ignored -> "step.parse";
+            case StepResolutionException ignored -> "step.resolve";
+            case UnsupportedGeometryException ignored -> "step.unsupported";
+            case TopologyException ignored -> "topology.invalid";
+            case GeometryException ignored -> "geometry.invalid";
+            case IOException ignored -> "io.read";
+            default -> "step.failed";
+        };
+        return MiniCadIssue.error(code, null, null, message);
     }
 
     private static String stackTrace(Exception exception) {

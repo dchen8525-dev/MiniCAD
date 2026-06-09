@@ -68,8 +68,8 @@ class Curve3DefaultMethodTest {
         BSplineCurve3 spline = new BSplineCurve3(
             2,
             controlPoints,
-            java.util.List.of(3, 1, 3),
-            java.util.List.of(0.0, 0.5, 1.0)
+            java.util.List.of(3, 3),
+            java.util.List.of(0.0, 1.0)
         );
 
         // Test explicit boundingBox

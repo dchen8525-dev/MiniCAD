@@ -1,8 +1,11 @@
 package com.minicad.app;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.MiniCadIssue;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,6 +18,11 @@ import java.util.stream.Collectors;
  * and GLB output. Extracted from StepPreviewJsonExporter.
  */
 public final class PreviewSerializers {
+
+    private static final int GLB_MAGIC = 0x46546C67;
+    private static final int GLB_VERSION = 2;
+    private static final int GLB_JSON_CHUNK_TYPE = 0x4E4F534A;
+    private static final int GLB_BIN_CHUNK_TYPE = 0x004E4942;
 
     private PreviewSerializers() {}
 
@@ -35,6 +43,8 @@ public final class PreviewSerializers {
         appendUnitInfo(json, payload.units());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
+        json.append(",\"issues\":");
+        appendIssues(json, payload.issues());
         json.append(",\"unsupportedBooleans\":");
         appendUnsupportedBooleans(json, payload.unsupportedBooleans());
         json.append(",\"unsupportedFaces\":");
@@ -86,7 +96,65 @@ public final class PreviewSerializers {
         writeIntLE(output, paddedBinary.length);
         writeIntLE(output, 0x004E4942);
         output.writeBytes(paddedBinary);
-        return output.toByteArray();
+        byte[] glb = output.toByteArray();
+        validateGlb(glb);
+        return glb;
+    }
+
+    public static void validateGlb(byte[] glb) {
+        if (glb == null) {
+            throw new IllegalArgumentException("GLB payload must not be null");
+        }
+        if (glb.length < 28) {
+            throw new IllegalArgumentException("GLB payload is too short: " + glb.length);
+        }
+        if (glb.length % 4 != 0) {
+            throw new IllegalArgumentException("GLB payload length must be 4-byte aligned: " + glb.length);
+        }
+        ByteBuffer buffer = ByteBuffer.wrap(glb).order(ByteOrder.LITTLE_ENDIAN);
+        int magic = buffer.getInt(0);
+        if (magic != GLB_MAGIC) {
+            throw new IllegalArgumentException("invalid GLB magic: 0x" + Integer.toHexString(magic));
+        }
+        int version = buffer.getInt(4);
+        if (version != GLB_VERSION) {
+            throw new IllegalArgumentException("unsupported GLB version: " + version);
+        }
+        int totalLength = buffer.getInt(8);
+        if (totalLength != glb.length) {
+            throw new IllegalArgumentException("GLB length header " + totalLength + " does not match payload length " + glb.length);
+        }
+        int offset = 12;
+        offset = validateChunk(buffer, glb.length, offset, GLB_JSON_CHUNK_TYPE, "JSON");
+        if (offset == glb.length) {
+            return;
+        }
+        offset = validateChunk(buffer, glb.length, offset, GLB_BIN_CHUNK_TYPE, "BIN");
+        if (offset != glb.length) {
+            throw new IllegalArgumentException("GLB contains trailing bytes after BIN chunk: " + (glb.length - offset));
+        }
+    }
+
+    private static int validateChunk(ByteBuffer buffer, int totalLength, int offset, int expectedType, String label) {
+        if (offset + 8 > totalLength) {
+            throw new IllegalArgumentException("GLB " + label + " chunk header is truncated");
+        }
+        int chunkLength = buffer.getInt(offset);
+        int chunkType = buffer.getInt(offset + 4);
+        if (chunkType != expectedType) {
+            throw new IllegalArgumentException("GLB " + label + " chunk type mismatch: 0x" + Integer.toHexString(chunkType));
+        }
+        if (chunkLength < 0) {
+            throw new IllegalArgumentException("GLB " + label + " chunk length is negative: " + chunkLength);
+        }
+        if (chunkLength % 4 != 0) {
+            throw new IllegalArgumentException("GLB " + label + " chunk length must be 4-byte aligned: " + chunkLength);
+        }
+        long nextOffset = (long) offset + 8L + chunkLength;
+        if (nextOffset > totalLength) {
+            throw new IllegalArgumentException("GLB " + label + " chunk extends beyond payload length");
+        }
+        return (int) nextOffset;
     }
 
     public static byte[] padChunk(byte[] bytes) {
@@ -112,6 +180,7 @@ public final class PreviewSerializers {
                 payload.product(),
                 payload.units(),
                 payload.pmi(),
+                payload.issues(),
                 payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
                 payload.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
@@ -176,6 +245,8 @@ public final class PreviewSerializers {
         appendUnitInfo(json, payload.units());
         json.append(",\"pmi\":");
         appendPmi(json, payload.pmi());
+        json.append(",\"issues\":");
+        appendIssues(json, payload.issues());
         json.append(",\"unsupportedBooleans\":");
         appendUnsupportedBooleans(json, payload.unsupportedBooleans());
         json.append(",\"unsupportedFaces\":");
@@ -302,6 +373,7 @@ public final class PreviewSerializers {
         preview.put("bounds", boundsMap(payload.bounds()));
         preview.put("validation", validationMap(payload.validation()));
         preview.put("pmi", pmiMaps(payload.pmi()));
+        preview.put("issues", issueMaps(payload.issues()));
         preview.put("unsupportedBooleans", unsupportedBooleanMaps(payload.unsupportedBooleans()));
         preview.put("unsupportedFaces", unsupportedFaceMaps(payload.unsupportedFaces()));
         preview.put("instances", instanceMaps(payload.instances()));
@@ -482,6 +554,24 @@ public final class PreviewSerializers {
             map.put("name", face.name());
             map.put("surfaceType", face.surfaceType());
             map.put("reason", face.reason());
+            list.add(map);
+        }
+        return List.copyOf(list);
+    }
+
+    private static List<Map<String, Object>> issueMaps(List<MiniCadIssue> issues) {
+        List<Map<String, Object>> list = new ArrayList<>(issues.size());
+        for (MiniCadIssue issue : issues) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("severity", issue.severity().name());
+            map.put("code", issue.code());
+            if (issue.entityId() != null) {
+                map.put("entityId", issue.entityId());
+            }
+            if (issue.entityType() != null) {
+                map.put("entityType", issue.entityType());
+            }
+            map.put("message", issue.message());
             list.add(map);
         }
         return List.copyOf(list);
@@ -670,6 +760,28 @@ public final class PreviewSerializers {
             json.append(",\"name\":").append(quote(face.name()));
             json.append(",\"surfaceType\":").append(quote(face.surfaceType()));
             json.append(",\"reason\":").append(quote(face.reason()));
+            json.append('}');
+        }
+        json.append(']');
+    }
+
+    public static void appendIssues(StringBuilder json, List<MiniCadIssue> issues) {
+        json.append('[');
+        for (int i = 0; i < issues.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            MiniCadIssue issue = issues.get(i);
+            json.append('{');
+            json.append("\"severity\":").append(quote(issue.severity().name()));
+            json.append(",\"code\":").append(quote(issue.code()));
+            if (issue.entityId() != null) {
+                json.append(",\"entityId\":").append(issue.entityId());
+            }
+            if (issue.entityType() != null) {
+                json.append(",\"entityType\":").append(quote(issue.entityType()));
+            }
+            json.append(",\"message\":").append(quote(issue.message()));
             json.append('}');
         }
         json.append(']');
@@ -1433,6 +1545,7 @@ public final class PreviewSerializers {
 
         private int addFaceMesh(FacePayload face) {
             IndexedTriangleMesh meshData = indexedTriangleMesh(face.triangles());
+            validateIndexedTriangleMesh(face.stepId(), meshData);
             int positionAccessor = addAccessor(meshData.positions(), true);
             int normalAccessor = addAccessor(meshData.normals(), false);
             int indexAccessor = addIndexAccessor(meshData.indices());
@@ -2003,6 +2116,50 @@ public final class PreviewSerializers {
                     new FloatArrayData(normalValues, uniquePoints.size(), null, null),
                     new IntArrayData(indexValues, indexValues.length)
             );
+        }
+
+        private static void validateIndexedTriangleMesh(int stepId, IndexedTriangleMesh meshData) {
+            int vertexCount = meshData.positions().count();
+            int normalCount = meshData.normals().count();
+            int indexCount = meshData.indices().count();
+            if (vertexCount == 0 && normalCount == 0 && indexCount == 0) {
+                return;
+            }
+            if (vertexCount <= 0) {
+                throw new IllegalArgumentException("face #" + stepId + " generated invalid GLB vertices");
+            }
+            if (meshData.positions().values().length != vertexCount * 3) {
+                throw new IllegalArgumentException("face #" + stepId + " position buffer does not match vertex count");
+            }
+            for (float position : meshData.positions().values()) {
+                if (!Float.isFinite(position)) {
+                    throw new IllegalArgumentException("face #" + stepId + " GLB position contains a non-finite value");
+                }
+            }
+            if (normalCount != vertexCount || meshData.normals().values().length != vertexCount * 3) {
+                throw new IllegalArgumentException("face #" + stepId + " normal buffer does not match vertex count");
+            }
+            if (indexCount <= 0 || indexCount % 3 != 0) {
+                throw new IllegalArgumentException("face #" + stepId + " index buffer is not made of triangles");
+            }
+            for (int index : meshData.indices().values()) {
+                if (index < 0 || index >= vertexCount) {
+                    throw new IllegalArgumentException("face #" + stepId + " GLB index " + index
+                            + " is outside vertex count " + vertexCount);
+                }
+            }
+            float[] normals = meshData.normals().values();
+            for (int i = 0; i < normals.length; i += 3) {
+                double nx = normals[i];
+                double ny = normals[i + 1];
+                double nz = normals[i + 2];
+                double length = Math.sqrt(nx * nx + ny * ny + nz * nz);
+                if (!Float.isFinite(normals[i]) || !Float.isFinite(normals[i + 1]) || !Float.isFinite(normals[i + 2])
+                        || !Double.isFinite(length) || Math.abs(length - 1.0) > 1.0e-4) {
+                    throw new IllegalArgumentException("face #" + stepId + " GLB normal at vertex "
+                            + (i / 3) + " is not normalized");
+                }
+            }
         }
     }
 }

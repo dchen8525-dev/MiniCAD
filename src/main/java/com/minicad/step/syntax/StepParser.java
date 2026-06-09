@@ -146,8 +146,18 @@ public final class StepParser {
     private StepValue.TypedValue parseTypedValue() {
         String typeName = expect(StepTokenType.IDENTIFIER, "expected typed value name").text();
         expect(StepTokenType.LPAREN, "expected '(' after typed value name");
-        StepValue wrapped = parseValue();
+        List<StepValue> values = new ArrayList<>();
+        if (current.type() != StepTokenType.RPAREN) {
+            values.add(parseValue());
+            while (current.type() == StepTokenType.COMMA) {
+                consume();
+                values.add(parseValue());
+            }
+        }
         expect(StepTokenType.RPAREN, "expected ')' after typed value payload");
+        StepValue wrapped = values.size() == 1
+                ? values.getFirst()
+                : new StepValue.ListValue(values);
         return new StepValue.TypedValue(typeName, wrapped);
     }
 

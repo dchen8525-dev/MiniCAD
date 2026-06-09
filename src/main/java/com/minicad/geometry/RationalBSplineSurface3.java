@@ -57,10 +57,17 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             if (this.controlPoints.get(row).size() != vCount || this.weightsData.get(row).size() != vCount) {
                 throw new GeometryException("control-point and weight rows must have uniform length");
             }
+            for (double weight : this.weightsData.get(row)) {
+                if (!Double.isFinite(weight) || weight <= 0.0) {
+                    throw new GeometryException("weights must be finite and positive");
+                }
+            }
         }
         if (this.uMultiplicities.size() != this.uKnots.size() || this.vMultiplicities.size() != this.vKnots.size()) {
             throw new GeometryException("knot multiplicities and knot values must have matching sizes");
         }
+        validateKnots(uDegree, this.controlPoints.size(), this.uKnots, this.uMultiplicities);
+        validateKnots(vDegree, vCount, this.vKnots, this.vMultiplicities);
         this.uDegree = uDegree;
         this.vDegree = vDegree;
     }
@@ -265,6 +272,35 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             }
         }
         return List.copyOf(expanded);
+    }
+
+    private static void validateKnots(
+            int degree,
+            int controlPointCount,
+            List<Double> knots,
+            List<Integer> multiplicities
+    ) {
+        int expandedCount = 0;
+        double previous = Double.NEGATIVE_INFINITY;
+        for (int index = 0; index < knots.size(); index++) {
+            double knot = knots.get(index);
+            if (!Double.isFinite(knot)) {
+                throw new GeometryException("knot values must be finite");
+            }
+            if (knot < previous) {
+                throw new GeometryException("knot values must be nondecreasing");
+            }
+            int multiplicity = multiplicities.get(index);
+            if (multiplicity < 1) {
+                throw new GeometryException("knot multiplicities must be positive");
+            }
+            expandedCount += multiplicity;
+            previous = knot;
+        }
+        int expected = controlPointCount + degree + 1;
+        if (expandedCount != expected) {
+            throw new GeometryException("expanded knot count must equal control point count + degree + 1");
+        }
     }
 
     private static int findSpan(int n, int degree, double parameter, List<Double> knots) {

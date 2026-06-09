@@ -173,6 +173,8 @@ let modelHasEdgeLines = false;
 let lastRenderScale = -1;
 let uploadedFile = null;
 const viewerLogPrefix = '[MiniCAD Viewer]';
+const maxUploadBytes = 50 * 1024 * 1024;
+const acceptedStepExtensions = new Set(['.step', '.stp', '.p21']);
 
 function logDebug(message, ...args) {
     console.debug(viewerLogPrefix, message, ...args);
@@ -369,6 +371,35 @@ animate();
 
 function setStatus(text) {
     statusText.textContent = text;
+}
+
+function formatBytes(bytes) {
+    if (bytes >= 1024 * 1024) {
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    if (bytes >= 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+    return `${bytes} B`;
+}
+
+function fileExtension(fileName = '') {
+    const dot = fileName.lastIndexOf('.');
+    return dot >= 0 ? fileName.slice(dot).toLowerCase() : '';
+}
+
+function validateStepFile(file) {
+    if (!file) {
+        return 'No STEP file selected.';
+    }
+    const extension = fileExtension(file.name);
+    if (!acceptedStepExtensions.has(extension)) {
+        return 'Only .step, .stp, and .p21 files are accepted.';
+    }
+    if (file.size > maxUploadBytes) {
+        return `File is ${formatBytes(file.size)}. The viewer upload limit is ${formatBytes(maxUploadBytes)}.`;
+    }
+    return null;
 }
 
 function updateStats(stats = {}) {
@@ -617,7 +648,10 @@ function clearModel() {
     stepObjects.clear();
     resetSelection();
     updateValidation();
+    updateProduct();
+    updateUnits();
     updateUnsupportedFaces();
+    updateUnsupportedBooleans();
     renderAssemblyTree([]);
     edgeLinesVisible = false;
     modelHasEdgeLines = false;
@@ -625,6 +659,16 @@ function clearModel() {
     if (togglePmiButton) {
         togglePmiButton.textContent = '隐藏 PMI';
     }
+}
+
+function disposeMaterial(material, disposedTextures = new Set()) {
+    for (const value of Object.values(material)) {
+        if (value?.isTexture && !disposedTextures.has(value)) {
+            disposedTextures.add(value);
+            value.dispose();
+        }
+    }
+    material.dispose();
 }
 
 function matrixFromRowMajor(elements) {
@@ -674,14 +718,24 @@ function pointsBounds(points) {
 }
 
 function disposeObject(object) {
+    const disposedGeometries = new Set();
+    const disposedMaterials = new Set();
+    const disposedTextures = new Set();
     object.traverse((node) => {
-        if (node.geometry) {
+        if (node.geometry && !disposedGeometries.has(node.geometry)) {
+            disposedGeometries.add(node.geometry);
             node.geometry.dispose();
         }
         if (Array.isArray(node.material)) {
-            node.material.forEach((material) => material.dispose());
-        } else if (node.material) {
-            node.material.dispose();
+            node.material.forEach((material) => {
+                if (material && !disposedMaterials.has(material)) {
+                    disposedMaterials.add(material);
+                    disposeMaterial(material, disposedTextures);
+                }
+            });
+        } else if (node.material && !disposedMaterials.has(node.material)) {
+            disposedMaterials.add(node.material);
+            disposeMaterial(node.material, disposedTextures);
         }
     });
 }
@@ -2233,10 +2287,11 @@ function renderGlbPreview(result) {
             modelHasEdgeLines = true;
         }
         if (node.isMesh && node.material) {
-            const baseColor = node.material.color?.clone() ?? new THREE.Color(0xc87a52);
-            const metalness = node.material.metalness ?? 0.08;
-            const roughness = node.material.roughness ?? 0.52;
-            const opacity = node.material.opacity != null ? node.material.opacity : 1.0;
+            const sourceMaterial = node.material;
+            const baseColor = sourceMaterial.color?.clone() ?? new THREE.Color(0xc87a52);
+            const metalness = sourceMaterial.metalness ?? 0.08;
+            const roughness = sourceMaterial.roughness ?? 0.52;
+            const opacity = sourceMaterial.opacity != null ? sourceMaterial.opacity : 1.0;
             const transparent = opacity < 1.0;
             node.material = new THREE.MeshStandardMaterial({
                 color: baseColor,
@@ -2246,6 +2301,11 @@ function renderGlbPreview(result) {
                 transparent,
                 side: THREE.DoubleSide
             });
+            if (Array.isArray(sourceMaterial)) {
+                sourceMaterial.forEach((material) => disposeMaterial(material));
+            } else {
+                disposeMaterial(sourceMaterial);
+            }
         }
         if (node.isMesh && node.userData?.surface) {
             rebuildParametricFaceGeometry(node);
@@ -2443,22 +2503,57 @@ async function renderCurrentInput() {
     }
 }
 
-fileInput.addEventListener('change', async (event) => {
-    const [file] = event.target.files;
+async function handleSelectedFile(file, source) {
     if (!file) {
+        return;
+    }
+    const validationError = validateStepFile(file);
+    if (validationError) {
+        uploadedFile = null;
+        fileInput.value = '';
+        clearModel();
+        updateStats();
+        setStatus(validationError);
+        logWarn('fileInput:rejected', {
+            source,
+            fileName: file.name,
+            size: file.size,
+            reason: validationError
+        });
         return;
     }
     uploadedFile = file;
     setStatus(`已选择文件：${file.name}，正在生成预览。`);
-    const prefixBytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
     logInfo('fileInput:loaded', {
+        source,
         fileName: file.name,
         size: file.size,
         textLength: 0,
-        byteLength: file.size,
-        bodyPrefixHex: Array.from(prefixBytes).map((value) => value.toString(16).padStart(2, '0')).join(' ')
+        byteLength: file.size
     });
     void renderCurrentInput();
+}
+
+fileInput.addEventListener('change', async (event) => {
+    const [file] = event.target.files;
+    await handleSelectedFile(file, 'input');
+});
+
+sceneHost.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    sceneHost.classList.add('drag-over');
+});
+
+sceneHost.addEventListener('dragleave', () => {
+    sceneHost.classList.remove('drag-over');
+});
+
+sceneHost.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    sceneHost.classList.remove('drag-over');
+    const [file] = event.dataTransfer.files;
+    await handleSelectedFile(file, 'drop');
 });
 
 renderer.domElement.addEventListener('click', (event) => {

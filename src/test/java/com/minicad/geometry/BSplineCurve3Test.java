@@ -41,8 +41,8 @@ class BSplineCurve3Test {
             new CartesianPoint(5, 10, 0),
             new CartesianPoint(10, 0, 0)
         );
-        List<Double> knots = List.of(0.0, 0.5, 1.0);
-        List<Integer> multiplicities = List.of(3, 1, 3);
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(3, 3);
 
         BSplineCurve3 bspline = new BSplineCurve3(2, controlPoints, multiplicities, knots);
 

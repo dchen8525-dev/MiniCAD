@@ -401,6 +401,170 @@ Verification:
    - Result: pass
    - JSON includes entityCount 37, unsupportedCount 0, bbox min `[0.0,0.0,0.0]`, bbox max `[1.0,1.0,0.0]`
 
+## Progress: G05/G06/G07/G08 Viewer Frontend Hardening
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added browser-side file validation before upload:
+   - accepts `.step`, `.stp`, and `.p21`.
+   - rejects other extensions before calling `/api/preview`.
+   - rejects files over the default 50 MB preview upload limit before calling `/api/preview`.
+2. Added drag-and-drop support on the scene area using the same validation path as the file input.
+3. Tightened viewer cleanup when loading a new model or handling an error:
+   - clears stale product metadata.
+   - clears stale unit metadata.
+   - clears stale unsupported boolean/faces state.
+4. Improved Three.js resource disposal:
+   - disposes old geometries.
+   - disposes old materials.
+   - disposes material textures.
+   - disposes source materials before replacing GLTF materials with viewer materials.
+5. Fixed viewer module loading under CSP:
+   - kept `script-src 'self'`.
+   - allowed only the fixed inline import map by SHA-256 hash.
+   - verified the browser creates a canvas and reports no module resolution errors.
+
+Verification:
+
+1. `mvn -q -Dtest=StepViewerStaticResourcesTest,StepViewerAppSecurityTest test`
+   - Result: pass
+2. Browser smoke test at `http://127.0.0.1:8081/?v=4`
+   - Result: pass
+   - Canvas count: 1
+   - Recent console errors: 0
+
+## Progress: G01 GLB Export Robustness
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added reusable GLB validation in `PreviewSerializers.validateGlb`.
+2. Validation now checks:
+   - non-null payload.
+   - minimum length.
+   - 4-byte total alignment.
+   - magic `glTF`.
+   - version `2`.
+   - header length equals actual payload length.
+   - JSON chunk type and bounds.
+   - BIN chunk type and bounds when present.
+   - no trailing bytes after the final chunk.
+3. `PreviewSerializers.toGlb` validates generated output before returning it.
+4. `StepPreviewJsonExporter.exportGlb` validates the final GLB before caching or sending it.
+5. Added regression tests for valid tiny GLB output and malformed length/chunk headers.
+
+Verification:
+
+1. `mvn -q -Dtest=StepPreviewJsonExporterTest#shouldExportGlbPreviewPacketForMinimalSquare+glbValidatorShouldRejectMalformedHeadersAndChunks test`
+   - Result: pass
+
+## Progress: G04 Mesh Normal Generation
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added GLB mesh consistency validation before face meshes are written:
+   - position buffer length must match vertex count.
+   - normal buffer count and length must match position vertices.
+   - indices must be non-empty triangle indices when a mesh has vertices.
+   - indices must stay within the vertex range.
+   - position and normal values must be finite.
+   - generated normals must be unit length within tolerance.
+2. Preserved compatibility with parameterized STEP faces that intentionally carry no pre-triangulated vertices and are rebuilt by the viewer from GLB extras.
+3. Added a non-empty triangle GLB regression test that reads the GLB JSON/BIN chunks and verifies:
+   - every mesh primitive includes a `NORMAL` accessor.
+   - normal accessor count matches the `POSITION` accessor count.
+   - exported normal vectors are normalized.
+   - index accessor count remains a multiple of 3.
+
+Verification:
+
+1. `mvn -q -Dtest=StepPreviewJsonExporterTest#glbMeshesShouldIncludeNormalizedNormalsMatchingPositions+shouldExportGlbPreviewPacketForMinimalSquare test`
+   - Result: pass
+
+## Progress: G02 Unsupported Face Reporting
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added regression coverage for unsupported face reporting in GLB preview metadata:
+   - `scene.extras.preview.stats.unsupportedFaceCount` carries the skipped face count.
+   - `scene.extras.preview.unsupportedFaces` carries id, surface type, and reason.
+   - `scene.extras.preview.issues` carries a structured warning with code `step.unsupported`.
+2. Added static viewer coverage to ensure the UI warning path remains present:
+   - unsupported face stat tile.
+   - Unsupported Faces panel.
+   - summary toggle.
+   - surface-type and reason summaries.
+   - GLB preview render path calls `updateUnsupportedFaces(preview.unsupportedFaces)`.
+
+Verification:
+
+1. `mvn -q -Dtest=PreviewSerializersIssueTest,StepViewerStaticResourcesTest test`
+   - Result: pass
+
+## Progress: J07 Maven Enforcer
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added `maven-enforcer-plugin` bound to the Maven `validate` phase.
+2. Enforced Java version `[21,22)` so builds fail clearly outside the supported Java 21 runtime.
+3. Enabled `dependencyConvergence` to catch conflicting transitive dependency versions.
+4. Enabled `banDuplicatePomDependencyVersions` to prevent duplicate dependency declarations.
+5. Resolved the convergence issue exposed by the new rule:
+   - Jetty paths were resolving `org.slf4j:slf4j-api:2.0.9`.
+   - Logback 1.5.18 was resolving `org.slf4j:slf4j-api:2.0.17`.
+   - Added `slf4j.version` and dependency management to converge on `2.0.17`.
+
+Verification:
+
+1. `mvn -B validate`
+   - Result: pass
+   - Enforcer rules passed: Java version, dependency convergence, duplicate dependency versions
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1599 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: J03/K02/K03/K04/K05 Documentation And Security Batch
+
+Date: 2026-06-09
+
+Completed:
+
+1. J03: Added `.github/workflows/codeql.yml` for Java CodeQL analysis on pushes, pull requests, and a weekly schedule.
+2. K02: Added `SECURITY.md` covering the local viewer threat model, vulnerability reporting, upload/cache expectations, and safe operational guidance.
+3. K03: Added `CONTRIBUTING.md` with Java 21 prerequisites, baseline commands, test expectations, entity support levels, and local fixture guidance.
+4. K04: Added `doc/architecture.md` with the pipeline `STEP text -> syntax -> semantic model -> geometry/topology -> export` and guidance for adding entity support.
+5. K05: Added `doc/troubleshooting.md` covering Java version errors, Maven validation, CLI usage, viewer startup, common STEP parse/resolution errors, and large-file guidance.
+
+Verification:
+
+1. `mvn -B clean test`
+   - Result: pass
+   - Tests run: 1599
+   - Failures: 0
+   - Errors: 0
+   - Skipped: 0
+2. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+3. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
 ## Progress: I03 Negative Syntax Tests
 
 Date: 2026-06-08

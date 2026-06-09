@@ -2,6 +2,7 @@ package com.minicad.app;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
+import com.minicad.common.MiniCadIssue;
 import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
@@ -630,6 +631,7 @@ public final class StepPreviewJsonExporter {
                 payload.instances().size());
         long glbStartedAt = System.nanoTime();
         byte[] glb = toGlb(payload);
+        PreviewSerializers.validateGlb(glb);
         log.info("stage={} elapsedMs={}, glbLength={}", "glb_encode_done", elapsedMillis(glbStartedAt), glb.length);
         log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
         return glb;
@@ -728,6 +730,7 @@ public final class StepPreviewJsonExporter {
                 productInfo,
                 units,
                 pmi,
+                previewIssues(units, unsupportedBooleans, unsupportedFaces),
                 unsupportedBooleans,
                 unsupportedFaces,
                 legacyGeometry.edges(),
@@ -735,6 +738,29 @@ public final class StepPreviewJsonExporter {
                 assembly.representations(),
                 assembly.instances()
         );
+    }
+
+    private static List<MiniCadIssue> previewIssues(
+            UnitExtractor.UnitInfo units,
+            List<UnsupportedBooleanPayload> unsupportedBooleans,
+            List<UnsupportedFacePayload> unsupportedFaces
+    ) {
+        List<MiniCadIssue> issues = new ArrayList<>(unsupportedBooleans.size() + unsupportedFaces.size() + 1);
+        if (units != null && units.scaleToMeters() != null
+                && Math.abs(units.scaleToMeters() - 1.0) > 1.0e-12) {
+            issues.add(MiniCadIssue.warning(
+                    "units.coordinates_not_normalized",
+                    null,
+                    null,
+                    "geometry coordinates are emitted in source STEP units; scaleToMeters is metadata only"));
+        }
+        for (UnsupportedBooleanPayload item : unsupportedBooleans) {
+            issues.add(MiniCadIssue.unsupported(item.stepId(), item.name(), item.reason()));
+        }
+        for (UnsupportedFacePayload face : unsupportedFaces) {
+            issues.add(MiniCadIssue.unsupported(face.stepId(), face.name(), face.reason()));
+        }
+        return List.copyOf(issues);
     }
 
     private static List<UnsupportedBooleanPayload> collectUnsupportedBooleans(Map<Integer, StepEntity> resolved) {
@@ -8938,6 +8964,7 @@ public final class StepPreviewJsonExporter {
                 payload.product(),
                 payload.units(),
                 payload.pmi(),
+                payload.issues(),
                 payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
                 payload.edges(),

@@ -148,6 +148,40 @@ public final class StepParameterReader {
   }
 
   /**
+   * Reads a typed SELECT-style parameter while preserving the outer wrapper name.
+   */
+  public static TypedSelection typedSelection(
+      StepEntityDefinition definition, int index, String entityName) {
+    StepValue value = definition.parameters().get(index);
+    if (value instanceof StepValue.TypedValue typedValue) {
+      return new TypedSelection(typedValue.typeName(), unwrapTyped(typedValue.value()));
+    }
+    throw new StepResolutionException(
+        entityName + " parameter " + index + " must be a typed SELECT value");
+  }
+
+  /**
+   * Reads an optional typed SELECT-style parameter.
+   */
+  public static TypedSelection optionalTypedSelection(
+      StepEntityDefinition definition, int index, String entityName) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return null;
+    }
+    return typedSelection(definition, index, entityName);
+  }
+
+  /**
+   * SELECT wrapper name plus the unwrapped payload value.
+   *
+   * @param typeName wrapper type name
+   * @param value unwrapped payload
+   */
+  public record TypedSelection(String typeName, StepValue value) {
+  }
+
+  /**
    * Converts a StepValue back to its STEP literal text representation.
    */
   public static String literalText(StepValue value) {

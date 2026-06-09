@@ -38,9 +38,15 @@ public record RationalBSplineCurve3(
         if (weights.size() != controlPoints.size()) {
             throw new GeometryException("weights must match control points");
         }
+        for (double weight : weights) {
+            if (!Double.isFinite(weight) || weight <= 0.0) {
+                throw new GeometryException("weights must be finite and positive");
+            }
+        }
         if (knotMultiplicities.size() != knots.size()) {
             throw new GeometryException("knot multiplicities and knots must have the same size");
         }
+        validateKnots(degree, controlPoints.size(), knots, knotMultiplicities);
     }
 
     public List<Double> expandedKnots() {
@@ -51,6 +57,35 @@ public record RationalBSplineCurve3(
             }
         }
         return List.copyOf(expanded);
+    }
+
+    private static void validateKnots(
+            int degree,
+            int controlPointCount,
+            List<Double> knots,
+            List<Integer> multiplicities
+    ) {
+        int expandedCount = 0;
+        double previous = Double.NEGATIVE_INFINITY;
+        for (int index = 0; index < knots.size(); index++) {
+            double knot = knots.get(index);
+            if (!Double.isFinite(knot)) {
+                throw new GeometryException("knot values must be finite");
+            }
+            if (knot < previous) {
+                throw new GeometryException("knot values must be nondecreasing");
+            }
+            int multiplicity = multiplicities.get(index);
+            if (multiplicity < 1) {
+                throw new GeometryException("knot multiplicities must be positive");
+            }
+            expandedCount += multiplicity;
+            previous = knot;
+        }
+        int expected = controlPointCount + degree + 1;
+        if (expandedCount != expected) {
+            throw new GeometryException("expanded knot count must equal control point count + degree + 1");
+        }
     }
 
     public double startParameter() {

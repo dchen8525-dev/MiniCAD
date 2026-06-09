@@ -265,6 +265,8 @@ class StepViewerAppSecurityTest {
         assertEquals("no-referrer", response.headers().firstValue("Referrer-Policy").orElse(""));
         assertEquals("same-origin", response.headers().firstValue("Cross-Origin-Resource-Policy").orElse(""));
         assertTrue(response.headers().firstValue("Content-Security-Policy").orElse("").contains("default-src 'self'"));
+        assertTrue(response.headers().firstValue("Content-Security-Policy").orElse("").contains(
+                "'sha256-jineBDmjBt81WPjXTP3GlHJ740C7ojpcHhfp2/uAlHw='"));
     }
 
     private static void assertGlb(byte[] body) {
