@@ -110,10 +110,19 @@ public final class StepBenchmarkApp {
             out.append("buildShellsFailed: ").append(result.buildSummary().shellBuildFailures()).append("\n");
             out.append("buildSolidsOk: ").append(result.buildSummary().solidsBuilt()).append("\n");
             out.append("buildSolidsFailed: ").append(result.buildSummary().solidBuildFailures()).append("\n");
+            appendFailure(out, "firstFaceBuildFailure", result.buildSummary().firstFaceBuildFailure());
+            appendFailure(out, "firstShellBuildFailure", result.buildSummary().firstShellBuildFailure());
+            appendFailure(out, "firstSolidBuildFailure", result.buildSummary().firstSolidBuildFailure());
             out.append("previewJsonLength: ").append(result.previewJsonLength()).append("\n");
             out.append("meshObjLength: ").append(result.meshObjLength()).append("\n");
         }
         return out.toString();
+    }
+
+    private static void appendFailure(StringBuilder out, String label, String failure) {
+        if (failure != null && !failure.isBlank()) {
+            out.append(label).append(": ").append(failure).append("\n");
+        }
     }
 
     private static BuildSummary benchmarkBuild(Map<Integer, StepEntity> resolved) {
@@ -124,6 +133,9 @@ public final class StepBenchmarkApp {
         int shellBuildFailures = 0;
         int solidsBuilt = 0;
         int solidBuildFailures = 0;
+        String firstFaceBuildFailure = null;
+        String firstShellBuildFailure = null;
+        String firstSolidBuildFailure = null;
 
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
@@ -132,8 +144,11 @@ public final class StepBenchmarkApp {
                 try {
                     builder.buildFace(id);
                     facesBuilt++;
-                } catch (Exception ignored) {
+                } catch (Exception ex) {
                     faceBuildFailures++;
+                    if (firstFaceBuildFailure == null) {
+                        firstFaceBuildFailure = buildFailureMessage(id, entity, ex);
+                    }
                 }
                 continue;
             }
@@ -141,8 +156,11 @@ public final class StepBenchmarkApp {
                 try {
                     builder.buildSolid(id);
                     solidsBuilt++;
-                } catch (Exception ignored) {
+                } catch (Exception ex) {
                     solidBuildFailures++;
+                    if (firstSolidBuildFailure == null) {
+                        firstSolidBuildFailure = buildFailureMessage(id, entity, ex);
+                    }
                 }
                 continue;
             }
@@ -150,8 +168,11 @@ public final class StepBenchmarkApp {
                 try {
                     builder.buildShell(id);
                     shellsBuilt++;
-                } catch (Exception ignored) {
+                } catch (Exception ex) {
                     shellBuildFailures++;
+                    if (firstShellBuildFailure == null) {
+                        firstShellBuildFailure = buildFailureMessage(id, entity, ex);
+                    }
                 }
             }
         }
@@ -162,8 +183,19 @@ public final class StepBenchmarkApp {
                 shellsBuilt,
                 shellBuildFailures,
                 solidsBuilt,
-                solidBuildFailures
+                solidBuildFailures,
+                firstFaceBuildFailure,
+                firstShellBuildFailure,
+                firstSolidBuildFailure
         );
+    }
+
+    private static String buildFailureMessage(int id, StepEntity entity, Exception ex) {
+        String message = ex.getMessage();
+        if (message == null || message.isBlank()) {
+            message = ex.getClass().getSimpleName();
+        }
+        return "#" + id + " " + entity.getClass().getSimpleName() + ": " + message;
     }
 
     private static boolean isShellCandidate(StepEntity entity) {
@@ -193,7 +225,10 @@ public final class StepBenchmarkApp {
             int shellsBuilt,
             int shellBuildFailures,
             int solidsBuilt,
-            int solidBuildFailures
+            int solidBuildFailures,
+            String firstFaceBuildFailure,
+            String firstShellBuildFailure,
+            String firstSolidBuildFailure
     ) {
     }
 

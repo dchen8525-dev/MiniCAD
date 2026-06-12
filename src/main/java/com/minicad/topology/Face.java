@@ -1,6 +1,7 @@
 package com.minicad.topology;
 
 import com.minicad.common.TopologyException;
+import com.minicad.common.Epsilon;
 import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Plane;
@@ -16,13 +17,6 @@ import java.util.List;
  * @param sameSense whether the face orientation matches the surface normal
  */
 public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean sameSense) {
-
-    /**
-     * Tolerance for validating that loop vertices lie on the supporting plane
-     * during STEP import. Industrial CAD files often have coordinates rounded
-     * to 6-8 decimal places, producing offsets of 1e-6 to 1e-4 mm.
-     */
-    private static final double IMPORT_PLANE_TOLERANCE = 1.0e-2;
 
     /**
      * Creates a face and validates that planar loop vertices lie on the plane.
@@ -74,7 +68,7 @@ public record Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean same
     }
 
     private static boolean planeContains(Plane plane, CartesianPoint point) {
-        return Math.abs(plane.signedDistanceTo(point)) <= IMPORT_PLANE_TOLERANCE;
+        return Math.abs(plane.signedDistanceTo(point)) <= Epsilon.IMPORT_PLANE_TOLERANCE;
     }
 
     /**

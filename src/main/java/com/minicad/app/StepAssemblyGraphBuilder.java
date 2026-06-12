@@ -27,6 +27,7 @@ import java.util.Set;
  * Builds an assembly instance graph from resolved STEP product and representation entities.
  */
 public final class StepAssemblyGraphBuilder {
+    private static final double AXIS_PARALLEL_TOLERANCE = 1.0e-9;
 
     private StepAssemblyGraphBuilder() {
     }
@@ -240,7 +241,12 @@ public final class StepAssemblyGraphBuilder {
     static double[] matrixForPlacement(StepAxis2Placement3D placement) {
         Vector3 z = directionVector(placement.axis()).normalize().asVector();
         Vector3 xSeed = directionVector(placement.refDirection()).normalize().asVector();
-        Vector3 y = z.cross(xSeed).normalize().asVector();
+        Vector3 cross = z.cross(xSeed);
+        if (cross.norm() <= AXIS_PARALLEL_TOLERANCE) {
+            throw new IllegalArgumentException("AXIS2_PLACEMENT_3D #" + placement.id()
+                    + " axis and refDirection must not be parallel");
+        }
+        Vector3 y = cross.normalize().asVector();
         Vector3 x = y.cross(z).normalize().asVector();
         List<Double> origin = placement.location().coordinates();
         return new double[]{

@@ -8929,7 +8929,7 @@ public final class StepPreviewJsonExporter {
         return reducePayloadGeometry(payload, MAX_TOTAL_TRIANGLE_POINTS, MAX_TOTAL_LOOP_POINTS, "payload_geometry_reduced");
     }
 
-    private static PreviewPayload reducePayloadGeometry(
+    static PreviewPayload reducePayloadGeometry(
             PreviewPayload payload,
             int maxTrianglePoints,
             int maxLoopPoints,
@@ -9009,8 +9009,20 @@ public final class StepPreviewJsonExporter {
             return triangles;
         }
         int triangleCount = triangles.size() / 3;
-        List<PointPayload> reduced = new ArrayList<>(Math.max(3, triangles.size() / factor));
-        for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex += factor) {
+        int sampleCount = Math.max(1, (triangleCount + factor - 1) / factor);
+        List<PointPayload> reduced = new ArrayList<>(sampleCount * 3);
+        int previousTriangleIndex = -1;
+        for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
+            int triangleIndex;
+            if (sampleCount == 1) {
+                triangleIndex = 0;
+            } else {
+                triangleIndex = (int) Math.round(sampleIndex * (triangleCount - 1) / (double) (sampleCount - 1));
+            }
+            if (triangleIndex == previousTriangleIndex) {
+                continue;
+            }
+            previousTriangleIndex = triangleIndex;
             int base = triangleIndex * 3;
             reduced.add(triangles.get(base));
             reduced.add(triangles.get(base + 1));

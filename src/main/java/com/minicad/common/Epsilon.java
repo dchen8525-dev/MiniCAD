@@ -10,6 +10,21 @@ public final class Epsilon {
      */
     public static final double EPS = 1.0e-9;
 
+    /**
+     * Tolerance for STEP import topology connectivity after geometric projection.
+     */
+    public static final double IMPORT_TOPOLOGY_TOLERANCE = 1.0e-2;
+
+    /**
+     * Tolerance for STEP import curve membership after endpoint projection.
+     */
+    public static final double IMPORT_CURVE_TOLERANCE = 1.0e-2;
+
+    /**
+     * Tolerance for STEP import planar face membership after coordinate rounding.
+     */
+    public static final double IMPORT_PLANE_TOLERANCE = 1.0e-2;
+
     private Epsilon() {
     }
 

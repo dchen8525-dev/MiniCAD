@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Parsed STEP DATA section represented as raw entity instances.
@@ -43,6 +44,29 @@ public final class StepFile {
 
     public List<StepHeaderEntry> headerEntries() {
         return headerEntries;
+    }
+
+    public Optional<StepHeaderEntry> firstHeaderEntry(String name) {
+        if (name == null || name.isBlank()) {
+            return Optional.empty();
+        }
+        return headerEntries.stream()
+                .filter(entry -> entry.name().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    public Optional<StepFileName> fileName() {
+        return firstHeaderEntry("FILE_NAME").map(StepFileName::from);
+    }
+
+    public Optional<StepFileSchema> fileSchema() {
+        return firstHeaderEntry("FILE_SCHEMA").map(StepFileSchema::from);
+    }
+
+    public List<String> schemaNames() {
+        return fileSchema()
+                .map(StepFileSchema::schemaNames)
+                .orElseGet(List::of);
     }
 
     public List<StepEntityInstance> entities() {

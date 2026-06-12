@@ -63,7 +63,9 @@ public final class StepViewerApp {
     public static void main(String[] args) throws Exception {
         ViewerConfig config = parseConfig(args);
         Server server = createServer(config);
-        cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
+        if (config.cacheEnabled()) {
+            cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
+        }
         server.start();
 
         printStartupInfo(config);
@@ -80,6 +82,7 @@ public final class StepViewerApp {
         context.addServlet(new ServletHolder(new StaticServlet()), "/");
         context.addServlet(new ServletHolder(new StaticServlet()), "/viewer.js");
         context.addServlet(new ServletHolder(new StaticServlet()), "/vendor/*");
+        context.addServlet(new ServletHolder(new ConfigServlet(config)), "/api/config");
         ServletHolder previewHolder = new ServletHolder(new PreviewServlet(config));
         previewHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(
                 System.getProperty("java.io.tmpdir"),
@@ -92,27 +95,50 @@ public final class StepViewerApp {
         return server;
     }
 
-    private static ViewerConfig parseConfig(String[] args) {
+    static ViewerConfig parseConfig(String[] args) {
         int port = DEFAULT_PORT;
         String host = DEFAULT_HOST;
-        if (args.length == 0) {
-            return ViewerConfig.from(port, host);
-        }
-        for (String arg : args) {
+        long maxUploadBytes = ViewerConfig.positiveLongProperty(
+                "minicad.preview.maxUploadBytes", DEFAULT_MAX_UPLOAD_BYTES);
+        long maxCacheBytes = ViewerConfig.positiveLongProperty(
+                "minicad.preview.cache.maxBytes", DEFAULT_MAX_CACHE_BYTES);
+        Path cacheDir = Path.of(System.getProperty("minicad.preview.cache.dir", PREVIEW_CACHE_DIR.toString()));
+        boolean cacheEnabled = true;
+        boolean debug = false;
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
             if (arg.startsWith("--port=")) {
                 port = parsePortText(arg.substring("--port=".length()));
+            } else if ("--port".equals(arg)) {
+                port = parsePortText(requireOptionValue(args, ++i, "--port"));
             } else if (arg.startsWith("--host=")) {
-                host = arg.substring("--host=".length());
-                if (host.isBlank()) {
-                    throw new IllegalArgumentException("host must not be blank");
-                }
+                host = parseHostText(arg.substring("--host=".length()));
+            } else if ("--host".equals(arg)) {
+                host = parseHostText(requireOptionValue(args, ++i, "--host"));
+            } else if (arg.startsWith("--cache-dir=")) {
+                cacheDir = Path.of(arg.substring("--cache-dir=".length()));
+            } else if ("--cache-dir".equals(arg)) {
+                cacheDir = Path.of(requireOptionValue(args, ++i, "--cache-dir"));
+            } else if (arg.startsWith("--max-upload=")) {
+                maxUploadBytes = parseByteCount(arg.substring("--max-upload=".length()), "--max-upload");
+            } else if ("--max-upload".equals(arg)) {
+                maxUploadBytes = parseByteCount(requireOptionValue(args, ++i, "--max-upload"), "--max-upload");
+            } else if (arg.startsWith("--max-cache=")) {
+                maxCacheBytes = parseByteCount(arg.substring("--max-cache=".length()), "--max-cache");
+            } else if ("--max-cache".equals(arg)) {
+                maxCacheBytes = parseByteCount(requireOptionValue(args, ++i, "--max-cache"), "--max-cache");
+            } else if ("--no-cache".equals(arg)) {
+                cacheEnabled = false;
+            } else if ("--debug".equals(arg)) {
+                debug = true;
             } else if (args.length == 1) {
                 port = parsePortText(arg);
             } else {
                 throw new IllegalArgumentException(usage());
             }
         }
-        return ViewerConfig.from(port, host);
+        return new ViewerConfig(port, host, maxUploadBytes, maxCacheBytes, cacheDir, cacheEnabled, debug);
     }
 
     private static int parsePortText(String portText) {
@@ -127,11 +153,53 @@ public final class StepViewerApp {
         throw new IllegalArgumentException("invalid port: " + portText + System.lineSeparator() + usage());
     }
 
+    private static String parseHostText(String host) {
+        if (host == null || host.isBlank()) {
+            throw new IllegalArgumentException("host must not be blank");
+        }
+        return host;
+    }
+
+    private static String requireOptionValue(String[] args, int index, String optionName) {
+        if (index >= args.length || args[index].startsWith("--")) {
+            throw new IllegalArgumentException(optionName + " requires a value" + System.lineSeparator() + usage());
+        }
+        return args[index];
+    }
+
+    private static long parseByteCount(String text, String optionName) {
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException(optionName + " requires a non-negative byte count");
+        }
+        String normalized = text.trim().toLowerCase(java.util.Locale.ROOT);
+        long multiplier = 1L;
+        if (normalized.endsWith("kb") || normalized.endsWith("k")) {
+            multiplier = 1024L;
+            normalized = normalized.replaceFirst("kb?$", "");
+        } else if (normalized.endsWith("mb") || normalized.endsWith("m")) {
+            multiplier = 1024L * 1024L;
+            normalized = normalized.replaceFirst("mb?$", "");
+        } else if (normalized.endsWith("gb") || normalized.endsWith("g")) {
+            multiplier = 1024L * 1024L * 1024L;
+            normalized = normalized.replaceFirst("gb?$", "");
+        }
+        try {
+            long value = Long.parseLong(normalized);
+            if (value >= 0 && value <= Long.MAX_VALUE / multiplier) {
+                return value * multiplier;
+            }
+        } catch (NumberFormatException ignored) {
+            // handled below
+        }
+        throw new IllegalArgumentException(optionName + " must be a non-negative byte count");
+    }
+
     private static String usage() {
         return """
                 Usage: StepViewerApp [port]
                        StepViewerApp --port=<port>
                        StepViewerApp --port=<port> --host=<host>
+                       StepViewerApp [--port <port>] [--host <host>] [--cache-dir <path>] [--max-upload <bytes>] [--max-cache <bytes>] [--no-cache] [--debug]
                 """.stripTrailing();
     }
 
@@ -141,10 +209,16 @@ public final class StepViewerApp {
             log.warn("Viewer is bound to non-loopback host {}. Only do this intentionally on trusted networks.", config.host());
         }
         log.info("URL: http://{}:{}", config.host(), config.port());
+        log.info("Preview upload limit: {} bytes", config.maxUploadBytes());
+        log.info("Preview cache: {}", config.cacheEnabled() ? config.cacheDir() + " maxBytes=" + config.maxCacheBytes() : "disabled");
+        if (config.debug()) {
+            log.warn("Viewer debug diagnostics are enabled. Do not use this for untrusted STEP files.");
+        }
         log.info("Routes:");
         log.info("  GET  /");
         log.info("  GET  /api/example?name=minimal-square");
         log.info("  GET  /api/example?name=plate-with-round-hole");
+        log.info("  GET  /api/config");
         log.info("  POST /api/preview");
         log.info("Press Ctrl+C to stop.");
     }
@@ -235,7 +309,7 @@ public final class StepViewerApp {
             }
             StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
             String stepText = decodedStepText.text();
-            if (includeRequestBodyPrefixInLogs()) {
+            if (config.debug() || includeRequestBodyPrefixInLogs()) {
                 log.info("requestId={} stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
                         requestId, "request_received", request.getRemoteAddr(),
                         request.getContentType(),
@@ -260,23 +334,30 @@ public final class StepViewerApp {
             log.info("requestId={} stage={} textLength={}",
                     requestId, "export_start", stepText.length());
             try {
-                Path cachePath = previewCachePath(stepText, config.cacheDir());
                 byte[] previewBinary;
                 String cacheStatus;
-                if (Files.exists(cachePath)) {
-                    previewBinary = Files.readAllBytes(cachePath);
-                    Files.setLastModifiedTime(cachePath, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
-                    cacheStatus = "hit";
-                    log.info("requestId={} stage={} binaryLength={}",
-                            requestId, "export_cache_hit", previewBinary.length);
-                } else {
+                if (!config.cacheEnabled()) {
                     previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
-                    Files.createDirectories(cachePath.getParent());
-                    writeCacheAtomically(cachePath, previewBinary);
-                    cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
-                    cacheStatus = "miss";
+                    cacheStatus = "disabled";
                     log.info("requestId={} stage={} binaryLength={}",
-                            requestId, "export_cache_miss_written", previewBinary.length);
+                            requestId, "export_cache_disabled", previewBinary.length);
+                } else {
+                    Path cachePath = previewCachePath(stepText, config.cacheDir());
+                    if (Files.exists(cachePath)) {
+                        previewBinary = Files.readAllBytes(cachePath);
+                        Files.setLastModifiedTime(cachePath, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                        cacheStatus = "hit";
+                        log.info("requestId={} stage={} binaryLength={}",
+                                requestId, "export_cache_hit", previewBinary.length);
+                    } else {
+                        previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
+                        Files.createDirectories(cachePath.getParent());
+                        writeCacheAtomically(cachePath, previewBinary);
+                        cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
+                        cacheStatus = "miss";
+                        log.info("requestId={} stage={} binaryLength={}",
+                                requestId, "export_cache_miss_written", previewBinary.length);
+                    }
                 }
                 log.info("requestId={} stage={} elapsedMs={}, binaryLength={}",
                         requestId, "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
@@ -290,7 +371,7 @@ public final class StepViewerApp {
                         requestId, "export_failed", elapsedMillis(startedAt),
                         ex.getClass().getSimpleName(), ex.getMessage());
                 if (ex instanceof StepParseException parseException) {
-                    logDiagnosticContext(requestId, stepText, parseException.getMessage());
+                    logDiagnosticContext(requestId, stepText, parseException.getMessage(), config.debug());
                 }
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
                         "failed to generate preview", requestId);
@@ -327,6 +408,27 @@ public final class StepViewerApp {
                 }
             }
             return readBounded(request.getInputStream(), maxBytes);
+        }
+    }
+
+    private static final class ConfigServlet extends HttpServlet {
+        private final ViewerConfig config;
+
+        private ConfigServlet(ViewerConfig config) {
+            this.config = config;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            send(response, HttpServletResponse.SC_OK, "application/json; charset=utf-8",
+                    "{\"maxUploadBytes\":" + config.maxUploadBytes()
+                            + ",\"previewCacheEnabled\":" + config.cacheEnabled()
+                            + ",\"acceptedExtensions\":[\".step\",\".stp\",\".p21\"]}");
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            sendJsonError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "use GET /api/config");
         }
     }
 
@@ -523,8 +625,8 @@ public final class StepViewerApp {
                 "default-src 'self'; script-src 'self' 'sha256-jineBDmjBt81WPjXTP3GlHJ740C7ojpcHhfp2/uAlHw='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
     }
 
-    private static void logDiagnosticContext(long requestId, String stepText, String message) {
-        if (!Boolean.getBoolean("minicad.preview.debugSourceExcerpt")) {
+    private static void logDiagnosticContext(long requestId, String stepText, String message, boolean debug) {
+        if (!debug && !Boolean.getBoolean("minicad.preview.debugSourceExcerpt")) {
             log.info("requestId={} stage={} context=disabled", requestId, "export_failed_context");
             return;
         }
@@ -544,14 +646,38 @@ public final class StepViewerApp {
         }
     }
 
-    record ViewerConfig(int port, String host, long maxUploadBytes, long maxCacheBytes, Path cacheDir) {
+    record ViewerConfig(
+            int port,
+            String host,
+            long maxUploadBytes,
+            long maxCacheBytes,
+            Path cacheDir,
+            boolean cacheEnabled,
+            boolean debug) {
+        ViewerConfig {
+            if (host == null || host.isBlank()) {
+                throw new IllegalArgumentException("host must not be blank");
+            }
+            if (maxUploadBytes < 0) {
+                throw new IllegalArgumentException("maxUploadBytes must be non-negative");
+            }
+            if (maxCacheBytes < 0) {
+                throw new IllegalArgumentException("maxCacheBytes must be non-negative");
+            }
+            if (cacheDir == null) {
+                throw new IllegalArgumentException("cacheDir must not be null");
+            }
+        }
+
         static ViewerConfig from(int port, String host) {
             return new ViewerConfig(
                     port,
                     host,
                     positiveLongProperty("minicad.preview.maxUploadBytes", DEFAULT_MAX_UPLOAD_BYTES),
                     positiveLongProperty("minicad.preview.cache.maxBytes", DEFAULT_MAX_CACHE_BYTES),
-                    Path.of(System.getProperty("minicad.preview.cache.dir", PREVIEW_CACHE_DIR.toString())));
+                    Path.of(System.getProperty("minicad.preview.cache.dir", PREVIEW_CACHE_DIR.toString())),
+                    true,
+                    false);
         }
 
         private static long positiveLongProperty(String propertyName, long defaultValue) {

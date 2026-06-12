@@ -47,4 +47,42 @@ class StepBenchmarkAppTest {
         assertTrue(output.contains("previewExportMs:"));
         assertTrue(output.contains("meshExportMs:"));
     }
+
+    @Test
+    void shouldFormatFirstBuildFailureReasons() {
+        StepBenchmarkApp.BuildSummary summary = new StepBenchmarkApp.BuildSummary(
+                1,
+                1,
+                2,
+                1,
+                3,
+                1,
+                "#10 StepAdvancedFace: unsupported surface",
+                "#20 StepGeometricSurfaceSet: requires bounded face geometry",
+                "#30 StepManifoldSolidBrep: closed shell edge use count"
+        );
+        StepBenchmarkApp.BenchmarkResult result = new StepBenchmarkApp.BenchmarkResult(
+                "inline",
+                100,
+                100,
+                3,
+                3,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                summary,
+                10,
+                20
+        );
+
+        String output = StepBenchmarkApp.formatResults(List.of(result));
+
+        assertTrue(output.contains("firstFaceBuildFailure: #10 StepAdvancedFace: unsupported surface"));
+        assertTrue(output.contains("firstShellBuildFailure: #20 StepGeometricSurfaceSet: requires bounded face geometry"));
+        assertTrue(output.contains("firstSolidBuildFailure: #30 StepManifoldSolidBrep: closed shell edge use count"));
+    }
 }

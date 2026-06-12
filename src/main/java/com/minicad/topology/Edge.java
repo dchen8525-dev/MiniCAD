@@ -28,7 +28,6 @@ import java.util.List;
  */
 public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
 
-    private static final double IMPORT_CURVE_TOLERANCE = 1.0e-2;
     private static final int IMPORT_CURVE_SAMPLES = 512;
 
     /**
@@ -128,10 +127,10 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         // closestPointTo (Newton-Raphson) which is much more accurate than
         // sample-based linear interpolation.
         if (curve instanceof BSplineCurve3 bspline) {
-            return bspline.distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+            return bspline.distanceTo(point) <= Epsilon.IMPORT_CURVE_TOLERANCE;
         }
         if (curve instanceof RationalBSplineCurve3 rational) {
-            return rational.distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+            return rational.distanceTo(point) <= Epsilon.IMPORT_CURVE_TOLERANCE;
         }
         // For wrapped curves, delegate to the underlying curve
         if (curve instanceof TrimmedCurve3 trimmed) {
@@ -147,7 +146,7 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         // Industrial STEP files often have vertex coordinates rounded to limited
         // precision, so use a tolerant distance check for all remaining curve types.
         double distance = curve.distanceTo(point);
-        if (distance <= IMPORT_CURVE_TOLERANCE) {
+        if (distance <= Epsilon.IMPORT_CURVE_TOLERANCE) {
             return true;
         }
         // Fall back to sample-based check for complex curves
@@ -162,7 +161,7 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
                 nearestDistance = dist;
             }
         }
-        return nearestDistance <= IMPORT_CURVE_TOLERANCE;
+        return nearestDistance <= Epsilon.IMPORT_CURVE_TOLERANCE;
     }
 
     private static List<CartesianPoint> sampleCurve(Curve3 curve) {
@@ -369,7 +368,7 @@ public record Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
      * @return true if point lies on the edge
      */
     public boolean contains(CartesianPoint point) {
-        return distanceTo(point) <= IMPORT_CURVE_TOLERANCE;
+        return distanceTo(point) <= Epsilon.IMPORT_CURVE_TOLERANCE;
     }
 
     private static List<CartesianPoint> sampleCurveWithSegments(Curve3 curve, int segments) {

@@ -7,6 +7,7 @@ import com.minicad.step.model.product.StepProductDefinitionShape;
 import com.minicad.step.model.product.StepProductDefinitionFormation;
 import com.minicad.step.model.product.StepProductRelationship;
 import com.minicad.step.syntax.StepFile;
+import com.minicad.step.syntax.StepFileName;
 import com.minicad.step.syntax.StepHeaderEntry;
 import com.minicad.step.syntax.StepValue;
 
@@ -43,30 +44,21 @@ final class ProductMetadataExtractor {
     static ProductMetadata extract(StepFile stepFile, Map<Integer, StepEntity> resolved) {
         String fileName = null;
         String fileDescription = null;
-        List<String> schemaNames = new ArrayList<>();
+        List<String> schemaNames = stepFile.schemaNames();
+
+        StepFileName headerFileName = stepFile.fileName().orElse(null);
+        if (headerFileName != null) {
+            fileName = headerFileName.name();
+        }
 
         for (StepHeaderEntry entry : stepFile.headerEntries()) {
             switch (entry.name()) {
-                case "FILE_NAME" -> {
-                    if (!entry.parameters().isEmpty()) {
-                        fileName = stringValue(entry.parameters().get(0));
-                    }
-                }
                 case "FILE_DESCRIPTION" -> {
                     StepValue desc = entry.parameters().isEmpty() ? null : entry.parameters().get(0);
                     if (desc instanceof StepValue.ListValue list && !list.elements().isEmpty()) {
                         fileDescription = stringValue(list.elements().get(0));
                     } else if (desc != null) {
                         fileDescription = stringValue(desc);
-                    }
-                }
-                case "FILE_SCHEMA" -> {
-                    StepValue schema = entry.parameters().isEmpty() ? null : entry.parameters().get(0);
-                    if (schema instanceof StepValue.ListValue list) {
-                        for (StepValue v : list.elements()) {
-                            String s = stringValue(v);
-                            if (s != null) schemaNames.add(s);
-                        }
                     }
                 }
             }
@@ -109,7 +101,7 @@ final class ProductMetadataExtractor {
 
         return new ProductMetadata(
                 fileName, fileDescription, productName, productDescription, productIdentifier,
-                List.copyOf(schemaNames), List.copyOf(components)
+                schemaNames, List.copyOf(components)
         );
     }
 

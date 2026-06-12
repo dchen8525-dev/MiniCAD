@@ -1,5 +1,6 @@
 package com.minicad.topology;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.TopologyException;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.CylindricalSurface;
@@ -64,6 +65,27 @@ class FaceTest {
         );
 
         assertEquals("all face vertices must lie on the plane", exception.getMessage());
+    }
+
+    @Test
+    void shouldAllowPlanarFaceVerticesWithinImportPlaneTolerance() {
+        Vertex v0 = new Vertex(new CartesianPoint(0.0, 0.0, 0.0));
+        Vertex v1 = new Vertex(new CartesianPoint(1.0, 0.0, Epsilon.IMPORT_PLANE_TOLERANCE * 0.5));
+        Vertex v2 = new Vertex(new CartesianPoint(0.0, 1.0, 0.0));
+
+        EdgeLoop loop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(v0, v1, line(v0, v1), true), true),
+                new OrientedEdge(new Edge(v1, v2, line(v1, v2), true), true),
+                new OrientedEdge(new Edge(v2, v0, line(v2, v0), true), true)
+        ));
+
+        Face face = new Face(
+                new Plane(new CartesianPoint(0.0, 0.0, 0.0), Direction3.from(new Vector3(0.0, 0.0, 1.0))),
+                List.of(FaceBound.outer(loop, true)),
+                true
+        );
+
+        assertEquals(1, face.boundCount());
     }
 
     @Test

@@ -2789,15 +2789,16 @@ class StepCadBuilderTest {
                 #12=PLANE('PL0',#13);
                 #13=AXIS2_PLACEMENT_3D('AX',#1,#14,#3);
                 #14=DIRECTION('DZ',(0.0,0.0,1.0));
-                #15=DEGENERATE_PCURVE('DPC0',#12,#11);
-                #16=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#14,#1,1.0,#14);
-                #17=CURVE_REPLICA('CR0',#5,#16);
+                #15=DIRECTION('DY',(0.0,1.0,0.0));
+                #16=DEGENERATE_PCURVE('DPC0',#12,#11);
+                #17=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#15,#1,1.0,#14);
+                #18=CURVE_REPLICA('CR0',#5,#17);
                 ENDSEC;
                 """);
 
         builder.buildCurveReference3(6);
-        builder.buildCurveReference3(17);
-        builder.buildPcurve2(15);
+        builder.buildCurveReference3(18);
+        builder.buildPcurve2(16);
     }
 
     @Test
@@ -2819,6 +2820,26 @@ class StepCadBuilderTest {
         assertEquals(12.0, point.x());
         assertEquals(24.0, point.y());
         assertEquals(36.0, point.z());
+    }
+
+    @Test
+    void shouldRejectPointReplicaWithNonOrthogonalTransformationAxes() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));
+                #2=DIRECTION('DX',(1.0,0.0,0.0));
+                #3=DIRECTION('SKEW',(1.0,1.0,0.0));
+                #4=DIRECTION('DZ',(0.0,0.0,1.0));
+                #5=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #6=CARTESIAN_TRANSFORMATION_OPERATOR_3D('BAD',#2,#3,#5,1.0,#4);
+                #7=POINT_REPLICA('PR0',#1,#6);
+                ENDSEC;
+                """);
+
+        UnsupportedGeometryException error =
+                assertThrows(UnsupportedGeometryException.class, () -> builder.buildPointReference(7));
+
+        assertEquals("CARTESIAN_TRANSFORMATION_OPERATOR_3D #6 axes must be orthogonal", error.getMessage());
     }
 
     @Test
@@ -3304,6 +3325,27 @@ class StepCadBuilderTest {
         assertNotNull(shell);
         assertEquals(1, shell.faces().size());
         assertInstanceOf(Plane.class, shell.faces().get(0).surface());
+    }
+
+    @Test
+    void shouldRejectGeometricSurfaceSetShellWithoutFaceBounds() {
+        StepCadBuilder builder = builder("""
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                #2=DIRECTION('DZ',(0.0,0.0,1.0));
+                #3=DIRECTION('DX',(1.0,0.0,0.0));
+                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
+                #5=PLANE('PL',#4);
+                #6=GEOMETRIC_SURFACE_SET('GSS',(#5));
+                ENDSEC;
+                """);
+
+        UnsupportedGeometryException exception = assertThrows(
+                UnsupportedGeometryException.class,
+                () -> builder.buildShell(6)
+        );
+
+        assertEquals("GEOMETRIC_SURFACE_SET shell construction requires bounded face geometry", exception.getMessage());
     }
 
     @Test

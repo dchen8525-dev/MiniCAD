@@ -10751,4 +10751,59 @@ class StepPreviewJsonExporterTest {
         assertTrue(json.contains("\"units\":{\"lengthUnit\":\"INCH\",\"scaleToMeters\":0.0254"), json);
         assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
     }
+
+    @Test
+    void shouldKeepAssemblyTransformsInSourceUnitsWhenLengthUnitsAreNotNormalized() {
+        String json = StepPreviewJsonExporter.export("""
+                DATA;
+                #1=APPLICATION_CONTEXT('mechanical design');
+                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
+                #3=PRODUCT('ASM','Assembly','Assembly',(#2));
+                #4=PRODUCT('COMP','Component','Component',(#2));
+                #5=PRODUCT_DEFINITION_FORMATION('v1','',#3);
+                #6=PRODUCT_DEFINITION_FORMATION('v1','',#4);
+                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
+                #8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);
+                #9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);
+                #10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);
+                #11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);
+                #12=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
+                #13=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#12);
+                #14=(CONVERSION_BASED_UNIT('INCH',#13) NAMED_UNIT(*) LENGTH_UNIT());
+                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
+                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#14))
+                    REPRESENTATION_CONTEXT('ID','CTX'));
+                #16=SHAPE_REPRESENTATION('ASM_REP',(),#15);
+                #17=SHAPE_REPRESENTATION('COMP_REP',(),#15);
+                #18=SHAPE_DEFINITION_REPRESENTATION(#10,#16);
+                #19=SHAPE_DEFINITION_REPRESENTATION(#11,#17);
+                #20=CARTESIAN_POINT('O',(0.0,0.0,0.0));
+                #21=CARTESIAN_POINT('T',(1.0,0.0,0.0));
+                #22=DIRECTION('DZ',(0.0,0.0,1.0));
+                #23=DIRECTION('DX',(1.0,0.0,0.0));
+                #24=AXIS2_PLACEMENT_3D('AX0',#20,#22,#23);
+                #25=AXIS2_PLACEMENT_3D('AX1',#21,#22,#23);
+                #26=ITEM_DEFINED_TRANSFORMATION('T1','',#24,#25);
+                #27=(REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#16,#17)
+                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#26));
+                #28=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');
+                #29=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#28);
+                ENDSEC;
+                """);
+
+        JSONObject payload = JSONObject.parseObject(json);
+        JSONObject units = payload.getJSONObject("units");
+        JSONArray instances = payload.getJSONArray("instances");
+        JSONObject child = instances.stream()
+                .map(JSONObject.class::cast)
+                .filter(instance -> Integer.valueOf(28).equals(instance.getInteger("occurrenceId")))
+                .findFirst()
+                .orElseThrow();
+        JSONArray matrix = child.getJSONArray("matrix");
+
+        assertEquals("INCH", units.getString("lengthUnit"));
+        assertEquals(0.0254, units.getDoubleValue("scaleToMeters"), 1.0e-12);
+        assertEquals(1.0, matrix.getDoubleValue(3), 1.0e-12);
+        assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
+    }
 }

@@ -207,8 +207,12 @@ class StepParameterReaderTest {
   void stringValueThrowsOnNonString() {
     var inst = instanceWithDef("TEST_ENTITY", List.of(new StepValue.NumberValue(1.0, "1")));
     var def = def(inst, "TEST_ENTITY");
-    assertThrows(StepResolutionException.class,
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
         () -> StepParameterReader.stringValue(def, 0, "TEST_ENTITY"));
+
+    assertEquals(
+        "TEST_ENTITY parameter 0 type mismatch: expected string, actual number",
+        exception.getMessage());
   }
 
   @Test
@@ -238,6 +242,48 @@ class StepParameterReaderTest {
         new StepValue.TypedValue("LENGTH_MEASURE", new StepValue.NumberValue(5.0, "5"))));
     var def = def(inst, "TEST");
     assertEquals(5.0, StepParameterReader.numberValue(def, 0, "TEST"));
+  }
+
+  @Test
+  void referenceIdReportsExpectedAndActualType() {
+    var inst = instanceWithDef("TEST", List.of(new StepValue.StringValue("not-ref")));
+    var def = def(inst, "TEST");
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.referenceId(def, 0, "TEST"));
+
+    assertEquals(
+        "TEST parameter 0 type mismatch: expected reference, actual string",
+        exception.getMessage());
+  }
+
+  @Test
+  void doubleListReportsExpectedAndActualParameterType() {
+    var inst = instanceWithDef("TEST", List.of(new StepValue.ReferenceValue(7)));
+    var def = def(inst, "TEST");
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.doubleList(def, 0, "TEST"));
+
+    assertEquals(
+        "TEST parameter 0 type mismatch: expected list, actual reference",
+        exception.getMessage());
+  }
+
+  @Test
+  void doubleListReportsExpectedAndActualElementType() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.ListValue(List.of(
+            new StepValue.NumberValue(1.0, "1.0"),
+            new StepValue.StringValue("bad")))));
+    var def = def(inst, "TEST");
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.doubleList(def, 0, "TEST"));
+
+    assertEquals(
+        "TEST parameter 0 numeric list element type mismatch: expected number, actual string",
+        exception.getMessage());
   }
 
   @Test

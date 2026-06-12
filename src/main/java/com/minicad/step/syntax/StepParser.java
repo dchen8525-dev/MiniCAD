@@ -9,7 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Minimal parser for the STEP DATA section.
+ * STEP physical-file parser for HEADER entries and one DATA section.
+ *
+ * <p>The parser builds a raw syntax model with entity ids, entity names, complex
+ * entity definitions, references, lists, typed values, enums, strings, omitted
+ * values, and numeric literals. EXPRESS schema validation, semantic entity
+ * construction, and multi-DATA-section exchange structures are handled outside
+ * this layer or explicitly rejected.</p>
  */
 public final class StepParser {
 

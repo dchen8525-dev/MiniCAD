@@ -99,6 +99,32 @@ class StepViewerAppSecurityTest {
     }
 
     @Test
+    void previewCanDisableCache() throws Exception {
+        StepViewerApp.ViewerConfig config = new StepViewerApp.ViewerConfig(
+                0,
+                "127.0.0.1",
+                1024 * 1024,
+                1024L * 1024L,
+                tempDir.resolve("disabled-cache"),
+                false,
+                false);
+        Server server = StepViewerApp.createServer(config);
+        server.start();
+        try (RunningViewer viewer = new RunningViewer(
+                server,
+                ((ServerConnector) server.getConnectors()[0]).getLocalPort())) {
+            String step = Files.readString(Path.of("examples", "minimal-square.step"));
+
+            HttpResponse<byte[]> response = postBytes(viewer.uri("/api/preview"), step);
+
+            assertEquals(200, response.statusCode());
+            assertEquals("disabled", response.headers().firstValue("X-MiniCAD-Cache").orElse(""));
+            assertFalse(Files.exists(config.cacheDir()));
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
     void concurrentPreviewRequestsForSameInputReturnValidGlb() throws Exception {
         try (RunningViewer viewer = startViewer(1024 * 1024)) {
             String step = Files.readString(Path.of("examples", "minimal-square.step"));
@@ -147,6 +173,21 @@ class StepViewerAppSecurityTest {
     }
 
     @Test
+    void configEndpointExposesBrowserUploadLimitWithoutPaths() throws Exception {
+        try (RunningViewer viewer = startViewer(12_345)) {
+            HttpResponse<String> response = get(viewer.uri("/api/config"));
+
+            assertEquals(200, response.statusCode());
+            assertTrue(response.body().contains("\"maxUploadBytes\":12345"));
+            assertTrue(response.body().contains("\"previewCacheEnabled\":true"));
+            assertTrue(response.body().contains("\"acceptedExtensions\":[\".step\",\".stp\",\".p21\"]"));
+            assertFalse(response.body().contains("cacheDir"));
+            assertFalse(response.body().contains("cachePath"));
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
     void helperRejectsExampleNamesBeforePathResolution() {
         assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("../pom"));
         assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("..\\pom"));
@@ -183,7 +224,9 @@ class StepViewerAppSecurityTest {
                 "127.0.0.1",
                 1024,
                 1024,
-                tempDir.resolve("cache"));
+                tempDir.resolve("cache"),
+                true,
+                false);
         Server server = StepViewerApp.createServer(config);
         try {
             ServerConnector connector = (ServerConnector) server.getConnectors()[0];
@@ -197,7 +240,9 @@ class StepViewerAppSecurityTest {
                 "0.0.0.0",
                 1024,
                 1024,
-                tempDir.resolve("cache2"));
+                tempDir.resolve("cache2"),
+                true,
+                false);
         Server externalServer = StepViewerApp.createServer(externalConfig);
         try {
             ServerConnector connector = (ServerConnector) externalServer.getConnectors()[0];
@@ -205,6 +250,33 @@ class StepViewerAppSecurityTest {
         } finally {
             externalServer.stop();
         }
+    }
+
+    @Test
+    void viewerConfigParsesExpandedArguments() {
+        StepViewerApp.ViewerConfig config = StepViewerApp.parseConfig(new String[] {
+                "--port", "9090",
+                "--host", "0.0.0.0",
+                "--cache-dir", tempDir.resolve("configured-cache").toString(),
+                "--max-upload", "2m",
+                "--max-cache=3k",
+                "--no-cache",
+                "--debug"
+        });
+
+        assertEquals(9090, config.port());
+        assertEquals("0.0.0.0", config.host());
+        assertEquals(tempDir.resolve("configured-cache"), config.cacheDir());
+        assertEquals(2L * 1024L * 1024L, config.maxUploadBytes());
+        assertEquals(3L * 1024L, config.maxCacheBytes());
+        assertFalse(config.cacheEnabled());
+        assertTrue(config.debug());
+    }
+
+    @Test
+    void viewerConfigRejectsMissingOptionValues() {
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[] {"--host"}));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[] {"--max-upload", "--debug"}));
     }
 
     @Test
@@ -232,7 +304,9 @@ class StepViewerAppSecurityTest {
                 "127.0.0.1",
                 maxUploadBytes,
                 1024L * 1024L,
-                tempDir.resolve("cache"));
+                tempDir.resolve("cache"),
+                true,
+                false);
         Server server = StepViewerApp.createServer(config);
         server.start();
         int port = ((ServerConnector) server.getConnectors()[0]).getLocalPort();

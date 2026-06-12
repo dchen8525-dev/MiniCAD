@@ -1,5 +1,6 @@
 package com.minicad.topology;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.TopologyException;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
@@ -53,7 +54,26 @@ class EdgeLoopTest {
                 () -> new EdgeLoop(List.of(new OrientedEdge(e0, true), new OrientedEdge(e1, true)))
         );
 
-        assertEquals("edge loop must be connected and closed", exception.getMessage());
+        assertEquals("edge loop must be connected and closed between edge 0 and edge 1; gap 1.0 exceeds tolerance "
+                + Epsilon.IMPORT_TOPOLOGY_TOLERANCE, exception.getMessage());
+    }
+
+    @Test
+    void shouldAllowLoopConnectivityWithinImportTopologyTolerance() {
+        Vertex v0 = new Vertex(new CartesianPoint(0.0, 0.0, 0.0));
+        Vertex v1 = new Vertex(new CartesianPoint(1.0, 0.0, 0.0));
+        Vertex v1Projected = new Vertex(new CartesianPoint(1.0, Epsilon.IMPORT_TOPOLOGY_TOLERANCE * 0.5, 0.0));
+        Vertex v2 = new Vertex(new CartesianPoint(1.0, 1.0, 0.0));
+        Vertex v3 = new Vertex(new CartesianPoint(0.0, 1.0, 0.0));
+
+        EdgeLoop loop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(v0, v1, line(v0, v1), true), true),
+                new OrientedEdge(new Edge(v1Projected, v2, line(v1Projected, v2), true), true),
+                new OrientedEdge(new Edge(v2, v3, line(v2, v3), true), true),
+                new OrientedEdge(new Edge(v3, v0, line(v3, v0), true), true)
+        ));
+
+        assertEquals(4, loop.edgeCount());
     }
 
     @Test

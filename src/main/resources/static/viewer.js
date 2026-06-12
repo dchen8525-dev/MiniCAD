@@ -173,7 +173,8 @@ let modelHasEdgeLines = false;
 let lastRenderScale = -1;
 let uploadedFile = null;
 const viewerLogPrefix = '[MiniCAD Viewer]';
-const maxUploadBytes = 50 * 1024 * 1024;
+const defaultMaxUploadBytes = 50 * 1024 * 1024;
+let maxUploadBytes = defaultMaxUploadBytes;
 const acceptedStepExtensions = new Set(['.step', '.stp', '.p21']);
 
 function logDebug(message, ...args) {
@@ -401,6 +402,31 @@ function validateStepFile(file) {
     }
     return null;
 }
+
+async function loadViewerConfig() {
+    try {
+        const response = await fetch('/api/config', { method: 'GET' });
+        if (!response.ok) {
+            throw new Error(`config request failed with status ${response.status}`);
+        }
+        const config = await response.json();
+        if (Number.isSafeInteger(config.maxUploadBytes) && config.maxUploadBytes >= 0) {
+            maxUploadBytes = config.maxUploadBytes;
+        }
+        logInfo('viewerConfig:loaded', {
+            maxUploadBytes,
+            previewCacheEnabled: Boolean(config.previewCacheEnabled)
+        });
+    } catch (error) {
+        maxUploadBytes = defaultMaxUploadBytes;
+        logWarn('viewerConfig:fallback', {
+            maxUploadBytes,
+            reason: error.message
+        });
+    }
+}
+
+void loadViewerConfig();
 
 function updateStats(stats = {}) {
     for (const [key, element] of statElements.entries()) {
@@ -665,10 +691,18 @@ function disposeMaterial(material, disposedTextures = new Set()) {
     for (const value of Object.values(material)) {
         if (value?.isTexture && !disposedTextures.has(value)) {
             disposedTextures.add(value);
-            value.dispose();
+            disposeTexture(value);
         }
     }
     material.dispose();
+}
+
+function disposeTexture(texture) {
+    const image = texture.image;
+    texture.dispose();
+    if (image && typeof image.close === 'function') {
+        image.close();
+    }
 }
 
 function matrixFromRowMajor(elements) {
@@ -2434,7 +2468,6 @@ async function requestPreview(payload, metadata = {}) {
             status: response.status,
             previewFormat: response.headers.get('X-MiniCAD-Preview-Format'),
             cache: response.headers.get('X-MiniCAD-Cache'),
-            cachePath: response.headers.get('X-MiniCAD-Cache-Path'),
             binaryLength: arrayBuffer.byteLength,
             faceCount: parsed?.preview?.stats?.faceCount ?? null,
             edgeCount: parsed?.preview?.stats?.edgeCount ?? null,

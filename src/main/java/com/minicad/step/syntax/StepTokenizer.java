@@ -6,7 +6,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Minimal tokenizer for a restricted subset of STEP syntax.
+ * Tokenizer for the STEP physical-file constructs consumed by {@link StepParser}.
+ *
+ * <p>It skips ISO 10303-21 block comments, decodes STEP string escapes, and
+ * emits tokens for raw entity parameters. It is not a standalone EXPRESS lexer;
+ * schema declarations and unsupported physical-file sections are intentionally
+ * outside this syntax layer.</p>
  */
 public final class StepTokenizer {
 

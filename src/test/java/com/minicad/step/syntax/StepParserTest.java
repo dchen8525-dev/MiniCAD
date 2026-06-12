@@ -3,10 +3,13 @@ package com.minicad.step.syntax;
 import com.minicad.common.StepParseException;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,6 +37,37 @@ class StepParserTest {
         assertEquals("FILE_DESCRIPTION", file.headerEntries().getFirst().name());
         assertEquals("CARTESIAN_POINT", file.entities().getFirst().name());
         assertEquals(10, file.entities().getFirst().id());
+    }
+
+    @Test
+    void shouldExposeTypedAp214AndAp242HeaderMetadata() {
+        String step = """
+                ISO-10303-21;
+                HEADER;
+                FILE_DESCRIPTION(('AP214/AP242 metadata'),'2;1');
+                FILE_NAME('assembly.step','2026-06-10T12:00:00',('Alice','Bob'),('MiniCAD Org'),'MiniCAD 0.1','MiniCAD Exporter','');
+                FILE_SCHEMA(('AUTOMOTIVE_DESIGN','AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF'));
+                ENDSEC;
+                DATA;
+                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
+                ENDSEC;
+                END-ISO-10303-21;
+                """;
+
+        StepFile file = StepParser.parse(step);
+        StepFileName fileName = file.fileName().orElseThrow();
+        StepFileSchema schema = file.fileSchema().orElseThrow();
+
+        assertEquals("assembly.step", fileName.name());
+        assertEquals("2026-06-10T12:00:00", fileName.timeStamp());
+        assertEquals(List.of("Alice", "Bob"), fileName.author());
+        assertEquals(List.of("MiniCAD Org"), fileName.organization());
+        assertEquals("MiniCAD 0.1", fileName.preprocessorVersion());
+        assertEquals("MiniCAD Exporter", fileName.originatingSystem());
+        assertEquals(List.of("AUTOMOTIVE_DESIGN", "AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF"), schema.schemaNames());
+        assertEquals(schema.schemaNames(), file.schemaNames());
+        assertThrows(UnsupportedOperationException.class, () -> fileName.author().add("Mallory"));
+        assertThrows(UnsupportedOperationException.class, () -> schema.schemaNames().clear());
     }
 
     @Test
@@ -88,6 +122,33 @@ class StepParserTest {
         assertEquals("AP242_SELECT", typedValue.typeName());
         StepValue.ListValue payload = assertInstanceOf(StepValue.ListValue.class, typedValue.value());
         assertEquals(3, payload.elements().size());
+    }
+
+    @Test
+    void shouldTreatCommentsAsWhitespaceBetweenParameterTokens() {
+        String step = """
+                DATA;
+                /* before entity */
+                #1=EXAMPLE(
+                    /* string */ 'part',
+                    /* enum */ .DONE.,
+                    /* typed select */ AP242_SELECT(/* ref */ #2, /* name */ 'selected', /* flag */ .T.),
+                    /* list */ (1.0, /* omitted */ $, /* not provided */ *)
+                );
+                ENDSEC;
+                """;
+
+        StepEntityInstance entity = StepParser.parse(step).entities().getFirst();
+
+        assertEquals("part", ((StepValue.StringValue) entity.parameters().get(0)).value());
+        assertEquals("DONE", ((StepValue.EnumValue) entity.parameters().get(1)).value());
+        StepValue.TypedValue typedValue = assertInstanceOf(StepValue.TypedValue.class, entity.parameters().get(2));
+        assertEquals("AP242_SELECT", typedValue.typeName());
+        StepValue.ListValue typedPayload = assertInstanceOf(StepValue.ListValue.class, typedValue.value());
+        assertEquals(3, typedPayload.elements().size());
+        StepValue.ListValue list = assertInstanceOf(StepValue.ListValue.class, entity.parameters().get(3));
+        assertInstanceOf(StepValue.OmittedValue.class, list.elements().get(1));
+        assertInstanceOf(StepValue.NotProvidedValue.class, list.elements().get(2));
     }
 
     @Test
@@ -457,7 +518,42 @@ class StepParserTest {
         assertThrows(UnsupportedOperationException.class, () -> file.entitiesById().clear());
     }
 
+    @Test
+    void parserFuzzShouldNotHangOrThrowUnexpectedExceptions() {
+        Random random = new Random(0x51E9C0DEL);
+
+        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> {
+            for (int i = 0; i < 250; i++) {
+                String step = "DATA;\n" + randomStepFragment(random) + "\nENDSEC;\n";
+                try {
+                    StepParser.parse(step);
+                } catch (StepParseException expected) {
+                    assertTrue(expected.getMessage() != null && !expected.getMessage().isBlank());
+                }
+            }
+        });
+    }
+
     private static String stringParameter(StepEntityInstance entity, int index) {
         return assertInstanceOf(StepValue.StringValue.class, entity.parameters().get(index)).value();
+    }
+
+    private static String randomStepFragment(Random random) {
+        String[] tokens = {
+                "#", "=", ";", "(", ")", ",", "$", "*",
+                "A", "B", "CARTESIAN_POINT", "DIRECTION", "AP242_SELECT",
+                "1", "2", "3", "0.0", "-4.5", "1E3", ".T.", ".FALSE.",
+                "'name'", "'A''B'", "#1", "#2", "#2147483648",
+                "/* comment */"
+        };
+        StringBuilder fragment = new StringBuilder();
+        int tokenCount = 1 + random.nextInt(48);
+        for (int i = 0; i < tokenCount; i++) {
+            if (i > 0 && random.nextBoolean()) {
+                fragment.append(' ');
+            }
+            fragment.append(tokens[random.nextInt(tokens.length)]);
+        }
+        return fragment.toString();
     }
 }

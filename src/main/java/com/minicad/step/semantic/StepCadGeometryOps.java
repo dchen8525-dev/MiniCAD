@@ -669,24 +669,20 @@ final class StepCadGeometryOps {
     }
 
     CartesianPoint transformPoint3(CartesianPoint point, StepCartesianTransformationOperator transformation) {
-        Vector3 basisX = transformAxis1_3(transformation);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY);
+        TransformBasis3 basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        Vector3 offset = basisX.scale(point.x() * scale)
-                .add(basisY.scale(point.y() * scale))
-                .add(basisZ.scale(point.z() * scale));
+        Vector3 offset = basis.x().scale(point.x() * scale)
+                .add(basis.y().scale(point.y() * scale))
+                .add(basis.z().scale(point.z() * scale));
         return builder.buildPoint(transformation.localOrigin().id()).add(offset);
     }
 
     Vector3 transformVector3(Vector3 vector, StepCartesianTransformationOperator transformation) {
-        Vector3 basisX = transformAxis1_3(transformation);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY);
+        TransformBasis3 basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        return basisX.scale(vector.x() * scale)
-                .add(basisY.scale(vector.y() * scale))
-                .add(basisZ.scale(vector.z() * scale));
+        return basis.x().scale(vector.x() * scale)
+                .add(basis.y().scale(vector.y() * scale))
+                .add(basis.z().scale(vector.z() * scale));
     }
 
     Point2 transformPoint2(Point2 point, StepCartesianTransformationOperator transformation) {
@@ -699,14 +695,12 @@ final class StepCadGeometryOps {
     }
 
     Direction3 transformDirection3(Direction3 direction, StepCartesianTransformationOperator transformation) {
-        Vector3 basisX = transformAxis1_3(transformation);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY);
+        TransformBasis3 basis = transformBasis3(transformation);
         Vector3 source = direction.asVector();
         return Direction3.from(
-                basisX.scale(source.x())
-                        .add(basisY.scale(source.y()))
-                        .add(basisZ.scale(source.z()))
+                basis.x().scale(source.x())
+                        .add(basis.y().scale(source.y()))
+                        .add(basis.z().scale(source.z()))
         );
     }
 
@@ -721,6 +715,29 @@ final class StepCadGeometryOps {
         return transformation.axis1() == null
                 ? new Vector3(1.0, 0.0, 0.0)
                 : builder.buildDirection(transformation.axis1().id()).asVector();
+    }
+
+    private TransformBasis3 transformBasis3(StepCartesianTransformationOperator transformation) {
+        Vector3 axis1 = transformAxis1_3(transformation);
+        Vector3 axis2 = transformAxis2OrDefault3(transformation, axis1);
+        Vector3 axis3 = transformAxis3OrDefault3(transformation, axis1, axis2);
+        validateOrthogonalBasis3(transformation, axis1, axis2, axis3);
+        return new TransformBasis3(axis1, axis2, axis3);
+    }
+
+    private static void validateOrthogonalBasis3(
+            StepCartesianTransformationOperator transformation,
+            Vector3 axis1,
+            Vector3 axis2,
+            Vector3 axis3
+    ) {
+        double tolerance = 1.0e-6;
+        if (Math.abs(axis1.dot(axis2)) > tolerance
+                || Math.abs(axis1.dot(axis3)) > tolerance
+                || Math.abs(axis2.dot(axis3)) > tolerance) {
+            throw new UnsupportedGeometryException("CARTESIAN_TRANSFORMATION_OPERATOR_3D #" + transformation.id()
+                    + " axes must be orthogonal");
+        }
     }
 
     private Vector3 transformAxis2OrDefault3(StepCartesianTransformationOperator transformation, Vector3 axis1) {
@@ -785,5 +802,8 @@ final class StepCadGeometryOps {
         CartesianPoint next = points.get(Math.min(index + 1, points.size() - 1));
         Vector3 tangent = next.subtract(previous);
         return tangent.isZero() ? new Vector3(1.0, 0.0, 0.0) : tangent;
+    }
+
+    private record TransformBasis3(Vector3 x, Vector3 y, Vector3 z) {
     }
 }

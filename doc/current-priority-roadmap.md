@@ -313,6 +313,323 @@ Verification:
    - Result: pass
    - Entity count: 93829
 
+## Progress: F03 Cartesian Transformation Operator Validation
+
+Date: 2026-06-11
+
+Completed:
+
+1. Added orthogonality validation for `CARTESIAN_TRANSFORMATION_OPERATOR_3D` axes before applying point, vector, direction, surface, or curve replica transforms.
+2. Kept valid skew `AXIS2_PLACEMENT_3D` reference directions orthogonalized in the assembly graph path while rejecting parallel axis/reference pairs.
+3. Fixed an existing curve-wrapper fixture so its transformation operator uses an explicitly orthogonal 3D basis.
+4. Added regression coverage for rejecting non-orthogonal transformation operator axes with a clear entity id in the error message.
+
+Verification:
+
+1. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1661 run, 0 failures, 0 errors, 0 skipped
+2. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+3. `java -cp target/classes + runtime dependency jars com.minicad.app.StepDumpApp examples/engine.stp`
+   - Result: pass
+   - Entity count: 93829
+4. StepViewerApp process check
+   - Result: no leftover process found
+
+## Progress: L01 Preview Payload Immutable Lists
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added construction-time defensive copies for list-bearing preview payload records in the app layer.
+2. Covered JSON and binary preview payloads, representation payloads, PMI payloads, edge/face/loop payloads, surface patches, and representation mesh records.
+3. Added deep defensive copies for B-Spline surface control point grids in `FaceSurfacePayload`.
+4. Added regression tests proving top-level preview lists, edge point lists, and nested control point grids cannot be mutated through original constructor inputs or returned accessors.
+
+Verification:
+
+1. `mvn -q -Dtest=StepPreviewPayloadTypesTest,PreviewSerializersIssueTest,StepPreviewJsonExporterTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1656 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual StepViewerApp process check
+   - Result: no matching process
+
+## Progress: F03 Assembly Placement Axis Validation
+
+Date: 2026-06-11
+
+Completed:
+
+1. Added explicit validation for degenerate `AXIS2_PLACEMENT_3D` assembly placement frames where `axis` and `refDirection` are parallel.
+2. Kept safe orthogonalization for valid skew `refDirection` inputs instead of rejecting STEP placements that can be normalized correctly.
+3. Added regression tests for parallel-axis rejection and skew-reference orthogonalization.
+
+Verification:
+
+1. `mvn -q -Dtest=StepAssemblyGraphBuilderTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1660 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: not run in this batch; sandbox lacks cached Maven exec plugin and escalation was not approved.
+5. Residual StepViewerApp process check
+   - Result: no matching process
+
+## Progress: L01 Preview Payload Array Defensive Copies
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added defensive copies for mutable array fields in preview payload records.
+2. `InstancePayload` now copies local/world transform matrices on construction and on accessor return.
+3. `PbrPayload`, `FloatArrayData`, and `IntArrayData` now copy internal color and binary buffer arrays on construction and on accessor return.
+4. Added regression tests proving constructor inputs and accessor-returned arrays cannot mutate internal payload state.
+
+Verification:
+
+1. `mvn -q -Dtest=StepPreviewPayloadTypesTest,PreviewSerializersIssueTest,StepPreviewJsonExporterTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1658 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual StepViewerApp process check
+   - Result: no matching process
+
+## Progress: J06 Forbidden API Regression Checks
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added source-level regression checks for unbounded `readAllBytes()` on viewer request and multipart upload streams.
+2. Added source-level regression checks to prevent reintroducing the `X-MiniCAD-Cache-Path` local filesystem disclosure header.
+3. Kept allowed local file/cache reads outside the forbidden request-stream patterns.
+
+Verification:
+
+1. `mvn -q -Dtest=ForbiddenApiUsageTest,StepViewerAppSecurityTest,StepViewerStaticResourcesTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1649 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: L04 Benchmark Build Failure Diagnostics
+
+Date: 2026-06-10
+
+Completed:
+
+1. Replaced ignored build exceptions in `StepBenchmarkApp` with captured first-failure diagnostics.
+2. Extended benchmark build summaries with first face, shell, and solid build failure messages.
+3. Added formatted benchmark output for first build failures while preserving existing failure counters.
+4. Added regression coverage for formatted first-failure diagnostics.
+
+Verification:
+
+1. `mvn -q -Dtest=StepBenchmarkAppTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1654 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: L04/C03 Explicit Unsupported Surface-Set Shells
+
+Date: 2026-06-10
+
+Completed:
+
+1. Removed a silent `catch (Exception ignored)` path from `StepShellBuilder.buildGeometricSurfaceSetShell`.
+2. Changed `GEOMETRIC_SURFACE_SET` shell construction to fail explicitly when only unbounded surface geometry is available.
+3. Added a regression test proving unbounded `GEOMETRIC_SURFACE_SET` surfaces report an `UnsupportedGeometryException` instead of being silently dropped.
+
+Verification:
+
+1. `mvn -q -Dtest=StepCadBuilderTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1653 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: E07 BREP_WITH_VOIDS Validation and D10 3D Face Area Check
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added `TopologyValidator.validateSolid(Solid)` to validate outer and void shells together.
+2. Added void-shell diagnostics for shells outside the outer shell bounding box.
+3. Added void-shell orientation diagnostics when a void shell has the same signed orientation as the outer shell.
+4. Changed planar zero-area validation to use 3D polygon area instead of XY-only projected area, avoiding false positives on vertical planar faces.
+5. Added regression tests for valid opposite-oriented void shells, same-orientation void shells, and void shells outside the outer shell.
+
+Verification:
+
+1. `mvn -q -Dtest=TopologyValidatorTest,SolidTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1652 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: D10 Degenerate Planar Face Validation
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added structured topology validation for zero-area planar faces.
+2. Kept face construction permissive so existing STEP imports can still build diagnostics instead of failing early.
+3. Added regression coverage for a collinear triangular face producing `face.zero_area`.
+
+Verification:
+
+1. `mvn -q -Dtest=TopologyValidatorTest,FaceTest,EdgeLoopTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1646 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: B04 Header Metadata Consumer Consolidation
+
+Date: 2026-06-10
+
+Completed:
+
+1. Updated `ProductMetadataExtractor` to reuse the typed `StepFile.fileName()` and `StepFile.schemaNames()` helpers.
+2. Removed duplicate local parsing of `FILE_NAME` and `FILE_SCHEMA` from the app metadata path.
+3. Preserved existing product metadata behavior while sharing one header parsing implementation.
+
+Verification:
+
+1. `mvn -q -Dtest=ProductMetadataExtractorTest,StepParserTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1647 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: B04 Typed STEP Header Metadata Access
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added typed `StepFile` accessors for `FILE_NAME` and `FILE_SCHEMA` header entries.
+2. Added a direct `StepFile.schemaNames()` helper for compatibility reporting and downstream consumers.
+3. Made `StepFileName` author/organization and `StepFileSchema` schema lists immutable.
+4. Added header arity diagnostics for malformed `FILE_NAME` and `FILE_SCHEMA` entries.
+5. Added AP214/AP242-style header coverage for schema, author, organization, timestamp, preprocessor version, and originating system.
+
+Verification:
+
+1. `mvn -q -Dtest=StepParserTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1647 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
+## Progress: E04 Edge Loop Closure Diagnostics
+
+Date: 2026-06-10
+
+Completed:
+
+1. Improved disconnected `EdgeLoop` diagnostics to identify the two adjacent edge indexes where closure/connectivity fails.
+2. Kept the existing measured gap and active tolerance in the error message.
+3. Updated regression coverage for the richer disconnected loop message.
+
+Verification:
+
+1. `mvn -q -Dtest=EdgeLoopTest,TopologyValidatorTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1646 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+5. Residual `StepViewerApp` process check
+   - Result: no matching process
+
 ## Progress: H03 CLI Multiple Files
 
 Date: 2026-06-08
@@ -506,6 +823,28 @@ Completed:
 Verification:
 
 1. `mvn -q -Dtest=PreviewSerializersIssueTest,StepViewerStaticResourcesTest test`
+   - Result: pass
+
+## Progress: G03 Large Model Performance
+
+Date: 2026-06-09
+
+Completed:
+
+1. Improved preview geometry reduction for large triangle payloads:
+   - triangle decimation now samples evenly across the whole triangle list.
+   - the first triangle is preserved.
+   - the tail triangle is preserved when reduction produces multiple samples.
+   - reduced triangle point count remains bounded by the configured limit.
+2. Made the geometry reduction entry point package-visible so the behavior can be tested directly without running a full STEP import.
+3. Added lightweight large-payload regression coverage:
+   - 300 triangle points reduce to the configured 30 point limit.
+   - reduced output still contains the first and last source triangle range.
+   - small triangle payloads are returned unchanged.
+
+Verification:
+
+1. `mvn -q -Dtest=StepPreviewGeometryReductionTest,StepPreviewJsonExporterTest#glbMeshesShouldIncludeNormalizedNormalsMatchingPositions+shouldExportGlbPreviewPacketForMinimalSquare test`
    - Result: pass
 
 ## Progress: J07 Maven Enforcer
@@ -922,6 +1261,186 @@ Verification:
 2. `mvn -B clean test`
    - Result: pass
    - Tests: 1594 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: B01/B02 Parser Scope And Compatibility Coverage
+
+Date: 2026-06-09
+
+Completed:
+
+1. Updated `StepParser` documentation to state the actual syntax-layer contract: HEADER entries plus one DATA section parsed into raw entity syntax.
+2. Updated `StepTokenizer` documentation to describe the supported STEP physical-file token constructs and to avoid implying full EXPRESS lexical coverage.
+3. Added a parser compatibility regression test proving block comments are treated as whitespace between strings, enums, typed parameter lists, omitted values, and not-provided values.
+
+Verification:
+
+1. `mvn -q -Dtest=StepParserTest#shouldTreatCommentsAsWhitespaceBetweenParameterTokens test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1635 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: C08 Parameter Type Diagnostics
+
+Date: 2026-06-09
+
+Completed:
+
+1. Centralized common `StepParameterReader` type mismatch messages for scalar values, references, lists, list elements, and numeric grids.
+2. Updated common diagnostics to include the expected STEP value category and the actual STEP value category.
+3. Preserved existing parameter-count diagnostics that already include entity id, entity type, expected count, and actual count.
+4. Added focused tests for string, reference, list-parameter, and list-element type mismatch messages.
+
+Verification:
+
+1. `mvn -q -Dtest=StepParameterReaderTest test`
+   - Result: pass
+2. `mvn -q -Dtest=StepEntityResolverTest,StepCadBuilderTest,StepDumpAppTest test`
+   - Result: pass
+3. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1638 run, 0 failures, 0 errors, 0 skipped
+4. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+5. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: G05 Viewer Memory Cleanup
+
+Date: 2026-06-09
+
+Completed:
+
+1. Confirmed `renderGlbPreview()` clears the existing model before adding a newly parsed GLB scene.
+2. Confirmed `clearModel()` removes and disposes objects under both model and PMI roots.
+3. Added explicit texture disposal through `disposeTexture()`.
+4. Closed `ImageBitmap`-style texture images when available, because `Texture.dispose()` does not close those backing resources itself.
+5. Updated static viewer resource tests to assert the texture and ImageBitmap cleanup path.
+
+Verification:
+
+1. `mvn -q -Dtest=StepViewerStaticResourcesTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1638 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: L07/L08 Viewer Config And Argument Parser
+
+Date: 2026-06-09
+
+Completed:
+
+1. Expanded viewer configuration into a single `ViewerConfig` covering port, host, upload limit, cache limit, cache directory, cache enablement, and debug mode.
+2. Added CLI options for `--port`, `--host`, `--cache-dir`, `--max-upload`, `--max-cache`, `--no-cache`, and `--debug`, while preserving the legacy single-port argument.
+3. Added byte-count parsing with `k`, `m`, and `g` suffixes for upload and cache limits.
+4. Made `--no-cache` bypass preview cache reads, writes, startup cleanup, and eviction while returning `X-MiniCAD-Cache: disabled`.
+5. Tied request-body prefix diagnostics and STEP source excerpts to explicit debug configuration.
+
+Verification:
+
+1. `mvn -q -Dtest=StepViewerAppSecurityTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1641 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: M05 Parser Fuzz Target
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added a deterministic parser fuzz regression test with a fixed random seed.
+2. The fuzz input generates short random STEP DATA fragments from parser-relevant tokens.
+3. The test asserts that random input either parses successfully or fails with `StepParseException`; unexpected exceptions and hangs are treated as regressions.
+4. Added a two-second preemptive timeout to keep the fuzz target suitable for the normal unit-test suite.
+
+Verification:
+
+1. `mvn -q -Dtest=StepParserTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1642 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: G08 Browser Upload Limit Sync
+
+Date: 2026-06-09
+
+Completed:
+
+1. Added `GET /api/config` to expose safe viewer runtime settings to the browser.
+2. The config endpoint returns `maxUploadBytes`, cache enablement, and accepted STEP file extensions without exposing local cache paths.
+3. Updated the browser viewer to load `/api/config` at startup and use the server-configured upload limit for client-side file-size prechecks.
+4. Kept the 50 MB browser default as a fallback if config loading fails.
+5. Removed browser-side logging of the obsolete `X-MiniCAD-Cache-Path` header.
+
+Verification:
+
+1. `mvn -q -Dtest=StepViewerAppSecurityTest,StepViewerStaticResourcesTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1643 run, 0 failures, 0 errors, 0 skipped
+3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
+   - Result: pass
+   - Entity count: 37
+4. `mvn -q exec:java -Dexec.args="examples/engine.stp"`
+   - Result: pass
+   - Entity count: 93829
+
+## Progress: E05 Centralized Topology Tolerance
+
+Date: 2026-06-10
+
+Completed:
+
+1. Added `Epsilon.IMPORT_TOPOLOGY_TOLERANCE` as the shared STEP import topology connectivity tolerance.
+2. Added shared STEP import curve and planar-face tolerances as `Epsilon.IMPORT_CURVE_TOLERANCE` and `Epsilon.IMPORT_PLANE_TOLERANCE`.
+3. Updated `EdgeLoop`, `Edge`, and `Face` to use centralized import tolerances instead of private local constants.
+4. Improved disconnected loop diagnostics to include the measured gap and active tolerance.
+5. Added regression coverage proving loops and planar faces within import tolerances are accepted.
+
+Verification:
+
+1. `mvn -q -Dtest=EdgeLoopTest,FaceTest,TopologyValidatorTest test`
+   - Result: pass
+2. `mvn -B clean test`
+   - Result: pass
+   - Tests: 1645 run, 0 failures, 0 errors, 0 skipped
 3. `mvn -q exec:java -Dexec.args="examples/minimal-square.step"`
    - Result: pass
    - Entity count: 37

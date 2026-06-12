@@ -22,6 +22,16 @@ record PreviewPayload(
         List<RepresentationPayload> representations,
         List<InstancePayload> instances
 ) {
+    PreviewPayload {
+        pmi = PreviewPayloadCopies.copy(pmi);
+        issues = PreviewPayloadCopies.copy(issues);
+        unsupportedBooleans = PreviewPayloadCopies.copy(unsupportedBooleans);
+        unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+        edges = PreviewPayloadCopies.copy(edges);
+        faces = PreviewPayloadCopies.copy(faces);
+        representations = PreviewPayloadCopies.copy(representations);
+        instances = PreviewPayloadCopies.copy(instances);
+    }
 }
 
 record AssemblyData(
@@ -31,6 +41,11 @@ record AssemblyData(
         GeometrySummary summary,
         BoundsPayload bounds
 ) {
+    AssemblyData {
+        representations = PreviewPayloadCopies.copy(representations);
+        instances = PreviewPayloadCopies.copy(instances);
+        unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+    }
 }
 
 record AssemblyMetrics(
@@ -44,12 +59,20 @@ record GeometryCollection(
         List<FacePayload> faces,
         List<UnsupportedFacePayload> unsupportedFaces
 ) {
+    GeometryCollection {
+        edges = PreviewPayloadCopies.copy(edges);
+        faces = PreviewPayloadCopies.copy(faces);
+        unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+    }
 }
 
 record RepresentationBuildResult(
         RepresentationPayload payload,
         List<UnsupportedFacePayload> unsupportedFaces
 ) {
+    RepresentationBuildResult {
+        unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+    }
 }
 
 record PreviewStats(
@@ -84,6 +107,9 @@ record ValidationReportPayload(
         int warnCount,
         List<ValidationCheckPayload> checks
 ) {
+    ValidationReportPayload {
+        checks = PreviewPayloadCopies.copy(checks);
+    }
 }
 
 record ValidationCheckPayload(
@@ -116,6 +142,11 @@ record PmiPayload(
         List<Integer> targetIds,
         List<PmiTargetPayload> targets
 ) {
+    PmiPayload {
+        leader = PreviewPayloadCopies.copy(leader);
+        targetIds = PreviewPayloadCopies.copy(targetIds);
+        targets = PreviewPayloadCopies.copy(targets);
+    }
 }
 
 record PmiTargetPayload(
@@ -130,6 +161,9 @@ record PmiTargetPayload(
         String viaDefinitionType,
         Integer viaDefinitionId
 ) {
+    PmiTargetPayload {
+        instanceIds = PreviewPayloadCopies.copy(instanceIds);
+    }
 }
 
 record RepresentationPayload(
@@ -140,6 +174,11 @@ record RepresentationPayload(
         List<EdgePayload> edges,
         List<FacePayload> faces
 ) {
+    RepresentationPayload {
+        layers = PreviewPayloadCopies.copy(layers);
+        edges = PreviewPayloadCopies.copy(edges);
+        faces = PreviewPayloadCopies.copy(faces);
+    }
 }
 
 record InstancePayload(
@@ -155,6 +194,21 @@ record InstancePayload(
         double[] worldMatrix,
         int depth
 ) {
+    InstancePayload {
+        representationIds = PreviewPayloadCopies.copy(representationIds);
+        localMatrix = PreviewPayloadCopies.copy(localMatrix);
+        worldMatrix = PreviewPayloadCopies.copy(worldMatrix);
+    }
+
+    @Override
+    public double[] localMatrix() {
+        return PreviewPayloadCopies.copy(localMatrix);
+    }
+
+    @Override
+    public double[] worldMatrix() {
+        return PreviewPayloadCopies.copy(worldMatrix);
+    }
 }
 
 record BinaryPreviewPayload(
@@ -172,6 +226,16 @@ record BinaryPreviewPayload(
         List<BinaryRepresentationPayload> representations,
         List<InstancePayload> instances
 ) {
+    BinaryPreviewPayload {
+        pmi = PreviewPayloadCopies.copy(pmi);
+        issues = PreviewPayloadCopies.copy(issues);
+        unsupportedBooleans = PreviewPayloadCopies.copy(unsupportedBooleans);
+        unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+        edges = PreviewPayloadCopies.copy(edges);
+        faces = PreviewPayloadCopies.copy(faces);
+        representations = PreviewPayloadCopies.copy(representations);
+        instances = PreviewPayloadCopies.copy(instances);
+    }
 }
 
 record BinaryRepresentationPayload(
@@ -182,6 +246,11 @@ record BinaryRepresentationPayload(
         List<BinaryEdgePayload> edges,
         List<BinaryFacePayload> faces
 ) {
+    BinaryRepresentationPayload {
+        layers = PreviewPayloadCopies.copy(layers);
+        edges = PreviewPayloadCopies.copy(edges);
+        faces = PreviewPayloadCopies.copy(faces);
+    }
 }
 
 record BinaryEdgePayload(int stepId, int pointOffset, int pointCount, EdgeCurvePayload curve, ColorPayload color) {
@@ -202,6 +271,11 @@ record BinaryFacePayload(
         int triangleOffset,
         int triangleCount
 ) {
+    BinaryFacePayload {
+        layers = PreviewPayloadCopies.copy(layers);
+        uvLoops = PreviewPayloadCopies.copy(uvLoops);
+        loops = PreviewPayloadCopies.copy(loops);
+    }
 }
 
 record BinaryLoopPayload(boolean outer, int pointOffset, int pointCount) {
@@ -214,6 +288,9 @@ record UvPoint(double u, double v) {
 }
 
 record ParametricLoopPayload(boolean outer, List<UvPoint> points) {
+    ParametricLoopPayload {
+        points = PreviewPayloadCopies.copy(points);
+    }
 }
 
 record UvBounds(double minU, double minV, double maxU, double maxV) {
@@ -227,6 +304,10 @@ record UvBounds(double minU, double minV, double maxU, double maxV) {
 }
 
 record EdgePayload(int stepId, List<PointPayload> points, EdgeCurvePayload curve, ColorPayload color) {
+    EdgePayload {
+        points = PreviewPayloadCopies.copy(points);
+    }
+
     EdgePayload(int stepId, List<PointPayload> points, EdgeCurvePayload curve) {
         this(stepId, points, curve, null);
     }
@@ -257,6 +338,15 @@ record EdgeCurvePayload(
         double startAngle,
         double sweepAngle
 ) {
+    EdgeCurvePayload {
+        center = PreviewPayloadCopies.copy(center);
+        axis = PreviewPayloadCopies.copy(axis);
+        xDirection = PreviewPayloadCopies.copy(xDirection);
+        refDirection = PreviewPayloadCopies.copy(refDirection);
+        associatedSurfaceTypes = PreviewPayloadCopies.copy(associatedSurfaceTypes);
+        associatedSurfaceStepIds = PreviewPayloadCopies.copy(associatedSurfaceStepIds);
+    }
+
     EdgeCurvePayload(
             int stepId,
             String type,
@@ -308,6 +398,17 @@ record FaceSurfacePayload(
         Boolean implicitOuter,
         Double transformScale
 ) {
+    FaceSurfacePayload {
+        center = PreviewPayloadCopies.copy(center);
+        axis = PreviewPayloadCopies.copy(axis);
+        xDirection = PreviewPayloadCopies.copy(xDirection);
+        controlPoints = PreviewPayloadCopies.copyControlPoints(controlPoints);
+        uMultiplicities = PreviewPayloadCopies.copy(uMultiplicities);
+        vMultiplicities = PreviewPayloadCopies.copy(vMultiplicities);
+        uKnots = PreviewPayloadCopies.copy(uKnots);
+        vKnots = PreviewPayloadCopies.copy(vKnots);
+    }
+
     FaceSurfacePayload(
             String type,
             List<Double> center,
@@ -350,6 +451,12 @@ record FacePayload(
         FaceSurfacePayload surface,
         List<ParametricLoopPayload> uvLoops
 ) {
+    FacePayload {
+        layers = PreviewPayloadCopies.copy(layers);
+        loops = PreviewPayloadCopies.copy(loops);
+        triangles = PreviewPayloadCopies.copy(triangles);
+        uvLoops = PreviewPayloadCopies.copy(uvLoops);
+    }
 }
 
 record UnsupportedFacePayload(
@@ -377,6 +484,12 @@ record SurfacePatch(
         List<CartesianPoint> left,
         List<CartesianPoint> right
 ) {
+    SurfacePatch {
+        bottom = PreviewPayloadCopies.copy(bottom);
+        top = PreviewPayloadCopies.copy(top);
+        left = PreviewPayloadCopies.copy(left);
+        right = PreviewPayloadCopies.copy(right);
+    }
 
     int uSegments() {
         return bottom.size() - 1;
@@ -454,6 +567,9 @@ record SurfacePatch(
 }
 
 record LoopPayload(boolean outer, List<PointPayload> points) {
+    LoopPayload {
+        points = PreviewPayloadCopies.copy(points);
+    }
 }
 
 record PointPayload(double x, double y, double z) {
@@ -466,12 +582,24 @@ record ColorPayload(int red, int green, int blue) {
 }
 
 record PbrPayload(double diffuse, double specular, Double specularExponent, int[] specularColor) {
+    PbrPayload {
+        specularColor = PreviewPayloadCopies.copy(specularColor);
+    }
+
+    @Override
+    public int[] specularColor() {
+        return PreviewPayloadCopies.copy(specularColor);
+    }
 }
 
 record GeometrySummary(int faceCount, int edgeCount, double approxSurfaceArea, double approxEdgeLength) {
 }
 
 record RepresentationMeshes(String name, List<FaceNode> faces, List<EdgeNode> edges) {
+    RepresentationMeshes {
+        faces = PreviewPayloadCopies.copy(faces);
+        edges = PreviewPayloadCopies.copy(edges);
+    }
 }
 
 record FaceNode(FacePayload face, int meshIndex, String name) {
@@ -481,10 +609,70 @@ record EdgeNode(EdgePayload edge, int meshIndex, String name) {
 }
 
 record FloatArrayData(float[] values, int count, float[] min, float[] max) {
+    FloatArrayData {
+        values = PreviewPayloadCopies.copy(values);
+        min = PreviewPayloadCopies.copy(min);
+        max = PreviewPayloadCopies.copy(max);
+    }
+
+    @Override
+    public float[] values() {
+        return PreviewPayloadCopies.copy(values);
+    }
+
+    @Override
+    public float[] min() {
+        return PreviewPayloadCopies.copy(min);
+    }
+
+    @Override
+    public float[] max() {
+        return PreviewPayloadCopies.copy(max);
+    }
 }
 
 record IntArrayData(int[] values, int count) {
+    IntArrayData {
+        values = PreviewPayloadCopies.copy(values);
+    }
+
+    @Override
+    public int[] values() {
+        return PreviewPayloadCopies.copy(values);
+    }
 }
 
 record IndexedTriangleMesh(FloatArrayData positions, FloatArrayData normals, IntArrayData indices) {
+}
+
+final class PreviewPayloadCopies {
+    private PreviewPayloadCopies() {
+    }
+
+    static <T> List<T> copy(List<T> values) {
+        return values == null ? null : List.copyOf(values);
+    }
+
+    static List<List<List<Double>>> copyControlPoints(List<List<List<Double>>> values) {
+        if (values == null) {
+            return null;
+        }
+        return values.stream()
+                .map(plane -> plane == null ? null : plane.stream()
+                        .map(row -> row == null ? null : List.copyOf(row))
+                        .toList())
+                .toList();
+    }
+
+    static double[] copy(double[] values) {
+        return values == null ? null : values.clone();
+    }
+
+    static float[] copy(float[] values) {
+        return values == null ? null : values.clone();
+    }
+
+    static int[] copy(int[] values) {
+        return values == null ? null : values.clone();
+    }
 }

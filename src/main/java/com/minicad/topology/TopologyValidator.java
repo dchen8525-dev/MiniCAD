@@ -1,6 +1,10 @@
 package com.minicad.topology;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.MiniCadIssue;
+import com.minicad.geometry.BoundingBox3;
+import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.Plane;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -33,7 +37,9 @@ public final class TopologyValidator {
 
         List<MiniCadIssue> issues = new ArrayList<>();
         Map<Edge, EdgeUseSummary> edgeUses = new IdentityHashMap<>();
-        for (Face face : shell.faces()) {
+        for (int faceIndex = 0; faceIndex < shell.faces().size(); faceIndex++) {
+            Face face = shell.faces().get(faceIndex);
+            validateFace(face, faceIndex, issues);
             for (FaceBound bound : face.bounds()) {
                 if (bound.loop() instanceof EdgeLoop edgeLoop) {
                     for (OrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -79,6 +85,83 @@ public final class TopologyValidator {
         return new ValidationResult(issues);
     }
 
+    /**
+     * Validates a solid and its optional void shells.
+     *
+     * @param solid solid to validate
+     * @return validation result
+     */
+    public static ValidationResult validateSolid(Solid solid) {
+        if (solid == null) {
+            return new ValidationResult(List.of(MiniCadIssue.error(
+                    "solid.null",
+                    null,
+                    null,
+                    "solid must not be null"
+            )));
+        }
+
+        List<MiniCadIssue> issues = new ArrayList<>();
+        issues.addAll(validateShell(solid.outerShell()).issues());
+
+        BoundingBox3 outerBox = solid.outerShell().boundingBox();
+        double outerVolumeSign = Math.signum(signedShellVolume(solid.outerShell()));
+        for (int index = 0; index < solid.voidShells().size(); index++) {
+            Shell voidShell = solid.voidShells().get(index);
+            issues.addAll(validateShell(voidShell).issues());
+            if (!outerBox.contains(voidShell.boundingBox())) {
+                issues.add(MiniCadIssue.error(
+                        "solid.void_outside_outer",
+                        null,
+                        null,
+                        "void shell " + index + " bounding box must be inside the outer shell bounding box"
+                ));
+            }
+
+            double voidVolumeSign = Math.signum(signedShellVolume(voidShell));
+            if (outerVolumeSign != 0.0 && voidVolumeSign != 0.0 && outerVolumeSign == voidVolumeSign) {
+                issues.add(MiniCadIssue.error(
+                        "solid.void_orientation",
+                        null,
+                        null,
+                        "void shell " + index + " orientation must be opposite to the outer shell"
+                ));
+            }
+        }
+
+        return new ValidationResult(issues);
+    }
+
+    private static void validateFace(Face face, int faceIndex, List<MiniCadIssue> issues) {
+        if (face.surface() instanceof Plane) {
+            double area = planarOuterArea(face);
+            if (area <= Epsilon.EPS) {
+                issues.add(MiniCadIssue.error(
+                        "face.zero_area",
+                        null,
+                        null,
+                        "planar face at shell index " + faceIndex + " has zero area"
+                ));
+            }
+        }
+    }
+
+    private static double planarOuterArea(Face face) {
+        FaceBound outer = face.outerBound();
+        if (outer == null) {
+            return 0.0;
+        }
+        if (outer.loop() instanceof EdgeLoop edgeLoop) {
+            return polygonArea3d(edgeLoop.vertices().stream()
+                    .map(Vertex::point)
+                    .toList());
+        }
+        if (outer.loop() instanceof PolyLoop polyLoop) {
+            return polygonArea3d(polyLoop.points());
+        }
+        return 0.0;
+    }
+
     private static String describeEdge(Edge edge) {
         return "(" + describeVertex(edge.start()) + " -> " + describeVertex(edge.end()) + ")";
     }
@@ -89,6 +172,62 @@ public final class TopologyValidator {
                 vertex.point().x(),
                 vertex.point().y(),
                 vertex.point().z()
+        );
+    }
+
+    private static double signedShellVolume(Shell shell) {
+        double volume = 0.0;
+        for (Face face : shell.faces()) {
+            FaceBound outer = face.outerBound();
+            if (outer != null && outer.loop() instanceof EdgeLoop edgeLoop) {
+                double contribution = signedLoopVolume(edgeLoop.vertices());
+                volume += face.sameSense() ? contribution : -contribution;
+            }
+        }
+        return volume / 6.0;
+    }
+
+    private static double signedLoopVolume(List<Vertex> vertices) {
+        if (vertices.size() < 3) {
+            return 0.0;
+        }
+        CartesianPoint origin = vertices.get(0).point();
+        double volume = 0.0;
+        for (int index = 1; index < vertices.size() - 1; index++) {
+            CartesianPoint b = vertices.get(index).point();
+            CartesianPoint c = vertices.get(index + 1).point();
+            volume += dot(origin, cross(b, c));
+        }
+        return volume;
+    }
+
+    private static double polygonArea3d(List<CartesianPoint> points) {
+        if (points.size() < 3) {
+            return 0.0;
+        }
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        for (int index = 0; index < points.size(); index++) {
+            CartesianPoint current = points.get(index);
+            CartesianPoint next = points.get((index + 1) % points.size());
+            CartesianPoint cross = cross(current, next);
+            x += cross.x();
+            y += cross.y();
+            z += cross.z();
+        }
+        return 0.5 * Math.sqrt(x * x + y * y + z * z);
+    }
+
+    private static double dot(CartesianPoint a, CartesianPoint b) {
+        return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+    }
+
+    private static CartesianPoint cross(CartesianPoint a, CartesianPoint b) {
+        return new CartesianPoint(
+                a.y() * b.z() - a.z() * b.y(),
+                a.z() * b.x() - a.x() * b.z(),
+                a.x() * b.y() - a.y() * b.x()
         );
     }
 

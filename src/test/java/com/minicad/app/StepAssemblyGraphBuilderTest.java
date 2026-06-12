@@ -3,6 +3,9 @@ package com.minicad.app;
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyNode;
 import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.geometry.StepAxis2Placement3D;
+import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.geometry.StepDirection;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StepAssemblyGraphBuilderTest {
 
@@ -119,5 +123,59 @@ class StepAssemblyGraphBuilderTest {
         assertEquals(-1.0, second.worldMatrix()[1], 1.0e-9);
         assertEquals(1.0, second.worldMatrix()[4], 1.0e-9);
         assertEquals(0.0, second.worldMatrix()[5], 1.0e-9);
+    }
+
+    @Test
+    void shouldRejectParallelPlacementAxisAndReferenceDirection() {
+        StepAxis2Placement3D placement = placement(
+                List.of(0.0, 0.0, 0.0),
+                List.of(0.0, 0.0, 1.0),
+                List.of(0.0, 0.0, 2.0));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> StepAssemblyGraphBuilder.matrixForPlacement(placement));
+
+        assertEquals("AXIS2_PLACEMENT_3D #1 axis and refDirection must not be parallel", ex.getMessage());
+    }
+
+    @Test
+    void shouldOrthogonalizeSkewPlacementReferenceDirection() {
+        StepAxis2Placement3D placement = placement(
+                List.of(1.0, 2.0, 3.0),
+                List.of(0.0, 0.0, 1.0),
+                List.of(1.0, 1.0, 0.25));
+
+        double[] matrix = StepAssemblyGraphBuilder.matrixForPlacement(placement);
+
+        assertEquals(1.0, matrix[3], 1.0e-9);
+        assertEquals(2.0, matrix[7], 1.0e-9);
+        assertEquals(3.0, matrix[11], 1.0e-9);
+        assertEquals(0.0, dot(column(matrix, 0), column(matrix, 1)), 1.0e-9);
+        assertEquals(0.0, dot(column(matrix, 0), column(matrix, 2)), 1.0e-9);
+        assertEquals(0.0, dot(column(matrix, 1), column(matrix, 2)), 1.0e-9);
+        assertEquals(1.0, length(column(matrix, 0)), 1.0e-9);
+        assertEquals(1.0, length(column(matrix, 1)), 1.0e-9);
+        assertEquals(1.0, length(column(matrix, 2)), 1.0e-9);
+    }
+
+    private static StepAxis2Placement3D placement(List<Double> origin, List<Double> axis, List<Double> refDirection) {
+        return new StepAxis2Placement3D(
+                1,
+                "P",
+                new StepCartesianPoint(2, "O", origin),
+                new StepDirection(3, "Z", axis),
+                new StepDirection(4, "X", refDirection));
+    }
+
+    private static double[] column(double[] matrix, int column) {
+        return new double[]{matrix[column], matrix[4 + column], matrix[8 + column]};
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    private static double length(double[] vector) {
+        return Math.sqrt(dot(vector, vector));
     }
 }

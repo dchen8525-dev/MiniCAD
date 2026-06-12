@@ -45,12 +45,21 @@ class StepViewerStaticResourcesTest {
         assertTrue(html.contains("\"three\": \"/vendor/three/build/three.module.js\""));
         assertTrue(html.contains("<script type=\"module\" src=\"/viewer.js\"></script>"));
 
-        assertTrue(js.contains("const maxUploadBytes = 50 * 1024 * 1024;"));
+        assertTrue(js.contains("const defaultMaxUploadBytes = 50 * 1024 * 1024;"));
+        assertTrue(js.contains("let maxUploadBytes = defaultMaxUploadBytes;"));
+        assertTrue(js.contains("async function loadViewerConfig()"));
+        assertTrue(js.contains("fetch('/api/config', { method: 'GET' })"));
+        assertTrue(js.contains("void loadViewerConfig();"));
         assertTrue(js.contains("acceptedStepExtensions = new Set(['.step', '.stp', '.p21'])"));
         assertTrue(js.contains("function validateStepFile(file)"));
+        assertTrue(js.contains("viewer upload limit is"));
+        assertTrue(!js.contains("X-MiniCAD-Cache-Path"));
         assertTrue(js.contains("sceneHost.addEventListener('drop'"));
         assertTrue(js.contains("disposeMaterial(material"));
-        assertTrue(js.contains("value.dispose();"));
+        assertTrue(js.contains("function disposeTexture(texture)"));
+        assertTrue(js.contains("texture.dispose();"));
+        assertTrue(js.contains("typeof image.close === 'function'"));
+        assertTrue(js.contains("image.close();"));
         assertTrue(js.contains("updateProduct();"));
         assertTrue(js.contains("updateUnits();"));
     }

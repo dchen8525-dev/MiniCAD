@@ -97,6 +97,32 @@ public final class StepParameterReader {
             + valueType(definition.parameters().get(index)));
   }
 
+  private static StepResolutionException parameterTypeMismatch(
+      StepEntityDefinition definition, int index, String entityName, String expected) {
+    return new StepResolutionException(
+        entityName
+            + " parameter "
+            + index
+            + " type mismatch: expected "
+            + expected
+            + ", actual "
+            + valueType(definition.parameters().get(index)));
+  }
+
+  private static StepResolutionException parameterElementTypeMismatch(
+      String entityName, int index, String elementRole, String expected, StepValue actual) {
+    return new StepResolutionException(
+        entityName
+            + " parameter "
+            + index
+            + " "
+            + elementRole
+            + " type mismatch: expected "
+            + expected
+            + ", actual "
+            + valueType(actual));
+  }
+
   public static String valueType(StepValue value) {
     StepValue unwrapped = unwrapTyped(value);
     return switch (unwrapped) {
@@ -216,8 +242,7 @@ public final class StepParameterReader {
     if (value instanceof StepValue.StringValue stringValue) {
       return stringValue.value();
     }
-    throw new StepResolutionException(
-        entityName + " parameter " + index + " must be a string");
+    throw parameterTypeMismatch(definition, index, entityName, "string");
   }
 
   /**
@@ -241,8 +266,7 @@ public final class StepParameterReader {
     if (value instanceof StepValue.NumberValue numberValue) {
       return numberValue.value();
     }
-    throw new StepResolutionException(
-        entityName + " parameter " + index + " must be a number");
+    throw parameterTypeMismatch(definition, index, entityName, "number");
   }
 
   /**
@@ -266,7 +290,10 @@ public final class StepParameterReader {
     double value = numberValue(definition, index, entityName);
     if (value != Math.rint(value)) {
       throw new StepResolutionException(
-          entityName + " parameter " + index + " must be an integer");
+          entityName
+              + " parameter "
+              + index
+              + " type mismatch: expected integer, actual non-integral number");
     }
     return (int) value;
   }
@@ -293,8 +320,7 @@ public final class StepParameterReader {
     if (value instanceof StepValue.EnumValue enumValue) {
       return enumValue.value();
     }
-    throw new StepResolutionException(
-        entityName + " parameter " + index + " must be an enum");
+    throw parameterTypeMismatch(definition, index, entityName, "enum");
   }
 
   /**
@@ -307,7 +333,12 @@ public final class StepParameterReader {
       case "F" -> false;
       default ->
           throw new StepResolutionException(
-              entityName + " parameter " + index + " must be .T. or .F.");
+              entityName
+                  + " parameter "
+                  + index
+                  + " type mismatch: expected boolean enum .T. or .F., actual enum ."
+                  + enumValue(definition, index, entityName)
+                  + ".");
     };
   }
 
@@ -324,8 +355,7 @@ public final class StepParameterReader {
     if (value instanceof StepValue.StringValue strValue) {
       return strValue.value();
     }
-    throw new StepResolutionException(
-        entityName + " parameter " + index + " must be a LOGICAL value (.T., .F., or .U.)");
+    throw parameterTypeMismatch(definition, index, entityName, "LOGICAL value (.T., .F., or .U.)");
   }
 
   // ---------------------------------------------------------------------------
@@ -341,8 +371,7 @@ public final class StepParameterReader {
     if (value instanceof StepValue.ReferenceValue referenceValue) {
       return referenceValue.id();
     }
-    throw new StepResolutionException(
-        entityName + " parameter " + index + " must be a reference");
+    throw parameterTypeMismatch(definition, index, entityName, "reference");
   }
 
   /**
@@ -360,7 +389,9 @@ public final class StepParameterReader {
     if (value instanceof StepValue.ReferenceValue referenceValue) {
       return resolver.apply(referenceValue.id());
     }
-    throw new StepResolutionException("parameter must be a reference or omit/not-provided");
+    throw new StepResolutionException(
+        "parameter type mismatch: expected reference, omitted, or not-provided, actual "
+            + valueType(value));
   }
 
   /**
@@ -448,8 +479,7 @@ public final class StepParameterReader {
       int minSize, int maxSize, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     if (listValue.elements().size() < minSize || listValue.elements().size() > maxSize) {
       throw new StepResolutionException(
@@ -461,8 +491,7 @@ public final class StepParameterReader {
       if (unwrapped instanceof StepValue.NumberValue numberValue) {
         result.add(numberValue.value());
       } else {
-        throw new StepResolutionException(
-            entityName + " coordinate list must contain only numbers");
+        throw parameterElementTypeMismatch(entityName, index, "coordinate element", "number", element);
       }
     }
     return List.copyOf(result);
@@ -483,15 +512,13 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-        throw new StepResolutionException(
-            entityName + " numeric list must contain only numbers");
+        throw parameterElementTypeMismatch(entityName, index, "numeric list element", "number", element);
       }
       result.add(numberValue.value());
     }
@@ -505,20 +532,21 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     List<Integer> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-        throw new StepResolutionException(
-            entityName + " integer list must contain only numbers");
+        throw parameterElementTypeMismatch(entityName, index, "integer list element", "number", element);
       }
       double dv = numberValue.value();
       if (dv != Math.rint(dv)) {
         throw new StepResolutionException(
-            entityName + " integer list must contain only integers");
+            entityName
+                + " parameter "
+                + index
+                + " integer list element type mismatch: expected integer, actual non-integral number");
       }
       result.add((int) dv);
     }
@@ -532,15 +560,13 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.StringValue strValue)) {
-        throw new StepResolutionException(
-            entityName + " string list must contain only strings");
+        throw parameterElementTypeMismatch(entityName, index, "string list element", "string", element);
       }
       result.add(strValue.value());
     }
@@ -558,15 +584,13 @@ public final class StepParameterReader {
     }
     StepValue unwrapped = unwrapTyped(value);
     if (!(unwrapped instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a string list");
+      throw parameterTypeMismatch(definition, index, entityName, "string list");
     }
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrappedElement = unwrapTyped(element);
       if (!(unwrappedElement instanceof StepValue.StringValue stringValue)) {
-        throw new StepResolutionException(
-            entityName + " string list must contain only strings");
+        throw parameterElementTypeMismatch(entityName, index, "string list element", "string", element);
       }
       result.add(stringValue.value());
     }
@@ -591,7 +615,8 @@ public final class StepParameterReader {
     for (double value : values) {
       if (value != Math.rint(value)) {
         throw new StepResolutionException(
-            entityName + " integer list must contain only integers");
+            entityName
+                + " integer list element type mismatch: expected integer, actual non-integral number");
       }
       result.add((int) value);
     }
@@ -604,13 +629,17 @@ public final class StepParameterReader {
    */
   public static List<Double> extractNumberList(StepValue value, String paramName) {
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(paramName + " parameter must be a list");
+      throw new StepResolutionException(
+          paramName + " parameter type mismatch: expected list, actual " + valueType(value));
     }
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
       if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-        throw new StepResolutionException(paramName + " numeric list must contain only numbers");
+        throw new StepResolutionException(
+            paramName
+                + " numeric list element type mismatch: expected number, actual "
+                + valueType(element));
       }
       result.add(numberValue.value());
     }
@@ -624,8 +653,7 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     return List.copyOf(listValue.elements());
   }
@@ -637,8 +665,7 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue listValue)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a list");
+      throw parameterTypeMismatch(definition, index, entityName, "list");
     }
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
@@ -654,22 +681,19 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue outerList)) {
-      throw new StepResolutionException(
-          entityName + " parameter " + index + " must be a nested list");
+      throw parameterTypeMismatch(definition, index, entityName, "nested list");
     }
     List<List<Double>> grid = new ArrayList<>(outerList.elements().size());
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
       if (!(row instanceof StepValue.ListValue rowList)) {
-        throw new StepResolutionException(
-            entityName + " numeric grid must contain only nested numeric lists");
+        throw parameterElementTypeMismatch(entityName, index, "grid row", "list", rowValue);
       }
       List<Double> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
         if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
-          throw new StepResolutionException(
-              entityName + " numeric grid must contain only numbers");
+          throw parameterElementTypeMismatch(entityName, index, "grid element", "number", element);
         }
         entries.add(numberValue.value());
       }

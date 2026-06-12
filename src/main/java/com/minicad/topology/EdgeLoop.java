@@ -15,12 +15,6 @@ import java.util.List;
 public record EdgeLoop(List<OrientedEdge> edges) implements Loop {
 
     /**
-     * Tolerance for loop connectivity during STEP import. After vertex projection
-     * onto curves, shared endpoints may differ by microns between adjacent edges.
-     */
-    private static final double IMPORT_LOOP_TOLERANCE = 1.0e-2;
-
-    /**
      * Creates a loop and validates closure/connectivity.
      */
     public EdgeLoop {
@@ -40,8 +34,10 @@ public record EdgeLoop(List<OrientedEdge> edges) implements Loop {
 
             OrientedEdge next = edges.get((i + 1) % edges.size());
             double gap = current.endVertex().point().distanceTo(next.startVertex().point());
-            if (gap > IMPORT_LOOP_TOLERANCE) {
-                throw new TopologyException("edge loop must be connected and closed");
+            if (gap > Epsilon.IMPORT_TOPOLOGY_TOLERANCE) {
+                throw new TopologyException("edge loop must be connected and closed between edge "
+                        + i + " and edge " + ((i + 1) % edges.size()) + "; gap " + gap
+                        + " exceeds tolerance " + Epsilon.IMPORT_TOPOLOGY_TOLERANCE);
             }
         }
     }

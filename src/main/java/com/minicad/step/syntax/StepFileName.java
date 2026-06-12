@@ -1,7 +1,9 @@
 package com.minicad.step.syntax;
 
-import java.time.LocalDateTime;
+import com.minicad.common.StepParseException;
+
 import java.util.List;
+
 /**
  * Parsed HEADER section FileName entry.
  * Contains file name, timestamp, author, organization, etc.
@@ -15,11 +17,19 @@ public record StepFileName(
     String originatingSystem,
     String authorization) {
 
+    public StepFileName {
+        author = List.copyOf(author);
+        organization = List.copyOf(organization);
+    }
+
     public static StepFileName from(StepHeaderEntry entry) {
         if (!"FILE_NAME".equalsIgnoreCase(entry.name())) {
             throw new IllegalArgumentException("Expected FILE_NAME, got " + entry.name());
         }
         List<StepValue> params = entry.parameters();
+        if (params.size() != 7) {
+            throw new StepParseException("FILE_NAME header entry expected 7 parameters, got " + params.size());
+        }
         return new StepFileName(
             extractString(params.get(0)),
             extractString(params.get(1)),

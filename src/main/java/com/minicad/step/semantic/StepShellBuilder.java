@@ -195,18 +195,17 @@ final class StepShellBuilder {
     }
 
     private Shell buildGeometricSurfaceSetShell(StepGeometricSurfaceSet surfaceSet) {
-        List<Face> faces = new ArrayList<>();
         for (StepEntity element : surfaceSet.elements()) {
             SurfaceGeometry surface = builder.buildSupportedFaceGeometry(element, "SURFACE");
-            if (surface == null) {
-                continue;
-            }
-            try {
-                faces.add(new Face(surface, List.of(), true));
-            } catch (Exception ignored) {
+            if (surface != null) {
+                throw new UnsupportedGeometryException(
+                        "GEOMETRIC_SURFACE_SET shell construction requires bounded face geometry"
+                );
             }
         }
-        return new Shell(faces, !faces.isEmpty());
+        throw new UnsupportedGeometryException(
+                "GEOMETRIC_SURFACE_SET shell construction requires supported surface elements"
+        );
     }
 
     private Shell buildFaceBasedSurfaceModel(StepFaceBasedSurfaceModel faceModel) {
