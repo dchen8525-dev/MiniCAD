@@ -1,6 +1,7 @@
 package com.minicad.step.model.classification;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal CLASSIFICATION_ASSIGNMENT metadata.
  *
@@ -8,14 +9,51 @@ import com.minicad.step.model.base.StepEntity;
  * @param assignedClass assigned classification group
  * @param role assignment role
  */
-public record StepClassificationAssignment(
-        int id,
-        StepGroup assignedClass,
-        StepClassificationRole role
-) implements StepEntity {
+/**
+ * Minimal CLASSIFICATION_ASSIGNMENT metadata.
+ *
+ * @param id STEP instance id
+ * @param assignedClass assigned classification group
+ * @param role assignment role
+ */
+public final class StepClassificationAssignment implements StepEntity {
+    private final int id;
+    private final StepGroup assignedClass;
+    private final StepClassificationRole role;
+
+    public StepClassificationAssignment(int id, StepGroup assignedClass, StepClassificationRole role) {
+        this.id = id;
+        this.assignedClass = assignedClass;
+        this.role = role;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepGroup getAssignedClass() {
+        return assignedClass;
+    }
+
+    public StepClassificationRole getRole() {
+        return role;
+    }
 
     @Override
-    public String name() {
-        return role.name();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepClassificationAssignment that = (StepClassificationAssignment) o;
+        return id == that.id && Objects.equals(assignedClass, that.assignedClass) && Objects.equals(role, that.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, assignedClass, role);
+    }
+
+    @Override
+    public String toString() {
+        return "StepClassificationAssignment{" + "id=" + id + "assignedClass=" + assignedClass + "role=" + role + "}";
     }
 }

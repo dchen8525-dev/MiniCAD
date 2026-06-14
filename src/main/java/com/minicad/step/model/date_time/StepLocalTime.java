@@ -1,6 +1,7 @@
 package com.minicad.step.model.date_time;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal LOCAL_TIME metadata.
  *
@@ -10,19 +11,65 @@ import com.minicad.step.model.base.StepEntity;
  * @param secondComponent optional second value
  * @param zone UTC offset
  */
-public record StepLocalTime(
-        int id,
-        int hourComponent,
-        int minuteComponent,
-        Double secondComponent,
-        StepCoordinatedUniversalTimeOffset zone
-) implements StepEntity {
+/**
+ * Minimal LOCAL_TIME metadata.
+ *
+ * @param id STEP instance id
+ * @param hourComponent hour value
+ * @param minuteComponent minute value
+ * @param secondComponent optional second value
+ * @param zone UTC offset
+ */
+public final class StepLocalTime implements StepEntity {
+    private final int id;
+    private final int hourComponent;
+    private final int minuteComponent;
+    private final Double secondComponent;
+    private final StepCoordinatedUniversalTimeOffset zone;
+
+    public StepLocalTime(int id, int hourComponent, int minuteComponent, Double secondComponent, StepCoordinatedUniversalTimeOffset zone) {
+        this.id = id;
+        this.hourComponent = hourComponent;
+        this.minuteComponent = minuteComponent;
+        this.secondComponent = secondComponent;
+        this.zone = zone;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getHourComponent() {
+        return hourComponent;
+    }
+
+    public int getMinuteComponent() {
+        return minuteComponent;
+    }
+
+    public Double getSecondComponent() {
+        return secondComponent;
+    }
+
+    public StepCoordinatedUniversalTimeOffset getZone() {
+        return zone;
+    }
 
     @Override
-    public String name() {
-        if (secondComponent == null) {
-            return "%02d:%02d".formatted(hourComponent, minuteComponent);
-        }
-        return "%02d:%02d:%s".formatted(hourComponent, minuteComponent, secondComponent);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepLocalTime that = (StepLocalTime) o;
+        return id == that.id && hourComponent == that.hourComponent && minuteComponent == that.minuteComponent && Objects.equals(secondComponent, that.secondComponent) && Objects.equals(zone, that.zone);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, hourComponent, minuteComponent, secondComponent, zone);
+    }
+
+    @Override
+    public String toString() {
+        return "StepLocalTime{" + "id=" + id + "hourComponent=" + hourComponent + "minuteComponent=" + minuteComponent + "secondComponent=" + secondComponent + "zone=" + zone + "}";
     }
 }

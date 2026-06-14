@@ -51,6 +51,7 @@ import com.minicad.topology.Shell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class StepShellBuilder {
 
@@ -62,34 +63,44 @@ final class StepShellBuilder {
 
     Shell buildShell(int id) {
         StepEntity entity = builder.requireExistingEntity(id);
-        if (entity instanceof StepOpenShell openShell) {
+        if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
             return buildFaceShell(openShell.faces(), false);
         }
-        if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+        if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
             return buildFaceShell(surfacedOpenShell.faces(), false);
         }
-        if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+        if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
             return buildFaceShell(orientedOpenShell.faces(), false);
         }
-        if (entity instanceof StepClosedShell closedShell) {
+        if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
             return buildFaceShell(closedShell.faces(), true);
         }
-        if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+        if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
             return buildFaceShell(orientedClosedShell.faces(), true);
         }
-        if (entity instanceof StepTessellatedFace tessellated) {
+        if (entity instanceof StepTessellatedFace) {
+            StepTessellatedFace tessellated = (StepTessellatedFace) entity;
             return builder.buildTessellatedFaceShell(tessellated);
         }
-        if (entity instanceof StepTessellatedFaceSet tessellated) {
+        if (entity instanceof StepTessellatedFaceSet) {
+            StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) entity;
             return builder.buildTessellatedShell(tessellated);
         }
-        if (entity instanceof StepTriangulatedFace triangulated) {
+        if (entity instanceof StepTriangulatedFace) {
+            StepTriangulatedFace triangulated = (StepTriangulatedFace) entity;
             return builder.buildTriangulatedFaceShell(triangulated);
         }
-        if (entity instanceof StepComplexTriangulatedFace complex) {
+        if (entity instanceof StepComplexTriangulatedFace) {
+            StepComplexTriangulatedFace complex = (StepComplexTriangulatedFace) entity;
             return builder.buildComplexTriangulatedFaceShell(complex);
         }
-        if (entity instanceof StepCubicBezierTriangulatedFace bezier) {
+        if (entity instanceof StepCubicBezierTriangulatedFace) {
+            StepCubicBezierTriangulatedFace bezier = (StepCubicBezierTriangulatedFace) entity;
             return builder.buildCubicBezierTriangulatedFaceShell(bezier);
         }
         if (entity instanceof StepVertexShell) {
@@ -98,10 +109,12 @@ final class StepShellBuilder {
         if (entity instanceof StepWireShell) {
             return new Shell(List.of(), false);
         }
-        if (entity instanceof StepConnectedFaceSet connectedFaces) {
+        if (entity instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaces = (StepConnectedFaceSet) entity;
             return buildConnectedFaceSet(connectedFaces);
         }
-        if (entity instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+        if (entity instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
             return buildConnectedFaceSubSet(connectedFaceSubSet);
         }
         if (entity instanceof StepGeometricCurveSet) {
@@ -110,22 +123,28 @@ final class StepShellBuilder {
         if (entity instanceof StepGeometricSet) {
             return new Shell(List.of(), false);
         }
-        if (entity instanceof StepGeometricSurfaceSet surfaceSet) {
+        if (entity instanceof StepGeometricSurfaceSet) {
+            StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) entity;
             return buildGeometricSurfaceSetShell(surfaceSet);
         }
-        if (entity instanceof StepFaceBasedSurfaceModel faceModel) {
+        if (entity instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) entity;
             return buildFaceBasedSurfaceModel(faceModel);
         }
-        if (entity instanceof StepManifoldSurfaceModel manifoldModel) {
+        if (entity instanceof StepManifoldSurfaceModel) {
+            StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) entity;
             return buildManifoldSurfaceModel(manifoldModel);
         }
-        if (entity instanceof StepShellBasedSurfaceModel shellModel) {
+        if (entity instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel shellModel = (StepShellBasedSurfaceModel) entity;
             return buildShellBasedSurfaceModel(shellModel);
         }
-        if (entity instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (entity instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
             return buildShellBasedWireframeModel(wireframeModel);
         }
-        if (entity instanceof StepSurfacePatch surfacePatch) {
+        if (entity instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) entity;
             return buildSurfacePatchShell(surfacePatch);
         }
         if (entity instanceof StepEdgeBasedWireframeModel) {
@@ -137,20 +156,25 @@ final class StepShellBuilder {
         if (entity instanceof StepEdgeWire) {
             return new Shell(List.of(), false);
         }
-        if (entity instanceof StepPlanarBox planarBox) {
+        if (entity instanceof StepPlanarBox) {
+            StepPlanarBox planarBox = (StepPlanarBox) entity;
             return buildPlanarBoxShell(planarBox);
         }
-        if (entity instanceof StepPlanarExtent planarExtent) {
+        if (entity instanceof StepPlanarExtent) {
+            StepPlanarExtent planarExtent = (StepPlanarExtent) entity;
             return buildPlanarExtentShell(planarExtent);
         }
         if (entity instanceof StepPointSet) {
             throw new UnsupportedGeometryException("POINT_SET cannot be converted to a B-Rep shell");
         }
-        if (entity instanceof StepFiniteElementMesh femMesh) {
+        if (entity instanceof StepFiniteElementMesh) {
+            StepFiniteElementMesh femMesh = (StepFiniteElementMesh) entity;
             return builder.buildFiniteElementMeshShell(femMesh);
         }
-        if (entity instanceof StepFlatPattern flatPattern) {
-            if (flatPattern.flatGeometry() instanceof StepFaceEntity faceEntity) {
+        if (entity instanceof StepFlatPattern) {
+            StepFlatPattern flatPattern = (StepFlatPattern) entity;
+            if (flatPattern.flatGeometry() instanceof StepFaceEntity) {
+                StepFaceEntity faceEntity = (StepFaceEntity) flatPattern.flatGeometry();
                 return new Shell(List.of(builder.buildFace(faceEntity.id())), false);
             }
             if (flatPattern.flatGeometry() instanceof StepOpenShell
@@ -159,10 +183,12 @@ final class StepShellBuilder {
             }
             return new Shell(List.of(), false);
         }
-        if (entity instanceof StepMappedItem mappedItem) {
+        if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
             return builder.buildShell(mappedItem.mappingTarget().id());
         }
-        if (entity instanceof StepSurfaceModel surfaceModel) {
+        if (entity instanceof StepSurfaceModel) {
+            StepSurfaceModel surfaceModel = (StepSurfaceModel) entity;
             StepEntity actual = builder.resolvedEntity(surfaceModel.id());
             if (actual != null && actual != surfaceModel) {
                 return builder.buildShell(actual.id());
@@ -177,20 +203,20 @@ final class StepShellBuilder {
     }
 
     private Shell buildFaceShell(List<? extends StepFaceEntity> faces, boolean closed) {
-        return new Shell(faces.stream().map(face -> builder.buildFace(face.id())).toList(), closed);
+        return new Shell(faces.stream().map(face -> builder.buildFace(face.id())).collect(Collectors.toList()), closed);
     }
 
     private Shell buildConnectedFaceSet(StepConnectedFaceSet connectedFaces) {
         List<Face> faces = connectedFaces.faces().stream()
                 .map(face -> builder.buildFace(face.id()))
-                .toList();
+                .collect(Collectors.toList());
         return new Shell(faces, !faces.isEmpty());
     }
 
     private Shell buildConnectedFaceSubSet(StepConnectedFaceSubSet connectedFaceSubSet) {
         List<Face> faces = connectedFaceSubSet.faces().stream()
                 .map(face -> builder.buildFace(face.id()))
-                .toList();
+                .collect(Collectors.toList());
         return new Shell(faces, !faces.isEmpty());
     }
 
@@ -211,7 +237,8 @@ final class StepShellBuilder {
     private Shell buildFaceBasedSurfaceModel(StepFaceBasedSurfaceModel faceModel) {
         List<Face> faces = new ArrayList<>();
         for (StepEntity faceSet : faceModel.faceSets()) {
-            if (faceSet instanceof StepConnectedFaceSet connectedFaces) {
+            if (faceSet instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaces = (StepConnectedFaceSet) faceSet;
                 faces.addAll(buildConnectedFaceSet(connectedFaces).faces());
             }
         }
@@ -247,7 +274,8 @@ final class StepShellBuilder {
         CartesianPoint p1;
         CartesianPoint p2;
         CartesianPoint p3;
-        if (surface instanceof Plane plane) {
+        if (surface instanceof Plane) {
+            Plane plane = (Plane) surface;
             p1 = plane.origin();
             Vector3 xDir = plane.normal().asVector().cross(new Vector3(1, 0, 0));
             if (xDir.norm() < Epsilon.EPS) {
@@ -304,7 +332,8 @@ final class StepShellBuilder {
         CartesianPoint corner = new CartesianPoint(0.0, 0.0, 0.0);
         Direction3 normal = new Direction3(0.0, 0.0, 1.0);
         Direction3 xDir = new Direction3(1.0, 0.0, 0.0);
-        if (planarBox.placement() instanceof StepAxis2Placement3D placement) {
+        if (planarBox.placement() instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement = (StepAxis2Placement3D) planarBox.placement();
             corner = builder.buildPoint(placement.location().id());
             if (placement.axis() != null) {
                 normal = builder.buildDirection(placement.axis().id());

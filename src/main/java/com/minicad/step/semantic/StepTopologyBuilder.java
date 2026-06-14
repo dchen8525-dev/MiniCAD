@@ -33,6 +33,7 @@ import com.minicad.topology.VertexLoop;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class StepTopologyBuilder {
 
@@ -49,7 +50,7 @@ final class StepTopologyBuilder {
 
     EdgeLoop buildEdgeLoop(int id) {
         StepEdgeLoop loop = builder.requireEntity(id, StepEdgeLoop.class, "EDGE_LOOP");
-        return new EdgeLoop(loop.edges().stream().map(edge -> builder.buildOrientedEdge(edge.id())).toList());
+        return new EdgeLoop(loop.edges().stream().map(edge -> builder.buildOrientedEdge(edge.id())).collect(Collectors.toList()));
     }
 
     VertexLoop buildVertexLoop(int id) {
@@ -59,20 +60,24 @@ final class StepTopologyBuilder {
 
     com.minicad.topology.PolyLoop buildPolyLoop(int id) {
         StepPolyLoop loop = builder.requireEntity(id, StepPolyLoop.class, "POLY_LOOP");
-        return new com.minicad.topology.PolyLoop(loop.polygon().stream().map(point -> builder.buildPoint(point.id())).toList());
+        return new com.minicad.topology.PolyLoop(loop.polygon().stream().map(point -> builder.buildPoint(point.id())).collect(Collectors.toList()));
     }
 
     CompositeCurve3 buildPath(int id) {
         StepEntity entity = builder.requireExistingEntity(id);
         List<StepOrientedEdge> edges;
         boolean needsEdgeOrientationFlip = false;
-        if (entity instanceof StepPath path) {
+        if (entity instanceof StepPath) {
+            StepPath path = (StepPath) entity;
             edges = path.edges();
-        } else if (entity instanceof StepOpenPath openPath) {
+        } else if (entity instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) entity;
             edges = openPath.edges();
-        } else if (entity instanceof StepSubpath subpath) {
+        } else if (entity instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) entity;
             edges = subpath.edges();
-        } else if (entity instanceof StepOrientedPath orientedPath) {
+        } else if (entity instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) entity;
             edges = orientedPath.edges();
             needsEdgeOrientationFlip = !orientedPath.orientation();
         } else {
@@ -88,13 +93,13 @@ final class StepTopologyBuilder {
                     .map(oe -> new OrientedEdge(oe.edge(), !oe.orientation()))
                     .map(OrientedEdge::edge)
                     .map(Edge::curve)
-                    .toList();
+                    .collect(Collectors.toList());
         } else {
             curves = edges.stream()
                     .map(oe -> builder.buildOrientedEdge(oe.id()))
                     .map(OrientedEdge::edge)
                     .map(Edge::curve)
-                    .toList();
+                    .collect(Collectors.toList());
         }
         return new CompositeCurve3(curves);
     }
@@ -115,7 +120,8 @@ final class StepTopologyBuilder {
 
     Face buildFace(int id) {
         StepEntity entity = builder.requireExistingEntity(id);
-        if (entity instanceof StepOrientedFace orientedFace) {
+        if (entity instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) entity;
             Face baseFace = builder.buildFace(orientedFace.faceElement().id());
             return new Face(
                     baseFace.surface(),
@@ -123,16 +129,20 @@ final class StepTopologyBuilder {
                     orientedFace.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
             );
         }
-        if (entity instanceof StepAdvancedFace advancedFace) {
+        if (entity instanceof StepAdvancedFace) {
+            StepAdvancedFace advancedFace = (StepAdvancedFace) entity;
             return buildFaceSurface(advancedFace, "ADVANCED_FACE");
         }
-        if (entity instanceof StepFaceSurface faceSurface) {
+        if (entity instanceof StepFaceSurface) {
+            StepFaceSurface faceSurface = (StepFaceSurface) entity;
             return buildFaceSurface(faceSurface, "FACE_SURFACE");
         }
-        if (entity instanceof StepSubface subface) {
+        if (entity instanceof StepSubface) {
+            StepSubface subface = (StepSubface) entity;
             return builder.buildFace(subface.faceElement().id());
         }
-        if (entity instanceof StepOrientedSubface orientedSubface) {
+        if (entity instanceof StepOrientedSubface) {
+            StepOrientedSubface orientedSubface = (StepOrientedSubface) entity;
             Face baseFace = builder.buildFace(orientedSubface.faceElement().id());
             return new Face(
                     baseFace.surface(),
@@ -140,10 +150,12 @@ final class StepTopologyBuilder {
                     orientedSubface.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
             );
         }
-        if (entity instanceof StepMachinedSurface machinedSurface) {
+        if (entity instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) entity;
             return builder.buildFace(machinedSurface.face().id());
         }
-        if (entity instanceof StepFace face) {
+        if (entity instanceof StepFace) {
+            StepFace face = (StepFace) entity;
             StepEntity actual = builder.resolvedEntity(face.id());
             if (actual != null && actual != face) {
                 if (actual instanceof StepOrientedFace || actual instanceof StepAdvancedFace
@@ -155,7 +167,8 @@ final class StepTopologyBuilder {
             }
             throw new StepResolutionException("entity #" + id + " is an abstract FACE with no concrete subtype");
         }
-        if (entity instanceof StepMappedItem mappedItem) {
+        if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
             return builder.buildFace(mappedItem.mappingTarget().id());
         }
         throw new StepResolutionException("entity #" + id + " is not a FACE");
@@ -173,7 +186,7 @@ final class StepTopologyBuilder {
         }
         List<com.minicad.topology.FaceBound> bounds = stepFace.bounds().stream()
                 .map(bound -> builder.buildFaceBound(bound.id()))
-                .toList();
+                .collect(Collectors.toList());
         if (bounds.stream().noneMatch(com.minicad.topology.FaceBound::outer)) {
             bounds = inferOuterBounds(bounds);
         }

@@ -1,6 +1,7 @@
 package com.minicad.step.model.annotation;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR.
  *
@@ -11,17 +12,72 @@ import com.minicad.step.model.base.StepEntity;
  * @param specularExponent specular exponent
  * @param specularColour specular colour
  */
-public record StepSurfaceStyleReflectanceAmbientDiffuseSpecular(
-        int id,
-        double ambientReflectance,
-        double diffuseReflectance,
-        double specularReflectance,
-        double specularExponent,
-        StepEntity specularColour
-) implements StepEntity {
+/**
+ * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR.
+ *
+ * @param id STEP instance id
+ * @param ambientReflectance ambient reflectance factor
+ * @param diffuseReflectance diffuse reflectance factor
+ * @param specularReflectance specular reflectance factor
+ * @param specularExponent specular exponent
+ * @param specularColour specular colour
+ */
+public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements StepEntity {
+    private final int id;
+    private final double ambientReflectance;
+    private final double diffuseReflectance;
+    private final double specularReflectance;
+    private final double specularExponent;
+    private final StepEntity specularColour;
+
+    public StepSurfaceStyleReflectanceAmbientDiffuseSpecular(int id, double ambientReflectance, double diffuseReflectance, double specularReflectance, double specularExponent, StepEntity specularColour) {
+        this.id = id;
+        this.ambientReflectance = ambientReflectance;
+        this.diffuseReflectance = diffuseReflectance;
+        this.specularReflectance = specularReflectance;
+        this.specularExponent = specularExponent;
+        this.specularColour = specularColour;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double getAmbientReflectance() {
+        return ambientReflectance;
+    }
+
+    public double getDiffuseReflectance() {
+        return diffuseReflectance;
+    }
+
+    public double getSpecularReflectance() {
+        return specularReflectance;
+    }
+
+    public double getSpecularExponent() {
+        return specularExponent;
+    }
+
+    public StepEntity getSpecularColour() {
+        return specularColour;
+    }
 
     @Override
-    public String name() {
-        return "";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepSurfaceStyleReflectanceAmbientDiffuseSpecular that = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) o;
+        return id == that.id && ambientReflectance == that.ambientReflectance && diffuseReflectance == that.diffuseReflectance && specularReflectance == that.specularReflectance && specularExponent == that.specularExponent && Objects.equals(specularColour, that.specularColour);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, ambientReflectance, diffuseReflectance, specularReflectance, specularExponent, specularColour);
+    }
+
+    @Override
+    public String toString() {
+        return "StepSurfaceStyleReflectanceAmbientDiffuseSpecular{" + "id=" + id + "ambientReflectance=" + ambientReflectance + "diffuseReflectance=" + diffuseReflectance + "specularReflectance=" + specularReflectance + "specularExponent=" + specularExponent + "specularColour=" + specularColour + "}";
     }
 }

@@ -9,7 +9,9 @@ import com.minicad.geometry.Plane;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Non-mutating topology checks for imported B-Rep structures.
@@ -41,7 +43,8 @@ public final class TopologyValidator {
             Face face = shell.faces().get(faceIndex);
             validateFace(face, faceIndex, issues);
             for (FaceBound bound : face.bounds()) {
-                if (bound.loop() instanceof EdgeLoop edgeLoop) {
+                if (bound.loop() instanceof EdgeLoop) {
+                    EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
                     for (OrientedEdge orientedEdge : edgeLoop.edges()) {
                         edgeUses.computeIfAbsent(orientedEdge.edge(), edge -> new EdgeUseSummary())
                                 .add(orientedEdge);
@@ -151,12 +154,14 @@ public final class TopologyValidator {
         if (outer == null) {
             return 0.0;
         }
-        if (outer.loop() instanceof EdgeLoop edgeLoop) {
+        if (outer.loop() instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) outer.loop();
             return polygonArea3d(edgeLoop.vertices().stream()
                     .map(Vertex::point)
-                    .toList());
+                    .collect(Collectors.toList()));
         }
-        if (outer.loop() instanceof PolyLoop polyLoop) {
+        if (outer.loop() instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) outer.loop();
             return polygonArea3d(polyLoop.points());
         }
         return 0.0;
@@ -261,40 +266,38 @@ public final class TopologyValidator {
      *
      * @param issues validation issues
      */
-    public record ValidationResult(List<MiniCadIssue> issues) {
+    /**
+     * Topology validation result.
+     *
+     * @param issues validation issues
+     */
+public final class ValidationResult {
+    private final List<MiniCadIssue> issues;
 
-        public ValidationResult {
-            issues = List.copyOf(issues);
-        }
-
-        /**
-         * Returns whether no validation issues were found.
-         *
-         * @return true when valid
-         */
-        public boolean ok() {
-            return issues.isEmpty();
-        }
-
-        /**
-         * Returns the number of error issues.
-         *
-         * @return error count
-         */
-        public long errorCount() {
-            return issues.stream()
-                    .filter(issue -> issue.severity() == MiniCadIssue.Severity.ERROR)
-                    .count();
-        }
-
-        /**
-         * Returns whether a code is present.
-         *
-         * @param code issue code
-         * @return true if any issue has the code
-         */
-        public boolean hasCode(String code) {
-            return issues.stream().anyMatch(issue -> issue.code().equals(code));
-        }
+    public ValidationResult(List<MiniCadIssue> issues) {
+        this.issues = issues == null ? null : java.util.List.copyOf(issues);
     }
+
+    public List<MiniCadIssue> getIssues() {
+        return issues;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValidationResult that = (ValidationResult) o;
+        return Objects.equals(issues, that.issues);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(issues);
+    }
+
+    @Override
+    public String toString() {
+        return "ValidationResult{" + "issues=" + issues + "}";
+    }
+}
 }

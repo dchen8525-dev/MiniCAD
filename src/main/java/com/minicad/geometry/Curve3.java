@@ -6,20 +6,7 @@ import com.minicad.common.Preconditions;
 /**
  * Minimal curve abstraction for topology-backed geometry.
  */
-public sealed interface Curve3 permits
-        Line3,
-        Circle,
-        Ellipse3,
-        Parabola3,
-        Hyperbola3,
-        Clothoid3,
-        DegenerateCurve3,
-        BSplineCurve3,
-        RationalBSplineCurve3,
-        TrimmedCurve3,
-        SurfaceCurve3,
-        Polyline3,
-        CompositeCurve3 {
+public interface Curve3 {
 
     /**
      * Returns whether a point lies on the curve within epsilon.

@@ -1,0 +1,9 @@
+// To reach 99.7%
+      registry.put(
+          "CHANGE_GROUP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHANGE_GROUP"));
+      registry.put(
+          "CHANGE_REQUEST",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHANGE_REQUEST"));

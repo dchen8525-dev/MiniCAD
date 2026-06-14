@@ -1,19 +1,51 @@
 package com.minicad.step.model.approval;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal CERTIFICATION_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedCertification assigned certification
  */
-public record StepCertificationAssignment(
-        int id,
-        StepCertification assignedCertification
-) implements StepEntity {
+/**
+ * Minimal CERTIFICATION_ASSIGNMENT metadata.
+ *
+ * @param id STEP instance id
+ * @param assignedCertification assigned certification
+ */
+public final class StepCertificationAssignment implements StepEntity {
+    private final int id;
+    private final StepCertification assignedCertification;
+
+    public StepCertificationAssignment(int id, StepCertification assignedCertification) {
+        this.id = id;
+        this.assignedCertification = assignedCertification;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepCertification getAssignedCertification() {
+        return assignedCertification;
+    }
 
     @Override
-    public String name() {
-        return assignedCertification.name();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepCertificationAssignment that = (StepCertificationAssignment) o;
+        return id == that.id && Objects.equals(assignedCertification, that.assignedCertification);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, assignedCertification);
+    }
+
+    @Override
+    public String toString() {
+        return "StepCertificationAssignment{" + "id=" + id + "assignedCertification=" + assignedCertification + "}";
     }
 }

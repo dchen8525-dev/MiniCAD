@@ -24,8 +24,8 @@ class SurfaceCurve3Test {
         assertPointEquals(new CartesianPoint(1.0, 0.0, 0.0), surfaceCurve.pointAt(0.5));
         assertPointEquals(new CartesianPoint(1.0, 0.0, 1.0), surfaceCurve.pointAt(1.0));
         assertPointEquals(new Vector3(0.0, 0.0, 1.0), surfaceCurve.tangentAt(1.0));
-        assertEquals(new CartesianPoint(0.0, 0.0, 0.0), surfaceCurve.sample(4).getFirst());
-        assertPointEquals(new CartesianPoint(1.0, 0.0, 1.0), surfaceCurve.sample(4).getLast());
+        assertEquals(new CartesianPoint(0.0, 0.0, 0.0), surfaceCurve.sample(4).get(0));
+        assertPointEquals(new CartesianPoint(1.0, 0.0, 1.0), surfaceCurve.sample(4).get(surfaceCurve.sample(4).size() - 1));
     }
 
     private static void assertPointEquals(CartesianPoint expected, CartesianPoint actual) {

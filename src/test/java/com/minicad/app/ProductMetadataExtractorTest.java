@@ -12,18 +12,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMetadataExtractorTest {
 
-    private static final String STEP_WITH_HEADER = """
-            ISO-10303-21;
-            HEADER;
-            FILE_DESCRIPTION(('Test Model Description'),'2;1');
-            FILE_NAME('bracket-v2.step','2026-04-17T10:00:00',('Developer'),(''),'MiniCAD','FreeCAD','');
-            FILE_SCHEMA(('AP203'));
-            ENDSEC;
-            DATA;
-            #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-            ENDSEC;
-            END-ISO-10303-21;
-            """;
+    private static final String STEP_WITH_HEADER = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "FILE_DESCRIPTION(('Test Model Description'),'2;1');\n"
+        + "FILE_NAME('bracket-v2.step','2026-04-17T10:00:00',('Developer'),(''),'MiniCAD','FreeCAD','');\n"
+        + "FILE_SCHEMA(('AP203'));\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
     @Test
     void shouldExtractHeaderMetadata() {
@@ -39,15 +38,14 @@ class ProductMetadataExtractorTest {
 
     @Test
     void shouldHandleEmptyHeader() {
-        String stepText = """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                ENDSEC;
-                END-ISO-10303-21;
-                """;
+        String stepText = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         StepFile stepFile = StepParser.parse(stepText);
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
@@ -58,16 +56,15 @@ class ProductMetadataExtractorTest {
 
     @Test
     void shouldExtractMultipleSchemas() {
-        String stepText = """
-                ISO-10303-21;
-                HEADER;
-                FILE_SCHEMA(('AP203','AP214'));
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                ENDSEC;
-                END-ISO-10303-21;
-                """;
+        String stepText = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "FILE_SCHEMA(('AP203','AP214'));\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         StepFile stepFile = StepParser.parse(stepText);
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);

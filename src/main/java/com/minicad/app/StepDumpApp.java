@@ -474,7 +474,7 @@ public final class StepDumpApp {
             err.accept("Usage: StepDumpApp [--debug] [--validate-only] [--json] <step-file>...");
             return null;
         }
-        return new CliOptions(paths.stream().map(Path::of).toList(), debug, validateOnly, json);
+        return new CliOptions(paths.stream().map(Path::of).collect(Collectors.toList()), debug, validateOnly, json);
     }
 
     private static void emitFailure(DumpFileResult result, Consumer<String> err) {
@@ -528,7 +528,7 @@ public final class StepDumpApp {
     private static BoundingBox3 calculatePointBoundingBox(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
         BoundingBox3.Box box = BoundingBox3.mutable();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepCartesianPoint point && point.coordinates().size() == 3) {
+            if (entity instanceof StepCartesianPoint) { StepCartesianPoint point = (StepCartesianPoint) entity;
                 try {
                     box.expand(builder.buildPoint(point.id()));
                 } catch (GeometryException | StepResolutionException ex) {
@@ -695,15 +695,12 @@ public final class StepDumpApp {
     }
 
     private static MiniCadIssue failureIssue(Exception exception, String message) {
-        String code = switch (exception) {
-            case StepParseException ignored -> "step.parse";
-            case StepResolutionException ignored -> "step.resolve";
-            case UnsupportedGeometryException ignored -> "step.unsupported";
-            case TopologyException ignored -> "topology.invalid";
-            case GeometryException ignored -> "geometry.invalid";
-            case IOException ignored -> "io.read";
-            default -> "step.failed";
-        };
+        String     code = null;
+    switch (exception) {
+        default:
+            code = "step.failed";
+            break;
+    };
         return MiniCadIssue.error(code, null, null, message);
     }
 
@@ -717,8 +714,8 @@ public final class StepDumpApp {
         lines.add("Syntax Summary");
         lines.add("  entityCount: " + file.entities().size());
         if (!file.entities().isEmpty()) {
-            lines.add("  firstId: #" + file.entities().getFirst().id());
-            lines.add("  lastId: #" + file.entities().getLast().id());
+            lines.add("  firstId: #" + file.entities().get(0).id());
+            lines.add("  lastId: #" + file.entities().get(file.entities().size() - 1).id());
         }
     }
 
@@ -765,7 +762,7 @@ public final class StepDumpApp {
         try {
             var method = entity.getClass().getMethod("entityName");
             Object value = method.invoke(entity);
-            if (value instanceof String name && !name.isBlank()) {
+            if (value instanceof String) { String name = (String) value;
                 return name;
             }
         } catch (ReflectiveOperationException ignored) {
@@ -810,7 +807,8 @@ public final class StepDumpApp {
         Set<Integer> faceBoundLoopIds = collectFaceBoundLoopIds(resolved.values());
 
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepOpenShell openShell) {
+            if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
                 FaceBuildCounts counts = summarizeShell(openShell.faces(), builder);
                 lines.add("  " + stepEntityTypeName(openShell) + " #" + openShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -820,7 +818,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+            } else if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
                 FaceBuildCounts counts = summarizeShell(surfacedOpenShell.faces(), builder);
                 lines.add("  " + stepEntityTypeName(surfacedOpenShell) + " #" + surfacedOpenShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -830,7 +829,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepClosedShell closedShell) {
+            } else if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
                 FaceBuildCounts counts = summarizeShell(closedShell.faces(), builder);
                 lines.add("  " + stepEntityTypeName(closedShell) + " #" + closedShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -840,7 +840,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+            } else if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
                 FaceBuildCounts counts = summarizeShell(orientedOpenShell.faces(), builder);
                 lines.add("  " + stepEntityTypeName(orientedOpenShell) + " #" + orientedOpenShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -850,7 +851,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+            } else if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
                 FaceBuildCounts counts = summarizeShell(orientedClosedShell.faces(), builder);
                 lines.add("  " + stepEntityTypeName(orientedClosedShell) + " #" + orientedClosedShell.id() + ": faces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -860,7 +862,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepManifoldSolidBrep solidBrep) {
+            } else if (entity instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) entity;
                 FaceBuildCounts counts = summarizeShell(shellFaces(solidBrep.outer()), builder);
                 lines.add("  " + stepEntityTypeName(solidBrep) + " #" + solidBrep.id() + ": shellFaces=" + counts.supportedFaces()
                         + ", unsupportedFaces=" + counts.unsupportedFaces());
@@ -870,7 +873,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepBrepWithVoids brepWithVoids) {
+            } else if (entity instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) entity;
                 FaceBuildCounts counts = summarizeShell(shellFaces(brepWithVoids.outer()), builder);
                 for (StepEntity voidShell : brepWithVoids.voids()) {
                     counts = counts.plus(summarizeShell(shellFaces(voidShell), builder));
@@ -883,7 +887,8 @@ public final class StepDumpApp {
                 unsupportedFaces += counts.unsupportedFaces();
                 mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
                 mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepSweptAreaSolid sweptAreaSolid) {
+            } else if (entity instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
                 try {
                     int faceCount = builder.buildSolid(sweptAreaSolid.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(sweptAreaSolid) + " #" + sweptAreaSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -898,7 +903,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepExtrudedFaceSolid extrudedFaceSolid) {
+            } else if (entity instanceof StepExtrudedFaceSolid) {
+            StepExtrudedFaceSolid extrudedFaceSolid = (StepExtrudedFaceSolid) entity;
                 try {
                     int faceCount = builder.buildSolid(extrudedFaceSolid.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(extrudedFaceSolid) + " #" + extrudedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -913,7 +919,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepRevolvedFaceSolid revolvedFaceSolid) {
+            } else if (entity instanceof StepRevolvedFaceSolid) {
+            StepRevolvedFaceSolid revolvedFaceSolid = (StepRevolvedFaceSolid) entity;
                 try {
                     int faceCount = builder.buildSolid(revolvedFaceSolid.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(revolvedFaceSolid) + " #" + revolvedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -928,7 +935,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepSolidReplica solidReplica) {
+            } else if (entity instanceof StepSolidReplica) {
+            StepSolidReplica solidReplica = (StepSolidReplica) entity;
                 try {
                     int faceCount = builder.buildSolid(solidReplica.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(solidReplica) + " #" + solidReplica.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -943,7 +951,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepCsgSolid csgSolid) {
+            } else if (entity instanceof StepCsgSolid) {
+            StepCsgSolid csgSolid = (StepCsgSolid) entity;
                 try {
                     int faceCount = builder.buildSolid(csgSolid.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(csgSolid) + " #" + csgSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -958,7 +967,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepCsgPrimitive csgPrimitive) {
+            } else if (entity instanceof StepCsgPrimitive) {
+            StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) entity;
                 try {
                     int faceCount = builder.buildSolid(csgPrimitive.id()).outerShell().faces().size();
                     lines.add("  " + stepEntityTypeName(csgPrimitive) + " #" + csgPrimitive.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
@@ -973,7 +983,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
                 solids++;
-            } else if (entity instanceof StepBooleanClippingResult clippingResult) {
+            } else if (entity instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) entity;
                 booleanResults++;
                 try {
                     int faceCount = builder.buildSolid(clippingResult.id()).outerShell().faces().size();
@@ -988,7 +999,8 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasons, reasonCounts);
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
-            } else if (entity instanceof StepBooleanResult booleanResult) {
+            } else if (entity instanceof StepBooleanResult) {
+            StepBooleanResult booleanResult = (StepBooleanResult) entity;
                 booleanResults++;
                 try {
                     int faceCount = builder.buildSolid(booleanResult.id()).outerShell().faces().size();
@@ -1003,7 +1015,7 @@ public final class StepDumpApp {
                     mergeReasonCounts(unsupportedReasons, reasonCounts);
                     mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
                 }
-            } else if (entity instanceof StepFaceEntity face && !shellFaceIds.contains(face.id())) {
+            } else if (entity instanceof StepFaceEntity } else if (entity instanceof StepFaceEntity face && !shellFaceIds.contains(face.id())) {} else if (entity instanceof StepFaceEntity face && !shellFaceIds.contains(face.id())) { !shellFaceIds.contains(((StepFaceEntity) entity).id())) { StepFaceEntity face = (StepFaceEntity) entity;
                 standaloneFaceEntities++;
                 try {
                     builder.buildFace(face.id());
@@ -1048,7 +1060,7 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepSubedge subedge && !orientedEdgeElementIds.contains(subedge.id())) {
+            } else if (entity instanceof StepSubedge } else if (entity instanceof StepSubedge subedge && !orientedEdgeElementIds.contains(subedge.id())) {} else if (entity instanceof StepSubedge subedge && !orientedEdgeElementIds.contains(subedge.id())) { !orientedEdgeElementIds.contains(((StepSubedge) entity).id())) { StepSubedge subedge = (StepSubedge) entity;
                 standaloneEdgeEntities++;
                 try {
                     builder.buildEdge(subedge.id());
@@ -1108,7 +1120,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepPath path) {
+            } else if (entity instanceof StepPath) {
+            StepPath path = (StepPath) entity;
                 standalonePathEntities++;
                 try {
                     validatePathEdges(path.edges(), builder);
@@ -1123,7 +1136,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepOpenPath openPath) {
+            } else if (entity instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) entity;
                 standalonePathEntities++;
                 try {
                     validatePathEdges(openPath.edges(), builder);
@@ -1138,7 +1152,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepSubpath subpath) {
+            } else if (entity instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) entity;
                 standalonePathEntities++;
                 try {
                     validatePathEdges(subpath.edges(), builder);
@@ -1153,7 +1168,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepOrientedPath orientedPath) {
+            } else if (entity instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) entity;
                 standalonePathEntities++;
                 try {
                     validatePathEdges(orientedPath.edges(), builder);
@@ -1168,7 +1184,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepConnectedEdgeSet edgeSet) {
+            } else if (entity instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int edgeCount = validateConnectedEdgeSet(edgeSet, builder);
@@ -1183,7 +1200,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepWireShell wireShell) {
+            } else if (entity instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) entity;
                 standaloneContainerEntities++;
                 try {
                     int loopCount = validateWireShell(wireShell, builder);
@@ -1198,7 +1216,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepVertexShell vertexShell) {
+            } else if (entity instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) entity;
                 standaloneContainerEntities++;
                 try {
                     builder.buildVertexLoop(vertexShell.extent().id());
@@ -1213,7 +1232,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepEdgeBasedWireframeModel wireframeModel) {
+            } else if (entity instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) entity;
                 standaloneContainerEntities++;
                 try {
                     int edgeCount = 0;
@@ -1231,7 +1251,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShellBasedWireframeModel wireframeModel) {
+            } else if (entity instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateShellBasedWireframeModel(wireframeModel, builder);
@@ -1246,7 +1267,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepFaceBasedSurfaceModel surfaceModel) {
+            } else if (entity instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) entity;
                 standaloneContainerEntities++;
                 try {
                     FaceBuildCounts counts = validateFaceBasedSurfaceModel(surfaceModel, builder);
@@ -1267,7 +1289,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShellBasedSurfaceModel surfaceModel) {
+            } else if (entity instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) entity;
                 standaloneContainerEntities++;
                 try {
                     FaceBuildCounts counts = validateShellBasedSurfaceModel(surfaceModel, builder);
@@ -1288,7 +1311,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepGeometricCurveSet curveSet) {
+            } else if (entity instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateGeometricCurveSet(curveSet, builder);
@@ -1303,7 +1327,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepPointSet pointSet) {
+            } else if (entity instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validatePointSet(pointSet, builder);
@@ -1318,7 +1343,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepGeometricSet geometricSet) {
+            } else if (entity instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateGeometricSet(geometricSet, builder);
@@ -1333,7 +1359,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentation representation) {
+            } else if (entity instanceof StepRepresentation) {
+            StepRepresentation representation = (StepRepresentation) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentation(representation, builder);
@@ -1353,7 +1380,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationMap representationMap) {
+            } else if (entity instanceof StepRepresentationMap) {
+            StepRepresentationMap representationMap = (StepRepresentationMap) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationMap(representationMap, builder);
@@ -1368,7 +1396,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepMappedItem mappedItem) {
+            } else if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateMappedItem(mappedItem, builder);
@@ -1383,7 +1412,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepStyledItem styledItem) {
+            } else if (entity instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateStyledItem(styledItem, builder);
@@ -1398,7 +1428,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepOverRidingStyledItem styledItem) {
+            } else if (entity instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateOverridingStyledItem(styledItem, builder);
@@ -1413,7 +1444,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationRelationship relationship) {
+            } else if (entity instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationRelationship(relationship, builder);
@@ -1428,7 +1460,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationRelationshipWithTransformation relationship) {
+            } else if (entity instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationRelationshipWithTransformation(relationship, builder);
@@ -1443,7 +1476,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShapeRepresentationRelationship relationship) {
+            } else if (entity instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateShapeRepresentationRelationship(relationship, builder);
@@ -1515,15 +1549,20 @@ public final class StepDumpApp {
     private static Set<Integer> collectShellFaceIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepOpenShell openShell) {
+            if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
                 openShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+            } else if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
                 surfacedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+            } else if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
                 orientedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepClosedShell closedShell) {
+            } else if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
                 closedShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+            } else if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
                 orientedClosedShell.faces().forEach(face -> ids.add(face.id()));
             }
         }
@@ -1543,7 +1582,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectOrientedEdgeElementIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepOrientedEdge orientedEdge) {
+            if (entity instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
                 ids.add(orientedEdge.edgeElement().id());
             }
         }
@@ -1553,7 +1593,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectFaceBoundLoopIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepFaceBound faceBound) {
+            if (entity instanceof StepFaceBound) {
+            StepFaceBound faceBound = (StepFaceBound) entity;
                 ids.add(faceBound.loop().id());
             }
         }
@@ -1575,13 +1616,16 @@ public final class StepDumpApp {
     private static int validateConnectedEdgeSet(StepConnectedEdgeSet edgeSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity edge : edgeSet.edges()) {
-            if (edge instanceof StepEdgeCurve edgeCurve) {
+            if (edge instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) edge;
                 builder.buildEdge(edgeCurve.id());
                 count++;
-            } else if (edge instanceof StepSubedge subedge) {
+            } else if (edge instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) edge;
                 builder.buildEdge(subedge.id());
                 count++;
-            } else if (edge instanceof StepOrientedEdge orientedEdge) {
+            } else if (edge instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) edge;
                 builder.buildOrientedEdge(orientedEdge.id());
                 count++;
             } else {
@@ -1594,11 +1638,14 @@ public final class StepDumpApp {
     private static int validateWireShell(StepWireShell wireShell, StepCadBuilder builder) {
         int count = 0;
         for (var loop : wireShell.loops()) {
-            if (loop instanceof StepEdgeLoop edgeLoop) {
+            if (loop instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) loop;
                 builder.buildEdgeLoop(edgeLoop.id());
-            } else if (loop instanceof StepVertexLoop vertexLoop) {
+            } else if (loop instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) loop;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (loop instanceof StepPolyLoop polyLoop) {
+            } else if (loop instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) loop;
                 validatePolyLoop(polyLoop, builder);
             } else {
                 throw new UnsupportedGeometryException("WIRE_SHELL requires EDGE_LOOP, VERTEX_LOOP or POLY_LOOP members");
@@ -1611,9 +1658,11 @@ public final class StepDumpApp {
     private static int validateShellBasedWireframeModel(StepShellBasedWireframeModel wireframeModel, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity boundary : wireframeModel.boundaries()) {
-            if (boundary instanceof StepWireShell wireShell) {
+            if (boundary instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) boundary;
                 validateWireShell(wireShell, builder);
-            } else if (boundary instanceof StepVertexShell vertexShell) {
+            } else if (boundary instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) boundary;
                 builder.buildVertexLoop(vertexShell.extent().id());
             } else {
                 throw new UnsupportedGeometryException("SHELL_BASED_WIREFRAME_MODEL requires WIRE_SHELL or VERTEX_SHELL boundaries");
@@ -1626,9 +1675,11 @@ public final class StepDumpApp {
     private static FaceBuildCounts validateFaceBasedSurfaceModel(StepFaceBasedSurfaceModel surfaceModel, StepCadBuilder builder) {
         FaceBuildCounts counts = new FaceBuildCounts(0, 0, Map.of(), Map.of());
         for (StepEntity faceSet : surfaceModel.faceSets()) {
-            if (faceSet instanceof StepConnectedFaceSet connectedFaceSet) {
+            if (faceSet instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) faceSet;
                 counts = counts.plus(summarizeShell(connectedFaceSet.faces(), builder));
-            } else if (faceSet instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+            } else if (faceSet instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) faceSet;
                 counts = counts.plus(summarizeShell(connectedFaceSubSet.faces(), builder));
             } else if (faceSet instanceof StepOpenShell
                     || faceSet instanceof StepSurfacedOpenShell
@@ -1655,53 +1706,74 @@ public final class StepDumpApp {
     private static int validateGeometricCurveSet(StepGeometricCurveSet curveSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity element : curveSet.elements()) {
-            if (element instanceof StepCartesianPoint point) {
+            if (element instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) element;
                 builder.buildPoint(point.id());
-            } else if (element instanceof StepVertexPoint vertexPoint) {
+            } else if (element instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) element;
                 builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (element instanceof StepGeometricReplica } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {} else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) { "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) { StepGeometricReplica replica = (StepGeometricReplica) element;
                 builder.buildPointReference(replica.id());
-            } else if (element instanceof StepLine line) {
+            } else if (element instanceof StepLine) {
+            StepLine line = (StepLine) element;
                 builder.buildLine(line.id());
-            } else if (element instanceof StepCircle circle) {
+            } else if (element instanceof StepCircle) {
+            StepCircle circle = (StepCircle) element;
                 builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse ellipse) {
+            } else if (element instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) element;
                 builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline polyline) {
+            } else if (element instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) element;
                 builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve edgeCurve) {
+            } else if (element instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
                 builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge subedge) {
+            } else if (element instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) element;
                 builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge orientedEdge) {
+            } else if (element instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
                 builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet edgeSet) {
+            } else if (element instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
                 validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop edgeLoop) {
+            } else if (element instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
                 validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop vertexLoop) {
+            } else if (element instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) element;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepPath path) {
+            } else if (element instanceof StepPath) {
+            StepPath path = (StepPath) element;
                 validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath openPath) {
+            } else if (element instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) element;
                 validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath subpath) {
+            } else if (element instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) element;
                 validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath orientedPath) {
+            } else if (element instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) element;
                 validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop polyLoop) {
+            } else if (element instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) element;
                 validatePolyLoop(polyLoop, builder);
-            } else if (element instanceof StepWireShell wireShell) {
+            } else if (element instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) element;
                 validateWireShell(wireShell, builder);
             } else if (element instanceof StepVertexShell
                     || element instanceof StepEdgeBasedWireframeModel
                     || element instanceof StepShellBasedWireframeModel) {
                 validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPointSet pointSet) {
+            } else if (element instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) element;
                 validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet geometricSet) {
+            } else if (element instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) element;
                 validateGeometricSet(geometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet nestedCurveSet) {
+            } else if (element instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet nestedCurveSet = (StepGeometricCurveSet) element;
                 validateGeometricCurveSet(nestedCurveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1715,11 +1787,13 @@ public final class StepDumpApp {
     private static int validatePointSet(StepPointSet pointSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity point : pointSet.points()) {
-            if (point instanceof StepCartesianPoint cartesianPoint) {
+            if (point instanceof StepCartesianPoint) {
+            StepCartesianPoint cartesianPoint = (StepCartesianPoint) point;
                 builder.buildPoint(cartesianPoint.id());
-            } else if (point instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (point instanceof StepGeometricReplica } else if (point instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {} else if (point instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) { "POINT_REPLICA".equals(((StepGeometricReplica) point).entityName())) { StepGeometricReplica replica = (StepGeometricReplica) point;
                 builder.buildPointReference(replica.id());
-            } else if (point instanceof StepVertexPoint vertexPoint) {
+            } else if (point instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) point;
                 builder.buildVertex(vertexPoint.id());
             } else if (point instanceof StepVertexShell
                     || point instanceof StepAnnotationSymbol
@@ -1735,11 +1809,14 @@ public final class StepDumpApp {
                     || point instanceof StepDraughtingAnnotationOccurrence
                     || point instanceof StepAnnotationPlane) {
                 validateSummaryEntity(point, builder);
-            } else if (point instanceof StepPointSet nestedPointSet) {
+            } else if (point instanceof StepPointSet) {
+            StepPointSet nestedPointSet = (StepPointSet) point;
                 validatePointSet(nestedPointSet, builder);
-            } else if (point instanceof StepGeometricSet geometricSet) {
+            } else if (point instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) point;
                 validateGeometricSet(geometricSet, builder);
-            } else if (point instanceof StepGeometricCurveSet curveSet) {
+            } else if (point instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) point;
                 validateGeometricCurveSet(curveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1753,33 +1830,46 @@ public final class StepDumpApp {
     private static int validateGeometricSet(StepGeometricSet geometricSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity element : geometricSet.elements()) {
-            if (element instanceof StepCartesianPoint cartesianPoint) {
+            if (element instanceof StepCartesianPoint) {
+            StepCartesianPoint cartesianPoint = (StepCartesianPoint) element;
                 builder.buildPoint(cartesianPoint.id());
-            } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (element instanceof StepGeometricReplica } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {} else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) { "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) { StepGeometricReplica replica = (StepGeometricReplica) element;
                 builder.buildPointReference(replica.id());
-            } else if (element instanceof StepVertexPoint vertexPoint) {
+            } else if (element instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) element;
                 builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepLine line) {
+            } else if (element instanceof StepLine) {
+            StepLine line = (StepLine) element;
                 builder.buildLine(line.id());
-            } else if (element instanceof StepCircle circle) {
+            } else if (element instanceof StepCircle) {
+            StepCircle circle = (StepCircle) element;
                 builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse ellipse) {
+            } else if (element instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) element;
                 builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline polyline) {
+            } else if (element instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) element;
                 builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve edgeCurve) {
+            } else if (element instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
                 builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge subedge) {
+            } else if (element instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) element;
                 builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge orientedEdge) {
+            } else if (element instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
                 builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet edgeSet) {
+            } else if (element instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
                 validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop edgeLoop) {
+            } else if (element instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
                 validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop vertexLoop) {
+            } else if (element instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) element;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepWireShell wireShell) {
+            } else if (element instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) element;
                 validateWireShell(wireShell, builder);
             } else if (element instanceof StepOpenShell
                     || element instanceof StepSurfacedOpenShell
@@ -1803,23 +1893,31 @@ public final class StepDumpApp {
                     || element instanceof StepBooleanResult
                     || element instanceof StepBooleanClippingResult) {
                 validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPath path) {
+            } else if (element instanceof StepPath) {
+            StepPath path = (StepPath) element;
                 validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath openPath) {
+            } else if (element instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) element;
                 validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath subpath) {
+            } else if (element instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) element;
                 validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath orientedPath) {
+            } else if (element instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) element;
                 validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop polyLoop) {
+            } else if (element instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) element;
                 validatePolyLoop(polyLoop, builder);
             } else if (isSupportedGeometricSetSurface(element)) {
                 validateSupportedSurfaceReference(element, builder);
-            } else if (element instanceof StepPointSet pointSet) {
+            } else if (element instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) element;
                 validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet nestedGeometricSet) {
+            } else if (element instanceof StepGeometricSet) {
+            StepGeometricSet nestedGeometricSet = (StepGeometricSet) element;
                 validateGeometricSet(nestedGeometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet curveSet) {
+            } else if (element instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) element;
                 validateGeometricCurveSet(curveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1831,35 +1929,49 @@ public final class StepDumpApp {
     }
 
     private static void validateSupportedSurfaceReference(StepEntity surface, StepCadBuilder builder) {
-        if (surface instanceof StepPlane plane) {
+        if (surface instanceof StepPlane) {
+            StepPlane plane = (StepPlane) surface;
             builder.buildPlane(plane.id());
-        } else if (surface instanceof StepCylindricalSurface cylindricalSurface) {
+        } else if (surface instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) surface;
             builder.buildCylindricalSurface(cylindricalSurface.id());
-        } else if (surface instanceof StepConicalSurface conicalSurface) {
+        } else if (surface instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) surface;
             builder.buildConicalSurface(conicalSurface.id());
-        } else if (surface instanceof StepSphericalSurface sphericalSurface) {
+        } else if (surface instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) surface;
             builder.buildSphericalSurface(sphericalSurface.id());
-        } else if (surface instanceof StepToroidalSurface toroidalSurface) {
+        } else if (surface instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) surface;
             builder.buildToroidalSurface(toroidalSurface.id());
-        } else if (surface instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        } else if (surface instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) surface;
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-        } else if (surface instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        } else if (surface instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surface;
             builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-        } else if (surface instanceof StepSurfaceOfRevolution revolutionSurface) {
+        } else if (surface instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surface;
             builder.buildSurfaceOfRevolution(revolutionSurface.id());
-        } else if (surface instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        } else if (surface instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) surface;
             builder.buildBSplineSurface(splineSurface.id());
-        } else if (surface instanceof StepRationalBSplineSurface rationalSplineSurface) {
+        } else if (surface instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) surface;
             builder.buildRationalBSplineSurface(rationalSplineSurface.id());
-        } else if (surface instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        } else if (surface instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
             builder.buildRectangularTrimmedSurface(trimmedSurface.id());
-        } else if (surface instanceof StepCurveBoundedSurface boundedSurface) {
+        } else if (surface instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) surface;
             builder.buildCurveBoundedSurface(boundedSurface.id());
-        } else if (surface instanceof StepOrientedSurface orientedSurface) {
+        } else if (surface instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
             builder.buildOrientedSurface(orientedSurface.id());
-        } else if (surface instanceof StepOffsetSurface offsetSurface) {
+        } else if (surface instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
             builder.buildOffsetSurface(offsetSurface.id());
-        } else if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        } else if (surface instanceof StepGeometricReplica } else if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {} else if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) { "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) { StepGeometricReplica replica = (StepGeometricReplica) surface;
             builder.buildSurfaceReplica(replica.id());
         } else {
             throw new UnsupportedGeometryException(
@@ -2060,94 +2172,117 @@ public final class StepDumpApp {
     }
 
     private static int validateSummaryEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepCartesianPoint point) {
+        if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
             validatePoint(point, builder);
             return 1;
         }
-        if (entity instanceof StepDirection direction) {
+        if (entity instanceof StepDirection) {
+            StepDirection direction = (StepDirection) entity;
             validateDirection(direction, builder);
             return 1;
         }
-        if (entity instanceof StepVector vector) {
+        if (entity instanceof StepVector) {
+            StepVector vector = (StepVector) entity;
             builder.buildVector(vector.id());
             return 1;
         }
-        if (entity instanceof StepVertexPoint vertexPoint) {
+        if (entity instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) entity;
             builder.buildVertex(vertexPoint.id());
             return 1;
         }
-        if (entity instanceof StepConicCurve conicCurve) {
+        if (entity instanceof StepConicCurve) {
+            StepConicCurve conicCurve = (StepConicCurve) entity;
             return validateSummaryEntity(conicCurve.position(), builder);
         }
-        if (entity instanceof StepLine line) {
+        if (entity instanceof StepLine) {
+            StepLine line = (StepLine) entity;
             validateLine(line, builder);
             return 1;
         }
-        if (entity instanceof StepCircle circle) {
+        if (entity instanceof StepCircle) {
+            StepCircle circle = (StepCircle) entity;
             validateCircle(circle, builder);
             return 1;
         }
-        if (entity instanceof StepEllipse ellipse) {
+        if (entity instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) entity;
             validateEllipse(ellipse, builder);
             return 1;
         }
-        if (entity instanceof StepPolyline polyline) {
+        if (entity instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) entity;
             validatePolyline(polyline, builder);
             return 1;
         }
-        if (entity instanceof StepBSplineCurveWithKnots splineCurve) {
+        if (entity instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots splineCurve = (StepBSplineCurveWithKnots) entity;
             builder.buildBSplineCurve(splineCurve.id());
             return 1;
         }
-        if (entity instanceof StepRationalBSplineCurve splineCurve) {
+        if (entity instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve splineCurve = (StepRationalBSplineCurve) entity;
             builder.buildRationalBSplineCurve(splineCurve.id());
             return 1;
         }
-        if (entity instanceof StepTrimmedCurve trimmedCurve) {
+        if (entity instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) entity;
             builder.buildTrimmedCurve(trimmedCurve.id());
             return 1;
         }
-        if (entity instanceof StepSurfaceCurve surfaceCurve) {
+        if (entity instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) entity;
             builder.buildSurfaceCurve(surfaceCurve.id());
             return 1;
         }
-        if (entity instanceof StepSeamCurve seamCurve) {
+        if (entity instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) entity;
             builder.buildSeamCurve(seamCurve.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurve compositeCurve) {
+        if (entity instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
             builder.buildCompositeCurve(compositeCurve.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurveOnSurface compositeCurveOnSurface) {
+        if (entity instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
             builder.buildCompositeCurve(compositeCurveOnSurface.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurveSegment segment) {
+        if (entity instanceof StepCompositeCurveSegment) {
+            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) entity;
             return validateSummaryEntity(segment.parentCurve(), builder);
         }
-        if (entity instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (entity instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) entity;
             builder.buildOffsetCurve2(offsetCurve2D.id());
             return 1;
         }
-        if (entity instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (entity instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) entity;
             builder.buildOffsetCurve3(offsetCurve3D.id());
             return 1;
         }
-        if (entity instanceof StepOrientedCurve orientedCurve) {
+        if (entity instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) entity;
             builder.buildCurveReference3(orientedCurve.id());
             return validateSummaryEntity(orientedCurve.curveElement(), builder);
         }
-        if (entity instanceof StepPcurve pcurve) {
+        if (entity instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) entity;
             builder.buildPcurve2(pcurve.id());
             return 1;
         }
-        if (entity instanceof StepDegeneratePcurve degeneratePcurve) {
+        if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve degeneratePcurve = (StepDegeneratePcurve) entity;
             builder.buildPcurve2(degeneratePcurve.id());
             return validateSummaryEntity(degeneratePcurve.basisSurface(), builder)
                     + validateSummaryEntity(degeneratePcurve.referenceToCurve(), builder);
         }
-        if (entity instanceof StepGeometricReplica replica) {
+        if (entity instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
             if ("POINT_REPLICA".equals(replica.entityName())) {
                 builder.buildPointReference(replica.id());
             }
@@ -2160,79 +2295,97 @@ public final class StepDumpApp {
             return validateSummaryEntity(replica.parent(), builder)
                     + validateSummaryEntity(replica.transformation(), builder);
         }
-        if (entity instanceof StepPlane plane) {
+        if (entity instanceof StepPlane) {
+            StepPlane plane = (StepPlane) entity;
             builder.buildPlane(plane.id());
             return 1;
         }
-        if (entity instanceof StepCylindricalSurface cylindricalSurface) {
+        if (entity instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) entity;
             builder.buildCylindricalSurface(cylindricalSurface.id());
             return 1;
         }
-        if (entity instanceof StepConicalSurface conicalSurface) {
+        if (entity instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) entity;
             builder.buildConicalSurface(conicalSurface.id());
             return 1;
         }
-        if (entity instanceof StepToroidalSurface toroidalSurface) {
+        if (entity instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) entity;
             builder.buildToroidalSurface(toroidalSurface.id());
             return 1;
         }
-        if (entity instanceof StepSphericalSurface sphericalSurface) {
+        if (entity instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) entity;
             builder.buildSphericalSurface(sphericalSurface.id());
             return 1;
         }
-        if (entity instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        if (entity instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) entity;
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             return 1;
         }
-        if (entity instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        if (entity instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) entity;
             builder.buildBSplineSurface(splineSurface.id());
             return 1;
         }
-        if (entity instanceof StepRationalBSplineSurface rationalSplineSurface) {
+        if (entity instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) entity;
             builder.buildRationalBSplineSurface(rationalSplineSurface.id());
             return 1;
         }
-        if (entity instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        if (entity instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) entity;
             builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             return validateSummaryEntity(extrusionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(extrusionSurface.extrusionAxis(), builder);
         }
-        if (entity instanceof StepSurfaceOfRevolution revolutionSurface) {
+        if (entity instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) entity;
             builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return validateSummaryEntity(revolutionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(revolutionSurface.axisPosition(), builder);
         }
-        if (entity instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (entity instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) entity;
             builder.buildRectangularTrimmedSurface(trimmedSurface.id());
             return validateSummaryEntity(trimmedSurface.basisSurface(), builder);
         }
-        if (entity instanceof StepCurveBoundedSurface boundedSurface) {
+        if (entity instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) entity;
             builder.buildCurveBoundedSurface(boundedSurface.id());
             return validateSummaryEntity(boundedSurface.basisSurface(), builder)
                     + validateSummaryItems(boundedSurface.boundaries(), builder);
         }
-        if (entity instanceof StepOrientedSurface orientedSurface) {
+        if (entity instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) entity;
             builder.buildOrientedSurface(orientedSurface.id());
             return validateSummaryEntity(orientedSurface.surfaceElement(), builder);
         }
-        if (entity instanceof StepOffsetSurface offsetSurface) {
+        if (entity instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) entity;
             builder.buildOffsetSurface(offsetSurface.id());
             return validateSummaryEntity(offsetSurface.basisSurface(), builder);
         }
-        if (entity instanceof StepAxis2Placement3D placement3D) {
+        if (entity instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) entity;
             builder.buildPlacement(placement3D.id());
             return 1;
         }
-        if (entity instanceof StepAxis1Placement axis1Placement) {
+        if (entity instanceof StepAxis1Placement) {
+            StepAxis1Placement axis1Placement = (StepAxis1Placement) entity;
             builder.buildAxis1Placement(axis1Placement.id());
             return 1;
         }
-        if (entity instanceof StepAxis2Placement2D placement2D) {
+        if (entity instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) entity;
             validatePoint(placement2D.location(), builder);
             validateDirection(placement2D.refDirection(), builder);
             return 1;
         }
-        if (entity instanceof StepCartesianTransformationOperator transformation) {
+        if (entity instanceof StepCartesianTransformationOperator) {
+            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) entity;
             if (transformation.axis1() != null) {
                 validateDirection(transformation.axis1(), builder);
             }
@@ -2245,85 +2398,106 @@ public final class StepDumpApp {
             validatePoint(transformation.localOrigin(), builder);
             return 1;
         }
-        if (entity instanceof StepItemDefinedTransformation transformation) {
+        if (entity instanceof StepItemDefinedTransformation) {
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             builder.buildPlacement(transformation.transformItem1().id());
             builder.buildPlacement(transformation.transformItem2().id());
             return 1;
         }
-        if (entity instanceof StepEdgeCurve edgeCurve) {
+        if (entity instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
             builder.buildEdge(edgeCurve.id());
             return 1;
         }
-        if (entity instanceof StepSubedge subedge) {
+        if (entity instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) entity;
             builder.buildEdge(subedge.id());
             return 1;
         }
-        if (entity instanceof StepOrientedEdge orientedEdge) {
+        if (entity instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
             builder.buildOrientedEdge(orientedEdge.id());
             return 1;
         }
-        if (entity instanceof StepEdgeLoop edgeLoop) {
+        if (entity instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) entity;
             builder.buildEdgeLoop(edgeLoop.id());
             return 1;
         }
-        if (entity instanceof StepVertexLoop vertexLoop) {
+        if (entity instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) entity;
             builder.buildVertexLoop(vertexLoop.id());
             return 1;
         }
-        if (entity instanceof StepPolyLoop polyLoop) {
+        if (entity instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) entity;
             validatePolyLoop(polyLoop, builder);
             return 1;
         }
-        if (entity instanceof StepPath path) {
+        if (entity instanceof StepPath) {
+            StepPath path = (StepPath) entity;
             validatePathEdges(path.edges(), builder);
             return 1;
         }
-        if (entity instanceof StepOpenPath openPath) {
+        if (entity instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) entity;
             validatePathEdges(openPath.edges(), builder);
             return 1;
         }
-        if (entity instanceof StepSubpath subpath) {
+        if (entity instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) entity;
             validatePathEdges(subpath.edges(), builder);
             return 1;
         }
-        if (entity instanceof StepOrientedPath orientedPath) {
+        if (entity instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) entity;
             validatePathEdges(orientedPath.edges(), builder);
             return 1;
         }
-        if (entity instanceof StepConnectedEdgeSet edgeSet) {
+        if (entity instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
             return validateConnectedEdgeSet(edgeSet, builder);
         }
-        if (entity instanceof StepWireShell wireShell) {
+        if (entity instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) entity;
             return validateWireShell(wireShell, builder);
         }
-        if (entity instanceof StepVertexShell vertexShell) {
+        if (entity instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) entity;
             builder.buildVertexLoop(vertexShell.extent().id());
             return 1;
         }
-        if (entity instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (entity instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) entity;
             int count = 0;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 count += validateConnectedEdgeSet(boundary, builder);
             }
             return count;
         }
-        if (entity instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (entity instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
             return validateShellBasedWireframeModel(wireframeModel, builder);
         }
-        if (entity instanceof StepFaceEntity face) {
+        if (entity instanceof StepFaceEntity) {
+            StepFaceEntity face = (StepFaceEntity) entity;
             builder.buildFace(face.id());
             return 1;
         }
-        if (entity instanceof StepFaceBasedSurfaceModel surfaceModel) {
+        if (entity instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) entity;
             return validateFaceBasedSurfaceModel(surfaceModel, builder).supportedFaces();
         }
-        if (entity instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (entity instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) entity;
             return validateShellBasedSurfaceModel(surfaceModel, builder).supportedFaces();
         }
-        if (entity instanceof StepConnectedFaceSet connectedFaceSet) {
+        if (entity instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
             return summarizeShell(connectedFaceSet.faces(), builder).supportedFaces();
         }
-        if (entity instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+        if (entity instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
             return summarizeShell(connectedFaceSubSet.faces(), builder).supportedFaces();
         }
         if (entity instanceof StepOpenShell
@@ -2345,26 +2519,32 @@ public final class StepDumpApp {
                 || entity instanceof StepBooleanClippingResult) {
             return builder.buildSolid(entity.id()).outerShell().faces().size();
         }
-        if (entity instanceof StepPointSet pointSet) {
+        if (entity instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) entity;
             return validatePointSet(pointSet, builder);
         }
-        if (entity instanceof StepGeometricCurveSet curveSet) {
+        if (entity instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) entity;
             return validateGeometricCurveSet(curveSet, builder);
         }
-        if (entity instanceof StepGeometricSet geometricSet) {
+        if (entity instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) entity;
             return validateGeometricSet(geometricSet, builder);
         }
-        if (entity instanceof StepBoxDomain boxDomain) {
+        if (entity instanceof StepBoxDomain) {
+            StepBoxDomain boxDomain = (StepBoxDomain) entity;
             return validateSummaryEntity(boxDomain.corner(), builder);
         }
-        if (entity instanceof StepHalfSpaceSolid halfSpaceSolid) {
+        if (entity instanceof StepHalfSpaceSolid) {
+            StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) entity;
             int count = validateSummaryEntity(halfSpaceSolid.baseSurface(), builder);
             if (halfSpaceSolid.enclosure() != null) {
                 count += validateSummaryEntity(halfSpaceSolid.enclosure(), builder);
             }
             return count;
         }
-        if (entity instanceof StepProfileDef profileDef) {
+        if (entity instanceof StepProfileDef) {
+            StepProfileDef profileDef = (StepProfileDef) entity;
             int count = 0;
             if (profileDef.position() != null) {
                 count += validateSummaryEntity(profileDef.position(), builder);
@@ -2372,140 +2552,182 @@ public final class StepDumpApp {
             count += validateSummaryItems(profileDef.curves(), builder);
             return Math.max(1, count);
         }
-        if (entity instanceof StepRepresentation representation) {
+        if (entity instanceof StepRepresentation) {
+            StepRepresentation representation = (StepRepresentation) entity;
             return validateRepresentation(representation, builder);
         }
-        if (entity instanceof StepRepresentationMap representationMap) {
+        if (entity instanceof StepRepresentationMap) {
+            StepRepresentationMap representationMap = (StepRepresentationMap) entity;
             return validateRepresentationMap(representationMap, builder);
         }
-        if (entity instanceof StepMappedItem mappedItem) {
+        if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
             return validateMappedItem(mappedItem, builder);
         }
-        if (entity instanceof StepStyledItem styledItem) {
+        if (entity instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) entity;
             return validateStyledItem(styledItem, builder);
         }
-        if (entity instanceof StepOverRidingStyledItem styledItem) {
+        if (entity instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
             return validateOverridingStyledItem(styledItem, builder);
         }
-        if (entity instanceof StepRepresentationRelationship relationship) {
+        if (entity instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
             return validateRepresentationRelationship(relationship, builder);
         }
-        if (entity instanceof StepRepresentationRelationshipWithTransformation relationship) {
+        if (entity instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
             return validateRepresentationRelationshipWithTransformation(relationship, builder);
         }
-        if (entity instanceof StepShapeRepresentationRelationship relationship) {
+        if (entity instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
             return validateShapeRepresentationRelationship(relationship, builder);
         }
-        if (entity instanceof StepAnnotationCurveOccurrence annotationCurveOccurrence) {
+        if (entity instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence annotationCurveOccurrence = (StepAnnotationCurveOccurrence) entity;
             return validateAnnotationCurveOccurrence(annotationCurveOccurrence.item(), builder);
         }
-        if (entity instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (entity instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) entity;
             return validateSummaryEntity(annotationOccurrence.item(), builder);
         }
-        if (entity instanceof StepLeaderCurve leaderCurve) {
+        if (entity instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) entity;
             return validateAnnotationCurveOccurrence(leaderCurve.item(), builder);
         }
-        if (entity instanceof StepDimensionCurve dimensionCurve) {
+        if (entity instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) entity;
             return validateAnnotationCurveOccurrence(dimensionCurve.item(), builder);
         }
-        if (entity instanceof StepProjectionCurve projectionCurve) {
+        if (entity instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) entity;
             return validateAnnotationCurveOccurrence(projectionCurve.item(), builder);
         }
-        if (entity instanceof StepAnnotationFillArea fillArea) {
+        if (entity instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
             return validateAnnotationFillArea(fillArea, builder);
         }
-        if (entity instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (entity instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
             return validateAnnotationFillArea(fillAreaOccurrence.item(), builder)
                     + validateSummaryEntity(fillAreaOccurrence.fillStyleTarget(), builder);
         }
-        if (entity instanceof StepAnnotationPlaceholderOccurrence placeholderOccurrence) {
+        if (entity instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) entity;
             return validateSummaryEntity(placeholderOccurrence.item(), builder);
         }
-        if (entity instanceof StepAnnotationPointOccurrence pointOccurrence) {
+        if (entity instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
             return validateSummaryEntity(pointOccurrence.item(), builder);
         }
-        if (entity instanceof StepAnnotationTextOccurrence textOccurrence) {
+        if (entity instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
             validateSummaryEntity(textOccurrence.position(), builder);
             return 1;
         }
-        if (entity instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (entity instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) entity;
             return validateSummaryEntity(symbolOccurrence.item(), builder);
         }
-        if (entity instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (entity instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) entity;
             return validateSummaryEntity(subfigureOccurrence.item(), builder);
         }
-        if (entity instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (entity instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) entity;
             return validateSummaryEntity(terminatorSymbol.item(), builder)
                     + validateSummaryEntity(terminatorSymbol.annotatedCurve(), builder);
         }
-        if (entity instanceof StepAnnotationPlane annotationPlane) {
+        if (entity instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) entity;
             return validateAnnotationPlane(annotationPlane, builder);
         }
-        if (entity instanceof StepDraughtingCallout callout) {
+        if (entity instanceof StepDraughtingCallout) {
+            StepDraughtingCallout callout = (StepDraughtingCallout) entity;
             return validateDraughtingCallout(callout, builder);
         }
-        if (entity instanceof StepDraughtingCalloutRelationship relationship) {
+        if (entity instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) entity;
             return validateDraughtingCallout(relationship.relatingCallout(), builder)
                     + validateDraughtingCallout(relationship.relatedCallout(), builder);
         }
-        if (entity instanceof StepAnnotationOccurrenceRelationship relationship) {
+        if (entity instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
             return validateSummaryEntity(relationship.relatingAnnotationOccurrence(), builder)
                     + validateSummaryEntity(relationship.relatedAnnotationOccurrence(), builder);
         }
-        if (entity instanceof StepSymbolRepresentationMap representationMap) {
+        if (entity instanceof StepSymbolRepresentationMap) {
+            StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) entity;
             validateSummaryEntity(representationMap.mappedOrigin(), builder);
             return validateRepresentation(representationMap.mappedRepresentation(), builder);
         }
-        if (entity instanceof StepAnnotationSymbol annotationSymbol) {
+        if (entity instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
             int count = validateSummaryEntity(annotationSymbol.mappingSource(), builder);
             return count + validateSummaryEntity(annotationSymbol.mappingTarget(), builder);
         }
-        if (entity instanceof StepAnnotationText annotationText) {
+        if (entity instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) entity;
             int count = validateSummaryEntity(annotationText.mappingSource(), builder);
             return count + validateSummaryEntity(annotationText.mappingTarget(), builder);
         }
-        if (entity instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (entity instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
             int count = validateSummaryEntity(annotationTextCharacter.mappingSource(), builder);
             return count + validateSummaryEntity(annotationTextCharacter.mappingTarget(), builder);
         }
-        if (entity instanceof StepPresentationLayerAssignment layerAssignment) {
+        if (entity instanceof StepPresentationLayerAssignment) {
+            StepPresentationLayerAssignment layerAssignment = (StepPresentationLayerAssignment) entity;
             return validateSummaryItems(layerAssignment.assignedItems(), builder);
         }
-        if (entity instanceof StepPresentationStyleAssignment assignment) {
+        if (entity instanceof StepPresentationStyleAssignment) {
+            StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) entity;
             return validatePresentationStyleAssignment(assignment, builder);
         }
-        if (entity instanceof StepCurveStyle curveStyle) {
+        if (entity instanceof StepCurveStyle) {
+            StepCurveStyle curveStyle = (StepCurveStyle) entity;
             return validateCurveStyle(curveStyle, builder);
         }
-        if (entity instanceof StepPointStyle pointStyle) {
+        if (entity instanceof StepPointStyle) {
+            StepPointStyle pointStyle = (StepPointStyle) entity;
             return validateSummaryEntity(pointStyle.marker(), builder)
                     + validateSummaryEntity(pointStyle.colour(), builder);
         }
-        if (entity instanceof StepSymbolStyle symbolStyle) {
+        if (entity instanceof StepSymbolStyle) {
+            StepSymbolStyle symbolStyle = (StepSymbolStyle) entity;
             return validateSummaryEntity(symbolStyle.styleOfSymbol(), builder);
         }
-        if (entity instanceof StepFillAreaStyleColour fillAreaStyleColour) {
+        if (entity instanceof StepFillAreaStyleColour) {
+            StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) entity;
             return validateSummaryEntity(fillAreaStyleColour.colour(), builder);
         }
-        if (entity instanceof StepFillAreaStyle fillAreaStyle) {
+        if (entity instanceof StepFillAreaStyle) {
+            StepFillAreaStyle fillAreaStyle = (StepFillAreaStyle) entity;
             return validateFillAreaStyle(fillAreaStyle, builder);
         }
-        if (entity instanceof StepSurfaceStyleFillArea surfaceStyleFillArea) {
+        if (entity instanceof StepSurfaceStyleFillArea) {
+            StepSurfaceStyleFillArea surfaceStyleFillArea = (StepSurfaceStyleFillArea) entity;
             return validateSummaryEntity(surfaceStyleFillArea.fillStyle(), builder);
         }
-        if (entity instanceof StepSurfaceStyleBoundary surfaceStyleBoundary) {
+        if (entity instanceof StepSurfaceStyleBoundary) {
+            StepSurfaceStyleBoundary surfaceStyleBoundary = (StepSurfaceStyleBoundary) entity;
             return validateCurveStyle(surfaceStyleBoundary.style(), builder);
         }
-        if (entity instanceof StepSurfaceStyleParameterLine surfaceStyleParameterLine) {
+        if (entity instanceof StepSurfaceStyleParameterLine) {
+            StepSurfaceStyleParameterLine surfaceStyleParameterLine = (StepSurfaceStyleParameterLine) entity;
             return validateCurveStyle(surfaceStyleParameterLine.style(), builder);
         }
-        if (entity instanceof StepSurfaceStyleControlGrid surfaceStyleControlGrid) {
+        if (entity instanceof StepSurfaceStyleControlGrid) {
+            StepSurfaceStyleControlGrid surfaceStyleControlGrid = (StepSurfaceStyleControlGrid) entity;
             return validateCurveStyle(surfaceStyleControlGrid.style(), builder);
         }
-        if (entity instanceof StepSurfaceStyleSegmentationCurve surfaceStyleSegmentationCurve) {
+        if (entity instanceof StepSurfaceStyleSegmentationCurve) {
+            StepSurfaceStyleSegmentationCurve surfaceStyleSegmentationCurve = (StepSurfaceStyleSegmentationCurve) entity;
             return validateCurveStyle(surfaceStyleSegmentationCurve.style(), builder);
         }
-        if (entity instanceof StepSurfaceStyleSilhouette surfaceStyleSilhouette) {
+        if (entity instanceof StepSurfaceStyleSilhouette) {
+            StepSurfaceStyleSilhouette surfaceStyleSilhouette = (StepSurfaceStyleSilhouette) entity;
             return validateCurveStyle(surfaceStyleSilhouette.style(), builder);
         }
         if (entity instanceof StepSurfaceStyleTransparent
@@ -2513,60 +2735,77 @@ public final class StepDumpApp {
                 || entity instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
             return 1;
         }
-        if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular specular) {
+        if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
+            StepSurfaceStyleReflectanceAmbientDiffuseSpecular specular = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) entity;
             return 1 + validateSummaryEntity(specular.specularColour(), builder);
         }
-        if (entity instanceof StepSurfaceSideStyle surfaceSideStyle) {
+        if (entity instanceof StepSurfaceSideStyle) {
+            StepSurfaceSideStyle surfaceSideStyle = (StepSurfaceSideStyle) entity;
             return validateSurfaceSideStyle(surfaceSideStyle, builder);
         }
-        if (entity instanceof StepSurfaceStyleUsage surfaceStyleUsage) {
+        if (entity instanceof StepSurfaceStyleUsage) {
+            StepSurfaceStyleUsage surfaceStyleUsage = (StepSurfaceStyleUsage) entity;
             return validateSurfaceSideStyle(surfaceStyleUsage.style(), builder);
         }
-        if (entity instanceof StepTextStyleForDefinedFont textStyleForDefinedFont) {
+        if (entity instanceof StepTextStyleForDefinedFont) {
+            StepTextStyleForDefinedFont textStyleForDefinedFont = (StepTextStyleForDefinedFont) entity;
             return validateSummaryEntity(textStyleForDefinedFont.textColour(), builder);
         }
-        if (entity instanceof StepTextStyle textStyle) {
+        if (entity instanceof StepTextStyle) {
+            StepTextStyle textStyle = (StepTextStyle) entity;
             return validateSummaryEntity(textStyle.characterAppearance(), builder);
         }
-        if (entity instanceof StepTextStyleWithSpacing textStyleWithSpacing) {
+        if (entity instanceof StepTextStyleWithSpacing) {
+            StepTextStyleWithSpacing textStyleWithSpacing = (StepTextStyleWithSpacing) entity;
             return validateSummaryEntity(textStyleWithSpacing.characterAppearance(), builder);
         }
-        if (entity instanceof StepTextStyleWithJustification textStyleWithJustification) {
+        if (entity instanceof StepTextStyleWithJustification) {
+            StepTextStyleWithJustification textStyleWithJustification = (StepTextStyleWithJustification) entity;
             return validateSummaryEntity(textStyleWithJustification.characterAppearance(), builder);
         }
-        if (entity instanceof StepTextStyleWithMirror textStyleWithMirror) {
+        if (entity instanceof StepTextStyleWithMirror) {
+            StepTextStyleWithMirror textStyleWithMirror = (StepTextStyleWithMirror) entity;
             return validateSummaryEntity(textStyleWithMirror.characterAppearance(), builder)
                     + validateSummaryEntity(textStyleWithMirror.mirrorPlacement(), builder);
         }
-        if (entity instanceof StepTextStyleWithBoxCharacteristics textStyleWithBoxCharacteristics) {
+        if (entity instanceof StepTextStyleWithBoxCharacteristics) {
+            StepTextStyleWithBoxCharacteristics textStyleWithBoxCharacteristics = (StepTextStyleWithBoxCharacteristics) entity;
             return validateSummaryEntity(textStyleWithBoxCharacteristics.characterAppearance(), builder);
         }
-        if (entity instanceof StepSymbolColour symbolColour) {
+        if (entity instanceof StepSymbolColour) {
+            StepSymbolColour symbolColour = (StepSymbolColour) entity;
             return validateSummaryEntity(symbolColour.colour(), builder);
         }
-        if (entity instanceof StepCharacterGlyphStyleStroke glyphStyleStroke) {
+        if (entity instanceof StepCharacterGlyphStyleStroke) {
+            StepCharacterGlyphStyleStroke glyphStyleStroke = (StepCharacterGlyphStyleStroke) entity;
             return validateCurveStyle(glyphStyleStroke.strokeStyle(), builder);
         }
-        if (entity instanceof StepCharacterGlyphStyleOutline glyphStyleOutline) {
+        if (entity instanceof StepCharacterGlyphStyleOutline) {
+            StepCharacterGlyphStyleOutline glyphStyleOutline = (StepCharacterGlyphStyleOutline) entity;
             return validateCurveStyle(glyphStyleOutline.outlineStyle(), builder);
         }
-        if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics glyphStyleOutline) {
+        if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
+            StepCharacterGlyphStyleOutlineWithCharacteristics glyphStyleOutline = (StepCharacterGlyphStyleOutlineWithCharacteristics) entity;
             return validateCurveStyle(glyphStyleOutline.outlineStyle(), builder)
                     + validateFillAreaStyle(glyphStyleOutline.characteristics(), builder);
         }
-        if (entity instanceof StepUserDefinedCurveFont userDefinedCurveFont) {
+        if (entity instanceof StepUserDefinedCurveFont) {
+            StepUserDefinedCurveFont userDefinedCurveFont = (StepUserDefinedCurveFont) entity;
             return validateRepresentationMap(userDefinedCurveFont.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedCurveFont.mappingTarget(), builder);
         }
-        if (entity instanceof StepUserDefinedMarker userDefinedMarker) {
+        if (entity instanceof StepUserDefinedMarker) {
+            StepUserDefinedMarker userDefinedMarker = (StepUserDefinedMarker) entity;
             return validateRepresentationMap(userDefinedMarker.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedMarker.mappingTarget(), builder);
         }
-        if (entity instanceof StepUserDefinedTerminatorSymbol userDefinedTerminatorSymbol) {
+        if (entity instanceof StepUserDefinedTerminatorSymbol) {
+            StepUserDefinedTerminatorSymbol userDefinedTerminatorSymbol = (StepUserDefinedTerminatorSymbol) entity;
             return validateRepresentationMap(userDefinedTerminatorSymbol.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedTerminatorSymbol.mappingTarget(), builder);
         }
-        if (entity instanceof StepGeometricRepresentationContext geometricRepresentationContext) {
+        if (entity instanceof StepGeometricRepresentationContext) {
+            StepGeometricRepresentationContext geometricRepresentationContext = (StepGeometricRepresentationContext) entity;
             int count = 1;
             if (geometricRepresentationContext.globalUnitAssignedContext() != null) {
                 count += validateSummaryEntity(geometricRepresentationContext.globalUnitAssignedContext(), builder);
@@ -2576,39 +2815,48 @@ public final class StepDumpApp {
             }
             return count;
         }
-        if (entity instanceof StepGlobalUnitAssignedContext globalUnitAssignedContext) {
+        if (entity instanceof StepGlobalUnitAssignedContext) {
+            StepGlobalUnitAssignedContext globalUnitAssignedContext = (StepGlobalUnitAssignedContext) entity;
             return validateSummaryItems(globalUnitAssignedContext.units(), builder);
         }
-        if (entity instanceof StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext) {
+        if (entity instanceof StepGlobalUncertaintyAssignedContext) {
+            StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext = (StepGlobalUncertaintyAssignedContext) entity;
             int count = 0;
             for (StepUncertaintyMeasureWithUnit uncertainty : globalUncertaintyAssignedContext.uncertainties()) {
                 count += validateSummaryEntity(uncertainty, builder);
             }
             return count;
         }
-        if (entity instanceof StepMeasureWithUnit measureWithUnit) {
+        if (entity instanceof StepMeasureWithUnit) {
+            StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) entity;
             return validateSummaryEntity(measureWithUnit.unitComponent(), builder);
         }
-        if (entity instanceof StepTypedMeasureWithUnit typedMeasureWithUnit) {
+        if (entity instanceof StepTypedMeasureWithUnit) {
+            StepTypedMeasureWithUnit typedMeasureWithUnit = (StepTypedMeasureWithUnit) entity;
             return validateSummaryEntity(typedMeasureWithUnit.unitComponent(), builder);
         }
-        if (entity instanceof StepUncertaintyMeasureWithUnit uncertaintyMeasureWithUnit) {
+        if (entity instanceof StepUncertaintyMeasureWithUnit) {
+            StepUncertaintyMeasureWithUnit uncertaintyMeasureWithUnit = (StepUncertaintyMeasureWithUnit) entity;
             return validateSummaryEntity(uncertaintyMeasureWithUnit.unitComponent(), builder);
         }
-        if (entity instanceof StepConversionBasedUnit conversionBasedUnit) {
+        if (entity instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) entity;
             return validateSummaryEntity(conversionBasedUnit.conversionFactor(), builder);
         }
-        if (entity instanceof StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset) {
+        if (entity instanceof StepConversionBasedUnitWithOffset) {
+            StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset = (StepConversionBasedUnitWithOffset) entity;
             return validateSummaryEntity(conversionBasedUnitWithOffset.conversionFactor(), builder);
         }
-        if (entity instanceof StepDerivedUnit derivedUnit) {
+        if (entity instanceof StepDerivedUnit) {
+            StepDerivedUnit derivedUnit = (StepDerivedUnit) entity;
             int count = 0;
             for (StepDerivedUnitElement element : derivedUnit.elements()) {
                 count += validateSummaryEntity(element, builder);
             }
             return count;
         }
-        if (entity instanceof StepDerivedUnitElement derivedUnitElement) {
+        if (entity instanceof StepDerivedUnitElement) {
+            StepDerivedUnitElement derivedUnitElement = (StepDerivedUnitElement) entity;
             return validateSummaryEntity(derivedUnitElement.unit(), builder);
         }
         if (entity instanceof StepPreDefinedColour
@@ -2691,258 +2939,320 @@ public final class StepDumpApp {
                 || entity instanceof StepDateTimeRole) {
             return 1;
         }
-        if (entity instanceof StepIdentificationAssignment identificationAssignment) {
+        if (entity instanceof StepIdentificationAssignment) {
+            StepIdentificationAssignment identificationAssignment = (StepIdentificationAssignment) entity;
             return validateSummaryEntity(identificationAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedIdentificationAssignment appliedIdentificationAssignment) {
+        if (entity instanceof StepAppliedIdentificationAssignment) {
+            StepAppliedIdentificationAssignment appliedIdentificationAssignment = (StepAppliedIdentificationAssignment) entity;
             return validateSummaryEntity(appliedIdentificationAssignment.role(), builder)
                     + validateSummaryItems(appliedIdentificationAssignment.items(), builder);
         }
-        if (entity instanceof StepPersonAndOrganization personAndOrganization) {
+        if (entity instanceof StepPersonAndOrganization) {
+            StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) entity;
             return validateSummaryEntity(personAndOrganization.person(), builder)
                     + validateSummaryEntity(personAndOrganization.organization(), builder);
         }
-        if (entity instanceof StepPersonAndOrganizationAssignment personAndOrganizationAssignment) {
+        if (entity instanceof StepPersonAndOrganizationAssignment) {
+            StepPersonAndOrganizationAssignment personAndOrganizationAssignment = (StepPersonAndOrganizationAssignment) entity;
             return validateSummaryEntity(personAndOrganizationAssignment.assignedPersonAndOrganization(), builder)
                     + validateSummaryEntity(personAndOrganizationAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedPersonAndOrganizationAssignment appliedPersonAndOrganizationAssignment) {
+        if (entity instanceof StepAppliedPersonAndOrganizationAssignment) {
+            StepAppliedPersonAndOrganizationAssignment appliedPersonAndOrganizationAssignment = (StepAppliedPersonAndOrganizationAssignment) entity;
             return validateSummaryEntity(appliedPersonAndOrganizationAssignment.assignedPersonAndOrganization(), builder)
                     + validateSummaryEntity(appliedPersonAndOrganizationAssignment.role(), builder)
                     + validateSummaryItems(appliedPersonAndOrganizationAssignment.items(), builder);
         }
-        if (entity instanceof StepLocalTime localTime) {
+        if (entity instanceof StepLocalTime) {
+            StepLocalTime localTime = (StepLocalTime) entity;
             return 1 + validateSummaryEntity(localTime.zone(), builder);
         }
-        if (entity instanceof StepDateAndTime dateAndTime) {
+        if (entity instanceof StepDateAndTime) {
+            StepDateAndTime dateAndTime = (StepDateAndTime) entity;
             return validateSummaryEntity(dateAndTime.dateComponent(), builder)
                     + validateSummaryEntity(dateAndTime.timeComponent(), builder);
         }
-        if (entity instanceof StepDateAssignment dateAssignment) {
+        if (entity instanceof StepDateAssignment) {
+            StepDateAssignment dateAssignment = (StepDateAssignment) entity;
             return validateSummaryEntity(dateAssignment.assignedDate(), builder)
                     + validateSummaryEntity(dateAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedDateAssignment appliedDateAssignment) {
+        if (entity instanceof StepAppliedDateAssignment) {
+            StepAppliedDateAssignment appliedDateAssignment = (StepAppliedDateAssignment) entity;
             return validateSummaryEntity(appliedDateAssignment.assignedDate(), builder)
                     + validateSummaryEntity(appliedDateAssignment.role(), builder)
                     + validateSummaryItems(appliedDateAssignment.items(), builder);
         }
-        if (entity instanceof StepDateTimeAssignment dateTimeAssignment) {
+        if (entity instanceof StepDateTimeAssignment) {
+            StepDateTimeAssignment dateTimeAssignment = (StepDateTimeAssignment) entity;
             return validateSummaryEntity(dateTimeAssignment.assignedDateAndTime(), builder)
                     + validateSummaryEntity(dateTimeAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedDateTimeAssignment appliedDateTimeAssignment) {
+        if (entity instanceof StepAppliedDateTimeAssignment) {
+            StepAppliedDateTimeAssignment appliedDateTimeAssignment = (StepAppliedDateTimeAssignment) entity;
             return validateSummaryEntity(appliedDateTimeAssignment.assignedDateAndTime(), builder)
                     + validateSummaryEntity(appliedDateTimeAssignment.role(), builder)
                     + validateSummaryItems(appliedDateTimeAssignment.items(), builder);
         }
-        if (entity instanceof StepDocumentReference documentReference) {
+        if (entity instanceof StepDocumentReference) {
+            StepDocumentReference documentReference = (StepDocumentReference) entity;
             return validateSummaryEntity(documentReference.assignedDocument(), builder);
         }
-        if (entity instanceof StepAppliedDocumentReference appliedDocumentReference) {
+        if (entity instanceof StepAppliedDocumentReference) {
+            StepAppliedDocumentReference appliedDocumentReference = (StepAppliedDocumentReference) entity;
             return validateSummaryEntity(appliedDocumentReference.assignedDocument(), builder)
                     + validateSummaryItems(appliedDocumentReference.items(), builder);
         }
-        if (entity instanceof StepDocumentRelationship documentRelationship) {
+        if (entity instanceof StepDocumentRelationship) {
+            StepDocumentRelationship documentRelationship = (StepDocumentRelationship) entity;
             return validateSummaryEntity(documentRelationship.relatingDocument(), builder)
                     + validateSummaryEntity(documentRelationship.relatedDocument(), builder);
         }
-        if (entity instanceof StepPropertyDefinitionRelationship propertyDefinitionRelationship) {
+        if (entity instanceof StepPropertyDefinitionRelationship) {
+            StepPropertyDefinitionRelationship propertyDefinitionRelationship = (StepPropertyDefinitionRelationship) entity;
             return 2;
         }
-        if (entity instanceof StepAbstractVariable abstractVariable) {
+        if (entity instanceof StepAbstractVariable) {
+            StepAbstractVariable abstractVariable = (StepAbstractVariable) entity;
             return validateSummaryEntity(abstractVariable.definition(), builder)
                     + validateSummaryEntity(abstractVariable.usedRepresentation(), builder);
         }
-        if (entity instanceof StepRowVariable rowVariable) {
+        if (entity instanceof StepRowVariable) {
+            StepRowVariable rowVariable = (StepRowVariable) entity;
             return validateSummaryEntity(rowVariable.definition(), builder)
                     + validateSummaryEntity(rowVariable.usedRepresentation(), builder);
         }
-        if (entity instanceof StepScalarVariable scalarVariable) {
+        if (entity instanceof StepScalarVariable) {
+            StepScalarVariable scalarVariable = (StepScalarVariable) entity;
             return validateSummaryEntity(scalarVariable.definition(), builder)
                     + validateSummaryEntity(scalarVariable.usedRepresentation(), builder);
         }
-        if (entity instanceof StepForwardChainingRulePremise rulePremise) {
+        if (entity instanceof StepForwardChainingRulePremise) {
+            StepForwardChainingRulePremise rulePremise = (StepForwardChainingRulePremise) entity;
             return validateSummaryEntity(rulePremise.definition(), builder)
                     + validateSummaryEntity(rulePremise.usedRepresentation(), builder);
         }
-        if (entity instanceof StepBackChainingRuleBody ruleBody) {
+        if (entity instanceof StepBackChainingRuleBody) {
+            StepBackChainingRuleBody ruleBody = (StepBackChainingRuleBody) entity;
             return validateSummaryEntity(ruleBody.definition(), builder)
                     + validateSummaryEntity(ruleBody.usedRepresentation(), builder);
         }
-        if (entity instanceof StepAttributeAssertion attributeAssertion) {
+        if (entity instanceof StepAttributeAssertion) {
+            StepAttributeAssertion attributeAssertion = (StepAttributeAssertion) entity;
             return validateSummaryEntity(attributeAssertion.usedRepresentation(), builder);
         }
-        if (entity instanceof StepApprovalPersonOrganization approvalPersonOrganization) {
+        if (entity instanceof StepApprovalPersonOrganization) {
+            StepApprovalPersonOrganization approvalPersonOrganization = (StepApprovalPersonOrganization) entity;
             return validateSummaryEntity(approvalPersonOrganization.personOrganization(), builder)
                     + validateSummaryEntity(approvalPersonOrganization.authorizedApproval(), builder)
                     + validateSummaryEntity(approvalPersonOrganization.role(), builder);
         }
-        if (entity instanceof StepApprovalDateTime approvalDateTime) {
+        if (entity instanceof StepApprovalDateTime) {
+            StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) entity;
             return validateSummaryEntity(approvalDateTime.dateTime(), builder)
                     + validateSummaryEntity(approvalDateTime.datedApproval(), builder);
         }
-        if (entity instanceof StepGroupRelationship groupRelationship) {
+        if (entity instanceof StepGroupRelationship) {
+            StepGroupRelationship groupRelationship = (StepGroupRelationship) entity;
             return validateSummaryEntity(groupRelationship.relatingGroup(), builder)
                     + validateSummaryEntity(groupRelationship.relatedGroup(), builder);
         }
-        if (entity instanceof StepOrganizationRelationship organizationRelationship) {
+        if (entity instanceof StepOrganizationRelationship) {
+            StepOrganizationRelationship organizationRelationship = (StepOrganizationRelationship) entity;
             return validateSummaryEntity(organizationRelationship.relatingOrganization(), builder)
                     + validateSummaryEntity(organizationRelationship.relatedOrganization(), builder);
         }
         if (entity instanceof StepApplicationContext) {
             return 1;
         }
-        if (entity instanceof StepApplicationProtocolDefinition applicationProtocolDefinition) {
+        if (entity instanceof StepApplicationProtocolDefinition) {
+            StepApplicationProtocolDefinition applicationProtocolDefinition = (StepApplicationProtocolDefinition) entity;
             return validateSummaryEntity(applicationProtocolDefinition.application(), builder);
         }
-        if (entity instanceof StepProduct product) {
+        if (entity instanceof StepProduct) {
+            StepProduct product = (StepProduct) entity;
             return 1;
         }
-        if (entity instanceof StepProductContext productContext) {
+        if (entity instanceof StepProductContext) {
+            StepProductContext productContext = (StepProductContext) entity;
             return validateSummaryEntity(productContext.frameOfReference(), builder);
         }
-        if (entity instanceof StepProductDefinitionContext productDefinitionContext) {
+        if (entity instanceof StepProductDefinitionContext) {
+            StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) entity;
             return validateSummaryEntity(productDefinitionContext.frameOfReference(), builder);
         }
-        if (entity instanceof StepProductDefinitionFormation formation) {
+        if (entity instanceof StepProductDefinitionFormation) {
+            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) entity;
             return validateSummaryEntity(formation.ofProduct(), builder);
         }
-        if (entity instanceof StepProductDefinition definition) {
+        if (entity instanceof StepProductDefinition) {
+            StepProductDefinition definition = (StepProductDefinition) entity;
             return validateSummaryEntity(definition.formation(), builder)
                     + validateSummaryEntity(definition.frameOfReference(), builder);
         }
-        if (entity instanceof StepProductDefinitionShape productDefinitionShape) {
+        if (entity instanceof StepProductDefinitionShape) {
+            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
             return validateSummaryEntity(productDefinitionShape.definition(), builder);
         }
-        if (entity instanceof StepProductDefinitionEffectivity productDefinitionEffectivity) {
+        if (entity instanceof StepProductDefinitionEffectivity) {
+            StepProductDefinitionEffectivity productDefinitionEffectivity = (StepProductDefinitionEffectivity) entity;
             return validateSummaryEntity(productDefinitionEffectivity.productDefinition(), builder);
         }
-        if (entity instanceof StepProductRelationship productRelationship) {
+        if (entity instanceof StepProductRelationship) {
+            StepProductRelationship productRelationship = (StepProductRelationship) entity;
             return validateSummaryEntity(productRelationship.relatingProduct(), builder)
                     + validateSummaryEntity(productRelationship.relatedProduct(), builder);
         }
-        if (entity instanceof StepProductDefinitionRelationship productDefinitionRelationship) {
+        if (entity instanceof StepProductDefinitionRelationship) {
+            StepProductDefinitionRelationship productDefinitionRelationship = (StepProductDefinitionRelationship) entity;
             return validateSummaryEntity(productDefinitionRelationship.relatingProductDefinition(), builder)
                     + validateSummaryEntity(productDefinitionRelationship.relatedProductDefinition(), builder);
         }
-        if (entity instanceof StepProductDefinitionFormationRelationship productDefinitionFormationRelationship) {
+        if (entity instanceof StepProductDefinitionFormationRelationship) {
+            StepProductDefinitionFormationRelationship productDefinitionFormationRelationship = (StepProductDefinitionFormationRelationship) entity;
             return validateSummaryEntity(productDefinitionFormationRelationship.relatingFormation(), builder)
                     + validateSummaryEntity(productDefinitionFormationRelationship.relatedFormation(), builder);
         }
-        if (entity instanceof StepProductDefinitionRelationshipRelationship relationshipRelationship) {
+        if (entity instanceof StepProductDefinitionRelationshipRelationship) {
+            StepProductDefinitionRelationshipRelationship relationshipRelationship = (StepProductDefinitionRelationshipRelationship) entity;
             return validateSummaryEntity(relationshipRelationship.relating(), builder)
                     + validateSummaryEntity(relationshipRelationship.related(), builder);
         }
-        if (entity instanceof StepPropertyDefinition propertyDefinition) {
+        if (entity instanceof StepPropertyDefinition) {
+            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
             return validateSummaryEntity(propertyDefinition.definition(), builder);
         }
-        if (entity instanceof StepPropertyDefinitionRepresentation propertyDefinitionRepresentation) {
+        if (entity instanceof StepPropertyDefinitionRepresentation) {
+            StepPropertyDefinitionRepresentation propertyDefinitionRepresentation = (StepPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(propertyDefinitionRepresentation.definition(), builder)
                     + validateSummaryEntity(propertyDefinitionRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepActionPropertyRepresentation actionPropertyRepresentation) {
+        if (entity instanceof StepActionPropertyRepresentation) {
+            StepActionPropertyRepresentation actionPropertyRepresentation = (StepActionPropertyRepresentation) entity;
             return validateSummaryEntity(actionPropertyRepresentation.definition(), builder)
                     + validateSummaryEntity(actionPropertyRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepContactRatioRepresentation contactRatioRepresentation) {
+        if (entity instanceof StepContactRatioRepresentation) {
+            StepContactRatioRepresentation contactRatioRepresentation = (StepContactRatioRepresentation) entity;
             return validateSummaryEntity(contactRatioRepresentation.definition(), builder)
                     + validateSummaryEntity(contactRatioRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepKinematicPropertyDefinitionRepresentation kinematicPropertyDefinitionRepresentation) {
+        if (entity instanceof StepKinematicPropertyDefinitionRepresentation) {
+            StepKinematicPropertyDefinitionRepresentation kinematicPropertyDefinitionRepresentation = (StepKinematicPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyDefinitionRepresentation.definition(), builder)
                     + validateSummaryEntity(kinematicPropertyDefinitionRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepKinematicPropertyMechanismRepresentation kinematicPropertyMechanismRepresentation) {
+        if (entity instanceof StepKinematicPropertyMechanismRepresentation) {
+            StepKinematicPropertyMechanismRepresentation kinematicPropertyMechanismRepresentation = (StepKinematicPropertyMechanismRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyMechanismRepresentation.definition(), builder)
                     + validateSummaryEntity(kinematicPropertyMechanismRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepKinematicPropertyRepresentationRelation kinematicPropertyRepresentationRelation) {
+        if (entity instanceof StepKinematicPropertyRepresentationRelation) {
+            StepKinematicPropertyRepresentationRelation kinematicPropertyRepresentationRelation = (StepKinematicPropertyRepresentationRelation) entity;
             return validateSummaryEntity(kinematicPropertyRepresentationRelation.definition(), builder)
                     + validateSummaryEntity(kinematicPropertyRepresentationRelation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepKinematicPropertyTopologyRepresentation kinematicPropertyTopologyRepresentation) {
+        if (entity instanceof StepKinematicPropertyTopologyRepresentation) {
+            StepKinematicPropertyTopologyRepresentation kinematicPropertyTopologyRepresentation = (StepKinematicPropertyTopologyRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyTopologyRepresentation.definition(), builder)
                     + validateSummaryEntity(kinematicPropertyTopologyRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepResourcePropertyRepresentation resourcePropertyRepresentation) {
+        if (entity instanceof StepResourcePropertyRepresentation) {
+            StepResourcePropertyRepresentation resourcePropertyRepresentation = (StepResourcePropertyRepresentation) entity;
             return validateSummaryEntity(resourcePropertyRepresentation.definition(), builder)
                     + validateSummaryEntity(resourcePropertyRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepShapeDefinitionRepresentation shapeDefinitionRepresentation) {
+        if (entity instanceof StepShapeDefinitionRepresentation) {
+            StepShapeDefinitionRepresentation shapeDefinitionRepresentation = (StepShapeDefinitionRepresentation) entity;
             return validateSummaryEntity(shapeDefinitionRepresentation.definition(), builder)
                     + validateSummaryEntity(shapeDefinitionRepresentation.usedRepresentation(), builder);
         }
-        if (entity instanceof StepContextDependentShapeRepresentation contextDependentShapeRepresentation) {
+        if (entity instanceof StepContextDependentShapeRepresentation) {
+            StepContextDependentShapeRepresentation contextDependentShapeRepresentation = (StepContextDependentShapeRepresentation) entity;
             return validateSummaryEntity(contextDependentShapeRepresentation.representationRelationship(), builder)
                     + validateSummaryEntity(contextDependentShapeRepresentation.representedProductRelation(), builder);
         }
-        if (entity instanceof StepNextAssemblyUsageOccurrence nextAssemblyUsageOccurrence) {
+        if (entity instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence nextAssemblyUsageOccurrence = (StepNextAssemblyUsageOccurrence) entity;
             return validateSummaryEntity(nextAssemblyUsageOccurrence.relatingProductDefinition(), builder)
                     + validateSummaryEntity(nextAssemblyUsageOccurrence.relatedProductDefinition(), builder);
         }
-        if (entity instanceof StepPlacedDatumTargetFeature placedDatumTargetFeature) {
+        if (entity instanceof StepPlacedDatumTargetFeature) {
+            StepPlacedDatumTargetFeature placedDatumTargetFeature = (StepPlacedDatumTargetFeature) entity;
             return validateSummaryEntity(placedDatumTargetFeature.usedRepresentation(), builder);
         }
-        if (entity instanceof StepShapeAspect shapeAspect) {
+        if (entity instanceof StepShapeAspect) {
+            StepShapeAspect shapeAspect = (StepShapeAspect) entity;
             return validateSummaryEntity(shapeAspect.ofShape(), builder);
         }
-        if (entity instanceof StepShapeAspectOccurrence shapeAspectOccurrence) {
+        if (entity instanceof StepShapeAspectOccurrence) {
+            StepShapeAspectOccurrence shapeAspectOccurrence = (StepShapeAspectOccurrence) entity;
             return validateSummaryEntity(shapeAspectOccurrence.ofShape(), builder)
                     + validateSummaryEntity(shapeAspectOccurrence.definition(), builder);
         }
-        if (entity instanceof StepShapeAspectRelationship shapeAspectRelationship) {
+        if (entity instanceof StepShapeAspectRelationship) {
+            StepShapeAspectRelationship shapeAspectRelationship = (StepShapeAspectRelationship) entity;
             return validateSummaryEntity(shapeAspectRelationship.relatingShapeAspect(), builder)
                     + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
         }
-        if (entity instanceof StepItemIdentifiedRepresentationUsage itemIdentifiedRepresentationUsage) {
+        if (entity instanceof StepItemIdentifiedRepresentationUsage) {
+            StepItemIdentifiedRepresentationUsage itemIdentifiedRepresentationUsage = (StepItemIdentifiedRepresentationUsage) entity;
             return validateRepresentationUsage(itemIdentifiedRepresentationUsage.definition(),
                     itemIdentifiedRepresentationUsage.usedRepresentation(),
                     itemIdentifiedRepresentationUsage.identifiedItem(),
                     builder);
         }
-        if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage chainBasedItemIdentifiedRepresentationUsage) {
+        if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
+            StepChainBasedItemIdentifiedRepresentationUsage chainBasedItemIdentifiedRepresentationUsage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
             return validateChainBasedRepresentationUsage(chainBasedItemIdentifiedRepresentationUsage.definition(),
                     chainBasedItemIdentifiedRepresentationUsage.nodes(),
                     chainBasedItemIdentifiedRepresentationUsage.undirectedLinks(),
                     chainBasedItemIdentifiedRepresentationUsage.identifiedItem(),
                     builder);
         }
-        if (entity instanceof StepPlacedTarget placedTarget) {
+        if (entity instanceof StepPlacedTarget) {
+            StepPlacedTarget placedTarget = (StepPlacedTarget) entity;
             return validateRepresentationUsage(placedTarget.definition(),
                     placedTarget.usedRepresentation(),
                     placedTarget.identifiedItem(),
                     builder);
         }
-        if (entity instanceof StepDraughtingModelItemAssociation draughtingModelItemAssociation) {
+        if (entity instanceof StepDraughtingModelItemAssociation) {
+            StepDraughtingModelItemAssociation draughtingModelItemAssociation = (StepDraughtingModelItemAssociation) entity;
             return validateRepresentationUsage(draughtingModelItemAssociation.definition(),
                     draughtingModelItemAssociation.usedRepresentation(),
                     draughtingModelItemAssociation.identifiedItem(),
                     builder);
         }
-        if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder associationWithPlaceholder) {
+        if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
+            StepDraughtingModelItemAssociationWithPlaceholder associationWithPlaceholder = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
             return validateRepresentationUsage(associationWithPlaceholder.definition(),
                     associationWithPlaceholder.usedRepresentation(),
                     associationWithPlaceholder.identifiedItem(),
                     builder) + validateSummaryEntity(associationWithPlaceholder.annotationPlaceholder(), builder);
         }
-        if (entity instanceof StepPmiRequirementItemAssociation pmiRequirementItemAssociation) {
+        if (entity instanceof StepPmiRequirementItemAssociation) {
+            StepPmiRequirementItemAssociation pmiRequirementItemAssociation = (StepPmiRequirementItemAssociation) entity;
             return validateRepresentationUsage(pmiRequirementItemAssociation.definition(),
                     pmiRequirementItemAssociation.usedRepresentation(),
                     pmiRequirementItemAssociation.identifiedItem(),
                     builder) + validateSummaryEntity(pmiRequirementItemAssociation.requirement(), builder);
         }
-        if (entity instanceof StepMechanicalDesignRequirementItemAssociation requirementItemAssociation) {
+        if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
+            StepMechanicalDesignRequirementItemAssociation requirementItemAssociation = (StepMechanicalDesignRequirementItemAssociation) entity;
             return validateRepresentationUsage(requirementItemAssociation.definition(),
                     requirementItemAssociation.usedRepresentation(),
                     requirementItemAssociation.identifiedItem(),
                     builder) + validateSummaryEntity(requirementItemAssociation.requirement(), builder);
         }
-        if (entity instanceof StepGeometricItemSpecificUsage geometricItemSpecificUsage) {
+        if (entity instanceof StepGeometricItemSpecificUsage) {
+            StepGeometricItemSpecificUsage geometricItemSpecificUsage = (StepGeometricItemSpecificUsage) entity;
             return validateSummaryEntity(geometricItemSpecificUsage.usage(), builder)
                     + validateSummaryEntity(geometricItemSpecificUsage.identifiedItem(), builder);
         }
-        if (entity instanceof StepChainBasedGeometricItemSpecificUsage chainBasedGeometricItemSpecificUsage) {
+        if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
+            StepChainBasedGeometricItemSpecificUsage chainBasedGeometricItemSpecificUsage = (StepChainBasedGeometricItemSpecificUsage) entity;
             int count = validateSummaryEntity(chainBasedGeometricItemSpecificUsage.usage(), builder)
                     + validateSummaryEntity(chainBasedGeometricItemSpecificUsage.identifiedItem(), builder);
             for (StepRepresentation node : chainBasedGeometricItemSpecificUsage.nodes()) {
@@ -2953,114 +3263,144 @@ public final class StepDumpApp {
             }
             return count;
         }
-        if (entity instanceof StepGroupAssignment groupAssignment) {
+        if (entity instanceof StepGroupAssignment) {
+            StepGroupAssignment groupAssignment = (StepGroupAssignment) entity;
             return validateSummaryEntity(groupAssignment.assignedGroup(), builder);
         }
-        if (entity instanceof StepAppliedGroupAssignment appliedGroupAssignment) {
+        if (entity instanceof StepAppliedGroupAssignment) {
+            StepAppliedGroupAssignment appliedGroupAssignment = (StepAppliedGroupAssignment) entity;
             return validateSummaryEntity(appliedGroupAssignment.assignedGroup(), builder)
                     + validateSummaryItems(appliedGroupAssignment.items(), builder);
         }
-        if (entity instanceof StepClassificationAssignment classificationAssignment) {
+        if (entity instanceof StepClassificationAssignment) {
+            StepClassificationAssignment classificationAssignment = (StepClassificationAssignment) entity;
             return validateSummaryEntity(classificationAssignment.assignedClass(), builder)
                     + validateSummaryEntity(classificationAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedClassificationAssignment appliedClassificationAssignment) {
+        if (entity instanceof StepAppliedClassificationAssignment) {
+            StepAppliedClassificationAssignment appliedClassificationAssignment = (StepAppliedClassificationAssignment) entity;
             return validateSummaryEntity(appliedClassificationAssignment.assignedClass(), builder)
                     + validateSummaryEntity(appliedClassificationAssignment.role(), builder)
                     + validateSummaryItems(appliedClassificationAssignment.items(), builder);
         }
-        if (entity instanceof StepOrganizationAssignment organizationAssignment) {
+        if (entity instanceof StepOrganizationAssignment) {
+            StepOrganizationAssignment organizationAssignment = (StepOrganizationAssignment) entity;
             return validateSummaryEntity(organizationAssignment.assignedOrganization(), builder)
                     + validateSummaryEntity(organizationAssignment.role(), builder);
         }
-        if (entity instanceof StepAppliedOrganizationAssignment appliedOrganizationAssignment) {
+        if (entity instanceof StepAppliedOrganizationAssignment) {
+            StepAppliedOrganizationAssignment appliedOrganizationAssignment = (StepAppliedOrganizationAssignment) entity;
             return validateSummaryEntity(appliedOrganizationAssignment.assignedOrganization(), builder)
                     + validateSummaryEntity(appliedOrganizationAssignment.role(), builder)
                     + validateSummaryItems(appliedOrganizationAssignment.items(), builder);
         }
-        if (entity instanceof StepAppliedNameAssignment appliedNameAssignment) {
+        if (entity instanceof StepAppliedNameAssignment) {
+            StepAppliedNameAssignment appliedNameAssignment = (StepAppliedNameAssignment) entity;
             return validateSummaryItems(appliedNameAssignment.items(), builder);
         }
-        if (entity instanceof StepApproval approval) {
+        if (entity instanceof StepApproval) {
+            StepApproval approval = (StepApproval) entity;
             return 1 + validateSummaryEntity(approval.status(), builder);
         }
-        if (entity instanceof StepApprovalAssignment approvalAssignment) {
+        if (entity instanceof StepApprovalAssignment) {
+            StepApprovalAssignment approvalAssignment = (StepApprovalAssignment) entity;
             return validateSummaryEntity(approvalAssignment.assignedApproval(), builder);
         }
-        if (entity instanceof StepAppliedApprovalAssignment appliedApprovalAssignment) {
+        if (entity instanceof StepAppliedApprovalAssignment) {
+            StepAppliedApprovalAssignment appliedApprovalAssignment = (StepAppliedApprovalAssignment) entity;
             return validateSummaryEntity(appliedApprovalAssignment.assignedApproval(), builder)
                     + validateSummaryItems(appliedApprovalAssignment.items(), builder);
         }
-        if (entity instanceof StepContract contract) {
+        if (entity instanceof StepContract) {
+            StepContract contract = (StepContract) entity;
             return 1 + validateSummaryEntity(contract.kind(), builder);
         }
-        if (entity instanceof StepContractAssignment contractAssignment) {
+        if (entity instanceof StepContractAssignment) {
+            StepContractAssignment contractAssignment = (StepContractAssignment) entity;
             return validateSummaryEntity(contractAssignment.assignedContract(), builder);
         }
-        if (entity instanceof StepAppliedContractAssignment appliedContractAssignment) {
+        if (entity instanceof StepAppliedContractAssignment) {
+            StepAppliedContractAssignment appliedContractAssignment = (StepAppliedContractAssignment) entity;
             return validateSummaryEntity(appliedContractAssignment.assignedContract(), builder)
                     + validateSummaryItems(appliedContractAssignment.items(), builder);
         }
-        if (entity instanceof StepCertification certification) {
+        if (entity instanceof StepCertification) {
+            StepCertification certification = (StepCertification) entity;
             return 1 + validateSummaryEntity(certification.kind(), builder);
         }
-        if (entity instanceof StepCertificationAssignment certificationAssignment) {
+        if (entity instanceof StepCertificationAssignment) {
+            StepCertificationAssignment certificationAssignment = (StepCertificationAssignment) entity;
             return validateSummaryEntity(certificationAssignment.assignedCertification(), builder);
         }
-        if (entity instanceof StepAppliedCertificationAssignment appliedCertificationAssignment) {
+        if (entity instanceof StepAppliedCertificationAssignment) {
+            StepAppliedCertificationAssignment appliedCertificationAssignment = (StepAppliedCertificationAssignment) entity;
             return validateSummaryEntity(appliedCertificationAssignment.assignedCertification(), builder)
                     + validateSummaryItems(appliedCertificationAssignment.items(), builder);
         }
-        if (entity instanceof StepSecurityClassification securityClassification) {
+        if (entity instanceof StepSecurityClassification) {
+            StepSecurityClassification securityClassification = (StepSecurityClassification) entity;
             return 1 + validateSummaryEntity(securityClassification.securityLevel(), builder);
         }
-        if (entity instanceof StepSecurityClassificationAssignment securityClassificationAssignment) {
+        if (entity instanceof StepSecurityClassificationAssignment) {
+            StepSecurityClassificationAssignment securityClassificationAssignment = (StepSecurityClassificationAssignment) entity;
             return validateSummaryEntity(securityClassificationAssignment.assignedSecurityClassification(), builder);
         }
-        if (entity instanceof StepAppliedSecurityClassificationAssignment appliedSecurityClassificationAssignment) {
+        if (entity instanceof StepAppliedSecurityClassificationAssignment) {
+            StepAppliedSecurityClassificationAssignment appliedSecurityClassificationAssignment = (StepAppliedSecurityClassificationAssignment) entity;
             return validateSummaryEntity(appliedSecurityClassificationAssignment.assignedSecurityClassification(), builder)
                     + validateSummaryItems(appliedSecurityClassificationAssignment.items(), builder);
         }
-        if (entity instanceof StepExternalSourceRelationship externalSourceRelationship) {
+        if (entity instanceof StepExternalSourceRelationship) {
+            StepExternalSourceRelationship externalSourceRelationship = (StepExternalSourceRelationship) entity;
             return validateSummaryEntity(externalSourceRelationship.relatingSource(), builder)
                     + validateSummaryEntity(externalSourceRelationship.relatedSource(), builder);
         }
-        if (entity instanceof StepGeneralPropertyRelationship generalPropertyRelationship) {
+        if (entity instanceof StepGeneralPropertyRelationship) {
+            StepGeneralPropertyRelationship generalPropertyRelationship = (StepGeneralPropertyRelationship) entity;
             return validateSummaryEntity(generalPropertyRelationship.relatingGeneralProperty(), builder)
                     + validateSummaryEntity(generalPropertyRelationship.relatedGeneralProperty(), builder);
         }
-        if (entity instanceof StepProductCategoryRelationship productCategoryRelationship) {
+        if (entity instanceof StepProductCategoryRelationship) {
+            StepProductCategoryRelationship productCategoryRelationship = (StepProductCategoryRelationship) entity;
             return validateSummaryEntity(productCategoryRelationship.category(), builder)
                     + validateSummaryEntity(productCategoryRelationship.subCategory(), builder);
         }
-        if (entity instanceof StepProductRelatedProductCategory productRelatedCategory) {
+        if (entity instanceof StepProductRelatedProductCategory) {
+            StepProductRelatedProductCategory productRelatedCategory = (StepProductRelatedProductCategory) entity;
             return validateSummaryItems(List.copyOf(productRelatedCategory.products()), builder);
         }
-        if (entity instanceof StepDocument document) {
+        if (entity instanceof StepDocument) {
+            StepDocument document = (StepDocument) entity;
             return 1 + validateSummaryEntity(document.kind(), builder);
         }
-        if (entity instanceof StepDocumentUsageConstraint documentUsageConstraint) {
+        if (entity instanceof StepDocumentUsageConstraint) {
+            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) entity;
             return validateSummaryEntity(documentUsageConstraint.source(), builder);
         }
-        if (entity instanceof StepEffectivityRelationship effectivityRelationship) {
+        if (entity instanceof StepEffectivityRelationship) {
+            StepEffectivityRelationship effectivityRelationship = (StepEffectivityRelationship) entity;
             return validateSummaryEntity(effectivityRelationship.relatingEffectivity(), builder)
                     + validateSummaryEntity(effectivityRelationship.relatedEffectivity(), builder);
         }
-        if (entity instanceof StepLanguageAssignment languageAssignment) {
+        if (entity instanceof StepLanguageAssignment) {
+            StepLanguageAssignment languageAssignment = (StepLanguageAssignment) entity;
             return validateSummaryEntity(languageAssignment.assignedLanguage(), builder);
         }
-        if (entity instanceof StepAppliedLanguageAssignment appliedLanguageAssignment) {
+        if (entity instanceof StepAppliedLanguageAssignment) {
+            StepAppliedLanguageAssignment appliedLanguageAssignment = (StepAppliedLanguageAssignment) entity;
             int count = validateSummaryEntity(appliedLanguageAssignment.assignedLanguage(), builder);
             for (StepEntity item : appliedLanguageAssignment.items()) {
                 count += validateSummaryEntity(item, builder);
             }
             return count;
         }
-        if (entity instanceof StepExternalIdentificationAssignment externalIdentificationAssignment) {
+        if (entity instanceof StepExternalIdentificationAssignment) {
+            StepExternalIdentificationAssignment externalIdentificationAssignment = (StepExternalIdentificationAssignment) entity;
             return validateSummaryEntity(externalIdentificationAssignment.role(), builder)
                     + validateSummaryEntity(externalIdentificationAssignment.source(), builder);
         }
-        if (entity instanceof StepAppliedExternalIdentificationAssignment appliedExternalIdentificationAssignment) {
+        if (entity instanceof StepAppliedExternalIdentificationAssignment) {
+            StepAppliedExternalIdentificationAssignment appliedExternalIdentificationAssignment = (StepAppliedExternalIdentificationAssignment) entity;
             int count = validateSummaryEntity(appliedExternalIdentificationAssignment.role(), builder)
                     + validateSummaryEntity(appliedExternalIdentificationAssignment.source(), builder);
             for (StepEntity item : appliedExternalIdentificationAssignment.items()) {
@@ -3112,7 +3452,7 @@ public final class StepDumpApp {
     }
 
     private static void validatePolyline(StepPolyline polyline, StepCadBuilder builder) {
-        if (!polyline.points().isEmpty() && polyline.points().getFirst().coordinates().size() == 2) {
+        if (!polyline.points().isEmpty() && polyline.points().get(0).coordinates().size() == 2) {
             builder.buildPolyline2(polyline.id());
         } else {
             builder.buildPolyline(polyline.id());
@@ -3125,19 +3465,24 @@ public final class StepDumpApp {
     }
 
     private static Iterable<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell openShell) {
+        if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
             return openShell.faces();
         }
-        if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+        if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
             return surfacedOpenShell.faces();
         }
-        if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+        if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
             return orientedOpenShell.faces();
         }
-        if (entity instanceof StepClosedShell closedShell) {
+        if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
             return closedShell.faces();
         }
-        if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+        if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
             return orientedClosedShell.faces();
         }
         throw new StepResolutionException("entity #" + entity.id() + " is not a supported shell");

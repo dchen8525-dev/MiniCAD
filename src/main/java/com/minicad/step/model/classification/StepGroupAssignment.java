@@ -1,19 +1,51 @@
 package com.minicad.step.model.classification;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal GROUP_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedGroup assigned group
  */
-public record StepGroupAssignment(
-        int id,
-        StepGroup assignedGroup
-) implements StepEntity {
+/**
+ * Minimal GROUP_ASSIGNMENT metadata.
+ *
+ * @param id STEP instance id
+ * @param assignedGroup assigned group
+ */
+public final class StepGroupAssignment implements StepEntity {
+    private final int id;
+    private final StepGroup assignedGroup;
+
+    public StepGroupAssignment(int id, StepGroup assignedGroup) {
+        this.id = id;
+        this.assignedGroup = assignedGroup;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepGroup getAssignedGroup() {
+        return assignedGroup;
+    }
 
     @Override
-    public String name() {
-        return assignedGroup.name();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepGroupAssignment that = (StepGroupAssignment) o;
+        return id == that.id && Objects.equals(assignedGroup, that.assignedGroup);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, assignedGroup);
+    }
+
+    @Override
+    public String toString() {
+        return "StepGroupAssignment{" + "id=" + id + "assignedGroup=" + assignedGroup + "}";
     }
 }

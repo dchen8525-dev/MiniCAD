@@ -2,6 +2,7 @@ package com.minicad.step.model.product;
 
 import com.minicad.step.model.base.StepEntity;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Resolved FACE_BASED_SURFACE_MODEL.
@@ -10,10 +11,51 @@ import java.util.List;
  * @param name STEP label
  * @param faceSets connected face sets
  */
-public record StepFaceBasedSurfaceModel(int id, String name, List<StepEntity> faceSets)
-    implements StepEntity {
+/**
+ * Resolved FACE_BASED_SURFACE_MODEL.
+ *
+ * @param id STEP id
+ * @param name STEP label
+ * @param faceSets connected face sets
+ */
+public final class StepFaceBasedSurfaceModel implements StepEntity {
+    private final int id;
+    private final String name;
+    private final List<StepEntity> faceSets;
 
-  public StepFaceBasedSurfaceModel {
-    faceSets = List.copyOf(faceSets);
-  }
+    public StepFaceBasedSurfaceModel(int id, String name, List<StepEntity> faceSets) {
+        this.id = id;
+        this.name = name;
+        this.faceSets = faceSets == null ? null : java.util.List.copyOf(faceSets);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StepEntity> getFaceSets() {
+        return faceSets;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepFaceBasedSurfaceModel that = (StepFaceBasedSurfaceModel) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(faceSets, that.faceSets);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, faceSets);
+    }
+
+    @Override
+    public String toString() {
+        return "StepFaceBasedSurfaceModel{" + "id=" + id + "name=" + name + "faceSets=" + faceSets + "}";
+    }
 }

@@ -70,7 +70,8 @@ final class ProductMetadataExtractor {
         List<ProductMetadata.ComponentInfo> components = new ArrayList<>();
 
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepProduct product) {
+            if (entity instanceof StepProduct) {
+            StepProduct product = (StepProduct) entity;
                 if (productName == null) {
                     productName = product.name();
                     productDescription = product.description();
@@ -78,21 +79,25 @@ final class ProductMetadataExtractor {
                 } else {
                     components.add(new ProductMetadata.ComponentInfo(product.name(), product.identifier(), product.description()));
                 }
-            } else if (entity instanceof StepProductDefinitionShape shape) {
+            } else if (entity instanceof StepProductDefinitionShape) {
+            StepProductDefinitionShape shape = (StepProductDefinitionShape) entity;
                 if (productName == null) {
                     productName = shape.name();
                     productDescription = shape.description();
                 }
-            } else if (entity instanceof StepProductDefinition pd) {
+            } else if (entity instanceof StepProductDefinition) {
+            StepProductDefinition pd = (StepProductDefinition) entity;
                 if (productName == null && pd.description() != null && !pd.description().isEmpty()) {
                     productDescription = pd.description();
                 }
-                if (pd.formation() instanceof StepProductDefinitionFormation formation) {
+                if (pd.formation() instanceof StepProductDefinitionFormation) {
+                    StepProductDefinitionFormation formation = (StepProductDefinitionFormation) pd.formation();
                     if (productName == null && formation.name() != null) {
                         productName = formation.name();
                     }
                 }
-            } else if (entity instanceof StepProductRelationship rel) {
+            } else if (entity instanceof StepProductRelationship) {
+            StepProductRelationship rel = (StepProductRelationship) entity;
                 if (rel.name() != null && productName == null) {
                     productName = rel.name();
                 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.base.StepFaceEntity;
+import java.util.Objects;
 
 /**
  * Resolved FACE_SURFACE.
@@ -14,18 +15,65 @@ import com.minicad.step.model.base.StepFaceEntity;
  * @param faceGeometry supporting surface
  * @param sameSense orientation flag
  */
-public record StepFaceSurface(
-        int id,
-        String name,
-        List<StepFaceBound> bounds,
-        StepEntity faceGeometry,
-        boolean sameSense
-) implements StepFaceEntity {
+/**
+ * Resolved FACE_SURFACE.
+ *
+ * @param id step id
+ * @param name step label
+ * @param bounds face bounds
+ * @param faceGeometry supporting surface
+ * @param sameSense orientation flag
+ */
+public final class StepFaceSurface implements StepFaceEntity {
+    private final int id;
+    private final String name;
+    private final List<StepFaceBound> bounds;
+    private final StepEntity faceGeometry;
+    private final boolean sameSense;
 
-    /**
-     * Creates an immutable face-surface record.
-     */
-    public StepFaceSurface {
-        bounds = List.copyOf(bounds);
+    public StepFaceSurface(int id, String name, List<StepFaceBound> bounds, StepEntity faceGeometry, boolean sameSense) {
+        this.id = id;
+        this.name = name;
+        this.bounds = bounds == null ? null : java.util.List.copyOf(bounds);
+        this.faceGeometry = faceGeometry;
+        this.sameSense = sameSense;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StepFaceBound> getBounds() {
+        return bounds;
+    }
+
+    public StepEntity getFaceGeometry() {
+        return faceGeometry;
+    }
+
+    public boolean isSameSense() {
+        return sameSense;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepFaceSurface that = (StepFaceSurface) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bounds, that.bounds) && Objects.equals(faceGeometry, that.faceGeometry) && sameSense == that.sameSense;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, bounds, faceGeometry, sameSense);
+    }
+
+    @Override
+    public String toString() {
+        return "StepFaceSurface{" + "id=" + id + "name=" + name + "bounds=" + bounds + "faceGeometry=" + faceGeometry + "sameSense=" + sameSense + "}";
     }
 }

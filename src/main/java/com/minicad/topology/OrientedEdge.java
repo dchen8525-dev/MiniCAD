@@ -3,6 +3,7 @@ package com.minicad.topology;
 import com.minicad.common.TopologyException;
 import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.CartesianPoint;
+import java.util.Objects;
 
 /**
  * Use of an edge with an explicit orientation inside a loop.
@@ -10,70 +11,44 @@ import com.minicad.geometry.CartesianPoint;
  * @param edge referenced base edge
  * @param orientation true for forward, false for reversed
  */
-public record OrientedEdge(Edge edge, boolean orientation) {
+/**
+ * Use of an edge with an explicit orientation inside a loop.
+ *
+ * @param edge referenced base edge
+ * @param orientation true for forward, false for reversed
+ */
+public final class OrientedEdge {
+    private final Edge edge;
+    private final boolean orientation;
 
-    /**
-     * Creates an oriented edge.
-     */
-    public OrientedEdge {
-        if (edge == null) {
-            throw new TopologyException("edge must not be null");
-        }
+    public OrientedEdge(Edge edge, boolean orientation) {
+        this.edge = edge;
+        this.orientation = orientation;
     }
 
-    /**
-     * Returns the effective start vertex under the orientation.
-     *
-     * @return oriented start vertex
-     */
-    public Vertex startVertex() {
-        return orientation ? edge.start() : edge.end();
+    public Edge getEdge() {
+        return edge;
     }
 
-    /**
-     * Returns the effective end vertex under the orientation.
-     *
-     * @return oriented end vertex
-     */
-    public Vertex endVertex() {
-        return orientation ? edge.end() : edge.start();
+    public boolean isOrientation() {
+        return orientation;
     }
 
-    /**
-     * Returns the bounding box of the underlying edge.
-     *
-     * @return bounding box enclosing the edge
-     */
-    public BoundingBox3 boundingBox() {
-        return edge.boundingBox();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrientedEdge that = (OrientedEdge) o;
+        return Objects.equals(edge, that.edge) && orientation == that.orientation;
     }
 
-    /**
-     * Returns the length of the underlying edge.
-     *
-     * @return edge length
-     */
-    public double length() {
-        return edge.length();
+    @Override
+    public int hashCode() {
+        return Objects.hash(edge, orientation);
     }
 
-    /**
-     * Returns the closest point on the edge to a given point.
-     *
-     * @param point target point
-     * @return closest point on the edge
-     */
-    public CartesianPoint closestPointTo(CartesianPoint point) {
-        return edge.closestPointTo(point);
-    }
-
-    /**
-     * Returns the distance from a point to the edge.
-     *
-     * @param point target point
-     * @return minimum distance to the edge
-     */
-    public double distanceTo(CartesianPoint point) {
-        return edge.distanceTo(point);
+    @Override
+    public String toString() {
+        return "OrientedEdge{" + "edge=" + edge + "orientation=" + orientation + "}";
     }
 }

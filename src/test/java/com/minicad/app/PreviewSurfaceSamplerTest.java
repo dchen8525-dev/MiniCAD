@@ -19,7 +19,7 @@ class PreviewSurfaceSamplerTest {
 
         // sampleGrid(n, m) returns (n+1)x(m+1) grid points
         assertEquals(5, grid.size());
-        assertEquals(5, grid.getFirst().size());
+        assertEquals(5, grid.get(0).size());
         // All points should be finite
         for (List<CartesianPoint> row : grid) {
             for (CartesianPoint pt : row) {
@@ -38,7 +38,7 @@ class PreviewSurfaceSamplerTest {
 
         List<List<CartesianPoint>> grid = plane.sampleGrid(2, 2);
         assertEquals(3, grid.size());
-        assertEquals(3, grid.getFirst().size());
+        assertEquals(3, grid.get(0).size());
 
         List<PointPayload> triangles = PreviewSurfaceSampler.triangulateSurfaceGrid(grid, true);
         // 3x3 grid → 4 quads → 8 triangles → 24 points

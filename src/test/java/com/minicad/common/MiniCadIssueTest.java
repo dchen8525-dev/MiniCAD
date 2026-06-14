@@ -15,11 +15,11 @@ class MiniCadIssueTest {
                 "B-spline surface preview is unsupported"
         );
 
-        assertEquals(MiniCadIssue.Severity.WARNING, issue.severity());
-        assertEquals("step.unsupported", issue.code());
-        assertEquals(42, issue.entityId());
-        assertEquals("ADVANCED_FACE", issue.entityType());
-        assertEquals("B-spline surface preview is unsupported", issue.message());
+        assertEquals(MiniCadIssue.Severity.WARNING, issue.getSeverity());
+        assertEquals("step.unsupported", issue.getCode());
+        assertEquals(42, issue.getEntityId());
+        assertEquals("ADVANCED_FACE", issue.getEntityType());
+        assertEquals("B-spline surface preview is unsupported", issue.getMessage());
     }
 
     @Test

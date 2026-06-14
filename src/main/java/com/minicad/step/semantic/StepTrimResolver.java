@@ -47,7 +47,7 @@ final class StepTrimResolver {
     void validateTrimValue(StepValue trim, Curve3 basis, String slot) {
         StepValue unwrapped = unwrapTyped(trim);
         if (unwrapped instanceof StepValue.ListValue innerList) {
-            validateTrimValue(innerList.elements().getFirst(), basis, slot);
+            validateTrimValue(innerList.elements().get(0), basis, slot);
             return;
         }
         if (unwrapped instanceof StepValue.ReferenceValue ref) {
@@ -68,7 +68,7 @@ final class StepTrimResolver {
         if (trims.isEmpty()) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
-        StepValue trim = unwrapTyped(trims.getFirst());
+        StepValue trim = unwrapTyped(trims.get(0));
         if (trim instanceof StepValue.ListValue innerList) {
             return resolveTrimParameter(innerList.elements(), basis, slot);
         }
@@ -77,7 +77,8 @@ final class StepTrimResolver {
         }
         if (trim instanceof StepValue.ReferenceValue ref) {
             StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
+            if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
                 if (point.coordinates().size() < 2) {
                     throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
                 }
@@ -96,13 +97,14 @@ final class StepTrimResolver {
         if (trims.isEmpty()) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
-        StepValue trim = unwrapTyped(trims.getFirst());
+        StepValue trim = unwrapTyped(trims.get(0));
         if (trim instanceof StepValue.ListValue innerList) {
             return resolveTrimPoint3(innerList.elements(), basis, slot);
         }
         if (trim instanceof StepValue.ReferenceValue ref) {
             StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
+            if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
                 if (point.coordinates().size() < 2) {
                     throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
                 }
@@ -117,9 +119,10 @@ final class StepTrimResolver {
     }
 
     Point2 requireTrimPoint2(List<StepEntity> trims, String slot) {
-        if (trims.isEmpty() || !(trims.getFirst() instanceof StepCartesianPoint point)) {
+        if (trims.isEmpty() || !(trims.get(0) instanceof StepCartesianPoint)) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
         }
+        StepCartesianPoint point = (StepCartesianPoint) trims.get(0);
         if (point.coordinates().size() != 2) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must be 2D for PCURVE");
         }
@@ -133,13 +136,14 @@ final class StepTrimResolver {
         if (trims.isEmpty()) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
-        StepValue trim = unwrapTyped(trims.getFirst());
+        StepValue trim = unwrapTyped(trims.get(0));
         if (trim instanceof StepValue.ListValue innerList) {
             return resolveTrimPoint2(innerList.elements(), basisCurve, slot);
         }
         if (trim instanceof StepValue.ReferenceValue ref) {
             StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
+            if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
                 if (point.coordinates().size() < 2) {
                     throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
                 }
@@ -161,13 +165,14 @@ final class StepTrimResolver {
         if (trims.isEmpty()) {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
-        StepValue trim = unwrapTyped(trims.getFirst());
+        StepValue trim = unwrapTyped(trims.get(0));
         if (trim instanceof StepValue.ListValue innerList) {
             return resolveTrimParam2(innerList.elements(), basisCurve, slot);
         }
         if (trim instanceof StepValue.ReferenceValue ref) {
             StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint point) {
+            if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
                 if (point.coordinates().size() < 2) {
                     throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
                 }
@@ -183,52 +188,55 @@ final class StepTrimResolver {
     }
 
     double parameterOnCurve2(Curve2 curve, Point2 point) {
-        return switch (curve) {
-            case Line2 line -> line.parameterOf(point);
-            case Circle2 circle -> {
-                Vector2 offset = point.subtract(circle.center());
-                Vector2 x = circle.xDirection().asVector();
-                Vector2 y = new Vector2(-x.y(), x.x());
-                double angle = Math.atan2(offset.dot(y) / circle.radius(), offset.dot(x) / circle.radius());
-                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
-            }
-            case Ellipse2 ellipse -> {
-                Vector2 offset = point.subtract(ellipse.center());
-                Vector2 x = ellipse.xDirection().asVector();
-                Vector2 y = new Vector2(-x.y(), x.x());
-                double angle = Math.atan2(offset.dot(y) / ellipse.semiAxis2(), offset.dot(x) / ellipse.semiAxis1());
-                yield angle >= 0.0 ? angle : angle + Math.PI * 2.0;
-            }
-            case BSplineCurve2 bspline -> parameterOnBSpline2(bspline, point);
-            case RationalBSplineCurve2 rational -> parameterOnRationalBSpline2(rational, point);
-            case Polyline2 polyline -> parameterOnPolyline2(polyline, point);
-            case TrimmedCurve2 trimmed -> parameterOnCurve2(trimmed.basisCurve(), point);
-            default -> 0.0;
-        };
+            switch (curve) {
+      case Line2 __:
+        return line.parameterOf(point);
+      case BSplineCurve2 __:
+        return parameterOnBSpline2(bspline, point);
+      case RationalBSplineCurve2 __:
+        return parameterOnRationalBSpline2(rational, point);
+      case Polyline2 __:
+        return parameterOnPolyline2(polyline, point);
+      case TrimmedCurve2 __:
+        return parameterOnCurve2(trimmed.basisCurve(), point);
+      default:
+        throw new IllegalArgumentException("Unknown value type: " + curve);
+    }
     }
 
     Point2 evaluateCurve2AtParameter(Curve2 curve, double param) {
-        return switch (curve) {
-            case Line2 line -> line.pointAt(param);
-            case Circle2 circle -> circle.pointAt(param);
-            case Ellipse2 ellipse -> ellipse.pointAt(param);
-            case Polyline2 polyline -> evaluatePolyline2AtParameter(polyline, param);
-            case TrimmedCurve2 trimmed -> evaluateCurve2AtParameter(trimmed.basisCurve(), param);
-            case BSplineCurve2 bspline -> bspline.pointAt(param);
-            case RationalBSplineCurve2 rational -> rational.pointAt(param);
-            case CompositeCurve2 composite -> evaluateComposite2AtParameter(composite, param);
-            default -> throw new UnsupportedGeometryException("TRIMMED_CURVE parameter trim not supported for 2D curve type " + curve.getClass().getSimpleName());
-        };
+            switch (curve) {
+      case Line2 __:
+        return line.pointAt(param);
+      case Circle2 __:
+        return circle.pointAt(param);
+      case Ellipse2 __:
+        return ellipse.pointAt(param);
+      case Polyline2 __:
+        return evaluatePolyline2AtParameter(polyline, param);
+      case TrimmedCurve2 __:
+        return evaluateCurve2AtParameter(trimmed.basisCurve(), param);
+      case BSplineCurve2 __:
+        return bspline.pointAt(param);
+      case RationalBSplineCurve2 __:
+        return rational.pointAt(param);
+      case CompositeCurve2 __:
+        return evaluateComposite2AtParameter(composite, param);
+      default:
+        throw new IllegalArgumentException();
+    }
     }
 
     Point2 snapTrimPoint2(Point2 point, Curve2 basisCurve) {
         if (basisCurve.contains(point)) {
             return point;
         }
-        if (basisCurve instanceof Line2 line) {
+        if (basisCurve instanceof Line2) {
+            Line2 line = (Line2) basisCurve;
             return line.closestPoint(point);
         }
-        if (basisCurve instanceof Circle2 circle) {
+        if (basisCurve instanceof Circle2) {
+            Circle2 circle = (Circle2) basisCurve;
             com.minicad.geometry2d.Vector2 offset = point.subtract(circle.center());
             double norm = offset.norm();
             if (norm <= Epsilon.EPS) {
@@ -236,7 +244,8 @@ final class StepTrimResolver {
             }
             return circle.center().add(offset.scale(circle.radius() / norm));
         }
-        if (basisCurve instanceof Ellipse2 ellipse) {
+        if (basisCurve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) basisCurve;
             com.minicad.geometry2d.Vector2 offset = point.subtract(ellipse.center());
             if (offset.norm() <= Epsilon.EPS) {
                 return ellipse.pointAt(0.0);
@@ -252,7 +261,8 @@ final class StepTrimResolver {
             double angle = Math.atan2(ny / norm, nx / norm);
             return ellipse.pointAt(angle);
         }
-        if (basisCurve instanceof BSplineCurve2 spline) {
+        if (basisCurve instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) basisCurve;
             Point2 best = null;
             double bestDistance = Double.POSITIVE_INFINITY;
             for (Point2 sample : spline.sample(192)) {
@@ -266,7 +276,8 @@ final class StepTrimResolver {
                 return best;
             }
         }
-        if (basisCurve instanceof TrimmedCurve2 trimmed) {
+        if (basisCurve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) basisCurve;
             return snapTrimPoint2(point, trimmed.basisCurve());
         }
         return point;

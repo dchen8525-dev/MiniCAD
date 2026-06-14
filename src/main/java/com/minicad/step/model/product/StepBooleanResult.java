@@ -1,6 +1,7 @@
 package com.minicad.step.model.product;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal BOOLEAN_RESULT.
  *
@@ -10,6 +11,65 @@ import com.minicad.step.model.base.StepEntity;
  * @param firstOperand first boolean operand
  * @param secondOperand second boolean operand
  */
-public record StepBooleanResult(
-    int id, String name, String operator, StepEntity firstOperand, StepEntity secondOperand)
-    implements StepEntity {}
+/**
+ * Minimal BOOLEAN_RESULT.
+ *
+ * @param id step id
+ * @param name inherited representation-item name
+ * @param operator boolean operator enum token
+ * @param firstOperand first boolean operand
+ * @param secondOperand second boolean operand
+ */
+public final class StepBooleanResult implements StepEntity {
+    private final int id;
+    private final String name;
+    private final String operator;
+    private final StepEntity firstOperand;
+    private final StepEntity secondOperand;
+
+    public StepBooleanResult(int id, String name, String operator, StepEntity firstOperand, StepEntity secondOperand) {
+        this.id = id;
+        this.name = name;
+        this.operator = operator;
+        this.firstOperand = firstOperand;
+        this.secondOperand = secondOperand;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public StepEntity getFirstOperand() {
+        return firstOperand;
+    }
+
+    public StepEntity getSecondOperand() {
+        return secondOperand;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepBooleanResult that = (StepBooleanResult) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operator, that.operator) && Objects.equals(firstOperand, that.firstOperand) && Objects.equals(secondOperand, that.secondOperand);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, operator, firstOperand, secondOperand);
+    }
+
+    @Override
+    public String toString() {
+        return "StepBooleanResult{" + "id=" + id + "name=" + name + "operator=" + operator + "firstOperand=" + firstOperand + "secondOperand=" + secondOperand + "}";
+    }
+}

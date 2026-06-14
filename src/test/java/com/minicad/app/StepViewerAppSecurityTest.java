@@ -351,7 +351,18 @@ class StepViewerAppSecurityTest {
         assertEquals('F', body[3]);
     }
 
-    private record RunningViewer(Server server, int port) implements AutoCloseable {
+    private static final class RunningViewer implements AutoCloseable {
+    private final Server server;
+    private final int port;
+
+    public RunningViewer(Server server, int port) {
+        this.server = server;
+        this.port = port;
+    }
+
+    public Server getServer() { return server; }
+    public int getPort() { return port; }
+}
         URI uri(String path) {
             return URI.create("http://127.0.0.1:" + port + path);
         }

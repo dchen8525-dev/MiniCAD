@@ -7,56 +7,56 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StepMeshExporterTest {
 
-    private static final String MINIMAL_SQUARE = """
-            ISO-10303-21;
-            HEADER;
-            ENDSEC;
-            DATA;
-            #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-            #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-            #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-            #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-            #10=DIRECTION('DZ',(0.0,0.0,1.0));
-            #11=DIRECTION('DX',(1.0,0.0,0.0));
-            #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
-            #13=PLANE('PL0',#12);
-            #20=VERTEX_POINT('V0',#1);
-            #21=VERTEX_POINT('V1',#2);
-            #22=VERTEX_POINT('V2',#3);
-            #23=VERTEX_POINT('V3',#4);
-            #30=DIRECTION('D1',(1.0,0.0,0.0));
-            #31=VECTOR('VE1',#30,1.0);
-            #32=LINE('L1',#1,#31);
-            #33=DIRECTION('D2',(0.0,1.0,0.0));
-            #34=VECTOR('VE2',#33,1.0);
-            #35=LINE('L2',#2,#34);
-            #36=DIRECTION('D3',(-1.0,0.0,0.0));
-            #37=VECTOR('VE3',#36,1.0);
-            #38=LINE('L3',#3,#37);
-            #39=DIRECTION('D4',(0.0,-1.0,0.0));
-            #40=VECTOR('VE4',#39,1.0);
-            #41=LINE('L4',#4,#40);
-            #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
-            #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
-            #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
-            #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
-            #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
-            #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
-            #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
-            #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
-            #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
-            #71=FACE_OUTER_BOUND('FOB',#70,.T.);
-            #80=ADVANCED_FACE('F0',(#71),#13,.T.);
-            #90=CLOSED_SHELL('CS',(#80));
-            #100=MANIFOLD_SOLID_BREP('S0',#90);
-            ENDSEC;
-            END-ISO-10303-21;
-            """;
+    private static final String MINIMAL_SQUARE = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#30=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#31=VECTOR('VE1',#30,1.0);\n"
+        + "#32=LINE('L1',#1,#31);\n"
+        + "#33=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#34=VECTOR('VE2',#33,1.0);\n"
+        + "#35=LINE('L2',#2,#34);\n"
+        + "#36=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#37=VECTOR('VE3',#36,1.0);\n"
+        + "#38=LINE('L3',#3,#37);\n"
+        + "#39=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#40=VECTOR('VE4',#39,1.0);\n"
+        + "#41=LINE('L4',#4,#40);\n"
+        + "#50=EDGE_CURVE('E1',#20,#21,#32,.T.);\n"
+        + "#51=EDGE_CURVE('E2',#21,#22,#35,.T.);\n"
+        + "#52=EDGE_CURVE('E3',#22,#23,#38,.T.);\n"
+        + "#53=EDGE_CURVE('E4',#23,#20,#41,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE1',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE2',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE3',$,$,#52,.T.);\n"
+        + "#63=ORIENTED_EDGE('OE4',$,$,#53,.T.);\n"
+        + "#70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));\n"
+        + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
+        + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
+        + "#90=CLOSED_SHELL('CS',(#80));\n"
+        + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
     @Test
     void shouldExportObj() {
@@ -128,19 +128,18 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportObjForCsgBlock() {
-        String stepText = """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('ORIGIN',(0.0,0.0,0.0));
-                #2=DIRECTION('Z',(0.0,0.0,1.0));
-                #3=DIRECTION('X',(1.0,0.0,0.0));
-                #4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);
-                #5=BLOCK('B',#4,1.0,2.0,3.0);
-                ENDSEC;
-                END-ISO-10303-21;
-                """;
+        String stepText = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('ORIGIN',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('Z',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('X',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
+        + "#5=BLOCK('B',#4,1.0,2.0,3.0);\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         String obj = StepMeshExporter.exportObj(stepText);
         assertTrue(obj.contains("v "));
@@ -171,26 +170,25 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportObjForTessellated() {
-        String stepText = """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(0.5,1.0,0.0));
-                #4=DIRECTION('Z',(0.0,0.0,1.0));
-                #5=DIRECTION('X',(1.0,0.0,0.0));
-                #6=AXIS2_PLACEMENT_3D('AX',#1,#4,#5);
-                #7=PLANE('PL',#6);
-                #8=POLY_LOOP('PL',(#1,#2,#3));
-                #9=FACE_OUTER_BOUND('FOB',#8,.T.);
-                #10=ADVANCED_FACE('F',(#9),#7,.T.);
-                #11=CLOSED_SHELL('CS',(#10));
-                #12=MANIFOLD_SOLID_BREP('S',#11);
-                ENDSEC;
-                END-ISO-10303-21;
-                """;
+        String stepText = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(0.5,1.0,0.0));\n"
+        + "#4=DIRECTION('Z',(0.0,0.0,1.0));\n"
+        + "#5=DIRECTION('X',(1.0,0.0,0.0));\n"
+        + "#6=AXIS2_PLACEMENT_3D('AX',#1,#4,#5);\n"
+        + "#7=PLANE('PL',#6);\n"
+        + "#8=POLY_LOOP('PL',(#1,#2,#3));\n"
+        + "#9=FACE_OUTER_BOUND('FOB',#8,.T.);\n"
+        + "#10=ADVANCED_FACE('F',(#9),#7,.T.);\n"
+        + "#11=CLOSED_SHELL('CS',(#10));\n"
+        + "#12=MANIFOLD_SOLID_BREP('S',#11);\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         String obj = StepMeshExporter.exportObj(stepText);
         assertTrue(obj.contains("v "));
@@ -199,72 +197,71 @@ class StepMeshExporterTest {
 
     @Test
     void shouldPreservePlanarHoleInObjExport() {
-        String stepText = """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(4.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(4.0,4.0,0.0));
-                #4=CARTESIAN_POINT('P3',(0.0,4.0,0.0));
-                #5=CARTESIAN_POINT('H0',(1.0,1.0,0.0));
-                #6=CARTESIAN_POINT('H1',(3.0,1.0,0.0));
-                #7=CARTESIAN_POINT('H2',(3.0,3.0,0.0));
-                #8=CARTESIAN_POINT('H3',(1.0,3.0,0.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
-                #13=PLANE('PL0',#12);
-                #20=VERTEX_POINT('V0',#1);
-                #21=VERTEX_POINT('V1',#2);
-                #22=VERTEX_POINT('V2',#3);
-                #23=VERTEX_POINT('V3',#4);
-                #24=VERTEX_POINT('V4',#5);
-                #25=VERTEX_POINT('V5',#6);
-                #26=VERTEX_POINT('V6',#7);
-                #27=VERTEX_POINT('V7',#8);
-                #30=DIRECTION('D1',(1.0,0.0,0.0));
-                #31=VECTOR('VE1',#30,1.0);
-                #32=LINE('L1',#1,#31);
-                #33=DIRECTION('D2',(0.0,1.0,0.0));
-                #34=VECTOR('VE2',#33,1.0);
-                #35=LINE('L2',#2,#34);
-                #36=DIRECTION('D3',(-1.0,0.0,0.0));
-                #37=VECTOR('VE3',#36,1.0);
-                #38=LINE('L3',#3,#37);
-                #39=DIRECTION('D4',(0.0,-1.0,0.0));
-                #40=VECTOR('VE4',#39,1.0);
-                #41=LINE('L4',#4,#40);
-                #42=LINE('L5',#5,#31);
-                #43=LINE('L6',#6,#34);
-                #44=LINE('L7',#7,#37);
-                #45=LINE('L8',#8,#40);
-                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
-                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
-                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
-                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
-                #54=EDGE_CURVE('E5',#24,#25,#42,.T.);
-                #55=EDGE_CURVE('E6',#25,#26,#43,.T.);
-                #56=EDGE_CURVE('E7',#26,#27,#44,.T.);
-                #57=EDGE_CURVE('E8',#27,#24,#45,.T.);
-                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
-                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
-                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
-                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
-                #64=ORIENTED_EDGE('OE5',$,$,#54,.T.);
-                #65=ORIENTED_EDGE('OE6',$,$,#55,.T.);
-                #66=ORIENTED_EDGE('OE7',$,$,#56,.T.);
-                #67=ORIENTED_EDGE('OE8',$,$,#57,.T.);
-                #70=EDGE_LOOP('OUTER',(#60,#61,#62,#63));
-                #71=EDGE_LOOP('INNER',(#64,#65,#66,#67));
-                #72=FACE_OUTER_BOUND('FOB',#70,.T.);
-                #73=FACE_BOUND('FB',#71,.T.);
-                #80=ADVANCED_FACE('F0',(#72,#73),#13,.T.);
-                #90=OPEN_SHELL('OS',(#80));
-                ENDSEC;
-                END-ISO-10303-21;
-                """;
+        String stepText = 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(4.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(4.0,4.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,4.0,0.0));\n"
+        + "#5=CARTESIAN_POINT('H0',(1.0,1.0,0.0));\n"
+        + "#6=CARTESIAN_POINT('H1',(3.0,1.0,0.0));\n"
+        + "#7=CARTESIAN_POINT('H2',(3.0,3.0,0.0));\n"
+        + "#8=CARTESIAN_POINT('H3',(1.0,3.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#24=VERTEX_POINT('V4',#5);\n"
+        + "#25=VERTEX_POINT('V5',#6);\n"
+        + "#26=VERTEX_POINT('V6',#7);\n"
+        + "#27=VERTEX_POINT('V7',#8);\n"
+        + "#30=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#31=VECTOR('VE1',#30,1.0);\n"
+        + "#32=LINE('L1',#1,#31);\n"
+        + "#33=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#34=VECTOR('VE2',#33,1.0);\n"
+        + "#35=LINE('L2',#2,#34);\n"
+        + "#36=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#37=VECTOR('VE3',#36,1.0);\n"
+        + "#38=LINE('L3',#3,#37);\n"
+        + "#39=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#40=VECTOR('VE4',#39,1.0);\n"
+        + "#41=LINE('L4',#4,#40);\n"
+        + "#42=LINE('L5',#5,#31);\n"
+        + "#43=LINE('L6',#6,#34);\n"
+        + "#44=LINE('L7',#7,#37);\n"
+        + "#45=LINE('L8',#8,#40);\n"
+        + "#50=EDGE_CURVE('E1',#20,#21,#32,.T.);\n"
+        + "#51=EDGE_CURVE('E2',#21,#22,#35,.T.);\n"
+        + "#52=EDGE_CURVE('E3',#22,#23,#38,.T.);\n"
+        + "#53=EDGE_CURVE('E4',#23,#20,#41,.T.);\n"
+        + "#54=EDGE_CURVE('E5',#24,#25,#42,.T.);\n"
+        + "#55=EDGE_CURVE('E6',#25,#26,#43,.T.);\n"
+        + "#56=EDGE_CURVE('E7',#26,#27,#44,.T.);\n"
+        + "#57=EDGE_CURVE('E8',#27,#24,#45,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE1',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE2',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE3',$,$,#52,.T.);\n"
+        + "#63=ORIENTED_EDGE('OE4',$,$,#53,.T.);\n"
+        + "#64=ORIENTED_EDGE('OE5',$,$,#54,.T.);\n"
+        + "#65=ORIENTED_EDGE('OE6',$,$,#55,.T.);\n"
+        + "#66=ORIENTED_EDGE('OE7',$,$,#56,.T.);\n"
+        + "#67=ORIENTED_EDGE('OE8',$,$,#57,.T.);\n"
+        + "#70=EDGE_LOOP('OUTER',(#60,#61,#62,#63));\n"
+        + "#71=EDGE_LOOP('INNER',(#64,#65,#66,#67));\n"
+        + "#72=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
+        + "#73=FACE_BOUND('FB',#71,.T.);\n"
+        + "#80=ADVANCED_FACE('F0',(#72,#73),#13,.T.);\n"
+        + "#90=OPEN_SHELL('OS',(#80));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         String obj = StepMeshExporter.exportObj(stepText);
 
@@ -337,11 +334,10 @@ class StepMeshExporterTest {
     @Test
     void shouldExportSurfaceReplicaCylindricalFace() {
         String obj = StepMeshExporter.exportObj(cylindricalFaceStep(
-                """
-                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
-                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
-                #92=SURFACE_REPLICA('SR0',#13,#91);
-                """,
+                
+        "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
+        + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
+        + "#92=SURFACE_REPLICA('SR0',#13,#91);"
                 "#92"
         ));
 
@@ -367,11 +363,10 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportSurfaceReplicaRevolutionFace() {
-        String obj = StepMeshExporter.exportObj(surfaceOfRevolutionFaceStep("""
-                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
-                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
-                #92=SURFACE_REPLICA('SR0',#14,#91);
-                """, "#92"));
+        String obj = StepMeshExporter.exportObj(surfaceOfRevolutionFaceStep(
+        "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
+        + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
+        + "#92=SURFACE_REPLICA('SR0',#14,#91);"
 
         assertTrue(obj.contains("f "));
         assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.4);
@@ -379,11 +374,10 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportSurfaceReplicaLinearExtrusionFace() {
-        String obj = StepMeshExporter.exportObj(surfaceOfLinearExtrusionFaceStep("""
-                #90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
-                #91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);
-                #92=SURFACE_REPLICA('SR0',#14,#91);
-                """, "#92"));
+        String obj = StepMeshExporter.exportObj(surfaceOfLinearExtrusionFaceStep(
+        "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
+        + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
+        + "#92=SURFACE_REPLICA('SR0',#14,#91);"
 
         assertTrue(obj.contains("f "));
         assertEquals(4.0, planarAreaFromObj(obj), 0.1);
@@ -391,55 +385,54 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportSurfaceReplicaLinearExtrusionFaceWithCompositeGeneratrix() {
-        String obj = StepMeshExporter.exportObj("""
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));
-                #4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));
-                #5=CARTESIAN_POINT('P4',(1.0,2.0,0.0));
-                #6=CARTESIAN_POINT('P5',(1.0,2.0,1.0));
-                #10=DIRECTION('DX',(1.0,0.0,0.0));
-                #11=DIRECTION('DY',(0.0,1.0,0.0));
-                #12=DIRECTION('DZ',(0.0,0.0,1.0));
-                #13=VECTOR('VX',#10,1.0);
-                #14=VECTOR('VZ',#12,1.0);
-                #15=VECTOR('VY',#11,2.0);
-                #20=LINE('L0',#1,#13);
-                #21=LINE('L1',#2,#14);
-                #22=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#20);
-                #23=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#21);
-                #24=COMPOSITE_CURVE('GEN',(#22,#23),.F.);
-                #25=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#24,#15);
-                #30=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
-                #31=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#30,1.0,$);
-                #32=SURFACE_REPLICA('SR0',#25,#31);
-                #40=VERTEX_POINT('V0',#1);
-                #41=VERTEX_POINT('V1',#3);
-                #42=VERTEX_POINT('V2',#6);
-                #43=VERTEX_POINT('V3',#4);
-                #44=POLYLINE('PL0',(#1,#2,#3));
-                #45=POLYLINE('PL1',(#4,#5,#6));
-                #46=LINE('SIDE0',#1,#15);
-                #47=LINE('SIDE1',#3,#15);
-                #50=EDGE_CURVE('E0',#40,#41,#44,.T.);
-                #51=EDGE_CURVE('E1',#41,#42,#47,.T.);
-                #52=EDGE_CURVE('E2',#43,#42,#45,.T.);
-                #53=EDGE_CURVE('E3',#40,#43,#46,.T.);
-                #60=ORIENTED_EDGE('OE0',$,$,#50,.T.);
-                #61=ORIENTED_EDGE('OE1',$,$,#51,.T.);
-                #62=ORIENTED_EDGE('OE2',$,$,#52,.F.);
-                #63=ORIENTED_EDGE('OE3',$,$,#53,.F.);
-                #70=EDGE_LOOP('L0',(#60,#61,#62,#63));
-                #71=FACE_OUTER_BOUND('B0',#70,.T.);
-                #72=ADVANCED_FACE('F0',(#71),#32,.T.);
-                #73=OPEN_SHELL('OS',(#72));
-                ENDSEC;
-                END-ISO-10303-21;
-                """);
+        String obj = StepMeshExporter.exportObj(
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));\n"
+        + "#5=CARTESIAN_POINT('P4',(1.0,2.0,0.0));\n"
+        + "#6=CARTESIAN_POINT('P5',(1.0,2.0,1.0));\n"
+        + "#10=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#11=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#12=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#13=VECTOR('VX',#10,1.0);\n"
+        + "#14=VECTOR('VZ',#12,1.0);\n"
+        + "#15=VECTOR('VY',#11,2.0);\n"
+        + "#20=LINE('L0',#1,#13);\n"
+        + "#21=LINE('L1',#2,#14);\n"
+        + "#22=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#20);\n"
+        + "#23=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#21);\n"
+        + "#24=COMPOSITE_CURVE('GEN',(#22,#23),.F.);\n"
+        + "#25=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#24,#15);\n"
+        + "#30=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
+        + "#31=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#30,1.0,$);\n"
+        + "#32=SURFACE_REPLICA('SR0',#25,#31);\n"
+        + "#40=VERTEX_POINT('V0',#1);\n"
+        + "#41=VERTEX_POINT('V1',#3);\n"
+        + "#42=VERTEX_POINT('V2',#6);\n"
+        + "#43=VERTEX_POINT('V3',#4);\n"
+        + "#44=POLYLINE('PL0',(#1,#2,#3));\n"
+        + "#45=POLYLINE('PL1',(#4,#5,#6));\n"
+        + "#46=LINE('SIDE0',#1,#15);\n"
+        + "#47=LINE('SIDE1',#3,#15);\n"
+        + "#50=EDGE_CURVE('E0',#40,#41,#44,.T.);\n"
+        + "#51=EDGE_CURVE('E1',#41,#42,#47,.T.);\n"
+        + "#52=EDGE_CURVE('E2',#43,#42,#45,.T.);\n"
+        + "#53=EDGE_CURVE('E3',#40,#43,#46,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE0',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE1',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE2',$,$,#52,.F.);\n"
+        + "#63=ORIENTED_EDGE('OE3',$,$,#53,.F.);\n"
+        + "#70=EDGE_LOOP('L0',(#60,#61,#62,#63));\n"
+        + "#71=FACE_OUTER_BOUND('B0',#70,.T.);\n"
+        + "#72=ADVANCED_FACE('F0',(#71),#32,.T.);\n"
+        + "#73=OPEN_SHELL('OS',(#72));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         assertTrue(obj.contains("f "));
         assertEquals(4.0, planarAreaFromObj(obj), 0.15);
@@ -447,201 +440,197 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportSurfaceReplicaRevolutionFaceWithCompositeGeneratrix() {
-        String obj = StepMeshExporter.exportObj("""
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(2.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(2.0,0.0,1.0));
-                #3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));
-                #4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));
-                #5=CARTESIAN_POINT('P4',(0.0,2.0,1.0));
-                #6=CARTESIAN_POINT('P5',(0.0,1.0,1.0));
-                #10=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #66=CARTESIAN_POINT('O1',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=DIRECTION('DY',(0.0,1.0,0.0));
-                #13=DIRECTION('DZ',(0.0,0.0,1.0));
-                #14=VECTOR('VZ',#13,1.0);
-                #15=DIRECTION('DNX',(-1.0,0.0,0.0));
-                #16=VECTOR('VNX',#15,1.0);
-                #17=LINE('L0',#1,#14);
-                #18=LINE('L1',#2,#16);
-                #19=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#17);
-                #20=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#18);
-                #21=COMPOSITE_CURVE('GEN',(#19,#20),.F.);
-                #22=AXIS1_PLACEMENT('AX0',#10,#13);
-                #23=SURFACE_OF_REVOLUTION('SOR0',#21,#22);
-                #24=CARTESIAN_POINT('T0',(0.0,0.0,5.0));
-                #25=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#24,1.0,$);
-                #26=SURFACE_REPLICA('SR0',#23,#25);
-                #30=VERTEX_POINT('V0',#1);
-                #31=VERTEX_POINT('V1',#3);
-                #32=VERTEX_POINT('V2',#6);
-                #33=VERTEX_POINT('V3',#4);
-                #34=POLYLINE('PL0',(#1,#2,#3));
-                #35=POLYLINE('PL1',(#4,#5,#6));
-                #36=AXIS2_PLACEMENT_3D('AX1',#10,#13,#11);
-                #37=AXIS2_PLACEMENT_3D('AX2',#66,#13,#11);
-                #38=CIRCLE('C0',#36,2.0);
-                #39=CIRCLE('C1',#37,1.0);
-                #40=EDGE_CURVE('E0',#30,#33,#38,.T.);
-                #41=EDGE_CURVE('E1',#33,#32,#35,.T.);
-                #42=EDGE_CURVE('E2',#31,#32,#39,.T.);
-                #43=EDGE_CURVE('E3',#30,#31,#34,.T.);
-                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
-                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
-                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
-                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
-                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
-                #61=FACE_OUTER_BOUND('B0',#60,.T.);
-                #62=ADVANCED_FACE('F0',(#61),#26,.T.);
-                #63=OPEN_SHELL('OS',(#62));
-                ENDSEC;
-                END-ISO-10303-21;
-                """);
+        String obj = StepMeshExporter.exportObj(
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(2.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(2.0,0.0,1.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,0.0,1.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,2.0,0.0));\n"
+        + "#5=CARTESIAN_POINT('P4',(0.0,2.0,1.0));\n"
+        + "#6=CARTESIAN_POINT('P5',(0.0,1.0,1.0));\n"
+        + "#10=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#66=CARTESIAN_POINT('O1',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#13=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#14=VECTOR('VZ',#13,1.0);\n"
+        + "#15=DIRECTION('DNX',(-1.0,0.0,0.0));\n"
+        + "#16=VECTOR('VNX',#15,1.0);\n"
+        + "#17=LINE('L0',#1,#14);\n"
+        + "#18=LINE('L1',#2,#16);\n"
+        + "#19=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#17);\n"
+        + "#20=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#18);\n"
+        + "#21=COMPOSITE_CURVE('GEN',(#19,#20),.F.);\n"
+        + "#22=AXIS1_PLACEMENT('AX0',#10,#13);\n"
+        + "#23=SURFACE_OF_REVOLUTION('SOR0',#21,#22);\n"
+        + "#24=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
+        + "#25=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#24,1.0,$);\n"
+        + "#26=SURFACE_REPLICA('SR0',#23,#25);\n"
+        + "#30=VERTEX_POINT('V0',#1);\n"
+        + "#31=VERTEX_POINT('V1',#3);\n"
+        + "#32=VERTEX_POINT('V2',#6);\n"
+        + "#33=VERTEX_POINT('V3',#4);\n"
+        + "#34=POLYLINE('PL0',(#1,#2,#3));\n"
+        + "#35=POLYLINE('PL1',(#4,#5,#6));\n"
+        + "#36=AXIS2_PLACEMENT_3D('AX1',#10,#13,#11);\n"
+        + "#37=AXIS2_PLACEMENT_3D('AX2',#66,#13,#11);\n"
+        + "#38=CIRCLE('C0',#36,2.0);\n"
+        + "#39=CIRCLE('C1',#37,1.0);\n"
+        + "#40=EDGE_CURVE('E0',#30,#33,#38,.T.);\n"
+        + "#41=EDGE_CURVE('E1',#33,#32,#35,.T.);\n"
+        + "#42=EDGE_CURVE('E2',#31,#32,#39,.T.);\n"
+        + "#43=EDGE_CURVE('E3',#30,#31,#34,.T.);\n"
+        + "#50=ORIENTED_EDGE('OE0',$,$,#40,.T.);\n"
+        + "#51=ORIENTED_EDGE('OE1',$,$,#41,.T.);\n"
+        + "#52=ORIENTED_EDGE('OE2',$,$,#42,.F.);\n"
+        + "#53=ORIENTED_EDGE('OE3',$,$,#43,.F.);\n"
+        + "#60=EDGE_LOOP('L0',(#50,#51,#52,#53));\n"
+        + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
+        + "#62=ADVANCED_FACE('F0',(#61),#26,.T.);\n"
+        + "#63=OPEN_SHELL('OS',(#62));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
 
         assertTrue(obj.contains("f "));
         assertEquals(7.0 * Math.PI / 4.0, planarAreaFromObj(obj), 0.35);
     }
 
     private static String cylindricalFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));
-                #3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));
-                #4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));
-                #5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));
-                #6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);
-                #13=CYLINDRICAL_SURFACE('CY0',#12,2.0);
-                %s
-                #15=CIRCLE('C0',#12,2.0);
-                #16=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);
-                #17=CIRCLE('C1',#16,2.0);
-                #20=VERTEX_POINT('V0',#2);
-                #21=VERTEX_POINT('V1',#3);
-                #22=VERTEX_POINT('V2',#6);
-                #23=VERTEX_POINT('V3',#5);
-                #30=VECTOR('VZ0',#10,2.0);
-                #31=LINE('L0',#3,#30);
-                #32=LINE('L1',#2,#30);
-                #40=EDGE_CURVE('E0',#20,#21,#15,.T.);
-                #41=EDGE_CURVE('E1',#21,#22,#31,.T.);
-                #42=EDGE_CURVE('E2',#23,#22,#17,.T.);
-                #43=EDGE_CURVE('E3',#20,#23,#32,.T.);
-                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
-                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
-                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
-                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
-                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
-                #61=FACE_OUTER_BOUND('B0',#60,.T.);
-                #70=ADVANCED_FACE('F0',(#61),%s,.T.);
-                #80=OPEN_SHELL('OS',(#70));
-                ENDSEC;
-                END-ISO-10303-21;
-                """.formatted(surfaceDeclarations, faceGeometryRef);
+        return 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));\n"
+        + "#5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));\n"
+        + "#6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);\n"
+        + "#13=CYLINDRICAL_SURFACE('CY0',#12,2.0);\n"
+        + "%s\n"
+        + "#15=CIRCLE('C0',#12,2.0);\n"
+        + "#16=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);\n"
+        + "#17=CIRCLE('C1',#16,2.0);\n"
+        + "#20=VERTEX_POINT('V0',#2);\n"
+        + "#21=VERTEX_POINT('V1',#3);\n"
+        + "#22=VERTEX_POINT('V2',#6);\n"
+        + "#23=VERTEX_POINT('V3',#5);\n"
+        + "#30=VECTOR('VZ0',#10,2.0);\n"
+        + "#31=LINE('L0',#3,#30);\n"
+        + "#32=LINE('L1',#2,#30);\n"
+        + "#40=EDGE_CURVE('E0',#20,#21,#15,.T.);\n"
+        + "#41=EDGE_CURVE('E1',#21,#22,#31,.T.);\n"
+        + "#42=EDGE_CURVE('E2',#23,#22,#17,.T.);\n"
+        + "#43=EDGE_CURVE('E3',#20,#23,#32,.T.);\n"
+        + "#50=ORIENTED_EDGE('OE0',$,$,#40,.T.);\n"
+        + "#51=ORIENTED_EDGE('OE1',$,$,#41,.T.);\n"
+        + "#52=ORIENTED_EDGE('OE2',$,$,#42,.F.);\n"
+        + "#53=ORIENTED_EDGE('OE3',$,$,#43,.F.);\n"
+        + "#60=EDGE_LOOP('L0',(#50,#51,#52,#53));\n"
+        + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
+        + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
+        + "#80=OPEN_SHELL('OS',(#70));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
     }
 
     private static String surfaceOfRevolutionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));
-                #3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));
-                #4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));
-                #5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));
-                #6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS1_PLACEMENT('AX1',#1,#10);
-                #13=LINE('GEN',#2,#30);
-                #14=SURFACE_OF_REVOLUTION('SOR0',#13,#12);
-                %s
-                #20=VERTEX_POINT('V0',#2);
-                #21=VERTEX_POINT('V1',#3);
-                #22=VERTEX_POINT('V2',#6);
-                #23=VERTEX_POINT('V3',#5);
-                #30=VECTOR('VZ0',#10,2.0);
-                #31=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);
-                #32=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);
-                #33=CIRCLE('C0',#31,2.0);
-                #34=CIRCLE('C1',#32,2.0);
-                #35=LINE('L0',#3,#30);
-                #36=LINE('L1',#2,#30);
-                #40=EDGE_CURVE('E0',#20,#21,#33,.T.);
-                #41=EDGE_CURVE('E1',#21,#22,#35,.T.);
-                #42=EDGE_CURVE('E2',#23,#22,#34,.T.);
-                #43=EDGE_CURVE('E3',#20,#23,#36,.T.);
-                #50=ORIENTED_EDGE('OE0',$,$,#40,.T.);
-                #51=ORIENTED_EDGE('OE1',$,$,#41,.T.);
-                #52=ORIENTED_EDGE('OE2',$,$,#42,.F.);
-                #53=ORIENTED_EDGE('OE3',$,$,#43,.F.);
-                #60=EDGE_LOOP('L0',(#50,#51,#52,#53));
-                #61=FACE_OUTER_BOUND('B0',#60,.T.);
-                #70=ADVANCED_FACE('F0',(#61),%s,.T.);
-                #80=OPEN_SHELL('OS',(#70));
-                ENDSEC;
-                END-ISO-10303-21;
-                """.formatted(surfaceDeclarations, faceGeometryRef);
+        return 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('A0',(2.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('B0',(0.0,2.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('O1',(0.0,0.0,2.0));\n"
+        + "#5=CARTESIAN_POINT('A1',(2.0,0.0,2.0));\n"
+        + "#6=CARTESIAN_POINT('B1',(0.0,2.0,2.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS1_PLACEMENT('AX1',#1,#10);\n"
+        + "#13=LINE('GEN',#2,#30);\n"
+        + "#14=SURFACE_OF_REVOLUTION('SOR0',#13,#12);\n"
+        + "%s\n"
+        + "#20=VERTEX_POINT('V0',#2);\n"
+        + "#21=VERTEX_POINT('V1',#3);\n"
+        + "#22=VERTEX_POINT('V2',#6);\n"
+        + "#23=VERTEX_POINT('V3',#5);\n"
+        + "#30=VECTOR('VZ0',#10,2.0);\n"
+        + "#31=AXIS2_PLACEMENT_3D('AX0',#1,#10,#11);\n"
+        + "#32=AXIS2_PLACEMENT_3D('AX1',#4,#10,#11);\n"
+        + "#33=CIRCLE('C0',#31,2.0);\n"
+        + "#34=CIRCLE('C1',#32,2.0);\n"
+        + "#35=LINE('L0',#3,#30);\n"
+        + "#36=LINE('L1',#2,#30);\n"
+        + "#40=EDGE_CURVE('E0',#20,#21,#33,.T.);\n"
+        + "#41=EDGE_CURVE('E1',#21,#22,#35,.T.);\n"
+        + "#42=EDGE_CURVE('E2',#23,#22,#34,.T.);\n"
+        + "#43=EDGE_CURVE('E3',#20,#23,#36,.T.);\n"
+        + "#50=ORIENTED_EDGE('OE0',$,$,#40,.T.);\n"
+        + "#51=ORIENTED_EDGE('OE1',$,$,#41,.T.);\n"
+        + "#52=ORIENTED_EDGE('OE2',$,$,#42,.F.);\n"
+        + "#53=ORIENTED_EDGE('OE3',$,$,#43,.F.);\n"
+        + "#60=EDGE_LOOP('L0',(#50,#51,#52,#53));\n"
+        + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
+        + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
+        + "#80=OPEN_SHELL('OS',(#70));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
     }
 
     private static String surfaceOfLinearExtrusionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return """
-                ISO-10303-21;
-                HEADER;
-                ENDSEC;
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(2.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(2.0,0.0,2.0));
-                #4=CARTESIAN_POINT('P3',(0.0,0.0,2.0));
-                #10=DIRECTION('DX',(1.0,0.0,0.0));
-                #11=DIRECTION('DZ',(0.0,0.0,1.0));
-                #12=VECTOR('VX',#10,2.0);
-                #13=LINE('GEN',#1,#12);
-                #14=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#13,#25);
-                %s
-                #20=VERTEX_POINT('V0',#1);
-                #21=VERTEX_POINT('V1',#2);
-                #22=VERTEX_POINT('V2',#3);
-                #23=VERTEX_POINT('V3',#4);
-                #24=LINE('L0',#1,#12);
-                #25=VECTOR('VZ',#11,2.0);
-                #26=LINE('L1',#2,#25);
-                #27=LINE('L2',#4,#12);
-                #28=LINE('L3',#1,#25);
-                #30=EDGE_CURVE('E0',#20,#21,#24,.T.);
-                #31=EDGE_CURVE('E1',#21,#22,#26,.T.);
-                #32=EDGE_CURVE('E2',#23,#22,#27,.T.);
-                #33=EDGE_CURVE('E3',#20,#23,#28,.T.);
-                #40=ORIENTED_EDGE('OE0',$,$,#30,.T.);
-                #41=ORIENTED_EDGE('OE1',$,$,#31,.T.);
-                #42=ORIENTED_EDGE('OE2',$,$,#32,.F.);
-                #43=ORIENTED_EDGE('OE3',$,$,#33,.F.);
-                #50=EDGE_LOOP('L0',(#40,#41,#42,#43));
-                #51=FACE_OUTER_BOUND('B0',#50,.T.);
-                #60=ADVANCED_FACE('F0',(#51),%s,.T.);
-                #70=OPEN_SHELL('OS',(#60));
-                ENDSEC;
-                END-ISO-10303-21;
-                """.formatted(surfaceDeclarations, faceGeometryRef);
+        return 
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(2.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(2.0,0.0,2.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,0.0,2.0));\n"
+        + "#10=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#11=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#12=VECTOR('VX',#10,2.0);\n"
+        + "#13=LINE('GEN',#1,#12);\n"
+        + "#14=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#13,#25);\n"
+        + "%s\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#24=LINE('L0',#1,#12);\n"
+        + "#25=VECTOR('VZ',#11,2.0);\n"
+        + "#26=LINE('L1',#2,#25);\n"
+        + "#27=LINE('L2',#4,#12);\n"
+        + "#28=LINE('L3',#1,#25);\n"
+        + "#30=EDGE_CURVE('E0',#20,#21,#24,.T.);\n"
+        + "#31=EDGE_CURVE('E1',#21,#22,#26,.T.);\n"
+        + "#32=EDGE_CURVE('E2',#23,#22,#27,.T.);\n"
+        + "#33=EDGE_CURVE('E3',#20,#23,#28,.T.);\n"
+        + "#40=ORIENTED_EDGE('OE0',$,$,#30,.T.);\n"
+        + "#41=ORIENTED_EDGE('OE1',$,$,#31,.T.);\n"
+        + "#42=ORIENTED_EDGE('OE2',$,$,#32,.F.);\n"
+        + "#43=ORIENTED_EDGE('OE3',$,$,#33,.F.);\n"
+        + "#50=EDGE_LOOP('L0',(#40,#41,#42,#43));\n"
+        + "#51=FACE_OUTER_BOUND('B0',#50,.T.);\n"
+        + "#60=ADVANCED_FACE('F0',(#51),%s,.T.);\n"
+        + "#70=OPEN_SHELL('OS',(#60));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;"
     }
 
     private static double planarAreaFromObj(String obj) {
         List<double[]> vertices = new ArrayList<>();
         double area = 0.0;
-        for (String line : obj.lines().toList()) {
+        for (String line : obj.lines().collect(Collectors.toList())) {
             if (line.startsWith("v ")) {
                 String[] parts = line.trim().split("\\s+");
                 vertices.add(new double[]{

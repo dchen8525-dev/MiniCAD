@@ -4,6 +4,7 @@ import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Minimal 2D degenerate curve representation.
@@ -11,52 +12,38 @@ import java.util.List;
  *
  * @param point the single point where the curve degenerates
  */
-public record DegenerateCurve2(Point2 point) implements Curve2 {
+/**
+ * Minimal 2D degenerate curve representation.
+ * A degenerate curve collapses to a single point.
+ *
+ * @param point the single point where the curve degenerates
+ */
+public final class DegenerateCurve2 implements Curve2 {
+    private final Point2 point;
 
-    public DegenerateCurve2 {
-        Preconditions.requireNonNull(point, "point");
+    public DegenerateCurve2(Point2 point) {
+        this.point = point;
     }
 
-    @Override
-    public boolean contains(Point2 other) {
-        Preconditions.requireNonNull(other, "other");
-        return point.equals(other);
-    }
-
-    @Override
-    public List<Point2> sample(int segments) {
-        return List.of(point, point);
-    }
-
-    @Override
-    public BoundingBox2 boundingBox() {
-        return BoundingBox2.of(point, point);
-    }
-
-    @Override
-    public Vector2 tangentAt(double parameter) {
-        throw new GeometryException("degenerate curve has no meaningful tangent");
-    }
-
-    @Override
-    public double length() {
-        return 0.0;
-    }
-
-    @Override
-    public Point2 closestPointTo(Point2 query) {
-        Preconditions.requireNonNull(query, "query");
+    public Point2 getPoint() {
         return point;
     }
 
-    /**
-     * Returns the parameter value for the degenerate curve.
-     * Always returns 0.0 as the curve collapses to a single point.
-     *
-     * @param query point to project (ignored)
-     * @return parameter value (always 0.0)
-     */
-    public double parameterOf(Point2 query) {
-        return 0.0;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DegenerateCurve2 that = (DegenerateCurve2) o;
+        return Objects.equals(point, that.point);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(point);
+    }
+
+    @Override
+    public String toString() {
+        return "DegenerateCurve2{" + "point=" + point + "}";
     }
 }

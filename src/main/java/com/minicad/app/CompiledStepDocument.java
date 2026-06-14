@@ -77,27 +77,40 @@ import java.util.Objects;
  * @see com.minicad.step.semantic.StepCadGeometryOps
  * @see com.minicad.step.semantic.StepTrimResolver
  */
-record CompiledStepDocument(
-        String stepText,
-        StepFile stepFile,
-        Map<Integer, StepEntity> resolved,
-        StepCadBuilder builder
-) {
+public final class CompiledStepDocument {
+    private final String stepText;
+    private final StepFile stepFile;
+    private final StepEntity> resolved;
+    private final StepCadBuilder builder;
 
-    CompiledStepDocument {
-        Objects.requireNonNull(stepText, "stepText");
-        Objects.requireNonNull(stepFile, "stepFile");
-        Objects.requireNonNull(resolved, "resolved");
-        Objects.requireNonNull(builder, "builder");
+    public CompiledStepDocument(String stepText, StepFile stepFile, StepEntity> resolved, StepCadBuilder builder) {
     }
 
-    static CompiledStepDocument compile(String stepText) {
-        StepFile stepFile = StepParser.parse(stepText);
-        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        return of(stepText, stepFile, resolved);
+    public String getStepText() {
+        return stepText;
+    }
+    public StepFile getStepFile() {
+        return stepFile;
+    }
+    public StepEntity> getResolved() {
+        return resolved;
+    }
+    public StepCadBuilder getBuilder() {
+        return builder;
     }
 
-    static CompiledStepDocument of(String stepText, StepFile stepFile, Map<Integer, StepEntity> resolved) {
-        return new CompiledStepDocument(stepText, stepFile, resolved, StepCadBuilder.fromResolved(resolved));
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CompiledStepDocument)) return false;
+        CompiledStepDocument that = (CompiledStepDocument) o;
+        return java.util.Objects.equals(stepText, that.stepText) && java.util.Objects.equals(stepFile, that.stepFile) && java.util.Objects.equals(resolved, that.resolved) && java.util.Objects.equals(builder, that.builder);
+    }
+
+    @Override public int hashCode() {
+        return java.util.Objects.hash(stepText, stepFile, resolved, builder);
+    }
+
+    @Override public String toString() {
+        return "CompiledStepDocument{" + "stepText=stepText, stepFile=stepFile, resolved=resolved, builder=builder" + "}";
     }
 }

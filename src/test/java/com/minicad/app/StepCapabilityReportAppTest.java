@@ -54,11 +54,10 @@ class StepCapabilityReportAppTest {
 
     @Test
     void loadsDeclarativeCapabilityRegistry() throws Exception {
-        String registry = """
-                # comment
-                entity\tlevel\tparsed\tresolved\tbuilt\texported\ttested\tlimitations
-                CARTESIAN_POINT\tL4\ttrue\ttrue\ttrue\ttrue\ttrue\tcommon path
-                """;
+        String registry = 
+        "# comment\n"
+        + "entity\tlevel\tparsed\tresolved\tbuilt\texported\ttested\tlimitations\n"
+        + "CARTESIAN_POINT\tL4\ttrue\ttrue\ttrue\ttrue\ttrue\tcommon path"
 
         Map<String, StepCapabilityRegistry.Capability> capabilities = StepCapabilityRegistry.load(
                 new ByteArrayInputStream(registry.getBytes(StandardCharsets.UTF_8)));
@@ -72,16 +71,15 @@ class StepCapabilityReportAppTest {
     @Test
     void scansExpressSchemaEntities() throws Exception {
         Path schema = tempDir.resolve("sample.exp");
-        Files.writeString(schema, """
-                SCHEMA sample_schema;
-                  ENTITY cartesian_point;
-                  END_ENTITY;
-
-                  ENTITY custom_entity
-                    ABSTRACT SUPERTYPE;
-                  END_ENTITY;
-                END_SCHEMA;
-                """);
+        Files.writeString(schema, 
+        "SCHEMA sample_schema;\n"
+        + "  ENTITY cartesian_point;\n"
+        + "  END_ENTITY;\n"
+        + "\n"
+        + "  ENTITY custom_entity\n"
+        + "    ABSTRACT SUPERTYPE;\n"
+        + "  END_ENTITY;\n"
+        + "END_SCHEMA;"
 
         assertEquals(
                 java.util.Set.of("CARTESIAN_POINT", "CUSTOM_ENTITY"),
@@ -91,12 +89,11 @@ class StepCapabilityReportAppTest {
     @Test
     void scansCuratedEntityLists() throws Exception {
         Path schema = tempDir.resolve("ap214-curated-entities.lst");
-        Files.writeString(schema, """
-                # Curated entity list
-                cartesian_point
-                ADVANCED_FACE # inline note
-                // ignored comment
-                """);
+        Files.writeString(schema, 
+        "# Curated entity list\n"
+        + "cartesian_point\n"
+        + "ADVANCED_FACE # inline note\n"
+        + "// ignored comment"
 
         assertEquals(
                 java.util.Set.of("ADVANCED_FACE", "CARTESIAN_POINT"),
@@ -106,14 +103,13 @@ class StepCapabilityReportAppTest {
     @Test
     void rendersSchemaCoverageReports() throws Exception {
         Path schema = tempDir.resolve("sample.exp");
-        Files.writeString(schema, """
-                SCHEMA sample_schema;
-                  ENTITY cartesian_point;
-                  END_ENTITY;
-                  ENTITY schema_only_entity;
-                  END_ENTITY;
-                END_SCHEMA;
-                """);
+        Files.writeString(schema, 
+        "SCHEMA sample_schema;\n"
+        + "  ENTITY cartesian_point;\n"
+        + "  END_ENTITY;\n"
+        + "  ENTITY schema_only_entity;\n"
+        + "  END_ENTITY;\n"
+        + "END_SCHEMA;"
         StepCapabilityReportApp.CapabilityReport report = StepCapabilityReportApp.scan(Path.of("."));
 
         StepCapabilityReportApp.SchemaCoverageReport schemaReport =

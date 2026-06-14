@@ -11,6 +11,7 @@ import com.minicad.step.model.profile.StepProfileDef;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.function.Function;
 
 /**
@@ -23,12 +24,32 @@ final class StepProfileBuilder {
     /**
      * Immutable pair of outer and inner 2D profile loops.
      */
-    record ProfileLoops(List<Point2> outer, List<List<Point2>> inner) {
-        ProfileLoops {
-            outer = List.copyOf(outer);
-            inner = inner.stream().map(List::copyOf).toList();
-        }
+public final class ProfileLoops {
+
+    public ProfileLoops() {
+        this.outer = List.copyOf(outer);
+        this.inner = inner.stream().map(List::copyOf).collect(Collectors.toList());
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProfileLoops that = (ProfileLoops) o;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "ProfileLoops{" + " + "}";
+    }
+}
 
     private final StepCadGeometryOps geometryOps;
     private final Function<StepEntity, Curve2> buildCurve2;
@@ -43,6 +64,7 @@ final class StepProfileBuilder {
             throw new UnsupportedGeometryException(profile.entityName() + " must be an AREA profile");
         }
         return switch (profile.entityName()) {
+        // TODO: JDK11 - Convert switch expression above
             case "RECTANGLE_PROFILE_DEF", "CENTERED_RECTANGLE_PROFILE_DEF" ->
                     new ProfileLoops(normalizeOuterLoop(rectangleProfile(profile)), List.of());
             case "CIRCLE_PROFILE_DEF" ->
@@ -106,7 +128,7 @@ final class StepProfileBuilder {
         if (profile.parameters().isEmpty()) {
             throw new UnsupportedGeometryException("CIRCLE_PROFILE_DEF requires a radius");
         }
-        double radius = profile.parameters().getFirst();
+        double radius = profile.parameters().get(0);
         if (radius <= 0.0) {
             throw new UnsupportedGeometryException("CIRCLE_PROFILE_DEF radius must be positive");
         }
@@ -145,7 +167,7 @@ final class StepProfileBuilder {
         appendArc(points, new Point2(-width * 0.5 + radius, height * 0.5 - radius), radius, Math.PI * 0.5, Math.PI, 12, false);
         appendArc(points, new Point2(-width * 0.5 + radius, -height * 0.5 + radius), radius, Math.PI, Math.PI * 1.5, 12, false);
         appendArc(points, new Point2(width * 0.5 - radius, -height * 0.5 + radius), radius, Math.PI * 1.5, Math.PI * 2.0, 12, false);
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -273,7 +295,7 @@ final class StepProfileBuilder {
         }
         points.add(new Point2(halfWeb, halfDepth));
         points.add(new Point2(halfFlange, halfDepth));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -304,7 +326,7 @@ final class StepProfileBuilder {
             appendFillet(points, -halfWeb, halfDepth - flangeThickness + filletRadius, filletRadius, Math.PI, Math.PI / 2, 6);
         }
         points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -327,7 +349,7 @@ final class StepProfileBuilder {
         }
         points.add(new Point2(thickness, depth));
         points.add(new Point2(0.0, depth));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -367,7 +389,7 @@ final class StepProfileBuilder {
             appendFillet(points, -halfFlange + webThickness + filletRadius, -halfDepth + flangeThickness + filletRadius, filletRadius, Math.PI * 1.5, Math.PI * 2, 6);
         }
         points.add(new Point2(-halfFlange, -halfDepth + flangeThickness));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -395,7 +417,7 @@ final class StepProfileBuilder {
         points.add(new Point2(-halfWeb, halfDepth - flangeThickness));
         points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
         points.add(new Point2(-halfFlange, halfDepth));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -422,7 +444,7 @@ final class StepProfileBuilder {
         points.add(new Point2(-halfFlange + webThickness, -halfDepth + flangeThickness));
         points.add(new Point2(-halfFlange + webThickness, halfDepth - flangeThickness));
         points.add(new Point2(-halfFlange, halfDepth - flangeThickness));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -457,7 +479,7 @@ final class StepProfileBuilder {
         points.add(new Point2(halfWidth, 0.0));
         points.add(new Point2(halfNeck, depth));
         points.add(new Point2(-halfNeck, depth));
-        points.add(points.getFirst());
+        points.add(points.get(0));
         return List.copyOf(points);
     }
 
@@ -496,18 +518,18 @@ final class StepProfileBuilder {
         if (profile.curves().isEmpty()) {
             throw new UnsupportedGeometryException(profile.entityName() + " requires a profile curve");
         }
-        return arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst());
+        return arbitraryProfileCurve(profile.entityName(), profile.curves().get(0));
     }
 
     private ProfileLoops arbitraryProfileWithVoids(StepProfileDef profile) {
         if (profile.curves().isEmpty()) {
             throw new UnsupportedGeometryException(profile.entityName() + " requires an outer profile curve");
         }
-        List<Point2> outer = normalizeOuterLoop(arbitraryProfileCurve(profile.entityName(), profile.curves().getFirst()));
+        List<Point2> outer = normalizeOuterLoop(arbitraryProfileCurve(profile.entityName(), profile.curves().get(0)));
         List<List<Point2>> inner = profile.curves().stream()
                 .skip(1)
                 .map(curve -> normalizeInnerLoop(arbitraryProfileCurve(profile.entityName(), curve)))
-                .toList();
+                .collect(Collectors.toList());
         return new ProfileLoops(outer, inner);
     }
 

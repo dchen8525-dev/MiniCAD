@@ -27,8 +27,8 @@ class TopologyBoundingBoxTest {
         Edge edge = new Edge(v1, v2, line, true);
 
         BoundingBox3 box = edge.boundingBox();
-        assertTrue(box.contains(v1.point()));
-        assertTrue(box.contains(v2.point()));
+        assertTrue(box.contains(v1.getPoint()));
+        assertTrue(box.contains(v2.getPoint()));
         assertEquals(0.0, box.minX());
         assertEquals(10.0, box.maxX());
     }
@@ -73,10 +73,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -111,10 +111,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -144,10 +144,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(5, 5, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 5, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -186,10 +186,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(3, 3, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 3, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -304,10 +304,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -337,10 +337,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -368,9 +368,9 @@ class TopologyBoundingBoxTest {
         Vertex v2 = new Vertex(new CartesianPoint(10, 0, 0));
         Vertex v3 = new Vertex(new CartesianPoint(5, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), v3.point().subtract(v2.point()).normalize());
-        Line3 l3 = new Line3(v3.point(), v1.point().subtract(v3.point()).normalize());
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), v3.getPoint().subtract(v2.getPoint()).normalize());
+        Line3 l3 = new Line3(v3.getPoint(), v1.getPoint().subtract(v3.getPoint()).normalize());
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -504,10 +504,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -541,10 +541,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -576,10 +576,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -611,10 +611,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -646,10 +646,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -680,10 +680,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -714,10 +714,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -751,10 +751,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -789,10 +789,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -825,10 +825,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -865,10 +865,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -900,10 +900,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(2, 3, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 3, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -936,10 +936,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -974,10 +974,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1013,10 +1013,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1050,10 +1050,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1089,10 +1089,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1126,10 +1126,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1163,10 +1163,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1199,10 +1199,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(10, 10, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 10, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);
@@ -1239,10 +1239,10 @@ class TopologyBoundingBoxTest {
         Vertex v3 = new Vertex(new CartesianPoint(20, 20, 0));
         Vertex v4 = new Vertex(new CartesianPoint(0, 20, 0));
 
-        Line3 l1 = new Line3(v1.point(), new Direction3(1, 0, 0));
-        Line3 l2 = new Line3(v2.point(), new Direction3(0, 1, 0));
-        Line3 l3 = new Line3(v3.point(), new Direction3(-1, 0, 0));
-        Line3 l4 = new Line3(v4.point(), new Direction3(0, -1, 0));
+        Line3 l1 = new Line3(v1.getPoint(), new Direction3(1, 0, 0));
+        Line3 l2 = new Line3(v2.getPoint(), new Direction3(0, 1, 0));
+        Line3 l3 = new Line3(v3.getPoint(), new Direction3(-1, 0, 0));
+        Line3 l4 = new Line3(v4.getPoint(), new Direction3(0, -1, 0));
 
         Edge e1 = new Edge(v1, v2, l1, true);
         Edge e2 = new Edge(v2, v3, l2, true);

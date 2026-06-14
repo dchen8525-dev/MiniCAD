@@ -21,47 +21,46 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportSameGlbFromCompiledDocument() {
-        CompiledStepDocument compiled = CompiledStepDocument.compile("""
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
-                #13=PLANE('PL0',#12);
-                #20=VERTEX_POINT('V0',#1);
-                #21=VERTEX_POINT('V1',#2);
-                #22=VERTEX_POINT('V2',#3);
-                #23=VERTEX_POINT('V3',#4);
-                #30=DIRECTION('D1',(1.0,0.0,0.0));
-                #31=VECTOR('VE1',#30,1.0);
-                #32=LINE('L1',#1,#31);
-                #33=DIRECTION('D2',(0.0,1.0,0.0));
-                #34=VECTOR('VE2',#33,1.0);
-                #35=LINE('L2',#2,#34);
-                #36=DIRECTION('D3',(-1.0,0.0,0.0));
-                #37=VECTOR('VE3',#36,1.0);
-                #38=LINE('L3',#3,#37);
-                #39=DIRECTION('D4',(0.0,-1.0,0.0));
-                #40=VECTOR('VE4',#39,1.0);
-                #41=LINE('L4',#4,#40);
-                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
-                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
-                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
-                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
-                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
-                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
-                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
-                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
-                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
-                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
-                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
-                #90=CLOSED_SHELL('CS',(#80));
-                #100=MANIFOLD_SOLID_BREP('S0',#90);
-                ENDSEC;
-                """);
+        CompiledStepDocument compiled = CompiledStepDocument.compile(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#30=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#31=VECTOR('VE1',#30,1.0);\n"
+        + "#32=LINE('L1',#1,#31);\n"
+        + "#33=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#34=VECTOR('VE2',#33,1.0);\n"
+        + "#35=LINE('L2',#2,#34);\n"
+        + "#36=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#37=VECTOR('VE3',#36,1.0);\n"
+        + "#38=LINE('L3',#3,#37);\n"
+        + "#39=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#40=VECTOR('VE4',#39,1.0);\n"
+        + "#41=LINE('L4',#4,#40);\n"
+        + "#50=EDGE_CURVE('E1',#20,#21,#32,.T.);\n"
+        + "#51=EDGE_CURVE('E2',#21,#22,#35,.T.);\n"
+        + "#52=EDGE_CURVE('E3',#22,#23,#38,.T.);\n"
+        + "#53=EDGE_CURVE('E4',#23,#20,#41,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE1',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE2',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE3',$,$,#52,.T.);\n"
+        + "#63=ORIENTED_EDGE('OE4',$,$,#53,.T.);\n"
+        + "#70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));\n"
+        + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
+        + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
+        + "#90=CLOSED_SHELL('CS',(#80));\n"
+        + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
+        + "ENDSEC;"
 
         byte[] direct = StepPreviewJsonExporter.exportGlb(compiled.stepText());
         byte[] compiledBinary = StepPreviewJsonExporter.exportGlb(compiled);
@@ -71,47 +70,46 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportGlbPreviewPacketForMinimalSquare() {
-        byte[] binary = StepPreviewJsonExporter.exportGlb("""
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
-                #13=PLANE('PL0',#12);
-                #20=VERTEX_POINT('V0',#1);
-                #21=VERTEX_POINT('V1',#2);
-                #22=VERTEX_POINT('V2',#3);
-                #23=VERTEX_POINT('V3',#4);
-                #30=DIRECTION('D1',(1.0,0.0,0.0));
-                #31=VECTOR('VE1',#30,1.0);
-                #32=LINE('L1',#1,#31);
-                #33=DIRECTION('D2',(0.0,1.0,0.0));
-                #34=VECTOR('VE2',#33,1.0);
-                #35=LINE('L2',#2,#34);
-                #36=DIRECTION('D3',(-1.0,0.0,0.0));
-                #37=VECTOR('VE3',#36,1.0);
-                #38=LINE('L3',#3,#37);
-                #39=DIRECTION('D4',(0.0,-1.0,0.0));
-                #40=VECTOR('VE4',#39,1.0);
-                #41=LINE('L4',#4,#40);
-                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
-                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
-                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
-                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
-                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
-                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
-                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
-                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
-                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
-                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
-                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
-                #90=CLOSED_SHELL('CS',(#80));
-                #100=MANIFOLD_SOLID_BREP('S0',#90);
-                ENDSEC;
-                """);
+        byte[] binary = StepPreviewJsonExporter.exportGlb(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#30=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#31=VECTOR('VE1',#30,1.0);\n"
+        + "#32=LINE('L1',#1,#31);\n"
+        + "#33=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#34=VECTOR('VE2',#33,1.0);\n"
+        + "#35=LINE('L2',#2,#34);\n"
+        + "#36=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#37=VECTOR('VE3',#36,1.0);\n"
+        + "#38=LINE('L3',#3,#37);\n"
+        + "#39=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#40=VECTOR('VE4',#39,1.0);\n"
+        + "#41=LINE('L4',#4,#40);\n"
+        + "#50=EDGE_CURVE('E1',#20,#21,#32,.T.);\n"
+        + "#51=EDGE_CURVE('E2',#21,#22,#35,.T.);\n"
+        + "#52=EDGE_CURVE('E3',#22,#23,#38,.T.);\n"
+        + "#53=EDGE_CURVE('E4',#23,#20,#41,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE1',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE2',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE3',$,$,#52,.T.);\n"
+        + "#63=ORIENTED_EDGE('OE4',$,$,#53,.T.);\n"
+        + "#70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));\n"
+        + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
+        + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
+        + "#90=CLOSED_SHELL('CS',(#80));\n"
+        + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
+        + "ENDSEC;"
 
         assertTrue(binary.length > 16);
         assertEquals('g', binary[0]);
@@ -143,47 +141,46 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void glbValidatorShouldRejectMalformedHeadersAndChunks() {
-        byte[] binary = StepPreviewJsonExporter.exportGlb("""
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #10=DIRECTION('DZ',(0.0,0.0,1.0));
-                #11=DIRECTION('DX',(1.0,0.0,0.0));
-                #12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);
-                #13=PLANE('PL0',#12);
-                #20=VERTEX_POINT('V0',#1);
-                #21=VERTEX_POINT('V1',#2);
-                #22=VERTEX_POINT('V2',#3);
-                #23=VERTEX_POINT('V3',#4);
-                #30=DIRECTION('D1',(1.0,0.0,0.0));
-                #31=VECTOR('VE1',#30,1.0);
-                #32=LINE('L1',#1,#31);
-                #33=DIRECTION('D2',(0.0,1.0,0.0));
-                #34=VECTOR('VE2',#33,1.0);
-                #35=LINE('L2',#2,#34);
-                #36=DIRECTION('D3',(-1.0,0.0,0.0));
-                #37=VECTOR('VE3',#36,1.0);
-                #38=LINE('L3',#3,#37);
-                #39=DIRECTION('D4',(0.0,-1.0,0.0));
-                #40=VECTOR('VE4',#39,1.0);
-                #41=LINE('L4',#4,#40);
-                #50=EDGE_CURVE('E1',#20,#21,#32,.T.);
-                #51=EDGE_CURVE('E2',#21,#22,#35,.T.);
-                #52=EDGE_CURVE('E3',#22,#23,#38,.T.);
-                #53=EDGE_CURVE('E4',#23,#20,#41,.T.);
-                #60=ORIENTED_EDGE('OE1',$,$,#50,.T.);
-                #61=ORIENTED_EDGE('OE2',$,$,#51,.T.);
-                #62=ORIENTED_EDGE('OE3',$,$,#52,.T.);
-                #63=ORIENTED_EDGE('OE4',$,$,#53,.T.);
-                #70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));
-                #71=FACE_OUTER_BOUND('FOB',#70,.T.);
-                #80=ADVANCED_FACE('F0',(#71),#13,.T.);
-                #90=CLOSED_SHELL('CS',(#80));
-                #100=MANIFOLD_SOLID_BREP('S0',#90);
-                ENDSEC;
-                """);
+        byte[] binary = StepPreviewJsonExporter.exportGlb(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=VERTEX_POINT('V0',#1);\n"
+        + "#21=VERTEX_POINT('V1',#2);\n"
+        + "#22=VERTEX_POINT('V2',#3);\n"
+        + "#23=VERTEX_POINT('V3',#4);\n"
+        + "#30=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#31=VECTOR('VE1',#30,1.0);\n"
+        + "#32=LINE('L1',#1,#31);\n"
+        + "#33=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#34=VECTOR('VE2',#33,1.0);\n"
+        + "#35=LINE('L2',#2,#34);\n"
+        + "#36=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#37=VECTOR('VE3',#36,1.0);\n"
+        + "#38=LINE('L3',#3,#37);\n"
+        + "#39=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#40=VECTOR('VE4',#39,1.0);\n"
+        + "#41=LINE('L4',#4,#40);\n"
+        + "#50=EDGE_CURVE('E1',#20,#21,#32,.T.);\n"
+        + "#51=EDGE_CURVE('E2',#21,#22,#35,.T.);\n"
+        + "#52=EDGE_CURVE('E3',#22,#23,#38,.T.);\n"
+        + "#53=EDGE_CURVE('E4',#23,#20,#41,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE1',$,$,#50,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE2',$,$,#51,.T.);\n"
+        + "#62=ORIENTED_EDGE('OE3',$,$,#52,.T.);\n"
+        + "#63=ORIENTED_EDGE('OE4',$,$,#53,.T.);\n"
+        + "#70=EDGE_LOOP('LOOP',(#60,#61,#62,#63));\n"
+        + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
+        + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
+        + "#90=CLOSED_SHELL('CS',(#80));\n"
+        + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
+        + "ENDSEC;"
         PreviewSerializers.validateGlb(binary);
 
         byte[] badLength = binary.clone();
@@ -299,16 +296,15 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedCurveMetadataInBinaryPreviewForImplicitBsplineCurveSubtypeMarkers() {
-        byte[] binary = StepPreviewJsonExporter.exportBinary("""
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(2.0,1.0,0.0));
-                #4=CARTESIAN_POINT('P3',(3.0,1.0,0.0));
-                #10=(BEZIER_CURVE() B_SPLINE_CURVE(3,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZ0'));
-                #11=GEOMETRIC_CURVE_SET('GCS0',(#10));
-                ENDSEC;
-                """);
+        byte[] binary = StepPreviewJsonExporter.exportBinary(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(2.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(3.0,1.0,0.0));\n"
+        + "#10=(BEZIER_CURVE() B_SPLINE_CURVE(3,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZ0'));\n"
+        + "#11=GEOMETRIC_CURVE_SET('GCS0',(#10));\n"
+        + "ENDSEC;"
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -319,21 +315,20 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedCurveMetadataInBinaryPreviewForTopologicalWrapperEdges() {
-        byte[] binary = StepPreviewJsonExporter.exportBinary("""
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=VECTOR('VX',#3,1.0);
-                #5=LINE('L0',#1,#4);
-                #6=TRIMMED_CURVE('TC0',#5,(#1),(#2),.T.,.CARTESIAN.);
-                #7=ORIENTED_CURVE('OC0',#6,.F.);
-                #8=VERTEX_POINT('V0',#1);
-                #9=VERTEX_POINT('V1',#2);
-                #10=EDGE_CURVE('E0',#8,#9,#7,.T.);
-                #11=CONNECTED_EDGE_SET('CES',(#10));
-                ENDSEC;
-                """);
+        byte[] binary = StepPreviewJsonExporter.exportBinary(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=VECTOR('VX',#3,1.0);\n"
+        + "#5=LINE('L0',#1,#4);\n"
+        + "#6=TRIMMED_CURVE('TC0',#5,(#1),(#2),.T.,.CARTESIAN.);\n"
+        + "#7=ORIENTED_CURVE('OC0',#6,.F.);\n"
+        + "#8=VERTEX_POINT('V0',#1);\n"
+        + "#9=VERTEX_POINT('V1',#2);\n"
+        + "#10=EDGE_CURVE('E0',#8,#9,#7,.T.);\n"
+        + "#11=CONNECTED_EDGE_SET('CES',(#10));\n"
+        + "ENDSEC;"
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -343,22 +338,21 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedCurveMetadataInBinaryRepresentationEdges() {
-        byte[] binary = StepPreviewJsonExporter.exportBinary("""
-                DATA;
-                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('SHIFT',(1.0,1.0,0.0));
-                #4=DIRECTION('DX',(1.0,0.0,0.0));
-                #5=DIRECTION('DY',(0.0,1.0,0.0));
-                #6=DIRECTION('DZ',(0.0,0.0,1.0));
-                #7=VECTOR('VX',#4,1.0);
-                #8=LINE('L0',#1,#7);
-                #9=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T',#4,#5,#3,1.0,#6);
-                #10=CURVE_REPLICA('CR',#8,#9);
-                #12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #13=SHAPE_REPRESENTATION('R0',(#10),#12);
-                ENDSEC;
-                """);
+        byte[] binary = StepPreviewJsonExporter.exportBinary(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('SHIFT',(1.0,1.0,0.0));\n"
+        + "#4=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#5=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#6=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#7=VECTOR('VX',#4,1.0);\n"
+        + "#8=LINE('L0',#1,#7);\n"
+        + "#9=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T',#4,#5,#3,1.0,#6);\n"
+        + "#10=CURVE_REPLICA('CR',#8,#9);\n"
+        + "#12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#13=SHAPE_REPRESENTATION('R0',(#10),#12);\n"
+        + "ENDSEC;"
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -369,17 +363,16 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedOffsetCurveMetadataInBinaryPreviewAndGlbExtras() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DX',(1.0,0.0,0.0));
-                #3=VECTOR('VX',#2,1.0);
-                #4=LINE('L0',#1,#3);
-                #5=DIRECTION('DZ',(0.0,0.0,1.0));
-                #6=OFFSET_CURVE_3D('OC3',#4,0.5,.F.,#5);
-                #7=GEOMETRIC_CURVE_SET('GCS0',(#6));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=VECTOR('VX',#2,1.0);\n"
+        + "#4=LINE('L0',#1,#3);\n"
+        + "#5=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#6=OFFSET_CURVE_3D('OC3',#4,0.5,.F.,#5);\n"
+        + "#7=GEOMETRIC_CURVE_SET('GCS0',(#6));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -396,28 +389,27 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSurfaceCurveAssociationMetadataInBinaryPreviewAndGlbExtras() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #2=DIRECTION('DZ',(0.0,0.0,1.0));
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=AXIS2_PLACEMENT_3D('AX0',#1,#2,#3);
-                #5=CYLINDRICAL_SURFACE('CY0',#4,1.0);
-                #6=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
-                #7=DIRECTION('DU',(0.0,0.0,1.0));
-                #8=VECTOR('VU',#7,1.0);
-                #9=LINE('L0',#6,#8);
-                #10=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #11=DIRECTION('DV',(0.0,1.0));
-                #12=VECTOR('VV',#11,1.0);
-                #13=LINE('UVL0',#10,#12);
-                #14=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #15=DEFINITIONAL_REPRESENTATION('DEF0',(#13),#14);
-                #16=PCURVE('PC0',#5,#15);
-                #17=SURFACE_CURVE('SC0',#9,(#16),.PCURVE_S1.);
-                #18=GEOMETRIC_CURVE_SET('GCS0',(#17));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX0',#1,#2,#3);\n"
+        + "#5=CYLINDRICAL_SURFACE('CY0',#4,1.0);\n"
+        + "#6=CARTESIAN_POINT('P0',(1.0,0.0,0.0));\n"
+        + "#7=DIRECTION('DU',(0.0,0.0,1.0));\n"
+        + "#8=VECTOR('VU',#7,1.0);\n"
+        + "#9=LINE('L0',#6,#8);\n"
+        + "#10=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#11=DIRECTION('DV',(0.0,1.0));\n"
+        + "#12=VECTOR('VV',#11,1.0);\n"
+        + "#13=LINE('UVL0',#10,#12);\n"
+        + "#14=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#15=DEFINITIONAL_REPRESENTATION('DEF0',(#13),#14);\n"
+        + "#16=PCURVE('PC0',#5,#15);\n"
+        + "#17=SURFACE_CURVE('SC0',#9,(#16),.PCURVE_S1.);\n"
+        + "#18=GEOMETRIC_CURVE_SET('GCS0',(#17));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -437,38 +429,37 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSeamCurveAssociationMetadataInBinaryPreviewAndGlbExtras() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));
-                #3=DIRECTION('DZ',(0.0,0.0,1.0));
-                #4=DIRECTION('DX',(1.0,0.0,0.0));
-                #5=AXIS2_PLACEMENT_3D('AX0',#1,#3,#4);
-                #6=AXIS2_PLACEMENT_3D('AX1',#2,#3,#4);
-                #7=CONICAL_SURFACE('CN0',#5,1.0,0.4636476090008061);
-                #8=CONICAL_SURFACE('CN1',#6,1.0,0.4636476090008061);
-                #10=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
-                #11=DIRECTION('DU',(1.0,0.0,1.0));
-                #12=VECTOR('VU',#11,1.0);
-                #13=LINE('L0',#10,#12);
-                #20=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #21=DIRECTION('DV0',(0.0,1.0));
-                #22=VECTOR('VV0',#21,1.0);
-                #23=LINE('GOOD',#20,#22);
-                #24=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #25=DEFINITIONAL_REPRESENTATION('DEF0',(#23),#24);
-                #26=PCURVE('PC0',#7,#25);
-                #27=CARTESIAN_POINT('UV1',(3.141592653589793,0.0));
-                #28=DIRECTION('DV1',(0.0,1.0));
-                #29=VECTOR('VV1',#28,1.0);
-                #30=LINE('BAD',#27,#29);
-                #31=REPRESENTATION_CONTEXT('PC1','PARAMETRIC');
-                #32=DEFINITIONAL_REPRESENTATION('DEF1',(#30),#31);
-                #33=PCURVE('PC1',#8,#32);
-                #34=SEAM_CURVE('SEAM0',#13,(#33,#26),.PCURVE_S1.);
-                #35=GEOMETRIC_CURVE_SET('GCS0',(#34));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#5=AXIS2_PLACEMENT_3D('AX0',#1,#3,#4);\n"
+        + "#6=AXIS2_PLACEMENT_3D('AX1',#2,#3,#4);\n"
+        + "#7=CONICAL_SURFACE('CN0',#5,1.0,0.4636476090008061);\n"
+        + "#8=CONICAL_SURFACE('CN1',#6,1.0,0.4636476090008061);\n"
+        + "#10=CARTESIAN_POINT('P0',(1.0,0.0,0.0));\n"
+        + "#11=DIRECTION('DU',(1.0,0.0,1.0));\n"
+        + "#12=VECTOR('VU',#11,1.0);\n"
+        + "#13=LINE('L0',#10,#12);\n"
+        + "#20=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#21=DIRECTION('DV0',(0.0,1.0));\n"
+        + "#22=VECTOR('VV0',#21,1.0);\n"
+        + "#23=LINE('GOOD',#20,#22);\n"
+        + "#24=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#25=DEFINITIONAL_REPRESENTATION('DEF0',(#23),#24);\n"
+        + "#26=PCURVE('PC0',#7,#25);\n"
+        + "#27=CARTESIAN_POINT('UV1',(3.141592653589793,0.0));\n"
+        + "#28=DIRECTION('DV1',(0.0,1.0));\n"
+        + "#29=VECTOR('VV1',#28,1.0);\n"
+        + "#30=LINE('BAD',#27,#29);\n"
+        + "#31=REPRESENTATION_CONTEXT('PC1','PARAMETRIC');\n"
+        + "#32=DEFINITIONAL_REPRESENTATION('DEF1',(#30),#31);\n"
+        + "#33=PCURVE('PC1',#8,#32);\n"
+        + "#34=SEAM_CURVE('SEAM0',#13,(#33,#26),.PCURVE_S1.);\n"
+        + "#35=GEOMETRIC_CURVE_SET('GCS0',(#34));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -488,34 +479,33 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPropagateSurfaceCurveAssociationMetadataThroughProjectionWrapperInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #2=DIRECTION('DZ',(0.0,0.0,1.0));
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=AXIS2_PLACEMENT_3D('AX0',#1,#2,#3);
-                #5=CYLINDRICAL_SURFACE('CY0',#4,1.0);
-                #6=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
-                #7=DIRECTION('DU',(0.0,0.0,1.0));
-                #8=VECTOR('VU',#7,1.0);
-                #9=LINE('L0',#6,#8);
-                #10=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #11=DIRECTION('DV',(0.0,1.0));
-                #12=VECTOR('VV',#11,1.0);
-                #13=LINE('UVL0',#10,#12);
-                #14=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #15=DEFINITIONAL_REPRESENTATION('DEF0',(#13),#14);
-                #16=PCURVE('PC0',#5,#15);
-                #17=SURFACE_CURVE('SC0',#9,(#16),.PCURVE_S1.);
-                #18=PRESENTATION_STYLE_ASSIGNMENT(());
-                #19=(PROJECTION_CURVE('PCW0',(#18),#17)
-                    ANNOTATION_CURVE_OCCURRENCE('PCW0',(#18),#17)
-                    STYLED_ITEM('PCW0',(#18),#17)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PCW0'));
-                #20=GEOMETRIC_CURVE_SET('GCS0',(#19));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX0',#1,#2,#3);\n"
+        + "#5=CYLINDRICAL_SURFACE('CY0',#4,1.0);\n"
+        + "#6=CARTESIAN_POINT('P0',(1.0,0.0,0.0));\n"
+        + "#7=DIRECTION('DU',(0.0,0.0,1.0));\n"
+        + "#8=VECTOR('VU',#7,1.0);\n"
+        + "#9=LINE('L0',#6,#8);\n"
+        + "#10=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#11=DIRECTION('DV',(0.0,1.0));\n"
+        + "#12=VECTOR('VV',#11,1.0);\n"
+        + "#13=LINE('UVL0',#10,#12);\n"
+        + "#14=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#15=DEFINITIONAL_REPRESENTATION('DEF0',(#13),#14);\n"
+        + "#16=PCURVE('PC0',#5,#15);\n"
+        + "#17=SURFACE_CURVE('SC0',#9,(#16),.PCURVE_S1.);\n"
+        + "#18=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#19=(PROJECTION_CURVE('PCW0',(#18),#17)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PCW0',(#18),#17)\n"
+        + "    STYLED_ITEM('PCW0',(#18),#17)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PCW0'));\n"
+        + "#20=GEOMETRIC_CURVE_SET('GCS0',(#19));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -535,44 +525,43 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPropagateSeamCurveAssociationMetadataThroughProjectionWrapperInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));
-                #3=DIRECTION('DZ',(0.0,0.0,1.0));
-                #4=DIRECTION('DX',(1.0,0.0,0.0));
-                #5=AXIS2_PLACEMENT_3D('AX0',#1,#3,#4);
-                #6=AXIS2_PLACEMENT_3D('AX1',#2,#3,#4);
-                #7=CONICAL_SURFACE('CN0',#5,1.0,0.4636476090008061);
-                #8=CONICAL_SURFACE('CN1',#6,1.0,0.4636476090008061);
-                #10=CARTESIAN_POINT('P0',(1.0,0.0,0.0));
-                #11=DIRECTION('DU',(1.0,0.0,1.0));
-                #12=VECTOR('VU',#11,1.0);
-                #13=LINE('L0',#10,#12);
-                #20=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #21=DIRECTION('DV0',(0.0,1.0));
-                #22=VECTOR('VV0',#21,1.0);
-                #23=LINE('GOOD',#20,#22);
-                #24=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #25=DEFINITIONAL_REPRESENTATION('DEF0',(#23),#24);
-                #26=PCURVE('PC0',#7,#25);
-                #27=CARTESIAN_POINT('UV1',(3.141592653589793,0.0));
-                #28=DIRECTION('DV1',(0.0,1.0));
-                #29=VECTOR('VV1',#28,1.0);
-                #30=LINE('BAD',#27,#29);
-                #31=REPRESENTATION_CONTEXT('PC1','PARAMETRIC');
-                #32=DEFINITIONAL_REPRESENTATION('DEF1',(#30),#31);
-                #33=PCURVE('PC1',#8,#32);
-                #34=SEAM_CURVE('SEAM0',#13,(#33,#26),.PCURVE_S1.);
-                #35=PRESENTATION_STYLE_ASSIGNMENT(());
-                #36=(PROJECTION_CURVE('PCW0',(#35),#34)
-                    ANNOTATION_CURVE_OCCURRENCE('PCW0',(#35),#34)
-                    STYLED_ITEM('PCW0',(#35),#34)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PCW0'));
-                #37=GEOMETRIC_CURVE_SET('GCS0',(#36));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#5=AXIS2_PLACEMENT_3D('AX0',#1,#3,#4);\n"
+        + "#6=AXIS2_PLACEMENT_3D('AX1',#2,#3,#4);\n"
+        + "#7=CONICAL_SURFACE('CN0',#5,1.0,0.4636476090008061);\n"
+        + "#8=CONICAL_SURFACE('CN1',#6,1.0,0.4636476090008061);\n"
+        + "#10=CARTESIAN_POINT('P0',(1.0,0.0,0.0));\n"
+        + "#11=DIRECTION('DU',(1.0,0.0,1.0));\n"
+        + "#12=VECTOR('VU',#11,1.0);\n"
+        + "#13=LINE('L0',#10,#12);\n"
+        + "#20=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#21=DIRECTION('DV0',(0.0,1.0));\n"
+        + "#22=VECTOR('VV0',#21,1.0);\n"
+        + "#23=LINE('GOOD',#20,#22);\n"
+        + "#24=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#25=DEFINITIONAL_REPRESENTATION('DEF0',(#23),#24);\n"
+        + "#26=PCURVE('PC0',#7,#25);\n"
+        + "#27=CARTESIAN_POINT('UV1',(3.141592653589793,0.0));\n"
+        + "#28=DIRECTION('DV1',(0.0,1.0));\n"
+        + "#29=VECTOR('VV1',#28,1.0);\n"
+        + "#30=LINE('BAD',#27,#29);\n"
+        + "#31=REPRESENTATION_CONTEXT('PC1','PARAMETRIC');\n"
+        + "#32=DEFINITIONAL_REPRESENTATION('DEF1',(#30),#31);\n"
+        + "#33=PCURVE('PC1',#8,#32);\n"
+        + "#34=SEAM_CURVE('SEAM0',#13,(#33,#26),.PCURVE_S1.);\n"
+        + "#35=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#36=(PROJECTION_CURVE('PCW0',(#35),#34)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PCW0',(#35),#34)\n"
+        + "    STYLED_ITEM('PCW0',(#35),#34)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PCW0'));\n"
+        + "#37=GEOMETRIC_CURVE_SET('GCS0',(#36));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -592,33 +581,32 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveCurveMetadataForMappedAnnotationSymbolEdgesInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DX',(1.0,0.0,0.0));
-                #3=VECTOR('VX',#2,1.0);
-                #4=LINE('L0',#1,#3);
-                #5=PRESENTATION_STYLE_ASSIGNMENT(());
-                #6=(PROJECTION_CURVE('PC0',(#5),#4)
-                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)
-                    STYLED_ITEM('PC0',(#5),#4)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PC0'));
-                #7=CARTESIAN_POINT('O2',(2.0,0.0));
-                #8=DIRECTION('DX2',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
-                #11=REPRESENTATION('SYM',(#6),#10);
-                #12=SYMBOL_REPRESENTATION_MAP(#9,#11);
-                #13=CARTESIAN_POINT('O3',(3.0,0.0));
-                #14=DIRECTION('DX3',(1.0,0.0));
-                #15=AXIS2_PLACEMENT_2D('TGT',#13,#14);
-                #16=ANNOTATION_SYMBOL('AS0',#12,#15);
-                #17=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#5),#16);
-                #18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #19=SHAPE_REPRESENTATION('ANN',(#17),#18);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=VECTOR('VX',#2,1.0);\n"
+        + "#4=LINE('L0',#1,#3);\n"
+        + "#5=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#6=(PROJECTION_CURVE('PC0',(#5),#4)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)\n"
+        + "    STYLED_ITEM('PC0',(#5),#4)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PC0'));\n"
+        + "#7=CARTESIAN_POINT('O2',(2.0,0.0));\n"
+        + "#8=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
+        + "#11=REPRESENTATION('SYM',(#6),#10);\n"
+        + "#12=SYMBOL_REPRESENTATION_MAP(#9,#11);\n"
+        + "#13=CARTESIAN_POINT('O3',(3.0,0.0));\n"
+        + "#14=DIRECTION('DX3',(1.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_2D('TGT',#13,#14);\n"
+        + "#16=ANNOTATION_SYMBOL('AS0',#12,#15);\n"
+        + "#17=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#5),#16);\n"
+        + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#19=SHAPE_REPRESENTATION('ANN',(#17),#18);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -636,33 +624,32 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveCurveMetadataForMappedAnnotationTextEdgesInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DX',(1.0,0.0,0.0));
-                #3=VECTOR('VX',#2,1.0);
-                #4=LINE('L0',#1,#3);
-                #5=PRESENTATION_STYLE_ASSIGNMENT(());
-                #6=(PROJECTION_CURVE('PC0',(#5),#4)
-                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)
-                    STYLED_ITEM('PC0',(#5),#4)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PC0'));
-                #7=CARTESIAN_POINT('O2',(2.0,0.0));
-                #8=DIRECTION('DX2',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
-                #11=REPRESENTATION('SYM',(#6),#10);
-                #12=REPRESENTATION_MAP(#9,#11);
-                #13=CARTESIAN_POINT('O3',(3.0,0.0));
-                #14=DIRECTION('DX3',(1.0,0.0));
-                #15=AXIS2_PLACEMENT_2D('TGT',#13,#14);
-                #16=ANNOTATION_TEXT('AT0',#12,#15);
-                #17=ANNOTATION_TEXT_CHARACTER('ATC0',#12,#15);
-                #18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #19=SHAPE_REPRESENTATION('ANN',(#16,#17),#18);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=VECTOR('VX',#2,1.0);\n"
+        + "#4=LINE('L0',#1,#3);\n"
+        + "#5=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#6=(PROJECTION_CURVE('PC0',(#5),#4)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)\n"
+        + "    STYLED_ITEM('PC0',(#5),#4)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PC0'));\n"
+        + "#7=CARTESIAN_POINT('O2',(2.0,0.0));\n"
+        + "#8=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
+        + "#11=REPRESENTATION('SYM',(#6),#10);\n"
+        + "#12=REPRESENTATION_MAP(#9,#11);\n"
+        + "#13=CARTESIAN_POINT('O3',(3.0,0.0));\n"
+        + "#14=DIRECTION('DX3',(1.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_2D('TGT',#13,#14);\n"
+        + "#16=ANNOTATION_TEXT('AT0',#12,#15);\n"
+        + "#17=ANNOTATION_TEXT_CHARACTER('ATC0',#12,#15);\n"
+        + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#19=SHAPE_REPRESENTATION('ANN',(#16,#17),#18);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -676,34 +663,33 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveMappedAnnotationCarrierMetadataForSymbolAndSubfigureOccurrencesInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DX',(1.0,0.0,0.0));
-                #3=VECTOR('VX',#2,1.0);
-                #4=LINE('L0',#1,#3);
-                #5=PRESENTATION_STYLE_ASSIGNMENT(());
-                #6=(PROJECTION_CURVE('PC0',(#5),#4)
-                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)
-                    STYLED_ITEM('PC0',(#5),#4)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PC0'));
-                #7=CARTESIAN_POINT('O2',(2.0,0.0));
-                #8=DIRECTION('DX2',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
-                #11=REPRESENTATION('SYM',(#6),#10);
-                #12=SYMBOL_REPRESENTATION_MAP(#9,#11);
-                #13=CARTESIAN_POINT('O3',(3.0,0.0));
-                #14=DIRECTION('DX3',(1.0,0.0));
-                #15=AXIS2_PLACEMENT_2D('TGT',#13,#14);
-                #16=ANNOTATION_SYMBOL('AS0',#12,#15);
-                #17=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#5),#16);
-                #18=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#5),#16);
-                #19=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #20=SHAPE_REPRESENTATION('ANN',(#17,#18),#19);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=VECTOR('VX',#2,1.0);\n"
+        + "#4=LINE('L0',#1,#3);\n"
+        + "#5=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#6=(PROJECTION_CURVE('PC0',(#5),#4)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)\n"
+        + "    STYLED_ITEM('PC0',(#5),#4)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PC0'));\n"
+        + "#7=CARTESIAN_POINT('O2',(2.0,0.0));\n"
+        + "#8=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
+        + "#11=REPRESENTATION('SYM',(#6),#10);\n"
+        + "#12=SYMBOL_REPRESENTATION_MAP(#9,#11);\n"
+        + "#13=CARTESIAN_POINT('O3',(3.0,0.0));\n"
+        + "#14=DIRECTION('DX3',(1.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_2D('TGT',#13,#14);\n"
+        + "#16=ANNOTATION_SYMBOL('AS0',#12,#15);\n"
+        + "#17=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#5),#16);\n"
+        + "#18=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#5),#16);\n"
+        + "#19=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#20=SHAPE_REPRESENTATION('ANN',(#17,#18),#19);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -725,36 +711,35 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveMappedAnnotationCarrierMetadataForDraughtingAnnotationOccurrenceInBinaryAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DX',(1.0,0.0,0.0));
-                #3=VECTOR('VX',#2,1.0);
-                #4=LINE('L0',#1,#3);
-                #5=PRESENTATION_STYLE_ASSIGNMENT(());
-                #6=(PROJECTION_CURVE('PC0',(#5),#4)
-                    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)
-                    STYLED_ITEM('PC0',(#5),#4)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('PC0'));
-                #7=CARTESIAN_POINT('O2',(2.0,0.0));
-                #8=DIRECTION('DX2',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));
-                #11=REPRESENTATION('SYM',(#6),#10);
-                #12=SYMBOL_REPRESENTATION_MAP(#9,#11);
-                #13=CARTESIAN_POINT('O3',(3.0,0.0));
-                #14=DIRECTION('DX3',(1.0,0.0));
-                #15=AXIS2_PLACEMENT_2D('TGT',#13,#14);
-                #16=ANNOTATION_SYMBOL('AS0',#12,#15);
-                #17=(DRAUGHTING_ANNOTATION_OCCURRENCE('DAO0',(#5),#16)
-                    STYLED_ITEM('DAO0',(#5),#16)
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('DAO0'));
-                #18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #19=SHAPE_REPRESENTATION('ANN',(#17),#18);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=VECTOR('VX',#2,1.0);\n"
+        + "#4=LINE('L0',#1,#3);\n"
+        + "#5=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#6=(PROJECTION_CURVE('PC0',(#5),#4)\n"
+        + "    ANNOTATION_CURVE_OCCURRENCE('PC0',(#5),#4)\n"
+        + "    STYLED_ITEM('PC0',(#5),#4)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('PC0'));\n"
+        + "#7=CARTESIAN_POINT('O2',(2.0,0.0));\n"
+        + "#8=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
+        + "#11=REPRESENTATION('SYM',(#6),#10);\n"
+        + "#12=SYMBOL_REPRESENTATION_MAP(#9,#11);\n"
+        + "#13=CARTESIAN_POINT('O3',(3.0,0.0));\n"
+        + "#14=DIRECTION('DX3',(1.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_2D('TGT',#13,#14);\n"
+        + "#16=ANNOTATION_SYMBOL('AS0',#12,#15);\n"
+        + "#17=(DRAUGHTING_ANNOTATION_OCCURRENCE('DAO0',(#5),#16)\n"
+        + "    STYLED_ITEM('DAO0',(#5),#16)\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('DAO0'));\n"
+        + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#19=SHAPE_REPRESENTATION('ANN',(#17),#18);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -772,50 +757,48 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiRelationshipMetadataInBinaryPreviewAndGlb() {
-        String calloutStep = """
-                DATA;
-                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #3=REPRESENTATION('REP_A',(#1),#2);
-                #4=PROPERTY_DEFINITION('PD','',#1);
-                #5=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #6=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #7=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','base',#5);
-                #8=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','child',#6);
-                #9=DRAUGHTING_CALLOUT('CALLOUT_A',(#7));
-                #10=DRAUGHTING_CALLOUT('CALLOUT_B',(#8));
-                #11=PLACED_TARGET('PT','target',#4,#3,#9);
-                #12=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#9,#10);
-                ENDSEC;
-                """;
-        String occurrenceStep = """
-                DATA;
-                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #3=REPRESENTATION('REP_A',(#1),#2);
-                #4=PROPERTY_DEFINITION('PD','',#1);
-                #5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
-                #6=REPRESENTATION('SYM',(),#5);
-                #7=CARTESIAN_POINT('O',(0.0,0.0));
-                #8=DIRECTION('X',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=SYMBOL_REPRESENTATION_MAP(#9,#6);
-                #11=CARTESIAN_POINT('P',(3.0,4.0));
-                #12=AXIS2_PLACEMENT_2D('TGT',#11,#8);
-                #13=ANNOTATION_SYMBOL('AS0',#10,#12);
-                #14=PRESENTATION_STYLE_ASSIGNMENT(());
-                #15=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #16=DIRECTION('DIR0',(1.0,0.0,0.0));
-                #17=VECTOR('V0',#16,1.0);
-                #18=LINE('L0',#15,#17);
-                #19=ANNOTATION_CURVE_OCCURRENCE('ACO0',(#14),#18);
-                #20=TERMINATOR_SYMBOL('TS0',(#14),#13,#19);
-                #21=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);
-                #22=ANNOTATION_OCCURRENCE_RELATIONSHIP('REL','links symbol to terminator',#21,#20);
-                #23=ANNOTATION_TEXT_OCCURRENCE('NOTE','occurrence-links',#15);
-                #24=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#4,#3,#23,#22);
-                ENDSEC;
-                """;
+        String calloutStep = 
+        "DATA;\n"
+        + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#3=REPRESENTATION('REP_A',(#1),#2);\n"
+        + "#4=PROPERTY_DEFINITION('PD','',#1);\n"
+        + "#5=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#6=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#7=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','base',#5);\n"
+        + "#8=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','child',#6);\n"
+        + "#9=DRAUGHTING_CALLOUT('CALLOUT_A',(#7));\n"
+        + "#10=DRAUGHTING_CALLOUT('CALLOUT_B',(#8));\n"
+        + "#11=PLACED_TARGET('PT','target',#4,#3,#9);\n"
+        + "#12=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#9,#10);\n"
+        + "ENDSEC;"
+        String occurrenceStep = 
+        "DATA;\n"
+        + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#3=REPRESENTATION('REP_A',(#1),#2);\n"
+        + "#4=PROPERTY_DEFINITION('PD','',#1);\n"
+        + "#5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
+        + "#6=REPRESENTATION('SYM',(),#5);\n"
+        + "#7=CARTESIAN_POINT('O',(0.0,0.0));\n"
+        + "#8=DIRECTION('X',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=SYMBOL_REPRESENTATION_MAP(#9,#6);\n"
+        + "#11=CARTESIAN_POINT('P',(3.0,4.0));\n"
+        + "#12=AXIS2_PLACEMENT_2D('TGT',#11,#8);\n"
+        + "#13=ANNOTATION_SYMBOL('AS0',#10,#12);\n"
+        + "#14=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#15=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#16=DIRECTION('DIR0',(1.0,0.0,0.0));\n"
+        + "#17=VECTOR('V0',#16,1.0);\n"
+        + "#18=LINE('L0',#15,#17);\n"
+        + "#19=ANNOTATION_CURVE_OCCURRENCE('ACO0',(#14),#18);\n"
+        + "#20=TERMINATOR_SYMBOL('TS0',(#14),#13,#19);\n"
+        + "#21=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);\n"
+        + "#22=ANNOTATION_OCCURRENCE_RELATIONSHIP('REL','links symbol to terminator',#21,#20);\n"
+        + "#23=ANNOTATION_TEXT_OCCURRENCE('NOTE','occurrence-links',#15);\n"
+        + "#24=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#4,#3,#23,#22);\n"
+        + "ENDSEC;"
 
         String calloutBinary = metadataFromBinary(StepPreviewJsonExporter.exportBinary(calloutStep));
         String calloutGlb = metadataFromGlb(StepPreviewJsonExporter.exportGlb(calloutStep));
@@ -842,37 +825,36 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiAssociativityMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #3=REPRESENTATION('REP_A',(#1),#2);
-                #4=PROPERTY_DEFINITION('PD','',#1);
-                #5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
-                #6=REPRESENTATION('SYM',(),#5);
-                #7=CARTESIAN_POINT('O',(0.0,0.0));
-                #8=DIRECTION('X',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=SYMBOL_REPRESENTATION_MAP(#9,#6);
-                #11=CARTESIAN_POINT('P',(3.0,4.0));
-                #12=AXIS2_PLACEMENT_2D('TGT',#11,#8);
-                #13=ANNOTATION_SYMBOL('AS0',#10,#12);
-                #14=PRESENTATION_STYLE_ASSIGNMENT(());
-                #15=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);
-                #16=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #17=DIRECTION('DIR0',(1.0,0.0,0.0));
-                #18=VECTOR('V0',#17,1.0);
-                #19=LINE('L0',#16,#18);
-                #20=PROJECTION_CURVE('PC0',(#14),#19);
-                #21=TERMINATOR_SYMBOL('TS0',(#14),#13,#20);
-                #22=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#15,#21);
-                #23=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#21,#20);
-                #24=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','assoc',#16);
-                #25=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','dim',#16);
-                #26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_A','',#4,#3,#24,#22);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_B','',#4,#3,#25,#23);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#3=REPRESENTATION('REP_A',(#1),#2);\n"
+        + "#4=PROPERTY_DEFINITION('PD','',#1);\n"
+        + "#5=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
+        + "#6=REPRESENTATION('SYM',(),#5);\n"
+        + "#7=CARTESIAN_POINT('O',(0.0,0.0));\n"
+        + "#8=DIRECTION('X',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=SYMBOL_REPRESENTATION_MAP(#9,#6);\n"
+        + "#11=CARTESIAN_POINT('P',(3.0,4.0));\n"
+        + "#12=AXIS2_PLACEMENT_2D('TGT',#11,#8);\n"
+        + "#13=ANNOTATION_SYMBOL('AS0',#10,#12);\n"
+        + "#14=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#15=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);\n"
+        + "#16=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#17=DIRECTION('DIR0',(1.0,0.0,0.0));\n"
+        + "#18=VECTOR('V0',#17,1.0);\n"
+        + "#19=LINE('L0',#16,#18);\n"
+        + "#20=PROJECTION_CURVE('PC0',(#14),#19);\n"
+        + "#21=TERMINATOR_SYMBOL('TS0',(#14),#13,#20);\n"
+        + "#22=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#15,#21);\n"
+        + "#23=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#21,#20);\n"
+        + "#24=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','assoc',#16);\n"
+        + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','dim',#16);\n"
+        + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_A','',#4,#3,#24,#22);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_B','',#4,#3,#25,#23);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -894,44 +876,43 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiUsageMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_BASE',(),#9);
-                #11=REPRESENTATION('REP_USAGE_A',(),#9);
-                #12=REPRESENTATION('REP_USAGE_B',(),#9);
-                #13=REPRESENTATION('REP_USAGE_C',(),#9);
-                #14=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #15=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','',#8,#11,#8);
-                #16=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','',#15,(#11,#12),(#17),#8);
-                #17=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);
-                #18=ANNOTATION_TEXT_OCCURRENCE('NOTE_USAGE_A','',#40);
-                #19=DRAUGHTING_CALLOUT('CALLOUT0',(#18));
-                #20=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#18,#11);
-                #21=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#19,(#12,#13),(#22),#12);
-                #22=REPRESENTATION_RELATIONSHIP('RR2','',#12,#13);
-                #23=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#16,#12,#19);
-                #24=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI0','',#21,#10,#31,#8);
-                #25=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDR0','',#23,#10,#32,#8);
-                #26=PLACED_TARGET('PT0','',#24,#13,#8);
-                #30=GEOMETRIC_SET('GS',());
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_PMI_NESTED','',#40);
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_MDR_NESTED','',#41);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PLACED_TARGET_NESTED','',#42);
-                #34=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#33,#8);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_BASE',(),#9);\n"
+        + "#11=REPRESENTATION('REP_USAGE_A',(),#9);\n"
+        + "#12=REPRESENTATION('REP_USAGE_B',(),#9);\n"
+        + "#13=REPRESENTATION('REP_USAGE_C',(),#9);\n"
+        + "#14=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#15=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','',#8,#11,#8);\n"
+        + "#16=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','',#15,(#11,#12),(#17),#8);\n"
+        + "#17=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);\n"
+        + "#18=ANNOTATION_TEXT_OCCURRENCE('NOTE_USAGE_A','',#40);\n"
+        + "#19=DRAUGHTING_CALLOUT('CALLOUT0',(#18));\n"
+        + "#20=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#18,#11);\n"
+        + "#21=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#19,(#12,#13),(#22),#12);\n"
+        + "#22=REPRESENTATION_RELATIONSHIP('RR2','',#12,#13);\n"
+        + "#23=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#16,#12,#19);\n"
+        + "#24=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI0','',#21,#10,#31,#8);\n"
+        + "#25=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDR0','',#23,#10,#32,#8);\n"
+        + "#26=PLACED_TARGET('PT0','',#24,#13,#8);\n"
+        + "#30=GEOMETRIC_SET('GS',());\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_PMI_NESTED','',#40);\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_MDR_NESTED','',#41);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PLACED_TARGET_NESTED','',#42);\n"
+        + "#34=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#33,#8);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -969,27 +950,26 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPlaceholderAssociationUsageMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #3=DRAUGHTING_MODEL('DM',(#1),#2);
-                #4=PROPERTY_DEFINITION('PD','',#1);
-                #5=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #6=CARTESIAN_POINT('P1',(1.0,1.0,0.0));
-                #7=ANNOTATION_POINT_OCCURRENCE('APO',(),#5);
-                #8=GEOMETRIC_SET('PHSET',(#6));
-                #9=ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(),#8,.TITLE.,1.0);
-                #10=ANNOTATION_SYMBOL_OCCURRENCE('ASO',(),#9);
-                #11=REPRESENTATION('REP_A',(),#2);
-                #12=REPRESENTATION('REP_B',(),#2);
-                #13=REPRESENTATION('REP_C',(),#2);
-                #14=REPRESENTATION_RELATIONSHIP('RR','chain',#12,#13);
-                #15=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#7,#11);
-                #16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);
-                #17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#3=DRAUGHTING_MODEL('DM',(#1),#2);\n"
+        + "#4=PROPERTY_DEFINITION('PD','',#1);\n"
+        + "#5=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#6=CARTESIAN_POINT('P1',(1.0,1.0,0.0));\n"
+        + "#7=ANNOTATION_POINT_OCCURRENCE('APO',(),#5);\n"
+        + "#8=GEOMETRIC_SET('PHSET',(#6));\n"
+        + "#9=ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(),#8,.TITLE.,1.0);\n"
+        + "#10=ANNOTATION_SYMBOL_OCCURRENCE('ASO',(),#9);\n"
+        + "#11=REPRESENTATION('REP_A',(),#2);\n"
+        + "#12=REPRESENTATION('REP_B',(),#2);\n"
+        + "#13=REPRESENTATION('REP_C',(),#2);\n"
+        + "#14=REPRESENTATION_RELATIONSHIP('RR','chain',#12,#13);\n"
+        + "#15=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#7,#11);\n"
+        + "#16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);\n"
+        + "#17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1021,24 +1001,23 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationUsageAssociationMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #3=REPRESENTATION('REP_A',(#1),#2);
-                #4=REPRESENTATION('REP_B',(#1),#2);
-                #5=REPRESENTATION('REP_C',(#1),#2);
-                #6=REPRESENTATION_RELATIONSHIP('RR','chain',#4,#5);
-                #7=PROPERTY_DEFINITION('PD','',#1);
-                #8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #9=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#8);
-                #10=GEOMETRIC_CURVE_SET('LEADER',(#8));
-                #11=DRAUGHTING_CALLOUT('CALLOUT',(#9,#10));
-                #12=ITEM_IDENTIFIED_REPRESENTATION_USAGE('USAGE','generic',#7,#3,#11);
-                #13=PLACED_TARGET('PT','target',#7,#4,#11);
-                #14=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CBIIRU','chain',#7,(#4,#5),(#6),#11);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#3=REPRESENTATION('REP_A',(#1),#2);\n"
+        + "#4=REPRESENTATION('REP_B',(#1),#2);\n"
+        + "#5=REPRESENTATION('REP_C',(#1),#2);\n"
+        + "#6=REPRESENTATION_RELATIONSHIP('RR','chain',#4,#5);\n"
+        + "#7=PROPERTY_DEFINITION('PD','',#1);\n"
+        + "#8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#9=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#8);\n"
+        + "#10=GEOMETRIC_CURVE_SET('LEADER',(#8));\n"
+        + "#11=DRAUGHTING_CALLOUT('CALLOUT',(#9,#10));\n"
+        + "#12=ITEM_IDENTIFIED_REPRESENTATION_USAGE('USAGE','generic',#7,#3,#11);\n"
+        + "#13=PLACED_TARGET('PT','target',#7,#4,#11);\n"
+        + "#14=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CBIIRU','chain',#7,(#4,#5),(#6),#11);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1072,56 +1051,55 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAnnotationContentUsageMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));
-                #2=REPRESENTATION('REP_USED',(),#1);
-                #3=REPRESENTATION('REP_A',(),#1);
-                #4=REPRESENTATION('REP_B',(),#1);
-                #5=REPRESENTATION_RELATIONSHIP('RR','chain',#3,#4);
-                #34=REPRESENTATION_RELATIONSHIP('RR_USED','used chain',#2,#3);
-                #35=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #36=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #37=DIRECTION('DZ3',(0.0,0.0,1.0));
-                #38=DIRECTION('DX3',(1.0,0.0,0.0));
-                #39=AXIS2_PLACEMENT_3D('AX0',#35,#37,#38);
-                #40=AXIS2_PLACEMENT_3D('AX1',#36,#37,#38);
-                #41=ITEM_DEFINED_TRANSFORMATION('T1','',#39,#40);
-                #42=(REPRESENTATION_RELATIONSHIP('RRT_USED','',#2,#4)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#41));
-                #43=SHAPE_REPRESENTATION_RELATIONSHIP('SRR_USED','',#2,#3);
-                #6=PROPERTY_DEFINITION('PD','',#2);
-                #7=CARTESIAN_POINT('O',(0.0,0.0));
-                #8=DIRECTION('X',(1.0,0.0));
-                #9=AXIS2_PLACEMENT_2D('MAP',#7,#8);
-                #10=REPRESENTATION('SYMREP',(),#1);
-                #11=SYMBOL_REPRESENTATION_MAP(#9,#10);
-                #12=CARTESIAN_POINT('P0',(10.0,20.0));
-                #13=AXIS2_PLACEMENT_2D('TGT0',#12,#8);
-                #14=ANNOTATION_SYMBOL('AS0',#11,#13);
-                #15=REPRESENTATION_MAP(#9,#10);
-                #16=CARTESIAN_POINT('P1',(30.0,40.0));
-                #17=AXIS2_PLACEMENT_2D('TGT1',#16,#8);
-                #18=ANNOTATION_TEXT('AT0',#15,#17);
-                #19=ANNOTATION_TEXT_CHARACTER('ATC0',#15,#17);
-                #20=CARTESIAN_POINT('F0',(0.0,0.0,0.0));
-                #21=CARTESIAN_POINT('F1',(1.0,0.0,0.0));
-                #22=CARTESIAN_POINT('F2',(1.0,1.0,0.0));
-                #23=POLYLINE('PL0',(#20,#21,#22));
-                #24=(ANNOTATION_FILL_AREA('FA0',(#23))
-                    GEOMETRIC_REPRESENTATION_ITEM()
-                    REPRESENTATION_ITEM('FA0'));
-                #25=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#20);
-                #26=GEOMETRIC_ITEM_SPECIFIC_USAGE('G0','',#25,#14);
-                #27=GEOMETRIC_ITEM_SPECIFIC_USAGE('G1','',#25,#18);
-                #28=GEOMETRIC_ITEM_SPECIFIC_USAGE('G2','',#25,#19);
-                #29=GEOMETRIC_ITEM_SPECIFIC_USAGE('G3','',#25,#24);
-                #30=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','',#6,#2,#14);
-                #31=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','',#6,(#3,#4),(#5),#18);
-                #32=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#6,#2,#19);
-                #33=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#6,#2,#24,#6);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
+        + "#2=REPRESENTATION('REP_USED',(),#1);\n"
+        + "#3=REPRESENTATION('REP_A',(),#1);\n"
+        + "#4=REPRESENTATION('REP_B',(),#1);\n"
+        + "#5=REPRESENTATION_RELATIONSHIP('RR','chain',#3,#4);\n"
+        + "#34=REPRESENTATION_RELATIONSHIP('RR_USED','used chain',#2,#3);\n"
+        + "#35=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#36=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#37=DIRECTION('DZ3',(0.0,0.0,1.0));\n"
+        + "#38=DIRECTION('DX3',(1.0,0.0,0.0));\n"
+        + "#39=AXIS2_PLACEMENT_3D('AX0',#35,#37,#38);\n"
+        + "#40=AXIS2_PLACEMENT_3D('AX1',#36,#37,#38);\n"
+        + "#41=ITEM_DEFINED_TRANSFORMATION('T1','',#39,#40);\n"
+        + "#42=(REPRESENTATION_RELATIONSHIP('RRT_USED','',#2,#4)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#41));\n"
+        + "#43=SHAPE_REPRESENTATION_RELATIONSHIP('SRR_USED','',#2,#3);\n"
+        + "#6=PROPERTY_DEFINITION('PD','',#2);\n"
+        + "#7=CARTESIAN_POINT('O',(0.0,0.0));\n"
+        + "#8=DIRECTION('X',(1.0,0.0));\n"
+        + "#9=AXIS2_PLACEMENT_2D('MAP',#7,#8);\n"
+        + "#10=REPRESENTATION('SYMREP',(),#1);\n"
+        + "#11=SYMBOL_REPRESENTATION_MAP(#9,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(10.0,20.0));\n"
+        + "#13=AXIS2_PLACEMENT_2D('TGT0',#12,#8);\n"
+        + "#14=ANNOTATION_SYMBOL('AS0',#11,#13);\n"
+        + "#15=REPRESENTATION_MAP(#9,#10);\n"
+        + "#16=CARTESIAN_POINT('P1',(30.0,40.0));\n"
+        + "#17=AXIS2_PLACEMENT_2D('TGT1',#16,#8);\n"
+        + "#18=ANNOTATION_TEXT('AT0',#15,#17);\n"
+        + "#19=ANNOTATION_TEXT_CHARACTER('ATC0',#15,#17);\n"
+        + "#20=CARTESIAN_POINT('F0',(0.0,0.0,0.0));\n"
+        + "#21=CARTESIAN_POINT('F1',(1.0,0.0,0.0));\n"
+        + "#22=CARTESIAN_POINT('F2',(1.0,1.0,0.0));\n"
+        + "#23=POLYLINE('PL0',(#20,#21,#22));\n"
+        + "#24=(ANNOTATION_FILL_AREA('FA0',(#23))\n"
+        + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
+        + "    REPRESENTATION_ITEM('FA0'));\n"
+        + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#20);\n"
+        + "#26=GEOMETRIC_ITEM_SPECIFIC_USAGE('G0','',#25,#14);\n"
+        + "#27=GEOMETRIC_ITEM_SPECIFIC_USAGE('G1','',#25,#18);\n"
+        + "#28=GEOMETRIC_ITEM_SPECIFIC_USAGE('G2','',#25,#19);\n"
+        + "#29=GEOMETRIC_ITEM_SPECIFIC_USAGE('G3','',#25,#24);\n"
+        + "#30=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','',#6,#2,#14);\n"
+        + "#31=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','',#6,(#3,#4),(#5),#18);\n"
+        + "#32=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#6,#2,#19);\n"
+        + "#33=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#6,#2,#24,#6);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1211,29 +1189,28 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPathAndWireUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=VECTOR('V0',#3,1.0);
-                #5=LINE('L0',#1,#4);
-                #6=VERTEX_POINT('VP0',#1);
-                #7=VERTEX_POINT('VP1',#2);
-                #8=EDGE_CURVE('E0',#6,#7,#5,.T.);
-                #9=ORIENTED_EDGE('OE0',$,$,#8,.T.);
-                #10=OPEN_PATH('OP',(#9));
-                #11=CONNECTED_EDGE_SET('CES',(#9));
-                #12=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #14=REPRESENTATION('REP_A',(),#13);
-                #15=REPRESENTATION('REP_B',(),#13);
-                #16=REPRESENTATION_RELATIONSHIP('RR','chain',#14,#15);
-                #17=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#1);
-                #18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);
-                #19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=VECTOR('V0',#3,1.0);\n"
+        + "#5=LINE('L0',#1,#4);\n"
+        + "#6=VERTEX_POINT('VP0',#1);\n"
+        + "#7=VERTEX_POINT('VP1',#2);\n"
+        + "#8=EDGE_CURVE('E0',#6,#7,#5,.T.);\n"
+        + "#9=ORIENTED_EDGE('OE0',$,$,#8,.T.);\n"
+        + "#10=OPEN_PATH('OP',(#9));\n"
+        + "#11=CONNECTED_EDGE_SET('CES',(#9));\n"
+        + "#12=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#14=REPRESENTATION('REP_A',(),#13);\n"
+        + "#15=REPRESENTATION('REP_B',(),#13);\n"
+        + "#16=REPRESENTATION_RELATIONSHIP('RR','chain',#14,#15);\n"
+        + "#17=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#1);\n"
+        + "#18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);\n"
+        + "#19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1249,42 +1226,41 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShellModelAndSolidUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #5=DIRECTION('DZ',(0.0,0.0,1.0));
-                #6=DIRECTION('DX',(1.0,0.0,0.0));
-                #7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);
-                #8=PLANE('PL0',#7);
-                #13=POLY_LOOP('LOOP',(#1,#2,#3,#4));
-                #14=FACE_OUTER_BOUND('FOB',#13,.T.);
-                #15=ADVANCED_FACE('FACE0',(#14),#8,.T.);
-                #16=OPEN_SHELL('OSH',(#15));
-                #17=FACE_BASED_SURFACE_MODEL('FBM',(#16));
-                #18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #19=REPRESENTATION('REP_A',(),#18);
-                #20=REPRESENTATION('REP_B',(),#18);
-                #21=REPRESENTATION_RELATIONSHIP('RR','chain',#19,#20);
-                #22=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHELL','',#1);
-                #23=ANNOTATION_TEXT_OCCURRENCE('NOTE_MODEL','',#2);
-                #24=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID','',#3);
-                #25=BLOCK('BLK',#7,1.0,1.0,1.0);
-                #26=POINT_SET('PS',(#1,#2));
-                #27=GEOMETRIC_CURVE_SET('GCS',(#26));
-                #28=GEOMETRIC_SET('GS',(#27));
-                #29=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SHELL','',#22,#16);
-                #30=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU_MODEL','',#23,(#19,#20),(#21),#17);
-                #31=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SOLID','',#24,#25);
-                #32=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SET','',#24,#28);
-                #33=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#29,#19,#22,#22);
-                #34=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#30,#19,#23,#23);
-                #35=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#19,#24,#24);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#19,#24,#24);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#5=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#6=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);\n"
+        + "#8=PLANE('PL0',#7);\n"
+        + "#13=POLY_LOOP('LOOP',(#1,#2,#3,#4));\n"
+        + "#14=FACE_OUTER_BOUND('FOB',#13,.T.);\n"
+        + "#15=ADVANCED_FACE('FACE0',(#14),#8,.T.);\n"
+        + "#16=OPEN_SHELL('OSH',(#15));\n"
+        + "#17=FACE_BASED_SURFACE_MODEL('FBM',(#16));\n"
+        + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#19=REPRESENTATION('REP_A',(),#18);\n"
+        + "#20=REPRESENTATION('REP_B',(),#18);\n"
+        + "#21=REPRESENTATION_RELATIONSHIP('RR','chain',#19,#20);\n"
+        + "#22=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHELL','',#1);\n"
+        + "#23=ANNOTATION_TEXT_OCCURRENCE('NOTE_MODEL','',#2);\n"
+        + "#24=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID','',#3);\n"
+        + "#25=BLOCK('BLK',#7,1.0,1.0,1.0);\n"
+        + "#26=POINT_SET('PS',(#1,#2));\n"
+        + "#27=GEOMETRIC_CURVE_SET('GCS',(#26));\n"
+        + "#28=GEOMETRIC_SET('GS',(#27));\n"
+        + "#29=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SHELL','',#22,#16);\n"
+        + "#30=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU_MODEL','',#23,(#19,#20),(#21),#17);\n"
+        + "#31=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SOLID','',#24,#25);\n"
+        + "#32=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SET','',#24,#28);\n"
+        + "#33=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#29,#19,#22,#22);\n"
+        + "#34=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#30,#19,#23,#23);\n"
+        + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#19,#24,#24);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#19,#24,#24);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1312,20 +1288,19 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedVertexLoopUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #9=VERTEX_POINT('VP0',#8);
-                #10=VERTEX_LOOP('VLOOP',#9);
-                #11=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#8);
-                #12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #13=REPRESENTATION('REP_A',(),#12);
-                #14=REPRESENTATION('REP_B',(),#12);
-                #15=REPRESENTATION_RELATIONSHIP('RR','chain',#13,#14);
-                #16=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#11,#10);
-                #17=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#11,(#13,#14),(#15),#10);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#9=VERTEX_POINT('VP0',#8);\n"
+        + "#10=VERTEX_LOOP('VLOOP',#9);\n"
+        + "#11=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#8);\n"
+        + "#12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#13=REPRESENTATION('REP_A',(),#12);\n"
+        + "#14=REPRESENTATION('REP_B',(),#12);\n"
+        + "#15=REPRESENTATION_RELATIONSHIP('RR','chain',#13,#14);\n"
+        + "#16=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#11,#10);\n"
+        + "#17=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#11,(#13,#14),(#15),#10);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1339,31 +1314,30 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);
-                #9=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#8);
-                #10=PROPERTY_DEFINITION('PD_ROOT','',#9);
-                #11=PROPERTY_DEFINITION('PD_TARGET','',#8);
-                #12=PROPERTY_DEFINITION_RELATIONSHIP('PDR','link',#10,#11);
-                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #14=REPRESENTATION('REP_USED',(),#13);
-                #15=REPRESENTATION('REP_PROP',(),#13);
-                #16=REPRESENTATION('REP_DATUM',(),#13);
-                #17=PROPERTY_DEFINITION_REPRESENTATION(#11,#15);
-                #18=PLACED_DATUM_TARGET_FEATURE(#11,#16);
-                #19=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #20=ANNOTATION_TEXT_OCCURRENCE('NOTE','semantic',#19);
-                #21=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','semantic link',#12,#14,#20,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);\n"
+        + "#9=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#8);\n"
+        + "#10=PROPERTY_DEFINITION('PD_ROOT','',#9);\n"
+        + "#11=PROPERTY_DEFINITION('PD_TARGET','',#8);\n"
+        + "#12=PROPERTY_DEFINITION_RELATIONSHIP('PDR','link',#10,#11);\n"
+        + "#13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#14=REPRESENTATION('REP_USED',(),#13);\n"
+        + "#15=REPRESENTATION('REP_PROP',(),#13);\n"
+        + "#16=REPRESENTATION('REP_DATUM',(),#13);\n"
+        + "#17=PROPERTY_DEFINITION_REPRESENTATION(#11,#15);\n"
+        + "#18=PLACED_DATUM_TARGET_FEATURE(#11,#16);\n"
+        + "#19=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#20=ANNOTATION_TEXT_OCCURRENCE('NOTE','semantic',#19);\n"
+        + "#21=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','semantic link',#12,#14,#20,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1385,37 +1359,36 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRequirementAndRelationshipDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=GENERAL_PROPERTY('GP1','gp1','');
-                #9=GENERAL_PROPERTY('GP2','gp2','');
-                #10=GENERAL_PROPERTY_RELATIONSHIP('LINK','',#8,#9);
-                #11=PROPERTY_DEFINITION('PD_GP2','',#9);
-                #12=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#13);
-                #13=SHAPE_ASPECT('SA_BASE','base',#7,.T.);
-                #14=PROPERTY_DEFINITION('PD_OCC','',#12);
-                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #16=REPRESENTATION('REP_USED_GP',(),#15);
-                #17=REPRESENTATION('REP_GP',(),#15);
-                #18=REPRESENTATION('REP_USED_REQ',(),#15);
-                #19=REPRESENTATION('REP_REQ',(),#15);
-                #20=ACTION_PROPERTY_REPRESENTATION(#11,#17);
-                #21=PROPERTY_DEFINITION_REPRESENTATION(#14,#19);
-                #22=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #23=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #24=ANNOTATION_TEXT_OCCURRENCE('NOTE_GP','',#22);
-                #25=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#23);
-                #26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#16,#24,#7);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#13,#18,#25,#12);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=GENERAL_PROPERTY('GP1','gp1','');\n"
+        + "#9=GENERAL_PROPERTY('GP2','gp2','');\n"
+        + "#10=GENERAL_PROPERTY_RELATIONSHIP('LINK','',#8,#9);\n"
+        + "#11=PROPERTY_DEFINITION('PD_GP2','',#9);\n"
+        + "#12=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#13);\n"
+        + "#13=SHAPE_ASPECT('SA_BASE','base',#7,.T.);\n"
+        + "#14=PROPERTY_DEFINITION('PD_OCC','',#12);\n"
+        + "#15=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#16=REPRESENTATION('REP_USED_GP',(),#15);\n"
+        + "#17=REPRESENTATION('REP_GP',(),#15);\n"
+        + "#18=REPRESENTATION('REP_USED_REQ',(),#15);\n"
+        + "#19=REPRESENTATION('REP_REQ',(),#15);\n"
+        + "#20=ACTION_PROPERTY_REPRESENTATION(#11,#17);\n"
+        + "#21=PROPERTY_DEFINITION_REPRESENTATION(#14,#19);\n"
+        + "#22=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#23=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#24=ANNOTATION_TEXT_OCCURRENCE('NOTE_GP','',#22);\n"
+        + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#23);\n"
+        + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#16,#24,#7);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#13,#18,#25,#12);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1441,82 +1414,81 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductAndRelationshipFamilyDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PROD_A','Product A','',(#2));
-                #4=PRODUCT('PROD_B','Product B','',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('vA','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('vB','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('pd-a','',#5,#7);
-                #9=PRODUCT_DEFINITION('pd-b','',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('pds-a','shape a',#8);
-                #11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #12=REPRESENTATION('REP_PROD',(),#11);
-                #13=SHAPE_DEFINITION_REPRESENTATION(#10,#12);
-                #14=PRODUCT_RELATIONSHIP('PR','contains','',#4,#3);
-                #15=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PFR','versions','',#6,#5);
-                #16=NEXT_ASSEMBLY_USAGE_OCCURRENCE('NAUO','occ','',#9,#8);
-                #17=PRODUCT_DEFINITION_RELATIONSHIP('PDR_1','peer-1','',#9,#8);
-                #18=PRODUCT_DEFINITION_RELATIONSHIP('PDR_2','peer-2','',#9,#8);
-                #19=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','links','',#17,#18);
-                #20=GROUP('G1','g1');
-                #21=GROUP('G2','g2');
-                #22=GROUP_RELATIONSHIP('GR','',#20,#21);
-                #23=DOCUMENT_TYPE('spec');
-                #24=DOCUMENT('DOC-1','Spec A','',#23);
-                #25=DOCUMENT('DOC-2','Spec B','',#23);
-                #26=DOCUMENT_RELATIONSHIP('DR','',#24,#25);
-                #27=ORGANIZATION('ORG-1','Org A','');
-                #28=ORGANIZATION('ORG-2','Org B','');
-                #29=ORGANIZATION_RELATIONSHIP('OR','',#27,#28);
-                #30=PRODUCT_CATEGORY('CAT_A','cat a');
-                #31=PRODUCT_CATEGORY('CAT_B','cat b');
-                #32=PRODUCT_CATEGORY_RELATIONSHIP('CR','',#30,#31);
-                #33=EFFECTIVITY('E-1');
-                #34=EFFECTIVITY('E-2');
-                #35=EFFECTIVITY_RELATIONSHIP('ER','',#33,#34);
-                #36=PROPERTY_DEFINITION('PD_GROUP','',#21);
-                #37=PROPERTY_DEFINITION('PD_DOC','',#25);
-                #38=PROPERTY_DEFINITION('PD_ORG','',#28);
-                #39=PROPERTY_DEFINITION('PD_CAT','',#31);
-                #40=PROPERTY_DEFINITION('PD_EFF','',#34);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#36,#12);
-                #42=PROPERTY_DEFINITION_REPRESENTATION(#37,#12);
-                #43=PROPERTY_DEFINITION_REPRESENTATION(#38,#12);
-                #44=PROPERTY_DEFINITION_REPRESENTATION(#39,#12);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#40,#12);
-                #46=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #48=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #49=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #50=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #51=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #53=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #54=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT','',#46);
-                #56=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORMATION','',#47);
-                #57=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCCURRENCE','',#48);
-                #58=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDRR','',#49);
-                #59=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP','',#50);
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#51);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORGANIZATION','',#52);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#53);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_EFFECTIVITY','',#54);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#4,#12,#55,#10);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#6,#12,#56,#10);
-                #66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#16,#12,#57,#10);
-                #67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#19,#12,#58,#10);
-                #68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#20,#12,#59,#10);
-                #69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#12,#60,#10);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#27,#12,#61,#10);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#30,#12,#62,#10);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#33,#12,#63,#10);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PROD_A','Product A','',(#2));\n"
+        + "#4=PRODUCT('PROD_B','Product B','',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('vA','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('vB','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('pd-a','',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('pd-b','',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('pds-a','shape a',#8);\n"
+        + "#11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#12=REPRESENTATION('REP_PROD',(),#11);\n"
+        + "#13=SHAPE_DEFINITION_REPRESENTATION(#10,#12);\n"
+        + "#14=PRODUCT_RELATIONSHIP('PR','contains','',#4,#3);\n"
+        + "#15=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PFR','versions','',#6,#5);\n"
+        + "#16=NEXT_ASSEMBLY_USAGE_OCCURRENCE('NAUO','occ','',#9,#8);\n"
+        + "#17=PRODUCT_DEFINITION_RELATIONSHIP('PDR_1','peer-1','',#9,#8);\n"
+        + "#18=PRODUCT_DEFINITION_RELATIONSHIP('PDR_2','peer-2','',#9,#8);\n"
+        + "#19=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','links','',#17,#18);\n"
+        + "#20=GROUP('G1','g1');\n"
+        + "#21=GROUP('G2','g2');\n"
+        + "#22=GROUP_RELATIONSHIP('GR','',#20,#21);\n"
+        + "#23=DOCUMENT_TYPE('spec');\n"
+        + "#24=DOCUMENT('DOC-1','Spec A','',#23);\n"
+        + "#25=DOCUMENT('DOC-2','Spec B','',#23);\n"
+        + "#26=DOCUMENT_RELATIONSHIP('DR','',#24,#25);\n"
+        + "#27=ORGANIZATION('ORG-1','Org A','');\n"
+        + "#28=ORGANIZATION('ORG-2','Org B','');\n"
+        + "#29=ORGANIZATION_RELATIONSHIP('OR','',#27,#28);\n"
+        + "#30=PRODUCT_CATEGORY('CAT_A','cat a');\n"
+        + "#31=PRODUCT_CATEGORY('CAT_B','cat b');\n"
+        + "#32=PRODUCT_CATEGORY_RELATIONSHIP('CR','',#30,#31);\n"
+        + "#33=EFFECTIVITY('E-1');\n"
+        + "#34=EFFECTIVITY('E-2');\n"
+        + "#35=EFFECTIVITY_RELATIONSHIP('ER','',#33,#34);\n"
+        + "#36=PROPERTY_DEFINITION('PD_GROUP','',#21);\n"
+        + "#37=PROPERTY_DEFINITION('PD_DOC','',#25);\n"
+        + "#38=PROPERTY_DEFINITION('PD_ORG','',#28);\n"
+        + "#39=PROPERTY_DEFINITION('PD_CAT','',#31);\n"
+        + "#40=PROPERTY_DEFINITION('PD_EFF','',#34);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#36,#12);\n"
+        + "#42=PROPERTY_DEFINITION_REPRESENTATION(#37,#12);\n"
+        + "#43=PROPERTY_DEFINITION_REPRESENTATION(#38,#12);\n"
+        + "#44=PROPERTY_DEFINITION_REPRESENTATION(#39,#12);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#40,#12);\n"
+        + "#46=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#48=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#49=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#50=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#51=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#54=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT','',#46);\n"
+        + "#56=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORMATION','',#47);\n"
+        + "#57=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCCURRENCE','',#48);\n"
+        + "#58=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDRR','',#49);\n"
+        + "#59=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP','',#50);\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#51);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORGANIZATION','',#52);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#53);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_EFFECTIVITY','',#54);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#4,#12,#55,#10);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#6,#12,#56,#10);\n"
+        + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#16,#12,#57,#10);\n"
+        + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#19,#12,#58,#10);\n"
+        + "#68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#20,#12,#59,#10);\n"
+        + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#12,#60,#10);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#27,#12,#61,#10);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#30,#12,#62,#10);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#33,#12,#63,#10);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1586,53 +1558,52 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRelationshipCarrierDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd-a','',#4,#5);
-                #7=PRODUCT_DEFINITION('pd-b','',#4,#5);
-                #8=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #9=PROPERTY_DEFINITION('PD_ROOT','',#8);
-                #10=PROPERTY_DEFINITION('PD_TARGET','',#8);
-                #11=PROPERTY_DEFINITION_RELATIONSHIP('PDR','link',#9,#10);
-                #12=GENERAL_PROPERTY('GP1','gp1','');
-                #13=GENERAL_PROPERTY('GP2','gp2','');
-                #14=GENERAL_PROPERTY_RELATIONSHIP('GPR','',#12,#13);
-                #15=SHAPE_ASPECT('SA1','sa1',#8,.T.);
-                #16=SHAPE_ASPECT('SA2','sa2',#8,.T.);
-                #17=SHAPE_ASPECT_RELATIONSHIP('SAR','',#15,#16);
-                #18=PRODUCT_DEFINITION_RELATIONSHIP('PDR_A','peer-a','',#7,#6);
-                #19=PRODUCT_DEFINITION_RELATIONSHIP('PDR_B','peer-b','',#7,#6);
-                #20=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','links','',#18,#19);
-                #21=PROPERTY_DEFINITION('PD_GP','',#13);
-                #22=PROPERTY_DEFINITION('PD_SA','',#16);
-                #23=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #24=REPRESENTATION('REP_PROP',(),#23);
-                #25=REPRESENTATION('REP_GP',(),#23);
-                #26=REPRESENTATION('REP_SA',(),#23);
-                #27=REPRESENTATION('REP_PDRR',(),#23);
-                #28=PROPERTY_DEFINITION_REPRESENTATION(#10,#24);
-                #29=ACTION_PROPERTY_REPRESENTATION(#21,#25);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#22,#26);
-                #31=SHAPE_DEFINITION_REPRESENTATION(#8,#27);
-                #32=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #33=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #34=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #35=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #36=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDR','',#32);
-                #37=ANNOTATION_TEXT_OCCURRENCE('NOTE_GPR','',#33);
-                #38=ANNOTATION_TEXT_OCCURRENCE('NOTE_SAR','',#34);
-                #39=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDRR','',#35);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#11,#24,#36,#8);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#25,#37,#8);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#17,#26,#38,#8);
-                #43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#20,#27,#39,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd-a','',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION('pd-b','',#4,#5);\n"
+        + "#8=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#9=PROPERTY_DEFINITION('PD_ROOT','',#8);\n"
+        + "#10=PROPERTY_DEFINITION('PD_TARGET','',#8);\n"
+        + "#11=PROPERTY_DEFINITION_RELATIONSHIP('PDR','link',#9,#10);\n"
+        + "#12=GENERAL_PROPERTY('GP1','gp1','');\n"
+        + "#13=GENERAL_PROPERTY('GP2','gp2','');\n"
+        + "#14=GENERAL_PROPERTY_RELATIONSHIP('GPR','',#12,#13);\n"
+        + "#15=SHAPE_ASPECT('SA1','sa1',#8,.T.);\n"
+        + "#16=SHAPE_ASPECT('SA2','sa2',#8,.T.);\n"
+        + "#17=SHAPE_ASPECT_RELATIONSHIP('SAR','',#15,#16);\n"
+        + "#18=PRODUCT_DEFINITION_RELATIONSHIP('PDR_A','peer-a','',#7,#6);\n"
+        + "#19=PRODUCT_DEFINITION_RELATIONSHIP('PDR_B','peer-b','',#7,#6);\n"
+        + "#20=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','links','',#18,#19);\n"
+        + "#21=PROPERTY_DEFINITION('PD_GP','',#13);\n"
+        + "#22=PROPERTY_DEFINITION('PD_SA','',#16);\n"
+        + "#23=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#24=REPRESENTATION('REP_PROP',(),#23);\n"
+        + "#25=REPRESENTATION('REP_GP',(),#23);\n"
+        + "#26=REPRESENTATION('REP_SA',(),#23);\n"
+        + "#27=REPRESENTATION('REP_PDRR',(),#23);\n"
+        + "#28=PROPERTY_DEFINITION_REPRESENTATION(#10,#24);\n"
+        + "#29=ACTION_PROPERTY_REPRESENTATION(#21,#25);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#22,#26);\n"
+        + "#31=SHAPE_DEFINITION_REPRESENTATION(#8,#27);\n"
+        + "#32=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#33=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#34=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#35=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#36=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDR','',#32);\n"
+        + "#37=ANNOTATION_TEXT_OCCURRENCE('NOTE_GPR','',#33);\n"
+        + "#38=ANNOTATION_TEXT_OCCURRENCE('NOTE_SAR','',#34);\n"
+        + "#39=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDRR','',#35);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#11,#24,#36,#8);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#25,#37,#8);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#17,#26,#38,#8);\n"
+        + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#20,#27,#39,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1674,72 +1645,71 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectProductAndMetadataRelationshipCarrierDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PROD_A','Product A','',(#2));
-                #4=PRODUCT('PROD_B','Product B','',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('vA','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('vB','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('pd-a','',#5,#7);
-                #9=PRODUCT_DEFINITION('pd-b','',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('pds-a','shape a',#8);
-                #11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #12=REPRESENTATION('REP_REL',(),#11);
-                #13=SHAPE_DEFINITION_REPRESENTATION(#10,#12);
-                #14=PRODUCT_RELATIONSHIP('PR','contains','',#4,#3);
-                #15=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PFR','versions','',#6,#5);
-                #16=GROUP('G1','g1');
-                #17=GROUP('G2','g2');
-                #18=GROUP_RELATIONSHIP('GR','',#16,#17);
-                #19=DOCUMENT_TYPE('spec');
-                #20=DOCUMENT('DOC-1','Spec A','',#19);
-                #21=DOCUMENT('DOC-2','Spec B','',#19);
-                #22=DOCUMENT_RELATIONSHIP('DR','',#20,#21);
-                #23=ORGANIZATION('ORG-1','Org A','');
-                #24=ORGANIZATION('ORG-2','Org B','');
-                #25=ORGANIZATION_RELATIONSHIP('OR','',#23,#24);
-                #26=PRODUCT_CATEGORY('CAT_A','cat a');
-                #27=PRODUCT_CATEGORY('CAT_B','cat b');
-                #28=PRODUCT_CATEGORY_RELATIONSHIP('CR','',#26,#27);
-                #29=EFFECTIVITY('E-1');
-                #30=EFFECTIVITY('E-2');
-                #31=EFFECTIVITY_RELATIONSHIP('ER','',#29,#30);
-                #32=PROPERTY_DEFINITION('PD_GROUP','',#17);
-                #33=PROPERTY_DEFINITION('PD_DOC','',#21);
-                #34=PROPERTY_DEFINITION('PD_ORG','',#24);
-                #35=PROPERTY_DEFINITION('PD_CAT','',#27);
-                #36=PROPERTY_DEFINITION('PD_EFF','',#30);
-                #37=PROPERTY_DEFINITION_REPRESENTATION(#32,#12);
-                #38=PROPERTY_DEFINITION_REPRESENTATION(#33,#12);
-                #39=PROPERTY_DEFINITION_REPRESENTATION(#34,#12);
-                #40=PROPERTY_DEFINITION_REPRESENTATION(#35,#12);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#36,#12);
-                #42=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #46=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #48=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_PR','',#42);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_PFR','',#43);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_GR','',#44);
-                #52=ANNOTATION_TEXT_OCCURRENCE('NOTE_DR','',#45);
-                #53=ANNOTATION_TEXT_OCCURRENCE('NOTE_OR','',#46);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_CR','',#47);
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_ER','',#48);
-                #56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#14,#12,#49,#10);
-                #57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#15,#12,#50,#10);
-                #58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#18,#12,#51,#10);
-                #59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#12,#52,#10);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#25,#12,#53,#10);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#12,#54,#10);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#12,#55,#10);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PROD_A','Product A','',(#2));\n"
+        + "#4=PRODUCT('PROD_B','Product B','',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('vA','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('vB','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('pd-a','',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('pd-b','',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('pds-a','shape a',#8);\n"
+        + "#11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#12=REPRESENTATION('REP_REL',(),#11);\n"
+        + "#13=SHAPE_DEFINITION_REPRESENTATION(#10,#12);\n"
+        + "#14=PRODUCT_RELATIONSHIP('PR','contains','',#4,#3);\n"
+        + "#15=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PFR','versions','',#6,#5);\n"
+        + "#16=GROUP('G1','g1');\n"
+        + "#17=GROUP('G2','g2');\n"
+        + "#18=GROUP_RELATIONSHIP('GR','',#16,#17);\n"
+        + "#19=DOCUMENT_TYPE('spec');\n"
+        + "#20=DOCUMENT('DOC-1','Spec A','',#19);\n"
+        + "#21=DOCUMENT('DOC-2','Spec B','',#19);\n"
+        + "#22=DOCUMENT_RELATIONSHIP('DR','',#20,#21);\n"
+        + "#23=ORGANIZATION('ORG-1','Org A','');\n"
+        + "#24=ORGANIZATION('ORG-2','Org B','');\n"
+        + "#25=ORGANIZATION_RELATIONSHIP('OR','',#23,#24);\n"
+        + "#26=PRODUCT_CATEGORY('CAT_A','cat a');\n"
+        + "#27=PRODUCT_CATEGORY('CAT_B','cat b');\n"
+        + "#28=PRODUCT_CATEGORY_RELATIONSHIP('CR','',#26,#27);\n"
+        + "#29=EFFECTIVITY('E-1');\n"
+        + "#30=EFFECTIVITY('E-2');\n"
+        + "#31=EFFECTIVITY_RELATIONSHIP('ER','',#29,#30);\n"
+        + "#32=PROPERTY_DEFINITION('PD_GROUP','',#17);\n"
+        + "#33=PROPERTY_DEFINITION('PD_DOC','',#21);\n"
+        + "#34=PROPERTY_DEFINITION('PD_ORG','',#24);\n"
+        + "#35=PROPERTY_DEFINITION('PD_CAT','',#27);\n"
+        + "#36=PROPERTY_DEFINITION('PD_EFF','',#30);\n"
+        + "#37=PROPERTY_DEFINITION_REPRESENTATION(#32,#12);\n"
+        + "#38=PROPERTY_DEFINITION_REPRESENTATION(#33,#12);\n"
+        + "#39=PROPERTY_DEFINITION_REPRESENTATION(#34,#12);\n"
+        + "#40=PROPERTY_DEFINITION_REPRESENTATION(#35,#12);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#36,#12);\n"
+        + "#42=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#46=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#48=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_PR','',#42);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_PFR','',#43);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_GR','',#44);\n"
+        + "#52=ANNOTATION_TEXT_OCCURRENCE('NOTE_DR','',#45);\n"
+        + "#53=ANNOTATION_TEXT_OCCURRENCE('NOTE_OR','',#46);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_CR','',#47);\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_ER','',#48);\n"
+        + "#56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#14,#12,#49,#10);\n"
+        + "#57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#15,#12,#50,#10);\n"
+        + "#58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#18,#12,#51,#10);\n"
+        + "#59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#12,#52,#10);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#25,#12,#53,#10);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#12,#54,#10);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#12,#55,#10);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1793,48 +1763,47 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedExternalCategoryAndLayerDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_EXT',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=PRODUCT_RELATED_PRODUCT_CATEGORY('CAT_LINK','',(#3));
-                #13=DOCUMENT_TYPE('spec');
-                #14=DOCUMENT('DOC-1','Spec A','',#13);
-                #15=DOCUMENT('DOC-2','Spec B','',#13);
-                #16=DOCUMENT_RELATIONSHIP('DR','',#14,#15);
-                #17=DOCUMENT_REFERENCE(#14,'internal');
-                #18=PROPERTY_DEFINITION('PD_DOC','',#15);
-                #19=PROPERTY_DEFINITION_REPRESENTATION(#18,#10);
-                #20=EXTERNAL_SOURCE('SRC_A');
-                #21=EXTERNAL_SOURCE('SRC_B');
-                #22=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#20,#21);
-                #23=EXTERNALLY_DEFINED_ITEM('EXT-1',#21);
-                #24=PROPERTY_DEFINITION('PD_EXT','',#23);
-                #25=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);
-                #26=PRESENTATION_LAYER_ASSIGNMENT('LAYER_A','',(#10));
-                #27=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #28=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #29=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #30=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#27);
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT_REF','',#28);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXTERNAL_SOURCE','',#29);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_LAYER','',#30);
-                #35=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#31,#8);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#17,#10,#32,#8);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#33,#8);
-                #38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#34,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_EXT',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=PRODUCT_RELATED_PRODUCT_CATEGORY('CAT_LINK','',(#3));\n"
+        + "#13=DOCUMENT_TYPE('spec');\n"
+        + "#14=DOCUMENT('DOC-1','Spec A','',#13);\n"
+        + "#15=DOCUMENT('DOC-2','Spec B','',#13);\n"
+        + "#16=DOCUMENT_RELATIONSHIP('DR','',#14,#15);\n"
+        + "#17=DOCUMENT_REFERENCE(#14,'internal');\n"
+        + "#18=PROPERTY_DEFINITION('PD_DOC','',#15);\n"
+        + "#19=PROPERTY_DEFINITION_REPRESENTATION(#18,#10);\n"
+        + "#20=EXTERNAL_SOURCE('SRC_A');\n"
+        + "#21=EXTERNAL_SOURCE('SRC_B');\n"
+        + "#22=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#20,#21);\n"
+        + "#23=EXTERNALLY_DEFINED_ITEM('EXT-1',#21);\n"
+        + "#24=PROPERTY_DEFINITION('PD_EXT','',#23);\n"
+        + "#25=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);\n"
+        + "#26=PRESENTATION_LAYER_ASSIGNMENT('LAYER_A','',(#10));\n"
+        + "#27=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#28=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#29=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#30=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#27);\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT_REF','',#28);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXTERNAL_SOURCE','',#29);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_LAYER','',#30);\n"
+        + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#31,#8);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#17,#10,#32,#8);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#33,#8);\n"
+        + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#34,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1880,96 +1849,95 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedBareAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_ASSIGN',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=APPROVAL_STATUS('approved');
-                #13=APPROVAL(#12,'design');
-                #14=APPROVAL_ASSIGNMENT(#13);
-                #15=SECURITY_CLASSIFICATION_LEVEL('unclassified');
-                #16=SECURITY_CLASSIFICATION('sec','export control',#15);
-                #17=SECURITY_CLASSIFICATION_ASSIGNMENT(#16);
-                #18=CONTRACT_TYPE('purchase');
-                #19=CONTRACT('C-1','supply',#18);
-                #20=CONTRACT_ASSIGNMENT(#19);
-                #21=CERTIFICATION_TYPE('material');
-                #22=CERTIFICATION('CERT-1','compliance',#21);
-                #23=CERTIFICATION_ASSIGNMENT(#22);
-                #24=PERSON('p-1','Doe','Jane',$,$,$);
-                #25=ORGANIZATION('org-1','Acme','engineering');
-                #26=PERSON_AND_ORGANIZATION(#24,#25);
-                #27=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #28=PERSON_AND_ORGANIZATION_ASSIGNMENT(#26,#27);
-                #29=LANGUAGE('en-US');
-                #30=LANGUAGE_ASSIGNMENT(#29);
-                #90=APPROVAL_ROLE('authorizer');
-                #91=APPROVAL_PERSON_ORGANIZATION(#26,#13,#90);
-                #93=CALENDAR_DATE(2026,11,4);
-                #94=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #95=LOCAL_TIME(9,15,$,#94);
-                #96=DATE_AND_TIME(#93,#95);
-                #92=APPROVAL_DATE_TIME(#96,#13);
-                #31=GROUP('G1','group');
-                #32=GROUP_ASSIGNMENT(#31);
-                #33=CLASSIFICATION_ROLE('family');
-                #34=CLASSIFICATION_ASSIGNMENT(#31,#33);
-                #35=CALENDAR_DATE(2026,11,4);
-                #36=DATE_ROLE('release');
-                #37=DATE_ASSIGNMENT(#35,#36);
-                #38=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #39=LOCAL_TIME(9,15,$,#38);
-                #40=DATE_AND_TIME(#35,#39);
-                #41=DATE_TIME_ROLE('created');
-                #42=DATE_TIME_ASSIGNMENT(#40,#41);
-                #43=IDENTIFICATION_ROLE('ext role');
-                #44=EXTERNAL_SOURCE('SRC_EXT');
-                #45=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#43,#44);
-                #97=EXTERNAL_SOURCE('SRC_LINK');
-                #98=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#44,#97);
-                #99=EXTERNALLY_DEFINED_ITEM('EXT-REF',#97);
-                #46=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #48=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #49=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #50=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #51=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #53=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #54=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#46);
-                #56=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#47);
-                #57=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#48);
-                #58=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#49);
-                #59=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#50);
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#51);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP_ASSIGN','',#52);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ASSIGN','',#53);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ASSIGN','',#54);
-                #64=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ASSIGN','',#46);
-                #65=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXTERNAL_ID','',#47);
-                #66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#14,#10,#55,#8);
-                #67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#17,#10,#56,#8);
-                #68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#57,#8);
-                #69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#23,#10,#58,#8);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#28,#10,#59,#8);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#30,#10,#60,#8);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#32,#10,#61,#8);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#62,#8);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#37,#10,#63,#8);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#64,#8);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#45,#10,#65,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_ASSIGN',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=APPROVAL_STATUS('approved');\n"
+        + "#13=APPROVAL(#12,'design');\n"
+        + "#14=APPROVAL_ASSIGNMENT(#13);\n"
+        + "#15=SECURITY_CLASSIFICATION_LEVEL('unclassified');\n"
+        + "#16=SECURITY_CLASSIFICATION('sec','export control',#15);\n"
+        + "#17=SECURITY_CLASSIFICATION_ASSIGNMENT(#16);\n"
+        + "#18=CONTRACT_TYPE('purchase');\n"
+        + "#19=CONTRACT('C-1','supply',#18);\n"
+        + "#20=CONTRACT_ASSIGNMENT(#19);\n"
+        + "#21=CERTIFICATION_TYPE('material');\n"
+        + "#22=CERTIFICATION('CERT-1','compliance',#21);\n"
+        + "#23=CERTIFICATION_ASSIGNMENT(#22);\n"
+        + "#24=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#25=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#26=PERSON_AND_ORGANIZATION(#24,#25);\n"
+        + "#27=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#28=PERSON_AND_ORGANIZATION_ASSIGNMENT(#26,#27);\n"
+        + "#29=LANGUAGE('en-US');\n"
+        + "#30=LANGUAGE_ASSIGNMENT(#29);\n"
+        + "#90=APPROVAL_ROLE('authorizer');\n"
+        + "#91=APPROVAL_PERSON_ORGANIZATION(#26,#13,#90);\n"
+        + "#93=CALENDAR_DATE(2026,11,4);\n"
+        + "#94=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#95=LOCAL_TIME(9,15,$,#94);\n"
+        + "#96=DATE_AND_TIME(#93,#95);\n"
+        + "#92=APPROVAL_DATE_TIME(#96,#13);\n"
+        + "#31=GROUP('G1','group');\n"
+        + "#32=GROUP_ASSIGNMENT(#31);\n"
+        + "#33=CLASSIFICATION_ROLE('family');\n"
+        + "#34=CLASSIFICATION_ASSIGNMENT(#31,#33);\n"
+        + "#35=CALENDAR_DATE(2026,11,4);\n"
+        + "#36=DATE_ROLE('release');\n"
+        + "#37=DATE_ASSIGNMENT(#35,#36);\n"
+        + "#38=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#39=LOCAL_TIME(9,15,$,#38);\n"
+        + "#40=DATE_AND_TIME(#35,#39);\n"
+        + "#41=DATE_TIME_ROLE('created');\n"
+        + "#42=DATE_TIME_ASSIGNMENT(#40,#41);\n"
+        + "#43=IDENTIFICATION_ROLE('ext role');\n"
+        + "#44=EXTERNAL_SOURCE('SRC_EXT');\n"
+        + "#45=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#43,#44);\n"
+        + "#97=EXTERNAL_SOURCE('SRC_LINK');\n"
+        + "#98=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#44,#97);\n"
+        + "#99=EXTERNALLY_DEFINED_ITEM('EXT-REF',#97);\n"
+        + "#46=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#48=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#49=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#50=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#51=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#54=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#46);\n"
+        + "#56=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#47);\n"
+        + "#57=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#48);\n"
+        + "#58=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#49);\n"
+        + "#59=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#50);\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#51);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP_ASSIGN','',#52);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ASSIGN','',#53);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ASSIGN','',#54);\n"
+        + "#64=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ASSIGN','',#46);\n"
+        + "#65=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXTERNAL_ID','',#47);\n"
+        + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#14,#10,#55,#8);\n"
+        + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#17,#10,#56,#8);\n"
+        + "#68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#57,#8);\n"
+        + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#23,#10,#58,#8);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#28,#10,#59,#8);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#30,#10,#60,#8);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#32,#10,#61,#8);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#62,#8);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#37,#10,#63,#8);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#64,#8);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#45,#10,#65,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2151,26 +2119,25 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAppliedGroupAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_GROUP',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=GROUP('G1','group');
-                #13=APPLIED_GROUP_ASSIGNMENT(#12,(#8));
-                #14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #15=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_GROUP','',#14);
-                #16=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#15,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_GROUP',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=GROUP('G1','group');\n"
+        + "#13=APPLIED_GROUP_ASSIGNMENT(#12,(#8));\n"
+        + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_GROUP','',#14);\n"
+        + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#15,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2188,55 +2155,54 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMetadataWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD_TARGET','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_TARGET',(),#10);
-                #12=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);
-                #13=NAME_ATTRIBUTE('N0',#8);
-                #14=DESCRIPTION_ATTRIBUTE('D0',#8);
-                #15=ID_ATTRIBUTE('I0',#8);
-                #16=IDENTIFICATION_ROLE('role');
-                #17=EXTERNAL_SOURCE('src');
-                #18=APPLIED_NAME_ASSIGNMENT('APPLIED_NAME',(#8));
-                #19=APPLIED_IDENTIFICATION_ASSIGNMENT('APPLIED_ID',#16,(#8));
-                #20=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('APPLIED_EXT',#16,#17,(#8));
-                #90=EXTERNAL_SOURCE('src-linked');
-                #91=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#17,#90);
-                #92=EXTERNALLY_DEFINED_ITEM('EXT-APPLIED',#90);
-                #21=ATTRIBUTE_ASSERTION(#9,#11);
-                #22=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #23=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #24=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #25=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #26=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #27=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #28=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #29=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ATTR','',#22);
-                #30=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ATTR','',#23);
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ATTR','',#24);
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_NAME','',#25);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_ID','',#26);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_EXT','',#27);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASSERT','',#28);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#11,#29,#8);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#11,#30,#8);
-                #38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#15,#11,#31,#8);
-                #39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#18,#11,#32,#8);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#19,#11,#33,#8);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#20,#11,#34,#8);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#11,#35,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD_TARGET','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_TARGET',(),#10);\n"
+        + "#12=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);\n"
+        + "#13=NAME_ATTRIBUTE('N0',#8);\n"
+        + "#14=DESCRIPTION_ATTRIBUTE('D0',#8);\n"
+        + "#15=ID_ATTRIBUTE('I0',#8);\n"
+        + "#16=IDENTIFICATION_ROLE('role');\n"
+        + "#17=EXTERNAL_SOURCE('src');\n"
+        + "#18=APPLIED_NAME_ASSIGNMENT('APPLIED_NAME',(#8));\n"
+        + "#19=APPLIED_IDENTIFICATION_ASSIGNMENT('APPLIED_ID',#16,(#8));\n"
+        + "#20=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('APPLIED_EXT',#16,#17,(#8));\n"
+        + "#90=EXTERNAL_SOURCE('src-linked');\n"
+        + "#91=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#17,#90);\n"
+        + "#92=EXTERNALLY_DEFINED_ITEM('EXT-APPLIED',#90);\n"
+        + "#21=ATTRIBUTE_ASSERTION(#9,#11);\n"
+        + "#22=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#23=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#24=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#25=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#26=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#27=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#28=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#29=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ATTR','',#22);\n"
+        + "#30=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ATTR','',#23);\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ATTR','',#24);\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_NAME','',#25);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_ID','',#26);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_EXT','',#27);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASSERT','',#28);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#11,#29,#8);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#11,#30,#8);\n"
+        + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#15,#11,#31,#8);\n"
+        + "#39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#18,#11,#32,#8);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#19,#11,#33,#8);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#20,#11,#34,#8);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#11,#35,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2290,98 +2256,97 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAppliedAndPlainMetadataAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_TARGET',(),#9);
-                #11=CALENDAR_DATE(2026,11,4);
-                #12=DATE_ROLE('release');
-                #13=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #14=LOCAL_TIME(9,15,$,#13);
-                #15=DATE_AND_TIME(#11,#14);
-                #16=DATE_TIME_ROLE('created');
-                #17=APPROVAL_STATUS('approved');
-                #18=APPROVAL(#17,'design');
-                #19=SECURITY_CLASSIFICATION_LEVEL('unclassified');
-                #20=SECURITY_CLASSIFICATION('sec','export control',#19);
-                #21=DOCUMENT_TYPE('specification');
-                #22=DOCUMENT('DOC-1','Spec','primary spec',#21);
-                #23=CONTRACT_TYPE('purchase');
-                #24=CONTRACT('C-1','supply',#23);
-                #25=CERTIFICATION_TYPE('material');
-                #26=CERTIFICATION('CERT-1','compliance',#25);
-                #27=PERSON('p-1','Doe','Jane',$,$,$);
-                #28=ORGANIZATION('org-1','Acme','engineering');
-                #29=PERSON_AND_ORGANIZATION(#27,#28);
-                #30=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #31=ORGANIZATION_ROLE('owner');
-                #32=LANGUAGE('en-US');
-                #90=APPROVAL_ROLE('authorizer');
-                #91=APPROVAL_PERSON_ORGANIZATION(#29,#18,#90);
-                #92=APPROVAL_DATE_TIME(#15,#18);
-                #33=APPLIED_DATE_ASSIGNMENT(#11,#12,(#8));
-                #34=APPLIED_DATE_AND_TIME_ASSIGNMENT(#15,#16,(#8));
-                #35=APPLIED_APPROVAL_ASSIGNMENT(#18,(#8));
-                #36=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#20,(#8));
-                #37=APPLIED_DOCUMENT_REFERENCE(#22,'internal',(#8));
-                #38=APPLIED_CONTRACT_ASSIGNMENT(#24,(#8));
-                #39=APPLIED_CERTIFICATION_ASSIGNMENT(#26,(#8));
-                #40=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#29,#30,(#8));
-                #41=APPLIED_ORGANIZATION_ASSIGNMENT(#28,#31,(#8));
-                #42=APPLIED_LANGUAGE_ASSIGNMENT(#32,(#8));
-                #43=NAME_ASSIGNMENT('NAME_META');
-                #44=IDENTIFICATION_ROLE('role');
-                #45=IDENTIFICATION_ASSIGNMENT('ID_META',#44);
-                #46=EXTERNAL_SOURCE('SRC');
-                #47=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT_META',#44,#46);
-                #48=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #49=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #50=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #51=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #53=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #54=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #55=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #56=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #57=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #58=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #59=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE','',#48);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME','',#49);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#50);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#51);
-                #64=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#52);
-                #65=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#53);
-                #66=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#54);
-                #67=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#55);
-                #68=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORGANIZATION','',#56);
-                #69=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#57);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ASSIGN','',#58);
-                #71=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ASSIGN','',#59);
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ID_ASSIGN','',#60);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#33,#10,#60,#8);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#34,#10,#61,#8);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#35,#10,#62,#8);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#36,#10,#63,#8);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#37,#10,#64,#8);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#38,#10,#65,#8);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#39,#10,#66,#8);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#67,#8);
-                #81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#68,#8);
-                #82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#69,#8);
-                #83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#43,#10,#70,#8);
-                #84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#45,#10,#71,#8);
-                #85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#47,#10,#72,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_TARGET',(),#9);\n"
+        + "#11=CALENDAR_DATE(2026,11,4);\n"
+        + "#12=DATE_ROLE('release');\n"
+        + "#13=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#14=LOCAL_TIME(9,15,$,#13);\n"
+        + "#15=DATE_AND_TIME(#11,#14);\n"
+        + "#16=DATE_TIME_ROLE('created');\n"
+        + "#17=APPROVAL_STATUS('approved');\n"
+        + "#18=APPROVAL(#17,'design');\n"
+        + "#19=SECURITY_CLASSIFICATION_LEVEL('unclassified');\n"
+        + "#20=SECURITY_CLASSIFICATION('sec','export control',#19);\n"
+        + "#21=DOCUMENT_TYPE('specification');\n"
+        + "#22=DOCUMENT('DOC-1','Spec','primary spec',#21);\n"
+        + "#23=CONTRACT_TYPE('purchase');\n"
+        + "#24=CONTRACT('C-1','supply',#23);\n"
+        + "#25=CERTIFICATION_TYPE('material');\n"
+        + "#26=CERTIFICATION('CERT-1','compliance',#25);\n"
+        + "#27=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#28=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#29=PERSON_AND_ORGANIZATION(#27,#28);\n"
+        + "#30=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#31=ORGANIZATION_ROLE('owner');\n"
+        + "#32=LANGUAGE('en-US');\n"
+        + "#90=APPROVAL_ROLE('authorizer');\n"
+        + "#91=APPROVAL_PERSON_ORGANIZATION(#29,#18,#90);\n"
+        + "#92=APPROVAL_DATE_TIME(#15,#18);\n"
+        + "#33=APPLIED_DATE_ASSIGNMENT(#11,#12,(#8));\n"
+        + "#34=APPLIED_DATE_AND_TIME_ASSIGNMENT(#15,#16,(#8));\n"
+        + "#35=APPLIED_APPROVAL_ASSIGNMENT(#18,(#8));\n"
+        + "#36=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#20,(#8));\n"
+        + "#37=APPLIED_DOCUMENT_REFERENCE(#22,'internal',(#8));\n"
+        + "#38=APPLIED_CONTRACT_ASSIGNMENT(#24,(#8));\n"
+        + "#39=APPLIED_CERTIFICATION_ASSIGNMENT(#26,(#8));\n"
+        + "#40=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#29,#30,(#8));\n"
+        + "#41=APPLIED_ORGANIZATION_ASSIGNMENT(#28,#31,(#8));\n"
+        + "#42=APPLIED_LANGUAGE_ASSIGNMENT(#32,(#8));\n"
+        + "#43=NAME_ASSIGNMENT('NAME_META');\n"
+        + "#44=IDENTIFICATION_ROLE('role');\n"
+        + "#45=IDENTIFICATION_ASSIGNMENT('ID_META',#44);\n"
+        + "#46=EXTERNAL_SOURCE('SRC');\n"
+        + "#47=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT_META',#44,#46);\n"
+        + "#48=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#49=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#50=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#51=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#54=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#55=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#56=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#57=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#58=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#59=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE','',#48);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME','',#49);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#50);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#51);\n"
+        + "#64=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#52);\n"
+        + "#65=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#53);\n"
+        + "#66=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#54);\n"
+        + "#67=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#55);\n"
+        + "#68=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORGANIZATION','',#56);\n"
+        + "#69=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#57);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ASSIGN','',#58);\n"
+        + "#71=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ASSIGN','',#59);\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ID_ASSIGN','',#60);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#33,#10,#60,#8);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#34,#10,#61,#8);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#35,#10,#62,#8);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#36,#10,#63,#8);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#37,#10,#64,#8);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#38,#10,#65,#8);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#39,#10,#66,#8);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#67,#8);\n"
+        + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#68,#8);\n"
+        + "#82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#69,#8);\n"
+        + "#83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#43,#10,#70,#8);\n"
+        + "#84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#45,#10,#71,#8);\n"
+        + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#47,#10,#72,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2579,23 +2544,22 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveRepresentationSubtypeNameInBinaryPreviewAndGlbDefinitionMetadata() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=SHAPE_REPRESENTATION('REP_SHAPE',(),#9);
-                #11=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #12=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_REP','',#11);
-                #13=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#12,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=SHAPE_REPRESENTATION('REP_SHAPE',(),#9);\n"
+        + "#11=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#12=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_REP','',#11);\n"
+        + "#13=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#12,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2609,47 +2573,46 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationRelationshipDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USAGE',(),#9);
-                #11=REPRESENTATION('REP_REL_A',(),#9);
-                #12=REPRESENTATION('REP_REL_B',(),#9);
-                #13=REPRESENTATION('REP_REL_C',(),#9);
-                #14=REPRESENTATION('REP_REL_D',(),#9);
-                #15=REPRESENTATION('REP_REL_E',(),#9);
-                #16=REPRESENTATION('REP_REL_F',(),#9);
-                #17=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #18=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);
-                #19=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #20=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #21=DIRECTION('DZ',(0.0,0.0,1.0));
-                #22=DIRECTION('DX',(1.0,0.0,0.0));
-                #23=AXIS2_PLACEMENT_3D('AX0',#19,#21,#22);
-                #24=AXIS2_PLACEMENT_3D('AX1',#20,#21,#22);
-                #25=ITEM_DEFINED_TRANSFORMATION('T1','',#23,#24);
-                #26=(REPRESENTATION_RELATIONSHIP('RRT','',#13,#14)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#25));
-                #27=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#15,#16);
-                #30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #31=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #32=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_REL','',#30);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_REL_XFORM','',#31);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_REP_REL','',#32);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#33,#8);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#26,#10,#34,#8);
-                #38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#27,#10,#35,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USAGE',(),#9);\n"
+        + "#11=REPRESENTATION('REP_REL_A',(),#9);\n"
+        + "#12=REPRESENTATION('REP_REL_B',(),#9);\n"
+        + "#13=REPRESENTATION('REP_REL_C',(),#9);\n"
+        + "#14=REPRESENTATION('REP_REL_D',(),#9);\n"
+        + "#15=REPRESENTATION('REP_REL_E',(),#9);\n"
+        + "#16=REPRESENTATION('REP_REL_F',(),#9);\n"
+        + "#17=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#18=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);\n"
+        + "#19=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#20=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#21=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#22=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#23=AXIS2_PLACEMENT_3D('AX0',#19,#21,#22);\n"
+        + "#24=AXIS2_PLACEMENT_3D('AX1',#20,#21,#22);\n"
+        + "#25=ITEM_DEFINED_TRANSFORMATION('T1','',#23,#24);\n"
+        + "#26=(REPRESENTATION_RELATIONSHIP('RRT','',#13,#14)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#25));\n"
+        + "#27=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#15,#16);\n"
+        + "#30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#32=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_REL','',#30);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_REL_XFORM','',#31);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_REP_REL','',#32);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#33,#8);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#26,#10,#34,#8);\n"
+        + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#27,#10,#35,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2693,44 +2656,43 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShapeRepresentationLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('ASM','Assembly','Assembly',(#2));
-                #4=PRODUCT('COMP','Component','Component',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('v1','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);
-                #9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);
-                #11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);
-                #12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');
-                #13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);
-                #20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #21=REPRESENTATION('REP_COMP',(),#20);
-                #22=REPRESENTATION('REP_OCC',(),#20);
-                #23=REPRESENTATION('REP_USAGE_OCC',(),#20);
-                #24=REPRESENTATION('REP_USAGE_PD',(),#20);
-                #25=REPRESENTATION('REP_USAGE_PDS',(),#20);
-                #26=SHAPE_DEFINITION_REPRESENTATION(#11,#21);
-                #27=REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22);
-                #28=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#13);
-                #29=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #30=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #31=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #38=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#29);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PD','pd',#30);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','pds',#31);
-                #39=ANNOTATION_TEXT_OCCURRENCE('NOTE_SDR','sdr',#38);
-                #35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#32,#13);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SDR','',#26,#25,#39,#11);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM','Assembly','Assembly',(#2));\n"
+        + "#4=PRODUCT('COMP','Component','Component',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('v1','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);\n"
+        + "#11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);\n"
+        + "#12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
+        + "#13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);\n"
+        + "#20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#21=REPRESENTATION('REP_COMP',(),#20);\n"
+        + "#22=REPRESENTATION('REP_OCC',(),#20);\n"
+        + "#23=REPRESENTATION('REP_USAGE_OCC',(),#20);\n"
+        + "#24=REPRESENTATION('REP_USAGE_PD',(),#20);\n"
+        + "#25=REPRESENTATION('REP_USAGE_PDS',(),#20);\n"
+        + "#26=SHAPE_DEFINITION_REPRESENTATION(#11,#21);\n"
+        + "#27=REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22);\n"
+        + "#28=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#13);\n"
+        + "#29=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#30=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#38=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#29);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PD','pd',#30);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','pds',#31);\n"
+        + "#39=ANNOTATION_TEXT_OCCURRENCE('NOTE_SDR','sdr',#38);\n"
+        + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#32,#13);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SDR','',#26,#25,#39,#11);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2752,40 +2714,39 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedTransformedAssemblyShapeDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('ASM','Assembly','Assembly',(#2));
-                #4=PRODUCT('COMP','Component','Component',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('v1','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);
-                #9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);
-                #11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);
-                #12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');
-                #13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);
-                #20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #21=REPRESENTATION('REP_COMP',(),#20);
-                #22=REPRESENTATION('REP_OCC',(),#20);
-                #23=REPRESENTATION('REP_USAGE_OCC',(),#20);
-                #24=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #25=CARTESIAN_POINT('TX1',(5.0,0.0,0.0));
-                #26=DIRECTION('DZ',(0.0,0.0,1.0));
-                #27=DIRECTION('DX',(1.0,0.0,0.0));
-                #28=AXIS2_PLACEMENT_3D('AX0',#24,#26,#27);
-                #29=AXIS2_PLACEMENT_3D('AX1',#25,#26,#27);
-                #30=ITEM_DEFINED_TRANSFORMATION('T1','',#28,#29);
-                #31=(REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#30));
-                #32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#31,#13);
-                #33=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#33);
-                #35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#34,#13);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM','Assembly','Assembly',(#2));\n"
+        + "#4=PRODUCT('COMP','Component','Component',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('v1','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);\n"
+        + "#11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);\n"
+        + "#12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
+        + "#13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);\n"
+        + "#20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#21=REPRESENTATION('REP_COMP',(),#20);\n"
+        + "#22=REPRESENTATION('REP_OCC',(),#20);\n"
+        + "#23=REPRESENTATION('REP_USAGE_OCC',(),#20);\n"
+        + "#24=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#25=CARTESIAN_POINT('TX1',(5.0,0.0,0.0));\n"
+        + "#26=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#27=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#28=AXIS2_PLACEMENT_3D('AX0',#24,#26,#27);\n"
+        + "#29=AXIS2_PLACEMENT_3D('AX1',#25,#26,#27);\n"
+        + "#30=ITEM_DEFINED_TRANSFORMATION('T1','',#28,#29);\n"
+        + "#31=(REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#30));\n"
+        + "#32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#31,#13);\n"
+        + "#33=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#33);\n"
+        + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#34,#13);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2807,41 +2768,40 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductShapeRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USAGE',(),#9);
-                #11=REPRESENTATION('REP_REL_A',(),#9);
-                #12=REPRESENTATION('REP_REL_B',(),#9);
-                #13=REPRESENTATION('REP_REL_C',(),#9);
-                #14=REPRESENTATION('REP_REL_D',(),#9);
-                #15=REPRESENTATION('REP_REL_E',(),#9);
-                #16=REPRESENTATION('REP_REL_F',(),#9);
-                #17=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #18=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #19=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #20=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #21=DIRECTION('DZ',(0.0,0.0,1.0));
-                #22=DIRECTION('DX',(1.0,0.0,0.0));
-                #23=AXIS2_PLACEMENT_3D('AX0',#19,#21,#22);
-                #24=AXIS2_PLACEMENT_3D('AX1',#20,#21,#22);
-                #25=ITEM_DEFINED_TRANSFORMATION('T1','',#23,#24);
-                #26=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#12)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#25));
-                #27=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#13);
-                #30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','',#30);
-                #32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#7,#10,#31,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USAGE',(),#9);\n"
+        + "#11=REPRESENTATION('REP_REL_A',(),#9);\n"
+        + "#12=REPRESENTATION('REP_REL_B',(),#9);\n"
+        + "#13=REPRESENTATION('REP_REL_C',(),#9);\n"
+        + "#14=REPRESENTATION('REP_REL_D',(),#9);\n"
+        + "#15=REPRESENTATION('REP_REL_E',(),#9);\n"
+        + "#16=REPRESENTATION('REP_REL_F',(),#9);\n"
+        + "#17=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#18=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#19=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#20=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#21=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#22=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#23=AXIS2_PLACEMENT_3D('AX0',#19,#21,#22);\n"
+        + "#24=AXIS2_PLACEMENT_3D('AX1',#20,#21,#22);\n"
+        + "#25=ITEM_DEFINED_TRANSFORMATION('T1','',#23,#24);\n"
+        + "#26=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#12)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#25));\n"
+        + "#27=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#13);\n"
+        + "#30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','',#30);\n"
+        + "#32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#7,#10,#31,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2893,97 +2853,96 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedContextAndProtocolDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=APPLICATION_PROTOCOL_DEFINITION('draft','AP203',2026,#1);
-                #3=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #4=PRODUCT('PRT','Part','Part',(#3));
-                #5=PRODUCT_DEFINITION_FORMATION('v1','',#4);
-                #6=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #7=PRODUCT_DEFINITION('pd','part def',#5,#6);
-                #8=PRODUCT_DEFINITION_SHAPE('pds','shape',#7);
-                #9=SHAPE_ASPECT('SA0','base',#8,.T.);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_META_CTX',(),#10);
-                #82=REPRESENTATION('REP_META_AUX0',(),#10);
-                #83=REPRESENTATION('REP_META_AUX1',(),#10);
-                #84=REPRESENTATION_RELATIONSHIP('RR_VAR','',#11,#82);
-                #85=CARTESIAN_POINT('TX0',(20.0,0.0,0.0));
-                #86=CARTESIAN_POINT('TX1',(21.0,0.0,0.0));
-                #87=DIRECTION('DZV',(0.0,0.0,1.0));
-                #88=DIRECTION('DXV',(1.0,0.0,0.0));
-                #89=AXIS2_PLACEMENT_3D('AXV0',#85,#87,#88);
-                #90=AXIS2_PLACEMENT_3D('AXV1',#86,#87,#88);
-                #91=ITEM_DEFINED_TRANSFORMATION('TV','',#89,#90);
-                #92=(REPRESENTATION_RELATIONSHIP('RRT_VAR','',#11,#83)
-                    REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#91));
-                #93=SHAPE_REPRESENTATION_RELATIONSHIP('SRR_VAR','',#11,#82);
-                #12=SHAPE_DEFINITION_REPRESENTATION(#8,#11);
-                #13=CHARACTERIZED_OBJECT('CO','characterized object');
-                #14=PROPERTY_DEFINITION('PD_CO','',#13);
-                #15=ABSTRACT_VARIABLE(#14,#11);
-                #16=ROW_VARIABLE(#14,#11);
-                #17=SCALAR_VARIABLE(#14,#11);
-                #18=FORWARD_CHAINING_RULE_PREMISE(#14,#11);
-                #19=BACK_CHAINING_RULE_BODY(#14,#11);
-                #20=CALENDAR_DATE(2026,11,4);
-                #21=DATE_ROLE('release');
-                #22=APPLIED_DATE_ASSIGNMENT(#20,#21,(#9));
-                #23=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #24=LOCAL_TIME(9,15,$,#23);
-                #25=DATE_AND_TIME(#20,#24);
-                #26=DATE_TIME_ROLE('created');
-                #27=APPLIED_DATE_AND_TIME_ASSIGNMENT(#25,#26,(#9));
-                #28=PERSON('p-1','Doe','Jane',$,$,$);
-                #29=ORGANIZATION('org-1','Acme','engineering');
-                #30=PERSON_AND_ORGANIZATION(#28,#29);
-                #31=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #32=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#30,#31,(#9));
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #48=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #49=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #50=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #51=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P12',(12.0,0.0,0.0));
-                #53=ANNOTATION_TEXT_OCCURRENCE('NOTE_APP_PROTOCOL','',#40);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_CONTEXT','',#41);
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_DEF_CONTEXT','',#42);
-                #56=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHARACTERIZED_OBJECT','',#43);
-                #57=ANNOTATION_TEXT_OCCURRENCE('NOTE_ABSTRACT_VARIABLE','',#44);
-                #58=ANNOTATION_TEXT_OCCURRENCE('NOTE_ROW_VARIABLE','',#45);
-                #59=ANNOTATION_TEXT_OCCURRENCE('NOTE_SCALAR_VARIABLE','',#46);
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORWARD_RULE','',#47);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_BACK_RULE','',#48);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CALENDAR_DATE','',#49);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_AND_TIME','',#50);
-                #64=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOCAL_TIME','',#51);
-                #65=ANNOTATION_TEXT_OCCURRENCE('NOTE_UTC_OFFSET','',#52);
-                #66=CARTESIAN_POINT('P13',(13.0,0.0,0.0));
-                #67=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON','',#66);
-                #68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#2,#11,#53,#9);
-                #69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#3,#11,#54,#9);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#6,#11,#55,#9);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#13,#11,#56,#9);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#15,#11,#57,#9);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#16,#11,#58,#9);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#17,#11,#59,#9);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#18,#11,#60,#9);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#19,#11,#61,#9);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#20,#11,#62,#9);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#25,#11,#63,#9);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#24,#11,#64,#9);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#23,#11,#65,#9);
-                #81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#28,#11,#67,#9);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=APPLICATION_PROTOCOL_DEFINITION('draft','AP203',2026,#1);\n"
+        + "#3=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#4=PRODUCT('PRT','Part','Part',(#3));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('v1','',#4);\n"
+        + "#6=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#7=PRODUCT_DEFINITION('pd','part def',#5,#6);\n"
+        + "#8=PRODUCT_DEFINITION_SHAPE('pds','shape',#7);\n"
+        + "#9=SHAPE_ASPECT('SA0','base',#8,.T.);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_META_CTX',(),#10);\n"
+        + "#82=REPRESENTATION('REP_META_AUX0',(),#10);\n"
+        + "#83=REPRESENTATION('REP_META_AUX1',(),#10);\n"
+        + "#84=REPRESENTATION_RELATIONSHIP('RR_VAR','',#11,#82);\n"
+        + "#85=CARTESIAN_POINT('TX0',(20.0,0.0,0.0));\n"
+        + "#86=CARTESIAN_POINT('TX1',(21.0,0.0,0.0));\n"
+        + "#87=DIRECTION('DZV',(0.0,0.0,1.0));\n"
+        + "#88=DIRECTION('DXV',(1.0,0.0,0.0));\n"
+        + "#89=AXIS2_PLACEMENT_3D('AXV0',#85,#87,#88);\n"
+        + "#90=AXIS2_PLACEMENT_3D('AXV1',#86,#87,#88);\n"
+        + "#91=ITEM_DEFINED_TRANSFORMATION('TV','',#89,#90);\n"
+        + "#92=(REPRESENTATION_RELATIONSHIP('RRT_VAR','',#11,#83)\n"
+        + "    REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#91));\n"
+        + "#93=SHAPE_REPRESENTATION_RELATIONSHIP('SRR_VAR','',#11,#82);\n"
+        + "#12=SHAPE_DEFINITION_REPRESENTATION(#8,#11);\n"
+        + "#13=CHARACTERIZED_OBJECT('CO','characterized object');\n"
+        + "#14=PROPERTY_DEFINITION('PD_CO','',#13);\n"
+        + "#15=ABSTRACT_VARIABLE(#14,#11);\n"
+        + "#16=ROW_VARIABLE(#14,#11);\n"
+        + "#17=SCALAR_VARIABLE(#14,#11);\n"
+        + "#18=FORWARD_CHAINING_RULE_PREMISE(#14,#11);\n"
+        + "#19=BACK_CHAINING_RULE_BODY(#14,#11);\n"
+        + "#20=CALENDAR_DATE(2026,11,4);\n"
+        + "#21=DATE_ROLE('release');\n"
+        + "#22=APPLIED_DATE_ASSIGNMENT(#20,#21,(#9));\n"
+        + "#23=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#24=LOCAL_TIME(9,15,$,#23);\n"
+        + "#25=DATE_AND_TIME(#20,#24);\n"
+        + "#26=DATE_TIME_ROLE('created');\n"
+        + "#27=APPLIED_DATE_AND_TIME_ASSIGNMENT(#25,#26,(#9));\n"
+        + "#28=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#29=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#30=PERSON_AND_ORGANIZATION(#28,#29);\n"
+        + "#31=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#32=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#30,#31,(#9));\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#48=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#49=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#50=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#51=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P12',(12.0,0.0,0.0));\n"
+        + "#53=ANNOTATION_TEXT_OCCURRENCE('NOTE_APP_PROTOCOL','',#40);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_CONTEXT','',#41);\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_DEF_CONTEXT','',#42);\n"
+        + "#56=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHARACTERIZED_OBJECT','',#43);\n"
+        + "#57=ANNOTATION_TEXT_OCCURRENCE('NOTE_ABSTRACT_VARIABLE','',#44);\n"
+        + "#58=ANNOTATION_TEXT_OCCURRENCE('NOTE_ROW_VARIABLE','',#45);\n"
+        + "#59=ANNOTATION_TEXT_OCCURRENCE('NOTE_SCALAR_VARIABLE','',#46);\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORWARD_RULE','',#47);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_BACK_RULE','',#48);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_CALENDAR_DATE','',#49);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_AND_TIME','',#50);\n"
+        + "#64=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOCAL_TIME','',#51);\n"
+        + "#65=ANNOTATION_TEXT_OCCURRENCE('NOTE_UTC_OFFSET','',#52);\n"
+        + "#66=CARTESIAN_POINT('P13',(13.0,0.0,0.0));\n"
+        + "#67=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON','',#66);\n"
+        + "#68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#2,#11,#53,#9);\n"
+        + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#3,#11,#54,#9);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#6,#11,#55,#9);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#13,#11,#56,#9);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#15,#11,#57,#9);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#16,#11,#58,#9);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#17,#11,#59,#9);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#18,#11,#60,#9);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#19,#11,#61,#9);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#20,#11,#62,#9);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#25,#11,#63,#9);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#24,#11,#64,#9);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#23,#11,#65,#9);\n"
+        + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#28,#11,#67,#9);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3091,118 +3050,117 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMetadataRolesStatusesAndTypesInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_ROLES',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=APPROVAL_STATUS('released');
-                #13=APPROVAL(#12,'design');
-                #14=APPLIED_APPROVAL_ASSIGNMENT(#13,(#8));
-                #15=SECURITY_CLASSIFICATION_LEVEL('controlled');
-                #16=SECURITY_CLASSIFICATION('sec','purpose',#15);
-                #17=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#16,(#8));
-                #18=CONTRACT_TYPE('purchase');
-                #19=CONTRACT('C-1','supply',#18);
-                #20=APPLIED_CONTRACT_ASSIGNMENT(#19,(#8));
-                #21=CERTIFICATION_TYPE('material');
-                #22=CERTIFICATION('CERT-1','compliance',#21);
-                #23=APPLIED_CERTIFICATION_ASSIGNMENT(#22,(#8));
-                #24=PERSON('p-1','Doe','Jane',$,$,$);
-                #25=ORGANIZATION('org-1','Acme','engineering');
-                #26=PERSON_AND_ORGANIZATION(#24,#25);
-                #27=APPROVAL_ROLE('authorizer');
-                #28=APPROVAL_PERSON_ORGANIZATION(#26,#13,#27);
-                #108=APPROVAL_DATE_TIME(#41,#13);
-                #29=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #30=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#26,#29,(#8));
-                #31=ORGANIZATION_ROLE('owner');
-                #32=APPLIED_ORGANIZATION_ASSIGNMENT(#25,#31,(#8));
-                #33=GROUP('G1','group');
-                #34=CLASSIFICATION_ROLE('family');
-                #35=APPLIED_CLASSIFICATION_ASSIGNMENT(#33,#34,(#8));
-                #36=CALENDAR_DATE(2026,11,4);
-                #37=DATE_ROLE('release');
-                #38=APPLIED_DATE_ASSIGNMENT(#36,#37,(#8));
-                #39=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #40=LOCAL_TIME(9,15,$,#39);
-                #41=DATE_AND_TIME(#36,#40);
-                #42=DATE_TIME_ROLE('created');
-                #43=APPLIED_DATE_AND_TIME_ASSIGNMENT(#41,#42,(#8));
-                #44=IDENTIFICATION_ROLE('identifier');
-                #45=EXTERNAL_SOURCE('SRC_EXT');
-                #46=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#44,#45,(#8));
-                #47=DOCUMENT_TYPE('spec');
-                #48=DOCUMENT('DOC-1','Spec A','',#47);
-                #49=PROPERTY_DEFINITION('PD_DOC','',#48);
-                #50=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);
-                #51=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #53=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #54=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #55=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #56=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #57=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #58=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #59=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #60=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_STATUS','',#51);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_LEVEL','',#52);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT_TYPE','',#53);
-                #64=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION_TYPE','',#54);
-                #65=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ROLE','',#55);
-                #66=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG_ROLE','',#56);
-                #67=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORG_ROLE','',#57);
-                #68=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ROLE','',#58);
-                #69=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ROLE','',#59);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ROLE','',#60);
-                #71=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #72=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #73=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ROLE','',#71);
-                #74=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT_TYPE','',#72);
-                #75=CARTESIAN_POINT('P12',(12.0,0.0,0.0));
-                #76=CARTESIAN_POINT('P13',(13.0,0.0,0.0));
-                #77=CARTESIAN_POINT('P14',(14.0,0.0,0.0));
-                #78=CARTESIAN_POINT('P15',(15.0,0.0,0.0));
-                #79=CARTESIAN_POINT('P16',(16.0,0.0,0.0));
-                #80=CARTESIAN_POINT('P17',(17.0,0.0,0.0));
-                #81=CARTESIAN_POINT('P18',(18.0,0.0,0.0));
-                #82=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#75);
-                #83=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#76);
-                #84=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#77);
-                #85=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#78);
-                #86=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#79);
-                #87=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_PERSON_ORG','',#80);
-                #88=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_DATE_TIME','',#81);
-                #89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#61,#8);
-                #90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#15,#10,#62,#8);
-                #91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#18,#10,#63,#8);
-                #92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#10,#64,#8);
-                #93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#65,#8);
-                #94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#29,#10,#66,#8);
-                #95=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#67,#8);
-                #96=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#68,#8);
-                #97=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#37,#10,#69,#8);
-                #98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#70,#8);
-                #99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#44,#10,#73,#8);
-                #100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#47,#10,#74,#8);
-                #101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#13,#10,#82,#8);
-                #102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#16,#10,#83,#8);
-                #103=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#19,#10,#84,#8);
-                #104=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#22,#10,#85,#8);
-                #105=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#26,#10,#86,#8);
-                #106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#28,#10,#87,#8);
-                #107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#108,#10,#88,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_ROLES',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=APPROVAL_STATUS('released');\n"
+        + "#13=APPROVAL(#12,'design');\n"
+        + "#14=APPLIED_APPROVAL_ASSIGNMENT(#13,(#8));\n"
+        + "#15=SECURITY_CLASSIFICATION_LEVEL('controlled');\n"
+        + "#16=SECURITY_CLASSIFICATION('sec','purpose',#15);\n"
+        + "#17=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#16,(#8));\n"
+        + "#18=CONTRACT_TYPE('purchase');\n"
+        + "#19=CONTRACT('C-1','supply',#18);\n"
+        + "#20=APPLIED_CONTRACT_ASSIGNMENT(#19,(#8));\n"
+        + "#21=CERTIFICATION_TYPE('material');\n"
+        + "#22=CERTIFICATION('CERT-1','compliance',#21);\n"
+        + "#23=APPLIED_CERTIFICATION_ASSIGNMENT(#22,(#8));\n"
+        + "#24=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#25=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#26=PERSON_AND_ORGANIZATION(#24,#25);\n"
+        + "#27=APPROVAL_ROLE('authorizer');\n"
+        + "#28=APPROVAL_PERSON_ORGANIZATION(#26,#13,#27);\n"
+        + "#108=APPROVAL_DATE_TIME(#41,#13);\n"
+        + "#29=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#30=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#26,#29,(#8));\n"
+        + "#31=ORGANIZATION_ROLE('owner');\n"
+        + "#32=APPLIED_ORGANIZATION_ASSIGNMENT(#25,#31,(#8));\n"
+        + "#33=GROUP('G1','group');\n"
+        + "#34=CLASSIFICATION_ROLE('family');\n"
+        + "#35=APPLIED_CLASSIFICATION_ASSIGNMENT(#33,#34,(#8));\n"
+        + "#36=CALENDAR_DATE(2026,11,4);\n"
+        + "#37=DATE_ROLE('release');\n"
+        + "#38=APPLIED_DATE_ASSIGNMENT(#36,#37,(#8));\n"
+        + "#39=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#40=LOCAL_TIME(9,15,$,#39);\n"
+        + "#41=DATE_AND_TIME(#36,#40);\n"
+        + "#42=DATE_TIME_ROLE('created');\n"
+        + "#43=APPLIED_DATE_AND_TIME_ASSIGNMENT(#41,#42,(#8));\n"
+        + "#44=IDENTIFICATION_ROLE('identifier');\n"
+        + "#45=EXTERNAL_SOURCE('SRC_EXT');\n"
+        + "#46=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#44,#45,(#8));\n"
+        + "#47=DOCUMENT_TYPE('spec');\n"
+        + "#48=DOCUMENT('DOC-1','Spec A','',#47);\n"
+        + "#49=PROPERTY_DEFINITION('PD_DOC','',#48);\n"
+        + "#50=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);\n"
+        + "#51=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#54=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#55=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#56=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#57=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#58=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#59=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#60=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_STATUS','',#51);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_LEVEL','',#52);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT_TYPE','',#53);\n"
+        + "#64=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION_TYPE','',#54);\n"
+        + "#65=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ROLE','',#55);\n"
+        + "#66=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG_ROLE','',#56);\n"
+        + "#67=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORG_ROLE','',#57);\n"
+        + "#68=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ROLE','',#58);\n"
+        + "#69=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ROLE','',#59);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ROLE','',#60);\n"
+        + "#71=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#72=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#73=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ROLE','',#71);\n"
+        + "#74=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT_TYPE','',#72);\n"
+        + "#75=CARTESIAN_POINT('P12',(12.0,0.0,0.0));\n"
+        + "#76=CARTESIAN_POINT('P13',(13.0,0.0,0.0));\n"
+        + "#77=CARTESIAN_POINT('P14',(14.0,0.0,0.0));\n"
+        + "#78=CARTESIAN_POINT('P15',(15.0,0.0,0.0));\n"
+        + "#79=CARTESIAN_POINT('P16',(16.0,0.0,0.0));\n"
+        + "#80=CARTESIAN_POINT('P17',(17.0,0.0,0.0));\n"
+        + "#81=CARTESIAN_POINT('P18',(18.0,0.0,0.0));\n"
+        + "#82=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#75);\n"
+        + "#83=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#76);\n"
+        + "#84=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#77);\n"
+        + "#85=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERTIFICATION','',#78);\n"
+        + "#86=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#79);\n"
+        + "#87=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_PERSON_ORG','',#80);\n"
+        + "#88=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_DATE_TIME','',#81);\n"
+        + "#89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#61,#8);\n"
+        + "#90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#15,#10,#62,#8);\n"
+        + "#91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#18,#10,#63,#8);\n"
+        + "#92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#10,#64,#8);\n"
+        + "#93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#65,#8);\n"
+        + "#94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#29,#10,#66,#8);\n"
+        + "#95=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#67,#8);\n"
+        + "#96=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#68,#8);\n"
+        + "#97=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#37,#10,#69,#8);\n"
+        + "#98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#70,#8);\n"
+        + "#99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#44,#10,#73,#8);\n"
+        + "#100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#47,#10,#74,#8);\n"
+        + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#13,#10,#82,#8);\n"
+        + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#16,#10,#83,#8);\n"
+        + "#103=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#19,#10,#84,#8);\n"
+        + "#104=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#22,#10,#85,#8);\n"
+        + "#105=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#26,#10,#86,#8);\n"
+        + "#106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#28,#10,#87,#8);\n"
+        + "#107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#108,#10,#88,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3288,172 +3246,171 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMetadataLeafAndEndpointLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_DIRECT_META',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=CALENDAR_DATE(2026,11,4);
-                #23=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #24=LOCAL_TIME(9,15,$,#23);
-                #25=DATE_AND_TIME(#22,#24);
-                #26=APPROVAL_STATUS('released');
-                #27=APPROVAL(#26,'design');
-                #28=APPROVAL_ROLE('authorizer');
-                #29=PERSON('p-1','Doe','Jane',$,$,$);
-                #30=ORGANIZATION('org-1','Acme','engineering');
-                #31=PERSON_AND_ORGANIZATION(#29,#30);
-                #32=APPROVAL_PERSON_ORGANIZATION(#31,#27,#28);
-                #33=APPROVAL_DATE_TIME(#25,#27);
-                #34=SECURITY_CLASSIFICATION_LEVEL('controlled');
-                #35=SECURITY_CLASSIFICATION('sec','purpose',#34);
-                #36=CONTRACT_TYPE('purchase');
-                #37=CONTRACT('C-1','supply',#36);
-                #38=CERTIFICATION_TYPE('material');
-                #39=CERTIFICATION('CERT-1','compliance',#38);
-                #40=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #41=ORGANIZATION_ROLE('owner');
-                #42=CLASSIFICATION_ROLE('family');
-                #43=DATE_ROLE('release');
-                #44=DATE_TIME_ROLE('created');
-                #45=IDENTIFICATION_ROLE('identifier');
-                #46=DOCUMENT_TYPE('spec');
-                #47=LANGUAGE('en-US');
-                #48=PROPERTY_DEFINITION('PD_CAL_DATE','',#22);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #50=PROPERTY_DEFINITION('PD_ZONE','',#23);
-                #51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);
-                #52=PROPERTY_DEFINITION('PD_LOCAL_TIME','',#24);
-                #53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);
-                #54=PROPERTY_DEFINITION('PD_DATE_TIME','',#25);
-                #55=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);
-                #56=PROPERTY_DEFINITION('PD_APPROVAL_STATUS','',#26);
-                #57=PROPERTY_DEFINITION_REPRESENTATION(#56,#10);
-                #58=PROPERTY_DEFINITION('PD_APPROVAL','',#27);
-                #59=PROPERTY_DEFINITION_REPRESENTATION(#58,#10);
-                #60=PROPERTY_DEFINITION('PD_SECURITY_LEVEL','',#34);
-                #61=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);
-                #62=PROPERTY_DEFINITION('PD_SECURITY','',#35);
-                #63=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);
-                #64=PROPERTY_DEFINITION('PD_CONTRACT_TYPE','',#36);
-                #65=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);
-                #66=PROPERTY_DEFINITION('PD_CONTRACT','',#37);
-                #67=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);
-                #68=PROPERTY_DEFINITION('PD_CERT_TYPE','',#38);
-                #69=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);
-                #70=PROPERTY_DEFINITION('PD_CERT','',#39);
-                #71=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);
-                #72=PROPERTY_DEFINITION('PD_PERSON','',#29);
-                #73=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);
-                #74=PROPERTY_DEFINITION('PD_PERSON_ORG','',#31);
-                #75=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);
-                #76=PROPERTY_DEFINITION('PD_APPROVAL_ROLE','',#28);
-                #77=PROPERTY_DEFINITION_REPRESENTATION(#76,#10);
-                #78=PROPERTY_DEFINITION('PD_PERSON_ORG_ROLE','',#40);
-                #79=PROPERTY_DEFINITION_REPRESENTATION(#78,#10);
-                #80=PROPERTY_DEFINITION('PD_ORG_ROLE','',#41);
-                #81=PROPERTY_DEFINITION_REPRESENTATION(#80,#10);
-                #82=PROPERTY_DEFINITION('PD_CLASS_ROLE','',#42);
-                #83=PROPERTY_DEFINITION_REPRESENTATION(#82,#10);
-                #84=PROPERTY_DEFINITION('PD_DATE_ROLE','',#43);
-                #85=PROPERTY_DEFINITION_REPRESENTATION(#84,#10);
-                #86=PROPERTY_DEFINITION('PD_DATE_TIME_ROLE','',#44);
-                #87=PROPERTY_DEFINITION_REPRESENTATION(#86,#10);
-                #88=PROPERTY_DEFINITION('PD_ID_ROLE','',#45);
-                #89=PROPERTY_DEFINITION_REPRESENTATION(#88,#10);
-                #90=PROPERTY_DEFINITION('PD_DOC_TYPE','',#46);
-                #91=PROPERTY_DEFINITION_REPRESENTATION(#90,#10);
-                #92=PROPERTY_DEFINITION('PD_LANGUAGE','',#47);
-                #93=PROPERTY_DEFINITION_REPRESENTATION(#92,#10);
-                #100=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #101=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #102=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #103=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #104=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #105=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #106=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #107=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #108=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #109=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #110=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #111=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #112=CARTESIAN_POINT('P12',(12.0,0.0,0.0));
-                #113=CARTESIAN_POINT('P13',(13.0,0.0,0.0));
-                #114=CARTESIAN_POINT('P14',(14.0,0.0,0.0));
-                #115=CARTESIAN_POINT('P15',(15.0,0.0,0.0));
-                #116=CARTESIAN_POINT('P16',(16.0,0.0,0.0));
-                #117=ANNOTATION_TEXT_OCCURRENCE('NOTE_CAL_DATE','',#100);
-                #118=ANNOTATION_TEXT_OCCURRENCE('NOTE_ZONE','',#101);
-                #119=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOCAL_TIME','',#102);
-                #120=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME','',#103);
-                #121=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_STATUS','',#104);
-                #122=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#105);
-                #123=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_LEVEL','',#106);
-                #124=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#107);
-                #125=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT_TYPE','',#108);
-                #126=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#109);
-                #127=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERT_TYPE','',#110);
-                #128=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERT','',#111);
-                #129=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON','',#112);
-                #130=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#113);
-                #131=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ROLE','',#114);
-                #132=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG_ROLE','',#115);
-                #133=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORG_ROLE','',#116);
-                #134=CARTESIAN_POINT('P17',(17.0,0.0,0.0));
-                #135=CARTESIAN_POINT('P18',(18.0,0.0,0.0));
-                #136=CARTESIAN_POINT('P19',(19.0,0.0,0.0));
-                #137=CARTESIAN_POINT('P20',(20.0,0.0,0.0));
-                #138=CARTESIAN_POINT('P21',(21.0,0.0,0.0));
-                #139=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ROLE','',#134);
-                #140=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ROLE','',#135);
-                #141=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ROLE','',#136);
-                #142=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ROLE','',#137);
-                #143=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_TYPE','',#138);
-                #144=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#139);
-                #145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#117,#8);
-                #146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#118,#8);
-                #147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#119,#8);
-                #148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#120,#8);
-                #149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#26,#10,#121,#8);
-                #150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#27,#10,#122,#8);
-                #151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#34,#10,#123,#8);
-                #152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#35,#10,#124,#8);
-                #153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#36,#10,#125,#8);
-                #154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#37,#10,#126,#8);
-                #155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#38,#10,#127,#8);
-                #156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#39,#10,#128,#8);
-                #157=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#29,#10,#129,#8);
-                #158=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#31,#10,#130,#8);
-                #159=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#28,#10,#131,#8);
-                #160=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#40,#10,#132,#8);
-                #161=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#41,#10,#133,#8);
-                #162=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#42,#10,#139,#8);
-                #163=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#43,#10,#140,#8);
-                #164=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#44,#10,#141,#8);
-                #165=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#45,#10,#142,#8);
-                #166=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#46,#10,#143,#8);
-                #167=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#47,#10,#144,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_DIRECT_META',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=CALENDAR_DATE(2026,11,4);\n"
+        + "#23=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#24=LOCAL_TIME(9,15,$,#23);\n"
+        + "#25=DATE_AND_TIME(#22,#24);\n"
+        + "#26=APPROVAL_STATUS('released');\n"
+        + "#27=APPROVAL(#26,'design');\n"
+        + "#28=APPROVAL_ROLE('authorizer');\n"
+        + "#29=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#30=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#31=PERSON_AND_ORGANIZATION(#29,#30);\n"
+        + "#32=APPROVAL_PERSON_ORGANIZATION(#31,#27,#28);\n"
+        + "#33=APPROVAL_DATE_TIME(#25,#27);\n"
+        + "#34=SECURITY_CLASSIFICATION_LEVEL('controlled');\n"
+        + "#35=SECURITY_CLASSIFICATION('sec','purpose',#34);\n"
+        + "#36=CONTRACT_TYPE('purchase');\n"
+        + "#37=CONTRACT('C-1','supply',#36);\n"
+        + "#38=CERTIFICATION_TYPE('material');\n"
+        + "#39=CERTIFICATION('CERT-1','compliance',#38);\n"
+        + "#40=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#41=ORGANIZATION_ROLE('owner');\n"
+        + "#42=CLASSIFICATION_ROLE('family');\n"
+        + "#43=DATE_ROLE('release');\n"
+        + "#44=DATE_TIME_ROLE('created');\n"
+        + "#45=IDENTIFICATION_ROLE('identifier');\n"
+        + "#46=DOCUMENT_TYPE('spec');\n"
+        + "#47=LANGUAGE('en-US');\n"
+        + "#48=PROPERTY_DEFINITION('PD_CAL_DATE','',#22);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#50=PROPERTY_DEFINITION('PD_ZONE','',#23);\n"
+        + "#51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);\n"
+        + "#52=PROPERTY_DEFINITION('PD_LOCAL_TIME','',#24);\n"
+        + "#53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);\n"
+        + "#54=PROPERTY_DEFINITION('PD_DATE_TIME','',#25);\n"
+        + "#55=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);\n"
+        + "#56=PROPERTY_DEFINITION('PD_APPROVAL_STATUS','',#26);\n"
+        + "#57=PROPERTY_DEFINITION_REPRESENTATION(#56,#10);\n"
+        + "#58=PROPERTY_DEFINITION('PD_APPROVAL','',#27);\n"
+        + "#59=PROPERTY_DEFINITION_REPRESENTATION(#58,#10);\n"
+        + "#60=PROPERTY_DEFINITION('PD_SECURITY_LEVEL','',#34);\n"
+        + "#61=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);\n"
+        + "#62=PROPERTY_DEFINITION('PD_SECURITY','',#35);\n"
+        + "#63=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);\n"
+        + "#64=PROPERTY_DEFINITION('PD_CONTRACT_TYPE','',#36);\n"
+        + "#65=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);\n"
+        + "#66=PROPERTY_DEFINITION('PD_CONTRACT','',#37);\n"
+        + "#67=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);\n"
+        + "#68=PROPERTY_DEFINITION('PD_CERT_TYPE','',#38);\n"
+        + "#69=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);\n"
+        + "#70=PROPERTY_DEFINITION('PD_CERT','',#39);\n"
+        + "#71=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);\n"
+        + "#72=PROPERTY_DEFINITION('PD_PERSON','',#29);\n"
+        + "#73=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);\n"
+        + "#74=PROPERTY_DEFINITION('PD_PERSON_ORG','',#31);\n"
+        + "#75=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);\n"
+        + "#76=PROPERTY_DEFINITION('PD_APPROVAL_ROLE','',#28);\n"
+        + "#77=PROPERTY_DEFINITION_REPRESENTATION(#76,#10);\n"
+        + "#78=PROPERTY_DEFINITION('PD_PERSON_ORG_ROLE','',#40);\n"
+        + "#79=PROPERTY_DEFINITION_REPRESENTATION(#78,#10);\n"
+        + "#80=PROPERTY_DEFINITION('PD_ORG_ROLE','',#41);\n"
+        + "#81=PROPERTY_DEFINITION_REPRESENTATION(#80,#10);\n"
+        + "#82=PROPERTY_DEFINITION('PD_CLASS_ROLE','',#42);\n"
+        + "#83=PROPERTY_DEFINITION_REPRESENTATION(#82,#10);\n"
+        + "#84=PROPERTY_DEFINITION('PD_DATE_ROLE','',#43);\n"
+        + "#85=PROPERTY_DEFINITION_REPRESENTATION(#84,#10);\n"
+        + "#86=PROPERTY_DEFINITION('PD_DATE_TIME_ROLE','',#44);\n"
+        + "#87=PROPERTY_DEFINITION_REPRESENTATION(#86,#10);\n"
+        + "#88=PROPERTY_DEFINITION('PD_ID_ROLE','',#45);\n"
+        + "#89=PROPERTY_DEFINITION_REPRESENTATION(#88,#10);\n"
+        + "#90=PROPERTY_DEFINITION('PD_DOC_TYPE','',#46);\n"
+        + "#91=PROPERTY_DEFINITION_REPRESENTATION(#90,#10);\n"
+        + "#92=PROPERTY_DEFINITION('PD_LANGUAGE','',#47);\n"
+        + "#93=PROPERTY_DEFINITION_REPRESENTATION(#92,#10);\n"
+        + "#100=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#101=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#102=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#103=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#104=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#105=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#106=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#107=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#108=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#109=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#110=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#111=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#112=CARTESIAN_POINT('P12',(12.0,0.0,0.0));\n"
+        + "#113=CARTESIAN_POINT('P13',(13.0,0.0,0.0));\n"
+        + "#114=CARTESIAN_POINT('P14',(14.0,0.0,0.0));\n"
+        + "#115=CARTESIAN_POINT('P15',(15.0,0.0,0.0));\n"
+        + "#116=CARTESIAN_POINT('P16',(16.0,0.0,0.0));\n"
+        + "#117=ANNOTATION_TEXT_OCCURRENCE('NOTE_CAL_DATE','',#100);\n"
+        + "#118=ANNOTATION_TEXT_OCCURRENCE('NOTE_ZONE','',#101);\n"
+        + "#119=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOCAL_TIME','',#102);\n"
+        + "#120=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME','',#103);\n"
+        + "#121=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_STATUS','',#104);\n"
+        + "#122=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL','',#105);\n"
+        + "#123=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_LEVEL','',#106);\n"
+        + "#124=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY','',#107);\n"
+        + "#125=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT_TYPE','',#108);\n"
+        + "#126=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTRACT','',#109);\n"
+        + "#127=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERT_TYPE','',#110);\n"
+        + "#128=ANNOTATION_TEXT_OCCURRENCE('NOTE_CERT','',#111);\n"
+        + "#129=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON','',#112);\n"
+        + "#130=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG','',#113);\n"
+        + "#131=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ROLE','',#114);\n"
+        + "#132=ANNOTATION_TEXT_OCCURRENCE('NOTE_PERSON_ORG_ROLE','',#115);\n"
+        + "#133=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORG_ROLE','',#116);\n"
+        + "#134=CARTESIAN_POINT('P17',(17.0,0.0,0.0));\n"
+        + "#135=CARTESIAN_POINT('P18',(18.0,0.0,0.0));\n"
+        + "#136=CARTESIAN_POINT('P19',(19.0,0.0,0.0));\n"
+        + "#137=CARTESIAN_POINT('P20',(20.0,0.0,0.0));\n"
+        + "#138=CARTESIAN_POINT('P21',(21.0,0.0,0.0));\n"
+        + "#139=ANNOTATION_TEXT_OCCURRENCE('NOTE_CLASS_ROLE','',#134);\n"
+        + "#140=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ROLE','',#135);\n"
+        + "#141=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_TIME_ROLE','',#136);\n"
+        + "#142=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ROLE','',#137);\n"
+        + "#143=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_TYPE','',#138);\n"
+        + "#144=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANGUAGE','',#139);\n"
+        + "#145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#117,#8);\n"
+        + "#146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#118,#8);\n"
+        + "#147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#119,#8);\n"
+        + "#148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#120,#8);\n"
+        + "#149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#26,#10,#121,#8);\n"
+        + "#150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#27,#10,#122,#8);\n"
+        + "#151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#34,#10,#123,#8);\n"
+        + "#152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#35,#10,#124,#8);\n"
+        + "#153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#36,#10,#125,#8);\n"
+        + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#37,#10,#126,#8);\n"
+        + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#38,#10,#127,#8);\n"
+        + "#156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#39,#10,#128,#8);\n"
+        + "#157=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#29,#10,#129,#8);\n"
+        + "#158=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#31,#10,#130,#8);\n"
+        + "#159=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#28,#10,#131,#8);\n"
+        + "#160=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#40,#10,#132,#8);\n"
+        + "#161=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#41,#10,#133,#8);\n"
+        + "#162=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#42,#10,#139,#8);\n"
+        + "#163=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#43,#10,#140,#8);\n"
+        + "#164=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#44,#10,#141,#8);\n"
+        + "#165=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#45,#10,#142,#8);\n"
+        + "#166=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#46,#10,#143,#8);\n"
+        + "#167=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#47,#10,#144,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3739,91 +3696,90 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMetadataWrapperLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_WRAP',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=NAME_ATTRIBUTE('N0',#8);
-                #23=DESCRIPTION_ATTRIBUTE('D0',#8);
-                #24=ID_ATTRIBUTE('I0',#8);
-                #25=NAME_ASSIGNMENT('NAME_META');
-                #26=IDENTIFICATION_ROLE('role');
-                #27=IDENTIFICATION_ASSIGNMENT('ID_META',#26);
-                #28=EXTERNAL_SOURCE('SRC');
-                #29=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT_META',#26,#28);
-                #30=APPLIED_NAME_ASSIGNMENT('APPLIED_NAME',(#8));
-                #31=APPLIED_IDENTIFICATION_ASSIGNMENT('APPLIED_ID',#26,(#8));
-                #32=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('APPLIED_EXT',#26,#28,(#8));
-                #33=EXTERNAL_SOURCE('SRC_LINK');
-                #34=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#28,#33);
-                #35=EXTERNALLY_DEFINED_ITEM('EXT-LINK',#33);
-                #36=PROPERTY_DEFINITION('PD_NAME_ATTR','',#22);
-                #37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);
-                #38=PROPERTY_DEFINITION('PD_DESC_ATTR','',#23);
-                #39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);
-                #40=PROPERTY_DEFINITION('PD_ID_ATTR','',#24);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #42=PROPERTY_DEFINITION('PD_NAME_ASSIGN','',#25);
-                #43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #44=PROPERTY_DEFINITION('PD_ID_ASSIGN','',#27);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #46=PROPERTY_DEFINITION('PD_EXT_ASSIGN','',#29);
-                #47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);
-                #48=PROPERTY_DEFINITION('PD_APPLIED_NAME','',#30);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #50=PROPERTY_DEFINITION('PD_APPLIED_ID','',#31);
-                #51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);
-                #52=PROPERTY_DEFINITION('PD_APPLIED_EXT','',#32);
-                #53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);
-                #60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #69=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ATTR','',#60);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ATTR','',#61);
-                #71=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ATTR','',#62);
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ASSIGN','',#63);
-                #73=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ASSIGN','',#64);
-                #74=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ASSIGN','',#65);
-                #75=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_NAME','',#66);
-                #76=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_ID','',#67);
-                #77=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_EXT','',#68);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#69,#8);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#70,#8);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#71,#8);
-                #81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#72,#8);
-                #82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#73,#8);
-                #83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#29,#10,#74,#8);
-                #84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#30,#10,#75,#8);
-                #85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#76,#8);
-                #86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#32,#10,#77,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_WRAP',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=NAME_ATTRIBUTE('N0',#8);\n"
+        + "#23=DESCRIPTION_ATTRIBUTE('D0',#8);\n"
+        + "#24=ID_ATTRIBUTE('I0',#8);\n"
+        + "#25=NAME_ASSIGNMENT('NAME_META');\n"
+        + "#26=IDENTIFICATION_ROLE('role');\n"
+        + "#27=IDENTIFICATION_ASSIGNMENT('ID_META',#26);\n"
+        + "#28=EXTERNAL_SOURCE('SRC');\n"
+        + "#29=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT_META',#26,#28);\n"
+        + "#30=APPLIED_NAME_ASSIGNMENT('APPLIED_NAME',(#8));\n"
+        + "#31=APPLIED_IDENTIFICATION_ASSIGNMENT('APPLIED_ID',#26,(#8));\n"
+        + "#32=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('APPLIED_EXT',#26,#28,(#8));\n"
+        + "#33=EXTERNAL_SOURCE('SRC_LINK');\n"
+        + "#34=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#28,#33);\n"
+        + "#35=EXTERNALLY_DEFINED_ITEM('EXT-LINK',#33);\n"
+        + "#36=PROPERTY_DEFINITION('PD_NAME_ATTR','',#22);\n"
+        + "#37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);\n"
+        + "#38=PROPERTY_DEFINITION('PD_DESC_ATTR','',#23);\n"
+        + "#39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);\n"
+        + "#40=PROPERTY_DEFINITION('PD_ID_ATTR','',#24);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#42=PROPERTY_DEFINITION('PD_NAME_ASSIGN','',#25);\n"
+        + "#43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#44=PROPERTY_DEFINITION('PD_ID_ASSIGN','',#27);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#46=PROPERTY_DEFINITION('PD_EXT_ASSIGN','',#29);\n"
+        + "#47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);\n"
+        + "#48=PROPERTY_DEFINITION('PD_APPLIED_NAME','',#30);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#50=PROPERTY_DEFINITION('PD_APPLIED_ID','',#31);\n"
+        + "#51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);\n"
+        + "#52=PROPERTY_DEFINITION('PD_APPLIED_EXT','',#32);\n"
+        + "#53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);\n"
+        + "#60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#69=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ATTR','',#60);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ATTR','',#61);\n"
+        + "#71=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ATTR','',#62);\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE_NAME_ASSIGN','',#63);\n"
+        + "#73=ANNOTATION_TEXT_OCCURRENCE('NOTE_ID_ASSIGN','',#64);\n"
+        + "#74=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ASSIGN','',#65);\n"
+        + "#75=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_NAME','',#66);\n"
+        + "#76=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_ID','',#67);\n"
+        + "#77=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_EXT','',#68);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#69,#8);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#70,#8);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#71,#8);\n"
+        + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#72,#8);\n"
+        + "#82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#73,#8);\n"
+        + "#83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#29,#10,#74,#8);\n"
+        + "#84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#30,#10,#75,#8);\n"
+        + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#76,#8);\n"
+        + "#86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#32,#10,#77,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3977,77 +3933,76 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectDocumentGroupAndExternalSourceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_DOC_META',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=GROUP('G1','group');
-                #23=DOCUMENT_TYPE('spec');
-                #24=DOCUMENT('DOC-1','Spec A','',#23);
-                #25=DOCUMENT_REFERENCE(#24,'internal');
-                #26=APPLIED_DOCUMENT_REFERENCE(#24,'applied',(#8));
-                #27=EXTERNAL_SOURCE('SRC');
-                #28=EXTERNALLY_DEFINED_ITEM('EXT-1',#27);
-                #29=EXTERNAL_SOURCE('SRC_LINK');
-                #30=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#27,#29);
-                #31=DOCUMENT_USAGE_CONSTRAINT(#24,'SECTION','7.1');
-                #32=PROPERTY_DEFINITION('PD_GROUP','',#22);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);
-                #34=PROPERTY_DEFINITION('PD_DOCUMENT','',#24);
-                #35=PROPERTY_DEFINITION_REPRESENTATION(#34,#10);
-                #36=PROPERTY_DEFINITION('PD_DOC_REF','',#25);
-                #37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);
-                #38=PROPERTY_DEFINITION('PD_APPLIED_DOC_REF','',#26);
-                #39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);
-                #40=PROPERTY_DEFINITION('PD_EXT_SOURCE','',#27);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #42=PROPERTY_DEFINITION('PD_EXT_ITEM','',#28);
-                #43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #44=PROPERTY_DEFINITION('PD_DOC_USAGE','',#31);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #50=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #51=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #52=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #53=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #54=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #55=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #56=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #57=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP','',#50);
-                #58=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#51);
-                #59=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_REF','',#52);
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_DOC_REF','',#53);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_SOURCE','',#54);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ITEM','',#55);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_USAGE','',#56);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#57,#8);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#24,#10,#58,#8);
-                #66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#25,#10,#59,#8);
-                #67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#60,#8);
-                #68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#61,#8);
-                #69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#10,#62,#8);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#63,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_DOC_META',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=GROUP('G1','group');\n"
+        + "#23=DOCUMENT_TYPE('spec');\n"
+        + "#24=DOCUMENT('DOC-1','Spec A','',#23);\n"
+        + "#25=DOCUMENT_REFERENCE(#24,'internal');\n"
+        + "#26=APPLIED_DOCUMENT_REFERENCE(#24,'applied',(#8));\n"
+        + "#27=EXTERNAL_SOURCE('SRC');\n"
+        + "#28=EXTERNALLY_DEFINED_ITEM('EXT-1',#27);\n"
+        + "#29=EXTERNAL_SOURCE('SRC_LINK');\n"
+        + "#30=EXTERNAL_SOURCE_RELATIONSHIP('SR','',#27,#29);\n"
+        + "#31=DOCUMENT_USAGE_CONSTRAINT(#24,'SECTION','7.1');\n"
+        + "#32=PROPERTY_DEFINITION('PD_GROUP','',#22);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);\n"
+        + "#34=PROPERTY_DEFINITION('PD_DOCUMENT','',#24);\n"
+        + "#35=PROPERTY_DEFINITION_REPRESENTATION(#34,#10);\n"
+        + "#36=PROPERTY_DEFINITION('PD_DOC_REF','',#25);\n"
+        + "#37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);\n"
+        + "#38=PROPERTY_DEFINITION('PD_APPLIED_DOC_REF','',#26);\n"
+        + "#39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);\n"
+        + "#40=PROPERTY_DEFINITION('PD_EXT_SOURCE','',#27);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#42=PROPERTY_DEFINITION('PD_EXT_ITEM','',#28);\n"
+        + "#43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#44=PROPERTY_DEFINITION('PD_DOC_USAGE','',#31);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#50=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#51=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#54=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#55=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#56=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#57=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP','',#50);\n"
+        + "#58=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOCUMENT','',#51);\n"
+        + "#59=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_REF','',#52);\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_DOC_REF','',#53);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_SOURCE','',#54);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_EXT_ITEM','',#55);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOC_USAGE','',#56);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#57,#8);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#24,#10,#58,#8);\n"
+        + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#25,#10,#59,#8);\n"
+        + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#60,#8);\n"
+        + "#68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#61,#8);\n"
+        + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#10,#62,#8);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#63,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4173,80 +4128,79 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAssignmentCarrierLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_ASSIGN',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=APPROVAL_STATUS('approved');
-                #23=APPROVAL(#22,'design');
-                #24=APPROVAL_ASSIGNMENT(#23);
-                #25=SECURITY_CLASSIFICATION_LEVEL('controlled');
-                #26=SECURITY_CLASSIFICATION('sec','purpose',#25);
-                #27=SECURITY_CLASSIFICATION_ASSIGNMENT(#26);
-                #28=DATE_ROLE('release');
-                #29=CALENDAR_DATE(2026,11,4);
-                #30=DATE_ASSIGNMENT(#29,#28);
-                #31=LANGUAGE('en-US');
-                #32=LANGUAGE_ASSIGNMENT(#31);
-                #33=GROUP('G1','group');
-                #34=GROUP_ASSIGNMENT(#33);
-                #35=PERSON('p-1','Doe','Jane',$,$,$);
-                #36=ORGANIZATION('org-1','Acme','engineering');
-                #37=PERSON_AND_ORGANIZATION(#35,#36);
-                #38=PERSON_AND_ORGANIZATION_ROLE('creator');
-                #39=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#37,#38,(#8));
-                #40=PROPERTY_DEFINITION('PD_APPROVAL_ASSIGN','',#24);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #42=PROPERTY_DEFINITION('PD_SECURITY_ASSIGN','',#27);
-                #43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #44=PROPERTY_DEFINITION('PD_DATE_ASSIGN','',#30);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #46=PROPERTY_DEFINITION('PD_LANG_ASSIGN','',#32);
-                #47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);
-                #48=PROPERTY_DEFINITION('PD_GROUP_ASSIGN','',#34);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #50=PROPERTY_DEFINITION('PD_APPLIED_PERSON_ORG_ASSIGN','',#39);
-                #51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);
-                #60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #66=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ASSIGN','',#60);
-                #67=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_ASSIGN','',#61);
-                #68=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ASSIGN','',#62);
-                #69=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANG_ASSIGN','',#63);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP_ASSIGN','',#64);
-                #71=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_PERSON_ORG_ASSIGN','',#65);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#66,#8);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#27,#10,#67,#8);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#30,#10,#68,#8);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#10,#69,#8);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#70,#8);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#39,#10,#71,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_ASSIGN',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=APPROVAL_STATUS('approved');\n"
+        + "#23=APPROVAL(#22,'design');\n"
+        + "#24=APPROVAL_ASSIGNMENT(#23);\n"
+        + "#25=SECURITY_CLASSIFICATION_LEVEL('controlled');\n"
+        + "#26=SECURITY_CLASSIFICATION('sec','purpose',#25);\n"
+        + "#27=SECURITY_CLASSIFICATION_ASSIGNMENT(#26);\n"
+        + "#28=DATE_ROLE('release');\n"
+        + "#29=CALENDAR_DATE(2026,11,4);\n"
+        + "#30=DATE_ASSIGNMENT(#29,#28);\n"
+        + "#31=LANGUAGE('en-US');\n"
+        + "#32=LANGUAGE_ASSIGNMENT(#31);\n"
+        + "#33=GROUP('G1','group');\n"
+        + "#34=GROUP_ASSIGNMENT(#33);\n"
+        + "#35=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#36=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#37=PERSON_AND_ORGANIZATION(#35,#36);\n"
+        + "#38=PERSON_AND_ORGANIZATION_ROLE('creator');\n"
+        + "#39=APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT(#37,#38,(#8));\n"
+        + "#40=PROPERTY_DEFINITION('PD_APPROVAL_ASSIGN','',#24);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#42=PROPERTY_DEFINITION('PD_SECURITY_ASSIGN','',#27);\n"
+        + "#43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#44=PROPERTY_DEFINITION('PD_DATE_ASSIGN','',#30);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#46=PROPERTY_DEFINITION('PD_LANG_ASSIGN','',#32);\n"
+        + "#47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);\n"
+        + "#48=PROPERTY_DEFINITION('PD_GROUP_ASSIGN','',#34);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#50=PROPERTY_DEFINITION('PD_APPLIED_PERSON_ORG_ASSIGN','',#39);\n"
+        + "#51=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);\n"
+        + "#60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#66=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_ASSIGN','',#60);\n"
+        + "#67=ANNOTATION_TEXT_OCCURRENCE('NOTE_SECURITY_ASSIGN','',#61);\n"
+        + "#68=ANNOTATION_TEXT_OCCURRENCE('NOTE_DATE_ASSIGN','',#62);\n"
+        + "#69=ANNOTATION_TEXT_OCCURRENCE('NOTE_LANG_ASSIGN','',#63);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_GROUP_ASSIGN','',#64);\n"
+        + "#71=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_PERSON_ORG_ASSIGN','',#65);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#66,#8);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#27,#10,#67,#8);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#30,#10,#68,#8);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#10,#69,#8);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#70,#8);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#39,#10,#71,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4356,39 +4310,38 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedApprovalPersonAndDateLeafMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_APPROVAL_CHAIN',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=APPROVAL_STATUS('released');
-                #13=APPROVAL(#12,'design');
-                #14=PERSON('p-1','Doe','Jane',$,$,$);
-                #15=ORGANIZATION('org-1','Acme','engineering');
-                #16=PERSON_AND_ORGANIZATION(#14,#15);
-                #17=APPROVAL_ROLE('authorizer');
-                #18=APPROVAL_PERSON_ORGANIZATION(#16,#13,#17);
-                #19=CALENDAR_DATE(2026,11,4);
-                #20=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);
-                #21=LOCAL_TIME(9,15,$,#20);
-                #22=DATE_AND_TIME(#19,#21);
-                #23=APPROVAL_DATE_TIME(#22,#13);
-                #24=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #25=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #26=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_PERSON','',#24);
-                #27=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_DATE','',#25);
-                #28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#26,#8);
-                #29=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#27,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_APPROVAL_CHAIN',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=APPROVAL_STATUS('released');\n"
+        + "#13=APPROVAL(#12,'design');\n"
+        + "#14=PERSON('p-1','Doe','Jane',$,$,$);\n"
+        + "#15=ORGANIZATION('org-1','Acme','engineering');\n"
+        + "#16=PERSON_AND_ORGANIZATION(#14,#15);\n"
+        + "#17=APPROVAL_ROLE('authorizer');\n"
+        + "#18=APPROVAL_PERSON_ORGANIZATION(#16,#13,#17);\n"
+        + "#19=CALENDAR_DATE(2026,11,4);\n"
+        + "#20=COORDINATED_UNIVERSAL_TIME_OFFSET(8,0,.AHEAD.);\n"
+        + "#21=LOCAL_TIME(9,15,$,#20);\n"
+        + "#22=DATE_AND_TIME(#19,#21);\n"
+        + "#23=APPROVAL_DATE_TIME(#22,#13);\n"
+        + "#24=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#25=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_PERSON','',#24);\n"
+        + "#27=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_DATE','',#25);\n"
+        + "#28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#26,#8);\n"
+        + "#29=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#27,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4446,71 +4399,70 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationContextAndLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=REPRESENTATION_CONTEXT('GEN','GENERAL');
-                #10=REPRESENTATION('REP_CONTEXT_ONLY',(),#9);
-                #11=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #12=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(0.01),#11,'distance_accuracy_value','confusion');
-                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
-                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#11))
-                    GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#12))
-                    REPRESENTATION_CONTEXT('GEO','MODEL'));
-                #14=REPRESENTATION('REP_GEOM_CONTEXT',(),#13);
-                #15=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #16=SHAPE_DEFINITION_REPRESENTATION(#7,#14);
-                #17=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #18=DIRECTION('X0',(1.0,0.0,0.0));
-                #19=DIRECTION('Y0',(0.0,1.0,0.0));
-                #20=AXIS2_PLACEMENT_3D('A0',#17,#18,#19);
-                #21=CARTESIAN_POINT('O1',(5.0,0.0,0.0));
-                #22=AXIS2_PLACEMENT_3D('A1',#21,#18,#19);
-                #23=ITEM_DEFINED_TRANSFORMATION('MOVE','translate x',#20,#22);
-                #24=(REPRESENTATION_RELATIONSHIP('RWT','',#10,#14)
-                    REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#23));
-                #25=REPRESENTATION_ITEM('REP_ITEM_ONLY');
-                #26=PROPERTY_DEFINITION('PD_REP_ITEM','',#25);
-                #27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #28=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));
-                #29=PROPERTY_DEFINITION('PD_GEOM_ITEM','',#28);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#29,#14);
-                #31=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));
-                #32=PROPERTY_DEFINITION('PD_TOPO_ITEM','',#31);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_CONTEXT','',#40);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_CONTEXT','',#41);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_SI_UNIT','',#42);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_UNCERTAINTY_CTX','',#43);
-                #52=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRANSFORM','',#44);
-                #53=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_ITEM','',#45);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_ITEM','',#46);
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO_ITEM','',#47);
-                #56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#9,#10,#48,#8);
-                #57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#14,#49,#8);
-                #58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#11,#14,#50,#8);
-                #59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#12,#14,#51,#8);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#23,#10,#52,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#25,#10,#53,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#28,#14,#54,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#55,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=REPRESENTATION_CONTEXT('GEN','GENERAL');\n"
+        + "#10=REPRESENTATION('REP_CONTEXT_ONLY',(),#9);\n"
+        + "#11=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#12=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(0.01),#11,'distance_accuracy_value','confusion');\n"
+        + "#13=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
+        + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#11))\n"
+        + "    GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#12))\n"
+        + "    REPRESENTATION_CONTEXT('GEO','MODEL'));\n"
+        + "#14=REPRESENTATION('REP_GEOM_CONTEXT',(),#13);\n"
+        + "#15=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#16=SHAPE_DEFINITION_REPRESENTATION(#7,#14);\n"
+        + "#17=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#18=DIRECTION('X0',(1.0,0.0,0.0));\n"
+        + "#19=DIRECTION('Y0',(0.0,1.0,0.0));\n"
+        + "#20=AXIS2_PLACEMENT_3D('A0',#17,#18,#19);\n"
+        + "#21=CARTESIAN_POINT('O1',(5.0,0.0,0.0));\n"
+        + "#22=AXIS2_PLACEMENT_3D('A1',#21,#18,#19);\n"
+        + "#23=ITEM_DEFINED_TRANSFORMATION('MOVE','translate x',#20,#22);\n"
+        + "#24=(REPRESENTATION_RELATIONSHIP('RWT','',#10,#14)\n"
+        + "    REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#23));\n"
+        + "#25=REPRESENTATION_ITEM('REP_ITEM_ONLY');\n"
+        + "#26=PROPERTY_DEFINITION('PD_REP_ITEM','',#25);\n"
+        + "#27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#28=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
+        + "#29=PROPERTY_DEFINITION('PD_GEOM_ITEM','',#28);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#29,#14);\n"
+        + "#31=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));\n"
+        + "#32=PROPERTY_DEFINITION('PD_TOPO_ITEM','',#31);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_CONTEXT','',#40);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_CONTEXT','',#41);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_SI_UNIT','',#42);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_UNCERTAINTY_CTX','',#43);\n"
+        + "#52=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRANSFORM','',#44);\n"
+        + "#53=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_ITEM','',#45);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_ITEM','',#46);\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO_ITEM','',#47);\n"
+        + "#56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#9,#10,#48,#8);\n"
+        + "#57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#14,#49,#8);\n"
+        + "#58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#11,#14,#50,#8);\n"
+        + "#59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#12,#14,#51,#8);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#23,#10,#52,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#25,#10,#53,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#28,#14,#54,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#55,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4560,279 +4512,278 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMeasureAndUnitDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_UNIT_CHAIN',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #13=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#12);
-                #14=(CONVERSION_BASED_UNIT('DEGREE',#13) NAMED_UNIT(*) PLANE_ANGLE_UNIT());
-                #15=(THERMODYNAMIC_TEMPERATURE_UNIT() NAMED_UNIT(*) SI_UNIT($,.KELVIN.));
-                #16=(CONVERSION_BASED_UNIT_WITH_OFFSET(THERMODYNAMIC_TEMPERATURE_MEASURE(273.15))
-                    CONVERSION_BASED_UNIT('DEG_C',#13)
-                    NAMED_UNIT(*)
-                    THERMODYNAMIC_TEMPERATURE_UNIT());
-                #17=(CONTEXT_DEPENDENT_UNIT('BOX') NAMED_UNIT(*));
-                #18=(FORCE_UNIT() NAMED_UNIT(*) SI_UNIT($,.NEWTON.));
-                #19=DERIVED_UNIT_ELEMENT(#18,1.0);
-                #20=DERIVED_UNIT((#19));
-                #21=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(0.01),#12,'distance_accuracy_value','confusion');
-                #22=LENGTH_MEASURE_WITH_UNIT(LENGTH_MEASURE(3.5),#12);
-                #23=PLANE_ANGLE_MEASURE_WITH_UNIT(PLANE_ANGLE_MEASURE(0.25),#14);
-                #24=PROPERTY_DEFINITION('PD_MWU','',#13);
-                #25=PROPERTY_DEFINITION('PD_TYPED','',#14);
-                #26=PROPERTY_DEFINITION('PD_OFFSET','',#16);
-                #27=PROPERTY_DEFINITION('PD_CTX_UNIT','',#17);
-                #28=PROPERTY_DEFINITION('PD_DERIVED','',#20);
-                #29=PROPERTY_DEFINITION('PD_UNCERTAINTY','',#21);
-                #30=PROPERTY_DEFINITION('PD_LEN_TYPED','',#22);
-                #31=PROPERTY_DEFINITION('PD_ANGLE_TYPED','',#23);
-                #32=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#25,#10);
-                #34=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #35=PROPERTY_DEFINITION_REPRESENTATION(#27,#10);
-                #36=PROPERTY_DEFINITION_REPRESENTATION(#28,#10);
-                #37=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);
-                #38=PROPERTY_DEFINITION_REPRESENTATION(#30,#10);
-                #39=PROPERTY_DEFINITION_REPRESENTATION(#31,#10);
-                #70=MASS_UNIT();
-                #71=TIME_UNIT();
-                #72=AREA_UNIT();
-                #73=VOLUME_UNIT();
-                #74=(SOLID_ANGLE_UNIT() NAMED_UNIT(*) SI_UNIT($,.STERADIAN.));
-                #75=RATIO_UNIT();
-                #76=MASS_MEASURE_WITH_UNIT(MASS_MEASURE(3.0),#70);
-                #77=TIME_MEASURE_WITH_UNIT(TIME_MEASURE(2.0),#71);
-                #78=AREA_MEASURE_WITH_UNIT(AREA_MEASURE(6.0),#72);
-                #79=VOLUME_MEASURE_WITH_UNIT(VOLUME_MEASURE(7.0),#73);
-                #80=SOLID_ANGLE_MEASURE_WITH_UNIT(SOLID_ANGLE_MEASURE(1.5),#74);
-                #81=RATIO_MEASURE_WITH_UNIT(RATIO_MEASURE(0.25),#75);
-                #82=PROPERTY_DEFINITION('PD_MASS_TYPED','',#76);
-                #83=PROPERTY_DEFINITION('PD_TIME_TYPED','',#77);
-                #84=PROPERTY_DEFINITION('PD_AREA_TYPED','',#78);
-                #85=PROPERTY_DEFINITION('PD_VOLUME_TYPED','',#79);
-                #86=PROPERTY_DEFINITION('PD_SOLID_ANGLE_TYPED','',#80);
-                #87=PROPERTY_DEFINITION('PD_RATIO_TYPED','',#81);
-                #88=PROPERTY_DEFINITION_REPRESENTATION(#82,#10);
-                #89=PROPERTY_DEFINITION_REPRESENTATION(#83,#10);
-                #90=PROPERTY_DEFINITION_REPRESENTATION(#84,#10);
-                #91=PROPERTY_DEFINITION_REPRESENTATION(#85,#10);
-                #92=PROPERTY_DEFINITION_REPRESENTATION(#86,#10);
-                #93=PROPERTY_DEFINITION_REPRESENTATION(#87,#10);
-                #112=FREQUENCY_UNIT();
-                #113=FORCE_UNIT();
-                #114=PRESSURE_UNIT();
-                #115=ENERGY_UNIT();
-                #116=POWER_UNIT();
-                #117=ELECTRIC_POTENTIAL_UNIT();
-                #118=RESISTANCE_UNIT();
-                #119=CONDUCTANCE_UNIT();
-                #120=MAGNETIC_FLUX_UNIT();
-                #121=ILLUMINANCE_UNIT();
-                #122=LUMINOUS_FLUX_UNIT();
-                #123=LUMINOUS_INTENSITY_UNIT();
-                #124=FREQUENCY_MEASURE_WITH_UNIT(FREQUENCY_MEASURE(50.0),#112);
-                #125=FORCE_MEASURE_WITH_UNIT(FORCE_MEASURE(100.0),#113);
-                #126=PRESSURE_MEASURE_WITH_UNIT(PRESSURE_MEASURE(1.5),#114);
-                #127=ENERGY_MEASURE_WITH_UNIT(ENERGY_MEASURE(42.0),#115);
-                #128=POWER_MEASURE_WITH_UNIT(POWER_MEASURE(3.5),#116);
-                #129=ELECTRIC_POTENTIAL_MEASURE_WITH_UNIT(ELECTRIC_POTENTIAL_MEASURE(220.0),#117);
-                #130=RESISTANCE_MEASURE_WITH_UNIT(RESISTANCE_MEASURE(10.0),#118);
-                #131=CONDUCTANCE_MEASURE_WITH_UNIT(CONDUCTANCE_MEASURE(0.1),#119);
-                #132=MAGNETIC_FLUX_MEASURE_WITH_UNIT(MAGNETIC_FLUX_MEASURE(0.02),#120);
-                #133=ILLUMINANCE_MEASURE_WITH_UNIT(ILLUMINANCE_MEASURE(500.0),#121);
-                #134=LUMINOUS_FLUX_MEASURE_WITH_UNIT(LUMINOUS_FLUX_MEASURE(800.0),#122);
-                #135=LUMINOUS_INTENSITY_MEASURE_WITH_UNIT(LUMINOUS_INTENSITY_MEASURE(120.0),#123);
-                #136=PROPERTY_DEFINITION('PD_FREQ_TYPED','',#124);
-                #137=PROPERTY_DEFINITION('PD_FORCE_TYPED','',#125);
-                #138=PROPERTY_DEFINITION('PD_PRESSURE_TYPED','',#126);
-                #139=PROPERTY_DEFINITION('PD_ENERGY_TYPED','',#127);
-                #140=PROPERTY_DEFINITION('PD_POWER_TYPED','',#128);
-                #141=PROPERTY_DEFINITION('PD_ELECTRIC_POTENTIAL_TYPED','',#129);
-                #142=PROPERTY_DEFINITION('PD_RESISTANCE_TYPED','',#130);
-                #143=PROPERTY_DEFINITION('PD_CONDUCTANCE_TYPED','',#131);
-                #144=PROPERTY_DEFINITION('PD_MAGNETIC_FLUX_TYPED','',#132);
-                #145=PROPERTY_DEFINITION('PD_ILLUMINANCE_TYPED','',#133);
-                #146=PROPERTY_DEFINITION('PD_LUMINOUS_FLUX_TYPED','',#134);
-                #147=PROPERTY_DEFINITION('PD_LUMINOUS_INTENSITY_TYPED','',#135);
-                #148=PROPERTY_DEFINITION_REPRESENTATION(#136,#10);
-                #149=PROPERTY_DEFINITION_REPRESENTATION(#137,#10);
-                #150=PROPERTY_DEFINITION_REPRESENTATION(#138,#10);
-                #151=PROPERTY_DEFINITION_REPRESENTATION(#139,#10);
-                #152=PROPERTY_DEFINITION_REPRESENTATION(#140,#10);
-                #153=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);
-                #154=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);
-                #155=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);
-                #156=PROPERTY_DEFINITION_REPRESENTATION(#144,#10);
-                #157=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);
-                #158=PROPERTY_DEFINITION_REPRESENTATION(#146,#10);
-                #159=PROPERTY_DEFINITION_REPRESENTATION(#147,#10);
-                #196=AMOUNT_OF_SUBSTANCE_UNIT();
-                #197=ELECTRIC_CHARGE_UNIT();
-                #198=CAPACITANCE_UNIT();
-                #199=MAGNETIC_FLUX_DENSITY_UNIT();
-                #200=INDUCTANCE_UNIT();
-                #201=RADIOACTIVITY_UNIT();
-                #202=ABSORBED_DOSE_UNIT();
-                #203=DOSE_EQUIVALENT_UNIT();
-                #204=ACCELERATION_UNIT();
-                #205=VELOCITY_UNIT();
-                #206=THERMAL_RESISTANCE_UNIT();
-                #207=AMOUNT_OF_SUBSTANCE_MEASURE_WITH_UNIT(AMOUNT_OF_SUBSTANCE_MEASURE(2.5),#196);
-                #208=ELECTRIC_CHARGE_MEASURE_WITH_UNIT(ELECTRIC_CHARGE_MEASURE(1.6),#197);
-                #209=CAPACITANCE_MEASURE_WITH_UNIT(CAPACITANCE_MEASURE(0.047),#198);
-                #210=MAGNETIC_FLUX_DENSITY_MEASURE_WITH_UNIT(MAGNETIC_FLUX_DENSITY_MEASURE(0.12),#199);
-                #211=INDUCTANCE_MEASURE_WITH_UNIT(INDUCTANCE_MEASURE(0.008),#200);
-                #212=RADIOACTIVITY_MEASURE_WITH_UNIT(RADIOACTIVITY_MEASURE(3.0),#201);
-                #213=ABSORBED_DOSE_MEASURE_WITH_UNIT(ABSORBED_DOSE_MEASURE(0.4),#202);
-                #214=DOSE_EQUIVALENT_MEASURE_WITH_UNIT(DOSE_EQUIVALENT_MEASURE(0.6),#203);
-                #215=ACCELERATION_MEASURE_WITH_UNIT(ACCELERATION_MEASURE(9.81),#204);
-                #216=VELOCITY_MEASURE_WITH_UNIT(VELOCITY_MEASURE(12.0),#205);
-                #217=THERMAL_RESISTANCE_MEASURE_WITH_UNIT(THERMAL_RESISTANCE_MEASURE(0.15),#206);
-                #218=PROPERTY_DEFINITION('PD_AMOUNT_TYPED','',#207);
-                #219=PROPERTY_DEFINITION('PD_CHARGE_TYPED','',#208);
-                #220=PROPERTY_DEFINITION('PD_CAPACITANCE_TYPED','',#209);
-                #221=PROPERTY_DEFINITION('PD_FLUX_DENSITY_TYPED','',#210);
-                #222=PROPERTY_DEFINITION('PD_INDUCTANCE_TYPED','',#211);
-                #223=PROPERTY_DEFINITION('PD_RADIOACTIVITY_TYPED','',#212);
-                #224=PROPERTY_DEFINITION('PD_ABSORBED_DOSE_TYPED','',#213);
-                #225=PROPERTY_DEFINITION('PD_DOSE_EQUIVALENT_TYPED','',#214);
-                #226=PROPERTY_DEFINITION('PD_ACCELERATION_TYPED','',#215);
-                #227=PROPERTY_DEFINITION('PD_VELOCITY_TYPED','',#216);
-                #228=PROPERTY_DEFINITION('PD_THERMAL_RESISTANCE_TYPED','',#217);
-                #229=PROPERTY_DEFINITION_REPRESENTATION(#218,#10);
-                #230=PROPERTY_DEFINITION_REPRESENTATION(#219,#10);
-                #231=PROPERTY_DEFINITION_REPRESENTATION(#220,#10);
-                #232=PROPERTY_DEFINITION_REPRESENTATION(#221,#10);
-                #233=PROPERTY_DEFINITION_REPRESENTATION(#222,#10);
-                #234=PROPERTY_DEFINITION_REPRESENTATION(#223,#10);
-                #235=PROPERTY_DEFINITION_REPRESENTATION(#224,#10);
-                #236=PROPERTY_DEFINITION_REPRESENTATION(#225,#10);
-                #237=PROPERTY_DEFINITION_REPRESENTATION(#226,#10);
-                #238=PROPERTY_DEFINITION_REPRESENTATION(#227,#10);
-                #239=PROPERTY_DEFINITION_REPRESENTATION(#228,#10);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_MWU','',#40);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_TYPED_UNIT','',#41);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_OFFSET_UNIT','',#42);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTEXT_UNIT','',#43);
-                #52=ANNOTATION_TEXT_OCCURRENCE('NOTE_DERIVED_UNIT','',#44);
-                #53=ANNOTATION_TEXT_OCCURRENCE('NOTE_UNCERTAINTY','',#45);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_LENGTH_TYPED','',#46);
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_ANGLE_TYPED','',#47);
-                #94=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #95=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #96=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #97=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #98=CARTESIAN_POINT('P12',(12.0,0.0,0.0));
-                #99=CARTESIAN_POINT('P13',(13.0,0.0,0.0));
-                #100=ANNOTATION_TEXT_OCCURRENCE('NOTE_MASS_TYPED','',#94);
-                #101=ANNOTATION_TEXT_OCCURRENCE('NOTE_TIME_TYPED','',#95);
-                #102=ANNOTATION_TEXT_OCCURRENCE('NOTE_AREA_TYPED','',#96);
-                #103=ANNOTATION_TEXT_OCCURRENCE('NOTE_VOLUME_TYPED','',#97);
-                #104=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID_ANGLE_TYPED','',#98);
-                #105=ANNOTATION_TEXT_OCCURRENCE('NOTE_RATIO_TYPED','',#99);
-                #160=CARTESIAN_POINT('P14',(14.0,0.0,0.0));
-                #161=CARTESIAN_POINT('P15',(15.0,0.0,0.0));
-                #162=CARTESIAN_POINT('P16',(16.0,0.0,0.0));
-                #163=CARTESIAN_POINT('P17',(17.0,0.0,0.0));
-                #164=CARTESIAN_POINT('P18',(18.0,0.0,0.0));
-                #165=CARTESIAN_POINT('P19',(19.0,0.0,0.0));
-                #166=CARTESIAN_POINT('P20',(20.0,0.0,0.0));
-                #167=CARTESIAN_POINT('P21',(21.0,0.0,0.0));
-                #168=CARTESIAN_POINT('P22',(22.0,0.0,0.0));
-                #169=CARTESIAN_POINT('P23',(23.0,0.0,0.0));
-                #170=CARTESIAN_POINT('P24',(24.0,0.0,0.0));
-                #171=CARTESIAN_POINT('P25',(25.0,0.0,0.0));
-                #172=ANNOTATION_TEXT_OCCURRENCE('NOTE_FREQUENCY_TYPED','',#160);
-                #173=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORCE_TYPED','',#161);
-                #174=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRESSURE_TYPED','',#162);
-                #175=ANNOTATION_TEXT_OCCURRENCE('NOTE_ENERGY_TYPED','',#163);
-                #176=ANNOTATION_TEXT_OCCURRENCE('NOTE_POWER_TYPED','',#164);
-                #177=ANNOTATION_TEXT_OCCURRENCE('NOTE_ELECTRIC_POTENTIAL_TYPED','',#165);
-                #178=ANNOTATION_TEXT_OCCURRENCE('NOTE_RESISTANCE_TYPED','',#166);
-                #179=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONDUCTANCE_TYPED','',#167);
-                #180=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAGNETIC_FLUX_TYPED','',#168);
-                #181=ANNOTATION_TEXT_OCCURRENCE('NOTE_ILLUMINANCE_TYPED','',#169);
-                #182=ANNOTATION_TEXT_OCCURRENCE('NOTE_LUMINOUS_FLUX_TYPED','',#170);
-                #183=ANNOTATION_TEXT_OCCURRENCE('NOTE_LUMINOUS_INTENSITY_TYPED','',#171);
-                #240=CARTESIAN_POINT('P26',(26.0,0.0,0.0));
-                #241=CARTESIAN_POINT('P27',(27.0,0.0,0.0));
-                #242=CARTESIAN_POINT('P28',(28.0,0.0,0.0));
-                #243=CARTESIAN_POINT('P29',(29.0,0.0,0.0));
-                #244=CARTESIAN_POINT('P30',(30.0,0.0,0.0));
-                #245=CARTESIAN_POINT('P31',(31.0,0.0,0.0));
-                #246=CARTESIAN_POINT('P32',(32.0,0.0,0.0));
-                #247=CARTESIAN_POINT('P33',(33.0,0.0,0.0));
-                #248=CARTESIAN_POINT('P34',(34.0,0.0,0.0));
-                #249=CARTESIAN_POINT('P35',(35.0,0.0,0.0));
-                #250=CARTESIAN_POINT('P36',(36.0,0.0,0.0));
-                #251=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMOUNT_TYPED','',#240);
-                #252=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHARGE_TYPED','',#241);
-                #253=ANNOTATION_TEXT_OCCURRENCE('NOTE_CAPACITANCE_TYPED','',#242);
-                #254=ANNOTATION_TEXT_OCCURRENCE('NOTE_FLUX_DENSITY_TYPED','',#243);
-                #255=ANNOTATION_TEXT_OCCURRENCE('NOTE_INDUCTANCE_TYPED','',#244);
-                #256=ANNOTATION_TEXT_OCCURRENCE('NOTE_RADIOACTIVITY_TYPED','',#245);
-                #257=ANNOTATION_TEXT_OCCURRENCE('NOTE_ABSORBED_DOSE_TYPED','',#246);
-                #258=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOSE_EQUIVALENT_TYPED','',#247);
-                #259=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACCELERATION_TYPED','',#248);
-                #260=ANNOTATION_TEXT_OCCURRENCE('NOTE_VELOCITY_TYPED','',#249);
-                #261=ANNOTATION_TEXT_OCCURRENCE('NOTE_THERMAL_RESISTANCE_TYPED','',#250);
-                #56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#48,#8);
-                #57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#10,#49,#8);
-                #58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#16,#10,#50,#8);
-                #59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#17,#10,#51,#8);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#20,#10,#52,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#21,#10,#53,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#22,#10,#54,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#23,#10,#55,#8);
-                #106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#76,#10,#100,#8);
-                #107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#77,#10,#101,#8);
-                #108=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#78,#10,#102,#8);
-                #109=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#79,#10,#103,#8);
-                #110=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#80,#10,#104,#8);
-                #111=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#81,#10,#105,#8);
-                #184=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#124,#10,#172,#8);
-                #185=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#125,#10,#173,#8);
-                #186=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#126,#10,#174,#8);
-                #187=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#127,#10,#175,#8);
-                #188=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#128,#10,#176,#8);
-                #189=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#129,#10,#177,#8);
-                #190=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#130,#10,#178,#8);
-                #191=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#131,#10,#179,#8);
-                #192=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#132,#10,#180,#8);
-                #193=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#133,#10,#181,#8);
-                #194=PMI_REQUIREMENT_ITEM_ASSOCIATION('A24','',#134,#10,#182,#8);
-                #195=PMI_REQUIREMENT_ITEM_ASSOCIATION('A25','',#135,#10,#183,#8);
-                #262=PMI_REQUIREMENT_ITEM_ASSOCIATION('A26','',#207,#10,#251,#8);
-                #263=PMI_REQUIREMENT_ITEM_ASSOCIATION('A27','',#208,#10,#252,#8);
-                #264=PMI_REQUIREMENT_ITEM_ASSOCIATION('A28','',#209,#10,#253,#8);
-                #265=PMI_REQUIREMENT_ITEM_ASSOCIATION('A29','',#210,#10,#254,#8);
-                #266=PMI_REQUIREMENT_ITEM_ASSOCIATION('A30','',#211,#10,#255,#8);
-                #267=PMI_REQUIREMENT_ITEM_ASSOCIATION('A31','',#212,#10,#256,#8);
-                #268=PMI_REQUIREMENT_ITEM_ASSOCIATION('A32','',#213,#10,#257,#8);
-                #269=PMI_REQUIREMENT_ITEM_ASSOCIATION('A33','',#214,#10,#258,#8);
-                #270=PMI_REQUIREMENT_ITEM_ASSOCIATION('A34','',#215,#10,#259,#8);
-                #271=PMI_REQUIREMENT_ITEM_ASSOCIATION('A35','',#216,#10,#260,#8);
-                #272=PMI_REQUIREMENT_ITEM_ASSOCIATION('A36','',#217,#10,#261,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_UNIT_CHAIN',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#13=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#12);\n"
+        + "#14=(CONVERSION_BASED_UNIT('DEGREE',#13) NAMED_UNIT(*) PLANE_ANGLE_UNIT());\n"
+        + "#15=(THERMODYNAMIC_TEMPERATURE_UNIT() NAMED_UNIT(*) SI_UNIT($,.KELVIN.));\n"
+        + "#16=(CONVERSION_BASED_UNIT_WITH_OFFSET(THERMODYNAMIC_TEMPERATURE_MEASURE(273.15))\n"
+        + "    CONVERSION_BASED_UNIT('DEG_C',#13)\n"
+        + "    NAMED_UNIT(*)\n"
+        + "    THERMODYNAMIC_TEMPERATURE_UNIT());\n"
+        + "#17=(CONTEXT_DEPENDENT_UNIT('BOX') NAMED_UNIT(*));\n"
+        + "#18=(FORCE_UNIT() NAMED_UNIT(*) SI_UNIT($,.NEWTON.));\n"
+        + "#19=DERIVED_UNIT_ELEMENT(#18,1.0);\n"
+        + "#20=DERIVED_UNIT((#19));\n"
+        + "#21=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(0.01),#12,'distance_accuracy_value','confusion');\n"
+        + "#22=LENGTH_MEASURE_WITH_UNIT(LENGTH_MEASURE(3.5),#12);\n"
+        + "#23=PLANE_ANGLE_MEASURE_WITH_UNIT(PLANE_ANGLE_MEASURE(0.25),#14);\n"
+        + "#24=PROPERTY_DEFINITION('PD_MWU','',#13);\n"
+        + "#25=PROPERTY_DEFINITION('PD_TYPED','',#14);\n"
+        + "#26=PROPERTY_DEFINITION('PD_OFFSET','',#16);\n"
+        + "#27=PROPERTY_DEFINITION('PD_CTX_UNIT','',#17);\n"
+        + "#28=PROPERTY_DEFINITION('PD_DERIVED','',#20);\n"
+        + "#29=PROPERTY_DEFINITION('PD_UNCERTAINTY','',#21);\n"
+        + "#30=PROPERTY_DEFINITION('PD_LEN_TYPED','',#22);\n"
+        + "#31=PROPERTY_DEFINITION('PD_ANGLE_TYPED','',#23);\n"
+        + "#32=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#25,#10);\n"
+        + "#34=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#35=PROPERTY_DEFINITION_REPRESENTATION(#27,#10);\n"
+        + "#36=PROPERTY_DEFINITION_REPRESENTATION(#28,#10);\n"
+        + "#37=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);\n"
+        + "#38=PROPERTY_DEFINITION_REPRESENTATION(#30,#10);\n"
+        + "#39=PROPERTY_DEFINITION_REPRESENTATION(#31,#10);\n"
+        + "#70=MASS_UNIT();\n"
+        + "#71=TIME_UNIT();\n"
+        + "#72=AREA_UNIT();\n"
+        + "#73=VOLUME_UNIT();\n"
+        + "#74=(SOLID_ANGLE_UNIT() NAMED_UNIT(*) SI_UNIT($,.STERADIAN.));\n"
+        + "#75=RATIO_UNIT();\n"
+        + "#76=MASS_MEASURE_WITH_UNIT(MASS_MEASURE(3.0),#70);\n"
+        + "#77=TIME_MEASURE_WITH_UNIT(TIME_MEASURE(2.0),#71);\n"
+        + "#78=AREA_MEASURE_WITH_UNIT(AREA_MEASURE(6.0),#72);\n"
+        + "#79=VOLUME_MEASURE_WITH_UNIT(VOLUME_MEASURE(7.0),#73);\n"
+        + "#80=SOLID_ANGLE_MEASURE_WITH_UNIT(SOLID_ANGLE_MEASURE(1.5),#74);\n"
+        + "#81=RATIO_MEASURE_WITH_UNIT(RATIO_MEASURE(0.25),#75);\n"
+        + "#82=PROPERTY_DEFINITION('PD_MASS_TYPED','',#76);\n"
+        + "#83=PROPERTY_DEFINITION('PD_TIME_TYPED','',#77);\n"
+        + "#84=PROPERTY_DEFINITION('PD_AREA_TYPED','',#78);\n"
+        + "#85=PROPERTY_DEFINITION('PD_VOLUME_TYPED','',#79);\n"
+        + "#86=PROPERTY_DEFINITION('PD_SOLID_ANGLE_TYPED','',#80);\n"
+        + "#87=PROPERTY_DEFINITION('PD_RATIO_TYPED','',#81);\n"
+        + "#88=PROPERTY_DEFINITION_REPRESENTATION(#82,#10);\n"
+        + "#89=PROPERTY_DEFINITION_REPRESENTATION(#83,#10);\n"
+        + "#90=PROPERTY_DEFINITION_REPRESENTATION(#84,#10);\n"
+        + "#91=PROPERTY_DEFINITION_REPRESENTATION(#85,#10);\n"
+        + "#92=PROPERTY_DEFINITION_REPRESENTATION(#86,#10);\n"
+        + "#93=PROPERTY_DEFINITION_REPRESENTATION(#87,#10);\n"
+        + "#112=FREQUENCY_UNIT();\n"
+        + "#113=FORCE_UNIT();\n"
+        + "#114=PRESSURE_UNIT();\n"
+        + "#115=ENERGY_UNIT();\n"
+        + "#116=POWER_UNIT();\n"
+        + "#117=ELECTRIC_POTENTIAL_UNIT();\n"
+        + "#118=RESISTANCE_UNIT();\n"
+        + "#119=CONDUCTANCE_UNIT();\n"
+        + "#120=MAGNETIC_FLUX_UNIT();\n"
+        + "#121=ILLUMINANCE_UNIT();\n"
+        + "#122=LUMINOUS_FLUX_UNIT();\n"
+        + "#123=LUMINOUS_INTENSITY_UNIT();\n"
+        + "#124=FREQUENCY_MEASURE_WITH_UNIT(FREQUENCY_MEASURE(50.0),#112);\n"
+        + "#125=FORCE_MEASURE_WITH_UNIT(FORCE_MEASURE(100.0),#113);\n"
+        + "#126=PRESSURE_MEASURE_WITH_UNIT(PRESSURE_MEASURE(1.5),#114);\n"
+        + "#127=ENERGY_MEASURE_WITH_UNIT(ENERGY_MEASURE(42.0),#115);\n"
+        + "#128=POWER_MEASURE_WITH_UNIT(POWER_MEASURE(3.5),#116);\n"
+        + "#129=ELECTRIC_POTENTIAL_MEASURE_WITH_UNIT(ELECTRIC_POTENTIAL_MEASURE(220.0),#117);\n"
+        + "#130=RESISTANCE_MEASURE_WITH_UNIT(RESISTANCE_MEASURE(10.0),#118);\n"
+        + "#131=CONDUCTANCE_MEASURE_WITH_UNIT(CONDUCTANCE_MEASURE(0.1),#119);\n"
+        + "#132=MAGNETIC_FLUX_MEASURE_WITH_UNIT(MAGNETIC_FLUX_MEASURE(0.02),#120);\n"
+        + "#133=ILLUMINANCE_MEASURE_WITH_UNIT(ILLUMINANCE_MEASURE(500.0),#121);\n"
+        + "#134=LUMINOUS_FLUX_MEASURE_WITH_UNIT(LUMINOUS_FLUX_MEASURE(800.0),#122);\n"
+        + "#135=LUMINOUS_INTENSITY_MEASURE_WITH_UNIT(LUMINOUS_INTENSITY_MEASURE(120.0),#123);\n"
+        + "#136=PROPERTY_DEFINITION('PD_FREQ_TYPED','',#124);\n"
+        + "#137=PROPERTY_DEFINITION('PD_FORCE_TYPED','',#125);\n"
+        + "#138=PROPERTY_DEFINITION('PD_PRESSURE_TYPED','',#126);\n"
+        + "#139=PROPERTY_DEFINITION('PD_ENERGY_TYPED','',#127);\n"
+        + "#140=PROPERTY_DEFINITION('PD_POWER_TYPED','',#128);\n"
+        + "#141=PROPERTY_DEFINITION('PD_ELECTRIC_POTENTIAL_TYPED','',#129);\n"
+        + "#142=PROPERTY_DEFINITION('PD_RESISTANCE_TYPED','',#130);\n"
+        + "#143=PROPERTY_DEFINITION('PD_CONDUCTANCE_TYPED','',#131);\n"
+        + "#144=PROPERTY_DEFINITION('PD_MAGNETIC_FLUX_TYPED','',#132);\n"
+        + "#145=PROPERTY_DEFINITION('PD_ILLUMINANCE_TYPED','',#133);\n"
+        + "#146=PROPERTY_DEFINITION('PD_LUMINOUS_FLUX_TYPED','',#134);\n"
+        + "#147=PROPERTY_DEFINITION('PD_LUMINOUS_INTENSITY_TYPED','',#135);\n"
+        + "#148=PROPERTY_DEFINITION_REPRESENTATION(#136,#10);\n"
+        + "#149=PROPERTY_DEFINITION_REPRESENTATION(#137,#10);\n"
+        + "#150=PROPERTY_DEFINITION_REPRESENTATION(#138,#10);\n"
+        + "#151=PROPERTY_DEFINITION_REPRESENTATION(#139,#10);\n"
+        + "#152=PROPERTY_DEFINITION_REPRESENTATION(#140,#10);\n"
+        + "#153=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);\n"
+        + "#154=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);\n"
+        + "#155=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);\n"
+        + "#156=PROPERTY_DEFINITION_REPRESENTATION(#144,#10);\n"
+        + "#157=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);\n"
+        + "#158=PROPERTY_DEFINITION_REPRESENTATION(#146,#10);\n"
+        + "#159=PROPERTY_DEFINITION_REPRESENTATION(#147,#10);\n"
+        + "#196=AMOUNT_OF_SUBSTANCE_UNIT();\n"
+        + "#197=ELECTRIC_CHARGE_UNIT();\n"
+        + "#198=CAPACITANCE_UNIT();\n"
+        + "#199=MAGNETIC_FLUX_DENSITY_UNIT();\n"
+        + "#200=INDUCTANCE_UNIT();\n"
+        + "#201=RADIOACTIVITY_UNIT();\n"
+        + "#202=ABSORBED_DOSE_UNIT();\n"
+        + "#203=DOSE_EQUIVALENT_UNIT();\n"
+        + "#204=ACCELERATION_UNIT();\n"
+        + "#205=VELOCITY_UNIT();\n"
+        + "#206=THERMAL_RESISTANCE_UNIT();\n"
+        + "#207=AMOUNT_OF_SUBSTANCE_MEASURE_WITH_UNIT(AMOUNT_OF_SUBSTANCE_MEASURE(2.5),#196);\n"
+        + "#208=ELECTRIC_CHARGE_MEASURE_WITH_UNIT(ELECTRIC_CHARGE_MEASURE(1.6),#197);\n"
+        + "#209=CAPACITANCE_MEASURE_WITH_UNIT(CAPACITANCE_MEASURE(0.047),#198);\n"
+        + "#210=MAGNETIC_FLUX_DENSITY_MEASURE_WITH_UNIT(MAGNETIC_FLUX_DENSITY_MEASURE(0.12),#199);\n"
+        + "#211=INDUCTANCE_MEASURE_WITH_UNIT(INDUCTANCE_MEASURE(0.008),#200);\n"
+        + "#212=RADIOACTIVITY_MEASURE_WITH_UNIT(RADIOACTIVITY_MEASURE(3.0),#201);\n"
+        + "#213=ABSORBED_DOSE_MEASURE_WITH_UNIT(ABSORBED_DOSE_MEASURE(0.4),#202);\n"
+        + "#214=DOSE_EQUIVALENT_MEASURE_WITH_UNIT(DOSE_EQUIVALENT_MEASURE(0.6),#203);\n"
+        + "#215=ACCELERATION_MEASURE_WITH_UNIT(ACCELERATION_MEASURE(9.81),#204);\n"
+        + "#216=VELOCITY_MEASURE_WITH_UNIT(VELOCITY_MEASURE(12.0),#205);\n"
+        + "#217=THERMAL_RESISTANCE_MEASURE_WITH_UNIT(THERMAL_RESISTANCE_MEASURE(0.15),#206);\n"
+        + "#218=PROPERTY_DEFINITION('PD_AMOUNT_TYPED','',#207);\n"
+        + "#219=PROPERTY_DEFINITION('PD_CHARGE_TYPED','',#208);\n"
+        + "#220=PROPERTY_DEFINITION('PD_CAPACITANCE_TYPED','',#209);\n"
+        + "#221=PROPERTY_DEFINITION('PD_FLUX_DENSITY_TYPED','',#210);\n"
+        + "#222=PROPERTY_DEFINITION('PD_INDUCTANCE_TYPED','',#211);\n"
+        + "#223=PROPERTY_DEFINITION('PD_RADIOACTIVITY_TYPED','',#212);\n"
+        + "#224=PROPERTY_DEFINITION('PD_ABSORBED_DOSE_TYPED','',#213);\n"
+        + "#225=PROPERTY_DEFINITION('PD_DOSE_EQUIVALENT_TYPED','',#214);\n"
+        + "#226=PROPERTY_DEFINITION('PD_ACCELERATION_TYPED','',#215);\n"
+        + "#227=PROPERTY_DEFINITION('PD_VELOCITY_TYPED','',#216);\n"
+        + "#228=PROPERTY_DEFINITION('PD_THERMAL_RESISTANCE_TYPED','',#217);\n"
+        + "#229=PROPERTY_DEFINITION_REPRESENTATION(#218,#10);\n"
+        + "#230=PROPERTY_DEFINITION_REPRESENTATION(#219,#10);\n"
+        + "#231=PROPERTY_DEFINITION_REPRESENTATION(#220,#10);\n"
+        + "#232=PROPERTY_DEFINITION_REPRESENTATION(#221,#10);\n"
+        + "#233=PROPERTY_DEFINITION_REPRESENTATION(#222,#10);\n"
+        + "#234=PROPERTY_DEFINITION_REPRESENTATION(#223,#10);\n"
+        + "#235=PROPERTY_DEFINITION_REPRESENTATION(#224,#10);\n"
+        + "#236=PROPERTY_DEFINITION_REPRESENTATION(#225,#10);\n"
+        + "#237=PROPERTY_DEFINITION_REPRESENTATION(#226,#10);\n"
+        + "#238=PROPERTY_DEFINITION_REPRESENTATION(#227,#10);\n"
+        + "#239=PROPERTY_DEFINITION_REPRESENTATION(#228,#10);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#47=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_MWU','',#40);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_TYPED_UNIT','',#41);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_OFFSET_UNIT','',#42);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTEXT_UNIT','',#43);\n"
+        + "#52=ANNOTATION_TEXT_OCCURRENCE('NOTE_DERIVED_UNIT','',#44);\n"
+        + "#53=ANNOTATION_TEXT_OCCURRENCE('NOTE_UNCERTAINTY','',#45);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_LENGTH_TYPED','',#46);\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_ANGLE_TYPED','',#47);\n"
+        + "#94=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#95=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#96=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#97=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#98=CARTESIAN_POINT('P12',(12.0,0.0,0.0));\n"
+        + "#99=CARTESIAN_POINT('P13',(13.0,0.0,0.0));\n"
+        + "#100=ANNOTATION_TEXT_OCCURRENCE('NOTE_MASS_TYPED','',#94);\n"
+        + "#101=ANNOTATION_TEXT_OCCURRENCE('NOTE_TIME_TYPED','',#95);\n"
+        + "#102=ANNOTATION_TEXT_OCCURRENCE('NOTE_AREA_TYPED','',#96);\n"
+        + "#103=ANNOTATION_TEXT_OCCURRENCE('NOTE_VOLUME_TYPED','',#97);\n"
+        + "#104=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID_ANGLE_TYPED','',#98);\n"
+        + "#105=ANNOTATION_TEXT_OCCURRENCE('NOTE_RATIO_TYPED','',#99);\n"
+        + "#160=CARTESIAN_POINT('P14',(14.0,0.0,0.0));\n"
+        + "#161=CARTESIAN_POINT('P15',(15.0,0.0,0.0));\n"
+        + "#162=CARTESIAN_POINT('P16',(16.0,0.0,0.0));\n"
+        + "#163=CARTESIAN_POINT('P17',(17.0,0.0,0.0));\n"
+        + "#164=CARTESIAN_POINT('P18',(18.0,0.0,0.0));\n"
+        + "#165=CARTESIAN_POINT('P19',(19.0,0.0,0.0));\n"
+        + "#166=CARTESIAN_POINT('P20',(20.0,0.0,0.0));\n"
+        + "#167=CARTESIAN_POINT('P21',(21.0,0.0,0.0));\n"
+        + "#168=CARTESIAN_POINT('P22',(22.0,0.0,0.0));\n"
+        + "#169=CARTESIAN_POINT('P23',(23.0,0.0,0.0));\n"
+        + "#170=CARTESIAN_POINT('P24',(24.0,0.0,0.0));\n"
+        + "#171=CARTESIAN_POINT('P25',(25.0,0.0,0.0));\n"
+        + "#172=ANNOTATION_TEXT_OCCURRENCE('NOTE_FREQUENCY_TYPED','',#160);\n"
+        + "#173=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORCE_TYPED','',#161);\n"
+        + "#174=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRESSURE_TYPED','',#162);\n"
+        + "#175=ANNOTATION_TEXT_OCCURRENCE('NOTE_ENERGY_TYPED','',#163);\n"
+        + "#176=ANNOTATION_TEXT_OCCURRENCE('NOTE_POWER_TYPED','',#164);\n"
+        + "#177=ANNOTATION_TEXT_OCCURRENCE('NOTE_ELECTRIC_POTENTIAL_TYPED','',#165);\n"
+        + "#178=ANNOTATION_TEXT_OCCURRENCE('NOTE_RESISTANCE_TYPED','',#166);\n"
+        + "#179=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONDUCTANCE_TYPED','',#167);\n"
+        + "#180=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAGNETIC_FLUX_TYPED','',#168);\n"
+        + "#181=ANNOTATION_TEXT_OCCURRENCE('NOTE_ILLUMINANCE_TYPED','',#169);\n"
+        + "#182=ANNOTATION_TEXT_OCCURRENCE('NOTE_LUMINOUS_FLUX_TYPED','',#170);\n"
+        + "#183=ANNOTATION_TEXT_OCCURRENCE('NOTE_LUMINOUS_INTENSITY_TYPED','',#171);\n"
+        + "#240=CARTESIAN_POINT('P26',(26.0,0.0,0.0));\n"
+        + "#241=CARTESIAN_POINT('P27',(27.0,0.0,0.0));\n"
+        + "#242=CARTESIAN_POINT('P28',(28.0,0.0,0.0));\n"
+        + "#243=CARTESIAN_POINT('P29',(29.0,0.0,0.0));\n"
+        + "#244=CARTESIAN_POINT('P30',(30.0,0.0,0.0));\n"
+        + "#245=CARTESIAN_POINT('P31',(31.0,0.0,0.0));\n"
+        + "#246=CARTESIAN_POINT('P32',(32.0,0.0,0.0));\n"
+        + "#247=CARTESIAN_POINT('P33',(33.0,0.0,0.0));\n"
+        + "#248=CARTESIAN_POINT('P34',(34.0,0.0,0.0));\n"
+        + "#249=CARTESIAN_POINT('P35',(35.0,0.0,0.0));\n"
+        + "#250=CARTESIAN_POINT('P36',(36.0,0.0,0.0));\n"
+        + "#251=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMOUNT_TYPED','',#240);\n"
+        + "#252=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHARGE_TYPED','',#241);\n"
+        + "#253=ANNOTATION_TEXT_OCCURRENCE('NOTE_CAPACITANCE_TYPED','',#242);\n"
+        + "#254=ANNOTATION_TEXT_OCCURRENCE('NOTE_FLUX_DENSITY_TYPED','',#243);\n"
+        + "#255=ANNOTATION_TEXT_OCCURRENCE('NOTE_INDUCTANCE_TYPED','',#244);\n"
+        + "#256=ANNOTATION_TEXT_OCCURRENCE('NOTE_RADIOACTIVITY_TYPED','',#245);\n"
+        + "#257=ANNOTATION_TEXT_OCCURRENCE('NOTE_ABSORBED_DOSE_TYPED','',#246);\n"
+        + "#258=ANNOTATION_TEXT_OCCURRENCE('NOTE_DOSE_EQUIVALENT_TYPED','',#247);\n"
+        + "#259=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACCELERATION_TYPED','',#248);\n"
+        + "#260=ANNOTATION_TEXT_OCCURRENCE('NOTE_VELOCITY_TYPED','',#249);\n"
+        + "#261=ANNOTATION_TEXT_OCCURRENCE('NOTE_THERMAL_RESISTANCE_TYPED','',#250);\n"
+        + "#56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#48,#8);\n"
+        + "#57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#14,#10,#49,#8);\n"
+        + "#58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#16,#10,#50,#8);\n"
+        + "#59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#17,#10,#51,#8);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#20,#10,#52,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#21,#10,#53,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#22,#10,#54,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#23,#10,#55,#8);\n"
+        + "#106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#76,#10,#100,#8);\n"
+        + "#107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#77,#10,#101,#8);\n"
+        + "#108=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#78,#10,#102,#8);\n"
+        + "#109=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#79,#10,#103,#8);\n"
+        + "#110=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#80,#10,#104,#8);\n"
+        + "#111=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#81,#10,#105,#8);\n"
+        + "#184=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#124,#10,#172,#8);\n"
+        + "#185=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#125,#10,#173,#8);\n"
+        + "#186=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#126,#10,#174,#8);\n"
+        + "#187=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#127,#10,#175,#8);\n"
+        + "#188=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#128,#10,#176,#8);\n"
+        + "#189=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#129,#10,#177,#8);\n"
+        + "#190=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#130,#10,#178,#8);\n"
+        + "#191=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#131,#10,#179,#8);\n"
+        + "#192=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#132,#10,#180,#8);\n"
+        + "#193=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#133,#10,#181,#8);\n"
+        + "#194=PMI_REQUIREMENT_ITEM_ASSOCIATION('A24','',#134,#10,#182,#8);\n"
+        + "#195=PMI_REQUIREMENT_ITEM_ASSOCIATION('A25','',#135,#10,#183,#8);\n"
+        + "#262=PMI_REQUIREMENT_ITEM_ASSOCIATION('A26','',#207,#10,#251,#8);\n"
+        + "#263=PMI_REQUIREMENT_ITEM_ASSOCIATION('A27','',#208,#10,#252,#8);\n"
+        + "#264=PMI_REQUIREMENT_ITEM_ASSOCIATION('A28','',#209,#10,#253,#8);\n"
+        + "#265=PMI_REQUIREMENT_ITEM_ASSOCIATION('A29','',#210,#10,#254,#8);\n"
+        + "#266=PMI_REQUIREMENT_ITEM_ASSOCIATION('A30','',#211,#10,#255,#8);\n"
+        + "#267=PMI_REQUIREMENT_ITEM_ASSOCIATION('A31','',#212,#10,#256,#8);\n"
+        + "#268=PMI_REQUIREMENT_ITEM_ASSOCIATION('A32','',#213,#10,#257,#8);\n"
+        + "#269=PMI_REQUIREMENT_ITEM_ASSOCIATION('A33','',#214,#10,#258,#8);\n"
+        + "#270=PMI_REQUIREMENT_ITEM_ASSOCIATION('A34','',#215,#10,#259,#8);\n"
+        + "#271=PMI_REQUIREMENT_ITEM_ASSOCIATION('A35','',#216,#10,#260,#8);\n"
+        + "#272=PMI_REQUIREMENT_ITEM_ASSOCIATION('A36','',#217,#10,#261,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4998,59 +4949,58 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedUserDefinedAndRepresentationLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_META_LEAF',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');
-                #13=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));
-                #14=ADDRESS('HQ','42','Market St',$,'Shanghai','Shanghai','200000','CN',$,'+86','cad@example.com',$);
-                #15=PROPERTY_DEFINITION('PD_DESC','',#12);
-                #16=PROPERTY_DEFINITION('PD_VAL','',#13);
-                #17=PROPERTY_DEFINITION('PD_ADDR','',#14);
-                #18=PROPERTY_DEFINITION_REPRESENTATION(#15,#10);
-                #19=PROPERTY_DEFINITION_REPRESENTATION(#16,#10);
-                #20=PROPERTY_DEFINITION_REPRESENTATION(#17,#10);
-                #21=CARTESIAN_POINT('M0',(0.0,0.0));
-                #22=DIRECTION('DX0',(1.0,0.0));
-                #23=AXIS2_PLACEMENT_2D('MAP0',#21,#22);
-                #24=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
-                #25=REPRESENTATION('REP_UDEF',(),#24);
-                #26=REPRESENTATION_MAP(#23,#25);
-                #27=CARTESIAN_POINT('T0',(3.0,4.0));
-                #28=AXIS2_PLACEMENT_2D('TGT0',#27,#22);
-                #29=USER_DEFINED_CURVE_FONT('UCF0',#26,#28);
-                #30=USER_DEFINED_MARKER('UDM0',#26,#28);
-                #31=USER_DEFINED_TERMINATOR_SYMBOL('UDT0',#26,#28);
-                #32=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #33=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #34=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #35=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #36=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #37=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #38=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_LEAF','',#32);
-                #39=ANNOTATION_TEXT_OCCURRENCE('NOTE_VALUE_LEAF','',#33);
-                #40=ANNOTATION_TEXT_OCCURRENCE('NOTE_ADDRESS_LEAF','',#34);
-                #41=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_CURVE_FONT','',#35);
-                #42=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_MARKER','',#36);
-                #43=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_TERMINATOR','',#37);
-                #44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#38,#8);
-                #45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#10,#39,#8);
-                #46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#14,#10,#40,#8);
-                #47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#29,#10,#41,#8);
-                #48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#42,#8);
-                #49=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#31,#10,#43,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_META_LEAF',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
+        + "#13=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));\n"
+        + "#14=ADDRESS('HQ','42','Market St',$,'Shanghai','Shanghai','200000','CN',$,'+86','cad@example.com',$);\n"
+        + "#15=PROPERTY_DEFINITION('PD_DESC','',#12);\n"
+        + "#16=PROPERTY_DEFINITION('PD_VAL','',#13);\n"
+        + "#17=PROPERTY_DEFINITION('PD_ADDR','',#14);\n"
+        + "#18=PROPERTY_DEFINITION_REPRESENTATION(#15,#10);\n"
+        + "#19=PROPERTY_DEFINITION_REPRESENTATION(#16,#10);\n"
+        + "#20=PROPERTY_DEFINITION_REPRESENTATION(#17,#10);\n"
+        + "#21=CARTESIAN_POINT('M0',(0.0,0.0));\n"
+        + "#22=DIRECTION('DX0',(1.0,0.0));\n"
+        + "#23=AXIS2_PLACEMENT_2D('MAP0',#21,#22);\n"
+        + "#24=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
+        + "#25=REPRESENTATION('REP_UDEF',(),#24);\n"
+        + "#26=REPRESENTATION_MAP(#23,#25);\n"
+        + "#27=CARTESIAN_POINT('T0',(3.0,4.0));\n"
+        + "#28=AXIS2_PLACEMENT_2D('TGT0',#27,#22);\n"
+        + "#29=USER_DEFINED_CURVE_FONT('UCF0',#26,#28);\n"
+        + "#30=USER_DEFINED_MARKER('UDM0',#26,#28);\n"
+        + "#31=USER_DEFINED_TERMINATOR_SYMBOL('UDT0',#26,#28);\n"
+        + "#32=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#33=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#34=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#35=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#36=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#37=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#38=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_LEAF','',#32);\n"
+        + "#39=ANNOTATION_TEXT_OCCURRENCE('NOTE_VALUE_LEAF','',#33);\n"
+        + "#40=ANNOTATION_TEXT_OCCURRENCE('NOTE_ADDRESS_LEAF','',#34);\n"
+        + "#41=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_CURVE_FONT','',#35);\n"
+        + "#42=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_MARKER','',#36);\n"
+        + "#43=ANNOTATION_TEXT_OCCURRENCE('NOTE_USER_TERMINATOR','',#37);\n"
+        + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#38,#8);\n"
+        + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#10,#39,#8);\n"
+        + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#14,#10,#40,#8);\n"
+        + "#47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#29,#10,#41,#8);\n"
+        + "#48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#42,#8);\n"
+        + "#49=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#31,#10,#43,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5104,28 +5054,27 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMeasureRepresentationItemMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_MEASURE',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=(NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #13=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#12);
-                #14=PROPERTY_DEFINITION('PD_MEASURE','',#13);
-                #15=PROPERTY_DEFINITION_REPRESENTATION(#14,#10);
-                #16=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #17=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE','',#16);
-                #18=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#17,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_MEASURE',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=(NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#13=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#12);\n"
+        + "#14=PROPERTY_DEFINITION('PD_MEASURE','',#13);\n"
+        + "#15=PROPERTY_DEFINITION_REPRESENTATION(#14,#10);\n"
+        + "#16=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#17=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE','',#16);\n"
+        + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#17,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5147,104 +5096,103 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRepresentationItemLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=REPRESENTATION_ITEM('REP_ITEM_ONLY');
-                #23=PROPERTY_DEFINITION('PD_REP_ITEM','',#22);
-                #24=PROPERTY_DEFINITION_REPRESENTATION(#23,#10);
-                #25=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));
-                #26=PROPERTY_DEFINITION('PD_GEOM_ITEM','',#25);
-                #27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #28=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));
-                #29=PROPERTY_DEFINITION('PD_TOPO_ITEM','',#28);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);
-                #31=(NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #32=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#31);
-                #33=PROPERTY_DEFINITION('PD_MEASURE','',#32);
-                #34=PROPERTY_DEFINITION_REPRESENTATION(#33,#10);
-                #35=DESCRIPTIVE_REPRESENTATION_ITEM('DESC_ITEM','descriptive');
-                #36=PROPERTY_DEFINITION('PD_DESC_ITEM','',#35);
-                #37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);
-                #38=VALUE_REPRESENTATION_ITEM('VALUE_ITEM',INTEGER_REPRESENTATION_ITEM(7));
-                #39=PROPERTY_DEFINITION('PD_VALUE_ITEM','',#38);
-                #40=PROPERTY_DEFINITION_REPRESENTATION(#39,#10);
-                #41=MEASURE_WITH_UNIT(LENGTH_MEASURE(9.5),#31);
-                #42=PROPERTY_DEFINITION('PD_MEASURE_WITH_UNIT','',#41);
-                #43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #44=ADDRESS('HQ','','Main St','','Shanghai','Shanghai','200000','CN','','','','');
-                #45=PROPERTY_DEFINITION('PD_ADDRESS','',#44);
-                #46=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);
-                #47=CHARACTERIZED_OBJECT('CHAR_OBJ','characterized');
-                #48=PROPERTY_DEFINITION('PD_CHAR_OBJ','',#47);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #50=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);
-                #51=PROPERTY_DEFINITION('PD_DIM_EXP','',#50);
-                #52=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);
-                #53=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('VERT_MARK'));
-                #54=PROPERTY_DEFINITION('PD_VERTEX','',#53);
-                #55=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);
-                #56=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('EDGE_MARK'));
-                #57=PROPERTY_DEFINITION('PD_EDGE','',#56);
-                #58=PROPERTY_DEFINITION_REPRESENTATION(#57,#10);
-                #60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #69=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #70=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #71=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_ITEM','',#60);
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_ITEM','',#61);
-                #73=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO_ITEM','',#62);
-                #74=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE_ITEM','',#63);
-                #75=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ITEM','',#64);
-                #76=ANNOTATION_TEXT_OCCURRENCE('NOTE_VALUE_ITEM','',#65);
-                #77=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE_WITH_UNIT','',#66);
-                #78=ANNOTATION_TEXT_OCCURRENCE('NOTE_ADDRESS','',#67);
-                #79=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHAR_OBJ','',#68);
-                #80=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIM_EXP','',#69);
-                #81=ANNOTATION_TEXT_OCCURRENCE('NOTE_VERTEX','',#70);
-                #82=ANNOTATION_TEXT_OCCURRENCE('NOTE_EDGE','',#71);
-                #83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#71,#8);
-                #84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#72,#8);
-                #85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#73,#8);
-                #86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#10,#74,#8);
-                #87=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#35,#10,#75,#8);
-                #88=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#38,#10,#76,#8);
-                #89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#41,#10,#77,#8);
-                #90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#44,#10,#78,#8);
-                #91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#47,#10,#79,#8);
-                #92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#50,#10,#80,#8);
-                #93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#53,#10,#81,#8);
-                #94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#56,#10,#82,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=REPRESENTATION_ITEM('REP_ITEM_ONLY');\n"
+        + "#23=PROPERTY_DEFINITION('PD_REP_ITEM','',#22);\n"
+        + "#24=PROPERTY_DEFINITION_REPRESENTATION(#23,#10);\n"
+        + "#25=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
+        + "#26=PROPERTY_DEFINITION('PD_GEOM_ITEM','',#25);\n"
+        + "#27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#28=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));\n"
+        + "#29=PROPERTY_DEFINITION('PD_TOPO_ITEM','',#28);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);\n"
+        + "#31=(NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#32=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#31);\n"
+        + "#33=PROPERTY_DEFINITION('PD_MEASURE','',#32);\n"
+        + "#34=PROPERTY_DEFINITION_REPRESENTATION(#33,#10);\n"
+        + "#35=DESCRIPTIVE_REPRESENTATION_ITEM('DESC_ITEM','descriptive');\n"
+        + "#36=PROPERTY_DEFINITION('PD_DESC_ITEM','',#35);\n"
+        + "#37=PROPERTY_DEFINITION_REPRESENTATION(#36,#10);\n"
+        + "#38=VALUE_REPRESENTATION_ITEM('VALUE_ITEM',INTEGER_REPRESENTATION_ITEM(7));\n"
+        + "#39=PROPERTY_DEFINITION('PD_VALUE_ITEM','',#38);\n"
+        + "#40=PROPERTY_DEFINITION_REPRESENTATION(#39,#10);\n"
+        + "#41=MEASURE_WITH_UNIT(LENGTH_MEASURE(9.5),#31);\n"
+        + "#42=PROPERTY_DEFINITION('PD_MEASURE_WITH_UNIT','',#41);\n"
+        + "#43=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#44=ADDRESS('HQ','','Main St','','Shanghai','Shanghai','200000','CN','','','','');\n"
+        + "#45=PROPERTY_DEFINITION('PD_ADDRESS','',#44);\n"
+        + "#46=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);\n"
+        + "#47=CHARACTERIZED_OBJECT('CHAR_OBJ','characterized');\n"
+        + "#48=PROPERTY_DEFINITION('PD_CHAR_OBJ','',#47);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#50=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);\n"
+        + "#51=PROPERTY_DEFINITION('PD_DIM_EXP','',#50);\n"
+        + "#52=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);\n"
+        + "#53=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('VERT_MARK'));\n"
+        + "#54=PROPERTY_DEFINITION('PD_VERTEX','',#53);\n"
+        + "#55=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);\n"
+        + "#56=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('EDGE_MARK'));\n"
+        + "#57=PROPERTY_DEFINITION('PD_EDGE','',#56);\n"
+        + "#58=PROPERTY_DEFINITION_REPRESENTATION(#57,#10);\n"
+        + "#60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#69=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#70=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#71=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_ITEM','',#60);\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOM_ITEM','',#61);\n"
+        + "#73=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO_ITEM','',#62);\n"
+        + "#74=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE_ITEM','',#63);\n"
+        + "#75=ANNOTATION_TEXT_OCCURRENCE('NOTE_DESC_ITEM','',#64);\n"
+        + "#76=ANNOTATION_TEXT_OCCURRENCE('NOTE_VALUE_ITEM','',#65);\n"
+        + "#77=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE_WITH_UNIT','',#66);\n"
+        + "#78=ANNOTATION_TEXT_OCCURRENCE('NOTE_ADDRESS','',#67);\n"
+        + "#79=ANNOTATION_TEXT_OCCURRENCE('NOTE_CHAR_OBJ','',#68);\n"
+        + "#80=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIM_EXP','',#69);\n"
+        + "#81=ANNOTATION_TEXT_OCCURRENCE('NOTE_VERTEX','',#70);\n"
+        + "#82=ANNOTATION_TEXT_OCCURRENCE('NOTE_EDGE','',#71);\n"
+        + "#83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#71,#8);\n"
+        + "#84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#72,#8);\n"
+        + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#73,#8);\n"
+        + "#86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#10,#74,#8);\n"
+        + "#87=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#35,#10,#75,#8);\n"
+        + "#88=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#38,#10,#76,#8);\n"
+        + "#89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#41,#10,#77,#8);\n"
+        + "#90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#44,#10,#78,#8);\n"
+        + "#91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#47,#10,#79,#8);\n"
+        + "#92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#50,#10,#80,#8);\n"
+        + "#93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#53,#10,#81,#8);\n"
+        + "#94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#56,#10,#82,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5416,71 +5364,70 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMapTransformAndPointReplicaLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=CARTESIAN_POINT('MAP_P0',(2.0,0.0));
-                #23=DIRECTION('MAP_D0',(1.0,0.0));
-                #24=AXIS2_PLACEMENT_2D('MAP0',#22,#23);
-                #25=REPRESENTATION('MAP_REP',(),#9);
-                #26=REPRESENTATION_MAP(#24,#25);
-                #27=SYMBOL_REPRESENTATION_MAP(#24,#25);
-                #28=CARTESIAN_POINT('MAP_P1',(3.0,0.0));
-                #29=DIRECTION('MAP_D1',(0.0,1.0));
-                #30=AXIS2_PLACEMENT_2D('TGT0',#28,#29);
-                #31=MAPPED_ITEM(#26,#30);
-                #32=CARTESIAN_POINT('TR0',(4.0,0.0,0.0));
-                #33=DIRECTION('DY',(0.0,1.0,0.0));
-                #34=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#16,#33,#32,1.0,#15);
-                #35=CARTESIAN_POINT('PR_P',(5.0,0.0,0.0));
-                #36=POINT_REPLICA('PR0',#35,#34);
-                #40=PROPERTY_DEFINITION('PD_REP_MAP','',#26);
-                #41=PROPERTY_DEFINITION('PD_SYM_MAP','',#27);
-                #42=PROPERTY_DEFINITION('PD_MAPPED','',#31);
-                #43=PROPERTY_DEFINITION('PD_ITEM_XF','',#19);
-                #44=PROPERTY_DEFINITION('PD_CART_XF','',#34);
-                #45=PROPERTY_DEFINITION('PD_POINT_REPLICA','',#36);
-                #50=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #51=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);
-                #52=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #53=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);
-                #54=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #55=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);
-                #60=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_MAP','',#13);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_SYM_MAP','',#14);
-                #62=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAPPED_ITEM','',#32);
-                #63=ANNOTATION_TEXT_OCCURRENCE('NOTE_ITEM_XF','',#35);
-                #64=ANNOTATION_TEXT_OCCURRENCE('NOTE_CART_XF','',#13);
-                #65=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_REPLICA','',#14);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#60,#8);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#27,#10,#61,#8);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#10,#62,#8);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#19,#10,#63,#8);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#64,#8);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#36,#10,#65,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=CARTESIAN_POINT('MAP_P0',(2.0,0.0));\n"
+        + "#23=DIRECTION('MAP_D0',(1.0,0.0));\n"
+        + "#24=AXIS2_PLACEMENT_2D('MAP0',#22,#23);\n"
+        + "#25=REPRESENTATION('MAP_REP',(),#9);\n"
+        + "#26=REPRESENTATION_MAP(#24,#25);\n"
+        + "#27=SYMBOL_REPRESENTATION_MAP(#24,#25);\n"
+        + "#28=CARTESIAN_POINT('MAP_P1',(3.0,0.0));\n"
+        + "#29=DIRECTION('MAP_D1',(0.0,1.0));\n"
+        + "#30=AXIS2_PLACEMENT_2D('TGT0',#28,#29);\n"
+        + "#31=MAPPED_ITEM(#26,#30);\n"
+        + "#32=CARTESIAN_POINT('TR0',(4.0,0.0,0.0));\n"
+        + "#33=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#34=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#16,#33,#32,1.0,#15);\n"
+        + "#35=CARTESIAN_POINT('PR_P',(5.0,0.0,0.0));\n"
+        + "#36=POINT_REPLICA('PR0',#35,#34);\n"
+        + "#40=PROPERTY_DEFINITION('PD_REP_MAP','',#26);\n"
+        + "#41=PROPERTY_DEFINITION('PD_SYM_MAP','',#27);\n"
+        + "#42=PROPERTY_DEFINITION('PD_MAPPED','',#31);\n"
+        + "#43=PROPERTY_DEFINITION('PD_ITEM_XF','',#19);\n"
+        + "#44=PROPERTY_DEFINITION('PD_CART_XF','',#34);\n"
+        + "#45=PROPERTY_DEFINITION('PD_POINT_REPLICA','',#36);\n"
+        + "#50=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#51=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);\n"
+        + "#52=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#53=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);\n"
+        + "#54=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#55=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);\n"
+        + "#60=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_MAP','',#13);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_SYM_MAP','',#14);\n"
+        + "#62=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAPPED_ITEM','',#32);\n"
+        + "#63=ANNOTATION_TEXT_OCCURRENCE('NOTE_ITEM_XF','',#35);\n"
+        + "#64=ANNOTATION_TEXT_OCCURRENCE('NOTE_CART_XF','',#13);\n"
+        + "#65=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_REPLICA','',#14);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#60,#8);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#27,#10,#61,#8);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#10,#62,#8);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#19,#10,#63,#8);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#64,#8);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#36,#10,#65,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5588,44 +5535,43 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectGenericPointAndCurveLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PT0'));
-                #23=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('CV0'));
-                #24=PROPERTY_DEFINITION('PD_POINT','',#22);
-                #25=PROPERTY_DEFINITION('PD_CURVE','',#23);
-                #26=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);
-                #27=PROPERTY_DEFINITION_REPRESENTATION(#25,#10);
-                #28=CARTESIAN_POINT('N0',(2.0,0.0,0.0));
-                #29=CARTESIAN_POINT('N1',(3.0,0.0,0.0));
-                #30=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_GENERIC','',#28);
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CURVE_GENERIC','',#29);
-                #32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#30,#8);
-                #33=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#31,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PT0'));\n"
+        + "#23=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('CV0'));\n"
+        + "#24=PROPERTY_DEFINITION('PD_POINT','',#22);\n"
+        + "#25=PROPERTY_DEFINITION('PD_CURVE','',#23);\n"
+        + "#26=PROPERTY_DEFINITION_REPRESENTATION(#24,#10);\n"
+        + "#27=PROPERTY_DEFINITION_REPRESENTATION(#25,#10);\n"
+        + "#28=CARTESIAN_POINT('N0',(2.0,0.0,0.0));\n"
+        + "#29=CARTESIAN_POINT('N1',(3.0,0.0,0.0));\n"
+        + "#30=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_GENERIC','',#28);\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CURVE_GENERIC','',#29);\n"
+        + "#32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#30,#8);\n"
+        + "#33=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#31,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5693,39 +5639,38 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRepresentationAndShapeAspectOccurrenceDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_DIRECT',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=SHAPE_ASPECT_OCCURRENCE('SAO0','occ',#7,.T.,#8);
-                #23=CARTESIAN_POINT('N0',(2.0,0.0,0.0));
-                #24=CARTESIAN_POINT('N1',(3.0,0.0,0.0));
-                #25=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_DIRECT','',#23);
-                #26=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_OCC','',#24);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#25,#8);
-                #28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#26,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_DIRECT',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=SHAPE_ASPECT_OCCURRENCE('SAO0','occ',#7,.T.,#8);\n"
+        + "#23=CARTESIAN_POINT('N0',(2.0,0.0,0.0));\n"
+        + "#24=CARTESIAN_POINT('N1',(3.0,0.0,0.0));\n"
+        + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE_REP_DIRECT','',#23);\n"
+        + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_OCC','',#24);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#25,#8);\n"
+        + "#28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#26,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5789,62 +5734,61 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectGeometricLeafLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=CARTESIAN_POINT('DP0',(2.0,0.0,0.0));
-                #23=PROPERTY_DEFINITION('PD_POINT','',#22);
-                #24=PROPERTY_DEFINITION_REPRESENTATION(#23,#10);
-                #25=DIRECTION('DD0',(0.0,1.0,0.0));
-                #26=PROPERTY_DEFINITION('PD_DIRECTION','',#25);
-                #27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #28=VECTOR('V0',#25,2.5);
-                #29=PROPERTY_DEFINITION('PD_VECTOR','',#28);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);
-                #31=AXIS2_PLACEMENT_3D('AX2',#22,#15,#16);
-                #32=PROPERTY_DEFINITION('PD_AXIS','',#31);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);
-                #34=PLANE('PL0',#31);
-                #35=PROPERTY_DEFINITION('PD_PLANE','',#34);
-                #36=PROPERTY_DEFINITION_REPRESENTATION(#35,#10);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT','',#40);
-                #46=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIRECTION','',#41);
-                #47=ANNOTATION_TEXT_OCCURRENCE('NOTE_VECTOR','',#42);
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS','',#43);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_PLANE','',#44);
-                #50=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#45,#8);
-                #51=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#46,#8);
-                #52=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#47,#8);
-                #53=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#31,#10,#48,#8);
-                #54=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#49,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=CARTESIAN_POINT('DP0',(2.0,0.0,0.0));\n"
+        + "#23=PROPERTY_DEFINITION('PD_POINT','',#22);\n"
+        + "#24=PROPERTY_DEFINITION_REPRESENTATION(#23,#10);\n"
+        + "#25=DIRECTION('DD0',(0.0,1.0,0.0));\n"
+        + "#26=PROPERTY_DEFINITION('PD_DIRECTION','',#25);\n"
+        + "#27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#28=VECTOR('V0',#25,2.5);\n"
+        + "#29=PROPERTY_DEFINITION('PD_VECTOR','',#28);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);\n"
+        + "#31=AXIS2_PLACEMENT_3D('AX2',#22,#15,#16);\n"
+        + "#32=PROPERTY_DEFINITION('PD_AXIS','',#31);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);\n"
+        + "#34=PLANE('PL0',#31);\n"
+        + "#35=PROPERTY_DEFINITION('PD_PLANE','',#34);\n"
+        + "#36=PROPERTY_DEFINITION_REPRESENTATION(#35,#10);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT','',#40);\n"
+        + "#46=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIRECTION','',#41);\n"
+        + "#47=ANNOTATION_TEXT_OCCURRENCE('NOTE_VECTOR','',#42);\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS','',#43);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_PLANE','',#44);\n"
+        + "#50=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#45,#8);\n"
+        + "#51=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#46,#8);\n"
+        + "#52=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#47,#8);\n"
+        + "#53=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#31,#10,#48,#8);\n"
+        + "#54=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#49,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5942,83 +5886,82 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectCurveAndSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=CARTESIAN_POINT('P0',(2.0,0.0,0.0));
-                #23=DIRECTION('DY',(0.0,1.0,0.0));
-                #24=VECTOR('V0',#23,2.5);
-                #25=LINE('L0',#22,#24);
-                #26=PROPERTY_DEFINITION('PD_LINE','',#25);
-                #27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #28=CIRCLE('C0',#17,5.0);
-                #29=PROPERTY_DEFINITION('PD_CIRCLE','',#28);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);
-                #31=ELLIPSE('E0',#17,6.0,3.0);
-                #32=PROPERTY_DEFINITION('PD_ELLIPSE','',#31);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);
-                #34=POLYLINE('PL0',(#13,#14,#22));
-                #35=PROPERTY_DEFINITION('PD_POLYLINE','',#34);
-                #36=PROPERTY_DEFINITION_REPRESENTATION(#35,#10);
-                #37=TRIMMED_CURVE('TC0',#25,(#22),(#14),.T.,.PARAMETER.);
-                #38=PROPERTY_DEFINITION('PD_TRIM','',#37);
-                #39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);
-                #40=CYLINDRICAL_SURFACE('CYL0',#17,2.0);
-                #41=PROPERTY_DEFINITION('PD_CYL','',#40);
-                #42=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);
-                #43=SURFACE_OF_LINEAR_EXTRUSION('SOLE0',#25,#24);
-                #44=PROPERTY_DEFINITION('PD_SOLE','',#43);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #46=AXIS1_PLACEMENT('AXIS1',#22,#15);
-                #47=SURFACE_OF_REVOLUTION('SOR0',#25,#46);
-                #48=PROPERTY_DEFINITION('PD_SOR','',#47);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #60=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #61=CARTESIAN_POINT('N1',(1.0,0.0,0.0));
-                #62=CARTESIAN_POINT('N2',(2.0,0.0,0.0));
-                #63=CARTESIAN_POINT('N3',(3.0,0.0,0.0));
-                #64=CARTESIAN_POINT('N4',(4.0,0.0,0.0));
-                #65=CARTESIAN_POINT('N5',(5.0,0.0,0.0));
-                #66=CARTESIAN_POINT('N6',(6.0,0.0,0.0));
-                #67=ANNOTATION_TEXT_OCCURRENCE('NOTE_LINE','',#60);
-                #68=ANNOTATION_TEXT_OCCURRENCE('NOTE_CIRCLE','',#61);
-                #69=ANNOTATION_TEXT_OCCURRENCE('NOTE_ELLIPSE','',#62);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_POLYLINE','',#63);
-                #71=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRIM','',#64);
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE_CYL','',#65);
-                #73=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLE','',#66);
-                #74=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOR','',#67);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#25,#10,#67,#8);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#28,#10,#68,#8);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#10,#69,#8);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#34,#10,#70,#8);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#37,#10,#71,#8);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#40,#10,#72,#8);
-                #81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#43,#10,#73,#8);
-                #82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#47,#10,#74,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=CARTESIAN_POINT('P0',(2.0,0.0,0.0));\n"
+        + "#23=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#24=VECTOR('V0',#23,2.5);\n"
+        + "#25=LINE('L0',#22,#24);\n"
+        + "#26=PROPERTY_DEFINITION('PD_LINE','',#25);\n"
+        + "#27=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#28=CIRCLE('C0',#17,5.0);\n"
+        + "#29=PROPERTY_DEFINITION('PD_CIRCLE','',#28);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);\n"
+        + "#31=ELLIPSE('E0',#17,6.0,3.0);\n"
+        + "#32=PROPERTY_DEFINITION('PD_ELLIPSE','',#31);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#32,#10);\n"
+        + "#34=POLYLINE('PL0',(#13,#14,#22));\n"
+        + "#35=PROPERTY_DEFINITION('PD_POLYLINE','',#34);\n"
+        + "#36=PROPERTY_DEFINITION_REPRESENTATION(#35,#10);\n"
+        + "#37=TRIMMED_CURVE('TC0',#25,(#22),(#14),.T.,.PARAMETER.);\n"
+        + "#38=PROPERTY_DEFINITION('PD_TRIM','',#37);\n"
+        + "#39=PROPERTY_DEFINITION_REPRESENTATION(#38,#10);\n"
+        + "#40=CYLINDRICAL_SURFACE('CYL0',#17,2.0);\n"
+        + "#41=PROPERTY_DEFINITION('PD_CYL','',#40);\n"
+        + "#42=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);\n"
+        + "#43=SURFACE_OF_LINEAR_EXTRUSION('SOLE0',#25,#24);\n"
+        + "#44=PROPERTY_DEFINITION('PD_SOLE','',#43);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#46=AXIS1_PLACEMENT('AXIS1',#22,#15);\n"
+        + "#47=SURFACE_OF_REVOLUTION('SOR0',#25,#46);\n"
+        + "#48=PROPERTY_DEFINITION('PD_SOR','',#47);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#60=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#61=CARTESIAN_POINT('N1',(1.0,0.0,0.0));\n"
+        + "#62=CARTESIAN_POINT('N2',(2.0,0.0,0.0));\n"
+        + "#63=CARTESIAN_POINT('N3',(3.0,0.0,0.0));\n"
+        + "#64=CARTESIAN_POINT('N4',(4.0,0.0,0.0));\n"
+        + "#65=CARTESIAN_POINT('N5',(5.0,0.0,0.0));\n"
+        + "#66=CARTESIAN_POINT('N6',(6.0,0.0,0.0));\n"
+        + "#67=ANNOTATION_TEXT_OCCURRENCE('NOTE_LINE','',#60);\n"
+        + "#68=ANNOTATION_TEXT_OCCURRENCE('NOTE_CIRCLE','',#61);\n"
+        + "#69=ANNOTATION_TEXT_OCCURRENCE('NOTE_ELLIPSE','',#62);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_POLYLINE','',#63);\n"
+        + "#71=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRIM','',#64);\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE_CYL','',#65);\n"
+        + "#73=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLE','',#66);\n"
+        + "#74=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOR','',#67);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#25,#10,#67,#8);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#28,#10,#68,#8);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#10,#69,#8);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#34,#10,#70,#8);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#37,#10,#71,#8);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#40,#10,#72,#8);\n"
+        + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#43,#10,#73,#8);\n"
+        + "#82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#47,#10,#74,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6110,49 +6053,48 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectConicCurveLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_A',(),#9);
-                #11=REPRESENTATION('REP_B',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #14=DIRECTION('DZ',(0.0,0.0,1.0));
-                #15=DIRECTION('DX',(1.0,0.0,0.0));
-                #16=AXIS2_PLACEMENT_3D('AX3',#13,#14,#15);
-                #17=PARABOLA('PAR0',#16,2.0);
-                #18=HYPERBOLA('HYP0',#16,4.0,2.0);
-                #19=DEGENERATE_CONIC('DC0',#16);
-                #20=PROPERTY_DEFINITION('PD_PAR','',#17);
-                #21=PROPERTY_DEFINITION('PD_HYP','',#18);
-                #22=PROPERTY_DEFINITION('PD_DC','',#19);
-                #23=PROPERTY_DEFINITION_REPRESENTATION(#20,#10);
-                #24=PROPERTY_DEFINITION_REPRESENTATION(#21,#10);
-                #25=PROPERTY_DEFINITION_REPRESENTATION(#22,#10);
-                #26=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #27=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #28=DIRECTION('TZ',(0.0,0.0,1.0));
-                #29=DIRECTION('TX',(1.0,0.0,0.0));
-                #30=AXIS2_PLACEMENT_3D('AX0',#26,#28,#29);
-                #31=AXIS2_PLACEMENT_3D('AX1',#27,#28,#29);
-                #32=ITEM_DEFINED_TRANSFORMATION('T1','',#30,#31);
-                #33=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#32));
-                #34=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONIC','',#13);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#35,#8);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#18,#10,#35,#8);
-                #38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#19,#10,#35,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_A',(),#9);\n"
+        + "#11=REPRESENTATION('REP_B',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#14=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#15=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#16=AXIS2_PLACEMENT_3D('AX3',#13,#14,#15);\n"
+        + "#17=PARABOLA('PAR0',#16,2.0);\n"
+        + "#18=HYPERBOLA('HYP0',#16,4.0,2.0);\n"
+        + "#19=DEGENERATE_CONIC('DC0',#16);\n"
+        + "#20=PROPERTY_DEFINITION('PD_PAR','',#17);\n"
+        + "#21=PROPERTY_DEFINITION('PD_HYP','',#18);\n"
+        + "#22=PROPERTY_DEFINITION('PD_DC','',#19);\n"
+        + "#23=PROPERTY_DEFINITION_REPRESENTATION(#20,#10);\n"
+        + "#24=PROPERTY_DEFINITION_REPRESENTATION(#21,#10);\n"
+        + "#25=PROPERTY_DEFINITION_REPRESENTATION(#22,#10);\n"
+        + "#26=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#27=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#28=DIRECTION('TZ',(0.0,0.0,1.0));\n"
+        + "#29=DIRECTION('TX',(1.0,0.0,0.0));\n"
+        + "#30=AXIS2_PLACEMENT_3D('AX0',#26,#28,#29);\n"
+        + "#31=AXIS2_PLACEMENT_3D('AX1',#27,#28,#29);\n"
+        + "#32=ITEM_DEFINED_TRANSFORMATION('T1','',#30,#31);\n"
+        + "#33=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#32));\n"
+        + "#34=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONIC','',#13);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#35,#8);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#18,#10,#35,#8);\n"
+        + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#19,#10,#35,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6188,100 +6130,99 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectSplineCurveAndSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_A',(),#9);
-                #11=REPRESENTATION('REP_B',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #15=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #16=CARTESIAN_POINT('P3',(0.0,1.0,1.0));
-                #17=DIRECTION('DZ',(0.0,0.0,1.0));
-                #18=DIRECTION('DX',(1.0,0.0,0.0));
-                #19=AXIS2_PLACEMENT_3D('AX0',#13,#17,#18);
-                #20=ITEM_DEFINED_TRANSFORMATION('T1','',#19,#19);
-                #21=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#20));
-                #22=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #30=(B_SPLINE_CURVE('BSC0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSC0'));
-                #31=(B_SPLINE_CURVE('BSK0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.)
-                     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)
-                     BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSK0'));
-                #32=(B_SPLINE_CURVE('RBC0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.)
-                     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)
-                     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0))
-                     BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('RBC0'));
-                #33=(BEZIER_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZ0'));
-                #34=(UNIFORM_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('UC0'));
-                #35=(QUASI_UNIFORM_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('QUC0'));
-                #36=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PBC0'));
-                #40=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSS0'));
-                #41=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.)
-                     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)
-                     BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSK0'));
-                #42=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.)
-                     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)
-                     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,1.0)))
-                     BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('RBS0'));
-                #43=(BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZS0'));
-                #44=(UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('US0'));
-                #45=(QUASI_UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('QUS0'));
-                #46=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PBS0'));
-                #130=PROPERTY_DEFINITION('PD_BSC','',#30);
-                #131=PROPERTY_DEFINITION('PD_BSK','',#31);
-                #132=PROPERTY_DEFINITION('PD_RBC','',#32);
-                #133=PROPERTY_DEFINITION('PD_BZ','',#33);
-                #134=PROPERTY_DEFINITION('PD_UC','',#34);
-                #135=PROPERTY_DEFINITION('PD_QUC','',#35);
-                #136=PROPERTY_DEFINITION('PD_PBC','',#36);
-                #137=PROPERTY_DEFINITION('PD_BSS','',#40);
-                #138=PROPERTY_DEFINITION('PD_BSKS','',#41);
-                #139=PROPERTY_DEFINITION('PD_RBS','',#42);
-                #140=PROPERTY_DEFINITION('PD_BZS','',#43);
-                #141=PROPERTY_DEFINITION('PD_US','',#44);
-                #142=PROPERTY_DEFINITION('PD_QUS','',#45);
-                #143=PROPERTY_DEFINITION('PD_PBS','',#46);
-                #160=PROPERTY_DEFINITION_REPRESENTATION(#130,#10);
-                #161=PROPERTY_DEFINITION_REPRESENTATION(#131,#10);
-                #162=PROPERTY_DEFINITION_REPRESENTATION(#132,#10);
-                #163=PROPERTY_DEFINITION_REPRESENTATION(#133,#10);
-                #164=PROPERTY_DEFINITION_REPRESENTATION(#134,#10);
-                #165=PROPERTY_DEFINITION_REPRESENTATION(#135,#10);
-                #166=PROPERTY_DEFINITION_REPRESENTATION(#136,#10);
-                #167=PROPERTY_DEFINITION_REPRESENTATION(#137,#10);
-                #168=PROPERTY_DEFINITION_REPRESENTATION(#138,#10);
-                #169=PROPERTY_DEFINITION_REPRESENTATION(#139,#10);
-                #170=PROPERTY_DEFINITION_REPRESENTATION(#140,#10);
-                #171=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);
-                #172=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);
-                #173=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);
-                #200=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPLINE','',#13);
-                #201=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#30,#10,#200,#8);
-                #202=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#31,#10,#200,#8);
-                #203=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#32,#10,#200,#8);
-                #204=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#33,#10,#200,#8);
-                #205=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#200,#8);
-                #206=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#35,#10,#200,#8);
-                #207=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#36,#10,#200,#8);
-                #208=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#200,#8);
-                #209=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#200,#8);
-                #210=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#200,#8);
-                #211=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#43,#10,#200,#8);
-                #212=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#44,#10,#200,#8);
-                #213=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#45,#10,#200,#8);
-                #214=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#46,#10,#200,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_A',(),#9);\n"
+        + "#11=REPRESENTATION('REP_B',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#16=CARTESIAN_POINT('P3',(0.0,1.0,1.0));\n"
+        + "#17=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#18=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#19=AXIS2_PLACEMENT_3D('AX0',#13,#17,#18);\n"
+        + "#20=ITEM_DEFINED_TRANSFORMATION('T1','',#19,#19);\n"
+        + "#21=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#20));\n"
+        + "#22=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#30=(B_SPLINE_CURVE('BSC0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSC0'));\n"
+        + "#31=(B_SPLINE_CURVE('BSK0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.)\n"
+        + "     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)\n"
+        + "     BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSK0'));\n"
+        + "#32=(B_SPLINE_CURVE('RBC0',2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.)\n"
+        + "     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)\n"
+        + "     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0))\n"
+        + "     BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('RBC0'));\n"
+        + "#33=(BEZIER_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZ0'));\n"
+        + "#34=(UNIFORM_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('UC0'));\n"
+        + "#35=(QUASI_UNIFORM_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('QUC0'));\n"
+        + "#36=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() B_SPLINE_CURVE(2,(#13,#14,#15),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PBC0'));\n"
+        + "#40=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSS0'));\n"
+        + "#41=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
+        + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)\n"
+        + "     BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BSK0'));\n"
+        + "#42=(B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
+        + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)\n"
+        + "     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,1.0)))\n"
+        + "     BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('RBS0'));\n"
+        + "#43=(BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZS0'));\n"
+        + "#44=(UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('US0'));\n"
+        + "#45=(QUASI_UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('QUS0'));\n"
+        + "#46=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#13,#14),(#15,#16)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('PBS0'));\n"
+        + "#130=PROPERTY_DEFINITION('PD_BSC','',#30);\n"
+        + "#131=PROPERTY_DEFINITION('PD_BSK','',#31);\n"
+        + "#132=PROPERTY_DEFINITION('PD_RBC','',#32);\n"
+        + "#133=PROPERTY_DEFINITION('PD_BZ','',#33);\n"
+        + "#134=PROPERTY_DEFINITION('PD_UC','',#34);\n"
+        + "#135=PROPERTY_DEFINITION('PD_QUC','',#35);\n"
+        + "#136=PROPERTY_DEFINITION('PD_PBC','',#36);\n"
+        + "#137=PROPERTY_DEFINITION('PD_BSS','',#40);\n"
+        + "#138=PROPERTY_DEFINITION('PD_BSKS','',#41);\n"
+        + "#139=PROPERTY_DEFINITION('PD_RBS','',#42);\n"
+        + "#140=PROPERTY_DEFINITION('PD_BZS','',#43);\n"
+        + "#141=PROPERTY_DEFINITION('PD_US','',#44);\n"
+        + "#142=PROPERTY_DEFINITION('PD_QUS','',#45);\n"
+        + "#143=PROPERTY_DEFINITION('PD_PBS','',#46);\n"
+        + "#160=PROPERTY_DEFINITION_REPRESENTATION(#130,#10);\n"
+        + "#161=PROPERTY_DEFINITION_REPRESENTATION(#131,#10);\n"
+        + "#162=PROPERTY_DEFINITION_REPRESENTATION(#132,#10);\n"
+        + "#163=PROPERTY_DEFINITION_REPRESENTATION(#133,#10);\n"
+        + "#164=PROPERTY_DEFINITION_REPRESENTATION(#134,#10);\n"
+        + "#165=PROPERTY_DEFINITION_REPRESENTATION(#135,#10);\n"
+        + "#166=PROPERTY_DEFINITION_REPRESENTATION(#136,#10);\n"
+        + "#167=PROPERTY_DEFINITION_REPRESENTATION(#137,#10);\n"
+        + "#168=PROPERTY_DEFINITION_REPRESENTATION(#138,#10);\n"
+        + "#169=PROPERTY_DEFINITION_REPRESENTATION(#139,#10);\n"
+        + "#170=PROPERTY_DEFINITION_REPRESENTATION(#140,#10);\n"
+        + "#171=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);\n"
+        + "#172=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);\n"
+        + "#173=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);\n"
+        + "#200=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPLINE','',#13);\n"
+        + "#201=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#30,#10,#200,#8);\n"
+        + "#202=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#31,#10,#200,#8);\n"
+        + "#203=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#32,#10,#200,#8);\n"
+        + "#204=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#33,#10,#200,#8);\n"
+        + "#205=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#200,#8);\n"
+        + "#206=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#35,#10,#200,#8);\n"
+        + "#207=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#36,#10,#200,#8);\n"
+        + "#208=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#200,#8);\n"
+        + "#209=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#200,#8);\n"
+        + "#210=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#200,#8);\n"
+        + "#211=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#43,#10,#200,#8);\n"
+        + "#212=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#44,#10,#200,#8);\n"
+        + "#213=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#45,#10,#200,#8);\n"
+        + "#214=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#46,#10,#200,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6361,84 +6302,83 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectWrapperCurveAndPrimitiveSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('O1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=DIRECTION('DY',(0.0,1.0,0.0));
-                #18=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #19=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #20=ITEM_DEFINED_TRANSFORMATION('T1','',#18,#19);
-                #21=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#20));
-                #22=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #23=VECTOR('V0',#17,2.5);
-                #24=LINE('L0',#13,#23);
-                #25=PLANE('PL_REF',#18);
-                #26=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #27=DIRECTION('DUV',(0.0,1.0));
-                #28=VECTOR('VUV',#27,1.0);
-                #29=LINE('UVL0',#26,#28);
-                #30=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #31=DEFINITIONAL_REPRESENTATION('DEF0',(#29),#30);
-                #32=PCURVE('PC0',#25,#31);
-                #33=SURFACE_CURVE('SC0',#24,(#32),.PCURVE_S1.);
-                #34=PROPERTY_DEFINITION('PD_SC','',#33);
-                #35=PROPERTY_DEFINITION_REPRESENTATION(#34,#10);
-                #36=SEAM_CURVE('SM0',#24,(#32,#32),.PCURVE_S1.);
-                #37=PROPERTY_DEFINITION('PD_SM','',#36);
-                #38=PROPERTY_DEFINITION_REPRESENTATION(#37,#10);
-                #39=OFFSET_CURVE_2D('OC2D',#32,1.0,.F.);
-                #40=PROPERTY_DEFINITION('PD_OC2D','',#39);
-                #41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #42=OFFSET_CURVE_3D('OC3D',#24,2.0,.F.,#17);
-                #43=PROPERTY_DEFINITION('PD_OC3D','',#42);
-                #44=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);
-                #45=CONICAL_SURFACE('CN0',#18,4.0,0.5);
-                #46=PROPERTY_DEFINITION('PD_CONE','',#45);
-                #47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);
-                #48=SPHERICAL_SURFACE('SP0',#18,6.0);
-                #49=PROPERTY_DEFINITION('PD_SPH','',#48);
-                #50=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);
-                #51=TOROIDAL_SURFACE('TO0',#18,8.0,2.0);
-                #52=PROPERTY_DEFINITION('PD_TOR','',#51);
-                #53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);
-                #70=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #71=CARTESIAN_POINT('N1',(1.0,0.0,0.0));
-                #72=CARTESIAN_POINT('N2',(2.0,0.0,0.0));
-                #73=CARTESIAN_POINT('N3',(3.0,0.0,0.0));
-                #74=CARTESIAN_POINT('N4',(4.0,0.0,0.0));
-                #75=CARTESIAN_POINT('N5',(5.0,0.0,0.0));
-                #76=ANNOTATION_TEXT_OCCURRENCE('NOTE_SC','',#70);
-                #77=ANNOTATION_TEXT_OCCURRENCE('NOTE_SM','',#71);
-                #78=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC2D','',#72);
-                #79=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC3D','',#73);
-                #80=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONE','',#74);
-                #81=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPH','',#75);
-                #82=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOR','',#75);
-                #83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#33,#10,#76,#8);
-                #84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#36,#10,#77,#8);
-                #85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#39,#10,#78,#8);
-                #86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#42,#10,#79,#8);
-                #87=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#45,#10,#80,#8);
-                #88=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#48,#10,#81,#8);
-                #89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#51,#10,#82,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('O1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#19=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#20=ITEM_DEFINED_TRANSFORMATION('T1','',#18,#19);\n"
+        + "#21=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#20));\n"
+        + "#22=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#23=VECTOR('V0',#17,2.5);\n"
+        + "#24=LINE('L0',#13,#23);\n"
+        + "#25=PLANE('PL_REF',#18);\n"
+        + "#26=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#27=DIRECTION('DUV',(0.0,1.0));\n"
+        + "#28=VECTOR('VUV',#27,1.0);\n"
+        + "#29=LINE('UVL0',#26,#28);\n"
+        + "#30=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#31=DEFINITIONAL_REPRESENTATION('DEF0',(#29),#30);\n"
+        + "#32=PCURVE('PC0',#25,#31);\n"
+        + "#33=SURFACE_CURVE('SC0',#24,(#32),.PCURVE_S1.);\n"
+        + "#34=PROPERTY_DEFINITION('PD_SC','',#33);\n"
+        + "#35=PROPERTY_DEFINITION_REPRESENTATION(#34,#10);\n"
+        + "#36=SEAM_CURVE('SM0',#24,(#32,#32),.PCURVE_S1.);\n"
+        + "#37=PROPERTY_DEFINITION('PD_SM','',#36);\n"
+        + "#38=PROPERTY_DEFINITION_REPRESENTATION(#37,#10);\n"
+        + "#39=OFFSET_CURVE_2D('OC2D',#32,1.0,.F.);\n"
+        + "#40=PROPERTY_DEFINITION('PD_OC2D','',#39);\n"
+        + "#41=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#42=OFFSET_CURVE_3D('OC3D',#24,2.0,.F.,#17);\n"
+        + "#43=PROPERTY_DEFINITION('PD_OC3D','',#42);\n"
+        + "#44=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);\n"
+        + "#45=CONICAL_SURFACE('CN0',#18,4.0,0.5);\n"
+        + "#46=PROPERTY_DEFINITION('PD_CONE','',#45);\n"
+        + "#47=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);\n"
+        + "#48=SPHERICAL_SURFACE('SP0',#18,6.0);\n"
+        + "#49=PROPERTY_DEFINITION('PD_SPH','',#48);\n"
+        + "#50=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);\n"
+        + "#51=TOROIDAL_SURFACE('TO0',#18,8.0,2.0);\n"
+        + "#52=PROPERTY_DEFINITION('PD_TOR','',#51);\n"
+        + "#53=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);\n"
+        + "#70=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#71=CARTESIAN_POINT('N1',(1.0,0.0,0.0));\n"
+        + "#72=CARTESIAN_POINT('N2',(2.0,0.0,0.0));\n"
+        + "#73=CARTESIAN_POINT('N3',(3.0,0.0,0.0));\n"
+        + "#74=CARTESIAN_POINT('N4',(4.0,0.0,0.0));\n"
+        + "#75=CARTESIAN_POINT('N5',(5.0,0.0,0.0));\n"
+        + "#76=ANNOTATION_TEXT_OCCURRENCE('NOTE_SC','',#70);\n"
+        + "#77=ANNOTATION_TEXT_OCCURRENCE('NOTE_SM','',#71);\n"
+        + "#78=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC2D','',#72);\n"
+        + "#79=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC3D','',#73);\n"
+        + "#80=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONE','',#74);\n"
+        + "#81=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPH','',#75);\n"
+        + "#82=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOR','',#75);\n"
+        + "#83=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#33,#10,#76,#8);\n"
+        + "#84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#36,#10,#77,#8);\n"
+        + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#39,#10,#78,#8);\n"
+        + "#86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#42,#10,#79,#8);\n"
+        + "#87=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#45,#10,#80,#8);\n"
+        + "#88=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#48,#10,#81,#8);\n"
+        + "#89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#51,#10,#82,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6502,83 +6442,82 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectCompositeReplicaAndWrapperSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_USED',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('O0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('O1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=VECTOR('VX',#16,1.0);
-                #23=LINE('L0',#13,#22);
-                #24=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#23);
-                #25=(COMPOSITE_CURVE('CC0',(#24),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('cc-name'));
-                #26=(COMPOSITE_CURVE_ON_SURFACE('CCS0',(#24),.F.) COMPOSITE_CURVE('CCS0',(#24),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('ccs-name'));
-                #27=PLANE('PL0',#17);
-                #28=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #29=DIRECTION('DUV',(1.0,0.0));
-                #30=VECTOR('VUV',#29,1.0);
-                #31=LINE('UL0',#28,#30);
-                #32=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');
-                #33=DEFINITIONAL_REPRESENTATION('DEF0',(#31),#32);
-                #34=DEGENERATE_PCURVE('DPC0',#27,#33);
-                #35=RECTANGULAR_TRIMMED_SURFACE('RTS0',#27,0.0,1.0,0.0,1.0,.T.,.T.);
-                #36=CURVE_BOUNDED_SURFACE('CBS0',#27,(#25),.T.);
-                #37=ORIENTED_SURFACE('OS0',#35,.T.);
-                #38=OFFSET_SURFACE('OFS0',#27,1.0,.F.);
-                #39=CURVE_REPLICA('CR0',#25,#81);
-                #40=SURFACE_REPLICA('SR0',#35,#81);
-                #50=PROPERTY_DEFINITION('PD_CCS','',#26);
-                #51=PROPERTY_DEFINITION('PD_CC','',#25);
-                #52=PROPERTY_DEFINITION('PD_SEG','',#24);
-                #53=PROPERTY_DEFINITION('PD_DPC','',#34);
-                #54=PROPERTY_DEFINITION('PD_RTS','',#35);
-                #55=PROPERTY_DEFINITION('PD_CBS','',#36);
-                #56=PROPERTY_DEFINITION('PD_OS','',#37);
-                #57=PROPERTY_DEFINITION('PD_OFS','',#38);
-                #58=PROPERTY_DEFINITION('PD_CR','',#39);
-                #59=PROPERTY_DEFINITION('PD_SR','',#40);
-                #60=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);
-                #61=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);
-                #62=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);
-                #63=PROPERTY_DEFINITION_REPRESENTATION(#53,#10);
-                #64=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);
-                #65=PROPERTY_DEFINITION_REPRESENTATION(#55,#10);
-                #66=PROPERTY_DEFINITION_REPRESENTATION(#56,#10);
-                #67=PROPERTY_DEFINITION_REPRESENTATION(#57,#10);
-                #68=PROPERTY_DEFINITION_REPRESENTATION(#58,#10);
-                #69=PROPERTY_DEFINITION_REPRESENTATION(#59,#10);
-                #70=ANNOTATION_TEXT_OCCURRENCE('NOTE_WRAP','',#13);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#70,#8);
-                #72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#70,#8);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#70,#8);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#34,#10,#70,#8);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#35,#10,#70,#8);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#36,#10,#70,#8);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#37,#10,#70,#8);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#38,#10,#70,#8);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#39,#10,#70,#8);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#40,#10,#70,#8);
-                #81=CARTESIAN_TRANSFORMATION_OPERATOR_3D('CTR0',#16,#15,#13,1.0,#16);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_USED',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('O1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=VECTOR('VX',#16,1.0);\n"
+        + "#23=LINE('L0',#13,#22);\n"
+        + "#24=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#23);\n"
+        + "#25=(COMPOSITE_CURVE('CC0',(#24),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('cc-name'));\n"
+        + "#26=(COMPOSITE_CURVE_ON_SURFACE('CCS0',(#24),.F.) COMPOSITE_CURVE('CCS0',(#24),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('ccs-name'));\n"
+        + "#27=PLANE('PL0',#17);\n"
+        + "#28=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#29=DIRECTION('DUV',(1.0,0.0));\n"
+        + "#30=VECTOR('VUV',#29,1.0);\n"
+        + "#31=LINE('UL0',#28,#30);\n"
+        + "#32=REPRESENTATION_CONTEXT('PC0','PARAMETRIC');\n"
+        + "#33=DEFINITIONAL_REPRESENTATION('DEF0',(#31),#32);\n"
+        + "#34=DEGENERATE_PCURVE('DPC0',#27,#33);\n"
+        + "#35=RECTANGULAR_TRIMMED_SURFACE('RTS0',#27,0.0,1.0,0.0,1.0,.T.,.T.);\n"
+        + "#36=CURVE_BOUNDED_SURFACE('CBS0',#27,(#25),.T.);\n"
+        + "#37=ORIENTED_SURFACE('OS0',#35,.T.);\n"
+        + "#38=OFFSET_SURFACE('OFS0',#27,1.0,.F.);\n"
+        + "#39=CURVE_REPLICA('CR0',#25,#81);\n"
+        + "#40=SURFACE_REPLICA('SR0',#35,#81);\n"
+        + "#50=PROPERTY_DEFINITION('PD_CCS','',#26);\n"
+        + "#51=PROPERTY_DEFINITION('PD_CC','',#25);\n"
+        + "#52=PROPERTY_DEFINITION('PD_SEG','',#24);\n"
+        + "#53=PROPERTY_DEFINITION('PD_DPC','',#34);\n"
+        + "#54=PROPERTY_DEFINITION('PD_RTS','',#35);\n"
+        + "#55=PROPERTY_DEFINITION('PD_CBS','',#36);\n"
+        + "#56=PROPERTY_DEFINITION('PD_OS','',#37);\n"
+        + "#57=PROPERTY_DEFINITION('PD_OFS','',#38);\n"
+        + "#58=PROPERTY_DEFINITION('PD_CR','',#39);\n"
+        + "#59=PROPERTY_DEFINITION('PD_SR','',#40);\n"
+        + "#60=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);\n"
+        + "#61=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);\n"
+        + "#62=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);\n"
+        + "#63=PROPERTY_DEFINITION_REPRESENTATION(#53,#10);\n"
+        + "#64=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);\n"
+        + "#65=PROPERTY_DEFINITION_REPRESENTATION(#55,#10);\n"
+        + "#66=PROPERTY_DEFINITION_REPRESENTATION(#56,#10);\n"
+        + "#67=PROPERTY_DEFINITION_REPRESENTATION(#57,#10);\n"
+        + "#68=PROPERTY_DEFINITION_REPRESENTATION(#58,#10);\n"
+        + "#69=PROPERTY_DEFINITION_REPRESENTATION(#59,#10);\n"
+        + "#70=ANNOTATION_TEXT_OCCURRENCE('NOTE_WRAP','',#13);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#70,#8);\n"
+        + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#70,#8);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#70,#8);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#34,#10,#70,#8);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#35,#10,#70,#8);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#36,#10,#70,#8);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#37,#10,#70,#8);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#38,#10,#70,#8);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#39,#10,#70,#8);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#40,#10,#70,#8);\n"
+        + "#81=CARTESIAN_TRANSFORMATION_OPERATOR_3D('CTR0',#16,#15,#13,1.0,#16);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6642,158 +6581,157 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectTopologyAndSurfaceContainerLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=SHAPE_REPRESENTATION('REP_A',(),#9);
-                #11=SHAPE_REPRESENTATION('REP_B',(),#9);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=VECTOR('VX',#16,1.0);
-                #18=LINE('L0',#12,#17);
-                #19=VERTEX_POINT('V0',#12);
-                #20=VERTEX_POINT('V1',#13);
-                #21=EDGE_CURVE('E0',#19,#20,#18,.T.);
-                #22=ORIENTED_EDGE('OE0',$,$,#21,.T.);
-                #23=PATH('PTH',(#22));
-                #24=OPEN_PATH('OP0',(#22));
-                #25=ORIENTED_PATH('OP1',#23,.F.);
-                #26=EDGE_LOOP('EL0',(#22));
-                #27=POLY_LOOP('PL0',(#12,#13,#14,#15));
-                #28=CONNECTED_EDGE_SET('CES0',(#21));
-                #29=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#28));
-                #30=WIRE_SHELL('WS0',(#26));
-                #31=VERTEX_LOOP('VL0',#19);
-                #32=VERTEX_SHELL('VS0',#31);
-                #33=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#30,#32));
-                #34=POINT_SET('PS0',(#12,#13));
-                #35=GEOMETRIC_CURVE_SET('GCS0',(#18));
-                #36=GEOMETRIC_SET('GS0',(#34,#35,#25,#27,#29,#33));
-                #37=DIRECTION('DZ',(0.0,0.0,1.0));
-                #38=AXIS2_PLACEMENT_3D('AX',#12,#37,#16);
-                #39=PLANE('PL',#38);
-                #40=FACE_BOUND('FB',#27,.T.);
-                #41=ADVANCED_FACE('AF0',(#40),#39,.T.);
-                #42=ORIENTED_FACE('OF0',#41,.F.);
-                #43=FACE_SURFACE('FS0',(#40),#39,.T.);
-                #44=OPEN_SHELL('OS0',(#41));
-                #45=SURFACED_OPEN_SHELL('SOS0',(#43));
-                #46=ORIENTED_OPEN_SHELL('OOS0',#44,.F.);
-                #47=CLOSED_SHELL('CS0',(#41));
-                #48=ORIENTED_CLOSED_SHELL('OCS0',#47,.F.);
-                #49=CONNECTED_FACE_SET('CFS0',(#41));
-                #50=CONNECTED_FACE_SUB_SET('CFSS0',(#41),#49);
-                #51=FACE_BASED_SURFACE_MODEL('FBSM0',(#49,#44));
-                #52=SHELL_BASED_SURFACE_MODEL('SBSM0',(#44,#45,#46,#47,#48));
-                #53=SUBPATH('SP0',(#22),#23);
-                #54=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('F0') REPRESENTATION_ITEM('F0'));
-                #55=(SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('S0'));
-                #56=(BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BC0'));
-                #57=(BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BS0'));
-                #60=PROPERTY_DEFINITION('PD_VP','',#19);
-                #61=PROPERTY_DEFINITION('PD_OP','',#25);
-                #62=PROPERTY_DEFINITION('PD_EL','',#26);
-                #63=PROPERTY_DEFINITION('PD_CES','',#28);
-                #64=PROPERTY_DEFINITION('PD_EBWM','',#29);
-                #65=PROPERTY_DEFINITION('PD_WS','',#30);
-                #66=PROPERTY_DEFINITION('PD_SBWM','',#33);
-                #67=PROPERTY_DEFINITION('PD_PS','',#34);
-                #68=PROPERTY_DEFINITION('PD_GCS','',#35);
-                #69=PROPERTY_DEFINITION('PD_GS','',#36);
-                #70=PROPERTY_DEFINITION('PD_AF','',#41);
-                #71=PROPERTY_DEFINITION('PD_FS','',#43);
-                #72=PROPERTY_DEFINITION('PD_OS','',#44);
-                #73=PROPERTY_DEFINITION('PD_SOS','',#45);
-                #74=PROPERTY_DEFINITION('PD_OOS','',#46);
-                #75=PROPERTY_DEFINITION('PD_CS','',#47);
-                #76=PROPERTY_DEFINITION('PD_OCS','',#48);
-                #77=PROPERTY_DEFINITION('PD_CFS','',#49);
-                #78=PROPERTY_DEFINITION('PD_CFSS','',#50);
-                #79=PROPERTY_DEFINITION('PD_FBSM','',#51);
-                #80=PROPERTY_DEFINITION('PD_SBSM','',#52);
-                #81=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);
-                #82=PROPERTY_DEFINITION_REPRESENTATION(#61,#10);
-                #83=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);
-                #84=PROPERTY_DEFINITION_REPRESENTATION(#63,#10);
-                #85=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);
-                #86=PROPERTY_DEFINITION_REPRESENTATION(#65,#10);
-                #87=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);
-                #88=PROPERTY_DEFINITION_REPRESENTATION(#67,#10);
-                #89=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);
-                #90=PROPERTY_DEFINITION_REPRESENTATION(#69,#10);
-                #91=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);
-                #92=PROPERTY_DEFINITION_REPRESENTATION(#71,#10);
-                #93=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);
-                #94=PROPERTY_DEFINITION_REPRESENTATION(#73,#10);
-                #95=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);
-                #96=PROPERTY_DEFINITION_REPRESENTATION(#75,#10);
-                #97=PROPERTY_DEFINITION_REPRESENTATION(#76,#10);
-                #98=PROPERTY_DEFINITION_REPRESENTATION(#77,#10);
-                #99=PROPERTY_DEFINITION_REPRESENTATION(#78,#10);
-                #100=PROPERTY_DEFINITION_REPRESENTATION(#79,#10);
-                #101=PROPERTY_DEFINITION_REPRESENTATION(#80,#10);
-                #141=PROPERTY_DEFINITION('PD_SP','',#53);
-                #142=PROPERTY_DEFINITION('PD_F','',#54);
-                #143=PROPERTY_DEFINITION('PD_S','',#55);
-                #144=PROPERTY_DEFINITION('PD_BC','',#56);
-                #145=PROPERTY_DEFINITION('PD_BS','',#57);
-                #146=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);
-                #147=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);
-                #148=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);
-                #149=PROPERTY_DEFINITION_REPRESENTATION(#144,#10);
-                #150=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);
-                #102=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #103=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #104=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #105=DIRECTION('TZ',(0.0,0.0,1.0));
-                #106=DIRECTION('TX',(1.0,0.0,0.0));
-                #107=AXIS2_PLACEMENT_3D('AX0',#103,#105,#106);
-                #108=AXIS2_PLACEMENT_3D('AX1',#104,#105,#106);
-                #109=ITEM_DEFINED_TRANSFORMATION('T1','',#107,#108);
-                #110=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#109));
-                #111=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #112=CARTESIAN_POINT('NOTE_P',(0.0,0.0,0.0));
-                #113=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO','direct topology link',#112);
-                #120=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#19,#10,#113,#8);
-                #121=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#113,#8);
-                #122=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#113,#8);
-                #123=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#28,#10,#113,#8);
-                #124=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#29,#10,#113,#8);
-                #125=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#30,#10,#113,#8);
-                #126=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#33,#10,#113,#8);
-                #127=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#113,#8);
-                #128=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#35,#10,#113,#8);
-                #129=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#36,#10,#113,#8);
-                #130=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#41,#10,#113,#8);
-                #131=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#43,#10,#113,#8);
-                #132=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#44,#10,#113,#8);
-                #133=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#45,#10,#113,#8);
-                #134=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#46,#10,#113,#8);
-                #135=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#47,#10,#113,#8);
-                #136=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#48,#10,#113,#8);
-                #137=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#49,#10,#113,#8);
-                #138=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#50,#10,#113,#8);
-                #139=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#51,#10,#113,#8);
-                #140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#52,#10,#113,#8);
-                #151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#53,#10,#113,#8);
-                #152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#54,#10,#113,#8);
-                #153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#55,#10,#113,#8);
-                #154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A24','',#56,#10,#113,#8);
-                #155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A25','',#57,#10,#113,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=SHAPE_REPRESENTATION('REP_A',(),#9);\n"
+        + "#11=SHAPE_REPRESENTATION('REP_B',(),#9);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=VECTOR('VX',#16,1.0);\n"
+        + "#18=LINE('L0',#12,#17);\n"
+        + "#19=VERTEX_POINT('V0',#12);\n"
+        + "#20=VERTEX_POINT('V1',#13);\n"
+        + "#21=EDGE_CURVE('E0',#19,#20,#18,.T.);\n"
+        + "#22=ORIENTED_EDGE('OE0',$,$,#21,.T.);\n"
+        + "#23=PATH('PTH',(#22));\n"
+        + "#24=OPEN_PATH('OP0',(#22));\n"
+        + "#25=ORIENTED_PATH('OP1',#23,.F.);\n"
+        + "#26=EDGE_LOOP('EL0',(#22));\n"
+        + "#27=POLY_LOOP('PL0',(#12,#13,#14,#15));\n"
+        + "#28=CONNECTED_EDGE_SET('CES0',(#21));\n"
+        + "#29=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#28));\n"
+        + "#30=WIRE_SHELL('WS0',(#26));\n"
+        + "#31=VERTEX_LOOP('VL0',#19);\n"
+        + "#32=VERTEX_SHELL('VS0',#31);\n"
+        + "#33=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#30,#32));\n"
+        + "#34=POINT_SET('PS0',(#12,#13));\n"
+        + "#35=GEOMETRIC_CURVE_SET('GCS0',(#18));\n"
+        + "#36=GEOMETRIC_SET('GS0',(#34,#35,#25,#27,#29,#33));\n"
+        + "#37=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#38=AXIS2_PLACEMENT_3D('AX',#12,#37,#16);\n"
+        + "#39=PLANE('PL',#38);\n"
+        + "#40=FACE_BOUND('FB',#27,.T.);\n"
+        + "#41=ADVANCED_FACE('AF0',(#40),#39,.T.);\n"
+        + "#42=ORIENTED_FACE('OF0',#41,.F.);\n"
+        + "#43=FACE_SURFACE('FS0',(#40),#39,.T.);\n"
+        + "#44=OPEN_SHELL('OS0',(#41));\n"
+        + "#45=SURFACED_OPEN_SHELL('SOS0',(#43));\n"
+        + "#46=ORIENTED_OPEN_SHELL('OOS0',#44,.F.);\n"
+        + "#47=CLOSED_SHELL('CS0',(#41));\n"
+        + "#48=ORIENTED_CLOSED_SHELL('OCS0',#47,.F.);\n"
+        + "#49=CONNECTED_FACE_SET('CFS0',(#41));\n"
+        + "#50=CONNECTED_FACE_SUB_SET('CFSS0',(#41),#49);\n"
+        + "#51=FACE_BASED_SURFACE_MODEL('FBSM0',(#49,#44));\n"
+        + "#52=SHELL_BASED_SURFACE_MODEL('SBSM0',(#44,#45,#46,#47,#48));\n"
+        + "#53=SUBPATH('SP0',(#22),#23);\n"
+        + "#54=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('F0') REPRESENTATION_ITEM('F0'));\n"
+        + "#55=(SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('S0'));\n"
+        + "#56=(BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BC0'));\n"
+        + "#57=(BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BS0'));\n"
+        + "#60=PROPERTY_DEFINITION('PD_VP','',#19);\n"
+        + "#61=PROPERTY_DEFINITION('PD_OP','',#25);\n"
+        + "#62=PROPERTY_DEFINITION('PD_EL','',#26);\n"
+        + "#63=PROPERTY_DEFINITION('PD_CES','',#28);\n"
+        + "#64=PROPERTY_DEFINITION('PD_EBWM','',#29);\n"
+        + "#65=PROPERTY_DEFINITION('PD_WS','',#30);\n"
+        + "#66=PROPERTY_DEFINITION('PD_SBWM','',#33);\n"
+        + "#67=PROPERTY_DEFINITION('PD_PS','',#34);\n"
+        + "#68=PROPERTY_DEFINITION('PD_GCS','',#35);\n"
+        + "#69=PROPERTY_DEFINITION('PD_GS','',#36);\n"
+        + "#70=PROPERTY_DEFINITION('PD_AF','',#41);\n"
+        + "#71=PROPERTY_DEFINITION('PD_FS','',#43);\n"
+        + "#72=PROPERTY_DEFINITION('PD_OS','',#44);\n"
+        + "#73=PROPERTY_DEFINITION('PD_SOS','',#45);\n"
+        + "#74=PROPERTY_DEFINITION('PD_OOS','',#46);\n"
+        + "#75=PROPERTY_DEFINITION('PD_CS','',#47);\n"
+        + "#76=PROPERTY_DEFINITION('PD_OCS','',#48);\n"
+        + "#77=PROPERTY_DEFINITION('PD_CFS','',#49);\n"
+        + "#78=PROPERTY_DEFINITION('PD_CFSS','',#50);\n"
+        + "#79=PROPERTY_DEFINITION('PD_FBSM','',#51);\n"
+        + "#80=PROPERTY_DEFINITION('PD_SBSM','',#52);\n"
+        + "#81=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);\n"
+        + "#82=PROPERTY_DEFINITION_REPRESENTATION(#61,#10);\n"
+        + "#83=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);\n"
+        + "#84=PROPERTY_DEFINITION_REPRESENTATION(#63,#10);\n"
+        + "#85=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);\n"
+        + "#86=PROPERTY_DEFINITION_REPRESENTATION(#65,#10);\n"
+        + "#87=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);\n"
+        + "#88=PROPERTY_DEFINITION_REPRESENTATION(#67,#10);\n"
+        + "#89=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);\n"
+        + "#90=PROPERTY_DEFINITION_REPRESENTATION(#69,#10);\n"
+        + "#91=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);\n"
+        + "#92=PROPERTY_DEFINITION_REPRESENTATION(#71,#10);\n"
+        + "#93=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);\n"
+        + "#94=PROPERTY_DEFINITION_REPRESENTATION(#73,#10);\n"
+        + "#95=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);\n"
+        + "#96=PROPERTY_DEFINITION_REPRESENTATION(#75,#10);\n"
+        + "#97=PROPERTY_DEFINITION_REPRESENTATION(#76,#10);\n"
+        + "#98=PROPERTY_DEFINITION_REPRESENTATION(#77,#10);\n"
+        + "#99=PROPERTY_DEFINITION_REPRESENTATION(#78,#10);\n"
+        + "#100=PROPERTY_DEFINITION_REPRESENTATION(#79,#10);\n"
+        + "#101=PROPERTY_DEFINITION_REPRESENTATION(#80,#10);\n"
+        + "#141=PROPERTY_DEFINITION('PD_SP','',#53);\n"
+        + "#142=PROPERTY_DEFINITION('PD_F','',#54);\n"
+        + "#143=PROPERTY_DEFINITION('PD_S','',#55);\n"
+        + "#144=PROPERTY_DEFINITION('PD_BC','',#56);\n"
+        + "#145=PROPERTY_DEFINITION('PD_BS','',#57);\n"
+        + "#146=PROPERTY_DEFINITION_REPRESENTATION(#141,#10);\n"
+        + "#147=PROPERTY_DEFINITION_REPRESENTATION(#142,#10);\n"
+        + "#148=PROPERTY_DEFINITION_REPRESENTATION(#143,#10);\n"
+        + "#149=PROPERTY_DEFINITION_REPRESENTATION(#144,#10);\n"
+        + "#150=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);\n"
+        + "#102=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#103=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#104=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#105=DIRECTION('TZ',(0.0,0.0,1.0));\n"
+        + "#106=DIRECTION('TX',(1.0,0.0,0.0));\n"
+        + "#107=AXIS2_PLACEMENT_3D('AX0',#103,#105,#106);\n"
+        + "#108=AXIS2_PLACEMENT_3D('AX1',#104,#105,#106);\n"
+        + "#109=ITEM_DEFINED_TRANSFORMATION('T1','',#107,#108);\n"
+        + "#110=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#109));\n"
+        + "#111=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#112=CARTESIAN_POINT('NOTE_P',(0.0,0.0,0.0));\n"
+        + "#113=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOPO','direct topology link',#112);\n"
+        + "#120=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#19,#10,#113,#8);\n"
+        + "#121=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#113,#8);\n"
+        + "#122=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#113,#8);\n"
+        + "#123=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#28,#10,#113,#8);\n"
+        + "#124=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#29,#10,#113,#8);\n"
+        + "#125=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#30,#10,#113,#8);\n"
+        + "#126=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#33,#10,#113,#8);\n"
+        + "#127=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#113,#8);\n"
+        + "#128=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#35,#10,#113,#8);\n"
+        + "#129=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#36,#10,#113,#8);\n"
+        + "#130=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#41,#10,#113,#8);\n"
+        + "#131=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#43,#10,#113,#8);\n"
+        + "#132=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#44,#10,#113,#8);\n"
+        + "#133=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#45,#10,#113,#8);\n"
+        + "#134=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#46,#10,#113,#8);\n"
+        + "#135=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#47,#10,#113,#8);\n"
+        + "#136=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#48,#10,#113,#8);\n"
+        + "#137=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#49,#10,#113,#8);\n"
+        + "#138=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#50,#10,#113,#8);\n"
+        + "#139=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#51,#10,#113,#8);\n"
+        + "#140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#52,#10,#113,#8);\n"
+        + "#151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#53,#10,#113,#8);\n"
+        + "#152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#54,#10,#113,#8);\n"
+        + "#153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#55,#10,#113,#8);\n"
+        + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A24','',#56,#10,#113,#8);\n"
+        + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A25','',#57,#10,#113,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6967,135 +6905,134 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectSolidAndProfileLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=SHAPE_REPRESENTATION('REP_A',(),#9);
-                #11=SHAPE_REPRESENTATION('REP_B',(),#9);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=DIRECTION('DZ',(0.0,0.0,1.0));
-                #14=DIRECTION('DX',(1.0,0.0,0.0));
-                #15=AXIS2_PLACEMENT_3D('AX3',#12,#13,#14);
-                #16=AXIS2_PLACEMENT_2D('AX2',#12,#14);
-                #17=BLOCK('BLK0',#15,1.0,2.0,3.0);
-                #18=CLOSED_SHELL('CS0',());
-                #19=MANIFOLD_SOLID_BREP('MSB0',#18);
-                #20=BREP_WITH_VOIDS('BV0',#18,());
-                #21=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#16,1.0,2.0);
-                #22=EXTRUDED_AREA_SOLID('EAS0',#21,#15,#13,4.0);
-                #23=AXIS1_PLACEMENT('AX1',#12,#13);
-                #24=REVOLVED_AREA_SOLID('RAS0',#21,#15,#23,1.57079632679);
-                #25=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#14,#13,#12,1.0,#14);
-                #26=SOLID_REPLICA('SR0',#19,#25);
-                #27=HALF_SPACE_SOLID('HS0',#28,.F.);
-                #28=PLANE('PL0',#15);
-                #29=CSG_SOLID('CSG0',#17);
-                #30=(BOOLEAN_RESULT(.UNION.,#19,#29) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BR0'));
-                #31=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#29,#19) BOOLEAN_RESULT(.DIFFERENCE.,#29,#19) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));
-                #130=SPHERE('SP0',#15,2.0);
-                #131=RIGHT_CIRCULAR_CYLINDER('RCY0',#23,5.0,2.0);
-                #132=TORUS('TOR0',#23,5.0,1.0);
-                #133=RIGHT_ANGULAR_WEDGE('WED0',#15,4.0,3.0,2.0,2.5);
-                #134=CIRCLE_PROFILE_DEF(.AREA.,'C',#16,2.0);
-                #135=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'CR',#16,3.0,5.0);
-                #136=ELLIPSE_PROFILE_DEF(.AREA.,'E',#16,3.0,1.5);
-                #137=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'RR',#16,6.0,4.0,0.5);
-                #138=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#16,3.0,0.5);
-                #139=POLYLINE('PLC',(#12,#12,#12,#12));
-                #140=POLYLINE('PLO',(#12,#12,#12));
-                #141=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#139);
-                #142=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#139);
-                #143=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#140);
-                #230=PROPERTY_DEFINITION('PD_BLK','',#17);
-                #231=PROPERTY_DEFINITION('PD_MSB','',#19);
-                #232=PROPERTY_DEFINITION('PD_BV','',#20);
-                #233=PROPERTY_DEFINITION('PD_RPD','',#21);
-                #234=PROPERTY_DEFINITION('PD_EAS','',#22);
-                #235=PROPERTY_DEFINITION('PD_RAS','',#24);
-                #236=PROPERTY_DEFINITION('PD_SR','',#26);
-                #237=PROPERTY_DEFINITION('PD_HS','',#27);
-                #238=PROPERTY_DEFINITION('PD_CSG','',#29);
-                #239=PROPERTY_DEFINITION('PD_BR','',#30);
-                #240=PROPERTY_DEFINITION('PD_BCR','',#31);
-                #145=PROPERTY_DEFINITION('PD_SPH','',#130);
-                #146=PROPERTY_DEFINITION('PD_RCY','',#131);
-                #147=PROPERTY_DEFINITION('PD_TOR','',#132);
-                #148=PROPERTY_DEFINITION('PD_WED','',#133);
-                #149=PROPERTY_DEFINITION('PD_C','',#134);
-                #150=PROPERTY_DEFINITION('PD_CR','',#135);
-                #151=PROPERTY_DEFINITION('PD_E','',#136);
-                #152=PROPERTY_DEFINITION('PD_RR','',#137);
-                #153=PROPERTY_DEFINITION('PD_CH','',#138);
-                #154=PROPERTY_DEFINITION('PD_ACP','',#141);
-                #155=PROPERTY_DEFINITION('PD_AP','',#142);
-                #156=PROPERTY_DEFINITION('PD_AOP','',#143);
-                #241=PROPERTY_DEFINITION_REPRESENTATION(#230,#10);
-                #242=PROPERTY_DEFINITION_REPRESENTATION(#231,#10);
-                #243=PROPERTY_DEFINITION_REPRESENTATION(#232,#10);
-                #244=PROPERTY_DEFINITION_REPRESENTATION(#233,#10);
-                #245=PROPERTY_DEFINITION_REPRESENTATION(#234,#10);
-                #246=PROPERTY_DEFINITION_REPRESENTATION(#235,#10);
-                #247=PROPERTY_DEFINITION_REPRESENTATION(#236,#10);
-                #248=PROPERTY_DEFINITION_REPRESENTATION(#237,#10);
-                #249=PROPERTY_DEFINITION_REPRESENTATION(#238,#10);
-                #250=PROPERTY_DEFINITION_REPRESENTATION(#239,#10);
-                #251=PROPERTY_DEFINITION_REPRESENTATION(#240,#10);
-                #157=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);
-                #158=PROPERTY_DEFINITION_REPRESENTATION(#146,#10);
-                #159=PROPERTY_DEFINITION_REPRESENTATION(#147,#10);
-                #160=PROPERTY_DEFINITION_REPRESENTATION(#148,#10);
-                #161=PROPERTY_DEFINITION_REPRESENTATION(#149,#10);
-                #162=PROPERTY_DEFINITION_REPRESENTATION(#150,#10);
-                #163=PROPERTY_DEFINITION_REPRESENTATION(#151,#10);
-                #164=PROPERTY_DEFINITION_REPRESENTATION(#152,#10);
-                #165=PROPERTY_DEFINITION_REPRESENTATION(#153,#10);
-                #166=PROPERTY_DEFINITION_REPRESENTATION(#154,#10);
-                #167=PROPERTY_DEFINITION_REPRESENTATION(#155,#10);
-                #168=PROPERTY_DEFINITION_REPRESENTATION(#156,#10);
-                #51=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #52=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #53=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #54=DIRECTION('TZ',(0.0,0.0,1.0));
-                #55=DIRECTION('TX',(1.0,0.0,0.0));
-                #56=AXIS2_PLACEMENT_3D('AX0',#52,#54,#55);
-                #57=AXIS2_PLACEMENT_3D('AX1',#53,#54,#55);
-                #58=ITEM_DEFINED_TRANSFORMATION('T1','',#56,#57);
-                #59=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#58));
-                #60=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #61=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID','',#12);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#61,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#19,#10,#61,#8);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#61,#8);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#10,#61,#8);
-                #66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#22,#10,#61,#8);
-                #67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#10,#61,#8);
-                #68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#26,#10,#61,#8);
-                #69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#27,#10,#61,#8);
-                #70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#29,#10,#61,#8);
-                #71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#30,#10,#61,#8);
-                #169=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#130,#10,#61,#8);
-                #170=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#131,#10,#61,#8);
-                #171=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#132,#10,#61,#8);
-                #172=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#133,#10,#61,#8);
-                #173=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#134,#10,#61,#8);
-                #174=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#135,#10,#61,#8);
-                #175=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#136,#10,#61,#8);
-                #176=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#137,#10,#61,#8);
-                #177=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#138,#10,#61,#8);
-                #178=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#141,#10,#61,#8);
-                #179=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#142,#10,#61,#8);
-                #180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#143,#10,#61,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=SHAPE_REPRESENTATION('REP_A',(),#9);\n"
+        + "#11=SHAPE_REPRESENTATION('REP_B',(),#9);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#14=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_3D('AX3',#12,#13,#14);\n"
+        + "#16=AXIS2_PLACEMENT_2D('AX2',#12,#14);\n"
+        + "#17=BLOCK('BLK0',#15,1.0,2.0,3.0);\n"
+        + "#18=CLOSED_SHELL('CS0',());\n"
+        + "#19=MANIFOLD_SOLID_BREP('MSB0',#18);\n"
+        + "#20=BREP_WITH_VOIDS('BV0',#18,());\n"
+        + "#21=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#16,1.0,2.0);\n"
+        + "#22=EXTRUDED_AREA_SOLID('EAS0',#21,#15,#13,4.0);\n"
+        + "#23=AXIS1_PLACEMENT('AX1',#12,#13);\n"
+        + "#24=REVOLVED_AREA_SOLID('RAS0',#21,#15,#23,1.57079632679);\n"
+        + "#25=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#14,#13,#12,1.0,#14);\n"
+        + "#26=SOLID_REPLICA('SR0',#19,#25);\n"
+        + "#27=HALF_SPACE_SOLID('HS0',#28,.F.);\n"
+        + "#28=PLANE('PL0',#15);\n"
+        + "#29=CSG_SOLID('CSG0',#17);\n"
+        + "#30=(BOOLEAN_RESULT(.UNION.,#19,#29) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BR0'));\n"
+        + "#31=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#29,#19) BOOLEAN_RESULT(.DIFFERENCE.,#29,#19) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
+        + "#130=SPHERE('SP0',#15,2.0);\n"
+        + "#131=RIGHT_CIRCULAR_CYLINDER('RCY0',#23,5.0,2.0);\n"
+        + "#132=TORUS('TOR0',#23,5.0,1.0);\n"
+        + "#133=RIGHT_ANGULAR_WEDGE('WED0',#15,4.0,3.0,2.0,2.5);\n"
+        + "#134=CIRCLE_PROFILE_DEF(.AREA.,'C',#16,2.0);\n"
+        + "#135=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'CR',#16,3.0,5.0);\n"
+        + "#136=ELLIPSE_PROFILE_DEF(.AREA.,'E',#16,3.0,1.5);\n"
+        + "#137=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'RR',#16,6.0,4.0,0.5);\n"
+        + "#138=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#16,3.0,0.5);\n"
+        + "#139=POLYLINE('PLC',(#12,#12,#12,#12));\n"
+        + "#140=POLYLINE('PLO',(#12,#12,#12));\n"
+        + "#141=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#139);\n"
+        + "#142=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#139);\n"
+        + "#143=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#140);\n"
+        + "#230=PROPERTY_DEFINITION('PD_BLK','',#17);\n"
+        + "#231=PROPERTY_DEFINITION('PD_MSB','',#19);\n"
+        + "#232=PROPERTY_DEFINITION('PD_BV','',#20);\n"
+        + "#233=PROPERTY_DEFINITION('PD_RPD','',#21);\n"
+        + "#234=PROPERTY_DEFINITION('PD_EAS','',#22);\n"
+        + "#235=PROPERTY_DEFINITION('PD_RAS','',#24);\n"
+        + "#236=PROPERTY_DEFINITION('PD_SR','',#26);\n"
+        + "#237=PROPERTY_DEFINITION('PD_HS','',#27);\n"
+        + "#238=PROPERTY_DEFINITION('PD_CSG','',#29);\n"
+        + "#239=PROPERTY_DEFINITION('PD_BR','',#30);\n"
+        + "#240=PROPERTY_DEFINITION('PD_BCR','',#31);\n"
+        + "#145=PROPERTY_DEFINITION('PD_SPH','',#130);\n"
+        + "#146=PROPERTY_DEFINITION('PD_RCY','',#131);\n"
+        + "#147=PROPERTY_DEFINITION('PD_TOR','',#132);\n"
+        + "#148=PROPERTY_DEFINITION('PD_WED','',#133);\n"
+        + "#149=PROPERTY_DEFINITION('PD_C','',#134);\n"
+        + "#150=PROPERTY_DEFINITION('PD_CR','',#135);\n"
+        + "#151=PROPERTY_DEFINITION('PD_E','',#136);\n"
+        + "#152=PROPERTY_DEFINITION('PD_RR','',#137);\n"
+        + "#153=PROPERTY_DEFINITION('PD_CH','',#138);\n"
+        + "#154=PROPERTY_DEFINITION('PD_ACP','',#141);\n"
+        + "#155=PROPERTY_DEFINITION('PD_AP','',#142);\n"
+        + "#156=PROPERTY_DEFINITION('PD_AOP','',#143);\n"
+        + "#241=PROPERTY_DEFINITION_REPRESENTATION(#230,#10);\n"
+        + "#242=PROPERTY_DEFINITION_REPRESENTATION(#231,#10);\n"
+        + "#243=PROPERTY_DEFINITION_REPRESENTATION(#232,#10);\n"
+        + "#244=PROPERTY_DEFINITION_REPRESENTATION(#233,#10);\n"
+        + "#245=PROPERTY_DEFINITION_REPRESENTATION(#234,#10);\n"
+        + "#246=PROPERTY_DEFINITION_REPRESENTATION(#235,#10);\n"
+        + "#247=PROPERTY_DEFINITION_REPRESENTATION(#236,#10);\n"
+        + "#248=PROPERTY_DEFINITION_REPRESENTATION(#237,#10);\n"
+        + "#249=PROPERTY_DEFINITION_REPRESENTATION(#238,#10);\n"
+        + "#250=PROPERTY_DEFINITION_REPRESENTATION(#239,#10);\n"
+        + "#251=PROPERTY_DEFINITION_REPRESENTATION(#240,#10);\n"
+        + "#157=PROPERTY_DEFINITION_REPRESENTATION(#145,#10);\n"
+        + "#158=PROPERTY_DEFINITION_REPRESENTATION(#146,#10);\n"
+        + "#159=PROPERTY_DEFINITION_REPRESENTATION(#147,#10);\n"
+        + "#160=PROPERTY_DEFINITION_REPRESENTATION(#148,#10);\n"
+        + "#161=PROPERTY_DEFINITION_REPRESENTATION(#149,#10);\n"
+        + "#162=PROPERTY_DEFINITION_REPRESENTATION(#150,#10);\n"
+        + "#163=PROPERTY_DEFINITION_REPRESENTATION(#151,#10);\n"
+        + "#164=PROPERTY_DEFINITION_REPRESENTATION(#152,#10);\n"
+        + "#165=PROPERTY_DEFINITION_REPRESENTATION(#153,#10);\n"
+        + "#166=PROPERTY_DEFINITION_REPRESENTATION(#154,#10);\n"
+        + "#167=PROPERTY_DEFINITION_REPRESENTATION(#155,#10);\n"
+        + "#168=PROPERTY_DEFINITION_REPRESENTATION(#156,#10);\n"
+        + "#51=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#52=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#54=DIRECTION('TZ',(0.0,0.0,1.0));\n"
+        + "#55=DIRECTION('TX',(1.0,0.0,0.0));\n"
+        + "#56=AXIS2_PLACEMENT_3D('AX0',#52,#54,#55);\n"
+        + "#57=AXIS2_PLACEMENT_3D('AX1',#53,#54,#55);\n"
+        + "#58=ITEM_DEFINED_TRANSFORMATION('T1','',#56,#57);\n"
+        + "#59=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#58));\n"
+        + "#60=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#61=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID','',#12);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#61,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#19,#10,#61,#8);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#61,#8);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#10,#61,#8);\n"
+        + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#22,#10,#61,#8);\n"
+        + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#10,#61,#8);\n"
+        + "#68=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#26,#10,#61,#8);\n"
+        + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#27,#10,#61,#8);\n"
+        + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#29,#10,#61,#8);\n"
+        + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#30,#10,#61,#8);\n"
+        + "#169=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#130,#10,#61,#8);\n"
+        + "#170=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#131,#10,#61,#8);\n"
+        + "#171=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#132,#10,#61,#8);\n"
+        + "#172=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#133,#10,#61,#8);\n"
+        + "#173=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#134,#10,#61,#8);\n"
+        + "#174=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#135,#10,#61,#8);\n"
+        + "#175=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#136,#10,#61,#8);\n"
+        + "#176=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#137,#10,#61,#8);\n"
+        + "#177=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#138,#10,#61,#8);\n"
+        + "#178=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#141,#10,#61,#8);\n"
+        + "#179=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#142,#10,#61,#8);\n"
+        + "#180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#143,#10,#61,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7207,56 +7144,55 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAnnotationMapDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_BASE',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('M0',(0.0,0.0));
-                #13=DIRECTION('DX0',(1.0,0.0));
-                #14=AXIS2_PLACEMENT_2D('MAP0',#12,#13);
-                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
-                #16=REPRESENTATION('REP_SYM',(),#15);
-                #17=SYMBOL_REPRESENTATION_MAP(#14,#16);
-                #18=CARTESIAN_POINT('T0',(3.0,4.0));
-                #19=AXIS2_PLACEMENT_2D('TGT0',#18,#13);
-                #20=ANNOTATION_SYMBOL('AS0',#17,#19);
-                #21=PRESENTATION_STYLE_ASSIGNMENT(());
-                #22=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#21),#20);
-                #23=CARTESIAN_POINT('M1',(0.0,0.0));
-                #24=AXIS2_PLACEMENT_2D('MAP1',#23,#13);
-                #25=REPRESENTATION('REP_TXT',(),#15);
-                #26=REPRESENTATION_MAP(#24,#25);
-                #27=CARTESIAN_POINT('T1',(6.0,7.0));
-                #28=AXIS2_PLACEMENT_2D('TGT1',#27,#13);
-                #29=ANNOTATION_TEXT('AT0',#26,#28);
-                #30=ANNOTATION_TEXT_CHARACTER('ATC0',#26,#28);
-                #31=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #32=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','base',#31);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','child',#32);
-                #35=DRAUGHTING_CALLOUT('CALLOUT_A',(#33,#22));
-                #36=DRAUGHTING_CALLOUT('CALLOUT_B',(#34,#22));
-                #37=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#35,#36);
-                #38=ANNOTATION_OCCURRENCE_RELATIONSHIP('AOR','link',#22,#34);
-                #39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#33,#8);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#20,#10,#34,#8);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#33,#8);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#29,#10,#34,#8);
-                #43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#33,#8);
-                #44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#35,#10,#34,#8);
-                #45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#37,#10,#33,#8);
-                #46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#38,#10,#34,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_BASE',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('M0',(0.0,0.0));\n"
+        + "#13=DIRECTION('DX0',(1.0,0.0));\n"
+        + "#14=AXIS2_PLACEMENT_2D('MAP0',#12,#13);\n"
+        + "#15=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
+        + "#16=REPRESENTATION('REP_SYM',(),#15);\n"
+        + "#17=SYMBOL_REPRESENTATION_MAP(#14,#16);\n"
+        + "#18=CARTESIAN_POINT('T0',(3.0,4.0));\n"
+        + "#19=AXIS2_PLACEMENT_2D('TGT0',#18,#13);\n"
+        + "#20=ANNOTATION_SYMBOL('AS0',#17,#19);\n"
+        + "#21=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#22=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#21),#20);\n"
+        + "#23=CARTESIAN_POINT('M1',(0.0,0.0));\n"
+        + "#24=AXIS2_PLACEMENT_2D('MAP1',#23,#13);\n"
+        + "#25=REPRESENTATION('REP_TXT',(),#15);\n"
+        + "#26=REPRESENTATION_MAP(#24,#25);\n"
+        + "#27=CARTESIAN_POINT('T1',(6.0,7.0));\n"
+        + "#28=AXIS2_PLACEMENT_2D('TGT1',#27,#13);\n"
+        + "#29=ANNOTATION_TEXT('AT0',#26,#28);\n"
+        + "#30=ANNOTATION_TEXT_CHARACTER('ATC0',#26,#28);\n"
+        + "#31=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#32=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_A','base',#31);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','child',#32);\n"
+        + "#35=DRAUGHTING_CALLOUT('CALLOUT_A',(#33,#22));\n"
+        + "#36=DRAUGHTING_CALLOUT('CALLOUT_B',(#34,#22));\n"
+        + "#37=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#35,#36);\n"
+        + "#38=ANNOTATION_OCCURRENCE_RELATIONSHIP('AOR','link',#22,#34);\n"
+        + "#39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#17,#10,#33,#8);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#20,#10,#34,#8);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#33,#8);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#29,#10,#34,#8);\n"
+        + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#33,#8);\n"
+        + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#35,#10,#34,#8);\n"
+        + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#37,#10,#33,#8);\n"
+        + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#38,#10,#34,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7326,133 +7262,132 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAnnotationWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_ANNOTATION_OFFSET',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=DIRECTION('DX',(1.0,0.0,0.0));
-                #16=DIRECTION('DY',(0.0,1.0,0.0));
-                #17=DIRECTION('DZ',(0.0,0.0,1.0));
-                #18=VECTOR('VX',#15,1.0);
-                #19=AXIS2_PLACEMENT_3D('AX3',#12,#17,#15);
-                #20=LINE('L0',#12,#18);
-                #21=OFFSET_CURVE_3D('OC3',#20,0.5,.F.,#16);
-                #22=ORIENTED_CURVE('ORC0',#21,.F.);
-                #23=B_SPLINE_CURVE_WITH_KNOTS('BC0',1,(#12,#13),.UNSPECIFIED.,.F.,.F.,(2,2),(0.0,1.0),.PIECEWISE_BEZIER_KNOTS.);
-                #24=(B_SPLINE_SURFACE(1,1,((#12,#13),(#14,#12)),.UNSPECIFIED.,.F.,.F.,.F.)
-                     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,1.0))));
-                #25=POLYLINE('PL0',(#12,#13,#14));
-                #26=PRESENTATION_STYLE_ASSIGNMENT(());
-                #27=ANNOTATION_CURVE_OCCURRENCE('ACO0',(#26),#22);
-                #28=ANNOTATION_FILL_AREA('AFA0',(#25));
-                #29=ANNOTATION_FILL_AREA_OCCURRENCE('AFAO0',(#26),#28,#12);
-                #30=GEOMETRIC_SET('GS0',(#12,#13));
-                #31=ANNOTATION_PLACEHOLDER_OCCURRENCE('APO0',(#26),#30,.END.,1.0);
-                #32=(ANNOTATION_POINT_OCCURRENCE('AP0',(#26),#12) DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#26),#12));
-                #33=ANNOTATION_TEXT_OCCURRENCE('AT0','note',#13);
-                #34=ANNOTATION_CURVE_OCCURRENCE('LC0',(#26),#20);
-                #35=DIMENSION_CURVE('DC0',(#26),#20);
-                #36=LEADER_CURVE('LD0',(#26),#20);
-                #37=PROJECTION_CURVE('PC0',(#26),#20);
-                #38=SYMBOL_REPRESENTATION_MAP(#19,#10);
-                #39=ANNOTATION_SYMBOL('AS0',#38,#19);
-                #40=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#26),#39);
-                #41=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#26),#39);
-                #42=TERMINATOR_SYMBOL('TS0',(#26),#39,#34);
-                #60=PROPERTY_DEFINITION('PD_OC3','',#21);
-                #61=PROPERTY_DEFINITION('PD_ORC','',#22);
-                #62=PROPERTY_DEFINITION('PD_BSC','',#23);
-                #63=PROPERTY_DEFINITION('PD_RBS','',#24);
-                #64=PROPERTY_DEFINITION('PD_ACO','',#27);
-                #65=PROPERTY_DEFINITION('PD_AFA','',#28);
-                #66=PROPERTY_DEFINITION('PD_AFAO','',#29);
-                #67=PROPERTY_DEFINITION('PD_APO','',#31);
-                #68=PROPERTY_DEFINITION('PD_AP','',#32);
-                #69=PROPERTY_DEFINITION('PD_AT','',#33);
-                #70=PROPERTY_DEFINITION('PD_DC','',#35);
-                #71=PROPERTY_DEFINITION('PD_LD','',#36);
-                #72=PROPERTY_DEFINITION('PD_PC','',#37);
-                #73=PROPERTY_DEFINITION('PD_ASO','',#40);
-                #74=PROPERTY_DEFINITION('PD_SUB','',#41);
-                #75=PROPERTY_DEFINITION('PD_TS','',#42);
-                #80=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);
-                #81=PROPERTY_DEFINITION_REPRESENTATION(#61,#10);
-                #82=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);
-                #83=PROPERTY_DEFINITION_REPRESENTATION(#63,#10);
-                #84=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);
-                #85=PROPERTY_DEFINITION_REPRESENTATION(#65,#10);
-                #86=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);
-                #87=PROPERTY_DEFINITION_REPRESENTATION(#67,#10);
-                #88=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);
-                #89=PROPERTY_DEFINITION_REPRESENTATION(#69,#10);
-                #90=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);
-                #91=PROPERTY_DEFINITION_REPRESENTATION(#71,#10);
-                #92=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);
-                #93=PROPERTY_DEFINITION_REPRESENTATION(#73,#10);
-                #94=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);
-                #95=PROPERTY_DEFINITION_REPRESENTATION(#75,#10);
-                #100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #101=CARTESIAN_POINT('N1',(1.0,0.0,0.0));
-                #102=CARTESIAN_POINT('N2',(2.0,0.0,0.0));
-                #103=CARTESIAN_POINT('N3',(3.0,0.0,0.0));
-                #104=CARTESIAN_POINT('N4',(4.0,0.0,0.0));
-                #105=CARTESIAN_POINT('N5',(5.0,0.0,0.0));
-                #106=CARTESIAN_POINT('N6',(6.0,0.0,0.0));
-                #107=CARTESIAN_POINT('N7',(7.0,0.0,0.0));
-                #108=CARTESIAN_POINT('N8',(8.0,0.0,0.0));
-                #109=CARTESIAN_POINT('N9',(9.0,0.0,0.0));
-                #110=CARTESIAN_POINT('N10',(10.0,0.0,0.0));
-                #111=CARTESIAN_POINT('N11',(11.0,0.0,0.0));
-                #112=CARTESIAN_POINT('N12',(12.0,0.0,0.0));
-                #113=CARTESIAN_POINT('N13',(13.0,0.0,0.0));
-                #114=CARTESIAN_POINT('N14',(14.0,0.0,0.0));
-                #115=CARTESIAN_POINT('N15',(15.0,0.0,0.0));
-                #116=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC3','',#100);
-                #117=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORC','',#101);
-                #118=ANNOTATION_TEXT_OCCURRENCE('NOTE_BSC','',#102);
-                #119=ANNOTATION_TEXT_OCCURRENCE('NOTE_RBS','',#103);
-                #120=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACO','',#104);
-                #121=ANNOTATION_TEXT_OCCURRENCE('NOTE_AFA','',#105);
-                #122=ANNOTATION_TEXT_OCCURRENCE('NOTE_AFAO','',#106);
-                #123=ANNOTATION_TEXT_OCCURRENCE('NOTE_APO','',#107);
-                #124=ANNOTATION_TEXT_OCCURRENCE('NOTE_AP','',#108);
-                #125=ANNOTATION_TEXT_OCCURRENCE('NOTE_AT','',#109);
-                #126=ANNOTATION_TEXT_OCCURRENCE('NOTE_DC','',#110);
-                #127=ANNOTATION_TEXT_OCCURRENCE('NOTE_LD','',#111);
-                #128=ANNOTATION_TEXT_OCCURRENCE('NOTE_PC','',#112);
-                #129=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASO','',#113);
-                #130=ANNOTATION_TEXT_OCCURRENCE('NOTE_SUB','',#114);
-                #131=ANNOTATION_TEXT_OCCURRENCE('NOTE_TS','',#115);
-                #140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#116,#8);
-                #141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#117,#8);
-                #142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#118,#8);
-                #143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#24,#10,#119,#8);
-                #144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#120,#8);
-                #145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#10,#121,#8);
-                #146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#29,#10,#122,#8);
-                #147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#123,#8);
-                #148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#32,#10,#124,#8);
-                #149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#33,#10,#125,#8);
-                #150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#35,#10,#126,#8);
-                #151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#36,#10,#127,#8);
-                #152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#37,#10,#128,#8);
-                #153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#40,#10,#129,#8);
-                #154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#41,#10,#130,#8);
-                #155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#42,#10,#131,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_ANNOTATION_OFFSET',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#16=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#17=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#18=VECTOR('VX',#15,1.0);\n"
+        + "#19=AXIS2_PLACEMENT_3D('AX3',#12,#17,#15);\n"
+        + "#20=LINE('L0',#12,#18);\n"
+        + "#21=OFFSET_CURVE_3D('OC3',#20,0.5,.F.,#16);\n"
+        + "#22=ORIENTED_CURVE('ORC0',#21,.F.);\n"
+        + "#23=B_SPLINE_CURVE_WITH_KNOTS('BC0',1,(#12,#13),.UNSPECIFIED.,.F.,.F.,(2,2),(0.0,1.0),.PIECEWISE_BEZIER_KNOTS.);\n"
+        + "#24=(B_SPLINE_SURFACE(1,1,((#12,#13),(#14,#12)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
+        + "     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,1.0))));\n"
+        + "#25=POLYLINE('PL0',(#12,#13,#14));\n"
+        + "#26=PRESENTATION_STYLE_ASSIGNMENT(());\n"
+        + "#27=ANNOTATION_CURVE_OCCURRENCE('ACO0',(#26),#22);\n"
+        + "#28=ANNOTATION_FILL_AREA('AFA0',(#25));\n"
+        + "#29=ANNOTATION_FILL_AREA_OCCURRENCE('AFAO0',(#26),#28,#12);\n"
+        + "#30=GEOMETRIC_SET('GS0',(#12,#13));\n"
+        + "#31=ANNOTATION_PLACEHOLDER_OCCURRENCE('APO0',(#26),#30,.END.,1.0);\n"
+        + "#32=(ANNOTATION_POINT_OCCURRENCE('AP0',(#26),#12) DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#26),#12));\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('AT0','note',#13);\n"
+        + "#34=ANNOTATION_CURVE_OCCURRENCE('LC0',(#26),#20);\n"
+        + "#35=DIMENSION_CURVE('DC0',(#26),#20);\n"
+        + "#36=LEADER_CURVE('LD0',(#26),#20);\n"
+        + "#37=PROJECTION_CURVE('PC0',(#26),#20);\n"
+        + "#38=SYMBOL_REPRESENTATION_MAP(#19,#10);\n"
+        + "#39=ANNOTATION_SYMBOL('AS0',#38,#19);\n"
+        + "#40=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#26),#39);\n"
+        + "#41=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#26),#39);\n"
+        + "#42=TERMINATOR_SYMBOL('TS0',(#26),#39,#34);\n"
+        + "#60=PROPERTY_DEFINITION('PD_OC3','',#21);\n"
+        + "#61=PROPERTY_DEFINITION('PD_ORC','',#22);\n"
+        + "#62=PROPERTY_DEFINITION('PD_BSC','',#23);\n"
+        + "#63=PROPERTY_DEFINITION('PD_RBS','',#24);\n"
+        + "#64=PROPERTY_DEFINITION('PD_ACO','',#27);\n"
+        + "#65=PROPERTY_DEFINITION('PD_AFA','',#28);\n"
+        + "#66=PROPERTY_DEFINITION('PD_AFAO','',#29);\n"
+        + "#67=PROPERTY_DEFINITION('PD_APO','',#31);\n"
+        + "#68=PROPERTY_DEFINITION('PD_AP','',#32);\n"
+        + "#69=PROPERTY_DEFINITION('PD_AT','',#33);\n"
+        + "#70=PROPERTY_DEFINITION('PD_DC','',#35);\n"
+        + "#71=PROPERTY_DEFINITION('PD_LD','',#36);\n"
+        + "#72=PROPERTY_DEFINITION('PD_PC','',#37);\n"
+        + "#73=PROPERTY_DEFINITION('PD_ASO','',#40);\n"
+        + "#74=PROPERTY_DEFINITION('PD_SUB','',#41);\n"
+        + "#75=PROPERTY_DEFINITION('PD_TS','',#42);\n"
+        + "#80=PROPERTY_DEFINITION_REPRESENTATION(#60,#10);\n"
+        + "#81=PROPERTY_DEFINITION_REPRESENTATION(#61,#10);\n"
+        + "#82=PROPERTY_DEFINITION_REPRESENTATION(#62,#10);\n"
+        + "#83=PROPERTY_DEFINITION_REPRESENTATION(#63,#10);\n"
+        + "#84=PROPERTY_DEFINITION_REPRESENTATION(#64,#10);\n"
+        + "#85=PROPERTY_DEFINITION_REPRESENTATION(#65,#10);\n"
+        + "#86=PROPERTY_DEFINITION_REPRESENTATION(#66,#10);\n"
+        + "#87=PROPERTY_DEFINITION_REPRESENTATION(#67,#10);\n"
+        + "#88=PROPERTY_DEFINITION_REPRESENTATION(#68,#10);\n"
+        + "#89=PROPERTY_DEFINITION_REPRESENTATION(#69,#10);\n"
+        + "#90=PROPERTY_DEFINITION_REPRESENTATION(#70,#10);\n"
+        + "#91=PROPERTY_DEFINITION_REPRESENTATION(#71,#10);\n"
+        + "#92=PROPERTY_DEFINITION_REPRESENTATION(#72,#10);\n"
+        + "#93=PROPERTY_DEFINITION_REPRESENTATION(#73,#10);\n"
+        + "#94=PROPERTY_DEFINITION_REPRESENTATION(#74,#10);\n"
+        + "#95=PROPERTY_DEFINITION_REPRESENTATION(#75,#10);\n"
+        + "#100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#101=CARTESIAN_POINT('N1',(1.0,0.0,0.0));\n"
+        + "#102=CARTESIAN_POINT('N2',(2.0,0.0,0.0));\n"
+        + "#103=CARTESIAN_POINT('N3',(3.0,0.0,0.0));\n"
+        + "#104=CARTESIAN_POINT('N4',(4.0,0.0,0.0));\n"
+        + "#105=CARTESIAN_POINT('N5',(5.0,0.0,0.0));\n"
+        + "#106=CARTESIAN_POINT('N6',(6.0,0.0,0.0));\n"
+        + "#107=CARTESIAN_POINT('N7',(7.0,0.0,0.0));\n"
+        + "#108=CARTESIAN_POINT('N8',(8.0,0.0,0.0));\n"
+        + "#109=CARTESIAN_POINT('N9',(9.0,0.0,0.0));\n"
+        + "#110=CARTESIAN_POINT('N10',(10.0,0.0,0.0));\n"
+        + "#111=CARTESIAN_POINT('N11',(11.0,0.0,0.0));\n"
+        + "#112=CARTESIAN_POINT('N12',(12.0,0.0,0.0));\n"
+        + "#113=CARTESIAN_POINT('N13',(13.0,0.0,0.0));\n"
+        + "#114=CARTESIAN_POINT('N14',(14.0,0.0,0.0));\n"
+        + "#115=CARTESIAN_POINT('N15',(15.0,0.0,0.0));\n"
+        + "#116=ANNOTATION_TEXT_OCCURRENCE('NOTE_OC3','',#100);\n"
+        + "#117=ANNOTATION_TEXT_OCCURRENCE('NOTE_ORC','',#101);\n"
+        + "#118=ANNOTATION_TEXT_OCCURRENCE('NOTE_BSC','',#102);\n"
+        + "#119=ANNOTATION_TEXT_OCCURRENCE('NOTE_RBS','',#103);\n"
+        + "#120=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACO','',#104);\n"
+        + "#121=ANNOTATION_TEXT_OCCURRENCE('NOTE_AFA','',#105);\n"
+        + "#122=ANNOTATION_TEXT_OCCURRENCE('NOTE_AFAO','',#106);\n"
+        + "#123=ANNOTATION_TEXT_OCCURRENCE('NOTE_APO','',#107);\n"
+        + "#124=ANNOTATION_TEXT_OCCURRENCE('NOTE_AP','',#108);\n"
+        + "#125=ANNOTATION_TEXT_OCCURRENCE('NOTE_AT','',#109);\n"
+        + "#126=ANNOTATION_TEXT_OCCURRENCE('NOTE_DC','',#110);\n"
+        + "#127=ANNOTATION_TEXT_OCCURRENCE('NOTE_LD','',#111);\n"
+        + "#128=ANNOTATION_TEXT_OCCURRENCE('NOTE_PC','',#112);\n"
+        + "#129=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASO','',#113);\n"
+        + "#130=ANNOTATION_TEXT_OCCURRENCE('NOTE_SUB','',#114);\n"
+        + "#131=ANNOTATION_TEXT_OCCURRENCE('NOTE_TS','',#115);\n"
+        + "#140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#116,#8);\n"
+        + "#141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#117,#8);\n"
+        + "#142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#118,#8);\n"
+        + "#143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#24,#10,#119,#8);\n"
+        + "#144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#120,#8);\n"
+        + "#145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#10,#121,#8);\n"
+        + "#146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#29,#10,#122,#8);\n"
+        + "#147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#123,#8);\n"
+        + "#148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#32,#10,#124,#8);\n"
+        + "#149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#33,#10,#125,#8);\n"
+        + "#150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#35,#10,#126,#8);\n"
+        + "#151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#36,#10,#127,#8);\n"
+        + "#152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#37,#10,#128,#8);\n"
+        + "#153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#40,#10,#129,#8);\n"
+        + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#41,#10,#130,#8);\n"
+        + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#42,#10,#131,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7502,100 +7437,99 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPresentationStyleDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_BASE_STYLE',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=REPRESENTATION('REP_STYLE_LEAF',(),#9);
-                #13=CARTESIAN_POINT('M0',(0.0,0.0));
-                #14=DIRECTION('DX0',(1.0,0.0));
-                #15=AXIS2_PLACEMENT_2D('MAP0',#13,#14);
-                #16=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));
-                #17=REPRESENTATION('REP_STYLE_MAP',(),#16);
-                #18=REPRESENTATION_MAP(#15,#17);
-                #19=CARTESIAN_POINT('T0',(3.0,4.0));
-                #20=AXIS2_PLACEMENT_2D('TGT0',#19,#14);
-                #21=USER_DEFINED_CURVE_FONT('UCF0',#18,#20);
-                #22=PRE_DEFINED_COLOUR('yellow');
-                #23=FILL_AREA_STYLE_COLOUR('',#22);
-                #24=FILL_AREA_STYLE('',(#23));
-                #25=SURFACE_STYLE_FILL_AREA(#24);
-                #26=CURVE_STYLE('CS0',#21,0.25,#22);
-                #27=SURFACE_STYLE_BOUNDARY(#26);
-                #28=SURFACE_STYLE_PARAMETER_LINE(#26);
-                #29=SURFACE_STYLE_CONTROL_GRID(#26);
-                #30=SURFACE_STYLE_SEGMENTATION_CURVE(#26);
-                #31=SURFACE_STYLE_SILHOUETTE(#26);
-                #32=SURFACE_SIDE_STYLE('',(#25,#27,#28,#29,#30,#31));
-                #33=SURFACE_STYLE_USAGE(.BOTH.,#32);
-                #34=PRESENTATION_STYLE_ASSIGNMENT((#33));
-                #35=CHARACTER_GLYPH_STYLE_STROKE(#26);
-                #36=CHARACTER_GLYPH_STYLE_OUTLINE(#26);
-                #37=CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS(#26,#24);
-                #38=TEXT_STYLE_FOR_DEFINED_FONT(#22);
-                #39=TEXT_STYLE('TS0',#38);
-                #40=TEXT_STYLE_WITH_SPACING('TS1',#38,0.15);
-                #41=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS2',#38,(BOX_HEIGHT(1.2)));
-                #42=PRE_DEFINED_CURVE_FONT('solid');
-                #43=CURVE_STYLE('CS1',#42,0.2,#22);
-                #44=PROPERTY_DEFINITION('PD_CURVE_FONT','',#43);
-                #45=PROPERTY_DEFINITION_REPRESENTATION(#44,#12);
-                #46=PRE_DEFINED_MARKER('dot');
-                #47=POINT_STYLE('PS0',#46,2.5,#22);
-                #48=PROPERTY_DEFINITION('PD_MARKER','',#47);
-                #49=PROPERTY_DEFINITION_REPRESENTATION(#48,#12);
-                #50=TEXT_STYLE_WITH_JUSTIFICATION('TS3',#38,.LEFT.);
-                #51=PROPERTY_DEFINITION('PD_COLOUR','',#50);
-                #52=PROPERTY_DEFINITION_REPRESENTATION(#51,#12);
-                #60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));
-                #68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));
-                #69=CARTESIAN_POINT('P9',(9.0,0.0,0.0));
-                #70=CARTESIAN_POINT('P10',(10.0,0.0,0.0));
-                #71=CARTESIAN_POINT('P11',(11.0,0.0,0.0));
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE_CURVE_STYLE','',#60);
-                #73=ANNOTATION_TEXT_OCCURRENCE('NOTE_SURFACE_USAGE','',#61);
-                #74=ANNOTATION_TEXT_OCCURRENCE('NOTE_STYLE_ASSIGNMENT','',#62);
-                #75=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_STROKE','',#63);
-                #76=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_OUTLINE','',#64);
-                #77=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_OUTLINE_FILL','',#65);
-                #78=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE','',#66);
-                #79=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_SPACING','',#67);
-                #80=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_BOX','',#68);
-                #81=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_CURVE_FONT','',#69);
-                #82=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_MARKER','',#70);
-                #83=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_COLOUR','',#71);
-                #84=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_JUST','',#71);
-                #90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#72,#8);
-                #91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#33,#10,#73,#8);
-                #92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#34,#10,#74,#8);
-                #93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#35,#10,#75,#8);
-                #94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#36,#10,#76,#8);
-                #95=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#37,#10,#77,#8);
-                #96=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#39,#10,#78,#8);
-                #97=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#79,#8);
-                #98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#80,#8);
-                #99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#81,#8);
-                #100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#46,#10,#82,#8);
-                #101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#22,#10,#83,#8);
-                #102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#50,#10,#84,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_BASE_STYLE',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=REPRESENTATION('REP_STYLE_LEAF',(),#9);\n"
+        + "#13=CARTESIAN_POINT('M0',(0.0,0.0));\n"
+        + "#14=DIRECTION('DX0',(1.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_2D('MAP0',#13,#14);\n"
+        + "#16=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
+        + "#17=REPRESENTATION('REP_STYLE_MAP',(),#16);\n"
+        + "#18=REPRESENTATION_MAP(#15,#17);\n"
+        + "#19=CARTESIAN_POINT('T0',(3.0,4.0));\n"
+        + "#20=AXIS2_PLACEMENT_2D('TGT0',#19,#14);\n"
+        + "#21=USER_DEFINED_CURVE_FONT('UCF0',#18,#20);\n"
+        + "#22=PRE_DEFINED_COLOUR('yellow');\n"
+        + "#23=FILL_AREA_STYLE_COLOUR('',#22);\n"
+        + "#24=FILL_AREA_STYLE('',(#23));\n"
+        + "#25=SURFACE_STYLE_FILL_AREA(#24);\n"
+        + "#26=CURVE_STYLE('CS0',#21,0.25,#22);\n"
+        + "#27=SURFACE_STYLE_BOUNDARY(#26);\n"
+        + "#28=SURFACE_STYLE_PARAMETER_LINE(#26);\n"
+        + "#29=SURFACE_STYLE_CONTROL_GRID(#26);\n"
+        + "#30=SURFACE_STYLE_SEGMENTATION_CURVE(#26);\n"
+        + "#31=SURFACE_STYLE_SILHOUETTE(#26);\n"
+        + "#32=SURFACE_SIDE_STYLE('',(#25,#27,#28,#29,#30,#31));\n"
+        + "#33=SURFACE_STYLE_USAGE(.BOTH.,#32);\n"
+        + "#34=PRESENTATION_STYLE_ASSIGNMENT((#33));\n"
+        + "#35=CHARACTER_GLYPH_STYLE_STROKE(#26);\n"
+        + "#36=CHARACTER_GLYPH_STYLE_OUTLINE(#26);\n"
+        + "#37=CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS(#26,#24);\n"
+        + "#38=TEXT_STYLE_FOR_DEFINED_FONT(#22);\n"
+        + "#39=TEXT_STYLE('TS0',#38);\n"
+        + "#40=TEXT_STYLE_WITH_SPACING('TS1',#38,0.15);\n"
+        + "#41=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS2',#38,(BOX_HEIGHT(1.2)));\n"
+        + "#42=PRE_DEFINED_CURVE_FONT('solid');\n"
+        + "#43=CURVE_STYLE('CS1',#42,0.2,#22);\n"
+        + "#44=PROPERTY_DEFINITION('PD_CURVE_FONT','',#43);\n"
+        + "#45=PROPERTY_DEFINITION_REPRESENTATION(#44,#12);\n"
+        + "#46=PRE_DEFINED_MARKER('dot');\n"
+        + "#47=POINT_STYLE('PS0',#46,2.5,#22);\n"
+        + "#48=PROPERTY_DEFINITION('PD_MARKER','',#47);\n"
+        + "#49=PROPERTY_DEFINITION_REPRESENTATION(#48,#12);\n"
+        + "#50=TEXT_STYLE_WITH_JUSTIFICATION('TS3',#38,.LEFT.);\n"
+        + "#51=PROPERTY_DEFINITION('PD_COLOUR','',#50);\n"
+        + "#52=PROPERTY_DEFINITION_REPRESENTATION(#51,#12);\n"
+        + "#60=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#61=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#62=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#63=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#64=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#65=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#66=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#67=CARTESIAN_POINT('P7',(7.0,0.0,0.0));\n"
+        + "#68=CARTESIAN_POINT('P8',(8.0,0.0,0.0));\n"
+        + "#69=CARTESIAN_POINT('P9',(9.0,0.0,0.0));\n"
+        + "#70=CARTESIAN_POINT('P10',(10.0,0.0,0.0));\n"
+        + "#71=CARTESIAN_POINT('P11',(11.0,0.0,0.0));\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE_CURVE_STYLE','',#60);\n"
+        + "#73=ANNOTATION_TEXT_OCCURRENCE('NOTE_SURFACE_USAGE','',#61);\n"
+        + "#74=ANNOTATION_TEXT_OCCURRENCE('NOTE_STYLE_ASSIGNMENT','',#62);\n"
+        + "#75=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_STROKE','',#63);\n"
+        + "#76=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_OUTLINE','',#64);\n"
+        + "#77=ANNOTATION_TEXT_OCCURRENCE('NOTE_GLYPH_OUTLINE_FILL','',#65);\n"
+        + "#78=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE','',#66);\n"
+        + "#79=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_SPACING','',#67);\n"
+        + "#80=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_BOX','',#68);\n"
+        + "#81=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_CURVE_FONT','',#69);\n"
+        + "#82=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_MARKER','',#70);\n"
+        + "#83=ANNOTATION_TEXT_OCCURRENCE('NOTE_LEAF_COLOUR','',#71);\n"
+        + "#84=ANNOTATION_TEXT_OCCURRENCE('NOTE_TEXT_STYLE_JUST','',#71);\n"
+        + "#90=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#26,#10,#72,#8);\n"
+        + "#91=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#33,#10,#73,#8);\n"
+        + "#92=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#34,#10,#74,#8);\n"
+        + "#93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#35,#10,#75,#8);\n"
+        + "#94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#36,#10,#76,#8);\n"
+        + "#95=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#37,#10,#77,#8);\n"
+        + "#96=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#39,#10,#78,#8);\n"
+        + "#97=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#40,#10,#79,#8);\n"
+        + "#98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#41,#10,#80,#8);\n"
+        + "#99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#81,#8);\n"
+        + "#100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#46,#10,#82,#8);\n"
+        + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#22,#10,#83,#8);\n"
+        + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#50,#10,#84,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7701,66 +7635,65 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedColourAndSurfaceStyleLeafMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_SURFACE_STYLE_LEAF',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=COLOUR_RGB('Amber',1.0,0.75,0.0);
-                #13=COLOUR_SPECIFICATION('amber-spec');
-                #14=COLOUR();
-                #15=FILL_AREA_STYLE_COLOUR('',#12);
-                #16=FILL_AREA_STYLE('',(#15));
-                #17=SURFACE_STYLE_FILL_AREA(#16);
-                #18=SURFACE_STYLE_TRANSPARENT(0.35);
-                #19=SURFACE_STYLE_REFLECTANCE_AMBIENT(0.2);
-                #20=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE(0.2,0.6);
-                #21=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR(0.2,0.6,0.4,32.0,#13);
-                #22=SURFACE_SIDE_STYLE('',(#17,#18,#19,#20,#21));
-                #23=SURFACE_STYLE_USAGE(.BOTH.,#22);
-                #24=PRESENTATION_STYLE_ASSIGNMENT((#23));
-                #25=PRE_DEFINED_SURFACE_SIDE_STYLE('both');
-                #26=PROPERTY_DEFINITION('PD_RGB','',#12);
-                #27=PROPERTY_DEFINITION('PD_SPEC','',#13);
-                #28=PROPERTY_DEFINITION('PD_COLOUR','',#14);
-                #29=PROPERTY_DEFINITION('PD_PRE_SIDE','',#25);
-                #30=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);
-                #31=PROPERTY_DEFINITION_REPRESENTATION(#27,#10);
-                #32=PROPERTY_DEFINITION_REPRESENTATION(#28,#10);
-                #33=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #47=ANNOTATION_TEXT_OCCURRENCE('NOTE_RGB','',#40);
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPEC','',#41);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_COLOUR','',#42);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRANSPARENT','',#43);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMBIENT','',#44);
-                #52=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMBIENT_DIFFUSE','',#45);
-                #53=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPECULAR','',#46);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_SIDE','',#46);
-                #55=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#47,#8);
-                #56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#10,#48,#8);
-                #57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#14,#10,#49,#8);
-                #58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#18,#10,#50,#8);
-                #59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#19,#10,#51,#8);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#20,#10,#52,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#10,#53,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#25,#10,#54,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_SURFACE_STYLE_LEAF',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=COLOUR_RGB('Amber',1.0,0.75,0.0);\n"
+        + "#13=COLOUR_SPECIFICATION('amber-spec');\n"
+        + "#14=COLOUR();\n"
+        + "#15=FILL_AREA_STYLE_COLOUR('',#12);\n"
+        + "#16=FILL_AREA_STYLE('',(#15));\n"
+        + "#17=SURFACE_STYLE_FILL_AREA(#16);\n"
+        + "#18=SURFACE_STYLE_TRANSPARENT(0.35);\n"
+        + "#19=SURFACE_STYLE_REFLECTANCE_AMBIENT(0.2);\n"
+        + "#20=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE(0.2,0.6);\n"
+        + "#21=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR(0.2,0.6,0.4,32.0,#13);\n"
+        + "#22=SURFACE_SIDE_STYLE('',(#17,#18,#19,#20,#21));\n"
+        + "#23=SURFACE_STYLE_USAGE(.BOTH.,#22);\n"
+        + "#24=PRESENTATION_STYLE_ASSIGNMENT((#23));\n"
+        + "#25=PRE_DEFINED_SURFACE_SIDE_STYLE('both');\n"
+        + "#26=PROPERTY_DEFINITION('PD_RGB','',#12);\n"
+        + "#27=PROPERTY_DEFINITION('PD_SPEC','',#13);\n"
+        + "#28=PROPERTY_DEFINITION('PD_COLOUR','',#14);\n"
+        + "#29=PROPERTY_DEFINITION('PD_PRE_SIDE','',#25);\n"
+        + "#30=PROPERTY_DEFINITION_REPRESENTATION(#26,#10);\n"
+        + "#31=PROPERTY_DEFINITION_REPRESENTATION(#27,#10);\n"
+        + "#32=PROPERTY_DEFINITION_REPRESENTATION(#28,#10);\n"
+        + "#33=PROPERTY_DEFINITION_REPRESENTATION(#29,#10);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#46=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#47=ANNOTATION_TEXT_OCCURRENCE('NOTE_RGB','',#40);\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPEC','',#41);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_COLOUR','',#42);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_TRANSPARENT','',#43);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMBIENT','',#44);\n"
+        + "#52=ANNOTATION_TEXT_OCCURRENCE('NOTE_AMBIENT_DIFFUSE','',#45);\n"
+        + "#53=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPECULAR','',#46);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_SIDE','',#46);\n"
+        + "#55=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#12,#10,#47,#8);\n"
+        + "#56=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#13,#10,#48,#8);\n"
+        + "#57=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#14,#10,#49,#8);\n"
+        + "#58=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#18,#10,#50,#8);\n"
+        + "#59=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#19,#10,#51,#8);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#20,#10,#52,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#10,#53,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#25,#10,#54,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7802,42 +7735,41 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedStyledAndLayerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_STYLE_WRAP',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #13=DIRECTION('N',(0.0,0.0,1.0));
-                #14=DIRECTION('X',(1.0,0.0,0.0));
-                #15=AXIS2_PLACEMENT_3D('AX',#12,#13,#14);
-                #16=PLANE('PL0',#15);
-                #17=PRE_DEFINED_COLOUR('yellow');
-                #18=PRE_DEFINED_CURVE_FONT('solid');
-                #19=CURVE_STYLE('CS0',#18,0.2,#17);
-                #20=PRESENTATION_STYLE_ASSIGNMENT((#19));
-                #21=STYLED_ITEM('S0',(#20),#16);
-                #22=OVER_RIDING_STYLED_ITEM('OS0',(#20),#16,#21);
-                #23=PRESENTATION_LAYER_ASSIGNMENT('L1','layer one',(#16,#21,#22));
-                #30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #31=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #32=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_STYLED','',#30);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_OVERRIDE','',#31);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_LAYER','',#32);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#33,#8);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#34,#8);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#35,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_STYLE_WRAP',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#13=DIRECTION('N',(0.0,0.0,1.0));\n"
+        + "#14=DIRECTION('X',(1.0,0.0,0.0));\n"
+        + "#15=AXIS2_PLACEMENT_3D('AX',#12,#13,#14);\n"
+        + "#16=PLANE('PL0',#15);\n"
+        + "#17=PRE_DEFINED_COLOUR('yellow');\n"
+        + "#18=PRE_DEFINED_CURVE_FONT('solid');\n"
+        + "#19=CURVE_STYLE('CS0',#18,0.2,#17);\n"
+        + "#20=PRESENTATION_STYLE_ASSIGNMENT((#19));\n"
+        + "#21=STYLED_ITEM('S0',(#20),#16);\n"
+        + "#22=OVER_RIDING_STYLED_ITEM('OS0',(#20),#16,#21);\n"
+        + "#23=PRESENTATION_LAYER_ASSIGNMENT('L1','layer one',(#16,#21,#22));\n"
+        + "#30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#32=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_STYLED','',#30);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_OVERRIDE','',#31);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_LAYER','',#32);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#33,#8);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#34,#8);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#35,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7871,58 +7803,57 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMappedTransformationAndPlacementCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_MAP_WRAP',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #13=DIRECTION('DZ',(0.0,0.0,1.0));
-                #14=DIRECTION('DX',(1.0,0.0,0.0));
-                #15=DIRECTION('DY',(0.0,1.0,0.0));
-                #16=AXIS1_PLACEMENT('AX1',#12,#13);
-                #17=AXIS2_PLACEMENT_3D('AX0',#12,#13,#14);
-                #18=CARTESIAN_POINT('T1',(5.0,0.0,0.0));
-                #19=AXIS2_PLACEMENT_3D('AX1T',#18,#13,#14);
-                #20=ITEM_DEFINED_TRANSFORMATION('MOVE','translate x',#17,#19);
-                #21=CARTESIAN_POINT('ORIG',(2.0,3.0,4.0));
-                #22=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#14,#15,#21,1.5,#13);
-                #23=CARTESIAN_POINT('M0',(0.0,0.0));
-                #24=DIRECTION('DX2',(1.0,0.0));
-                #25=AXIS2_PLACEMENT_2D('MAP0',#23,#24);
-                #26=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));
-                #27=REPRESENTATION('REP_MAPPED',(),#26);
-                #28=REPRESENTATION_MAP(#25,#27);
-                #29=MAPPED_ITEM(#28,#22);
-                #30=POINT_REPLICA('PR0',#12,#22);
-                #40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #46=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAPPED','',#40);
-                #47=ANNOTATION_TEXT_OCCURRENCE('NOTE_REPLICA','',#41);
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_ITEM_TRANSFORM','',#42);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_CART_TRANSFORM','',#43);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS1','',#44);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS2','',#45);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#29,#10,#46,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#30,#10,#47,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#48,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#10,#49,#8);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#16,#10,#50,#8);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#17,#10,#51,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_MAP_WRAP',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#13=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#14=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#16=AXIS1_PLACEMENT('AX1',#12,#13);\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#12,#13,#14);\n"
+        + "#18=CARTESIAN_POINT('T1',(5.0,0.0,0.0));\n"
+        + "#19=AXIS2_PLACEMENT_3D('AX1T',#18,#13,#14);\n"
+        + "#20=ITEM_DEFINED_TRANSFORMATION('MOVE','translate x',#17,#19);\n"
+        + "#21=CARTESIAN_POINT('ORIG',(2.0,3.0,4.0));\n"
+        + "#22=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',#14,#15,#21,1.5,#13);\n"
+        + "#23=CARTESIAN_POINT('M0',(0.0,0.0));\n"
+        + "#24=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#25=AXIS2_PLACEMENT_2D('MAP0',#23,#24);\n"
+        + "#26=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));\n"
+        + "#27=REPRESENTATION('REP_MAPPED',(),#26);\n"
+        + "#28=REPRESENTATION_MAP(#25,#27);\n"
+        + "#29=MAPPED_ITEM(#28,#22);\n"
+        + "#30=POINT_REPLICA('PR0',#12,#22);\n"
+        + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#46=ANNOTATION_TEXT_OCCURRENCE('NOTE_MAPPED','',#40);\n"
+        + "#47=ANNOTATION_TEXT_OCCURRENCE('NOTE_REPLICA','',#41);\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_ITEM_TRANSFORM','',#42);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_CART_TRANSFORM','',#43);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS1','',#44);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_AXIS2','',#45);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#29,#10,#46,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#30,#10,#47,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#48,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#10,#49,#8);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#16,#10,#50,#8);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#17,#10,#51,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7984,61 +7915,60 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedTopologyAndContainerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_TOPO_WRAP',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #15=DIRECTION('DX',(1.0,0.0,0.0));
-                #16=VECTOR('VX',#15,1.0);
-                #17=LINE('L0',#12,#16);
-                #18=VERTEX_POINT('V0',#12);
-                #19=VERTEX_POINT('V1',#13);
-                #20=EDGE_CURVE('E0',#18,#19,#17,.T.);
-                #21=ORIENTED_EDGE('OE0',$,$,#20,.T.);
-                #22=PATH('PTH',(#21));
-                #23=OPEN_PATH('OP0',(#21));
-                #24=ORIENTED_PATH('OP1',#22,.F.);
-                #25=EDGE_LOOP('EL0',(#21));
-                #26=POLY_LOOP('PL0',(#12,#13,#14));
-                #27=CONNECTED_EDGE_SET('CES0',(#20));
-                #28=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#27));
-                #29=WIRE_SHELL('WS0',(#25));
-                #30=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#29));
-                #31=POINT_SET('PS0',(#12,#13));
-                #32=GEOMETRIC_CURVE_SET('GCS0',(#17));
-                #33=GEOMETRIC_SET('GS0',(#31,#32,#24,#26,#28,#30));
-                #40=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('N1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('N2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('N3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('N4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('N5',(5.0,0.0,0.0));
-                #46=ANNOTATION_TEXT_OCCURRENCE('NOTE_PATH','',#40);
-                #47=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOOP','',#41);
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_WIREFRAME','',#42);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHELL_WIREFRAME','',#43);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_SET','',#44);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOMETRIC_SET','',#45);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#46,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#47,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#48,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#30,#10,#49,#8);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#31,#10,#50,#8);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#33,#10,#51,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_TOPO_WRAP',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#16=VECTOR('VX',#15,1.0);\n"
+        + "#17=LINE('L0',#12,#16);\n"
+        + "#18=VERTEX_POINT('V0',#12);\n"
+        + "#19=VERTEX_POINT('V1',#13);\n"
+        + "#20=EDGE_CURVE('E0',#18,#19,#17,.T.);\n"
+        + "#21=ORIENTED_EDGE('OE0',$,$,#20,.T.);\n"
+        + "#22=PATH('PTH',(#21));\n"
+        + "#23=OPEN_PATH('OP0',(#21));\n"
+        + "#24=ORIENTED_PATH('OP1',#22,.F.);\n"
+        + "#25=EDGE_LOOP('EL0',(#21));\n"
+        + "#26=POLY_LOOP('PL0',(#12,#13,#14));\n"
+        + "#27=CONNECTED_EDGE_SET('CES0',(#20));\n"
+        + "#28=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#27));\n"
+        + "#29=WIRE_SHELL('WS0',(#25));\n"
+        + "#30=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#29));\n"
+        + "#31=POINT_SET('PS0',(#12,#13));\n"
+        + "#32=GEOMETRIC_CURVE_SET('GCS0',(#17));\n"
+        + "#33=GEOMETRIC_SET('GS0',(#31,#32,#24,#26,#28,#30));\n"
+        + "#40=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('N1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('N2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('N3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('N4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('N5',(5.0,0.0,0.0));\n"
+        + "#46=ANNOTATION_TEXT_OCCURRENCE('NOTE_PATH','',#40);\n"
+        + "#47=ANNOTATION_TEXT_OCCURRENCE('NOTE_LOOP','',#41);\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_WIREFRAME','',#42);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHELL_WIREFRAME','',#43);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_POINT_SET','',#44);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_GEOMETRIC_SET','',#45);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#24,#10,#46,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#47,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#28,#10,#48,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#30,#10,#49,#8);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#31,#10,#50,#8);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#33,#10,#51,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8110,67 +8040,66 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSurfaceContainerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_SURF_WRAP',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #16=DIRECTION('DZ',(0.0,0.0,1.0));
-                #17=DIRECTION('DX',(1.0,0.0,0.0));
-                #18=AXIS2_PLACEMENT_3D('AX',#12,#16,#17);
-                #19=PLANE('PL',#18);
-                #20=POLY_LOOP('PL0',(#12,#13,#14,#15));
-                #21=FACE_BOUND('FB',#20,.T.);
-                #22=ADVANCED_FACE('AF0',(#21),#19,.T.);
-                #23=ORIENTED_FACE('OF0',#22,.F.);
-                #24=FACE_SURFACE('FS0',(#21),#19,.T.);
-                #25=OPEN_SHELL('OS0',(#22));
-                #26=SURFACED_OPEN_SHELL('SOS0',(#24));
-                #27=ORIENTED_OPEN_SHELL('OOS0',#25,.F.);
-                #28=CLOSED_SHELL('CS0',(#22));
-                #29=ORIENTED_CLOSED_SHELL('OCS0',#28,.F.);
-                #30=CONNECTED_FACE_SET('CFS0',(#22));
-                #31=CONNECTED_FACE_SUB_SET('CFSS0',(#22),#30);
-                #32=FACE_BASED_SURFACE_MODEL('FBSM0',(#30,#25));
-                #33=SHELL_BASED_SURFACE_MODEL('SBSM0',(#25,#26,#27,#28,#29));
-                #40=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #41=CARTESIAN_POINT('N1',(1.0,0.0,0.0));
-                #42=CARTESIAN_POINT('N2',(2.0,0.0,0.0));
-                #43=CARTESIAN_POINT('N3',(3.0,0.0,0.0));
-                #44=CARTESIAN_POINT('N4',(4.0,0.0,0.0));
-                #45=CARTESIAN_POINT('N5',(5.0,0.0,0.0));
-                #52=CARTESIAN_POINT('N6',(6.0,0.0,0.0));
-                #53=CARTESIAN_POINT('N7',(7.0,0.0,0.0));
-                #46=ANNOTATION_TEXT_OCCURRENCE('NOTE_AF','',#40);
-                #47=ANNOTATION_TEXT_OCCURRENCE('NOTE_OF','',#41);
-                #48=ANNOTATION_TEXT_OCCURRENCE('NOTE_FS','',#42);
-                #49=ANNOTATION_TEXT_OCCURRENCE('NOTE_OS','',#43);
-                #50=ANNOTATION_TEXT_OCCURRENCE('NOTE_CFS','',#44);
-                #51=ANNOTATION_TEXT_OCCURRENCE('NOTE_MODEL','',#45);
-                #54=ANNOTATION_TEXT_OCCURRENCE('NOTE_CFSS','',#52);
-                #55=ANNOTATION_TEXT_OCCURRENCE('NOTE_FBSM','',#53);
-                #60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#46,#8);
-                #61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#47,#8);
-                #62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#48,#8);
-                #63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#49,#8);
-                #64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#50,#8);
-                #65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#33,#10,#51,#8);
-                #66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#54,#8);
-                #67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#32,#10,#55,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_SURF_WRAP',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#16=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#17=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX',#12,#16,#17);\n"
+        + "#19=PLANE('PL',#18);\n"
+        + "#20=POLY_LOOP('PL0',(#12,#13,#14,#15));\n"
+        + "#21=FACE_BOUND('FB',#20,.T.);\n"
+        + "#22=ADVANCED_FACE('AF0',(#21),#19,.T.);\n"
+        + "#23=ORIENTED_FACE('OF0',#22,.F.);\n"
+        + "#24=FACE_SURFACE('FS0',(#21),#19,.T.);\n"
+        + "#25=OPEN_SHELL('OS0',(#22));\n"
+        + "#26=SURFACED_OPEN_SHELL('SOS0',(#24));\n"
+        + "#27=ORIENTED_OPEN_SHELL('OOS0',#25,.F.);\n"
+        + "#28=CLOSED_SHELL('CS0',(#22));\n"
+        + "#29=ORIENTED_CLOSED_SHELL('OCS0',#28,.F.);\n"
+        + "#30=CONNECTED_FACE_SET('CFS0',(#22));\n"
+        + "#31=CONNECTED_FACE_SUB_SET('CFSS0',(#22),#30);\n"
+        + "#32=FACE_BASED_SURFACE_MODEL('FBSM0',(#30,#25));\n"
+        + "#33=SHELL_BASED_SURFACE_MODEL('SBSM0',(#25,#26,#27,#28,#29));\n"
+        + "#40=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#41=CARTESIAN_POINT('N1',(1.0,0.0,0.0));\n"
+        + "#42=CARTESIAN_POINT('N2',(2.0,0.0,0.0));\n"
+        + "#43=CARTESIAN_POINT('N3',(3.0,0.0,0.0));\n"
+        + "#44=CARTESIAN_POINT('N4',(4.0,0.0,0.0));\n"
+        + "#45=CARTESIAN_POINT('N5',(5.0,0.0,0.0));\n"
+        + "#52=CARTESIAN_POINT('N6',(6.0,0.0,0.0));\n"
+        + "#53=CARTESIAN_POINT('N7',(7.0,0.0,0.0));\n"
+        + "#46=ANNOTATION_TEXT_OCCURRENCE('NOTE_AF','',#40);\n"
+        + "#47=ANNOTATION_TEXT_OCCURRENCE('NOTE_OF','',#41);\n"
+        + "#48=ANNOTATION_TEXT_OCCURRENCE('NOTE_FS','',#42);\n"
+        + "#49=ANNOTATION_TEXT_OCCURRENCE('NOTE_OS','',#43);\n"
+        + "#50=ANNOTATION_TEXT_OCCURRENCE('NOTE_CFS','',#44);\n"
+        + "#51=ANNOTATION_TEXT_OCCURRENCE('NOTE_MODEL','',#45);\n"
+        + "#54=ANNOTATION_TEXT_OCCURRENCE('NOTE_CFSS','',#52);\n"
+        + "#55=ANNOTATION_TEXT_OCCURRENCE('NOTE_FBSM','',#53);\n"
+        + "#60=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#46,#8);\n"
+        + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#47,#8);\n"
+        + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#48,#8);\n"
+        + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#49,#8);\n"
+        + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#50,#8);\n"
+        + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#33,#10,#51,#8);\n"
+        + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#54,#8);\n"
+        + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#32,#10,#55,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8252,31 +8181,30 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPathAndWireSemanticDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=VERTEX_POINT('VP0',#1);
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=VECTOR('V0',#3,1.0);
-                #5=LINE('L0',#1,#4);
-                #6=EDGE_CURVE('E0',#2,#2,#5,.T.);
-                #7=ORIENTED_EDGE('',*,*,#6,.T.);
-                #8=PATH('OP',(#7));
-                #9=CONNECTED_EDGE_SET('CES',(#7));
-                #10=EDGE_LOOP('EL',(#7));
-                #11=WIRE_SHELL('WS',(#10));
-                #12=VERTEX_LOOP('VL',#2);
-                #13=VERTEX_SHELL('VS',#12);
-                #14=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #15=REPRESENTATION('REP_A',(),#14);
-                #16=ANNOTATION_TEXT_OCCURRENCE('NOTE','targets',#1);
-                #17=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#8,#15,#16,#8);
-                #18=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#9,#15,#16,#9);
-                #19=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#10,#15,#16,#10);
-                #20=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#11,#15,#16,#11);
-                #21=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#13,#15,#16,#13);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=VERTEX_POINT('VP0',#1);\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=VECTOR('V0',#3,1.0);\n"
+        + "#5=LINE('L0',#1,#4);\n"
+        + "#6=EDGE_CURVE('E0',#2,#2,#5,.T.);\n"
+        + "#7=ORIENTED_EDGE('',*,*,#6,.T.);\n"
+        + "#8=PATH('OP',(#7));\n"
+        + "#9=CONNECTED_EDGE_SET('CES',(#7));\n"
+        + "#10=EDGE_LOOP('EL',(#7));\n"
+        + "#11=WIRE_SHELL('WS',(#10));\n"
+        + "#12=VERTEX_LOOP('VL',#2);\n"
+        + "#13=VERTEX_SHELL('VS',#12);\n"
+        + "#14=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#15=REPRESENTATION('REP_A',(),#14);\n"
+        + "#16=ANNOTATION_TEXT_OCCURRENCE('NOTE','targets',#1);\n"
+        + "#17=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#8,#15,#16,#8);\n"
+        + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#9,#15,#16,#9);\n"
+        + "#19=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#10,#15,#16,#10);\n"
+        + "#20=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#11,#15,#16,#11);\n"
+        + "#21=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#13,#15,#16,#13);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8340,57 +8268,56 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShellAndModelSemanticDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('P2',(0.0,1.0,0.0));
-                #4=DIRECTION('N',(0.0,0.0,1.0));
-                #5=DIRECTION('X',(1.0,0.0,0.0));
-                #6=AXIS2_PLACEMENT_3D('AX',#1,#4,#5);
-                #7=PLANE('PL',#6);
-                #8=POLY_LOOP('PL0',(#1,#2,#3));
-                #9=FACE_BOUND('FB',#8,.T.);
-                #10=FACE_SURFACE('AF',(#9),#7,.T.);
-                #11=CONNECTED_FACE_SET('CFS',(#10));
-                #12=CONNECTED_FACE_SUB_SET('CFSS',(#10),#11);
-                #13=OPEN_SHELL('OS',(#10));
-                #14=SURFACED_OPEN_SHELL('SOS',(#10));
-                #15=ORIENTED_OPEN_SHELL('OOS',#13,.T.);
-                #16=CLOSED_SHELL('CS',(#10));
-                #17=ORIENTED_CLOSED_SHELL('OCS',#16,.T.);
-                #18=FACE_BASED_SURFACE_MODEL('FBSM',(#11));
-                #19=SHELL_BASED_SURFACE_MODEL('SBSM',(#13,#16));
-                #20=VERTEX_POINT('VP0',#1);
-                #21=VERTEX_POINT('VP1',#2);
-                #22=DIRECTION('DX',(1.0,0.0,0.0));
-                #23=VECTOR('V0',#22,1.0);
-                #24=LINE('L0',#1,#23);
-                #25=EDGE_CURVE('E0',#20,#21,#24,.T.);
-                #26=ORIENTED_EDGE('OE0',$,$,#25,.T.);
-                #27=CONNECTED_EDGE_SET('CES',(#26));
-                #28=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#27));
-                #29=EDGE_LOOP('EL',(#26));
-                #30=WIRE_SHELL('WS',(#29));
-                #31=VERTEX_LOOP('VL',#20);
-                #32=VERTEX_SHELL('VS',#31);
-                #33=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#30,#32));
-                #34=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #35=REPRESENTATION('REP_A',(),#34);
-                #36=ANNOTATION_TEXT_OCCURRENCE('NOTE','containers',#1);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#11,#35,#36,#11);
-                #38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#12,#35,#36,#12);
-                #39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#13,#35,#36,#13);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#14,#35,#36,#14);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#15,#35,#36,#15);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#16,#35,#36,#16);
-                #43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#17,#35,#36,#17);
-                #44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#18,#35,#36,#18);
-                #45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#19,#35,#36,#19);
-                #46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#35,#36,#28);
-                #47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#33,#35,#36,#33);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(0.0,1.0,0.0));\n"
+        + "#4=DIRECTION('N',(0.0,0.0,1.0));\n"
+        + "#5=DIRECTION('X',(1.0,0.0,0.0));\n"
+        + "#6=AXIS2_PLACEMENT_3D('AX',#1,#4,#5);\n"
+        + "#7=PLANE('PL',#6);\n"
+        + "#8=POLY_LOOP('PL0',(#1,#2,#3));\n"
+        + "#9=FACE_BOUND('FB',#8,.T.);\n"
+        + "#10=FACE_SURFACE('AF',(#9),#7,.T.);\n"
+        + "#11=CONNECTED_FACE_SET('CFS',(#10));\n"
+        + "#12=CONNECTED_FACE_SUB_SET('CFSS',(#10),#11);\n"
+        + "#13=OPEN_SHELL('OS',(#10));\n"
+        + "#14=SURFACED_OPEN_SHELL('SOS',(#10));\n"
+        + "#15=ORIENTED_OPEN_SHELL('OOS',#13,.T.);\n"
+        + "#16=CLOSED_SHELL('CS',(#10));\n"
+        + "#17=ORIENTED_CLOSED_SHELL('OCS',#16,.T.);\n"
+        + "#18=FACE_BASED_SURFACE_MODEL('FBSM',(#11));\n"
+        + "#19=SHELL_BASED_SURFACE_MODEL('SBSM',(#13,#16));\n"
+        + "#20=VERTEX_POINT('VP0',#1);\n"
+        + "#21=VERTEX_POINT('VP1',#2);\n"
+        + "#22=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#23=VECTOR('V0',#22,1.0);\n"
+        + "#24=LINE('L0',#1,#23);\n"
+        + "#25=EDGE_CURVE('E0',#20,#21,#24,.T.);\n"
+        + "#26=ORIENTED_EDGE('OE0',$,$,#25,.T.);\n"
+        + "#27=CONNECTED_EDGE_SET('CES',(#26));\n"
+        + "#28=EDGE_BASED_WIREFRAME_MODEL('EBWM',(#27));\n"
+        + "#29=EDGE_LOOP('EL',(#26));\n"
+        + "#30=WIRE_SHELL('WS',(#29));\n"
+        + "#31=VERTEX_LOOP('VL',#20);\n"
+        + "#32=VERTEX_SHELL('VS',#31);\n"
+        + "#33=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#30,#32));\n"
+        + "#34=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#35=REPRESENTATION('REP_A',(),#34);\n"
+        + "#36=ANNOTATION_TEXT_OCCURRENCE('NOTE','containers',#1);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#11,#35,#36,#11);\n"
+        + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#12,#35,#36,#12);\n"
+        + "#39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#13,#35,#36,#13);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#14,#35,#36,#14);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#15,#35,#36,#15);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#16,#35,#36,#16);\n"
+        + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#17,#35,#36,#17);\n"
+        + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#18,#35,#36,#18);\n"
+        + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#19,#35,#36,#19);\n"
+        + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#35,#36,#28);\n"
+        + "#47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#33,#35,#36,#33);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8494,79 +8421,78 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSolidDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #2=DIRECTION('DZ',(0.0,0.0,1.0));
-                #3=DIRECTION('DX',(1.0,0.0,0.0));
-                #4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);
-                #5=BLOCK('BLK',#4,10.0,20.0,30.0);
-                #6=CARTESIAN_POINT('PZ',(0.0,0.0,15.0));
-                #7=AXIS2_PLACEMENT_3D('PLAX',#6,#2,#3);
-                #8=PLANE('PLANE',#7);
-                #9=HALF_SPACE_SOLID('HS',#8,.T.);
-                #10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));
-                #11=CSG_SOLID('CSG0',#10);
-                #12=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));
-                #20=CARTESIAN_POINT('P2D',(0.0,0.0));
-                #21=DIRECTION('DX2',(1.0,0.0));
-                #22=AXIS2_PLACEMENT_2D('PROFILE_AX',#20,#21);
-                #23=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#22,4.0,2.0);
-                #24=DIRECTION('DIR',(0.0,0.0,1.0));
-                #25=EXTRUDED_AREA_SOLID('EX0',#23,#4,#24,5.0);
-                #26=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TX',#2,#3,#1,1.0,$);
-                #27=SOLID_REPLICA('SR0',#25,#26);
-                #30=CARTESIAN_POINT('Q0',(0.0,0.0,0.0));
-                #31=CARTESIAN_POINT('Q1',(1.0,0.0,0.0));
-                #32=CARTESIAN_POINT('Q2',(1.0,1.0,0.0));
-                #33=CARTESIAN_POINT('Q3',(0.0,1.0,0.0));
-                #34=DIRECTION('NZ',(0.0,0.0,1.0));
-                #35=DIRECTION('NX',(1.0,0.0,0.0));
-                #36=AXIS2_PLACEMENT_3D('SAX',#30,#34,#35);
-                #37=PLANE('SPL',#36);
-                #38=VERTEX_POINT('V0',#30);
-                #39=VERTEX_POINT('V1',#31);
-                #40=VERTEX_POINT('V2',#32);
-                #41=VERTEX_POINT('V3',#33);
-                #42=DIRECTION('D1',(1.0,0.0,0.0));
-                #43=VECTOR('VE1',#42,1.0);
-                #44=LINE('L1',#30,#43);
-                #45=DIRECTION('D2',(0.0,1.0,0.0));
-                #46=VECTOR('VE2',#45,1.0);
-                #47=LINE('L2',#31,#46);
-                #48=DIRECTION('D3',(-1.0,0.0,0.0));
-                #49=VECTOR('VE3',#48,1.0);
-                #50=LINE('L3',#32,#49);
-                #51=DIRECTION('D4',(0.0,-1.0,0.0));
-                #52=VECTOR('VE4',#51,1.0);
-                #53=LINE('L4',#33,#52);
-                #54=EDGE_CURVE('E1',#38,#39,#44,.T.);
-                #55=EDGE_CURVE('E2',#39,#40,#47,.T.);
-                #56=EDGE_CURVE('E3',#40,#41,#50,.T.);
-                #57=EDGE_CURVE('E4',#41,#38,#53,.T.);
-                #58=ORIENTED_EDGE('OE1',$,$,#54,.T.);
-                #59=ORIENTED_EDGE('OE2',$,$,#55,.T.);
-                #60=ORIENTED_EDGE('OE3',$,$,#56,.T.);
-                #61=ORIENTED_EDGE('OE4',$,$,#57,.T.);
-                #62=EDGE_LOOP('LOOP',(#58,#59,#60,#61));
-                #63=FACE_OUTER_BOUND('FOB',#62,.T.);
-                #64=ADVANCED_FACE('AF0',(#63),#37,.T.);
-                #65=CLOSED_SHELL('CS0',(#64));
-                #66=MANIFOLD_SOLID_BREP('MSB0',#65);
-                #67=BREP_WITH_VOIDS('BWV0',#65,());
-                #70=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #71=REPRESENTATION('REP_A',(),#70);
-                #72=ANNOTATION_TEXT_OCCURRENCE('NOTE','solids',#1);
-                #73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#66,#71,#72,#66);
-                #74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#67,#71,#72,#67);
-                #75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#25,#71,#72,#25);
-                #76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#27,#71,#72,#27);
-                #77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#5,#71,#72,#5);
-                #78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#11,#71,#72,#11);
-                #79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#10,#71,#72,#10);
-                #80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#12,#71,#72,#12);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
+        + "#5=BLOCK('BLK',#4,10.0,20.0,30.0);\n"
+        + "#6=CARTESIAN_POINT('PZ',(0.0,0.0,15.0));\n"
+        + "#7=AXIS2_PLACEMENT_3D('PLAX',#6,#2,#3);\n"
+        + "#8=PLANE('PLANE',#7);\n"
+        + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
+        + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
+        + "#11=CSG_SOLID('CSG0',#10);\n"
+        + "#12=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
+        + "#20=CARTESIAN_POINT('P2D',(0.0,0.0));\n"
+        + "#21=DIRECTION('DX2',(1.0,0.0));\n"
+        + "#22=AXIS2_PLACEMENT_2D('PROFILE_AX',#20,#21);\n"
+        + "#23=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#22,4.0,2.0);\n"
+        + "#24=DIRECTION('DIR',(0.0,0.0,1.0));\n"
+        + "#25=EXTRUDED_AREA_SOLID('EX0',#23,#4,#24,5.0);\n"
+        + "#26=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TX',#2,#3,#1,1.0,$);\n"
+        + "#27=SOLID_REPLICA('SR0',#25,#26);\n"
+        + "#30=CARTESIAN_POINT('Q0',(0.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('Q1',(1.0,0.0,0.0));\n"
+        + "#32=CARTESIAN_POINT('Q2',(1.0,1.0,0.0));\n"
+        + "#33=CARTESIAN_POINT('Q3',(0.0,1.0,0.0));\n"
+        + "#34=DIRECTION('NZ',(0.0,0.0,1.0));\n"
+        + "#35=DIRECTION('NX',(1.0,0.0,0.0));\n"
+        + "#36=AXIS2_PLACEMENT_3D('SAX',#30,#34,#35);\n"
+        + "#37=PLANE('SPL',#36);\n"
+        + "#38=VERTEX_POINT('V0',#30);\n"
+        + "#39=VERTEX_POINT('V1',#31);\n"
+        + "#40=VERTEX_POINT('V2',#32);\n"
+        + "#41=VERTEX_POINT('V3',#33);\n"
+        + "#42=DIRECTION('D1',(1.0,0.0,0.0));\n"
+        + "#43=VECTOR('VE1',#42,1.0);\n"
+        + "#44=LINE('L1',#30,#43);\n"
+        + "#45=DIRECTION('D2',(0.0,1.0,0.0));\n"
+        + "#46=VECTOR('VE2',#45,1.0);\n"
+        + "#47=LINE('L2',#31,#46);\n"
+        + "#48=DIRECTION('D3',(-1.0,0.0,0.0));\n"
+        + "#49=VECTOR('VE3',#48,1.0);\n"
+        + "#50=LINE('L3',#32,#49);\n"
+        + "#51=DIRECTION('D4',(0.0,-1.0,0.0));\n"
+        + "#52=VECTOR('VE4',#51,1.0);\n"
+        + "#53=LINE('L4',#33,#52);\n"
+        + "#54=EDGE_CURVE('E1',#38,#39,#44,.T.);\n"
+        + "#55=EDGE_CURVE('E2',#39,#40,#47,.T.);\n"
+        + "#56=EDGE_CURVE('E3',#40,#41,#50,.T.);\n"
+        + "#57=EDGE_CURVE('E4',#41,#38,#53,.T.);\n"
+        + "#58=ORIENTED_EDGE('OE1',$,$,#54,.T.);\n"
+        + "#59=ORIENTED_EDGE('OE2',$,$,#55,.T.);\n"
+        + "#60=ORIENTED_EDGE('OE3',$,$,#56,.T.);\n"
+        + "#61=ORIENTED_EDGE('OE4',$,$,#57,.T.);\n"
+        + "#62=EDGE_LOOP('LOOP',(#58,#59,#60,#61));\n"
+        + "#63=FACE_OUTER_BOUND('FOB',#62,.T.);\n"
+        + "#64=ADVANCED_FACE('AF0',(#63),#37,.T.);\n"
+        + "#65=CLOSED_SHELL('CS0',(#64));\n"
+        + "#66=MANIFOLD_SOLID_BREP('MSB0',#65);\n"
+        + "#67=BREP_WITH_VOIDS('BWV0',#65,());\n"
+        + "#70=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#71=REPRESENTATION('REP_A',(),#70);\n"
+        + "#72=ANNOTATION_TEXT_OCCURRENCE('NOTE','solids',#1);\n"
+        + "#73=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#66,#71,#72,#66);\n"
+        + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#67,#71,#72,#67);\n"
+        + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#25,#71,#72,#25);\n"
+        + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#27,#71,#72,#27);\n"
+        + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#5,#71,#72,#5);\n"
+        + "#78=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#11,#71,#72,#11);\n"
+        + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#10,#71,#72,#10);\n"
+        + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#12,#71,#72,#12);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8618,87 +8544,86 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPrimitiveSurfaceAndProfileDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_PRIMITIVE_SOLID',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #16=DIRECTION('DZ',(0.0,0.0,1.0));
-                #17=DIRECTION('DX',(1.0,0.0,0.0));
-                #18=VECTOR('VX',#17,1.0);
-                #19=AXIS1_PLACEMENT('AX1',#12,#16);
-                #20=AXIS2_PLACEMENT_3D('AX2',#12,#16,#17);
-                #21=AXIS2_PLACEMENT_2D('AX2D',#12,#17);
-                #22=LINE('L0',#12,#18);
-                #23=CIRCLE('C0',#20,1.0);
-                #24=ELLIPSE('E0',#20,2.0,1.0);
-                #25=PLANE('PL0',#20);
-                #26=CYLINDRICAL_SURFACE('CY0',#20,1.0);
-                #27=CONICAL_SURFACE('CN0',#20,1.0,0.5);
-                #28=TOROIDAL_SURFACE('TO0',#20,5.0,1.0);
-                #29=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#22,#18);
-                #30=SURFACE_OF_REVOLUTION('SOR0',#22,#19);
-                #31=POINT_SET('PS0',(#12,#13));
-                #32=VERTEX_POINT('V0',#12);
-                #33=VERTEX_POINT('V1',#13);
-                #34=VERTEX_POINT('V2',#14);
-                #35=VERTEX_POINT('V3',#15);
-                #36=EDGE_CURVE('E0',#32,#33,#22,.T.);
-                #37=EDGE_CURVE('E1',#33,#34,#22,.T.);
-                #38=EDGE_CURVE('E2',#34,#35,#22,.T.);
-                #39=EDGE_CURVE('E3',#35,#32,#22,.T.);
-                #40=ORIENTED_EDGE('OE0',$,$,#36,.T.);
-                #41=ORIENTED_EDGE('OE1',$,$,#37,.T.);
-                #42=ORIENTED_EDGE('OE2',$,$,#38,.T.);
-                #43=ORIENTED_EDGE('OE3',$,$,#39,.T.);
-                #44=EDGE_LOOP('EL0',(#40,#41,#42,#43));
-                #45=FACE_OUTER_BOUND('FOB0',#44,.T.);
-                #46=ADVANCED_FACE('AF0',(#45),#25,.T.);
-                #47=ORIENTED_FACE('OF0',#46,.F.);
-                #48=CLOSED_SHELL('CS0',(#46));
-                #49=MANIFOLD_SOLID_BREP('MSB0',#48);
-                #50=BREP_WITH_VOIDS('BV0',#48,());
-                #51=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#21,1.0,1.0);
-                #52=EXTRUDED_AREA_SOLID('EAS0',#51,#20,#16,2.0);
-                #53=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#17,#16,#12,1.0,#17);
-                #54=SOLID_REPLICA('SR0',#49,#53);
-                #55=BLOCK('BLK0',#20,1.0,2.0,3.0);
-                #56=CSG_SOLID('CSG0',#55);
-                #57=(BOOLEAN_RESULT(.UNION.,#49,#56) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BR0'));
-                #58=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#56,#49) BOOLEAN_RESULT(.DIFFERENCE.,#56,#49) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));
-                #100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #101=ANNOTATION_TEXT_OCCURRENCE('NOTE','primitive',#100);
-                #140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#101,#8);
-                #141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#101,#8);
-                #142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#101,#8);
-                #143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#24,#10,#101,#8);
-                #144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#25,#10,#101,#8);
-                #145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#26,#10,#101,#8);
-                #146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#27,#10,#101,#8);
-                #147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#28,#10,#101,#8);
-                #148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#29,#10,#101,#8);
-                #149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#30,#10,#101,#8);
-                #150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#51,#10,#101,#8);
-                #151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#52,#10,#101,#8);
-                #152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#54,#10,#101,#8);
-                #153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#55,#10,#101,#8);
-                #154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#56,#10,#101,#8);
-                #155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#57,#10,#101,#8);
-                #156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#58,#10,#101,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_PRIMITIVE_SOLID',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#16=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#17=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#18=VECTOR('VX',#17,1.0);\n"
+        + "#19=AXIS1_PLACEMENT('AX1',#12,#16);\n"
+        + "#20=AXIS2_PLACEMENT_3D('AX2',#12,#16,#17);\n"
+        + "#21=AXIS2_PLACEMENT_2D('AX2D',#12,#17);\n"
+        + "#22=LINE('L0',#12,#18);\n"
+        + "#23=CIRCLE('C0',#20,1.0);\n"
+        + "#24=ELLIPSE('E0',#20,2.0,1.0);\n"
+        + "#25=PLANE('PL0',#20);\n"
+        + "#26=CYLINDRICAL_SURFACE('CY0',#20,1.0);\n"
+        + "#27=CONICAL_SURFACE('CN0',#20,1.0,0.5);\n"
+        + "#28=TOROIDAL_SURFACE('TO0',#20,5.0,1.0);\n"
+        + "#29=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#22,#18);\n"
+        + "#30=SURFACE_OF_REVOLUTION('SOR0',#22,#19);\n"
+        + "#31=POINT_SET('PS0',(#12,#13));\n"
+        + "#32=VERTEX_POINT('V0',#12);\n"
+        + "#33=VERTEX_POINT('V1',#13);\n"
+        + "#34=VERTEX_POINT('V2',#14);\n"
+        + "#35=VERTEX_POINT('V3',#15);\n"
+        + "#36=EDGE_CURVE('E0',#32,#33,#22,.T.);\n"
+        + "#37=EDGE_CURVE('E1',#33,#34,#22,.T.);\n"
+        + "#38=EDGE_CURVE('E2',#34,#35,#22,.T.);\n"
+        + "#39=EDGE_CURVE('E3',#35,#32,#22,.T.);\n"
+        + "#40=ORIENTED_EDGE('OE0',$,$,#36,.T.);\n"
+        + "#41=ORIENTED_EDGE('OE1',$,$,#37,.T.);\n"
+        + "#42=ORIENTED_EDGE('OE2',$,$,#38,.T.);\n"
+        + "#43=ORIENTED_EDGE('OE3',$,$,#39,.T.);\n"
+        + "#44=EDGE_LOOP('EL0',(#40,#41,#42,#43));\n"
+        + "#45=FACE_OUTER_BOUND('FOB0',#44,.T.);\n"
+        + "#46=ADVANCED_FACE('AF0',(#45),#25,.T.);\n"
+        + "#47=ORIENTED_FACE('OF0',#46,.F.);\n"
+        + "#48=CLOSED_SHELL('CS0',(#46));\n"
+        + "#49=MANIFOLD_SOLID_BREP('MSB0',#48);\n"
+        + "#50=BREP_WITH_VOIDS('BV0',#48,());\n"
+        + "#51=RECTANGLE_PROFILE_DEF(.AREA.,'RPD',#21,1.0,1.0);\n"
+        + "#52=EXTRUDED_AREA_SOLID('EAS0',#51,#20,#16,2.0);\n"
+        + "#53=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#17,#16,#12,1.0,#17);\n"
+        + "#54=SOLID_REPLICA('SR0',#49,#53);\n"
+        + "#55=BLOCK('BLK0',#20,1.0,2.0,3.0);\n"
+        + "#56=CSG_SOLID('CSG0',#55);\n"
+        + "#57=(BOOLEAN_RESULT(.UNION.,#49,#56) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BR0'));\n"
+        + "#58=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#56,#49) BOOLEAN_RESULT(.DIFFERENCE.,#56,#49) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
+        + "#100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#101=ANNOTATION_TEXT_OCCURRENCE('NOTE','primitive',#100);\n"
+        + "#140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#101,#8);\n"
+        + "#141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#101,#8);\n"
+        + "#142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#101,#8);\n"
+        + "#143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#24,#10,#101,#8);\n"
+        + "#144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#25,#10,#101,#8);\n"
+        + "#145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#26,#10,#101,#8);\n"
+        + "#146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#27,#10,#101,#8);\n"
+        + "#147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#28,#10,#101,#8);\n"
+        + "#148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#29,#10,#101,#8);\n"
+        + "#149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#30,#10,#101,#8);\n"
+        + "#150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#51,#10,#101,#8);\n"
+        + "#151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#52,#10,#101,#8);\n"
+        + "#152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#54,#10,#101,#8);\n"
+        + "#153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#55,#10,#101,#8);\n"
+        + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#56,#10,#101,#8);\n"
+        + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#57,#10,#101,#8);\n"
+        + "#156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#58,#10,#101,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8778,46 +8703,45 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedGeometricLeafAndHalfSpaceDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_GEOM_LEAF',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #13=DIRECTION('DZ',(0.0,0.0,1.0));
-                #14=DIRECTION('DX',(1.0,0.0,0.0));
-                #21=(SURFACE_MODEL() REPRESENTATION_ITEM('SM0'));
-                #22=(SOLID_MODEL() REPRESENTATION_ITEM('SO0'));
-                #17=AXIS2_PLACEMENT_3D('AX2',#12,#13,#14);
-                #24=BOX_DOMAIN(#12,2.0,3.0,4.0);
-                #25=PLANE('PLN',#17);
-                #26=HALF_SPACE_SOLID('HS',#25,.T.);
-                #27=BOXED_HALF_SPACE('BHS',#25,.F.,#24);
-                #70=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #71=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #72=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #73=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #74=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #84=ANNOTATION_TEXT_OCCURRENCE('NOTE_SURFACE_MODEL','',#70);
-                #85=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID_MODEL','',#71);
-                #86=ANNOTATION_TEXT_OCCURRENCE('NOTE_BOX_DOMAIN','',#72);
-                #87=ANNOTATION_TEXT_OCCURRENCE('NOTE_HALF_SPACE','',#73);
-                #88=ANNOTATION_TEXT_OCCURRENCE('NOTE_BOXED_HALF_SPACE','',#74);
-                #98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#84,#8);
-                #99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#85,#8);
-                #100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#86,#8);
-                #101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#87,#8);
-                #102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#88,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_GEOM_LEAF',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#13=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#14=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#21=(SURFACE_MODEL() REPRESENTATION_ITEM('SM0'));\n"
+        + "#22=(SOLID_MODEL() REPRESENTATION_ITEM('SO0'));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX2',#12,#13,#14);\n"
+        + "#24=BOX_DOMAIN(#12,2.0,3.0,4.0);\n"
+        + "#25=PLANE('PLN',#17);\n"
+        + "#26=HALF_SPACE_SOLID('HS',#25,.T.);\n"
+        + "#27=BOXED_HALF_SPACE('BHS',#25,.F.,#24);\n"
+        + "#70=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#71=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#72=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#73=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#74=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#84=ANNOTATION_TEXT_OCCURRENCE('NOTE_SURFACE_MODEL','',#70);\n"
+        + "#85=ANNOTATION_TEXT_OCCURRENCE('NOTE_SOLID_MODEL','',#71);\n"
+        + "#86=ANNOTATION_TEXT_OCCURRENCE('NOTE_BOX_DOMAIN','',#72);\n"
+        + "#87=ANNOTATION_TEXT_OCCURRENCE('NOTE_HALF_SPACE','',#73);\n"
+        + "#88=ANNOTATION_TEXT_OCCURRENCE('NOTE_BOXED_HALF_SPACE','',#74);\n"
+        + "#98=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#84,#8);\n"
+        + "#99=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#85,#8);\n"
+        + "#100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#86,#8);\n"
+        + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#87,#8);\n"
+        + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#88,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8865,52 +8789,51 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRationalCurveAndProfileDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_PROFILE_CURVE',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=DIRECTION('DX',(1.0,0.0,0.0));
-                #16=AXIS2_PLACEMENT_2D('AX2',#12,#15);
-                #17=POLYLINE('PLC',(#12,#13,#14,#12));
-                #18=POLYLINE('PLO',(#12,#13,#14));
-                #19=(B_SPLINE_CURVE('RBC0',2,(#12,#13,#14),.UNSPECIFIED.,.F.,.F.)
-                     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)
-                     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0)));
-                #20=CIRCLE_PROFILE_DEF(.AREA.,'C',#16,2.0);
-                #21=RECTANGLE_PROFILE_DEF(.AREA.,'R',#16,4.0,2.0);
-                #22=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'CR',#16,3.0,5.0);
-                #23=ELLIPSE_PROFILE_DEF(.AREA.,'E',#16,3.0,1.5);
-                #24=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'RR',#16,6.0,4.0,0.5);
-                #25=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#16,3.0,0.5);
-                #26=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#17);
-                #27=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#17);
-                #28=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#18);
-                #100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #101=ANNOTATION_TEXT_OCCURRENCE('NOTE','profiles',#100);
-                #130=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#19,#10,#101,#8);
-                #131=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#20,#10,#101,#8);
-                #132=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#21,#10,#101,#8);
-                #133=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#10,#101,#8);
-                #134=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#23,#10,#101,#8);
-                #135=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#10,#101,#8);
-                #136=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#25,#10,#101,#8);
-                #137=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#26,#10,#101,#8);
-                #138=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#27,#10,#101,#8);
-                #139=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#10,#101,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_PROFILE_CURVE',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#16=AXIS2_PLACEMENT_2D('AX2',#12,#15);\n"
+        + "#17=POLYLINE('PLC',(#12,#13,#14,#12));\n"
+        + "#18=POLYLINE('PLO',(#12,#13,#14));\n"
+        + "#19=(B_SPLINE_CURVE('RBC0',2,(#12,#13,#14),.UNSPECIFIED.,.F.,.F.)\n"
+        + "     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)\n"
+        + "     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0)));\n"
+        + "#20=CIRCLE_PROFILE_DEF(.AREA.,'C',#16,2.0);\n"
+        + "#21=RECTANGLE_PROFILE_DEF(.AREA.,'R',#16,4.0,2.0);\n"
+        + "#22=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'CR',#16,3.0,5.0);\n"
+        + "#23=ELLIPSE_PROFILE_DEF(.AREA.,'E',#16,3.0,1.5);\n"
+        + "#24=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'RR',#16,6.0,4.0,0.5);\n"
+        + "#25=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#16,3.0,0.5);\n"
+        + "#26=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#17);\n"
+        + "#27=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#17);\n"
+        + "#28=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#18);\n"
+        + "#100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#101=ANNOTATION_TEXT_OCCURRENCE('NOTE','profiles',#100);\n"
+        + "#130=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#19,#10,#101,#8);\n"
+        + "#131=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#20,#10,#101,#8);\n"
+        + "#132=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#21,#10,#101,#8);\n"
+        + "#133=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#22,#10,#101,#8);\n"
+        + "#134=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#23,#10,#101,#8);\n"
+        + "#135=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#24,#10,#101,#8);\n"
+        + "#136=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#25,#10,#101,#8);\n"
+        + "#137=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#26,#10,#101,#8);\n"
+        + "#138=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#27,#10,#101,#8);\n"
+        + "#139=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#10,#101,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8974,66 +8897,65 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedWrapperCurveSurfaceAndTopologyLeafMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_WRAPPER_LEAF',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=VECTOR('VX',#16,1.0);
-                #18=AXIS2_PLACEMENT_3D('AX3',#12,#15,#16);
-                #19=LINE('L0',#12,#17);
-                #32=PLANE('PL0',#18);
-                #33=RECTANGULAR_TRIMMED_SURFACE('RTS',#32,0.0,1.0,0.0,1.0,.T.,.T.);
-                #34=POLYLINE('PL1',(#12,#13,#14));
-                #35=CURVE_BOUNDED_SURFACE('CBS',#32,(#34),.F.);
-                #36=ORIENTED_SURFACE('OS',#32,.T.);
-                #37=OFFSET_SURFACE('OFS',#32,1.0,.F.);
-                #38=SPHERICAL_SURFACE('SPH',#18,2.0);
-                #39=DEGENERATE_TOROIDAL_SURFACE('DTS',#18,5.0,1.0,.T.);
-                #40=CARTESIAN_POINT('UV0',(0.0,0.0));
-                #41=DIRECTION('UX',(1.0,0.0));
-                #42=VECTOR('UVV',#41,1.0);
-                #43=LINE('UVL',#40,#42);
-                #44=REPRESENTATION_CONTEXT('PC','PARAMETRIC');
-                #45=DEFINITIONAL_REPRESENTATION('DPR',(#43),#44);
-                #46=DEGENERATE_PCURVE('DPC',#32,#45);
-                #47=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('VTX0'));
-                #48=VERTEX_POINT('VP0',#12);
-                #49=VERTEX_POINT('VP1',#13);
-                #50=EDGE_CURVE('EC0',#48,#49,#19,.T.);
-                #51=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('ED0'));
-                #52=SUBEDGE('SE0',#48,#49,#50);
-                #53=POLY_LOOP('LOOP0',(#12,#13,#14));
-                #54=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('FC0'));
-                #110=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #157=ANNOTATION_TEXT_OCCURRENCE('NOTE','wrappers',#110);
-                #170=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#33,#10,#157,#8);
-                #171=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#35,#10,#157,#8);
-                #172=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#36,#10,#157,#8);
-                #173=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#37,#10,#157,#8);
-                #174=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#38,#10,#157,#8);
-                #175=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#39,#10,#157,#8);
-                #176=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#46,#10,#157,#8);
-                #177=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#47,#10,#157,#8);
-                #178=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#51,#10,#157,#8);
-                #179=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#52,#10,#157,#8);
-                #180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#53,#10,#157,#8);
-                #181=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#54,#10,#157,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_WRAPPER_LEAF',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=VECTOR('VX',#16,1.0);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX3',#12,#15,#16);\n"
+        + "#19=LINE('L0',#12,#17);\n"
+        + "#32=PLANE('PL0',#18);\n"
+        + "#33=RECTANGULAR_TRIMMED_SURFACE('RTS',#32,0.0,1.0,0.0,1.0,.T.,.T.);\n"
+        + "#34=POLYLINE('PL1',(#12,#13,#14));\n"
+        + "#35=CURVE_BOUNDED_SURFACE('CBS',#32,(#34),.F.);\n"
+        + "#36=ORIENTED_SURFACE('OS',#32,.T.);\n"
+        + "#37=OFFSET_SURFACE('OFS',#32,1.0,.F.);\n"
+        + "#38=SPHERICAL_SURFACE('SPH',#18,2.0);\n"
+        + "#39=DEGENERATE_TOROIDAL_SURFACE('DTS',#18,5.0,1.0,.T.);\n"
+        + "#40=CARTESIAN_POINT('UV0',(0.0,0.0));\n"
+        + "#41=DIRECTION('UX',(1.0,0.0));\n"
+        + "#42=VECTOR('UVV',#41,1.0);\n"
+        + "#43=LINE('UVL',#40,#42);\n"
+        + "#44=REPRESENTATION_CONTEXT('PC','PARAMETRIC');\n"
+        + "#45=DEFINITIONAL_REPRESENTATION('DPR',(#43),#44);\n"
+        + "#46=DEGENERATE_PCURVE('DPC',#32,#45);\n"
+        + "#47=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('VTX0'));\n"
+        + "#48=VERTEX_POINT('VP0',#12);\n"
+        + "#49=VERTEX_POINT('VP1',#13);\n"
+        + "#50=EDGE_CURVE('EC0',#48,#49,#19,.T.);\n"
+        + "#51=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('ED0'));\n"
+        + "#52=SUBEDGE('SE0',#48,#49,#50);\n"
+        + "#53=POLY_LOOP('LOOP0',(#12,#13,#14));\n"
+        + "#54=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('FC0'));\n"
+        + "#110=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#157=ANNOTATION_TEXT_OCCURRENCE('NOTE','wrappers',#110);\n"
+        + "#170=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#33,#10,#157,#8);\n"
+        + "#171=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#35,#10,#157,#8);\n"
+        + "#172=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#36,#10,#157,#8);\n"
+        + "#173=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#37,#10,#157,#8);\n"
+        + "#174=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#38,#10,#157,#8);\n"
+        + "#175=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#39,#10,#157,#8);\n"
+        + "#176=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#46,#10,#157,#8);\n"
+        + "#177=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#47,#10,#157,#8);\n"
+        + "#178=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#51,#10,#157,#8);\n"
+        + "#179=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#52,#10,#157,#8);\n"
+        + "#180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#53,#10,#157,#8);\n"
+        + "#181=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#54,#10,#157,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9093,90 +9015,89 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedReplicaShellAndCurveWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                #10=REPRESENTATION('REP_WRAPPER_SHELL',(),#9);
-                #11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);
-                #12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));
-                #15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));
-                #16=DIRECTION('DZ',(0.0,0.0,1.0));
-                #17=DIRECTION('DX',(1.0,0.0,0.0));
-                #18=DIRECTION('DY',(0.0,1.0,0.0));
-                #19=VECTOR('VX',#17,2.0);
-                #20=AXIS2_PLACEMENT_3D('AX3',#12,#16,#17);
-                #21=LINE('L0',#12,#19);
-                #22=TRIMMED_CURVE('TC0',#21,(#12),(#13),.T.,.CARTESIAN.);
-                #23=REPRESENTATION_CONTEXT('UV','PARAMETRIC');
-                #24=DEFINITIONAL_REPRESENTATION('DR0',(#21),#23);
-                #25=PCURVE('PC0',#32,#24);
-                #26=SURFACE_CURVE('SC0',#21,(#25),.PCURVE_S1.);
-                #27=PCURVE('PC1',#32,#24);
-                #28=SEAM_CURVE('SEAM0',#21,(#25,#27),.PCURVE_S1.);
-                #29=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#21);
-                #30=(COMPOSITE_CURVE('CC0',(#29),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('cc-name'));
-                #31=(COMPOSITE_CURVE_ON_SURFACE('CCS0',(#29),.F.) COMPOSITE_CURVE('CCS0',(#29),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('ccs-name'));
-                #32=PLANE('PL0',#20);
-                #33=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#17,#18,#12,1.0,#16);
-                #34=CURVE_REPLICA('CR0',#21,#33);
-                #35=SURFACE_REPLICA('SR0',#32,#33);
-                #36=VERTEX_POINT('V0',#12);
-                #37=VERTEX_POINT('V1',#13);
-                #38=VERTEX_POINT('V2',#14);
-                #39=VERTEX_POINT('V3',#15);
-                #40=EDGE_CURVE('E0',#36,#37,#21,.T.);
-                #41=EDGE_CURVE('E1',#37,#38,#21,.T.);
-                #42=EDGE_CURVE('E2',#38,#39,#21,.T.);
-                #43=EDGE_CURVE('E3',#39,#36,#21,.T.);
-                #44=ORIENTED_EDGE('OE0',$,$,#40,.T.);
-                #45=ORIENTED_EDGE('OE1',$,$,#41,.T.);
-                #46=ORIENTED_EDGE('OE2',$,$,#42,.T.);
-                #47=ORIENTED_EDGE('OE3',$,$,#43,.T.);
-                #48=EDGE_LOOP('EL0',(#44,#45,#46,#47));
-                #49=VERTEX_LOOP('VL0',#36);
-                #50=FACE_OUTER_BOUND('FOB0',#48,.T.);
-                #51=ADVANCED_FACE('F0',(#50),#32,.T.);
-                #52=OPEN_SHELL('OS0',(#51));
-                #53=ORIENTED_OPEN_SHELL('OOS0',#52,.F.);
-                #54=CLOSED_SHELL('CS0',(#51));
-                #55=ORIENTED_CLOSED_SHELL('OCS0',#54,.F.);
-                #56=CONNECTED_EDGE_SET('CES0',(#40,#41,#42,#43));
-                #57=CONNECTED_FACE_SET('CFS0',(#51));
-                #58=(CONNECTED_FACE_SUB_SET('CFSS0',(#51),#57) CONNECTED_FACE_SET('CFSS0',(#51)));
-                #100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));
-                #120=ANNOTATION_TEXT_OCCURRENCE('NOTE','wrappers',#100);
-                #140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#120,#8);
-                #141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#120,#8);
-                #142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#120,#8);
-                #143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#28,#10,#120,#8);
-                #144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#120,#8);
-                #145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#31,#10,#120,#8);
-                #146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#33,#10,#120,#8);
-                #147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#120,#8);
-                #148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#35,#10,#120,#8);
-                #149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#36,#10,#120,#8);
-                #150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#48,#10,#120,#8);
-                #151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#49,#10,#120,#8);
-                #152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#50,#10,#120,#8);
-                #153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#52,#10,#120,#8);
-                #154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#53,#10,#120,#8);
-                #155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#54,#10,#120,#8);
-                #156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#55,#10,#120,#8);
-                #157=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#56,#10,#120,#8);
-                #158=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#57,#10,#120,#8);
-                #159=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#58,#10,#120,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#10=REPRESENTATION('REP_WRAPPER_SHELL',(),#9);\n"
+        + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
+        + "#12=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#16=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#17=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#18=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#19=VECTOR('VX',#17,2.0);\n"
+        + "#20=AXIS2_PLACEMENT_3D('AX3',#12,#16,#17);\n"
+        + "#21=LINE('L0',#12,#19);\n"
+        + "#22=TRIMMED_CURVE('TC0',#21,(#12),(#13),.T.,.CARTESIAN.);\n"
+        + "#23=REPRESENTATION_CONTEXT('UV','PARAMETRIC');\n"
+        + "#24=DEFINITIONAL_REPRESENTATION('DR0',(#21),#23);\n"
+        + "#25=PCURVE('PC0',#32,#24);\n"
+        + "#26=SURFACE_CURVE('SC0',#21,(#25),.PCURVE_S1.);\n"
+        + "#27=PCURVE('PC1',#32,#24);\n"
+        + "#28=SEAM_CURVE('SEAM0',#21,(#25,#27),.PCURVE_S1.);\n"
+        + "#29=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#21);\n"
+        + "#30=(COMPOSITE_CURVE('CC0',(#29),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('cc-name'));\n"
+        + "#31=(COMPOSITE_CURVE_ON_SURFACE('CCS0',(#29),.F.) COMPOSITE_CURVE('CCS0',(#29),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('ccs-name'));\n"
+        + "#32=PLANE('PL0',#20);\n"
+        + "#33=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#17,#18,#12,1.0,#16);\n"
+        + "#34=CURVE_REPLICA('CR0',#21,#33);\n"
+        + "#35=SURFACE_REPLICA('SR0',#32,#33);\n"
+        + "#36=VERTEX_POINT('V0',#12);\n"
+        + "#37=VERTEX_POINT('V1',#13);\n"
+        + "#38=VERTEX_POINT('V2',#14);\n"
+        + "#39=VERTEX_POINT('V3',#15);\n"
+        + "#40=EDGE_CURVE('E0',#36,#37,#21,.T.);\n"
+        + "#41=EDGE_CURVE('E1',#37,#38,#21,.T.);\n"
+        + "#42=EDGE_CURVE('E2',#38,#39,#21,.T.);\n"
+        + "#43=EDGE_CURVE('E3',#39,#36,#21,.T.);\n"
+        + "#44=ORIENTED_EDGE('OE0',$,$,#40,.T.);\n"
+        + "#45=ORIENTED_EDGE('OE1',$,$,#41,.T.);\n"
+        + "#46=ORIENTED_EDGE('OE2',$,$,#42,.T.);\n"
+        + "#47=ORIENTED_EDGE('OE3',$,$,#43,.T.);\n"
+        + "#48=EDGE_LOOP('EL0',(#44,#45,#46,#47));\n"
+        + "#49=VERTEX_LOOP('VL0',#36);\n"
+        + "#50=FACE_OUTER_BOUND('FOB0',#48,.T.);\n"
+        + "#51=ADVANCED_FACE('F0',(#50),#32,.T.);\n"
+        + "#52=OPEN_SHELL('OS0',(#51));\n"
+        + "#53=ORIENTED_OPEN_SHELL('OOS0',#52,.F.);\n"
+        + "#54=CLOSED_SHELL('CS0',(#51));\n"
+        + "#55=ORIENTED_CLOSED_SHELL('OCS0',#54,.F.);\n"
+        + "#56=CONNECTED_EDGE_SET('CES0',(#40,#41,#42,#43));\n"
+        + "#57=CONNECTED_FACE_SET('CFS0',(#51));\n"
+        + "#58=(CONNECTED_FACE_SUB_SET('CFSS0',(#51),#57) CONNECTED_FACE_SET('CFSS0',(#51)));\n"
+        + "#100=CARTESIAN_POINT('N0',(0.0,0.0,0.0));\n"
+        + "#120=ANNOTATION_TEXT_OCCURRENCE('NOTE','wrappers',#100);\n"
+        + "#140=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#120,#8);\n"
+        + "#141=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#25,#10,#120,#8);\n"
+        + "#142=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#26,#10,#120,#8);\n"
+        + "#143=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#28,#10,#120,#8);\n"
+        + "#144=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#120,#8);\n"
+        + "#145=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#31,#10,#120,#8);\n"
+        + "#146=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#33,#10,#120,#8);\n"
+        + "#147=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#34,#10,#120,#8);\n"
+        + "#148=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#35,#10,#120,#8);\n"
+        + "#149=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#36,#10,#120,#8);\n"
+        + "#150=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#48,#10,#120,#8);\n"
+        + "#151=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#49,#10,#120,#8);\n"
+        + "#152=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#50,#10,#120,#8);\n"
+        + "#153=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#52,#10,#120,#8);\n"
+        + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#53,#10,#120,#8);\n"
+        + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#54,#10,#120,#8);\n"
+        + "#156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#55,#10,#120,#8);\n"
+        + "#157=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#56,#10,#120,#8);\n"
+        + "#158=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#57,#10,#120,#8);\n"
+        + "#159=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#58,#10,#120,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9268,41 +9189,40 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductAndAssemblyShapeDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('ASM','Assembly','Assembly',(#2));
-                #4=PRODUCT('COMP','Component','Component',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('v1','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);
-                #9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);
-                #11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);
-                #12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');
-                #13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);
-                #20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #21=REPRESENTATION('REP_COMP',(),#20);
-                #22=REPRESENTATION('REP_OCC',(),#20);
-                #23=REPRESENTATION('REP_USAGE_OCC',(),#20);
-                #24=REPRESENTATION('REP_USAGE_PD',(),#20);
-                #25=REPRESENTATION('REP_USAGE_PDS',(),#20);
-                #26=SHAPE_DEFINITION_REPRESENTATION(#11,#21);
-                #27=REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22);
-                #28=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#13);
-                #29=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #30=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #31=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#29);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PD','pd',#30);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','pds',#31);
-                #35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#32,#13);
-                #36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);
-                #37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM','Assembly','Assembly',(#2));\n"
+        + "#4=PRODUCT('COMP','Component','Component',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('v1','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);\n"
+        + "#11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);\n"
+        + "#12=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
+        + "#13=PRODUCT_DEFINITION_SHAPE('occ_shape','',#12);\n"
+        + "#20=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#21=REPRESENTATION('REP_COMP',(),#20);\n"
+        + "#22=REPRESENTATION('REP_OCC',(),#20);\n"
+        + "#23=REPRESENTATION('REP_USAGE_OCC',(),#20);\n"
+        + "#24=REPRESENTATION('REP_USAGE_PD',(),#20);\n"
+        + "#25=REPRESENTATION('REP_USAGE_PDS',(),#20);\n"
+        + "#26=SHAPE_DEFINITION_REPRESENTATION(#11,#21);\n"
+        + "#27=REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#21,#22);\n"
+        + "#28=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#13);\n"
+        + "#29=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#30=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#29);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_PD','pd',#30);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','pds',#31);\n"
+        + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#32,#13);\n"
+        + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);\n"
+        + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9344,48 +9264,47 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAdditionalPropertyRepresentationLinkMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD0','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_ACTION',(),#10);
-                #12=REPRESENTATION('REP_CONTACT',(),#10);
-                #13=REPRESENTATION('REP_KDEF',(),#10);
-                #14=REPRESENTATION('REP_KMECH',(),#10);
-                #15=REPRESENTATION('REP_KREL',(),#10);
-                #16=REPRESENTATION('REP_KTOPO',(),#10);
-                #17=REPRESENTATION('REP_RESOURCE',(),#10);
-                #18=ACTION_PROPERTY_REPRESENTATION(#9,#11);
-                #19=CONTACT_RATIO_REPRESENTATION(#9,#12);
-                #20=KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION(#9,#13);
-                #21=KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION(#9,#14);
-                #22=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#9,#15);
-                #23=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#9,#16);
-                #24=RESOURCE_PROPERTY_REPRESENTATION(#9,#17);
-                #28=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);
-                #29=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #30=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #31=DIRECTION('DZ',(0.0,0.0,1.0));
-                #32=DIRECTION('DX',(1.0,0.0,0.0));
-                #33=AXIS2_PLACEMENT_3D('AX0',#29,#31,#32);
-                #34=AXIS2_PLACEMENT_3D('AX1',#30,#31,#32);
-                #35=ITEM_DEFINED_TRANSFORMATION('T1','',#33,#34);
-                #36=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#13)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#35));
-                #37=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#14);
-                #25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #26=ANNOTATION_TEXT_OCCURRENCE('NOTE','links',#25);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD0','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_ACTION',(),#10);\n"
+        + "#12=REPRESENTATION('REP_CONTACT',(),#10);\n"
+        + "#13=REPRESENTATION('REP_KDEF',(),#10);\n"
+        + "#14=REPRESENTATION('REP_KMECH',(),#10);\n"
+        + "#15=REPRESENTATION('REP_KREL',(),#10);\n"
+        + "#16=REPRESENTATION('REP_KTOPO',(),#10);\n"
+        + "#17=REPRESENTATION('REP_RESOURCE',(),#10);\n"
+        + "#18=ACTION_PROPERTY_REPRESENTATION(#9,#11);\n"
+        + "#19=CONTACT_RATIO_REPRESENTATION(#9,#12);\n"
+        + "#20=KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION(#9,#13);\n"
+        + "#21=KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION(#9,#14);\n"
+        + "#22=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#9,#15);\n"
+        + "#23=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#9,#16);\n"
+        + "#24=RESOURCE_PROPERTY_REPRESENTATION(#9,#17);\n"
+        + "#28=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);\n"
+        + "#29=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#30=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#31=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#32=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#33=AXIS2_PLACEMENT_3D('AX0',#29,#31,#32);\n"
+        + "#34=AXIS2_PLACEMENT_3D('AX1',#30,#31,#32);\n"
+        + "#35=ITEM_DEFINED_TRANSFORMATION('T1','',#33,#34);\n"
+        + "#36=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#13)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#35));\n"
+        + "#37=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#14);\n"
+        + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE','links',#25);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9473,55 +9392,54 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAdditionalPropertyRepresentationLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD0','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_ACTION',(),#10);
-                #12=REPRESENTATION('REP_CONTACT',(),#10);
-                #13=REPRESENTATION('REP_KDEF',(),#10);
-                #14=REPRESENTATION('REP_KMECH',(),#10);
-                #15=REPRESENTATION('REP_KREL',(),#10);
-                #16=REPRESENTATION('REP_KTOPO',(),#10);
-                #17=REPRESENTATION('REP_RESOURCE',(),#10);
-                #18=ACTION_PROPERTY_REPRESENTATION(#9,#11);
-                #19=CONTACT_RATIO_REPRESENTATION(#9,#12);
-                #20=KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION(#9,#13);
-                #21=KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION(#9,#14);
-                #22=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#9,#15);
-                #23=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#9,#16);
-                #24=RESOURCE_PROPERTY_REPRESENTATION(#9,#17);
-                #25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #26=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #27=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #28=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #29=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #30=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #31=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACTION','',#25);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTACT','',#26);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_KDEF','',#27);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_KMECH','',#28);
-                #36=ANNOTATION_TEXT_OCCURRENCE('NOTE_KREL','',#29);
-                #37=ANNOTATION_TEXT_OCCURRENCE('NOTE_KTOPO','',#30);
-                #38=ANNOTATION_TEXT_OCCURRENCE('NOTE_RESOURCE','',#31);
-                #39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#11,#32,#7);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#19,#12,#33,#7);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#13,#34,#7);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#14,#35,#7);
-                #43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#22,#15,#36,#7);
-                #44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#23,#16,#37,#7);
-                #45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#24,#17,#38,#7);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD0','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_ACTION',(),#10);\n"
+        + "#12=REPRESENTATION('REP_CONTACT',(),#10);\n"
+        + "#13=REPRESENTATION('REP_KDEF',(),#10);\n"
+        + "#14=REPRESENTATION('REP_KMECH',(),#10);\n"
+        + "#15=REPRESENTATION('REP_KREL',(),#10);\n"
+        + "#16=REPRESENTATION('REP_KTOPO',(),#10);\n"
+        + "#17=REPRESENTATION('REP_RESOURCE',(),#10);\n"
+        + "#18=ACTION_PROPERTY_REPRESENTATION(#9,#11);\n"
+        + "#19=CONTACT_RATIO_REPRESENTATION(#9,#12);\n"
+        + "#20=KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION(#9,#13);\n"
+        + "#21=KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION(#9,#14);\n"
+        + "#22=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#9,#15);\n"
+        + "#23=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#9,#16);\n"
+        + "#24=RESOURCE_PROPERTY_REPRESENTATION(#9,#17);\n"
+        + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#26=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#27=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#28=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#29=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#30=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#31=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_ACTION','',#25);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_CONTACT','',#26);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_KDEF','',#27);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_KMECH','',#28);\n"
+        + "#36=ANNOTATION_TEXT_OCCURRENCE('NOTE_KREL','',#29);\n"
+        + "#37=ANNOTATION_TEXT_OCCURRENCE('NOTE_KTOPO','',#30);\n"
+        + "#38=ANNOTATION_TEXT_OCCURRENCE('NOTE_RESOURCE','',#31);\n"
+        + "#39=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#11,#32,#7);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#19,#12,#33,#7);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#13,#34,#7);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#21,#14,#35,#7);\n"
+        + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#22,#15,#36,#7);\n"
+        + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#23,#16,#37,#7);\n"
+        + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#24,#17,#38,#7);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9577,26 +9495,25 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPlacedDatumTargetFeatureMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);
-                #9=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);
-                #10=PROPERTY_DEFINITION('PD_TARGET','',#9);
-                #11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #12=REPRESENTATION('REP_DATUM',(),#11);
-                #13=PLACED_DATUM_TARGET_FEATURE(#10,#12);
-                #14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #15=ANNOTATION_TEXT_OCCURRENCE('NOTE','datum',#14);
-                #16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#10,#12,#15,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);\n"
+        + "#9=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);\n"
+        + "#10=PROPERTY_DEFINITION('PD_TARGET','',#9);\n"
+        + "#11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#12=REPRESENTATION('REP_DATUM',(),#11);\n"
+        + "#13=PLACED_DATUM_TARGET_FEATURE(#10,#12);\n"
+        + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE','datum',#14);\n"
+        + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#10,#12,#15,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9614,39 +9531,38 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRuleAndDatumPropertyRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD_TARGET','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_RULE',(),#10);
-                #28=REPRESENTATION('REP_AUX',(),#10);
-                #12=FORWARD_CHAINING_RULE_PREMISE(#9,#11);
-                #13=BACK_CHAINING_RULE_BODY(#9,#11);
-                #14=PLACED_DATUM_TARGET_FEATURE(#9,#11);
-                #15=REPRESENTATION_RELATIONSHIP('RR','',#11,#28);
-                #16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #18=DIRECTION('DZ',(0.0,0.0,1.0));
-                #19=DIRECTION('DX',(1.0,0.0,0.0));
-                #20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);
-                #21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);
-                #22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);
-                #23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#28)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));
-                #24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#28);
-                #25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #26=ANNOTATION_TEXT_OCCURRENCE('NOTE_RULE_DATUM','',#25);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD_TARGET','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_RULE',(),#10);\n"
+        + "#28=REPRESENTATION('REP_AUX',(),#10);\n"
+        + "#12=FORWARD_CHAINING_RULE_PREMISE(#9,#11);\n"
+        + "#13=BACK_CHAINING_RULE_BODY(#9,#11);\n"
+        + "#14=PLACED_DATUM_TARGET_FEATURE(#9,#11);\n"
+        + "#15=REPRESENTATION_RELATIONSHIP('RR','',#11,#28);\n"
+        + "#16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#18=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#19=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);\n"
+        + "#21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);\n"
+        + "#22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);\n"
+        + "#23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#28)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));\n"
+        + "#24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#28);\n"
+        + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE_RULE_DATUM','',#25);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9706,25 +9622,24 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPropertyDefinitionRepresentationMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD0','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_PROP',(),#10);
-                #12=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);
-                #13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #14=ANNOTATION_TEXT_OCCURRENCE('NOTE','prop',#13);
-                #15=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#14,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD0','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_PROP',(),#10);\n"
+        + "#12=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);\n"
+        + "#13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#14=ANNOTATION_TEXT_OCCURRENCE('NOTE','prop',#13);\n"
+        + "#15=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#14,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9742,38 +9657,37 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPropertyAndAttributeRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD0','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_PROP',(),#10);
-                #12=REPRESENTATION('REP_ASSERT',(),#10);
-                #13=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);
-                #14=ATTRIBUTE_ASSERTION(#9,#12);
-                #15=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);
-                #16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #18=DIRECTION('DZ',(0.0,0.0,1.0));
-                #19=DIRECTION('DX',(1.0,0.0,0.0));
-                #20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);
-                #21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);
-                #22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);
-                #23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#12)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));
-                #24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#12);
-                #25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #26=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct property links',#25);
-                #27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD0','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_PROP',(),#10);\n"
+        + "#12=REPRESENTATION('REP_ASSERT',(),#10);\n"
+        + "#13=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);\n"
+        + "#14=ATTRIBUTE_ASSERTION(#9,#12);\n"
+        + "#15=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);\n"
+        + "#16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#18=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#19=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);\n"
+        + "#21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);\n"
+        + "#22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);\n"
+        + "#23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#12)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));\n"
+        + "#24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#12);\n"
+        + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct property links',#25);\n"
+        + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9831,41 +9745,40 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPropertyAndAttributeLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=PROPERTY_DEFINITION('PD0','',#8);
-                #10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #11=REPRESENTATION('REP_PROP',(),#10);
-                #12=REPRESENTATION('REP_ASSERT',(),#10);
-                #13=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);
-                #14=ATTRIBUTE_ASSERTION(#9,#12);
-                #15=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);
-                #16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #18=DIRECTION('DZ',(0.0,0.0,1.0));
-                #19=DIRECTION('DX',(1.0,0.0,0.0));
-                #20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);
-                #21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);
-                #22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);
-                #23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#12)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));
-                #24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#12);
-                #25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #26=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #27=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDR','direct pdr',#25);
-                #28=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASSERT','direct assert',#26);
-                #29=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDR','',#13,#11,#27,#8);
-                #30=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_ASSERT','',#14,#12,#28,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=PROPERTY_DEFINITION('PD0','',#8);\n"
+        + "#10=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#11=REPRESENTATION('REP_PROP',(),#10);\n"
+        + "#12=REPRESENTATION('REP_ASSERT',(),#10);\n"
+        + "#13=PROPERTY_DEFINITION_REPRESENTATION(#9,#11);\n"
+        + "#14=ATTRIBUTE_ASSERTION(#9,#12);\n"
+        + "#15=REPRESENTATION_RELATIONSHIP('RR','',#11,#12);\n"
+        + "#16=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#17=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#18=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#19=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#20=AXIS2_PLACEMENT_3D('AX0',#16,#18,#19);\n"
+        + "#21=AXIS2_PLACEMENT_3D('AX1',#17,#18,#19);\n"
+        + "#22=ITEM_DEFINED_TRANSFORMATION('T1','',#20,#21);\n"
+        + "#23=(REPRESENTATION_RELATIONSHIP('RRT','',#11,#12)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));\n"
+        + "#24=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#11,#12);\n"
+        + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#26=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#27=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDR','direct pdr',#25);\n"
+        + "#28=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASSERT','direct assert',#26);\n"
+        + "#29=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDR','',#13,#11,#27,#8);\n"
+        + "#30=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_ASSERT','',#14,#12,#28,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9921,107 +9834,106 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPredefinedAndColourLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA0','base',#7,.T.);
-                #9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #10=REPRESENTATION('REP_PREDEF',(),#9);
-                #11=REPRESENTATION('REP_AUX',(),#9);
-                #12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);
-                #13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));
-                #14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));
-                #15=DIRECTION('DZ',(0.0,0.0,1.0));
-                #16=DIRECTION('DX',(1.0,0.0,0.0));
-                #17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);
-                #18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);
-                #19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);
-                #20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));
-                #21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);
-                #22=PRE_DEFINED_COLOUR('yellow');
-                #23=DRAUGHTING_PRE_DEFINED_COLOUR('red');
-                #24=COLOUR_RGB('Amber',1.0,0.75,0.0);
-                #25=COLOUR_SPECIFICATION('amber-spec');
-                #26=COLOUR();
-                #27=PRE_DEFINED_CURVE_FONT('solid');
-                #28=DRAUGHTING_PRE_DEFINED_CURVE_FONT('chain');
-                #29=PRE_DEFINED_TEXT_FONT('iso');
-                #30=DRAUGHTING_PRE_DEFINED_TEXT_FONT('cadfont');
-                #31=PRE_DEFINED_TERMINATOR_SYMBOL('arrow');
-                #32=PRE_DEFINED_SYMBOL('sym');
-                #33=PRE_DEFINED_DIMENSION_SYMBOL('dim');
-                #34=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('tol');
-                #35=PRE_DEFINED_ITEM('pdi');
-                #36=PRE_DEFINED_MARKER('dot');
-                #40=PROPERTY_DEFINITION('PD0','',#22);
-                #41=PROPERTY_DEFINITION('PD1','',#23);
-                #42=PROPERTY_DEFINITION('PD2','',#24);
-                #43=PROPERTY_DEFINITION('PD3','',#25);
-                #44=PROPERTY_DEFINITION('PD4','',#26);
-                #45=PROPERTY_DEFINITION('PD5','',#27);
-                #46=PROPERTY_DEFINITION('PD6','',#28);
-                #47=PROPERTY_DEFINITION('PD7','',#29);
-                #48=PROPERTY_DEFINITION('PD8','',#30);
-                #49=PROPERTY_DEFINITION('PD9','',#31);
-                #50=PROPERTY_DEFINITION('PD10','',#32);
-                #51=PROPERTY_DEFINITION('PD11','',#33);
-                #52=PROPERTY_DEFINITION('PD12','',#34);
-                #53=PROPERTY_DEFINITION('PD13','',#35);
-                #54=PROPERTY_DEFINITION('PD14','',#36);
-                #60=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);
-                #61=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);
-                #62=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);
-                #63=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);
-                #64=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);
-                #65=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);
-                #66=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);
-                #67=PROPERTY_DEFINITION_REPRESENTATION(#47,#10);
-                #68=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);
-                #69=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);
-                #70=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);
-                #71=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);
-                #72=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);
-                #73=PROPERTY_DEFINITION_REPRESENTATION(#53,#10);
-                #74=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);
-                #80=ANNOTATION_TEXT_OCCURRENCE('NOTE_PREDEF_COLOUR','',#13);
-                #81=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_COLOUR','',#14);
-                #82=ANNOTATION_TEXT_OCCURRENCE('NOTE_RGB','',#13);
-                #83=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPEC','',#14);
-                #84=ANNOTATION_TEXT_OCCURRENCE('NOTE_COLOUR','',#13);
-                #85=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_FONT','',#14);
-                #86=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_FONT','',#13);
-                #87=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_TEXT_FONT','',#14);
-                #88=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_TEXT_FONT','',#13);
-                #89=ANNOTATION_TEXT_OCCURRENCE('NOTE_TERM','',#14);
-                #90=ANNOTATION_TEXT_OCCURRENCE('NOTE_SYMBOL','',#13);
-                #91=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIM_SYMBOL','',#14);
-                #92=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOL_SYMBOL','',#13);
-                #93=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_ITEM','',#14);
-                #94=ANNOTATION_TEXT_OCCURRENCE('NOTE_MARKER','',#13);
-                #100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#80,#8);
-                #101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#81,#8);
-                #102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#82,#8);
-                #103=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#83,#8);
-                #104=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#26,#10,#84,#8);
-                #105=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#27,#10,#85,#8);
-                #106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#28,#10,#86,#8);
-                #107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#29,#10,#87,#8);
-                #108=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#30,#10,#88,#8);
-                #109=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#31,#10,#89,#8);
-                #110=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#32,#10,#90,#8);
-                #111=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#33,#10,#91,#8);
-                #112=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#34,#10,#92,#8);
-                #113=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#35,#10,#93,#8);
-                #114=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#36,#10,#94,#8);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
+        + "#9=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#10=REPRESENTATION('REP_PREDEF',(),#9);\n"
+        + "#11=REPRESENTATION('REP_AUX',(),#9);\n"
+        + "#12=REPRESENTATION_RELATIONSHIP('RR','',#10,#11);\n"
+        + "#13=CARTESIAN_POINT('TX0',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('TX1',(1.0,0.0,0.0));\n"
+        + "#15=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#16=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#17=AXIS2_PLACEMENT_3D('AX0',#13,#15,#16);\n"
+        + "#18=AXIS2_PLACEMENT_3D('AX1',#14,#15,#16);\n"
+        + "#19=ITEM_DEFINED_TRANSFORMATION('T1','',#17,#18);\n"
+        + "#20=(REPRESENTATION_RELATIONSHIP('RRT','',#10,#11)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#19));\n"
+        + "#21=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','',#10,#11);\n"
+        + "#22=PRE_DEFINED_COLOUR('yellow');\n"
+        + "#23=DRAUGHTING_PRE_DEFINED_COLOUR('red');\n"
+        + "#24=COLOUR_RGB('Amber',1.0,0.75,0.0);\n"
+        + "#25=COLOUR_SPECIFICATION('amber-spec');\n"
+        + "#26=COLOUR();\n"
+        + "#27=PRE_DEFINED_CURVE_FONT('solid');\n"
+        + "#28=DRAUGHTING_PRE_DEFINED_CURVE_FONT('chain');\n"
+        + "#29=PRE_DEFINED_TEXT_FONT('iso');\n"
+        + "#30=DRAUGHTING_PRE_DEFINED_TEXT_FONT('cadfont');\n"
+        + "#31=PRE_DEFINED_TERMINATOR_SYMBOL('arrow');\n"
+        + "#32=PRE_DEFINED_SYMBOL('sym');\n"
+        + "#33=PRE_DEFINED_DIMENSION_SYMBOL('dim');\n"
+        + "#34=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('tol');\n"
+        + "#35=PRE_DEFINED_ITEM('pdi');\n"
+        + "#36=PRE_DEFINED_MARKER('dot');\n"
+        + "#40=PROPERTY_DEFINITION('PD0','',#22);\n"
+        + "#41=PROPERTY_DEFINITION('PD1','',#23);\n"
+        + "#42=PROPERTY_DEFINITION('PD2','',#24);\n"
+        + "#43=PROPERTY_DEFINITION('PD3','',#25);\n"
+        + "#44=PROPERTY_DEFINITION('PD4','',#26);\n"
+        + "#45=PROPERTY_DEFINITION('PD5','',#27);\n"
+        + "#46=PROPERTY_DEFINITION('PD6','',#28);\n"
+        + "#47=PROPERTY_DEFINITION('PD7','',#29);\n"
+        + "#48=PROPERTY_DEFINITION('PD8','',#30);\n"
+        + "#49=PROPERTY_DEFINITION('PD9','',#31);\n"
+        + "#50=PROPERTY_DEFINITION('PD10','',#32);\n"
+        + "#51=PROPERTY_DEFINITION('PD11','',#33);\n"
+        + "#52=PROPERTY_DEFINITION('PD12','',#34);\n"
+        + "#53=PROPERTY_DEFINITION('PD13','',#35);\n"
+        + "#54=PROPERTY_DEFINITION('PD14','',#36);\n"
+        + "#60=PROPERTY_DEFINITION_REPRESENTATION(#40,#10);\n"
+        + "#61=PROPERTY_DEFINITION_REPRESENTATION(#41,#10);\n"
+        + "#62=PROPERTY_DEFINITION_REPRESENTATION(#42,#10);\n"
+        + "#63=PROPERTY_DEFINITION_REPRESENTATION(#43,#10);\n"
+        + "#64=PROPERTY_DEFINITION_REPRESENTATION(#44,#10);\n"
+        + "#65=PROPERTY_DEFINITION_REPRESENTATION(#45,#10);\n"
+        + "#66=PROPERTY_DEFINITION_REPRESENTATION(#46,#10);\n"
+        + "#67=PROPERTY_DEFINITION_REPRESENTATION(#47,#10);\n"
+        + "#68=PROPERTY_DEFINITION_REPRESENTATION(#48,#10);\n"
+        + "#69=PROPERTY_DEFINITION_REPRESENTATION(#49,#10);\n"
+        + "#70=PROPERTY_DEFINITION_REPRESENTATION(#50,#10);\n"
+        + "#71=PROPERTY_DEFINITION_REPRESENTATION(#51,#10);\n"
+        + "#72=PROPERTY_DEFINITION_REPRESENTATION(#52,#10);\n"
+        + "#73=PROPERTY_DEFINITION_REPRESENTATION(#53,#10);\n"
+        + "#74=PROPERTY_DEFINITION_REPRESENTATION(#54,#10);\n"
+        + "#80=ANNOTATION_TEXT_OCCURRENCE('NOTE_PREDEF_COLOUR','',#13);\n"
+        + "#81=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_COLOUR','',#14);\n"
+        + "#82=ANNOTATION_TEXT_OCCURRENCE('NOTE_RGB','',#13);\n"
+        + "#83=ANNOTATION_TEXT_OCCURRENCE('NOTE_SPEC','',#14);\n"
+        + "#84=ANNOTATION_TEXT_OCCURRENCE('NOTE_COLOUR','',#13);\n"
+        + "#85=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_FONT','',#14);\n"
+        + "#86=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_FONT','',#13);\n"
+        + "#87=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_TEXT_FONT','',#14);\n"
+        + "#88=ANNOTATION_TEXT_OCCURRENCE('NOTE_DRAUGHT_TEXT_FONT','',#13);\n"
+        + "#89=ANNOTATION_TEXT_OCCURRENCE('NOTE_TERM','',#14);\n"
+        + "#90=ANNOTATION_TEXT_OCCURRENCE('NOTE_SYMBOL','',#13);\n"
+        + "#91=ANNOTATION_TEXT_OCCURRENCE('NOTE_DIM_SYMBOL','',#14);\n"
+        + "#92=ANNOTATION_TEXT_OCCURRENCE('NOTE_TOL_SYMBOL','',#13);\n"
+        + "#93=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRE_ITEM','',#14);\n"
+        + "#94=ANNOTATION_TEXT_OCCURRENCE('NOTE_MARKER','',#13);\n"
+        + "#100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#80,#8);\n"
+        + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#81,#8);\n"
+        + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#82,#8);\n"
+        + "#103=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#25,#10,#83,#8);\n"
+        + "#104=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#26,#10,#84,#8);\n"
+        + "#105=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#27,#10,#85,#8);\n"
+        + "#106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#28,#10,#86,#8);\n"
+        + "#107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#29,#10,#87,#8);\n"
+        + "#108=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#30,#10,#88,#8);\n"
+        + "#109=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#31,#10,#89,#8);\n"
+        + "#110=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#32,#10,#90,#8);\n"
+        + "#111=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#33,#10,#91,#8);\n"
+        + "#112=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#34,#10,#92,#8);\n"
+        + "#113=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#35,#10,#93,#8);\n"
+        + "#114=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#36,#10,#94,#8);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10115,49 +10027,48 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectProductCategoryAndEffectivityDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=PRODUCT_CATEGORY('CAT_A','cat a');
-                #9=PRODUCT_RELATED_PRODUCT_CATEGORY('CAT_LINK','',(#3));
-                #10=GENERAL_PROPERTY('GP-1','gp','general property');
-                #11=EFFECTIVITY('EFF-1');
-                #12=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#6);
-                #13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #14=REPRESENTATION('REP_UPSTREAM',(),#13);
-                #20=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #21=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #22=CARTESIAN_POINT('P2',(2.0,0.0,0.0));
-                #23=CARTESIAN_POINT('P3',(3.0,0.0,0.0));
-                #24=CARTESIAN_POINT('P4',(4.0,0.0,0.0));
-                #25=CARTESIAN_POINT('P5',(5.0,0.0,0.0));
-                #26=CARTESIAN_POINT('P6',(6.0,0.0,0.0));
-                #27=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT','',#20);
-                #28=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORMATION','',#21);
-                #29=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_DEF','',#22);
-                #30=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','',#23);
-                #31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#24);
-                #32=ANNOTATION_TEXT_OCCURRENCE('NOTE_RELATED_CATEGORY','',#25);
-                #33=ANNOTATION_TEXT_OCCURRENCE('NOTE_GENERAL_PROPERTY','',#26);
-                #34=ANNOTATION_TEXT_OCCURRENCE('NOTE_EFFECTIVITY','',#20);
-                #35=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDE','',#21);
-                #40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#3,#14,#27,#7);
-                #41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#4,#14,#28,#7);
-                #42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#6,#14,#29,#7);
-                #43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#7,#14,#30,#7);
-                #44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#8,#14,#31,#7);
-                #45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#9,#14,#32,#7);
-                #46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#10,#14,#33,#7);
-                #47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#11,#14,#34,#7);
-                #48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#12,#14,#35,#7);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=PRODUCT_CATEGORY('CAT_A','cat a');\n"
+        + "#9=PRODUCT_RELATED_PRODUCT_CATEGORY('CAT_LINK','',(#3));\n"
+        + "#10=GENERAL_PROPERTY('GP-1','gp','general property');\n"
+        + "#11=EFFECTIVITY('EFF-1');\n"
+        + "#12=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#6);\n"
+        + "#13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#14=REPRESENTATION('REP_UPSTREAM',(),#13);\n"
+        + "#20=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#21=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#22=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
+        + "#23=CARTESIAN_POINT('P3',(3.0,0.0,0.0));\n"
+        + "#24=CARTESIAN_POINT('P4',(4.0,0.0,0.0));\n"
+        + "#25=CARTESIAN_POINT('P5',(5.0,0.0,0.0));\n"
+        + "#26=CARTESIAN_POINT('P6',(6.0,0.0,0.0));\n"
+        + "#27=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT','',#20);\n"
+        + "#28=ANNOTATION_TEXT_OCCURRENCE('NOTE_FORMATION','',#21);\n"
+        + "#29=ANNOTATION_TEXT_OCCURRENCE('NOTE_PRODUCT_DEF','',#22);\n"
+        + "#30=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','',#23);\n"
+        + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CATEGORY','',#24);\n"
+        + "#32=ANNOTATION_TEXT_OCCURRENCE('NOTE_RELATED_CATEGORY','',#25);\n"
+        + "#33=ANNOTATION_TEXT_OCCURRENCE('NOTE_GENERAL_PROPERTY','',#26);\n"
+        + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_EFFECTIVITY','',#20);\n"
+        + "#35=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDE','',#21);\n"
+        + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#3,#14,#27,#7);\n"
+        + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#4,#14,#28,#7);\n"
+        + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#6,#14,#29,#7);\n"
+        + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#7,#14,#30,#7);\n"
+        + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#8,#14,#31,#7);\n"
+        + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#9,#14,#32,#7);\n"
+        + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#10,#14,#33,#7);\n"
+        + "#47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#11,#14,#34,#7);\n"
+        + "#48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#12,#14,#35,#7);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10203,36 +10114,35 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedGeneralPropertyAndShapeAspectRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=GENERAL_PROPERTY('GP1','gp1','');
-                #9=GENERAL_PROPERTY('GP2','gp2','');
-                #10=GENERAL_PROPERTY_RELATIONSHIP('LINK','',#8,#9);
-                #11=PROPERTY_DEFINITION('PD_GP2','',#9);
-                #12=SHAPE_ASPECT('SA_BASE','base',#7,.T.);
-                #13=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);
-                #14=SHAPE_ASPECT_RELATIONSHIP('SAR','',#12,#13);
-                #15=PROPERTY_DEFINITION('PD_TARGET','',#13);
-                #16=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #17=REPRESENTATION('REP_GP',(),#16);
-                #18=REPRESENTATION('REP_SA',(),#16);
-                #19=ACTION_PROPERTY_REPRESENTATION(#11,#17);
-                #20=PROPERTY_DEFINITION_REPRESENTATION(#15,#18);
-                #21=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #22=CARTESIAN_POINT('P1',(1.0,0.0,0.0));
-                #23=ANNOTATION_TEXT_OCCURRENCE('NOTE_GP','',#21);
-                #24=ANNOTATION_TEXT_OCCURRENCE('NOTE_SA','',#22);
-                #25=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#17,#23,#7);
-                #26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SA','',#12,#18,#24,#7);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=GENERAL_PROPERTY('GP1','gp1','');\n"
+        + "#9=GENERAL_PROPERTY('GP2','gp2','');\n"
+        + "#10=GENERAL_PROPERTY_RELATIONSHIP('LINK','',#8,#9);\n"
+        + "#11=PROPERTY_DEFINITION('PD_GP2','',#9);\n"
+        + "#12=SHAPE_ASPECT('SA_BASE','base',#7,.T.);\n"
+        + "#13=SHAPE_ASPECT('SA_TARGET','target',#7,.T.);\n"
+        + "#14=SHAPE_ASPECT_RELATIONSHIP('SAR','',#12,#13);\n"
+        + "#15=PROPERTY_DEFINITION('PD_TARGET','',#13);\n"
+        + "#16=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#17=REPRESENTATION('REP_GP',(),#16);\n"
+        + "#18=REPRESENTATION('REP_SA',(),#16);\n"
+        + "#19=ACTION_PROPERTY_REPRESENTATION(#11,#17);\n"
+        + "#20=PROPERTY_DEFINITION_REPRESENTATION(#15,#18);\n"
+        + "#21=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#22=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#23=ANNOTATION_TEXT_OCCURRENCE('NOTE_GP','',#21);\n"
+        + "#24=ANNOTATION_TEXT_OCCURRENCE('NOTE_SA','',#22);\n"
+        + "#25=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#17,#23,#7);\n"
+        + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SA','',#12,#18,#24,#7);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10258,26 +10168,25 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRequirementSemanticDefinitionSubtypeMetadataInBinaryPreviewAndGlb() {
-        String step = """
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('PRT','Part','Part',(#2));
-                #4=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #6=PRODUCT_DEFINITION('pd','part def',#4,#5);
-                #7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);
-                #8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);
-                #9=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#8);
-                #10=PROPERTY_DEFINITION('PD_OCC','',#9);
-                #11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));
-                #12=REPRESENTATION('REP_REQ',(),#11);
-                #13=PROPERTY_DEFINITION_REPRESENTATION(#10,#12);
-                #14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));
-                #15=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#14);
-                #16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#8,#12,#15,#9);
-                ENDSEC;
-                """;
+        String step = 
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('PRT','Part','Part',(#2));\n"
+        + "#4=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#6=PRODUCT_DEFINITION('pd','part def',#4,#5);\n"
+        + "#7=PRODUCT_DEFINITION_SHAPE('pds','shape',#6);\n"
+        + "#8=SHAPE_ASPECT('SA_BASE','base',#7,.T.);\n"
+        + "#9=SPOTFACE_HOLE_OCCURRENCE('SA_OCC','occurrence',#7,.T.,#8);\n"
+        + "#10=PROPERTY_DEFINITION('PD_OCC','',#9);\n"
+        + "#11=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#12=REPRESENTATION('REP_REQ',(),#11);\n"
+        + "#13=PROPERTY_DEFINITION_REPRESENTATION(#10,#12);\n"
+        + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#14);\n"
+        + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#8,#12,#15,#9);\n"
+        + "ENDSEC;"
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10345,11 +10254,10 @@ class StepPreviewJsonExporterTest {
     @Test
     void shouldEmbedSurfaceWrapperMetadataInBinaryPreviewForSurfaceReplica() {
         byte[] binary = StepPreviewJsonExporter.exportBinary(surfaceOfRevolutionFaceStep(
-                """
-                #100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));
-                #101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);
-                #102=SURFACE_REPLICA('SR0',#10,#101);
-                """,
+                
+        "#100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));\n"
+        + "#101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);\n"
+        + "#102=SURFACE_REPLICA('SR0',#10,#101);"
                 "#102",
                 "1.0,0.0,2.0",
                 "-1.0,0.0,2.0",
@@ -10535,11 +10443,10 @@ class StepPreviewJsonExporterTest {
     @Test
     void shouldEmbedSurfaceWrapperMetadataInGlbExtrasForSurfaceReplica() {
         byte[] binary = StepPreviewJsonExporter.exportGlb(surfaceOfRevolutionFaceStep(
-                """
-                #100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));
-                #101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);
-                #102=SURFACE_REPLICA('SR0',#10,#101);
-                """,
+                
+        "#100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));\n"
+        + "#101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);\n"
+        + "#102=SURFACE_REPLICA('SR0',#10,#101);"
                 "#102",
                 "1.0,0.0,2.0",
                 "-1.0,0.0,2.0",
@@ -10659,46 +10566,45 @@ class StepPreviewJsonExporterTest {
             String p11,
             String p01
     ) {
-        return """
-                DATA;
-                #1=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #2=CARTESIAN_POINT('B0',(1.0,0.0,0.0));
-                #3=CARTESIAN_POINT('B1',(1.0,0.0,1.0));
-                #4=DIRECTION('DZ',(0.0,0.0,1.0));
-                #5=DIRECTION('DX',(1.0,0.0,0.0));
-                #6=AXIS1_PLACEMENT('AX1',#1,#4);
-                #7=VECTOR('VZ',#4,1.0);
-                #8=LINE('GEN',#2,#7);
-                #9=AXIS2_PLACEMENT_3D('AC0',#1,#4,#5);
-                #10=SURFACE_OF_REVOLUTION('SOR0',#8,#6);
-                %s
-                #12=CARTESIAN_POINT('P00',(%s));
-                #13=CARTESIAN_POINT('P10',(%s));
-                #14=CARTESIAN_POINT('P11',(%s));
-                #15=CARTESIAN_POINT('P01',(%s));
-                #16=VERTEX_POINT('V0',#12);
-                #17=VERTEX_POINT('V1',#13);
-                #18=VERTEX_POINT('V2',#14);
-                #19=VERTEX_POINT('V3',#15);
-                #20=AXIS2_PLACEMENT_3D('AC1',#3,#4,#5);
-                #30=CIRCLE('C0',#9,1.0);
-                #31=LINE('L0',#13,#7);
-                #32=CIRCLE('C1',#20,1.0);
-                #33=LINE('L1',#12,#7);
-                #40=EDGE_CURVE('E0',#16,#17,#30,.T.);
-                #41=EDGE_CURVE('E1',#17,#18,#31,.T.);
-                #42=EDGE_CURVE('E2',#19,#18,#32,.T.);
-                #43=EDGE_CURVE('E3',#16,#19,#33,.T.);
-                #44=ORIENTED_EDGE('OE0',$,$,#40,.T.);
-                #45=ORIENTED_EDGE('OE1',$,$,#41,.T.);
-                #46=ORIENTED_EDGE('OE2',$,$,#42,.F.);
-                #47=ORIENTED_EDGE('OE3',$,$,#43,.F.);
-                #48=EDGE_LOOP('L0',(#44,#45,#46,#47));
-                #49=FACE_OUTER_BOUND('B0',#48,.T.);
-                #50=ADVANCED_FACE('F0',(#49),%s,.T.);
-                #51=OPEN_SHELL('OS',(#50));
-                ENDSEC;
-                """.formatted(surfaceDeclarations, p00, p10, p11, p01, faceGeometryRef);
+        return 
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('B0',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('B1',(1.0,0.0,1.0));\n"
+        + "#4=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#5=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#6=AXIS1_PLACEMENT('AX1',#1,#4);\n"
+        + "#7=VECTOR('VZ',#4,1.0);\n"
+        + "#8=LINE('GEN',#2,#7);\n"
+        + "#9=AXIS2_PLACEMENT_3D('AC0',#1,#4,#5);\n"
+        + "#10=SURFACE_OF_REVOLUTION('SOR0',#8,#6);\n"
+        + "%s\n"
+        + "#12=CARTESIAN_POINT('P00',(%s));\n"
+        + "#13=CARTESIAN_POINT('P10',(%s));\n"
+        + "#14=CARTESIAN_POINT('P11',(%s));\n"
+        + "#15=CARTESIAN_POINT('P01',(%s));\n"
+        + "#16=VERTEX_POINT('V0',#12);\n"
+        + "#17=VERTEX_POINT('V1',#13);\n"
+        + "#18=VERTEX_POINT('V2',#14);\n"
+        + "#19=VERTEX_POINT('V3',#15);\n"
+        + "#20=AXIS2_PLACEMENT_3D('AC1',#3,#4,#5);\n"
+        + "#30=CIRCLE('C0',#9,1.0);\n"
+        + "#31=LINE('L0',#13,#7);\n"
+        + "#32=CIRCLE('C1',#20,1.0);\n"
+        + "#33=LINE('L1',#12,#7);\n"
+        + "#40=EDGE_CURVE('E0',#16,#17,#30,.T.);\n"
+        + "#41=EDGE_CURVE('E1',#17,#18,#31,.T.);\n"
+        + "#42=EDGE_CURVE('E2',#19,#18,#32,.T.);\n"
+        + "#43=EDGE_CURVE('E3',#16,#19,#33,.T.);\n"
+        + "#44=ORIENTED_EDGE('OE0',$,$,#40,.T.);\n"
+        + "#45=ORIENTED_EDGE('OE1',$,$,#41,.T.);\n"
+        + "#46=ORIENTED_EDGE('OE2',$,$,#42,.F.);\n"
+        + "#47=ORIENTED_EDGE('OE3',$,$,#43,.F.);\n"
+        + "#48=EDGE_LOOP('L0',(#44,#45,#46,#47));\n"
+        + "#49=FACE_OUTER_BOUND('B0',#48,.T.);\n"
+        + "#50=ADVANCED_FACE('F0',(#49),%s,.T.);\n"
+        + "#51=OPEN_SHELL('OS',(#50));\n"
+        + "ENDSEC;"
     }
 
     private static void assertMetadataContains(String metadata, String... fragments) {
@@ -10737,16 +10643,15 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportInchUnitScaleInJsonMetadata() {
-        String json = StepPreviewJsonExporter.export("""
-                DATA;
-                #1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);
-                #3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());
-                #4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
-                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))
-                    REPRESENTATION_CONTEXT('ID','MODEL'));
-                ENDSEC;
-                """);
+        String json = StepPreviewJsonExporter.export(
+        "DATA;\n"
+        + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);\n"
+        + "#3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());\n"
+        + "#4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
+        + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))\n"
+        + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "ENDSEC;"
 
         assertTrue(json.contains("\"units\":{\"lengthUnit\":\"INCH\",\"scaleToMeters\":0.0254"), json);
         assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
@@ -10754,42 +10659,41 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldKeepAssemblyTransformsInSourceUnitsWhenLengthUnitsAreNotNormalized() {
-        String json = StepPreviewJsonExporter.export("""
-                DATA;
-                #1=APPLICATION_CONTEXT('mechanical design');
-                #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                #3=PRODUCT('ASM','Assembly','Assembly',(#2));
-                #4=PRODUCT('COMP','Component','Component',(#2));
-                #5=PRODUCT_DEFINITION_FORMATION('v1','',#3);
-                #6=PRODUCT_DEFINITION_FORMATION('v1','',#4);
-                #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                #8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);
-                #9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);
-                #10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);
-                #11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);
-                #12=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #13=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#12);
-                #14=(CONVERSION_BASED_UNIT('INCH',#13) NAMED_UNIT(*) LENGTH_UNIT());
-                #15=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
-                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#14))
-                    REPRESENTATION_CONTEXT('ID','CTX'));
-                #16=SHAPE_REPRESENTATION('ASM_REP',(),#15);
-                #17=SHAPE_REPRESENTATION('COMP_REP',(),#15);
-                #18=SHAPE_DEFINITION_REPRESENTATION(#10,#16);
-                #19=SHAPE_DEFINITION_REPRESENTATION(#11,#17);
-                #20=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                #21=CARTESIAN_POINT('T',(1.0,0.0,0.0));
-                #22=DIRECTION('DZ',(0.0,0.0,1.0));
-                #23=DIRECTION('DX',(1.0,0.0,0.0));
-                #24=AXIS2_PLACEMENT_3D('AX0',#20,#22,#23);
-                #25=AXIS2_PLACEMENT_3D('AX1',#21,#22,#23);
-                #26=ITEM_DEFINED_TRANSFORMATION('T1','',#24,#25);
-                #27=(REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#16,#17)
-                     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#26));
-                #28=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');
-                #29=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#28);
-                ENDSEC;
-                """);
+        String json = StepPreviewJsonExporter.export(
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM','Assembly','Assembly',(#2));\n"
+        + "#4=PRODUCT('COMP','Component','Component',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('v1','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('v1','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('asm_pd','assembly',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('comp_pd','component',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('asm_shape','',#8);\n"
+        + "#11=PRODUCT_DEFINITION_SHAPE('comp_shape','',#9);\n"
+        + "#12=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#13=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#12);\n"
+        + "#14=(CONVERSION_BASED_UNIT('INCH',#13) NAMED_UNIT(*) LENGTH_UNIT());\n"
+        + "#15=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
+        + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#14))\n"
+        + "    REPRESENTATION_CONTEXT('ID','CTX'));\n"
+        + "#16=SHAPE_REPRESENTATION('ASM_REP',(),#15);\n"
+        + "#17=SHAPE_REPRESENTATION('COMP_REP',(),#15);\n"
+        + "#18=SHAPE_DEFINITION_REPRESENTATION(#10,#16);\n"
+        + "#19=SHAPE_DEFINITION_REPRESENTATION(#11,#17);\n"
+        + "#20=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#21=CARTESIAN_POINT('T',(1.0,0.0,0.0));\n"
+        + "#22=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#23=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#24=AXIS2_PLACEMENT_3D('AX0',#20,#22,#23);\n"
+        + "#25=AXIS2_PLACEMENT_3D('AX1',#21,#22,#23);\n"
+        + "#26=ITEM_DEFINED_TRANSFORMATION('T1','',#24,#25);\n"
+        + "#27=(REPRESENTATION_RELATIONSHIP('CTX','occ ctx',#16,#17)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#26));\n"
+        + "#28=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
+        + "#29=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#28);\n"
+        + "ENDSEC;"
 
         JSONObject payload = JSONObject.parseObject(json);
         JSONObject units = payload.getJSONObject("units");

@@ -55,27 +55,35 @@ public final class StepTokenizer {
         }
 
         char c = input.charAt(index);
-        return switch (c) {
-            case '#' -> single(StepTokenType.HASH, HASH_TEXT);
-            case '=' -> single(StepTokenType.EQUALS, EQUALS_TEXT);
-            case '(' -> single(StepTokenType.LPAREN, LPAREN_TEXT);
-            case ')' -> single(StepTokenType.RPAREN, RPAREN_TEXT);
-            case ',' -> single(StepTokenType.COMMA, COMMA_TEXT);
-            case ';' -> single(StepTokenType.SEMICOLON, SEMICOLON_TEXT);
-            case '$' -> single(StepTokenType.DOLLAR, DOLLAR_TEXT);
-            case '*' -> single(StepTokenType.STAR, STAR_TEXT);
-            case '\'' -> stringToken();
-            case '.' -> enumToken();
-            default -> {
-                if (isNumberStart(c)) {
-                    yield numberToken();
-                }
-                if (isIdentifierStart(c)) {
-                    yield identifierToken();
-                }
-                throw new StepParseException("unexpected character '" + c + "' at position " + index);
+        if (c == '#') {
+            return single(StepTokenType.HASH, HASH_TEXT);
+        } else if (c == '=') {
+            return single(StepTokenType.EQUALS, EQUALS_TEXT);
+        } else if (c == '(') {
+            return single(StepTokenType.LPAREN, LPAREN_TEXT);
+        } else if (c == ')') {
+            return single(StepTokenType.RPAREN, RPAREN_TEXT);
+        } else if (c == ',') {
+            return single(StepTokenType.COMMA, COMMA_TEXT);
+        } else if (c == ';') {
+            return single(StepTokenType.SEMICOLON, SEMICOLON_TEXT);
+        } else if (c == '$') {
+            return single(StepTokenType.DOLLAR, DOLLAR_TEXT);
+        } else if (c == '*') {
+            return single(StepTokenType.STAR, STAR_TEXT);
+        } else if (c == '\'') {
+            return stringToken();
+        } else if (c == '.') {
+            return enumToken();
+        } else {
+            if (isNumberStart(c)) {
+                return numberToken();
             }
-        };
+            if (isIdentifierStart(c)) {
+                return identifierToken();
+            }
+            throw new StepParseException("unexpected character '" + c + "' at position " + index);
+        }
     }
 
     private StepToken single(StepTokenType type, String text) {
@@ -126,15 +134,15 @@ public final class StepTokenizer {
             throw new StepParseException("malformed string escape at position " + escapeStart);
         }
         index += 3;
-        return switch (escapeType) {
-            case 'S', 's' -> {
-                appendSingleByteEscape(value, stringCharset, escapeStart);
-                yield stringCharset;
-            }
-            case 'P', 'p' -> parseCodePageEscape(stringCharset, escapeStart);
-            default -> throw new StepParseException("unsupported string escape '\\" + escapeType
+        if (escapeType == 'S' || escapeType == 's') {
+            appendSingleByteEscape(value, stringCharset, escapeStart);
+            return stringCharset;
+        } else if (escapeType == 'P' || escapeType == 'p') {
+            return parseCodePageEscape(stringCharset, escapeStart);
+        } else {
+            throw new StepParseException("unsupported string escape '\\" + escapeType
                     + "\\' at position " + escapeStart);
-        };
+        }
     }
 
     private Charset appendHexStringEscape(
@@ -174,18 +182,12 @@ public final class StepTokenizer {
         }
         char page = Character.toUpperCase(input.charAt(index));
         index++;
-        String charsetName = switch (page) {
-            case 'A' -> "ISO-8859-1";
-            case 'B' -> "ISO-8859-2";
-            case 'C' -> "ISO-8859-3";
-            case 'D' -> "ISO-8859-4";
-            case 'E' -> "ISO-8859-5";
-            case 'F' -> "ISO-8859-6";
-            case 'G' -> "ISO-8859-7";
-            case 'H' -> "ISO-8859-8";
-            case 'I' -> "ISO-8859-9";
-            default -> null;
-        };
+        String     charsetName = null;
+    switch (page) {
+        default:
+            charsetName = null;
+            break;
+    };
         if (charsetName == null || !Charset.isSupported(charsetName)) {
             throw new StepParseException("unsupported \\P\\ string escape code page '" + page
                     + "' at position " + escapeStart);

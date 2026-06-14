@@ -4,6 +4,7 @@ import com.minicad.step.model.base.StepEntity;
 import java.util.List;
 
 import com.minicad.step.model.base.StepFaceEntity;
+import java.util.Objects;
 
 /**
  * Resolved OPEN_SHELL.
@@ -12,12 +13,51 @@ import com.minicad.step.model.base.StepFaceEntity;
  * @param name step label
  * @param faces shell faces
  */
-public record StepOpenShell(int id, String name, List<StepFaceEntity> faces) implements StepEntity {
+/**
+ * Resolved OPEN_SHELL.
+ *
+ * @param id step id
+ * @param name step label
+ * @param faces shell faces
+ */
+public final class StepOpenShell implements StepEntity {
+    private final int id;
+    private final String name;
+    private final List<StepFaceEntity> faces;
 
-    /**
-     * Creates an immutable shell record.
-     */
-    public StepOpenShell {
-        faces = List.copyOf(faces);
+    public StepOpenShell(int id, String name, List<StepFaceEntity> faces) {
+        this.id = id;
+        this.name = name;
+        this.faces = faces == null ? null : java.util.List.copyOf(faces);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StepFaceEntity> getFaces() {
+        return faces;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepOpenShell that = (StepOpenShell) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(faces, that.faces);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, faces);
+    }
+
+    @Override
+    public String toString() {
+        return "StepOpenShell{" + "id=" + id + "name=" + name + "faces=" + faces + "}";
     }
 }

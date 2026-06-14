@@ -26,7 +26,7 @@ class FaceTest {
                 true
         );
 
-        assertEquals(1, face.bounds().size());
+        assertEquals(1, face.getBounds().size());
     }
 
     @Test
@@ -103,11 +103,11 @@ class FaceTest {
                         ),
                         2.0
                 ),
-                List.of(FaceBound.outer(new PolyLoop(List.of(v0.point(), v1.point(), v2.point())), true)),
+                List.of(FaceBound.outer(new PolyLoop(List.of(v0.getPoint(), v1.getPoint(), v2.getPoint())), true)),
                 true
         );
 
-        assertEquals(1, face.bounds().size());
+        assertEquals(1, face.getBounds().size());
     }
 
     private static EdgeLoop squareLoop() {
@@ -125,6 +125,6 @@ class FaceTest {
     }
 
     private static Line3 line(Vertex start, Vertex end) {
-        return new Line3(start.point(), Direction3.from(end.point().subtract(start.point())));
+        return new Line3(start.getPoint(), Direction3.from(end.getPoint().subtract(start.getPoint())));
     }
 }

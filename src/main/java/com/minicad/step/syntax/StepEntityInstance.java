@@ -3,6 +3,7 @@ package com.minicad.step.syntax;
 import com.minicad.common.StepParseException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Locale;
 
 /**
@@ -23,7 +24,7 @@ public final class StepEntityInstance {
         this.definitions = List.copyOf(definitions);
         this.normalizedDefinitionNames = this.definitions.stream()
                 .map(definition -> asciiUpper(definition.name()))
-                .toList();
+                .collect(Collectors.toList());
         this.name = buildName(this.definitions);
     }
 
@@ -52,7 +53,7 @@ public final class StepEntityInstance {
     }
 
     public List<StepValue> parameters() {
-        return definitions.getFirst().parameters();
+        return definitions.get(0).parameters();
     }
 
     public boolean hasDefinition(String entityName) {
@@ -90,7 +91,7 @@ public final class StepEntityInstance {
 
     private static String buildName(List<StepEntityDefinition> definitions) {
         if (definitions.size() == 1) {
-            return definitions.getFirst().name();
+            return definitions.get(0).name();
         }
         StringBuilder builder = new StringBuilder();
         for (StepEntityDefinition definition : definitions) {

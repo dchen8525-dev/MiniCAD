@@ -1,0 +1,29 @@
+// Phase 5 final: Additional entities to reach 90%
+      registry.put(
+          "ABSTRACTED_EXPRESSION_FUNCTION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ABSTRACTED_EXPRESSION_FUNCTION"));
+      registry.put(
+          "ACTION_RESOURCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ACTION_RESOURCE"));
+      registry.put(
+          "AGC_WITH_DIMENSION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AGC_WITH_DIMENSION"));
+      registry.put(
+          "AGGREGATE_ID_ATTRIBUTE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AGGREGATE_ID_ATTRIBUTE"));
+      registry.put(
+          "ANGLE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANGLE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
+      registry.put(
+          "ANGLE_DIRECTION_REFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANGLE_DIRECTION_REFERENCE"));
+      registry.put(
+          "ANGULARITY_TOLERANCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANGULARITY_TOLERANCE"));

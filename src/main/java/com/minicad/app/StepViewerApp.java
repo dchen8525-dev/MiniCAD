@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -195,12 +196,10 @@ public final class StepViewerApp {
     }
 
     private static String usage() {
-        return """
-                Usage: StepViewerApp [port]
-                       StepViewerApp --port=<port>
-                       StepViewerApp --port=<port> --host=<host>
-                       StepViewerApp [--port <port>] [--host <host>] [--cache-dir <path>] [--max-upload <bytes>] [--max-cache <bytes>] [--no-cache] [--debug]
-                """.stripTrailing();
+        return "Usage: StepViewerApp [port]\n"
+                + "       StepViewerApp --port=<port>\n"
+                + "       StepViewerApp --port=<port> --host=<host>\n"
+                + "       StepViewerApp [--port <port>] [--host <host>] [--cache-dir <path>] [--max-upload <bytes>] [--max-cache <bytes>] [--no-cache] [--debug]";
     }
 
     private static void printStartupInfo(ViewerConfig config) {
@@ -370,7 +369,8 @@ public final class StepViewerApp {
                 log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
                         requestId, "export_failed", elapsedMillis(startedAt),
                         ex.getClass().getSimpleName(), ex.getMessage());
-                if (ex instanceof StepParseException parseException) {
+                if (ex instanceof StepParseException) {
+            StepParseException parseException = (StepParseException) ex;
                     logDiagnosticContext(requestId, stepText, parseException.getMessage(), config.debug());
                 }
                 sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
@@ -463,11 +463,18 @@ public final class StepViewerApp {
             throw new IllegalArgumentException("invalid example name");
         }
         Path examplesDir = Path.of("examples").toAbsolutePath().normalize();
-        String fileName = switch (normalizedName) {
-            case "minimal-square" -> "minimal-square.step";
-            case "plate-with-round-hole" -> "plate-with-round-hole.step";
-            default -> normalizedName + ".step";
-        };
+        String     fileName = null;
+    switch (normalizedName) {
+        case "minimal-square":
+            fileName = "minimal-square.step";
+            break;
+        case "plate-with-round-hole":
+            fileName = "plate-with-round-hole.step";
+            break;
+        default:
+            fileName = normalizedName + ".step";
+            break;
+    };
         Path examplePath = examplesDir.resolve(fileName).normalize();
         if (!examplePath.startsWith(examplesDir)) {
             throw new IllegalArgumentException("example path escapes examples directory");
@@ -497,20 +504,20 @@ public final class StepViewerApp {
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
             switch (ch) {
-                case '\\' -> escaped.append("\\\\");
-                case '"' -> escaped.append("\\\"");
-                case '\n' -> escaped.append("\\n");
-                case '\r' -> escaped.append("\\r");
-                case '\t' -> escaped.append("\\t");
-                case '\b' -> escaped.append("\\b");
-                case '\f' -> escaped.append("\\f");
-                default -> {
+                case '\\': escaped.append("\\\\"); break;
+                case '"': escaped.append("\\\""); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                default:
                     if (ch < 0x20) {
                         escaped.append(String.format("\\u%04x", (int) ch));
                     } else {
                         escaped.append(ch);
                     }
-                }
+                    break;
             }
         }
         return escaped.toString();
@@ -601,7 +608,7 @@ public final class StepViewerApp {
                             return java.nio.file.attribute.FileTime.fromMillis(Long.MAX_VALUE);
                         }
                     }))
-                    .toList();
+                    .collect(Collectors.toList());
         }
         long totalBytes = 0;
         for (Path file : files) {
@@ -646,15 +653,23 @@ public final class StepViewerApp {
         }
     }
 
-    record ViewerConfig(
-            int port,
-            String host,
-            long maxUploadBytes,
-            long maxCacheBytes,
-            Path cacheDir,
-            boolean cacheEnabled,
-            boolean debug) {
-        ViewerConfig {
+    static final class ViewerConfig {
+        private final int port;
+        private final String host;
+        private final long maxUploadBytes;
+        private final long maxCacheBytes;
+        private final Path cacheDir;
+        private final boolean cacheEnabled;
+        private final boolean debug;
+
+        ViewerConfig(
+                int port,
+                String host,
+                long maxUploadBytes,
+                long maxCacheBytes,
+                Path cacheDir,
+                boolean cacheEnabled,
+                boolean debug) {
             if (host == null || host.isBlank()) {
                 throw new IllegalArgumentException("host must not be blank");
             }
@@ -667,7 +682,22 @@ public final class StepViewerApp {
             if (cacheDir == null) {
                 throw new IllegalArgumentException("cacheDir must not be null");
             }
+            this.port = port;
+            this.host = host;
+            this.maxUploadBytes = maxUploadBytes;
+            this.maxCacheBytes = maxCacheBytes;
+            this.cacheDir = cacheDir;
+            this.cacheEnabled = cacheEnabled;
+            this.debug = debug;
         }
+
+        int port() { return port; }
+        String host() { return host; }
+        long maxUploadBytes() { return maxUploadBytes; }
+        long maxCacheBytes() { return maxCacheBytes; }
+        Path cacheDir() { return cacheDir; }
+        boolean cacheEnabled() { return cacheEnabled; }
+        boolean debug() { return debug; }
 
         static ViewerConfig from(int port, String host) {
             return new ViewerConfig(

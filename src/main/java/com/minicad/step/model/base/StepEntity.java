@@ -1108,12 +1108,12 @@ public interface StepEntity {
      *
      * @return instance id
      */
-    int id();
+    int getId();
 
     /**
      * Returns the optional STEP label/name field.
      *
      * @return label or empty string
      */
-    String name();
+    String getName();
 }

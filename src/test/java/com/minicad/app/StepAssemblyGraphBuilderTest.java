@@ -60,45 +60,44 @@ class StepAssemblyGraphBuilderTest {
     @Test
     void shouldBuildMultiplePartInstancesWithRotationAndTranslation() {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
-                StepParser.parse("""
-                        DATA;
-                        #1=APPLICATION_CONTEXT('mechanical design');
-                        #2=PRODUCT_CONTEXT('part definition','mechanical',#1);
-                        #3=PRODUCT('ASM','Assembly','',(#2));
-                        #4=PRODUCT('PART','Repeated Part','',(#2));
-                        #5=PRODUCT_DEFINITION_FORMATION('asm-v1','',#3);
-                        #6=PRODUCT_DEFINITION_FORMATION('part-v1','',#4);
-                        #7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);
-                        #8=PRODUCT_DEFINITION('asm-def','assembly',#5,#7);
-                        #9=PRODUCT_DEFINITION('part-def','part',#6,#7);
-                        #10=PRODUCT_DEFINITION_SHAPE('asm-shape','',#8);
-                        #11=PRODUCT_DEFINITION_SHAPE('part-shape','',#9);
-                        #12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));
-                        #13=CARTESIAN_POINT('O',(0.0,0.0,0.0));
-                        #14=CARTESIAN_POINT('T1',(2.0,0.0,0.0));
-                        #15=CARTESIAN_POINT('T2',(5.0,0.0,0.0));
-                        #16=DIRECTION('DZ',(0.0,0.0,1.0));
-                        #17=DIRECTION('DX',(1.0,0.0,0.0));
-                        #18=DIRECTION('DY',(0.0,1.0,0.0));
-                        #19=AXIS2_PLACEMENT_3D('AX0',#13,#16,#17);
-                        #20=AXIS2_PLACEMENT_3D('MOVE',#14,#16,#17);
-                        #21=AXIS2_PLACEMENT_3D('ROT90_MOVE',#15,#16,#18);
-                        #22=ITEM_DEFINED_TRANSFORMATION('move','translate x',#19,#20);
-                        #23=ITEM_DEFINED_TRANSFORMATION('rotate-move','rotate z and translate',#19,#21);
-                        #24=SHAPE_REPRESENTATION('ASM_REP',(),#12);
-                        #25=SHAPE_REPRESENTATION('PART_REP',(),#12);
-                        #26=SHAPE_DEFINITION_REPRESENTATION(#10,#24);
-                        #27=SHAPE_DEFINITION_REPRESENTATION(#11,#25);
-                        #28=(REPRESENTATION_RELATIONSHIP('rr1','first instance',#24,#25)
-                             REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));
-                        #29=(REPRESENTATION_RELATIONSHIP('rr2','second instance',#24,#25)
-                             REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#23));
-                        #30=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','first part','',#8,#9);
-                        #31=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-2','second part','',#8,#9);
-                        #32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#28,#30);
-                        #33=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#29,#31);
-                        ENDSEC;
-                        """)
+                StepParser.parse(
+        "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM','Assembly','',(#2));\n"
+        + "#4=PRODUCT('PART','Repeated Part','',(#2));\n"
+        + "#5=PRODUCT_DEFINITION_FORMATION('asm-v1','',#3);\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('part-v1','',#4);\n"
+        + "#7=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#8=PRODUCT_DEFINITION('asm-def','assembly',#5,#7);\n"
+        + "#9=PRODUCT_DEFINITION('part-def','part',#6,#7);\n"
+        + "#10=PRODUCT_DEFINITION_SHAPE('asm-shape','',#8);\n"
+        + "#11=PRODUCT_DEFINITION_SHAPE('part-shape','',#9);\n"
+        + "#12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#13=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('T1',(2.0,0.0,0.0));\n"
+        + "#15=CARTESIAN_POINT('T2',(5.0,0.0,0.0));\n"
+        + "#16=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#17=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#18=DIRECTION('DY',(0.0,1.0,0.0));\n"
+        + "#19=AXIS2_PLACEMENT_3D('AX0',#13,#16,#17);\n"
+        + "#20=AXIS2_PLACEMENT_3D('MOVE',#14,#16,#17);\n"
+        + "#21=AXIS2_PLACEMENT_3D('ROT90_MOVE',#15,#16,#18);\n"
+        + "#22=ITEM_DEFINED_TRANSFORMATION('move','translate x',#19,#20);\n"
+        + "#23=ITEM_DEFINED_TRANSFORMATION('rotate-move','rotate z and translate',#19,#21);\n"
+        + "#24=SHAPE_REPRESENTATION('ASM_REP',(),#12);\n"
+        + "#25=SHAPE_REPRESENTATION('PART_REP',(),#12);\n"
+        + "#26=SHAPE_DEFINITION_REPRESENTATION(#10,#24);\n"
+        + "#27=SHAPE_DEFINITION_REPRESENTATION(#11,#25);\n"
+        + "#28=(REPRESENTATION_RELATIONSHIP('rr1','first instance',#24,#25)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#22));\n"
+        + "#29=(REPRESENTATION_RELATIONSHIP('rr2','second instance',#24,#25)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#23));\n"
+        + "#30=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','first part','',#8,#9);\n"
+        + "#31=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-2','second part','',#8,#9);\n"
+        + "#32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#28,#30);\n"
+        + "#33=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#29,#31);\n"
+        + "ENDSEC;"
         );
 
         AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);

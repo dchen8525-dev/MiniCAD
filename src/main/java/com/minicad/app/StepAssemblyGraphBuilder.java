@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 
 /**
  * Builds an assembly instance graph from resolved STEP product and representation entities.
@@ -35,21 +36,23 @@ public final class StepAssemblyGraphBuilder {
     public static AssemblyGraph build(Map<Integer, StepEntity> resolved) {
         Map<Integer, String> representationNames = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
+            if (entity instanceof StepRepresentation) { StepRepresentation representation = (StepRepresentation) entity;
                 representationNames.put(representation.id(), representation.name());
             }
         }
 
         Map<Integer, StepProduct> productByDefinitionId = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepProductDefinition productDefinition) {
+            if (entity instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) entity;
                 productByDefinitionId.put(productDefinition.id(), productDefinition.formation().ofProduct());
             }
         }
 
         Map<Integer, List<Integer>> repIdsByProductDefinition = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepShapeDefinitionRepresentation link) {
+            if (entity instanceof StepShapeDefinitionRepresentation) {
+            StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) entity;
                 Integer productDefinitionId = productDefinitionIdFor(link.definition().definition());
                 if (productDefinitionId == null) {
                     continue;
@@ -65,7 +68,8 @@ public final class StepAssemblyGraphBuilder {
 
         Map<Integer, StepContextDependentShapeRepresentation> contextByOccurrence = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepContextDependentShapeRepresentation contextDependent) {
+            if (entity instanceof StepContextDependentShapeRepresentation) {
+            StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) entity;
                 Integer occurrenceId = occurrenceIdFor(contextDependent.representedProductRelation());
                 if (occurrenceId != null) {
                     contextByOccurrence.put(occurrenceId, contextDependent);
@@ -76,7 +80,8 @@ public final class StepAssemblyGraphBuilder {
         Map<Integer, List<StepNextAssemblyUsageOccurrence>> childrenByParent = new LinkedHashMap<>();
         Set<Integer> childDefinitions = new LinkedHashSet<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepNextAssemblyUsageOccurrence occurrence) {
+            if (entity instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) entity;
                 childrenByParent
                         .computeIfAbsent(occurrence.relatingProductDefinition().id(), ignored -> new ArrayList<>())
                         .add(occurrence);
@@ -89,7 +94,8 @@ public final class StepAssemblyGraphBuilder {
 
         List<AssemblyNode> nodes = new ArrayList<>();
         for (StepEntity entity : resolved.values()) {
-            if (!(entity instanceof StepProductDefinition productDefinition)) {
+            if (!(entity instanceof StepProductDefinition)) {
+            StepProductDefinition productDefinition = (StepProductDefinition) entity;
                 continue;
             }
             if (childDefinitions.contains(productDefinition.id())) {
@@ -127,21 +133,26 @@ public final class StepAssemblyGraphBuilder {
     }
 
     private static Integer productDefinitionIdFor(StepEntity definition) {
-        if (definition instanceof StepProductDefinition productDefinition) {
+        if (definition instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) definition;
             return productDefinition.id();
         }
-        if (definition instanceof StepNextAssemblyUsageOccurrence occurrence) {
+        if (definition instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) definition;
             return occurrence.relatedProductDefinition().id();
         }
         return null;
     }
 
     private static Integer occurrenceIdFor(StepEntity relation) {
-        if (relation instanceof StepNextAssemblyUsageOccurrence occurrence) {
+        if (relation instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) relation;
             return occurrence.id();
         }
-        if (relation instanceof StepProductDefinitionShape shape
-                && shape.definition() instanceof StepNextAssemblyUsageOccurrence occurrence) {
+        if (relation instanceof StepProductDefinitionShape
+            && ((StepProductDefinitionShape) relation).definition() instanceof StepNextAssemblyUsageOccurrence) {
+            StepProductDefinitionShape shape = (StepProductDefinitionShape) relation;
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) shape.definition();
             return occurrence.id();
         }
         return null;
@@ -222,7 +233,8 @@ public final class StepAssemblyGraphBuilder {
             Map<Integer, StepEntity> resolved
     ) {
         StepEntity relation = resolved.get(contextDependent.representationRelationship().id());
-        if (relation instanceof StepRepresentationRelationshipWithTransformation withTransformation) {
+        if (relation instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation withTransformation = (StepRepresentationRelationshipWithTransformation) relation;
             return matrixFor(withTransformation.transformationOperator());
         }
         if (relation instanceof StepShapeRepresentationRelationship
@@ -307,8 +319,42 @@ public final class StepAssemblyGraphBuilder {
         };
     }
 
-    public record AssemblyGraph(List<AssemblyRepresentation> representations, List<AssemblyNode> nodes) {
+    
+public final class AssemblyGraph {
+    private final List<AssemblyRepresentation> representations;
+    private final List<AssemblyNode> nodes;
+
+    public AssemblyGraph(List<AssemblyRepresentation> representations, List<AssemblyNode> nodes) {
+        this.representations = representations == null ? null : java.util.List.copyOf(representations);
+        this.nodes = nodes == null ? null : java.util.List.copyOf(nodes);
     }
+
+    public List<AssemblyRepresentation> getRepresentations() {
+        return representations;
+    }
+
+    public List<AssemblyNode> getNodes() {
+        return nodes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssemblyGraph that = (AssemblyGraph) o;
+        return Objects.equals(representations, that.representations) && Objects.equals(nodes, that.nodes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(representations, nodes);
+    }
+
+    @Override
+    public String toString() {
+        return "AssemblyGraph{" + "representations=" + representations + "nodes=" + nodes + "}";
+    }
+}
 
     public record AssemblyRepresentation(int representationId, String name) {
     }

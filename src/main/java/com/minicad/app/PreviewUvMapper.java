@@ -50,13 +50,16 @@ public final class PreviewUvMapper {
     // ─── mapperForSurface ─────────────────────────────────────────────────
 
     public static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (geometry instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             return mapperForSurface(trimmedSurface.basisSurface(), builder);
         }
-        if (geometry instanceof StepCurveBoundedSurface boundedSurface) {
+        if (geometry instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
             return mapperForSurface(boundedSurface.basisSurface(), builder);
         }
-        if (geometry instanceof StepOrientedSurface orientedSurface) {
+        if (geometry instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(orientedSurface.surfaceElement(), builder);
             if (base == null) {
                 return null;
@@ -91,7 +94,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepOffsetSurface offsetSurface) {
+        if (geometry instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface.basisSurface(), builder);
             if (base == null) {
                 return null;
@@ -126,7 +130,8 @@ public final class PreviewUvMapper {
             };
         }
         // Elliptical-axis surfaces — CadBuilder approximates these as standard surfaces
-        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis) {
+            StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis = (StepCylindricalSurfaceWithEllipticalAxis) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -151,7 +156,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis) {
+            StepConicalSurfaceWithEllipticalAxis ellipticalAxis = (StepConicalSurfaceWithEllipticalAxis) geometry;
             ConicalSurface surface = builder.buildConicalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -176,7 +182,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis) {
+            StepSphericalSurfaceWithEllipticalAxis ellipticalAxis = (StepSphericalSurfaceWithEllipticalAxis) geometry;
             SphericalSurface surface = builder.buildSphericalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -201,7 +208,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis ellipticalAxis) {
+        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis) {
+            StepToroidalSurfaceWithCylindricalAxis ellipticalAxis = (StepToroidalSurfaceWithCylindricalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithCylindricalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -234,7 +242,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
+            StepToroidalSurfaceWithEllipticalAxis ellipticalAxis = (StepToroidalSurfaceWithEllipticalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -267,7 +276,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepOffsetSurface2 offsetSurface2) {
+        if (geometry instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface2.basisSurface(), builder);
             if (base == null) {
                 return null;
@@ -302,7 +312,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation)) {
                 return null;
             }
@@ -346,7 +357,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepPlane stepPlane) {
+        if (geometry instanceof StepPlane) {
+            StepPlane stepPlane = (StepPlane) geometry;
             Axis2Placement3D placement = builder.buildPlacement(stepPlane.position().id());
             Plane plane = builder.buildPlane(stepPlane.id());
             Direction3 uDirection = placement.xDirection();
@@ -372,7 +384,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
+        if (geometry instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -397,7 +410,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepConicalSurface conicalSurface) {
+        if (geometry instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) geometry;
             ConicalSurface surface = builder.buildConicalSurface(conicalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -422,7 +436,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepSphericalSurface sphericalSurface) {
+        if (geometry instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(sphericalSurface.position().id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -447,7 +462,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        if (geometry instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(degenerateToroidalSurface.position().id());
             double majorRadius = degenerateToroidalSurface.majorRadius();
             double minorRadius = degenerateToroidalSurface.minorRadius();
@@ -482,7 +498,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurface toroidalSurface) {
+        if (geometry instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) geometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -515,7 +532,8 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepRationalBSplineSurface splineSurface) {
+        if (geometry instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) geometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -559,26 +577,32 @@ public final class PreviewUvMapper {
                 }
             };
         }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) geometry;
             return extrusionMapper(extrusionSurface, builder);
         }
-        if (geometry instanceof StepSurfaceOfRevolution revolutionSurface) {
+        if (geometry instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) geometry;
             return revolutionMapper(revolutionSurface, builder);
         }
         // Rectangular composite surface: delegate to parent surface mapper
-        if (geometry instanceof StepRectangularCompositeSurface compositeSurface) {
+        if (geometry instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) geometry;
             return mapperForSurface(compositeSurface.parentSurface(), builder);
         }
         // Surface patch: delegate to basis surface mapper
-        if (geometry instanceof StepSurfacePatch surfacePatch) {
+        if (geometry instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) geometry;
             return mapperForSurface(surfacePatch.basisSurface(), builder);
         }
         // Blended surface: delegate to primary surface mapper
-        if (geometry instanceof StepBlendedSurface blended) {
+        if (geometry instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) geometry;
             return mapperForSurface(blended.primarySurface(), builder);
         }
         // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
-        if (geometry instanceof StepFreeFormSurface freeForm) {
+        if (geometry instanceof StepFreeFormSurface) {
+            StepFreeFormSurface freeForm = (StepFreeFormSurface) geometry;
             BSplineSurface3 surface = buildFreeFormSurface(freeForm, builder);
             double uSpan = surface.uEnd() - surface.uStart();
             double vSpan = surface.vEnd() - surface.vStart();
@@ -896,8 +920,8 @@ public final class PreviewUvMapper {
                 previous = uv;
             }
             uvPoints = normalizePeriodicLoop(uvPoints, mapper);
-            uvPoints.set(0, uvPoints.getFirst());
-            uvPoints.set(uvPoints.size() - 1, uvPoints.getFirst());
+            uvPoints.set(0, uvPoints.get(0));
+            uvPoints.set(uvPoints.size() - 1, uvPoints.get(0));
             loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(uvPoints)));
         }
         return List.copyOf(loops);
@@ -936,8 +960,8 @@ public final class PreviewUvMapper {
                 loopPoints = reverseClosedLoop(loopPoints);
             }
             loopPoints = normalizePeriodicLoop(loopPoints, mapper);
-            if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
-                loopPoints.add(loopPoints.getFirst());
+            if (!sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
+                loopPoints.add(loopPoints.get(0));
             }
             loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
         }
@@ -970,8 +994,8 @@ public final class PreviewUvMapper {
             previous = normalizedPoint;
         }
         if (normalized.size() >= 2) {
-            UvPoint first = normalized.getFirst();
-            UvPoint last = normalized.getLast();
+            UvPoint first = normalized.get(0);
+            UvPoint last = normalized.get(normalized.size() - 1);
             double u = last.u();
             double v = last.v();
             if (uPeriod != null) {
@@ -1023,26 +1047,31 @@ public final class PreviewUvMapper {
         Boolean implicitOuter = null;
         Double transformScale = null;
 
-        if (geometry instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (geometry instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             basisType = StepPreviewJsonExporter.surfaceTypeName(trimmedSurface.basisSurface());
             basisStepId = trimmedSurface.basisSurface().id();
             trimU1 = trimmedSurface.u1();
             trimU2 = trimmedSurface.u2();
             trimV1 = trimmedSurface.v1();
             trimV2 = trimmedSurface.v2();
-        } else if (geometry instanceof StepCurveBoundedSurface boundedSurface) {
+        } else if (geometry instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
             basisType = StepPreviewJsonExporter.surfaceTypeName(boundedSurface.basisSurface());
             basisStepId = boundedSurface.basisSurface().id();
             implicitOuter = boundedSurface.implicitOuter();
-        } else if (geometry instanceof StepOrientedSurface orientedSurface) {
+        } else if (geometry instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             basisType = StepPreviewJsonExporter.surfaceTypeName(orientedSurface.surfaceElement());
             basisStepId = orientedSurface.surfaceElement().id();
             orientation = orientedSurface.orientation();
-        } else if (geometry instanceof StepOffsetSurface offsetSurface) {
+        } else if (geometry instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             basisType = StepPreviewJsonExporter.surfaceTypeName(offsetSurface.basisSurface());
             basisStepId = offsetSurface.basisSurface().id();
             offsetDistance = offsetSurface.distance();
-        } else if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        } else if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             basisType = StepPreviewJsonExporter.surfaceTypeName(replica.parent());
             basisStepId = replica.parent().id();
             transformScale = replica.transformation().scale();
@@ -1109,11 +1138,12 @@ public final class PreviewUvMapper {
                 : orientedEdge.edgeElement().start();
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
         StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity> pcurves = switch (associatedSource) {
-            case StepSurfaceCurve surfaceCurve -> matchingPcurves(surfaceCurve.associatedGeometry(), faceGeometry);
-            case StepSeamCurve seamCurve -> matchingPcurves(seamCurve.associatedGeometry(), faceGeometry);
-            default -> List.of();
-        };
+        List<StepEntity>     pcurves = null;
+    switch (associatedSource) {
+        default:
+            pcurves = List.of();
+            break;
+    };
         if (pcurves.isEmpty()) {
             if (shouldFallbackToProjectedEdge(edgeGeometry)) {
                 List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
@@ -1136,7 +1166,8 @@ public final class PreviewUvMapper {
                 unsupportedPcurveCount++;
                 continue;
             }
-            if (built instanceof Line2 line) {
+            if (built instanceof Line2) {
+            Line2 line = (Line2) built;
                 UvPoint start = snapToLine(projectedStart, line);
                 UvPoint end = snapToLine(projectedEnd, line);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -1147,10 +1178,11 @@ public final class PreviewUvMapper {
                 }
                 continue;
             }
-            if (built instanceof BSplineCurve2 spline) {
+            if (built instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) built;
                 List<UvPoint> samples = sampleSplinePcurve(spline, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
+                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -1158,7 +1190,8 @@ public final class PreviewUvMapper {
                 }
                 continue;
             }
-            if (built instanceof Circle2 circle) {
+            if (built instanceof Circle2) {
+            Circle2 circle = (Circle2) built;
                 UvPoint start = snapToCircle(projectedStart, circle);
                 UvPoint end = snapToCircle(projectedEnd, circle);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -1169,7 +1202,8 @@ public final class PreviewUvMapper {
                 }
                 continue;
             }
-            if (built instanceof Ellipse2 ellipse) {
+            if (built instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) built;
                 UvPoint start = snapToEllipse(projectedStart, ellipse);
                 UvPoint end = snapToEllipse(projectedEnd, ellipse);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -1180,10 +1214,11 @@ public final class PreviewUvMapper {
                 }
                 continue;
             }
-            if (built instanceof TrimmedCurve2 trimmed) {
+            if (built instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) built;
                 List<UvPoint> samples = sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
+                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -1248,19 +1283,30 @@ public final class PreviewUvMapper {
     // ─── shouldFallbackToProjectedEdge / associatedGeometrySummary ────────
 
     public static boolean shouldFallbackToProjectedEdge(StepEntity edgeGeometry) {
-        return switch (unwrapAssociatedCurveGeometry(edgeGeometry)) {
-            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry().isEmpty();
-            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry().isEmpty();
-            default -> true;
-        };
+        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
+        if (unwrapped instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
+            return surfaceCurve.associatedGeometry().isEmpty();
+        } else if (unwrapped instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
+            return seamCurve.associatedGeometry().isEmpty();
+        } else {
+            return true;
+        }
     }
 
     public static String associatedGeometrySummary(StepEntity edgeGeometry) {
-        List<StepEntity> associated = switch (unwrapAssociatedCurveGeometry(edgeGeometry)) {
-            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry();
-            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry();
-            default -> List.of();
-        };
+        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
+        List<StepEntity> associated;
+        if (unwrapped instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
+            associated = surfaceCurve.associatedGeometry();
+        } else if (unwrapped instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
+            associated = seamCurve.associatedGeometry();
+        } else {
+            associated = List.of();
+        }
         if (associated.isEmpty()) {
             return "[]";
         }
@@ -1274,35 +1320,43 @@ public final class PreviewUvMapper {
     public static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
         StepEntity current = edgeGeometry;
         for (int depth = 0; depth < 16; depth++) {
-            if (current instanceof StepOrientedCurve orientedCurve) {
+            if (current instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
                 current = orientedCurve.curveElement();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
-            if (current instanceof StepAnnotationCurveOccurrence occurrence) {
+            if (current instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
                 current = occurrence.item();
                 continue;
             }
-            if (current instanceof StepDimensionCurve dimensionCurve) {
+            if (current instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
                 current = dimensionCurve.item();
                 continue;
             }
-            if (current instanceof StepLeaderCurve leaderCurve) {
+            if (current instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
                 current = leaderCurve.item();
                 continue;
             }
-            if (current instanceof StepProjectionCurve projectionCurve) {
+            if (current instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
                 current = projectionCurve.item();
                 continue;
             }
-            if (current instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            if (current instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
                 current = annotationOccurrence.item();
                 continue;
             }
-            if (current instanceof StepTerminatorSymbol terminatorSymbol) {
+            if (current instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
                 current = terminatorSymbol.annotatedCurve();
                 continue;
             }
@@ -1316,10 +1370,12 @@ public final class PreviewUvMapper {
     public static String pcurveBasisSurfaceSummary(List<StepEntity> pcurves) {
         return pcurves.stream()
                 .map(pcurve -> {
-                    if (pcurve instanceof StepPcurve exact) {
+                    if (pcurve instanceof StepPcurve) {
+            StepPcurve exact = (StepPcurve) pcurve;
                         return "#" + exact.id() + "->#" + exact.basisSurface().id();
                     }
-                    if (pcurve instanceof StepDegeneratePcurve degenerate) {
+                    if (pcurve instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve degenerate = (StepDegeneratePcurve) pcurve;
                         return "#" + degenerate.id() + "->#" + degenerate.basisSurface().id();
                     }
                     return "#" + pcurve.id();
@@ -1333,9 +1389,11 @@ public final class PreviewUvMapper {
         Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
         List<StepEntity> matches = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
+            if (associated instanceof StepPcurve && acceptableSurfaceIds.contains(((StepPcurve) associated).basisSurface().id())) {
+                StepPcurve pcurve = (StepPcurve) associated;
                 matches.add(pcurve);
-            } else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
+            } else if (associated instanceof StepDegeneratePcurve && acceptableSurfaceIds.contains(((StepDegeneratePcurve) associated).basisSurface().id())) {
+                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
                 matches.add(pcurve);
             }
         }
@@ -1349,23 +1407,28 @@ public final class PreviewUvMapper {
         StepEntity current = faceGeometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
             ids.add(current.id());
-            if (current instanceof StepRectangularTrimmedSurface trimmedSurface) {
+            if (current instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepCurveBoundedSurface boundedSurface) {
+            if (current instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOrientedSurface orientedSurface) {
+            if (current instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof StepOffsetSurface offsetSurface) {
+            if (current instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -1502,19 +1565,24 @@ public final class PreviewUvMapper {
     }
 
     public static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
-        if (curve instanceof Line2 line) {
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
             return sampleLinePcurve(line, start, end);
         }
-        if (curve instanceof Circle2 circle) {
+        if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
             return sampleCirclePcurve(circle, start, end);
         }
-        if (curve instanceof Ellipse2 ellipse) {
+        if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
             return sampleEllipsePcurve(ellipse, start, end);
         }
-        if (curve instanceof BSplineCurve2 spline) {
+        if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) curve;
             return sampleSplinePcurve(spline, start, end);
         }
-        if (curve instanceof TrimmedCurve2 trimmed) {
+        if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
             return sampleTrimmedPcurve(trimmed, start, end);
         }
         return List.of();
@@ -1524,7 +1592,7 @@ public final class PreviewUvMapper {
         if (samples.isEmpty()) {
             return Double.POSITIVE_INFINITY;
         }
-        return distanceSquared(start, samples.getFirst()) + distanceSquared(end, samples.getLast());
+        return distanceSquared(start, samples.get(0)) + distanceSquared(end, samples.get(samples.size() - 1));
     }
 
     public static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
@@ -1532,8 +1600,8 @@ public final class PreviewUvMapper {
             return samples;
         }
         List<UvPoint> aligned = new ArrayList<>(samples);
-        double forwardScore = distanceSquared(projectedStart, aligned.getFirst()) + distanceSquared(projectedEnd, aligned.getLast());
-        double reverseScore = distanceSquared(projectedStart, aligned.getLast()) + distanceSquared(projectedEnd, aligned.getFirst());
+        double forwardScore = distanceSquared(projectedStart, aligned.get(0)) + distanceSquared(projectedEnd, aligned.get(aligned.size() - 1));
+        double reverseScore = distanceSquared(projectedStart, aligned.get(aligned.size() - 1)) + distanceSquared(projectedEnd, aligned.get(0));
         if (reverseScore < forwardScore) {
             java.util.Collections.reverse(aligned);
         }
@@ -1662,7 +1730,7 @@ public final class PreviewUvMapper {
         for (CartesianPoint point : points) {
             double angle = cylindricalAngle(placement, point);
             if (!angles.isEmpty()) {
-                double previous = angles.getLast();
+                double previous = angles.get(angles.size() - 1);
                 while (angle - previous > Math.PI) {
                     angle -= Math.PI * 2.0;
                 }
@@ -1804,7 +1872,7 @@ public final class PreviewUvMapper {
         for (CartesianPoint point : points) {
             double value = toroidalU(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -1822,7 +1890,7 @@ public final class PreviewUvMapper {
         for (CartesianPoint point : points) {
             double value = toroidalV(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -1883,25 +1951,32 @@ public final class PreviewUvMapper {
     }
 
     private static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurface splineSurface) {
+        if (geometry instanceof StepBSplineSurface) {
+            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
             return builder.buildGenericBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+            StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
             return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
         }
-        if (geometry instanceof StepBezierSurface splineSurface) {
+        if (geometry instanceof StepBezierSurface) {
+            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
             return builder.buildBezierSurface(splineSurface.id());
         }
-        if (geometry instanceof StepUniformSurface splineSurface) {
+        if (geometry instanceof StepUniformSurface) {
+            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
             return builder.buildUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepQuasiUniformSurface splineSurface) {
+        if (geometry instanceof StepQuasiUniformSurface) {
+            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
             return builder.buildQuasiUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepPiecewiseBezierSurface splineSurface) {
+        if (geometry instanceof StepPiecewiseBezierSurface) {
+            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
         }
         throw new UnsupportedGeometryException(StepPreviewJsonExporter.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
@@ -1909,7 +1984,7 @@ public final class PreviewUvMapper {
 
     private static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
         int uCount = surface.controlPoints().size();
-        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().getFirst().size();
+        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
         if (uCount < 2 || vCount < 2) {
             throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
         }
@@ -2097,18 +2172,22 @@ public final class PreviewUvMapper {
     }
 
     private static List<CartesianPoint> sampleLoop(FaceBound bound) {
-        if (bound.loop() instanceof VertexLoop vertexLoop) {
+        if (bound.loop() instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) bound.loop();
             return List.of(vertexLoop.vertex().point());
         }
-        if (bound.loop() instanceof PolyLoop polyLoop) {
+        if (bound.loop() instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) bound.loop();
             List<CartesianPoint> sampled = new ArrayList<>(polyLoop.points());
-            if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-                sampled.add(sampled.getFirst());
+            if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+                sampled.add(sampled.get(0));
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
-        if (!(bound.loop() instanceof EdgeLoop edgeLoop)) {
+        if (!(bound.loop() instanceof EdgeLoop)) {
             throw new com.minicad.common.UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
+        }
+        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
         }
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
@@ -2120,8 +2199,8 @@ public final class PreviewUvMapper {
             }
             firstEdge = false;
         }
-        if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-            sampled.add(sampled.getFirst());
+        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+            sampled.add(sampled.get(0));
         }
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
@@ -2131,10 +2210,10 @@ public final class PreviewUvMapper {
             return points;
         }
         List<T> reversed = new ArrayList<>(points);
-        if (reversed.getFirst().equals(reversed.getLast())) {
+        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
             T start = reversed.removeLast();
             java.util.Collections.reverse(reversed);
-            reversed.add(reversed.getFirst());
+            reversed.add(reversed.get(0));
             reversed.set(0, start);
             reversed.set(reversed.size() - 1, start);
             return reversed;
@@ -2149,22 +2228,28 @@ public final class PreviewUvMapper {
 
     private static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
         try {
-            if (item instanceof StepLine line) {
+            if (item instanceof StepLine) {
+            StepLine line = (StepLine) item;
                 return builder.buildLine(line.id());
             }
-            if (item instanceof StepCircle circle) {
+            if (item instanceof StepCircle) {
+            StepCircle circle = (StepCircle) item;
                 return builder.buildCircle(circle.id());
             }
-            if (item instanceof StepEllipse ellipse) {
+            if (item instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) item;
                 return builder.buildEllipse(ellipse.id());
             }
-            if (item instanceof StepPolyline polyline) {
+            if (item instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) item;
                 return builder.buildPolyline(polyline.id());
             }
-            if (item instanceof StepBSplineSurfaceWithKnots spline) {
+            if (item instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots spline = (StepBSplineSurfaceWithKnots) item;
                 return builder.buildBSplineCurve(spline.id());
             }
-            if (item instanceof StepTrimmedCurve trimmedCurve) {
+            if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
                 return builder.buildTrimmedCurve(trimmedCurve.id());
             }
             if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve compositeCurve) {
@@ -2180,7 +2265,8 @@ public final class PreviewUvMapper {
         if (curve instanceof Line3) {
             return List.of(start, end);
         }
-        if (curve instanceof Polyline3 polyline) {
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
             List<CartesianPoint> points = new ArrayList<>(polyline.points());
             if (!naturalForward) {
                 java.util.Collections.reverse(points);

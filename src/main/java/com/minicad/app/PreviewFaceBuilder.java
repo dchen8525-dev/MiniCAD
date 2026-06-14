@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -65,35 +66,41 @@ public final class PreviewFaceBuilder {
     // ─── Core face building ──────────────────────────────────────────────
 
     public static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).toList();
+        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
         if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
-            FaceBound bound = bounds.getFirst();
+            FaceBound bound = bounds.get(0);
             return List.of(FaceBound.outer(bound.loop(), bound.orientation()));
         }
         return bounds;
     }
 
     public static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace advancedFace) {
+        if (stepFace instanceof StepAdvancedFace) {
+            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
             return advancedFace.faceGeometry();
         }
-        if (stepFace instanceof StepFaceSurface faceSurface) {
+        if (stepFace instanceof StepFaceSurface) {
+            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
             return faceSurface.faceGeometry();
         }
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             return faceGeometry(orientedFace.faceElement());
         }
         return null;
     }
 
     public static boolean faceSameSense(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace advancedFace) {
+        if (stepFace instanceof StepAdvancedFace) {
+            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
             return advancedFace.sameSense();
         }
-        if (stepFace instanceof StepFaceSurface faceSurface) {
+        if (stepFace instanceof StepFaceSurface) {
+            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
             return faceSurface.sameSense();
         }
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             boolean base = faceSameSense(orientedFace.faceElement());
             return orientedFace.orientation() ? base : !base;
         }
@@ -140,47 +147,58 @@ public final class PreviewFaceBuilder {
     public static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
         StepEntity current = geometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface trimmedSurface) {
+            if (current instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepCurveBoundedSurface boundedSurface) {
+            if (current instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOrientedSurface orientedSurface) {
+            if (current instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof StepOffsetSurface offsetSurface) {
+            if (current instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOffsetSurface2 offsetSurface2) {
+            if (current instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
                 current = offsetSurface2.basisSurface();
                 continue;
             }
-            if (current instanceof StepSurfacePatch surfacePatch) {
+            if (current instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
                 current = surfacePatch.basisSurface();
                 continue;
             }
-            if (current instanceof StepRectangularCompositeSurface compositeSurface) {
+            if (current instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
                 current = compositeSurface.parentSurface();
                 continue;
             }
-            if (current instanceof StepMachinedSurface machinedSurface) {
+            if (current instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
                 current = machinedSurface.face();
                 continue;
             }
-            if (current instanceof StepBlendedSurface blended) {
+            if (current instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) current;
                 current = blended.primarySurface();
                 continue;
             }
-            if (current instanceof StepMappedItem mappedItem) {
+            if (current instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) current;
                 current = mappedItem.mappingTarget();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -197,31 +215,40 @@ public final class PreviewFaceBuilder {
         if (surface == null) {
             return null;
         }
-        if (surface instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (surface instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
             return describeUnsupportedPreviewSurface(trimmedSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepCurveBoundedSurface curveBoundedSurface) {
+        if (surface instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface curveBoundedSurface = (StepCurveBoundedSurface) surface;
             return describeUnsupportedPreviewSurface(curveBoundedSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepOrientedSurface orientedSurface) {
+        if (surface instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
             return describeUnsupportedPreviewSurface(orientedSurface.surfaceElement(), builder);
         }
-        if (surface instanceof StepOffsetSurface offsetSurface) {
+        if (surface instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
             return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepOffsetSurface2 offsetSurface2) {
+        if (surface instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) surface;
             return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
         }
-        if (surface instanceof StepSurfacePatch surfacePatch) {
+        if (surface instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) surface;
             return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
         }
-        if (surface instanceof StepRectangularCompositeSurface compositeSurface) {
+        if (surface instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) surface;
             return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
         }
-        if (surface instanceof StepMachinedSurface machinedSurface) {
+        if (surface instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) surface;
             return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
         }
-        if (surface instanceof StepBlendedSurface blended) {
+        if (surface instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) surface;
             return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
         }
         if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
@@ -251,11 +278,11 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
 
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop)) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop)) {
             return null;
         }
         if (outerLoop.edges().size() != 4) {
@@ -264,20 +291,20 @@ public final class PreviewFaceBuilder {
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Line3)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
         }
 
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.getFirst();
-        OrientedEdge upperArc = circleEdges.getLast();
+        OrientedEdge lowerArc = circleEdges.get(0);
+        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
         if (averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.getLast();
-            upperArc = circleEdges.getFirst();
+            lowerArc = circleEdges.get(circleEdges.size() - 1);
+            upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
@@ -299,19 +326,19 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = cylindricalNormal(surface, angles.getFirst(), sameSense);
+        Vector3 startNormal = cylindricalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(surfacePoint(surface, angles.getFirst(), lowerHeight)),
+                StepPreviewJsonExporter.toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "cylindrical_strip",
@@ -323,8 +350,8 @@ public final class PreviewFaceBuilder {
                         null,
                         lowerHeight,
                         upperHeight,
-                        angles.getFirst(),
-                        angles.getLast() - angles.getFirst(),
+                        angles.get(0),
+                        angles.get(angles.size() - 1) - angles.get(0),
                         null,
                         null,
                         null,
@@ -344,29 +371,29 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Line3)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
         }
 
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.getFirst();
-        OrientedEdge upperArc = circleEdges.getLast();
+        OrientedEdge lowerArc = circleEdges.get(0);
+        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
         if (averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.getLast();
-            upperArc = circleEdges.getFirst();
+            lowerArc = circleEdges.get(circleEdges.size() - 1);
+            upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
@@ -388,19 +415,19 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = conicalNormal(surface, angles.getFirst(), sameSense);
+        Vector3 startNormal = conicalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(conicalSurfacePoint(surface, angles.getFirst(), lowerHeight)),
+                StepPreviewJsonExporter.toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "conical_strip",
@@ -412,8 +439,8 @@ public final class PreviewFaceBuilder {
                         surface.semiAngle(),
                         lowerHeight,
                         upperHeight,
-                        angles.getFirst(),
-                        angles.getLast() - angles.getFirst(),
+                        angles.get(0),
+                        angles.get(angles.size() - 1) - angles.get(0),
                         null,
                         null,
                         null,
@@ -433,10 +460,10 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
@@ -458,19 +485,19 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = sphericalNormal(surface.position(), lowerU.getFirst(), lowerV, sameSense);
+        Vector3 startNormal = sphericalNormal(surface.position(), lowerU.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "SPHERICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.getFirst(), lowerV)),
+                StepPreviewJsonExporter.toPointPayload(sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "spherical_strip",
@@ -482,8 +509,8 @@ public final class PreviewFaceBuilder {
                         null,
                         lowerV,
                         upperV,
-                        lowerU.getFirst(),
-                        lowerU.getLast() - lowerU.getFirst(),
+                        lowerU.get(0),
+                        lowerU.get(lowerU.size() - 1) - lowerU.get(0),
                         null,
                         null,
                         null,
@@ -503,16 +530,16 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 4) {
             return null;
         }
@@ -524,8 +551,8 @@ public final class PreviewFaceBuilder {
             List<CartesianPoint> points = StepPreviewJsonExporter.sampleOrientedEdge(edge);
             List<Double> uValues = unwrapToroidalU(surface, points);
             List<Double> vValues = unwrapToroidalV(surface, points);
-            double uRange = Math.abs(uValues.getLast() - uValues.getFirst());
-            double vRange = Math.abs(vValues.getLast() - vValues.getFirst());
+            double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
+            double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
             if (uRange >= vRange) {
                 varyingUEdges.add(edge);
             } else {
@@ -536,11 +563,11 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        OrientedEdge lowerVEdge = varyingUEdges.getFirst();
-        OrientedEdge upperVEdge = varyingUEdges.getLast();
+        OrientedEdge lowerVEdge = varyingUEdges.get(0);
+        OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
         if (averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge))) {
-            lowerVEdge = varyingUEdges.getLast();
-            upperVEdge = varyingUEdges.getFirst();
+            lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
+            upperVEdge = varyingUEdges.get(0);
         }
 
         List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge);
@@ -557,19 +584,19 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.getFirst(), lowerV, sameSense);
+        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(toroidalSurfacePoint(surface, uValues.getFirst(), lowerV)),
+                StepPreviewJsonExporter.toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -581,8 +608,8 @@ public final class PreviewFaceBuilder {
                         null,
                         lowerV,
                         upperV,
-                        uValues.getFirst(),
-                        uValues.getLast() - uValues.getFirst(),
+                        uValues.get(0),
+                        uValues.get(uValues.size() - 1) - uValues.get(0),
                         null,
                         null,
                         null,
@@ -602,7 +629,7 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
         RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(stepSurface.id());
@@ -628,7 +655,7 @@ public final class PreviewFaceBuilder {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -687,10 +714,10 @@ public final class PreviewFaceBuilder {
             StepCadBuilder builder
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
         SurfacePatch patch = PreviewSurfaceSampler.buildFourSidedPatch(outerLoop);
@@ -716,7 +743,7 @@ public final class PreviewFaceBuilder {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -867,7 +894,7 @@ public final class PreviewFaceBuilder {
             StepCadBuilder builder
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
         BSplineSurface3 surface = PreviewSurfaceSampler.buildFreeFormSurface(stepSurface, builder);
@@ -895,7 +922,7 @@ public final class PreviewFaceBuilder {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -1088,16 +1115,20 @@ public final class PreviewFaceBuilder {
             StepCadBuilder builder
     ) {
         StepEntity basis = stepSurface.parentSurface();
-        if (basis instanceof StepCylindricalSurface cyl) {
+        if (basis instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cyl = (StepCylindricalSurface) basis;
             return toCylindricalFacePayload(stepFace, cyl, builder, metadata);
         }
-        if (basis instanceof StepConicalSurface cone) {
+        if (basis instanceof StepConicalSurface) {
+            StepConicalSurface cone = (StepConicalSurface) basis;
             return toConicalFacePayload(stepFace, cone, builder, metadata);
         }
-        if (basis instanceof StepSphericalSurface sphere) {
+        if (basis instanceof StepSphericalSurface) {
+            StepSphericalSurface sphere = (StepSphericalSurface) basis;
             return toSphericalFacePayload(stepFace, sphere, builder, metadata);
         }
-        if (basis instanceof StepToroidalSurface torus) {
+        if (basis instanceof StepToroidalSurface) {
+            StepToroidalSurface torus = (StepToroidalSurface) basis;
             return toToroidalFacePayload(stepFace, torus, builder, metadata);
         }
         if (basis instanceof StepPlane) {
@@ -1165,18 +1196,23 @@ public final class PreviewFaceBuilder {
         // Remove shells that are referenced by B-rep solids to avoid duplicate processing
         for (Integer solidId : solidIds) {
             StepEntity solidEntity = resolved.get(solidId);
-            if (solidEntity instanceof StepManifoldSolidBrep brep) {
+            if (solidEntity instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep brep = (StepManifoldSolidBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepFacettedBrep brep) {
+            } else if (solidEntity instanceof StepFacettedBrep) {
+            StepFacettedBrep brep = (StepFacettedBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepNonManifoldSolidBrep brep) {
+            } else if (solidEntity instanceof StepNonManifoldSolidBrep) {
+            StepNonManifoldSolidBrep brep = (StepNonManifoldSolidBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepAdvancedBrep brep) {
+            } else if (solidEntity instanceof StepAdvancedBrep) {
+            StepAdvancedBrep brep = (StepAdvancedBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
                 for (StepEntity voidShell : brep.voids()) {
                     shellIds.remove(voidShell.id());
                 }
-            } else if (solidEntity instanceof StepBrepWithVoids brep) {
+            } else if (solidEntity instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
                 shellIds.remove(brep.outer().id());
                 for (StepEntity voidShell : brep.voids()) {
                     shellIds.remove(voidShell.id());
@@ -1205,13 +1241,15 @@ public final class PreviewFaceBuilder {
 
         for (Integer shellId : shellIds) {
             StepEntity shellEntity = resolved.get(shellId);
-            if (shellEntity instanceof StepTessellatedFaceSet tessellated) {
+            if (shellEntity instanceof StepTessellatedFaceSet) {
+            StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) shellEntity;
                 List<FacePayload> tessFaces = StepPreviewJsonExporter.buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
                 faces.addAll(tessFaces);
                 log.debug("stage={} shellId={}, tessellatedFaceCount={}", "geometry_tessellated_shell", shellId, tessFaces.size());
                 continue;
             }
-            if (shellEntity instanceof StepTessellatedFace tessellatedFace) {
+            if (shellEntity instanceof StepTessellatedFace) {
+            StepTessellatedFace tessellatedFace = (StepTessellatedFace) shellEntity;
                 FacePayload payload = StepPreviewJsonExporter.buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
                 if (payload != null) {
                     faces.add(payload);
@@ -1337,11 +1375,13 @@ public final class PreviewFaceBuilder {
     }
 
     public static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
-        if (item instanceof StepStyledItem styledItem) {
+        if (item instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) item;
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
-        if (item instanceof StepOverRidingStyledItem styledItem) {
+        if (item instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
@@ -1359,7 +1399,8 @@ public final class PreviewFaceBuilder {
                 || item instanceof StepSurfacePatch) {
             return;
         }
-        if (item instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (item instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) item;
             for (StepEntity shell : surfaceModel.shells()) {
                 collectShellLikeIds(shell, shellIds);
             }
@@ -1373,13 +1414,15 @@ public final class PreviewFaceBuilder {
             shellIds.add(item.id());
             return;
         }
-        if (item instanceof StepManifoldSurfaceModel manifoldModel) {
+        if (item instanceof StepManifoldSurfaceModel) {
+            StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) item;
             for (StepEntity shell : manifoldModel.shells()) {
                 collectShellLikeIds(shell, shellIds);
             }
             return;
         }
-        if (item instanceof StepFaceBasedSurfaceModel faceModel) {
+        if (item instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) item;
             for (StepEntity faceSet : faceModel.faceSets()) {
                 collectShellLikeIds(faceSet, shellIds);
             }
@@ -1393,130 +1436,154 @@ public final class PreviewFaceBuilder {
             StepCadBuilder builder,
             StepMetadataExtractor metadata
     ) {
-        if (item instanceof StepStyledItem styledItem) {
+        if (item instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) item;
             collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepOverRidingStyledItem styledItem) {
+        if (item instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
             collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepPolyline polyline) {
+        if (item instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) item;
             edges.putIfAbsent(polyline.id(), toPolylineEdgePayload(polyline));
             return;
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             for (StepEntity element : curveSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             for (StepEntity element : geometricSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (item instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
             for (StepEntity boundary : wireframeModel.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (item instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (item instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
             for (StepEntity edge : connectedEdgeSet.edges()) {
                 collectStandaloneEdges(edge, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeCurve edgeCurve) {
+        if (item instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
             edges.putIfAbsent(edgeCurve.id(), StepPreviewJsonExporter.buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepFilletEdge filletEdge) {
+        if (item instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
             edges.putIfAbsent(filletEdge.id(), StepPreviewJsonExporter.buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepChamferEdge chamferEdge) {
+        if (item instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
             edges.putIfAbsent(chamferEdge.id(), StepPreviewJsonExporter.buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepPath path) {
+        if (item instanceof StepPath) {
+            StepPath path = (StepPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepOpenPath path) {
+        if (item instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepSubpath subpath) {
+        if (item instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) item;
             for (StepOrientedEdge orientedEdge : subpath.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepOrientedPath orientedPath) {
+        if (item instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) item;
             for (StepOrientedEdge orientedEdge : orientedPath.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepWireShell wireShell) {
+        if (item instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) item;
             for (StepEntity loop : wireShell.loops()) {
                 collectStandaloneEdges(loop, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeWire edgeWire) {
+        if (item instanceof StepEdgeWire) {
+            StepEdgeWire edgeWire = (StepEdgeWire) item;
             for (StepEntity edge : edgeWire.edges()) {
                 collectStandaloneEdges(edge, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepGeometricSurfaceSet surfaceSet) {
+        if (item instanceof StepGeometricSurfaceSet) {
+            StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) item;
             for (StepEntity element : surfaceSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeLoop edgeLoop) {
+        if (item instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) item;
             for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepPolyLoop polyLoop) {
+        if (item instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) item;
             edges.putIfAbsent(polyLoop.id(), toPolyLoopEdgePayload(polyLoop));
             return;
         }
         if (item instanceof StepVertexShell || item instanceof StepVertexLoop) {
             return;
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepAnnotationFillArea fillArea) {
+        if (item instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
             for (StepEntity boundary : fillArea.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (item instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
             collectStandaloneEdges(fillAreaOccurrence.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             collectMappedAnnotationEdges(
                     annotationSymbol.id(),
                     annotationSymbol.mappingSource().mappedRepresentation(),
@@ -1530,7 +1597,8 @@ public final class PreviewFaceBuilder {
             );
             return;
         }
-        if (item instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             if (!collectMappedAnnotationCarrierEdges(
                     symbolOccurrence.id(),
                     "ANNOTATION_SYMBOL_OCCURRENCE",
@@ -1544,7 +1612,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             if (!collectMappedAnnotationCarrierEdges(
                     subfigureOccurrence.id(),
                     "ANNOTATION_SUBFIGURE_OCCURRENCE",
@@ -1558,7 +1627,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             collectMappedAnnotationEdges(
                     annotationText.id(),
                     annotationText.mappingSource().mappedRepresentation(),
@@ -1572,7 +1642,8 @@ public final class PreviewFaceBuilder {
             );
             return;
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             collectMappedAnnotationEdges(
                     annotationTextCharacter.id(),
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
@@ -1586,7 +1657,8 @@ public final class PreviewFaceBuilder {
             );
             return;
         }
-        if (item instanceof StepDimensionCurve dimensionCurve) {
+        if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1595,7 +1667,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepLeaderCurve leaderCurve) {
+        if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1604,7 +1677,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepProjectionCurve projectionCurve) {
+        if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1613,7 +1687,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1632,7 +1707,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1641,7 +1717,8 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1650,15 +1727,18 @@ public final class PreviewFaceBuilder {
             }
             return;
         }
-        if (item instanceof StepFilletEdge filletEdge) {
+        if (item instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
             collectStandaloneEdges(filletEdge.originalEdge(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepChamferEdge chamferEdge) {
+        if (item instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
             collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepSubedge subedge) {
+        if (item instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) item;
             collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder, metadata);
             return;
         }
@@ -1682,7 +1762,8 @@ public final class PreviewFaceBuilder {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepRepresentation candidate : StepPreviewJsonExporter.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
-                if (item instanceof StepMappedItem mappedItem) {
+                if (item instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) item;
                     geometry = mergeGeometry(
                             geometry,
                             expandMappedItemGeometry(mappedItem, resolved, builder, metadata, visitingRepresentations)
@@ -1702,7 +1783,8 @@ public final class PreviewFaceBuilder {
     ) {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepEntity entity : resolved.values()) {
-            if (!(entity instanceof StepRepresentationRelationshipWithTransformation relationship)) {
+            if (!(entity instanceof StepRepresentationRelationshipWithTransformation)) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 continue;
             }
             if (!relationship.rep1().shapeRepresentation()
@@ -1722,10 +1804,10 @@ public final class PreviewFaceBuilder {
             StepMetadataExtractor.DisplayMetadata relationshipMetadata = metadata.forItem(relationship.id());
             List<EdgePayload> edges = source.payload().edges().stream()
                     .map(edge -> StepPreviewJsonExporter.transformMappedEdge(edge, relationship.id(), matrix))
-                    .toList();
+                    .collect(Collectors.toList());
             List<FacePayload> faces = source.payload().faces().stream()
                     .map(face -> StepPreviewJsonExporter.transformMappedFace(face, relationship.id(), matrix, relationshipMetadata))
-                    .toList();
+                    .collect(Collectors.toList());
             geometry = mergeGeometry(geometry, new GeometryCollection(edges, faces, source.unsupportedFaces()));
         }
         return geometry;
@@ -1754,10 +1836,10 @@ public final class PreviewFaceBuilder {
         StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(mappedItem.id());
         List<EdgePayload> edges = source.payload().edges().stream()
                 .map(edge -> StepPreviewJsonExporter.transformMappedEdge(edge, mappedItem.id(), matrix))
-                .toList();
+                .collect(Collectors.toList());
         List<FacePayload> faces = source.payload().faces().stream()
                 .map(face -> StepPreviewJsonExporter.transformMappedFace(face, mappedItem.id(), matrix, itemMetadata))
-                .toList();
+                .collect(Collectors.toList());
         return new GeometryCollection(edges, faces, source.unsupportedFaces());
     }
 
@@ -1796,13 +1878,15 @@ public final class PreviewFaceBuilder {
     // ─── Edge/loop building ──────────────────────────────────────────────
 
     public static List<CartesianPoint> sampleLoop(FaceBound bound) {
-        if (bound.loop() instanceof VertexLoop vertexLoop) {
+        if (bound.loop() instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) bound.loop();
             return List.of(vertexLoop.vertex().point());
         }
-        if (bound.loop() instanceof PolyLoop polyLoop) {
+        if (bound.loop() instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) bound.loop();
             List<CartesianPoint> sampled = new ArrayList<>(polyLoop.points());
-            if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-                sampled.add(sampled.getFirst());
+            if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+                sampled.add(sampled.get(0));
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
@@ -1819,15 +1903,16 @@ public final class PreviewFaceBuilder {
             }
             firstEdge = false;
         }
-        if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-            sampled.add(sampled.getFirst());
+        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+            sampled.add(sampled.get(0));
         }
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
     public static void collectTopologyEdges(Face face, Set<Edge> edges) {
         for (FaceBound bound : face.bounds()) {
-            if (bound.loop() instanceof EdgeLoop edgeLoop) {
+            if (bound.loop() instanceof EdgeLoop) {
+                EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
                 for (OrientedEdge orientedEdge : edgeLoop.edges()) {
                     edges.add(orientedEdge.edge());
                 }
@@ -1840,10 +1925,10 @@ public final class PreviewFaceBuilder {
             return points;
         }
         List<T> reversed = new ArrayList<>(points);
-        if (reversed.getFirst().equals(reversed.getLast())) {
+        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
             T start = reversed.removeLast();
             java.util.Collections.reverse(reversed);
-            reversed.add(reversed.getFirst());
+            reversed.add(reversed.get(0));
             reversed.set(0, start);
             reversed.set(reversed.size() - 1, start);
             return reversed;
@@ -1868,17 +1953,17 @@ public final class PreviewFaceBuilder {
     public static EdgePayload toPolylineEdgePayload(StepPolyline polyline) {
         List<CartesianPoint> points = polyline.points().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
-                .toList();
+                .collect(Collectors.toList());
         return new EdgePayload(polyline.id(), toPointPayloads(points), null);
     }
 
     public static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
         List<CartesianPoint> points = polyLoop.polygon().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
-                .toList();
+                .collect(Collectors.toList());
         List<CartesianPoint> closed = new ArrayList<>(points);
-        if (!closed.isEmpty() && closed.getFirst().distanceTo(closed.getLast()) > 1.0e-9) {
-            closed.add(closed.getFirst());
+        if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
+            closed.add(closed.get(0));
         }
         return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null);
     }
@@ -1886,25 +1971,32 @@ public final class PreviewFaceBuilder {
     // ─── Shell/vertex utilities ──────────────────────────────────────────
 
     public static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell openShell) {
+        if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
             return openShell.faces();
         }
-        if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+        if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
             return surfacedOpenShell.faces();
         }
-        if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+        if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
             return orientedOpenShell.faces();
         }
-        if (entity instanceof StepClosedShell closedShell) {
+        if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
             return closedShell.faces();
         }
-        if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+        if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
             return orientedClosedShell.faces();
         }
-        if (entity instanceof StepConnectedFaceSet connectedFaceSet) {
+        if (entity instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
             return connectedFaceSet.faces();
         }
-        if (entity instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+        if (entity instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
             return connectedFaceSubSet.faces();
         }
         throw new UnsupportedGeometryException(
@@ -1934,7 +2026,8 @@ public final class PreviewFaceBuilder {
     }
 
     public static PointPayload pointPayloadFromVertex(StepEntity vertex) {
-        if (vertex instanceof StepCartesianPoint cp) {
+        if (vertex instanceof StepCartesianPoint) {
+            StepCartesianPoint cp = (StepCartesianPoint) vertex;
             double cx = cp.coordinates().get(0);
             double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
             double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
@@ -2050,11 +2143,13 @@ public final class PreviewFaceBuilder {
     public static StepEntity unwrapStyledItem(StepEntity item) {
         StepEntity current = item;
         while (true) {
-            if (current instanceof StepStyledItem styledItem) {
+            if (current instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) current;
                 current = styledItem.item();
                 continue;
             }
-            if (current instanceof StepOverRidingStyledItem styledItem) {
+            if (current instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) current;
                 current = styledItem.item();
                 continue;
             }
@@ -2107,24 +2202,42 @@ public final class PreviewFaceBuilder {
     }
 
     public static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
-        return switch (surface) {
-            case Plane ignored -> "PLANE";
-            case CylindricalSurface ignored -> "CYLINDRICAL_SURFACE";
-            case ConicalSurface ignored -> "CONICAL_SURFACE";
-            case SphericalSurface ignored -> "SPHERICAL_SURFACE";
-            case ToroidalSurface ignored -> "TOROIDAL_SURFACE";
-            case BSplineSurface3 ignored -> "BSPLINE_SURFACE";
-            case RationalBSplineSurface3 ignored -> "RATIONAL_BSPLINE_SURFACE";
-            case RuledSurface3 ignored -> "RULED_SURFACE";
-            case SurfaceOfRevolution3 ignored -> "SURFACE_OF_REVOLUTION";
-            case OffsetSurface3 ignored -> "OFFSET_SURFACE";
-            case SurfaceOfLinearExtrusion3 ignored -> "SURFACE_OF_LINEAR_EXTRUSION";
-            case SurfaceOfConstantRadius3 ignored -> "SURFACE_OF_CONSTANT_RADIUS";
-            case ParaboloidSurface ignored -> "PARABOLOID_SURFACE";
-            case HyperboloidSurface ignored -> "HYPERBOLOID_SURFACE";
-            case SurfaceOfTranslation3 ignored -> "SURFACE_OF_TRANSLATION";
-            case SurfaceOfProjection3 ignored -> "SURFACE_OF_PROJECTION";
-        };
+            switch (surface) {
+      case Plane __:
+        return "PLANE";
+      case CylindricalSurface __:
+        return "CYLINDRICAL_SURFACE";
+      case ConicalSurface __:
+        return "CONICAL_SURFACE";
+      case SphericalSurface __:
+        return "SPHERICAL_SURFACE";
+      case ToroidalSurface __:
+        return "TOROIDAL_SURFACE";
+      case BSplineSurface3 __:
+        return "BSPLINE_SURFACE";
+      case RationalBSplineSurface3 __:
+        return "RATIONAL_BSPLINE_SURFACE";
+      case RuledSurface3 __:
+        return "RULED_SURFACE";
+      case SurfaceOfRevolution3 __:
+        return "SURFACE_OF_REVOLUTION";
+      case OffsetSurface3 __:
+        return "OFFSET_SURFACE";
+      case SurfaceOfLinearExtrusion3 __:
+        return "SURFACE_OF_LINEAR_EXTRUSION";
+      case SurfaceOfConstantRadius3 __:
+        return "SURFACE_OF_CONSTANT_RADIUS";
+      case ParaboloidSurface __:
+        return "PARABOLOID_SURFACE";
+      case HyperboloidSurface __:
+        return "HYPERBOLOID_SURFACE";
+      case SurfaceOfTranslation3 __:
+        return "SURFACE_OF_TRANSLATION";
+      case SurfaceOfProjection3 __:
+        return "SURFACE_OF_PROJECTION";
+      default:
+        throw new IllegalArgumentException("Unknown value type: " + surface);
+    }
     }
 
     // ─── Local helper methods (copied from StepPreviewJsonExporter) ──────
@@ -2136,7 +2249,7 @@ public final class PreviewFaceBuilder {
     }
 
     private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
-        return points.stream().map(PreviewFaceBuilder::toPointPayload).toList();
+        return points.stream().map(PreviewFaceBuilder::toPointPayload).collect(Collectors.toList());
     }
 
     private static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
@@ -2374,7 +2487,7 @@ public final class PreviewFaceBuilder {
         for (CartesianPoint point : points) {
             double value = toroidalU(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -2392,7 +2505,7 @@ public final class PreviewFaceBuilder {
         for (CartesianPoint point : points) {
             double value = toroidalV(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -2448,7 +2561,7 @@ public final class PreviewFaceBuilder {
         for (CartesianPoint point : points) {
             double angle = cylindricalAngle(placement, point);
             if (!angles.isEmpty()) {
-                double previous = angles.getLast();
+                double previous = angles.get(angles.size() - 1);
                 while (angle - previous > Math.PI) {
                     angle -= Math.PI * 2.0;
                 }
@@ -2556,7 +2669,8 @@ public final class PreviewFaceBuilder {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationSymbol.mappingSource().mappedRepresentation(),
@@ -2570,7 +2684,8 @@ public final class PreviewFaceBuilder {
             );
             return true;
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationText.mappingSource().mappedRepresentation(),
@@ -2584,7 +2699,8 @@ public final class PreviewFaceBuilder {
             );
             return true;
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
@@ -2598,7 +2714,8 @@ public final class PreviewFaceBuilder {
             );
             return true;
         }
-        if (item instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -2609,7 +2726,8 @@ public final class PreviewFaceBuilder {
                     builder
             );
         }
-        if (item instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -2699,7 +2817,7 @@ public final class PreviewFaceBuilder {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null

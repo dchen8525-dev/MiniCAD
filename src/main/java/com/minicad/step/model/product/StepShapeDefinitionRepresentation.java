@@ -3,6 +3,7 @@ package com.minicad.step.model.product;
 import com.minicad.step.model.base.StepEntity;
 
 import com.minicad.step.model.workflow.StepRepresentation;
+import java.util.Objects;
 /**
  * Minimal shape definition representation link.
  *
@@ -10,14 +11,51 @@ import com.minicad.step.model.workflow.StepRepresentation;
  * @param definition referenced product definition shape
  * @param usedRepresentation referenced shape representation
  */
-public record StepShapeDefinitionRepresentation(
-        int id,
-        StepProductDefinitionShape definition,
-        StepRepresentation usedRepresentation
-) implements StepEntity {
+/**
+ * Minimal shape definition representation link.
+ *
+ * @param id STEP instance id
+ * @param definition referenced product definition shape
+ * @param usedRepresentation referenced shape representation
+ */
+public final class StepShapeDefinitionRepresentation implements StepEntity {
+    private final int id;
+    private final StepProductDefinitionShape definition;
+    private final StepRepresentation usedRepresentation;
+
+    public StepShapeDefinitionRepresentation(int id, StepProductDefinitionShape definition, StepRepresentation usedRepresentation) {
+        this.id = id;
+        this.definition = definition;
+        this.usedRepresentation = usedRepresentation;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepProductDefinitionShape getDefinition() {
+        return definition;
+    }
+
+    public StepRepresentation getUsedRepresentation() {
+        return usedRepresentation;
+    }
 
     @Override
-    public String name() {
-        return "";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepShapeDefinitionRepresentation that = (StepShapeDefinitionRepresentation) o;
+        return id == that.id && Objects.equals(definition, that.definition) && Objects.equals(usedRepresentation, that.usedRepresentation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, definition, usedRepresentation);
+    }
+
+    @Override
+    public String toString() {
+        return "StepShapeDefinitionRepresentation{" + "id=" + id + "definition=" + definition + "usedRepresentation=" + usedRepresentation + "}";
     }
 }

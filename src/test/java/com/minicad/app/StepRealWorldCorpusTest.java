@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +31,7 @@ class StepRealWorldCorpusTest {
                     .filter(Files::isRegularFile)
                     .filter(StepRealWorldCorpusTest::isStepFixture)
                     .sorted()
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         for (Path fixture : fixtures) {

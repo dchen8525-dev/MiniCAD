@@ -28,19 +28,24 @@ public final class PreviewEdgeSampler {
     // ─── Main loose edge sampling entry point ─────────────────────────────
 
     public static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepAnnotationFillArea fillArea) {
+        if (item instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
             return sampleAnnotationFillAreaPoints(fillArea, builder);
         }
-        if (item instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (item instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
             return sampleAnnotationFillAreaPoints(fillAreaOccurrence.item(), builder);
         }
-        if (item instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (item instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
             return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
         }
-        if (item instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (item instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
             return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
         }
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             return sampleMappedAnnotationPoints(
                     annotationSymbol.mappingSource().mappedRepresentation(),
                     annotationSymbol.mappingSource().mappedOrigin(),
@@ -48,7 +53,8 @@ public final class PreviewEdgeSampler {
                     builder
             );
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             return sampleMappedAnnotationPoints(
                     annotationText.mappingSource().mappedRepresentation(),
                     annotationText.mappingSource().mappedOrigin(),
@@ -56,7 +62,8 @@ public final class PreviewEdgeSampler {
                     builder
             );
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             return sampleMappedAnnotationPoints(
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
                     annotationTextCharacter.mappingSource().mappedOrigin(),
@@ -64,18 +71,22 @@ public final class PreviewEdgeSampler {
                     builder
             );
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
-            List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
-            if (parentPoints == null) {
-                return null;
+        if (item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            if ("CURVE_REPLICA".equals(replica.entityName())) {
+                List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
+                if (parentPoints == null) {
+                    return null;
+                }
+                List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
+                for (CartesianPoint point : parentPoints) {
+                    transformed.add(transformPoint(point, replica.transformation(), builder));
+                }
+                return List.copyOf(transformed);
             }
-            List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
-            for (CartesianPoint point : parentPoints) {
-                transformed.add(transformPoint(point, replica.transformation(), builder));
-            }
-            return List.copyOf(transformed);
         }
-        if (item instanceof StepOrientedCurve orientedCurve) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
             List<CartesianPoint> points = sampleLooseEdgePoints(orientedCurve.curveElement(), builder);
             if (points == null) {
                 return null;
@@ -87,19 +98,24 @@ public final class PreviewEdgeSampler {
             Collections.reverse(reversed);
             return List.copyOf(reversed);
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return sampleGeometricCollectionPoints(geometricSet.elements(), builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return sampleGeometricCollectionPoints(curveSet.elements(), builder);
         }
-        if (item instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (item instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
             return sampleGeometricCollectionPoints(connectedEdgeSet.edges(), builder);
         }
-        if (item instanceof StepWireShell wireShell) {
+        if (item instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) item;
             return sampleWireShellPoints(wireShell, builder);
         }
-        if (item instanceof StepEdgeWire edgeWire) {
+        if (item instanceof StepEdgeWire) {
+            StepEdgeWire edgeWire = (StepEdgeWire) item;
             return sampleGeometricCollectionPoints(edgeWire.edges(), builder);
         }
         Curve3 curve = curveForLooseEdge(item, builder);
@@ -113,137 +129,181 @@ public final class PreviewEdgeSampler {
 
     public static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
         try {
-            if (item instanceof StepLine line) {
+            if (item instanceof StepLine) {
+                StepLine line = (StepLine) item;
                 return builder.buildLine(line.id());
             }
-            if (item instanceof StepCircle circle) {
+            if (item instanceof StepCircle) {
+                StepCircle circle = (StepCircle) item;
                 return builder.buildCircle(circle.id());
             }
-            if (item instanceof StepEllipse ellipse) {
+            if (item instanceof StepEllipse) {
+                StepEllipse ellipse = (StepEllipse) item;
                 return builder.buildEllipse(ellipse.id());
             }
-            if (item instanceof StepConicCurve conic) {
+            if (item instanceof StepConicCurve) {
+                StepConicCurve conic = (StepConicCurve) item;
                 List<CartesianPoint> points = PreviewCurveEvaluator.sampleConicCurvePoints(conic, builder);
                 return points == null ? null : new Polyline3(points);
             }
-            if (item instanceof StepBezierCurve curve) {
+            if (item instanceof StepBezierCurve) {
+                StepBezierCurve curve = (StepBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepUniformCurve curve) {
+            if (item instanceof StepUniformCurve) {
+                StepUniformCurve curve = (StepUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepQuasiUniformCurve curve) {
+            if (item instanceof StepQuasiUniformCurve) {
+                StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepPiecewiseBezierCurve curve) {
+            if (item instanceof StepPiecewiseBezierCurve) {
+                StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepBSplineCurveWithKnots spline) {
+            if (item instanceof StepBSplineCurveWithKnots) {
+                StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
                 return builder.buildBSplineCurve(spline.id());
             }
-            if (item instanceof StepSurfaceCurve surfaceCurve) {
+            if (item instanceof StepSurfaceCurve) {
+                StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
                 return builder.buildSurfaceCurve(surfaceCurve.id());
             }
-            if (item instanceof StepSeamCurve seamCurve) {
+            if (item instanceof StepSeamCurve) {
+                StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id());
             }
-            if (item instanceof StepTrimmedCurve trimmedCurve) {
+            if (item instanceof StepTrimmedCurve) {
+                StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
                 return builder.buildTrimmedCurve(trimmedCurve.id());
             }
-            if (item instanceof StepPolyline polyline) {
+            if (item instanceof StepPolyline) {
+                StepPolyline polyline = (StepPolyline) item;
                 return builder.buildPolyline(polyline.id());
             }
-            if (item instanceof StepCompositeCurve compositeCurve) {
+            if (item instanceof StepCompositeCurve) {
+                StepCompositeCurve compositeCurve = (StepCompositeCurve) item;
                 return builder.buildCompositeCurve(compositeCurve.id());
             }
-            if (item instanceof StepCompositeCurveOnSurface compositeCurveOnSurface) {
+            if (item instanceof StepCompositeCurveOnSurface) {
+                StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) item;
                 return builder.buildCompositeCurve(compositeCurveOnSurface.id());
             }
-            if (item instanceof StepRationalBSplineCurve spline) {
+            if (item instanceof StepRationalBSplineCurve) {
+                StepRationalBSplineCurve spline = (StepRationalBSplineCurve) item;
                 return builder.buildRationalBSplineCurve(spline.id());
             }
-            if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+            if (item instanceof StepOffsetCurve2D) {
+                StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
                 return PreviewCurveEvaluator.liftCurve2(builder.buildOffsetCurve2(offsetCurve2D.id()));
             }
-            if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+            if (item instanceof StepOffsetCurve3D) {
+                StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
                 return builder.buildOffsetCurve3(offsetCurve3D.id());
             }
-            if (item instanceof StepPcurve pcurve) {
+            if (item instanceof StepPcurve) {
+                StepPcurve pcurve = (StepPcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
-                return built instanceof Curve2 curve2 ? PreviewCurveEvaluator.liftCurve2(curve2) : null;
+                return built instanceof Curve2 ? PreviewCurveEvaluator.liftCurve2((Curve2) built) : null;
             }
-            if (item instanceof StepDegeneratePcurve pcurve) {
+            if (item instanceof StepDegeneratePcurve) {
+                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
-                return built instanceof Curve2 curve2 ? PreviewCurveEvaluator.liftCurve2(curve2) : null;
+                return built instanceof Curve2 ? PreviewCurveEvaluator.liftCurve2((Curve2) built) : null;
             }
-            if (item instanceof StepOrientedCurve orientedCurve) {
+            if (item instanceof StepOrientedCurve) {
+                StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
                 return curveForLooseEdge(orientedCurve.curveElement(), builder);
             }
-            if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+            if (item instanceof StepAnnotationCurveOccurrence) {
+                StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
                 return curveForLooseEdge(occurrence.item(), builder);
             }
-            if (item instanceof StepDimensionCurve dimensionCurve) {
+            if (item instanceof StepDimensionCurve) {
+                StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
                 return curveForLooseEdge(dimensionCurve.item(), builder);
             }
-            if (item instanceof StepLeaderCurve leaderCurve) {
+            if (item instanceof StepLeaderCurve) {
+                StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
                 return curveForLooseEdge(leaderCurve.item(), builder);
             }
-            if (item instanceof StepProjectionCurve projectionCurve) {
+            if (item instanceof StepProjectionCurve) {
+                StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
                 return curveForLooseEdge(projectionCurve.item(), builder);
             }
-            if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            if (item instanceof StepDraughtingAnnotationOccurrence) {
+                StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
                 return curveForLooseEdge(annotationOccurrence.item(), builder);
             }
-            if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+            if (item instanceof StepTerminatorSymbol) {
+                StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
                 return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
             }
-            if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
-                List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
-                return points == null ? null : new Polyline3(points);
+            if (item instanceof StepGeometricReplica) {
+                StepGeometricReplica replica = (StepGeometricReplica) item;
+                if ("CURVE_REPLICA".equals(replica.entityName())) {
+                    List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
+                    return points == null ? null : new Polyline3(points);
+                }
             }
-            if (item instanceof StepIndexedPolyCurve polyCurve) {
+            if (item instanceof StepIndexedPolyCurve) {
+                StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
                 return builder.buildCurveReference3(polyCurve.id());
             }
-            if (item instanceof StepClothoid clothoid) {
+            if (item instanceof StepClothoid) {
+                StepClothoid clothoid = (StepClothoid) item;
                 return builder.buildCurveReference3(clothoid.id());
             }
-            if (item instanceof StepDegenerateCurve degenerate) {
+            if (item instanceof StepDegenerateCurve) {
+                StepDegenerateCurve degenerate = (StepDegenerateCurve) item;
                 return builder.buildCurveReference3(degenerate.id());
             }
-            if (item instanceof StepBSplineCurve bspline) {
+            if (item instanceof StepBSplineCurve) {
+                StepBSplineCurve bspline = (StepBSplineCurve) item;
                 return builder.buildCurveReference3(bspline.id());
             }
-            if (item instanceof StepCompositeCurveOnSurface compositeOnSurface) {
+            if (item instanceof StepCompositeCurveOnSurface) {
+                StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
                 return builder.buildCurveReference3(compositeOnSurface.id());
             }
-            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints splineBreak) {
+            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+                StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) item;
                 return builder.buildBSplineCurveWithBreakpoints(splineBreak.id());
             }
-            if (item instanceof StepLineSegment lineSeg) {
+            if (item instanceof StepLineSegment) {
+                StepLineSegment lineSeg = (StepLineSegment) item;
                 return new Polyline3(List.of(
                         builder.buildPoint(lineSeg.startPoint().id()),
                         builder.buildPoint(lineSeg.endPoint().id())
                 ));
             }
-            if (item instanceof StepEdgeCurve edgeCurve) {
+            if (item instanceof StepEdgeCurve) {
+                StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
                 return builder.buildCurveReference3(edgeCurve.id());
             }
-            if (item instanceof StepSurfacedEdgeCurve surfacedEdge) {
+            if (item instanceof StepSurfacedEdgeCurve) {
+                StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) item;
                 return builder.buildCurveReference3(surfacedEdge.id());
             }
-            if (item instanceof StepCompositeCurveOnSurface3D compositeOnSurface3D) {
+            if (item instanceof StepCompositeCurveOnSurface3D) {
+                StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) item;
                 return builder.buildCurveReference3(compositeOnSurface3D.id());
             }
-            if (item instanceof StepPath path) {
+            if (item instanceof StepPath) {
+                StepPath path = (StepPath) item;
                 return builder.buildPath(path.id());
             }
-            if (item instanceof StepOpenPath openPath) {
+            if (item instanceof StepOpenPath) {
+                StepOpenPath openPath = (StepOpenPath) item;
                 return builder.buildPath(openPath.id());
             }
-            if (item instanceof StepSubpath subpath) {
+            if (item instanceof StepSubpath) {
+                StepSubpath subpath = (StepSubpath) item;
                 return builder.buildPath(subpath.id());
             }
-            if (item instanceof StepSeamCurve seamCurve) {
+            if (item instanceof StepSeamCurve) {
+                StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id()).curve3d();
             }
             if (item instanceof StepCircle2D
@@ -269,10 +329,12 @@ public final class PreviewEdgeSampler {
         } catch (UnsupportedGeometryException | StepResolutionException ex) {
             return null;
         }
-        if (item instanceof StepBoundedCurve bounded) {
+        if (item instanceof StepBoundedCurve) {
+            StepBoundedCurve bounded = (StepBoundedCurve) item;
             return builder.buildCurveReference3(bounded.id());
         }
-        if (item instanceof StepMappedItem mappedItem) {
+        if (item instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) item;
             return curveForLooseEdge(mappedItem.mappingTarget(), builder);
         }
         return null;
@@ -323,7 +385,8 @@ public final class PreviewEdgeSampler {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationSymbol.mappingSource().mappedRepresentation(),
@@ -337,7 +400,8 @@ public final class PreviewEdgeSampler {
             );
             return true;
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationText.mappingSource().mappedRepresentation(),
@@ -351,7 +415,8 @@ public final class PreviewEdgeSampler {
             );
             return true;
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
@@ -365,7 +430,8 @@ public final class PreviewEdgeSampler {
             );
             return true;
         }
-        if (item instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -376,7 +442,8 @@ public final class PreviewEdgeSampler {
                     builder
             );
         }
-        if (item instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -506,7 +573,8 @@ public final class PreviewEdgeSampler {
         if (mappingTarget instanceof StepAxis2Placement3D || mappingTarget instanceof StepAxis2Placement2D) {
             targetPlacement = mappingTarget;
         }
-        if (mappedOrigin instanceof StepRepresentation mappedRep) {
+        if (mappedOrigin instanceof StepRepresentation) {
+            StepRepresentation mappedRep = (StepRepresentation) mappedOrigin;
             for (StepEntity repItem : mappedRep.items()) {
                 if (repItem instanceof StepAxis2Placement3D) {
                     originPlacement = repItem;
@@ -527,10 +595,12 @@ public final class PreviewEdgeSampler {
     // ─── Private helper: matrix for placement entity ──────────────────────
 
     private static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        if (placement instanceof StepAxis2Placement3D placement3D) {
+        if (placement instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
             return StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
         }
-        if (placement instanceof StepAxis2Placement2D placement2D) {
+        if (placement instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
             CartesianPoint origin = pointFromPlacement(placement2D);
             if (origin == null) {
                 return null;

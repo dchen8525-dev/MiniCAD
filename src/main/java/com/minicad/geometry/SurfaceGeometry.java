@@ -6,23 +6,7 @@ import com.minicad.common.Preconditions;
 /**
  * Marker interface for supported face surface geometry.
  */
-public sealed interface SurfaceGeometry permits
-        Plane,
-        OffsetSurface3,
-        CylindricalSurface,
-        ConicalSurface,
-        SphericalSurface,
-        ToroidalSurface,
-        BSplineSurface3,
-        RationalBSplineSurface3,
-        SurfaceOfLinearExtrusion3,
-        SurfaceOfRevolution3,
-        RuledSurface3,
-        SurfaceOfConstantRadius3,
-        ParaboloidSurface,
-        HyperboloidSurface,
-        SurfaceOfTranslation3,
-        SurfaceOfProjection3 {
+public interface SurfaceGeometry {
 
     /**
      * Returns the approximate bounding box of the surface by sampling.

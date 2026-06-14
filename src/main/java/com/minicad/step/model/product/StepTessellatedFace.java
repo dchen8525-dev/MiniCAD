@@ -2,6 +2,7 @@ package com.minicad.step.model.product;
 
 import com.minicad.step.model.base.StepEntity;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Minimal TESSELLATED_FACE.
@@ -11,13 +12,52 @@ import java.util.List;
  * @param name STEP label
  * @param triangles list of triangle entities or vertex references
  */
-public record StepTessellatedFace(
-        int id,
-        String name,
-        List<StepEntity> triangles
-) implements StepEntity {
+/**
+ * Minimal TESSELLATED_FACE.
+ * A face defined by a tessellated (triangulated) surface.
+ *
+ * @param id STEP id
+ * @param name STEP label
+ * @param triangles list of triangle entities or vertex references
+ */
+public final class StepTessellatedFace implements StepEntity {
+    private final int id;
+    private final String name;
+    private final List<StepEntity> triangles;
 
-    public StepTessellatedFace {
-        triangles = List.copyOf(triangles);
+    public StepTessellatedFace(int id, String name, List<StepEntity> triangles) {
+        this.id = id;
+        this.name = name;
+        this.triangles = triangles == null ? null : java.util.List.copyOf(triangles);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StepEntity> getTriangles() {
+        return triangles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepTessellatedFace that = (StepTessellatedFace) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(triangles, that.triangles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, triangles);
+    }
+
+    @Override
+    public String toString() {
+        return "StepTessellatedFace{" + "id=" + id + "name=" + name + "triangles=" + triangles + "}";
     }
 }

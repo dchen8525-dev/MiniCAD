@@ -6,6 +6,7 @@ import com.minicad.common.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Minimal rational tensor-product B-spline surface.
@@ -37,8 +38,8 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         if (uDegree < 1 || vDegree < 1) {
             throw new GeometryException("surface degrees must be at least 1");
         }
-        this.controlPoints = controlPoints.stream().map(List::copyOf).toList();
-        this.weightsData = weightsData.stream().map(List::copyOf).toList();
+        this.controlPoints = controlPoints.stream().map(List::copyOf).collect(Collectors.toList());
+        this.weightsData = weightsData.stream().map(List::copyOf).collect(Collectors.toList());
         this.uMultiplicities = List.copyOf(uMultiplicities);
         this.vMultiplicities = List.copyOf(vMultiplicities);
         this.uKnots = List.copyOf(uKnots);
@@ -46,7 +47,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         if (this.controlPoints.size() < uDegree + 1) {
             throw new GeometryException("U control-point count must be at least degree + 1");
         }
-        int vCount = this.controlPoints.getFirst().size();
+        int vCount = this.controlPoints.get(0).size();
         if (vCount < vDegree + 1) {
             throw new GeometryException("V control-point count must be at least degree + 1");
         }
@@ -112,17 +113,17 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     }
 
     public double vEnd() {
-        return vExpanded().get(controlPoints.getFirst().size());
+        return vExpanded().get(controlPoints.get(0).size());
     }
 
     public CartesianPoint pointAt(double u, double v) {
         List<Double> uExp = uExpanded();
         List<Double> vExp = vExpanded();
         double clampedU = clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
-        double clampedV = clamp(v, vExp.get(vDegree), vExp.get(controlPoints.getFirst().size()));
+        double clampedV = clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
 
         int uCount = controlPoints.size();
-        int vCount = controlPoints.getFirst().size();
+        int vCount = controlPoints.get(0).size();
         int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
         int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
 
@@ -161,7 +162,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         double clampedV = clamp(v, vStart(), vEnd());
 
         int uCount = controlPoints.size();
-        int vCount = controlPoints.getFirst().size();
+        int vCount = controlPoints.get(0).size();
 
         int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
         int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
@@ -324,7 +325,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     private static double basisValue(int i, int degree, double parameter, List<Double> knots) {
         if (degree == 0) {
             if ((parameter >= knots.get(i) && parameter < knots.get(i + 1))
-                    || (Epsilon.equals(parameter, knots.getLast()) && Epsilon.equals(parameter, knots.get(i + 1)))) {
+                    || (Epsilon.equals(parameter, knots.get(knots.size() - 1)) && Epsilon.equals(parameter, knots.get(i + 1)))) {
                 return 1.0;
             }
             return 0.0;

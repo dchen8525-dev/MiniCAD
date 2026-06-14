@@ -3,6 +3,7 @@ package com.minicad.step.model.product;
 import com.minicad.step.model.base.StepEntity;
 
 import com.minicad.step.model.workflow.StepRepresentation;
+import java.util.Objects;
 /**
  * Minimal REPRESENTATION_MAP.
  *
@@ -10,14 +11,51 @@ import com.minicad.step.model.workflow.StepRepresentation;
  * @param mappedOrigin mapped origin placement
  * @param mappedRepresentation mapped representation
  */
-public record StepRepresentationMap(
-        int id,
-        StepEntity mappedOrigin,
-        StepRepresentation mappedRepresentation
-) implements StepEntity {
+/**
+ * Minimal REPRESENTATION_MAP.
+ *
+ * @param id STEP instance id
+ * @param mappedOrigin mapped origin placement
+ * @param mappedRepresentation mapped representation
+ */
+public final class StepRepresentationMap implements StepEntity {
+    private final int id;
+    private final StepEntity mappedOrigin;
+    private final StepRepresentation mappedRepresentation;
+
+    public StepRepresentationMap(int id, StepEntity mappedOrigin, StepRepresentation mappedRepresentation) {
+        this.id = id;
+        this.mappedOrigin = mappedOrigin;
+        this.mappedRepresentation = mappedRepresentation;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepEntity getMappedOrigin() {
+        return mappedOrigin;
+    }
+
+    public StepRepresentation getMappedRepresentation() {
+        return mappedRepresentation;
+    }
 
     @Override
-    public String name() {
-        return "";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepRepresentationMap that = (StepRepresentationMap) o;
+        return id == that.id && Objects.equals(mappedOrigin, that.mappedOrigin) && Objects.equals(mappedRepresentation, that.mappedRepresentation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, mappedOrigin, mappedRepresentation);
+    }
+
+    @Override
+    public String toString() {
+        return "StepRepresentationMap{" + "id=" + id + "mappedOrigin=" + mappedOrigin + "mappedRepresentation=" + mappedRepresentation + "}";
     }
 }

@@ -1,0 +1,529 @@
+// Phase 3: Additional simple entities (auto-generated)
+      registry.put(
+          "ADD_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "ADD_ELEMENT"));
+      registry.put(
+          "ANALYSIS_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "ANALYSIS_ITEM"));
+      registry.put(
+          "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "APPLIED_PRESENTED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "APPLIED_PRESENTED_ITEM"));
+      registry.put(
+          "APPLIED_USAGE_RIGHT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_USAGE_RIGHT"));
+      registry.put(
+          "ASSEMBLY_BOND_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "ASSEMBLY_BOND_DEFINITION"));
+      registry.put(
+          "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE"));
+      registry.put(
+          "ASSEMBLY_GROUP_COMPONENT_DEFINITION_PLACEMENT_LINK",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "ASSEMBLY_GROUP_COMPONENT_DEFINITION_PLACEMENT_LINK"));
+      registry.put(
+          "BREAKDOWN_ELEMENT_REALIZATION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "BREAKDOWN_ELEMENT_REALIZATION"));
+      registry.put(
+          "BREAKDOWN_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BREAKDOWN_ELEMENT_USAGE"));
+      registry.put(
+          "CHANGE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CHANGE_ELEMENT"));
+      registry.put(
+          "CHANGE_ELEMENT_SEQUENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CHANGE_ELEMENT_SEQUENCE"));
+      registry.put(
+          "CHARACTER_GLYPH_FONT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTER_GLYPH_FONT_USAGE"));
+      registry.put(
+          "COLLECTION_VIEW_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COLLECTION_VIEW_DEFINITION"));
+      registry.put(
+          "COMPOSITE_ASSEMBLY_SEQUENCE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COMPOSITE_ASSEMBLY_SEQUENCE_DEFINITION"));
+      registry.put(
+          "CONFIGURABLE_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CONFIGURABLE_ITEM"));
+      registry.put(
+          "CONNECTIVITY_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CONNECTIVITY_DEFINITION"));
+      registry.put(
+          "CONTACT_FEATURE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CONTACT_FEATURE_DEFINITION"));
+      registry.put(
+          "COORDINATES_LIST",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COORDINATES_LIST"));
+      registry.put(
+          "COUNTERBORE_HOLE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COUNTERBORE_HOLE_DEFINITION"));
+      registry.put(
+          "COUNTERBORE_HOLE_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERBORE_HOLE_OCCURRENCE"));
+      registry.put(
+          "COUNTERBORE_HOLE_OCCURRENCE_IN_ASSEMBLY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERBORE_HOLE_OCCURRENCE_IN_ASSEMBLY"));
+      registry.put(
+          "COUNTERDRILL_HOLE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COUNTERDRILL_HOLE_DEFINITION"));
+      registry.put(
+          "COUNTERDRILL_HOLE_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERDRILL_HOLE_OCCURRENCE"));
+      registry.put(
+          "COUNTERDRILL_HOLE_OCCURRENCE_IN_ASSEMBLY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERDRILL_HOLE_OCCURRENCE_IN_ASSEMBLY"));
+      registry.put(
+          "COUNTERSINK_HOLE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "COUNTERSINK_HOLE_DEFINITION"));
+      registry.put(
+          "COUNTERSINK_HOLE_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERSINK_HOLE_OCCURRENCE"));
+      registry.put(
+          "COUNTERSINK_HOLE_OCCURRENCE_IN_ASSEMBLY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COUNTERSINK_HOLE_OCCURRENCE_IN_ASSEMBLY"));
+      registry.put(
+          "CRITERION_REPORT_ITEM_WITH_NUMBER_OF_INSTANCES",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CRITERION_REPORT_ITEM_WITH_NUMBER_OF_INSTANCES"));
+      registry.put(
+          "CRITERION_REPORT_ITEM_WITH_VALUE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CRITERION_REPORT_ITEM_WITH_VALUE"));
+      registry.put(
+          "CROSS_SECTIONAL_ALTERNATIVE_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CROSS_SECTIONAL_ALTERNATIVE_SHAPE_ELEMENT"));
+      registry.put(
+          "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT"));
+      registry.put(
+          "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT_WITH_LACING",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT_WITH_LACING"));
+      registry.put(
+          "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT_WITH_TUBULAR_COVER",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT_WITH_TUBULAR_COVER"));
+      registry.put(
+          "CROSS_SECTIONAL_OCCURRENCE_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CROSS_SECTIONAL_OCCURRENCE_SHAPE_ELEMENT"));
+      registry.put(
+          "CROSS_SECTIONAL_PART_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "CROSS_SECTIONAL_PART_SHAPE_ELEMENT"));
+      registry.put(
+          "DATA_EQUIVALENCE_ASSESSMENT_SPECIFICATION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_EQUIVALENCE_ASSESSMENT_SPECIFICATION"));
+      registry.put(
+          "DATA_EQUIVALENCE_CRITERION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_EQUIVALENCE_CRITERION"));
+      registry.put(
+          "DATA_EQUIVALENCE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DATA_EQUIVALENCE_DEFINITION"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTED_ELEMENT_PAIR",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DATA_EQUIVALENCE_INSPECTED_ELEMENT_PAIR"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_CRITERION_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_EQUIVALENCE_INSPECTION_CRITERION_REPORT"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_CRITERION_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_EQUIVALENCE_INSPECTION_CRITERION_REPORT_ITEM"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_INSTANCE_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DATA_EQUIVALENCE_INSPECTION_INSTANCE_REPORT_ITEM"));
+      registry.put(
+          "DATA_QUALITY_ASSESSMENT_MEASUREMENT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_ASSESSMENT_MEASUREMENT_ASSOCIATION"));
+      registry.put(
+          "DATA_QUALITY_ASSESSMENT_SPECIFICATION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_QUALITY_ASSESSMENT_SPECIFICATION"));
+      registry.put(
+          "DATA_QUALITY_CRITERION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_QUALITY_CRITERION"));
+      registry.put(
+          "DATA_QUALITY_CRITERION_ASSESSMENT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_CRITERION_ASSESSMENT_ASSOCIATION"));
+      registry.put(
+          "DATA_QUALITY_CRITERION_MEASUREMENT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_CRITERION_MEASUREMENT_ASSOCIATION"));
+      registry.put(
+          "DATA_QUALITY_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DATA_QUALITY_DEFINITION"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_CRITERION_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_QUALITY_INSPECTION_CRITERION_REPORT"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_CRITERION_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_QUALITY_INSPECTION_CRITERION_REPORT_ITEM"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM"));
+      registry.put(
+          "DATA_QUALITY_REPORT_MEASUREMENT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_REPORT_MEASUREMENT_ASSOCIATION"));
+      registry.put(
+          "DEFINITIONAL_PRODUCT_DEFINITION_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DEFINITIONAL_PRODUCT_DEFINITION_USAGE"));
+      registry.put(
+          "DELETE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DELETE_ELEMENT"));
+      registry.put(
+          "DEPENDENT_VARIABLE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DEPENDENT_VARIABLE_DEFINITION"));
+      registry.put(
+          "DIFFERENT_NUMBER_OF_TOPOLOGICAL_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DIFFERENT_NUMBER_OF_TOPOLOGICAL_ELEMENTS"));
+      registry.put(
+          "DIFFERENT_NUMBER_OF_TOPOLOGICAL_ELEMENTS_WIREFRAME_MODEL",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DIFFERENT_NUMBER_OF_TOPOLOGICAL_ELEMENTS_WIREFRAME_MODEL"));
+      registry.put(
+          "DOCUMENT_PRODUCT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DOCUMENT_PRODUCT_ASSOCIATION"));
+      registry.put(
+          "DRAWING_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "DRAWING_DEFINITION"));
+      registry.put(
+          "DRAWING_SHEET_REVISION_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DRAWING_SHEET_REVISION_USAGE"));
+      registry.put(
+          "EQUIVALENCE_INSTANCE_REPORT_ITEM_WITH_NOTABLE_INSTANCES",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EQUIVALENCE_INSTANCE_REPORT_ITEM_WITH_NOTABLE_INSTANCES"));
+      registry.put(
+          "EVALUATION_PRODUCT_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EVALUATION_PRODUCT_DEFINITION"));
+      registry.put(
+          "EVENT_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "EVENT_OCCURRENCE"));
+      registry.put(
+          "EXTERNALLY_CONDITIONED_DATA_QUALITY_CRITERION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "EXTERNALLY_CONDITIONED_DATA_QUALITY_CRITERION"));
+      registry.put(
+          "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM"));
+      registry.put(
+          "EXTERNALLY_DEFINED_FEATURE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EXTERNALLY_DEFINED_FEATURE_DEFINITION"));
+      registry.put(
+          "EXTERNALLY_DEFINED_ITEM_WITH_MULTIPLE_REFERENCES",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EXTERNALLY_DEFINED_ITEM_WITH_MULTIPLE_REFERENCES"));
+      registry.put(
+          "EXTERNALLY_LISTED_DATA",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "EXTERNALLY_LISTED_DATA"));
+      registry.put(
+          "FEATURE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "FEATURE_DEFINITION"));
+      registry.put(
+          "FEATURE_DEFINITION_WITH_CONNECTION_AREA",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "FEATURE_DEFINITION_WITH_CONNECTION_AREA"));
+      registry.put(
+          "FIXED_INSTANCE_ATTRIBUTE_SET",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "FIXED_INSTANCE_ATTRIBUTE_SET"));
+      registry.put(
+          "FOUNDED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "FOUNDED_ITEM"));
+      registry.put(
+          "FUNCTIONAL_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "FUNCTIONAL_ELEMENT_USAGE"));
+      registry.put(
+          "GENERIC_PRODUCT_DEFINITION_REFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "GENERIC_PRODUCT_DEFINITION_REFERENCE"));
+      registry.put(
+          "GPS_FILTRATION_SPECIFICATION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "GPS_FILTRATION_SPECIFICATION"));
+      registry.put(
+          "HIDDEN_ELEMENT_OVER_RIDING_STYLED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "HIDDEN_ELEMENT_OVER_RIDING_STYLED_ITEM"));
+      registry.put(
+          "INAPPROPRIATE_ELEMENT_VISIBILITY",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "INAPPROPRIATE_ELEMENT_VISIBILITY"));
+      registry.put(
+          "INCONSISTENT_ELEMENT_REFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "INCONSISTENT_ELEMENT_REFERENCE"));
+      registry.put(
+          "INDIRECTLY_SELECTED_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "INDIRECTLY_SELECTED_ELEMENTS"));
+      registry.put(
+          "INDIRECTLY_SELECTED_SHAPE_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "INDIRECTLY_SELECTED_SHAPE_ELEMENTS"));
+      registry.put(
+          "INFORMATION_USAGE_RIGHT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "INFORMATION_USAGE_RIGHT"));
+      registry.put(
+          "INSTANCE_REPORT_ITEM_WITH_EXTREME_INSTANCES",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "INSTANCE_REPORT_ITEM_WITH_EXTREME_INSTANCES"));
+      registry.put(
+          "MATING_MATERIAL_ITEMS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "MATING_MATERIAL_ITEMS"));
+      registry.put(
+          "MODIFY_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "MODIFY_ELEMENT"));
+      registry.put(
+          "NON_AGREED_ACCURACY_PARAMETER_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "NON_AGREED_ACCURACY_PARAMETER_USAGE"));
+      registry.put(
+          "NON_AGREED_SCALE_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "NON_AGREED_SCALE_USAGE"));
+      registry.put(
+          "PHYSICAL_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PHYSICAL_ELEMENT_USAGE"));
+      registry.put(
+          "PLY_LAMINATE_SEQUENCE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PLY_LAMINATE_SEQUENCE_DEFINITION"));
+      registry.put(
+          "PRESENTED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRESENTED_ITEM"));
+      registry.put(
+          "PROCESS_PRODUCT_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PROCESS_PRODUCT_ASSOCIATION"));
+      registry.put(
+          "PRODUCT_DEFINITION_FORMATION_RESOURCE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_FORMATION_RESOURCE"));
+      registry.put(
+          "PRODUCT_DEFINITION_KINEMATICS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_KINEMATICS"));
+      registry.put(
+          "PRODUCT_DEFINITION_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_DEFINITION_OCCURRENCE"));
+      registry.put(
+          "PRODUCT_DEFINITION_OCCURRENCE_REFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_DEFINITION_OCCURRENCE_REFERENCE"));
+      registry.put(
+          "PRODUCT_DEFINITION_PROCESS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_PROCESS"));
+      registry.put(
+          "PRODUCT_DEFINITION_REFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_REFERENCE"));
+      registry.put(
+          "PRODUCT_DEFINITION_SPECIFIED_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_DEFINITION_SPECIFIED_OCCURRENCE"));
+      registry.put(
+          "PRODUCT_DEFINITION_SUBSTITUTE",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_SUBSTITUTE"));
+      registry.put(
+          "PRODUCT_GROUP_ATTRIBUTE_SET",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PRODUCT_GROUP_ATTRIBUTE_SET"));
+      registry.put(
+          "PRODUCT_SPECIFICATION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "PRODUCT_SPECIFICATION"));
+      registry.put(
+          "PROJECTED_ZONE_DEFINITION_WITH_OFFSET",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PROJECTED_ZONE_DEFINITION_WITH_OFFSET"));
+      registry.put(
+          "RELATIVE_EVENT_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "RELATIVE_EVENT_OCCURRENCE"));
+      registry.put(
+          "REPOSITIONED_TESSELLATED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "REPOSITIONED_TESSELLATED_ITEM"));
+      registry.put(
+          "REP_ITEM_GROUP",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "REP_ITEM_GROUP"));
+      registry.put(
+          "RIGHT_TO_USAGE_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "RIGHT_TO_USAGE_ASSOCIATION"));
+      registry.put(
+          "ROLE_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ROLE_ASSOCIATION"));
+      registry.put(
+          "RULE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "RULE_DEFINITION"));
+      registry.put(
+          "RULE_SET",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "RULE_SET"));
+      registry.put(
+          "RULE_SET_GROUP",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "RULE_SET_GROUP"));
+      registry.put(
+          "RULE_SOFTWARE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "RULE_SOFTWARE_DEFINITION"));
+      registry.put(
+          "SATISFYING_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SATISFYING_ITEM"));
+      registry.put(
+          "SCANNED_DATA_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SCANNED_DATA_ITEM"));
+      registry.put(
+          "SHAPE_DATA_QUALITY_CRITERION",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SHAPE_DATA_QUALITY_CRITERION"));
+      registry.put(
+          "SHAPE_DATA_QUALITY_CRITERION_AND_ACCURACY_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "SHAPE_DATA_QUALITY_CRITERION_AND_ACCURACY_ASSOCIATION"));
+      registry.put(
+          "SHAPE_DATA_QUALITY_INSPECTION_CRITERION_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SHAPE_DATA_QUALITY_INSPECTION_CRITERION_REPORT"));
+      registry.put(
+          "SHAPE_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SHAPE_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM"));
+      registry.put(
+          "SHAPE_FEATURE_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SHAPE_FEATURE_DEFINITION"));
+      registry.put(
+          "SHAPE_INSPECTION_RESULT_ACCURACY_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "SHAPE_INSPECTION_RESULT_ACCURACY_ASSOCIATION"));
+      registry.put(
+          "SMEARED_MATERIAL_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SMEARED_MATERIAL_DEFINITION"));
+      registry.put(
+          "SOLID_WITH_SHAPE_ELEMENT_PATTERN",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SOLID_WITH_SHAPE_ELEMENT_PATTERN"));
+      registry.put(
+          "SPECIFICATION_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SPECIFICATION_DEFINITION"));
+      registry.put(
+          "STYLED_TESSELLATED_ITEM_WITH_COLOURS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "STYLED_TESSELLATED_ITEM_WITH_COLOURS"));
+      registry.put(
+          "SYSTEM_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "SYSTEM_ELEMENT_USAGE"));
+      registry.put(
+          "TESSELLATED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "TESSELLATED_ITEM"));
+      registry.put(
+          "TESSELLATED_STRUCTURED_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "TESSELLATED_STRUCTURED_ITEM"));
+      registry.put(
+          "TWISTED_CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "TWISTED_CROSS_SECTIONAL_GROUP_SHAPE_ELEMENT"));
+      registry.put(
+          "UNUSED_SHAPE_ELEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "UNUSED_SHAPE_ELEMENT"));
+      registry.put(
+          "USER_SELECTED_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "USER_SELECTED_ELEMENTS"));
+      registry.put(
+          "USER_SELECTED_SHAPE_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "USER_SELECTED_SHAPE_ELEMENTS"));
+      registry.put(
+          "WRONG_ELEMENT_NAME",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "WRONG_ELEMENT_NAME"));
+      registry.put(
+          "ZONE_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ZONE_ELEMENT_USAGE"));

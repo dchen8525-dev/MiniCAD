@@ -8,16 +8,15 @@ class UnitExtractorTest {
 
     @Test
     void extractsInchScaleFromConversionBasedLengthUnit() {
-        CompiledStepDocument compiled = CompiledStepDocument.compile("""
-                DATA;
-                #1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);
-                #3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());
-                #4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)
-                    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))
-                    REPRESENTATION_CONTEXT('ID','MODEL'));
-                ENDSEC;
-                """);
+        CompiledStepDocument compiled = CompiledStepDocument.compile(
+        "DATA;\n"
+        + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);\n"
+        + "#3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());\n"
+        + "#4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
+        + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))\n"
+        + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "ENDSEC;"
 
         UnitExtractor.UnitInfo units = UnitExtractor.extract(compiled.resolved());
 
@@ -27,13 +26,12 @@ class UnitExtractorTest {
 
     @Test
     void extractsStandaloneInchScaleFromConversionBasedLengthUnit() {
-        CompiledStepDocument compiled = CompiledStepDocument.compile("""
-                DATA;
-                #1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
-                #2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);
-                #3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());
-                ENDSEC;
-                """);
+        CompiledStepDocument compiled = CompiledStepDocument.compile(
+        "DATA;\n"
+        + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
+        + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);\n"
+        + "#3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());\n"
+        + "ENDSEC;"
 
         UnitExtractor.UnitInfo units = UnitExtractor.extract(compiled.resolved());
 

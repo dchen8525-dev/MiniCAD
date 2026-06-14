@@ -344,6 +344,8 @@ import com.minicad.step.model.unit.StepVolumeUnitWithUnit;
 import com.minicad.step.model.unit.StepAreaUnitWithUnit;
 import com.minicad.step.model.unit.StepMassUnitWithUnit;
 import com.minicad.step.model.unit.StepConversionBasedUnitAndUnit;
+import com.minicad.step.model.unit.StepExternallyDefinedConversionBasedUnit;
+import com.minicad.step.model.unit.StepNonAgreedUnitUsage;
 import com.minicad.step.model.geometry.StepCartesianTransformationOperator;
 import com.minicad.step.model.annotation.StepCurveStyle;
 import com.minicad.step.model.date_time.StepDateAssignment;
@@ -746,6 +748,22 @@ import com.minicad.step.model.geometry.StepPiecewiseBezierCurve2D;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve2D;
 import com.minicad.step.model.geometry.StepDegenerateCurve2D;
 import com.minicad.step.model.validation.StepValidationPropertyRepresentation;
+import com.minicad.step.model.validation.StepA3mEquivalenceAccuracyAssociation;
+import com.minicad.step.model.validation.StepA3mEquivalenceCriterion;
+import com.minicad.step.model.validation.StepA3mInspectedModelAndInspectionResultRelationship;
+import com.minicad.step.model.validation.StepA3maEquivalenceInspectionResult;
+import com.minicad.step.model.validation.StepA3msEquivalenceInspectionResult;
+import com.minicad.step.model.validation.StepDataEquivalenceAssessmentSpecification;
+import com.minicad.step.model.validation.StepDataEquivalenceInspectionCriterionReportItem;
+import com.minicad.step.model.validation.StepDataEquivalenceInspectionInstanceReportItem;
+import com.minicad.step.model.validation.StepDataEquivalenceInspectionRequirement;
+import com.minicad.step.model.validation.StepDataEquivalenceReportRequest;
+import com.minicad.step.model.representation.StepRepresentationItemRelationship;
+import com.minicad.step.model.expression.StepUnaryGenericExpression;
+import com.minicad.step.model.expression.StepBinaryGenericExpression;
+import com.minicad.step.model.expression.StepMultipleArityGenericExpression;
+import com.minicad.step.model.expression.StepSimpleGenericExpression;
+import com.minicad.step.model.misc.StepGenericEntity;
 import com.minicad.step.model.analysis.StepCalculatedGeometricRepresentationItem;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
@@ -1888,7 +1906,7 @@ public final class StepEntityResolver {
       throw new UnsupportedStepEntityException(
           "PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
-    StepEntity item = representation.items().getFirst();
+    StepEntity item = representation.items().get(0);
     if (!isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
           "PCURVE reference_to_curve must contain a supported curve item");
@@ -1914,7 +1932,7 @@ public final class StepEntityResolver {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
-    StepEntity item = representation.items().getFirst();
+    StepEntity item = representation.items().get(0);
     if (!isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_PCURVE reference_to_curve must contain a supported curve item");
@@ -2404,8 +2422,8 @@ public final class StepEntityResolver {
             StepOrientedEdge.class,
             "OPEN_PATH edge list must contain ORIENTED_EDGE references");
     if (!edges.isEmpty()) {
-      StepOrientedEdge first = edges.getFirst();
-      StepOrientedEdge last = edges.getLast();
+      StepOrientedEdge first = edges.get(0);
+      StepOrientedEdge last = edges.get(edges.size() - 1);
       if (orientedEdgeStartId(first) == orientedEdgeEndId(last)) {
         throw new UnsupportedStepEntityException(
             "OPEN_PATH start vertex must differ from end vertex");
@@ -2473,14 +2491,20 @@ public final class StepEntityResolver {
   }
 
   private static List<StepOrientedEdge> pathEdges(StepEntity entity) {
-    return switch (entity) {
-      case StepPath path -> path.edges();
-      case StepOpenPath openPath -> openPath.edges();
-      case StepSubpath subpath -> subpath.edges();
-      case StepOrientedPath orientedPath -> orientedPath.edges();
-      case StepEdgeLoop edgeLoop -> edgeLoop.edges();
-      default -> throw new UnsupportedStepEntityException("entity is not a supported path");
-    };
+        switch (entity) {
+      case StepPath __:
+        return path.edges();
+      case StepOpenPath __:
+        return openPath.edges();
+      case StepSubpath __:
+        return subpath.edges();
+      case StepOrientedPath __:
+        return orientedPath.edges();
+      case StepEdgeLoop __:
+        return edgeLoop.edges();
+      default:
+        throw new IllegalArgumentException("Unknown value type: " + entity);
+    }
   }
 
   StepVertexLoop resolveVertexLoop(StepEntityInstance instance) {
@@ -3766,7 +3790,8 @@ public final class StepEntityResolver {
 
   StepDirection optionalResolveDirection(int id) {
     StepEntity entity = resolve(id);
-    if (entity instanceof StepDirection direction) {
+    if (entity instanceof StepDirection) {
+            StepDirection direction = (StepDirection) entity;
       return direction;
     }
     return null;
@@ -3774,7 +3799,8 @@ public final class StepEntityResolver {
 
   StepCartesianPoint optionalResolveCartesianPoint(int id) {
     StepEntity entity = resolve(id);
-    if (entity instanceof StepCartesianPoint point) {
+    if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
       return point;
     }
     return null;
@@ -8694,7 +8720,8 @@ public final class StepEntityResolver {
     requireParameterCount(instance, definition, 2);
     validateNamedUnitDimensions(instance);
     StepEntity conversionFactor = resolve(referenceId(instance, definition, 1));
-    if (!(conversionFactor instanceof StepMeasureWithUnit measureWithUnit)) {
+    if (!(conversionFactor instanceof StepMeasureWithUnit)) {
+            StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) conversionFactor;
       throw new StepResolutionException(
           "CONVERSION_BASED_UNIT conversion_factor must reference MEASURE_WITH_UNIT");
     }
@@ -8743,7 +8770,7 @@ public final class StepEntityResolver {
     }
     StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
     requireParameterCount(instance, definition, 1);
-    StepValue dimensions = unwrapTyped(definition.parameters().getFirst());
+    StepValue dimensions = unwrapTyped(definition.parameters().get(0));
     if (isUnset(dimensions)) {
       return;
     }
@@ -9195,6 +9222,7 @@ public final class StepEntityResolver {
 
   StepProfileDef resolveProfileDefSubtype(StepEntityInstance instance, StepEntityDefinition concrete) {
     return switch (concrete.name()) {
+        // TODO: JDK11 - Convert switch expression above
       case "CIRCLE_PROFILE_DEF" -> resolveCircleProfileDef(instance);
       case "RECTANGLE_PROFILE_DEF" -> resolveRectangleProfileDef(instance);
       case "ARBITRARY_CLOSED_PROFILE_DEF" -> resolveArbitraryClosedProfileDef(instance);
@@ -9858,7 +9886,7 @@ public final class StepEntityResolver {
                             }
                             return style;
                         })
-                .toList());
+                .collect(Collectors.toList()));
   }
 
   StepSurfaceStyleUsage resolveSurfaceStyleUsage(StepEntityInstance instance) {
@@ -10690,7 +10718,7 @@ public final class StepEntityResolver {
     StepValue eqParam = unwrapTyped(definition.parameters().get(2));
     if (eqParam instanceof StepValue.ListValue outerList
         && outerList.elements().size() == 1
-        && outerList.elements().getFirst() instanceof StepValue.ListValue innerList) {
+        && outerList.elements().get(0) instanceof StepValue.ListValue innerList) {
       eqParam = innerList;
     }
     List<Double> eqList = extractNumberList(definition, eqParam, "CURVE_2D");
@@ -11192,7 +11220,8 @@ public final class StepEntityResolver {
             instance, definition, 2, "TESSELLATED_FACE_SET coordinates must contain entity references");
     List<StepCartesianPoint> coordinates = new ArrayList<>();
     for (StepEntity entity : coordinateEntities) {
-      if (!(entity instanceof StepCartesianPoint point)) {
+      if (!(entity instanceof StepCartesianPoint)) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
         throw new StepResolutionException(
             "TESSELLATED_FACE_SET coordinates must contain CARTESIAN_POINT entities");
       }
@@ -11345,8 +11374,8 @@ public final class StepEntityResolver {
         || item instanceof StepAnnotationSubfigureOccurrence
         || item instanceof StepDraughtingAnnotationOccurrence
         || item instanceof StepAnnotationPlane
-        || item instanceof StepGeometricReplica replica
-            && "POINT_REPLICA".equals(replica.entityName());
+        || (item instanceof StepGeometricReplica
+            && "POINT_REPLICA".equals(((StepGeometricReplica) item).entityName()));
   }
 
   private boolean isSupportedAnnotationPlaneElement(StepEntity item) {
@@ -11439,8 +11468,8 @@ public final class StepEntityResolver {
   private static boolean isPointLikeSetElement(StepEntity element) {
     return element instanceof StepCartesianPoint
         || element instanceof StepVertexPoint
-        || element instanceof StepGeometricReplica replica
-            && "POINT_REPLICA".equals(replica.entityName());
+        || (element instanceof StepGeometricReplica
+            && "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName()));
   }
 
   StepPointSet resolvePointSet(StepEntityInstance instance) {
@@ -11499,8 +11528,8 @@ public final class StepEntityResolver {
           && !(content instanceof StepCartesianPoint)
           && !(content instanceof StepVertexPoint)
           && !isSupportedCurveReference(content)
-          && !(content instanceof StepGeometricReplica replica
-              && "POINT_REPLICA".equals(replica.entityName()))
+          && !(content instanceof StepGeometricReplica
+              && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName()))
           && !(content instanceof StepEdgeCurve)
           && !(content instanceof StepSubedge)
           && !(content instanceof StepOrientedEdge)
@@ -12050,6 +12079,7 @@ public final class StepEntityResolver {
   private boolean booleanValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     return switch (enumValue(instance, definition, index)) {
+        // TODO: JDK11 - Convert switch expression above
       case "T" -> true;
       case "F" -> false;
       default ->
@@ -12097,7 +12127,7 @@ public final class StepEntityResolver {
     }
     return listValue.elements().stream()
         .map(v -> numberValueFrom(instance, v, definition, index))
-        .toList();
+        .collect(Collectors.toList());
   }
 
   private double numberValueFrom(
@@ -12337,20 +12367,24 @@ public final class StepEntityResolver {
   }
 
   private String literalText(StepValue value) {
-    return switch (value) {
-      case StepValue.StringValue stringValue -> stringValue.value();
-      case StepValue.NumberValue numberValue -> numberValue.raw();
-      case StepValue.EnumValue enumValue -> "." + enumValue.value() + ".";
-      case StepValue.ReferenceValue referenceValue -> "#" + referenceValue.id();
-      case StepValue.OmittedValue ignored -> "$";
-      case StepValue.NotProvidedValue ignored -> "*";
-      case StepValue.ListValue listValue ->
-          listValue.elements().stream()
-              .map(this::literalText)
-              .collect(Collectors.joining(",", "(", ")"));
-      case StepValue.TypedValue typedValue ->
-          typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
-    };
+        switch (value) {
+      case StepValue.StringValue __:
+        return stringValue.value();
+      case StepValue.NumberValue __:
+        return numberValue.raw();
+      case StepValue.EnumValue __:
+        return "." + enumValue.value() + ".";
+      case StepValue.ReferenceValue __:
+        return "#" + referenceValue.id();
+      case StepValue.OmittedValue __:
+        return "$";
+      case StepValue.NotProvidedValue __:
+        return "*";
+      case StepValue.TypedValue __:
+        return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
+      default:
+        throw new IllegalArgumentException();
+    }
   }
 
   <T extends StepEntity> T requireEntity(int id, Class<T> type, String message) {
@@ -12489,8 +12523,8 @@ public final class StepEntityResolver {
         || entity instanceof StepSweptDiskSolid
         || entity instanceof StepCurve2D
         || entity instanceof StepMappedItem
-        || (entity instanceof StepGeometricReplica replica
-            && "CURVE_REPLICA".equals(replica.entityName()));
+        || (entity instanceof StepGeometricReplica
+            && "CURVE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
   }
 
   private boolean isSupportedSurfaceReference(StepEntity entity) {
@@ -12521,8 +12555,8 @@ public final class StepEntityResolver {
         || entity instanceof StepOrientedSurface
         || entity instanceof StepSubface
         || entity instanceof StepMappedItem
-        || (entity instanceof StepGeometricReplica replica
-            && "SURFACE_REPLICA".equals(replica.entityName()));
+        || (entity instanceof StepGeometricReplica
+            && "SURFACE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
   }
 
   private <T extends StepEntity> List<T> referenceList(
@@ -12628,22 +12662,28 @@ public final class StepEntityResolver {
   }
 
   private boolean matchesUnitKind(StepEntity entity, String expectedUnitKind) {
-    if (entity instanceof StepNamedUnit namedUnit) {
+    if (entity instanceof StepNamedUnit) {
+            StepNamedUnit namedUnit = (StepNamedUnit) entity;
       return expectedUnitKind.equals(namedUnit.unitKind());
     }
-    if (entity instanceof StepSiUnit siUnit) {
+    if (entity instanceof StepSiUnit) {
+            StepSiUnit siUnit = (StepSiUnit) entity;
       return expectedUnitKind.equals(siUnit.unitKind());
     }
-    if (entity instanceof StepConversionBasedUnit conversionBasedUnit) {
+    if (entity instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) entity;
       return expectedUnitKind.equals(conversionBasedUnit.unitKind());
     }
-    if (entity instanceof StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset) {
+    if (entity instanceof StepConversionBasedUnitWithOffset) {
+            StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset = (StepConversionBasedUnitWithOffset) entity;
       return expectedUnitKind.equals(conversionBasedUnitWithOffset.unitKind());
     }
-    if (entity instanceof StepContextDependentUnit contextDependentUnit) {
+    if (entity instanceof StepContextDependentUnit) {
+            StepContextDependentUnit contextDependentUnit = (StepContextDependentUnit) entity;
       return expectedUnitKind.equals(contextDependentUnit.unitKind());
     }
-    if (entity instanceof StepDerivedUnit derivedUnit) {
+    if (entity instanceof StepDerivedUnit) {
+            StepDerivedUnit derivedUnit = (StepDerivedUnit) entity;
       return expectedUnitKind.equals(derivedUnit.unitKind());
     }
     return false;
@@ -12718,6 +12758,230 @@ public final class StepEntityResolver {
     return registry;
   }
 
+  // Phase 2: Additional unit resolver methods
+
+  /**
+   * Resolve EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT entity.
+   */
+  StepExternallyDefinedConversionBasedUnit resolveExternallyDefinedConversionBasedUnit(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT");
+    requireParameterCount(instance, definition, 2);
+    validateNamedUnitDimensions(instance);
+    StepExternallyDefinedItem item = requireEntity(
+        referenceId(instance, definition, 1),
+        StepExternallyDefinedItem.class,
+        this);
+    return new StepExternallyDefinedConversionBasedUnit(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        deriveUnitKind(instance),
+        item);
+  }
+
+  /**
+   * Resolve NON_AGREED_UNIT_USAGE entity.
+   */
+  StepNonAgreedUnitUsage resolveNonAgreedUnitUsage(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "NON_AGREED_UNIT_USAGE");
+    requireParameterCount(instance, definition, 2);
+    StepEntity unit = resolve(referenceId(instance, definition, 1));
+    String unitName = stringValue(instance, definition, 0);
+    return new StepNonAgreedUnitUsage(
+        instance.id(),
+        unitName,
+        unit);
+  }
+
+  // Phase 2 Batch 2: A3M Validation entities resolver methods
+
+  StepA3mEquivalenceAccuracyAssociation resolveA3mEquivalenceAccuracyAssociation(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "A3M_EQUIVALENCE_ACCURACY_ASSOCIATION");
+    requireParameterCount(instance, definition, 4);
+    String description = optionalStringValue(instance, definition, 2);
+    return new StepA3mEquivalenceAccuracyAssociation(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        description,
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  StepA3mInspectedModelAndInspectionResultRelationship resolveA3mInspectedModelAndInspectionResultRelationship(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "A3M_INSPECTED_MODEL_AND_INSPECTION_RESULT_RELATIONSHIP");
+    requireParameterCount(instance, definition, 2);
+    return new StepA3mInspectedModelAndInspectionResultRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        resolve(referenceId(instance, definition, 2)));
+  }
+
+  StepA3maEquivalenceInspectionResult resolveA3maEquivalenceInspectionResult(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "A3MA_EQUIVALENCE_INSPECTION_RESULT");
+    requireParameterCount(instance, definition, 4);
+    String description = optionalStringValue(instance, definition, 2);
+    return new StepA3maEquivalenceInspectionResult(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        description,
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  StepA3msEquivalenceInspectionResult resolveA3msEquivalenceInspectionResult(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "A3MS_EQUIVALENCE_INSPECTION_RESULT");
+    requireParameterCount(instance, definition, 4);
+    String description = optionalStringValue(instance, definition, 2);
+    return new StepA3msEquivalenceInspectionResult(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        description,
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)));
+  }
+
+  StepA3mEquivalenceCriterion resolveA3mEquivalenceCriterion(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "A3M_EQUIVALENCE_CRITERION");
+    requireParameterCount(instance, definition, 7);
+    return new StepA3mEquivalenceCriterion(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        literalList(instance, definition, 2),
+        literalList(instance, definition, 3),
+        resolve(referenceId(instance, definition, 4)),
+        literalList(instance, definition, 5),
+        literalList(instance, definition, 6));
+  }
+
+  // Phase 2 Batch 2: Helper resolver methods for A3M validation entities
+
+  StepRepresentationItemRelationship resolveRepresentationItemRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    String description = optionalStringValue(instance, definition, 1);
+    return new StepRepresentationItemRelationship(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        description,
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        entityName);
+  }
+
+  StepDataEquivalenceAssessmentSpecification resolveDataEquivalenceAssessmentSpecification(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 3);
+    String description = optionalStringValue(instance, definition, 2);
+    return new StepDataEquivalenceAssessmentSpecification(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        description,
+        entityName);
+  }
+
+  StepDataEquivalenceInspectionCriterionReportItem resolveDataEquivalenceInspectionCriterionReportItem(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    // Note: This entity is subtype of representation_item with additional attributes
+    // We use simplified extraction for now
+    requireParameterCount(instance, definition, 2);
+    return new StepDataEquivalenceInspectionCriterionReportItem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepDataEquivalenceInspectionInstanceReportItem resolveDataEquivalenceInspectionInstanceReportItem(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepDataEquivalenceInspectionInstanceReportItem(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepDataEquivalenceInspectionRequirement resolveDataEquivalenceInspectionRequirement(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepDataEquivalenceInspectionRequirement(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepDataEquivalenceReportRequest resolveDataEquivalenceReportRequest(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepDataEquivalenceReportRequest(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        entityName);
+  }
+
+  // Phase 2 Batch 3: Mathematical function and expression resolver methods
+
+  StepUnaryGenericExpression resolveUnaryGenericExpression(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepUnaryGenericExpression(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepBinaryGenericExpression resolveBinaryGenericExpression(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 3);
+    return new StepBinaryGenericExpression(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        literalList(instance, definition, 1),
+        entityName);
+  }
+
+  StepMultipleArityGenericExpression resolveMultipleArityGenericExpression(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepMultipleArityGenericExpression(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        literalList(instance, definition, 1),
+        entityName);
+  }
+
+  StepSimpleGenericExpression resolveSimpleGenericExpression(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 1);
+    return new StepSimpleGenericExpression(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityName);
+  }
+
   private record ResolvedBSplineCurveData(
       String name,
       int degree,
@@ -12735,5 +12999,106 @@ public final class StepEntityResolver {
       boolean uClosed,
       boolean vClosed,
       boolean selfIntersect) {}
+
+  // Phase 2 Batch 4-10: Generic helper resolver methods for alias families
+
+  StepEntity resolveGenericAssignment(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepEntity resolveGenericRelationship(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 4);
+    String description = optionalStringValue(instance, definition, 1);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        description,
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)),
+        entityName);
+  }
+
+  StepEntity resolveGenericRequirement(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepEntity resolveGenericStatus(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 1);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityName);
+  }
+
+  StepEntity resolveGenericProperty(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepEntity resolveGenericSetup(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
+
+  StepEntity resolveGenericType(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 1);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityName);
+  }
+
+  StepEntity resolveGenericRole(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 1);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        entityName);
+  }
+
+  StepEntity resolveGenericActual(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 2);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        resolve(referenceId(instance, definition, 1)),
+        entityName);
+  }
 
 }

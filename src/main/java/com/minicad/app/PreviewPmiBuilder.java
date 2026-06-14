@@ -105,7 +105,7 @@ public final class PreviewPmiBuilder {
                 "",
                 StepPreviewJsonExporter.toPointPayload(position),
                 List.of(),
-                targets.stream().map(PmiTargetPayload::id).toList(),
+                targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 targets
         );
     }
@@ -250,7 +250,8 @@ public final class PreviewPmiBuilder {
             StepCadBuilder builder
     ) {
         String zoneShape = null;
-        if (zone.form() instanceof StepToleranceZoneForm form) {
+        if (zone.form() instanceof StepToleranceZoneForm) {
+            StepToleranceZoneForm form = (StepToleranceZoneForm) zone.form();
             zoneShape = form.zoneShape();
         }
         CartesianPoint position = pointFromAnnotationPoint(zone.form(), builder);
@@ -319,7 +320,8 @@ public final class PreviewPmiBuilder {
         int pointIndex = 0;
         for (StepEntity element : annotationPlane.elements()) {
             CartesianPoint position = null;
-            if (element instanceof StepGeometricSet geometricSet) {
+            if (element instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) element;
                 position = pointFromGeometricSet(geometricSet, builder);
             }
             if (position == null) {
@@ -378,51 +380,60 @@ public final class PreviewPmiBuilder {
             List<PointPayload> leader,
             StepCadBuilder builder
     ) {
-        if (content instanceof StepGeometricSet geometricSet) {
+        if (content instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) content;
             for (StepEntity element : geometricSet.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepGeometricCurveSet curveSet) {
+        if (content instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) content;
             for (StepEntity element : curveSet.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepPointSet pointSet) {
+        if (content instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) content;
             for (StepEntity point : pointSet.points()) {
                 appendPmiLeader(point, leader, builder);
             }
             return;
         }
-        if (content instanceof StepAnnotationPlaceholderOccurrence placeholderOccurrence) {
+        if (content instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) content;
             appendPmiLeader(placeholderOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationPlane annotationPlane) {
+        if (content instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) content;
             for (StepEntity element : annotationPlane.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepFaceBasedSurfaceModel surfaceModel) {
+        if (content instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) content;
             for (StepEntity faceSet : surfaceModel.faceSets()) {
                 appendPmiLeader(faceSet, leader, builder);
             }
             return;
         }
-        if (content instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (content instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) content;
             for (StepEntity shell : surfaceModel.shells()) {
                 appendPmiLeader(shell, leader, builder);
             }
             return;
         }
-        if (content instanceof StepManifoldSolidBrep solid) {
+        if (content instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) content;
             appendPmiLeader(solid.outer(), leader, builder);
             return;
         }
-        if (content instanceof StepBrepWithVoids solid) {
+        if (content instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) content;
             appendPmiLeader(solid.outer(), leader, builder);
             for (StepEntity voidShell : solid.voids()) {
                 appendPmiLeader(voidShell, leader, builder);
@@ -444,73 +455,87 @@ public final class PreviewPmiBuilder {
             appendPmiLeaderForSolid(content, leader, builder);
             return;
         }
-        if (content instanceof StepAdvancedFace face) {
+        if (content instanceof StepAdvancedFace) {
+            StepAdvancedFace face = (StepAdvancedFace) content;
             for (StepFaceBound bound : face.bounds()) {
                 appendPmiLeader(bound, leader, builder);
             }
             return;
         }
-        if (content instanceof StepFaceSurface face) {
+        if (content instanceof StepFaceSurface) {
+            StepFaceSurface face = (StepFaceSurface) content;
             for (StepFaceBound bound : face.bounds()) {
                 appendPmiLeader(bound, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedFace face) {
+        if (content instanceof StepOrientedFace) {
+            StepOrientedFace face = (StepOrientedFace) content;
             appendPmiLeader(face.faceElement(), leader, builder);
             return;
         }
-        if (content instanceof StepFaceBound faceBound) {
+        if (content instanceof StepFaceBound) {
+            StepFaceBound faceBound = (StepFaceBound) content;
             appendPmiLeader(faceBound.loop(), leader, builder);
             return;
         }
-        if (content instanceof StepOpenShell shell) {
+        if (content instanceof StepOpenShell) {
+            StepOpenShell shell = (StepOpenShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepSurfacedOpenShell shell) {
+        if (content instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedOpenShell shell) {
+        if (content instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell shell = (StepOrientedOpenShell) content;
             appendPmiLeader(shell.openShellElement(), leader, builder);
             return;
         }
-        if (content instanceof StepClosedShell shell) {
+        if (content instanceof StepClosedShell) {
+            StepClosedShell shell = (StepClosedShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedClosedShell shell) {
+        if (content instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell shell = (StepOrientedClosedShell) content;
             appendPmiLeader(shell.closedShellElement(), leader, builder);
             return;
         }
-        if (content instanceof StepConnectedFaceSet faceSet) {
+        if (content instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) content;
             for (StepFaceEntity face : faceSet.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepConnectedFaceSubSet faceSet) {
+        if (content instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) content;
             for (StepFaceEntity face : faceSet.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepAnnotationPointOccurrence pointOccurrence) {
+        if (content instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) content;
             appendPmiLeader(pointOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (content instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) content;
             appendPmiLeader(occurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationFillArea fillArea) {
+        if (content instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) content;
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleAnnotationFillAreaPoints(fillArea, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -519,11 +544,13 @@ public final class PreviewPmiBuilder {
             }
             return;
         }
-        if (content instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (content instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) content;
             appendPmiLeader(fillAreaOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationSymbol annotationSymbol) {
+        if (content instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) content;
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationSymbol, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -532,15 +559,18 @@ public final class PreviewPmiBuilder {
             }
             return;
         }
-        if (content instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (content instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) content;
             appendPmiLeader(symbolOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (content instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) content;
             appendPmiLeader(subfigureOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationText annotationText) {
+        if (content instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) content;
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationText, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -549,7 +579,8 @@ public final class PreviewPmiBuilder {
             }
             return;
         }
-        if (content instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (content instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) content;
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationTextCharacter, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -558,96 +589,116 @@ public final class PreviewPmiBuilder {
             }
             return;
         }
-        if (content instanceof StepDimensionCurve dimensionCurve) {
+        if (content instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) content;
             appendPmiLeader(dimensionCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepLeaderCurve leaderCurve) {
+        if (content instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) content;
             appendPmiLeader(leaderCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepProjectionCurve projectionCurve) {
+        if (content instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) content;
             appendPmiLeader(projectionCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (content instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) content;
             appendPmiLeader(annotationOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (content instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) content;
             appendPmiLeader(terminatorSymbol.annotatedCurve(), leader, builder);
             return;
         }
-        if (content instanceof StepPath path) {
+        if (content instanceof StepPath) {
+            StepPath path = (StepPath) content;
             appendPmiPathLeader(path.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepOpenPath path) {
+        if (content instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) content;
             appendPmiPathLeader(path.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepSubpath subpath) {
+        if (content instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) content;
             appendPmiPathLeader(subpath.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepOrientedPath orientedPath) {
+        if (content instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) content;
             appendPmiPathLeader(orientedPath.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (content instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) content;
             for (StepEntity edge : connectedEdgeSet.edges()) {
                 appendPmiLeader(edge, leader, builder);
             }
             return;
         }
-        if (content instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (content instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) content;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 appendPmiLeader(boundary, leader, builder);
             }
             return;
         }
-        if (content instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (content instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) content;
             for (StepEntity boundary : wireframeModel.boundaries()) {
                 appendPmiLeader(boundary, leader, builder);
             }
             return;
         }
-        if (content instanceof StepWireShell wireShell) {
+        if (content instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) content;
             for (StepLoop loop : wireShell.loops()) {
                 appendPmiLeader(loop, leader, builder);
             }
             return;
         }
-        if (content instanceof StepEdgeLoop edgeLoop) {
+        if (content instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) content;
             appendPmiPathLeader(edgeLoop.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepVertexLoop vertexLoop) {
+        if (content instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) content;
             leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
-        if (content instanceof StepPolyLoop polyLoop) {
+        if (content instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
                 leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
             }
             return;
         }
-        if (content instanceof StepVertexShell vertexShell) {
+        if (content instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) content;
             leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
-        if (content instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+        if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) content;
             CartesianPoint point = pointFromReplica(replica, builder);
             if (point != null) {
                 leader.add(StepPreviewJsonExporter.toPointPayload(point));
             }
             return;
         }
-        if (content instanceof StepCartesianPoint point) {
+        if (content instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) content;
             leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
             return;
         }
-        if (content instanceof StepVertexPoint vertexPoint) {
+        if (content instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) content;
             leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
             return;
         }
@@ -695,17 +746,20 @@ public final class PreviewPmiBuilder {
             List<PointPayload> leader,
             StepCadBuilder builder
     ) {
-        if (loop instanceof EdgeLoop edgeLoop) {
+        if (loop instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) loop;
             for (OrientedEdge edge : edgeLoop.edges()) {
                 appendTopologyEdgeLeader(edge, leader);
             }
             return;
         }
-        if (loop instanceof VertexLoop vertexLoop) {
+        if (loop instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) loop;
             leader.add(StepPreviewJsonExporter.toPointPayload(vertexLoop.vertex().point()));
             return;
         }
-        if (loop instanceof PolyLoop polyLoop) {
+        if (loop instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) loop;
             for (CartesianPoint point : polyLoop.points()) {
                 leader.add(StepPreviewJsonExporter.toPointPayload(point));
             }
@@ -836,133 +890,176 @@ public final class PreviewPmiBuilder {
     }
 
     public static String pmiTargetName(StepEntity target) {
-        if (target instanceof StepFaceEntity face) {
+        if (target instanceof StepFaceEntity) {
+            StepFaceEntity face = (StepFaceEntity) target;
             return StepPreviewJsonExporter.faceDisplayName(face);
         }
-        if (target instanceof StepEdgeCurve edge) {
+        if (target instanceof StepEdgeCurve) {
+            StepEdgeCurve edge = (StepEdgeCurve) target;
             return edge.name();
         }
-        if (target instanceof StepSubedge subedge) {
+        if (target instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) target;
             return subedge.name();
         }
-        if (target instanceof StepOrientedEdge orientedEdge) {
+        if (target instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) target;
             return orientedEdge.name();
         }
-        if (target instanceof StepPath path) {
+        if (target instanceof StepPath) {
+            StepPath path = (StepPath) target;
             return path.name();
         }
-        if (target instanceof StepOpenPath path) {
+        if (target instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) target;
             return path.name();
         }
-        if (target instanceof StepSubpath subpath) {
+        if (target instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) target;
             return subpath.name();
         }
-        if (target instanceof StepOrientedPath orientedPath) {
+        if (target instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) target;
             return orientedPath.name();
         }
-        if (target instanceof StepConnectedEdgeSet edgeSet) {
+        if (target instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) target;
             return edgeSet.name();
         }
-        if (target instanceof StepPointSet pointSet) {
+        if (target instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) target;
             return pointSet.name();
         }
-        if (target instanceof StepAnnotationSymbol annotationSymbol) {
+        if (target instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) target;
             return annotationSymbol.name();
         }
-        if (target instanceof StepAnnotationText annotationText) {
+        if (target instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) target;
             return annotationText.name();
         }
-        if (target instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (target instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) target;
             return annotationTextCharacter.name();
         }
-        if (target instanceof StepAnnotationFillArea fillArea) {
+        if (target instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) target;
             return fillArea.name();
         }
-        if (target instanceof StepGeometricSet geometricSet) {
+        if (target instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) target;
             return geometricSet.name();
         }
-        if (target instanceof StepGeometricCurveSet curveSet) {
+        if (target instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) target;
             return curveSet.name();
         }
-        if (target instanceof StepOpenShell openShell) {
+        if (target instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepSurfacedOpenShell openShell) {
+        if (target instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell openShell = (StepSurfacedOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepOrientedOpenShell openShell) {
+        if (target instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell openShell = (StepOrientedOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepClosedShell closedShell) {
+        if (target instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) target;
             return closedShell.name();
         }
-        if (target instanceof StepOrientedClosedShell closedShell) {
+        if (target instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell closedShell = (StepOrientedClosedShell) target;
             return closedShell.name();
         }
-        if (target instanceof StepWireShell wireShell) {
+        if (target instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) target;
             return wireShell.name();
         }
-        if (target instanceof StepVertexShell vertexShell) {
+        if (target instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) target;
             return vertexShell.name();
         }
-        if (target instanceof StepEdgeLoop edgeLoop) {
+        if (target instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) target;
             return edgeLoop.name();
         }
-        if (target instanceof StepVertexLoop vertexLoop) {
+        if (target instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) target;
             return vertexLoop.name();
         }
-        if (target instanceof StepPolyLoop polyLoop) {
+        if (target instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) target;
             return polyLoop.name();
         }
-        if (target instanceof StepConnectedFaceSet faceSet) {
+        if (target instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) target;
             return faceSet.name();
         }
-        if (target instanceof StepConnectedFaceSubSet faceSet) {
+        if (target instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) target;
             return faceSet.name();
         }
-        if (target instanceof StepFaceBasedSurfaceModel surfaceModel) {
+        if (target instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) target;
             return surfaceModel.name();
         }
-        if (target instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (target instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) target;
             return surfaceModel.name();
         }
-        if (target instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (target instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) target;
             return wireframeModel.name();
         }
-        if (target instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (target instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) target;
             return wireframeModel.name();
         }
-        if (target instanceof StepManifoldSolidBrep solid) {
+        if (target instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) target;
             return solid.name();
         }
-        if (target instanceof StepBrepWithVoids solid) {
+        if (target instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) target;
             return solid.name();
         }
-        if (target instanceof StepSweptAreaSolid solid) {
+        if (target instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid solid = (StepSweptAreaSolid) target;
             return solid.name();
         }
-        if (target instanceof StepSolidReplica solid) {
+        if (target instanceof StepSolidReplica) {
+            StepSolidReplica solid = (StepSolidReplica) target;
             return solid.name();
         }
-        if (target instanceof StepCsgSolid solid) {
+        if (target instanceof StepCsgSolid) {
+            StepCsgSolid solid = (StepCsgSolid) target;
             return solid.name();
         }
-        if (target instanceof StepCsgPrimitive solid) {
+        if (target instanceof StepCsgPrimitive) {
+            StepCsgPrimitive solid = (StepCsgPrimitive) target;
             return solid.name();
         }
-        if (target instanceof StepBooleanResult solid) {
+        if (target instanceof StepBooleanResult) {
+            StepBooleanResult solid = (StepBooleanResult) target;
             return solid.name();
         }
-        if (target instanceof StepBooleanClippingResult solid) {
+        if (target instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult solid = (StepBooleanClippingResult) target;
             return solid.name();
         }
-        if (target instanceof StepSweptDiskSolid solid) {
+        if (target instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid solid = (StepSweptDiskSolid) target;
             return solid.name();
         }
-        if (target instanceof StepComplexClippingResult solid) {
+        if (target instanceof StepComplexClippingResult) {
+            StepComplexClippingResult solid = (StepComplexClippingResult) target;
             return solid.name();
         }
-        if (target instanceof StepRepresentation representation) {
+        if (target instanceof StepRepresentation) {
+            StepRepresentation representation = (StepRepresentation) target;
             return representation.name();
         }
         return "";
@@ -1136,7 +1233,8 @@ public final class PreviewPmiBuilder {
         if (!isSupportedPmiUsageCarrier(identifiedItem)) {
             return;
         }
-        if (definition instanceof StepAnnotationOccurrenceRelationship relationship) {
+        if (definition instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) definition;
             appendPmiTarget(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -1145,7 +1243,8 @@ public final class PreviewPmiBuilder {
                     relationship.entityName(),
                     relationship.id()
             );
-        } else if (definition instanceof StepDraughtingCalloutRelationship relationship) {
+        } else if (definition instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) definition;
             appendPmiTarget(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -1162,22 +1261,28 @@ public final class PreviewPmiBuilder {
     // =========================================================================
 
     public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepCartesianPoint point) {
+        if (item instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) item;
             return StepPreviewJsonExporter.pointFromStep(point);
         }
-        if (item instanceof StepVertexPoint vertexPoint) {
+        if (item instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) item;
             return StepPreviewJsonExporter.pointFromStep(vertexPoint.point());
         }
-        if (item instanceof StepVertexShell vertexShell) {
+        if (item instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) item;
             return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
         }
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             return pointFromPointSet(pointSet, builder);
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return pointFromGeometricSet(geometricSet, builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return pointFromGeometricCurveSet(curveSet, builder);
         }
         if (item instanceof StepAnnotationSymbol
@@ -1196,7 +1301,7 @@ public final class PreviewPmiBuilder {
                 || item instanceof StepAnnotationPlane) {
             return pointFromAnnotationOccurrence(item, builder);
         }
-        if (builder != null && item instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+        if (builder != null && item instanceof StepGeometricReplica && "POINT_REPLICA".equals(replica.entityName())) {
             return pointFromReplica(replica, builder);
         }
         return null;
@@ -1214,41 +1319,54 @@ public final class PreviewPmiBuilder {
         if (sampled == null || sampled.isEmpty()) {
             return null;
         }
-        return sampled.getFirst();
+        return sampled.get(0);
     }
 
     static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
-        return switch (occurrence) {
-            case StepAnnotationPointOccurrence pointOccurrence -> pointFromAnnotationPoint(pointOccurrence.item(), builder);
-            case StepAnnotationCurveOccurrence curveOccurrence -> pointFromCurveCarrier(curveOccurrence.item(), builder);
-            case StepLeaderCurve leaderCurve -> pointFromCurveCarrier(leaderCurve.item(), builder);
-            case StepDimensionCurve dimensionCurve -> pointFromCurveCarrier(dimensionCurve.item(), builder);
-            case StepProjectionCurve projectionCurve -> pointFromCurveCarrier(projectionCurve.item(), builder);
-            case StepAnnotationFillAreaOccurrence fillAreaOccurrence -> pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
-            case StepAnnotationFillArea fillArea -> pointFromAnnotationFillArea(fillArea, builder);
-            case StepAnnotationSymbol annotationSymbol -> pointFromAnnotationSymbol(annotationSymbol);
-            case StepAnnotationSymbolOccurrence symbolOccurrence -> pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
-            case StepAnnotationSubfigureOccurrence subfigureOccurrence -> pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
-            case StepAnnotationPlaceholderOccurrence placeholderOccurrence -> pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
-            case StepAnnotationPlane annotationPlane -> pointFromAnnotationPlane(annotationPlane, builder);
-            case StepAnnotationText annotationText -> pointFromPlacement(annotationText.mappingTarget());
-            case StepAnnotationTextCharacter annotationTextCharacter -> pointFromPlacement(annotationTextCharacter.mappingTarget());
-            case StepAnnotationTextOccurrence textOccurrence -> pointFromAnnotationPoint(textOccurrence.position(), builder);
-            case StepDraughtingAnnotationOccurrence annotationOccurrence -> pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
-            case StepTerminatorSymbol terminatorSymbol -> {
-                CartesianPoint position = pointFromAnnotationOccurrence(terminatorSymbol.item(), builder);
-                if (position == null) {
-                    position = pointFromAnnotationOccurrence(terminatorSymbol.annotatedCurve(), builder);
-                }
-                yield position;
-            }
-            case StepPointSet pointSet -> pointFromPointSet(pointSet, builder);
-            case StepGeometricSet geometricSet -> pointFromGeometricSet(geometricSet, builder);
-            case StepGeometricCurveSet curveSet -> pointFromGeometricCurveSet(curveSet, builder);
-            case StepVertexShell vertexShell -> StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
-            case StepGeometricReplica replica when "POINT_REPLICA".equals(replica.entityName()) -> builder == null ? null : pointFromReplica(replica, builder);
-            default -> null;
-        };
+            switch (occurrence) {
+      case StepAnnotationPointOccurrence __:
+        return pointFromAnnotationPoint(pointOccurrence.item(), builder);
+      case StepAnnotationCurveOccurrence __:
+        return pointFromCurveCarrier(curveOccurrence.item(), builder);
+      case StepLeaderCurve __:
+        return pointFromCurveCarrier(leaderCurve.item(), builder);
+      case StepDimensionCurve __:
+        return pointFromCurveCarrier(dimensionCurve.item(), builder);
+      case StepProjectionCurve __:
+        return pointFromCurveCarrier(projectionCurve.item(), builder);
+      case StepAnnotationFillAreaOccurrence __:
+        return pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+      case StepAnnotationFillArea __:
+        return pointFromAnnotationFillArea(fillArea, builder);
+      case StepAnnotationSymbol __:
+        return pointFromAnnotationSymbol(annotationSymbol);
+      case StepAnnotationSymbolOccurrence __:
+        return pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
+      case StepAnnotationSubfigureOccurrence __:
+        return pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
+      case StepAnnotationPlaceholderOccurrence __:
+        return pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
+      case StepAnnotationPlane __:
+        return pointFromAnnotationPlane(annotationPlane, builder);
+      case StepAnnotationText __:
+        return pointFromPlacement(annotationText.mappingTarget());
+      case StepAnnotationTextCharacter __:
+        return pointFromPlacement(annotationTextCharacter.mappingTarget());
+      case StepAnnotationTextOccurrence __:
+        return pointFromAnnotationPoint(textOccurrence.position(), builder);
+      case StepDraughtingAnnotationOccurrence __:
+        return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
+      case StepPointSet __:
+        return pointFromPointSet(pointSet, builder);
+      case StepGeometricSet __:
+        return pointFromGeometricSet(geometricSet, builder);
+      case StepGeometricCurveSet __:
+        return pointFromGeometricCurveSet(curveSet, builder);
+      case StepVertexShell __:
+        return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
+      default:
+        throw new IllegalArgumentException("Unknown value type: " + occurrence);
+    }
     }
 
     public static CartesianPoint pointFromCurveCarrier(StepEntity item, StepCadBuilder builder) {
@@ -1256,7 +1374,7 @@ public final class PreviewPmiBuilder {
         if (sampled == null || sampled.isEmpty()) {
             return null;
         }
-        return sampled.getFirst();
+        return sampled.get(0);
     }
 
     public static CartesianPoint pointFromGeometricSet(StepGeometricSet geometricSet, StepCadBuilder builder) {
@@ -1297,7 +1415,8 @@ public final class PreviewPmiBuilder {
 
     public static CartesianPoint pointFromAnnotationPlane(StepAnnotationPlane annotationPlane, StepCadBuilder builder) {
         for (StepEntity element : annotationPlane.elements()) {
-            if (element instanceof StepGeometricSet geometricSet) {
+            if (element instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) element;
                 CartesianPoint point = pointFromGeometricSet(geometricSet, builder);
                 if (point != null) {
                     return point;
@@ -1326,16 +1445,20 @@ public final class PreviewPmiBuilder {
     }
 
     public static CartesianPoint pointFromPlaceholderItem(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return pointFromGeometricSet(geometricSet, builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return pointFromGeometricCurveSet(curveSet, builder);
         }
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             return pointFromPointSet(pointSet, builder);
         }
-        if (item instanceof StepAnnotationPlane annotationPlane) {
+        if (item instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
             return pointFromAnnotationPlane(annotationPlane, builder);
         }
         CartesianPoint point = pointFromAnnotationOccurrence(item, builder);
@@ -1350,25 +1473,29 @@ public final class PreviewPmiBuilder {
             List<CartesianPoint> positions,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             for (StepEntity point : pointSet.points()) {
                 collectPlaceholderPositions(point, positions, builder);
             }
             return;
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             for (StepEntity element : geometricSet.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
             return;
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             for (StepEntity element : curveSet.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
             return;
         }
-        if (item instanceof StepAnnotationPlane annotationPlane) {
+        if (item instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
             for (StepEntity element : annotationPlane.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
@@ -1384,10 +1511,12 @@ public final class PreviewPmiBuilder {
     }
 
     public static CartesianPoint pointFromPlacement(StepEntity placement) {
-        if (placement instanceof StepAxis2Placement3D placement3D) {
+        if (placement instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
             return StepPreviewJsonExporter.pointFromStep(placement3D.location());
         }
-        if (placement instanceof StepAxis2Placement2D placement2D) {
+        if (placement instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
             StepCartesianPoint point = placement2D.location();
             return new CartesianPoint(point.coordinates().get(0), point.coordinates().get(1), 0.0);
         }
@@ -1395,10 +1524,12 @@ public final class PreviewPmiBuilder {
     }
 
     public static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
-        if (replica.parent() instanceof StepCartesianPoint point) {
+        if (replica.parent() instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) replica.parent();
             return transformPoint(StepPreviewJsonExporter.pointFromStep(point), replica.transformation(), builder);
         }
-        if (replica.parent() instanceof StepVertexPoint vertexPoint) {
+        if (replica.parent() instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) replica.parent();
             return transformPoint(StepPreviewJsonExporter.pointFromStep(vertexPoint.point()), replica.transformation(), builder);
         }
         return null;
@@ -1476,7 +1607,8 @@ public final class PreviewPmiBuilder {
         StepAnnotationTextOccurrence text = null;
         List<PointPayload> leader = new ArrayList<>();
         for (StepEntity content : callout.contents()) {
-            if (content instanceof StepAnnotationTextOccurrence annotationText) {
+            if (content instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence annotationText = (StepAnnotationTextOccurrence) content;
                 text = annotationText;
             } else {
                 appendPmiLeader(content, leader, builder);
@@ -1494,7 +1626,7 @@ public final class PreviewPmiBuilder {
                 text.text(),
                 StepPreviewJsonExporter.toPointPayload(position),
                 List.copyOf(leader),
-                targets.stream().map(PmiTargetPayload::id).toList(),
+                targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 List.copyOf(targets)
         );
     }

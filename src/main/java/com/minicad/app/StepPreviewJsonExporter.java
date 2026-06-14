@@ -767,7 +767,8 @@ public final class StepPreviewJsonExporter {
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
         List<UnsupportedBooleanPayload> list = new ArrayList<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepBooleanClippingResult clippingResult) {
+            if (entity instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) entity;
                 String reason = unsupportedBooleanReason(builder, clippingResult.id());
                 if (reason != null) {
                     list.add(new UnsupportedBooleanPayload(
@@ -777,7 +778,8 @@ public final class StepPreviewJsonExporter {
                             reason
                     ));
                 }
-            } else if (entity instanceof StepBooleanResult booleanResult) {
+            } else if (entity instanceof StepBooleanResult) {
+            StepBooleanResult booleanResult = (StepBooleanResult) entity;
                 String reason = unsupportedBooleanReason(builder, booleanResult.id());
                 if (reason != null) {
                     list.add(new UnsupportedBooleanPayload(
@@ -861,18 +863,23 @@ public final class StepPreviewJsonExporter {
         // Remove shells that are referenced by B-rep solids to avoid duplicate processing
         for (Integer solidId : solidIds) {
             StepEntity solidEntity = resolved.get(solidId);
-            if (solidEntity instanceof StepManifoldSolidBrep brep) {
+            if (solidEntity instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep brep = (StepManifoldSolidBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepFacettedBrep brep) {
+            } else if (solidEntity instanceof StepFacettedBrep) {
+            StepFacettedBrep brep = (StepFacettedBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepNonManifoldSolidBrep brep) {
+            } else if (solidEntity instanceof StepNonManifoldSolidBrep) {
+            StepNonManifoldSolidBrep brep = (StepNonManifoldSolidBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepAdvancedBrep brep) {
+            } else if (solidEntity instanceof StepAdvancedBrep) {
+            StepAdvancedBrep brep = (StepAdvancedBrep) solidEntity;
                 shellIds.remove(brep.outer().id());
                 for (StepEntity voidShell : brep.voids()) {
                     shellIds.remove(voidShell.id());
                 }
-            } else if (solidEntity instanceof StepBrepWithVoids brep) {
+            } else if (solidEntity instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
                 shellIds.remove(brep.outer().id());
                 for (StepEntity voidShell : brep.voids()) {
                     shellIds.remove(voidShell.id());
@@ -900,13 +907,15 @@ public final class StepPreviewJsonExporter {
 
         for (Integer shellId : shellIds) {
             StepEntity shellEntity = resolved.get(shellId);
-            if (shellEntity instanceof StepTessellatedFaceSet tessellated) {
+            if (shellEntity instanceof StepTessellatedFaceSet) {
+            StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) shellEntity;
                 List<FacePayload> tessFaces = buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
                 faces.addAll(tessFaces);
                 log.debug("stage={} shellId={}, tessellatedFaceCount={}", "geometry_tessellated_shell", shellId, tessFaces.size());
                 continue;
             }
-            if (shellEntity instanceof StepTessellatedFace tessellatedFace) {
+            if (shellEntity instanceof StepTessellatedFace) {
+            StepTessellatedFace tessellatedFace = (StepTessellatedFace) shellEntity;
                 FacePayload payload = buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
                 if (payload != null) {
                     faces.add(payload);
@@ -937,7 +946,8 @@ public final class StepPreviewJsonExporter {
                             processedFaces, faces.size(), unsupportedFaces.size(), uniqueEdgeIds.size());
                 }
                 for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-                    if (bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop) {
+                    if (bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop) {
+                        com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
                         for (StepOrientedEdge edge : edgeLoop.edges()) {
                             uniqueEdgeIds.add(edge.edgeElement().id());
                         }
@@ -1032,11 +1042,13 @@ public final class StepPreviewJsonExporter {
     }
 
     private static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
-        if (item instanceof StepStyledItem styledItem) {
+        if (item instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) item;
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
-        if (item instanceof StepOverRidingStyledItem styledItem) {
+        if (item instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
@@ -1056,7 +1068,8 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepSurfacePatch) {
             return;
         }
-        if (item instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (item instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) item;
             for (StepEntity shell : surfaceModel.shells()) {
                 collectShellLikeIds(shell, shellIds);
             }
@@ -1070,13 +1083,15 @@ public final class StepPreviewJsonExporter {
             shellIds.add(item.id());
             return;
         }
-        if (item instanceof StepManifoldSurfaceModel manifoldModel) {
+        if (item instanceof StepManifoldSurfaceModel) {
+            StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) item;
             for (StepEntity shell : manifoldModel.shells()) {
                 collectShellLikeIds(shell, shellIds);
             }
             return;
         }
-        if (item instanceof StepFaceBasedSurfaceModel faceModel) {
+        if (item instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) item;
             for (StepEntity faceSet : faceModel.faceSets()) {
                 collectShellLikeIds(faceSet, shellIds);
             }
@@ -1090,130 +1105,154 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder,
             StepMetadataExtractor metadata
     ) {
-        if (item instanceof StepStyledItem styledItem) {
+        if (item instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) item;
             collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepOverRidingStyledItem styledItem) {
+        if (item instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
             collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepPolyline polyline) {
+        if (item instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) item;
             edges.putIfAbsent(polyline.id(), toPolylineEdgePayload(polyline));
             return;
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             for (StepEntity element : curveSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             for (StepEntity element : geometricSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (item instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
             for (StepEntity boundary : wireframeModel.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (item instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (item instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
             for (StepEntity edge : connectedEdgeSet.edges()) {
                 collectStandaloneEdges(edge, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeCurve edgeCurve) {
+        if (item instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
             edges.putIfAbsent(edgeCurve.id(), buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepFilletEdge filletEdge) {
+        if (item instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
             edges.putIfAbsent(filletEdge.id(), buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepChamferEdge chamferEdge) {
+        if (item instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
             edges.putIfAbsent(chamferEdge.id(), buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
             return;
         }
-        if (item instanceof StepPath path) {
+        if (item instanceof StepPath) {
+            StepPath path = (StepPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepOpenPath path) {
+        if (item instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepSubpath subpath) {
+        if (item instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) item;
             for (StepOrientedEdge orientedEdge : subpath.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepOrientedPath orientedPath) {
+        if (item instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) item;
             for (StepOrientedEdge orientedEdge : orientedPath.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepWireShell wireShell) {
+        if (item instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) item;
             for (StepEntity loop : wireShell.loops()) {
                 collectStandaloneEdges(loop, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeWire edgeWire) {
+        if (item instanceof StepEdgeWire) {
+            StepEdgeWire edgeWire = (StepEdgeWire) item;
             for (StepEntity edge : edgeWire.edges()) {
                 collectStandaloneEdges(edge, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepGeometricSurfaceSet surfaceSet) {
+        if (item instanceof StepGeometricSurfaceSet) {
+            StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) item;
             for (StepEntity element : surfaceSet.elements()) {
                 collectStandaloneEdges(element, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepEdgeLoop edgeLoop) {
+        if (item instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) item;
             for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                 edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
-        if (item instanceof StepPolyLoop polyLoop) {
+        if (item instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) item;
             edges.putIfAbsent(polyLoop.id(), toPolyLoopEdgePayload(polyLoop));
             return;
         }
         if (item instanceof StepVertexShell || item instanceof com.minicad.step.model.topology.StepVertexLoop) {
             return;
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepAnnotationFillArea fillArea) {
+        if (item instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
             for (StepEntity boundary : fillArea.boundaries()) {
                 collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
             }
             return;
         }
-        if (item instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (item instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
             collectStandaloneEdges(fillAreaOccurrence.item(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             collectMappedAnnotationEdges(
                     annotationSymbol.id(),
                     annotationSymbol.mappingSource().mappedRepresentation(),
@@ -1227,7 +1266,8 @@ public final class StepPreviewJsonExporter {
             );
             return;
         }
-        if (item instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             if (!collectMappedAnnotationCarrierEdges(
                     symbolOccurrence.id(),
                     "ANNOTATION_SYMBOL_OCCURRENCE",
@@ -1241,7 +1281,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             if (!collectMappedAnnotationCarrierEdges(
                     subfigureOccurrence.id(),
                     "ANNOTATION_SUBFIGURE_OCCURRENCE",
@@ -1255,7 +1296,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             collectMappedAnnotationEdges(
                     annotationText.id(),
                     annotationText.mappingSource().mappedRepresentation(),
@@ -1269,7 +1311,8 @@ public final class StepPreviewJsonExporter {
             );
             return;
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             collectMappedAnnotationEdges(
                     annotationTextCharacter.id(),
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
@@ -1283,7 +1326,8 @@ public final class StepPreviewJsonExporter {
             );
             return;
         }
-        if (item instanceof StepDimensionCurve dimensionCurve) {
+        if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1292,7 +1336,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepLeaderCurve leaderCurve) {
+        if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1301,7 +1346,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepProjectionCurve projectionCurve) {
+        if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1310,7 +1356,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1329,7 +1376,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1338,7 +1386,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1347,15 +1396,18 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (item instanceof StepFilletEdge filletEdge) {
+        if (item instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
             collectStandaloneEdges(filletEdge.originalEdge(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepChamferEdge chamferEdge) {
+        if (item instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
             collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder, metadata);
             return;
         }
-        if (item instanceof StepSubedge subedge) {
+        if (item instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) item;
             collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder, metadata);
             return;
         }
@@ -1465,11 +1517,13 @@ public final class StepPreviewJsonExporter {
     private static StepEntity unwrapStyledItem(StepEntity item) {
         StepEntity current = item;
         while (true) {
-            if (current instanceof StepStyledItem styledItem) {
+            if (current instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) current;
                 current = styledItem.item();
                 continue;
             }
-            if (current instanceof StepOverRidingStyledItem styledItem) {
+            if (current instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) current;
                 current = styledItem.item();
                 continue;
             }
@@ -1515,7 +1569,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationSymbol.mappingSource().mappedRepresentation(),
@@ -1529,7 +1584,8 @@ public final class StepPreviewJsonExporter {
             );
             return true;
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationText.mappingSource().mappedRepresentation(),
@@ -1543,7 +1599,8 @@ public final class StepPreviewJsonExporter {
             );
             return true;
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             collectMappedAnnotationEdges(
                     mappedOwnerId,
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
@@ -1557,7 +1614,8 @@ public final class StepPreviewJsonExporter {
             );
             return true;
         }
-        if (item instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -1568,7 +1626,8 @@ public final class StepPreviewJsonExporter {
                     builder
             );
         }
-        if (item instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
                     sourceType,
@@ -1599,10 +1658,12 @@ public final class StepPreviewJsonExporter {
     }
 
     private static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        if (placement instanceof StepAxis2Placement3D placement3D) {
+        if (placement instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
             return StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
         }
-        if (placement instanceof StepAxis2Placement2D placement2D) {
+        if (placement instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
             CartesianPoint origin = pointFromPlacement(placement2D);
             if (origin == null) {
                 return null;
@@ -1631,7 +1692,8 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             PreviewFaceResult base = buildPreviewFaceResult(orientedFace.faceElement(), builder, metadata);
             if (base.face() == null) {
                 return new PreviewFaceResult(
@@ -1670,7 +1732,8 @@ public final class StepPreviewJsonExporter {
                 return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
         }
-        if (previewGeometry instanceof StepCylindricalSurface cylindricalSurface) {
+        if (previewGeometry instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepCylindricalSurface) {
                     FacePayload payload = toCylindricalFacePayload(stepFace, cylindricalSurface, builder, metadata);
@@ -1682,7 +1745,8 @@ public final class StepPreviewJsonExporter {
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
         }
-        if (previewGeometry instanceof StepConicalSurface conicalSurface) {
+        if (previewGeometry instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepConicalSurface) {
                     FacePayload payload = toConicalFacePayload(stepFace, conicalSurface, builder, metadata);
@@ -1701,7 +1765,8 @@ public final class StepPreviewJsonExporter {
             }
             return trimmed;
         }
-        if (previewGeometry instanceof StepRationalBSplineSurface splineSurface) {
+        if (previewGeometry instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) previewGeometry;
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
                 if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
@@ -1762,7 +1827,8 @@ public final class StepPreviewJsonExporter {
             }
             return trimmed;
         }
-        if (previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends toroidalSurfaceWithBends) {
+        if (previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
+            StepToroidalSurfaceWithSpecifiedBends toroidalSurfaceWithBends = (StepToroidalSurfaceWithSpecifiedBends) previewGeometry;
             try {
                 if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
                     FacePayload payload = toToroidalWithSpecifiedBendsFacePayload(stepFace, toroidalSurfaceWithBends, builder, metadata);
@@ -1774,7 +1840,8 @@ public final class StepPreviewJsonExporter {
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
             }
         }
-        if (previewGeometry instanceof StepToroidalSurface toroidalSurface) {
+        if (previewGeometry instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepToroidalSurface) {
                     FacePayload payload = toToroidalFacePayload(stepFace, toroidalSurface, builder, metadata);
@@ -1822,7 +1889,8 @@ public final class StepPreviewJsonExporter {
             }
             return trimmed;
         }
-        if (previewGeometry instanceof StepRuledSurface ruledSurface) {
+        if (previewGeometry instanceof StepRuledSurface) {
+            StepRuledSurface ruledSurface = (StepRuledSurface) previewGeometry;
             try {
                 FacePayload payload = toRuledSurfaceFacePayload(stepFace, ruledSurface, builder, metadata);
                 if (payload != null) {
@@ -1833,7 +1901,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "ruled surface preview failed"));
         }
-        if (previewGeometry instanceof StepSurfaceOfConstantRadius surfaceOfConstantRadius) {
+        if (previewGeometry instanceof StepSurfaceOfConstantRadius) {
+            StepSurfaceOfConstantRadius surfaceOfConstantRadius = (StepSurfaceOfConstantRadius) previewGeometry;
             try {
                 FacePayload payload = toSurfaceOfConstantRadiusFacePayload(stepFace, surfaceOfConstantRadius, builder, metadata);
                 if (payload != null) {
@@ -1844,7 +1913,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
         }
-        if (previewGeometry instanceof StepParaboloidSurface paraboloidSurface) {
+        if (previewGeometry instanceof StepParaboloidSurface) {
+            StepParaboloidSurface paraboloidSurface = (StepParaboloidSurface) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, paraboloidSurface, "PARABOLOID_SURFACE", builder, metadata);
                 if (payload != null) {
@@ -1855,7 +1925,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "paraboloid surface preview failed"));
         }
-        if (previewGeometry instanceof StepHyperboloidSurface hyperboloidSurface) {
+        if (previewGeometry instanceof StepHyperboloidSurface) {
+            StepHyperboloidSurface hyperboloidSurface = (StepHyperboloidSurface) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, hyperboloidSurface, "HYPERBOLOID_SURFACE", builder, metadata);
                 if (payload != null) {
@@ -1866,7 +1937,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "hyperboloid surface preview failed"));
         }
-        if (previewGeometry instanceof StepSurfaceOfTranslation translationSurface) {
+        if (previewGeometry instanceof StepSurfaceOfTranslation) {
+            StepSurfaceOfTranslation translationSurface = (StepSurfaceOfTranslation) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, translationSurface, "SURFACE_OF_TRANSLATION", builder, metadata);
                 if (payload != null) {
@@ -1877,7 +1949,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of translation preview failed"));
         }
-        if (previewGeometry instanceof StepSurfaceOfProjection projectionSurface) {
+        if (previewGeometry instanceof StepSurfaceOfProjection) {
+            StepSurfaceOfProjection projectionSurface = (StepSurfaceOfProjection) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, projectionSurface, "SURFACE_OF_PROJECTION", builder, metadata);
                 if (payload != null) {
@@ -1888,7 +1961,8 @@ public final class StepPreviewJsonExporter {
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of projection preview failed"));
         }
-        if (previewGeometry instanceof StepBlendedSurface blended) {
+        if (previewGeometry instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) previewGeometry;
             // Blended surface: approximate by rendering the primary surface with blend radius as metadata
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, blended.primarySurface(), metadata, builder);
@@ -1901,7 +1975,8 @@ public final class StepPreviewJsonExporter {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
         }
         // Free-form surfaces: try parametric mapping, fall back to sampled tessellation
-        if (previewGeometry instanceof StepFreeFormSurface freeForm) {
+        if (previewGeometry instanceof StepFreeFormSurface) {
+            StepFreeFormSurface freeForm = (StepFreeFormSurface) previewGeometry;
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
                 if (trimmed.face() != null) {
@@ -1926,7 +2001,8 @@ public final class StepPreviewJsonExporter {
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
         }
         // Machined surface: delegate to the underlying face geometry
-        if (previewGeometry instanceof StepMachinedSurface machinedSurface) {
+        if (previewGeometry instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) previewGeometry;
             return buildPreviewFaceResult((StepFaceEntity) machinedSurface.face(), builder, metadata);
         }
         String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
@@ -1939,43 +2015,53 @@ public final class StepPreviewJsonExporter {
     private static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
         StepEntity current = geometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface trimmedSurface) {
+            if (current instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepCurveBoundedSurface boundedSurface) {
+            if (current instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOrientedSurface orientedSurface) {
+            if (current instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof StepOffsetSurface offsetSurface) {
+            if (current instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOffsetSurface2 offsetSurface2) {
+            if (current instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
                 current = offsetSurface2.basisSurface();
                 continue;
             }
-            if (current instanceof StepSurfacePatch surfacePatch) {
+            if (current instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
                 current = surfacePatch.basisSurface();
                 continue;
             }
-            if (current instanceof StepRectangularCompositeSurface compositeSurface) {
+            if (current instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
                 current = compositeSurface.parentSurface();
                 continue;
             }
-            if (current instanceof StepMachinedSurface machinedSurface) {
+            if (current instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
                 current = machinedSurface.face();
                 continue;
             }
-            if (current instanceof StepBlendedSurface blended) {
+            if (current instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) current;
                 current = blended.primarySurface();
                 continue;
             }
-            if (current instanceof StepMappedItem mappedItem) {
+            if (current instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) current;
                 current = mappedItem.mappingTarget();
                 continue;
             }
@@ -1996,35 +2082,46 @@ public final class StepPreviewJsonExporter {
         if (surface == null) {
             return null;
         }
-        if (surface instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (surface instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
             return describeUnsupportedPreviewSurface(trimmedSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepCurveBoundedSurface curveBoundedSurface) {
+        if (surface instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface curveBoundedSurface = (StepCurveBoundedSurface) surface;
             return describeUnsupportedPreviewSurface(curveBoundedSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepOrientedSurface orientedSurface) {
+        if (surface instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
             return describeUnsupportedPreviewSurface(orientedSurface.surfaceElement(), builder);
         }
-        if (surface instanceof StepOffsetSurface offsetSurface) {
+        if (surface instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
             return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
         }
-        if (surface instanceof StepOffsetSurface2 offsetSurface2) {
+        if (surface instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) surface;
             return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
         }
-        if (surface instanceof StepSurfacePatch surfacePatch) {
+        if (surface instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) surface;
             return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
         }
-        if (surface instanceof StepRectangularCompositeSurface compositeSurface) {
+        if (surface instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) surface;
             return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
         }
-        if (surface instanceof StepMachinedSurface machinedSurface) {
+        if (surface instanceof StepMachinedSurface) {
+            StepMachinedSurface machinedSurface = (StepMachinedSurface) surface;
             return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
         }
-        if (surface instanceof StepBlendedSurface blended) {
+        if (surface instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) surface;
             return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
         }
-        if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
-            if (replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation) {
+        if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) surface;
+            if (replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator) {
+                com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
                 double scale = transformation.scale() == null ? 1.0 : transformation.scale();
                 if (Math.abs(scale) <= 1.0e-9) {
                     return "SURFACE_REPLICA zero scale preview is unsupported";
@@ -2069,7 +2166,7 @@ public final class StepPreviewJsonExporter {
         List<UnsupportedFacePayload> unsupportedFaces = new ArrayList<>();
         for (AssemblyRepresentation assemblyRepresentation : graph.representations()) {
             StepEntity entity = resolved.get(assemblyRepresentation.representationId());
-            if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
+            if (entity instanceof StepRepresentation) { StepRepresentation representation = (StepRepresentation) entity;
                 RepresentationBuildResult result = buildRepresentationPayload(
                         representation,
                         assemblyRepresentation.name(),
@@ -2084,7 +2181,7 @@ public final class StepPreviewJsonExporter {
 
         if (representations.isEmpty()) {
             for (StepEntity entity : resolved.values()) {
-                if (entity instanceof StepRepresentation representation && representation.shapeRepresentation()) {
+                if (entity instanceof StepRepresentation) { StepRepresentation representation = (StepRepresentation) entity;
                     RepresentationBuildResult result = buildRepresentationPayload(
                             representation,
                             representation.name(),
@@ -2108,7 +2205,7 @@ public final class StepPreviewJsonExporter {
                     node.parentId(),
                     node.productDefinitionId(),
                     node.occurrenceId(),
-                    node.representationIds().isEmpty() ? null : node.representationIds().getFirst(),
+                    node.representationIds().isEmpty() ? null : node.representationIds().get(0),
                     node.representationIds(),
                     node.label(),
                     node.description(),
@@ -2223,7 +2320,8 @@ public final class StepPreviewJsonExporter {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
-                if (item instanceof StepMappedItem mappedItem) {
+                if (item instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) item;
                     geometry = mergeGeometry(
                             geometry,
                             expandMappedItemGeometry(mappedItem, resolved, builder, metadata, visitingRepresentations)
@@ -2243,7 +2341,8 @@ public final class StepPreviewJsonExporter {
     ) {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepEntity entity : resolved.values()) {
-            if (!(entity instanceof StepRepresentationRelationshipWithTransformation relationship)) {
+            if (!(entity instanceof StepRepresentationRelationshipWithTransformation)) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 continue;
             }
             if (!relationship.rep1().shapeRepresentation()
@@ -2263,10 +2362,10 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata relationshipMetadata = metadata.forItem(relationship.id());
             List<EdgePayload> edges = source.payload().edges().stream()
                     .map(edge -> transformMappedEdge(edge, relationship.id(), matrix))
-                    .toList();
+                    .collect(Collectors.toList());
             List<FacePayload> faces = source.payload().faces().stream()
                     .map(face -> transformMappedFace(face, relationship.id(), matrix, relationshipMetadata))
-                    .toList();
+                    .collect(Collectors.toList());
             geometry = mergeGeometry(geometry, new GeometryCollection(edges, faces, source.unsupportedFaces()));
         }
         return geometry;
@@ -2295,10 +2394,10 @@ public final class StepPreviewJsonExporter {
         StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(mappedItem.id());
         List<EdgePayload> edges = source.payload().edges().stream()
                 .map(edge -> transformMappedEdge(edge, mappedItem.id(), matrix))
-                .toList();
+                .collect(Collectors.toList());
         List<FacePayload> faces = source.payload().faces().stream()
                 .map(face -> transformMappedFace(face, mappedItem.id(), matrix, itemMetadata))
-                .toList();
+                .collect(Collectors.toList());
         return new GeometryCollection(edges, faces, source.unsupportedFaces());
     }
 
@@ -2441,7 +2540,8 @@ public final class StepPreviewJsonExporter {
         }
         ordered.add(current);
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepShapeRepresentationRelationship relationship) {
+            if (entity instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
                 if (!relationship.rep1().shapeRepresentation() || !relationship.rep2().shapeRepresentation()) {
                     continue;
                 }
@@ -2452,7 +2552,8 @@ public final class StepPreviewJsonExporter {
                 }
                 continue;
             }
-            if (entity instanceof StepRepresentationRelationship relationship) {
+            if (entity instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
                 if (!relationship.rep1().shapeRepresentation() || !relationship.rep2().shapeRepresentation()) {
                     continue;
                 }
@@ -2480,7 +2581,8 @@ public final class StepPreviewJsonExporter {
     }
 
     static String faceDisplayName(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             return faceDisplayName(orientedFace.faceElement());
         }
         return stepFace.name();
@@ -2631,8 +2733,8 @@ public final class StepPreviewJsonExporter {
         int unsupported = 0;
         int processed = 0;
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepFaceEntity stepFace
-                    && buildPreviewFaceResult(stepFace, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
+            if (entity instanceof StepFaceEntity
+                    && buildPreviewFaceResult((StepFaceEntity) entity, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
                 unsupported++;
             }
             if (entity instanceof StepFaceEntity) {
@@ -2696,7 +2798,8 @@ public final class StepPreviewJsonExporter {
     ) {
         List<PointPayload> allPoints = new ArrayList<>();
         for (StepEntity triangleRef : tessellatedFace.triangles()) {
-            if (triangleRef instanceof StepTessellatedTriangle triangle) {
+            if (triangleRef instanceof StepTessellatedTriangle) {
+            StepTessellatedTriangle triangle = (StepTessellatedTriangle) triangleRef;
                 PointPayload p1 = pointPayloadFromVertex(triangle.vertex1());
                 PointPayload p2 = pointPayloadFromVertex(triangle.vertex2());
                 PointPayload p3 = pointPayloadFromVertex(triangle.vertex3());
@@ -2739,7 +2842,8 @@ public final class StepPreviewJsonExporter {
     }
 
     private static PointPayload pointPayloadFromVertex(StepEntity vertex) {
-        if (vertex instanceof StepCartesianPoint cp) {
+        if (vertex instanceof StepCartesianPoint) {
+            StepCartesianPoint cp = (StepCartesianPoint) vertex;
             double cx = cp.coordinates().get(0);
             double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
             double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
@@ -2749,25 +2853,32 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell openShell) {
+        if (entity instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) entity;
             return openShell.faces();
         }
-        if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+        if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
             return surfacedOpenShell.faces();
         }
-        if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+        if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
             return orientedOpenShell.faces();
         }
-        if (entity instanceof StepClosedShell closedShell) {
+        if (entity instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) entity;
             return closedShell.faces();
         }
-        if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+        if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
             return orientedClosedShell.faces();
         }
-        if (entity instanceof StepConnectedFaceSet connectedFaceSet) {
+        if (entity instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
             return connectedFaceSet.faces();
         }
-        if (entity instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+        if (entity instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
             return connectedFaceSubSet.faces();
         }
         throw new UnsupportedGeometryException(
@@ -2804,7 +2915,8 @@ public final class StepPreviewJsonExporter {
     ) {
         SurfaceGeometry surface = face.surface();
         boolean sameSense = face.sameSense();
-        if (surface instanceof Plane plane) {
+        if (surface instanceof Plane) {
+            Plane plane = (Plane) surface;
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
                 loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
@@ -2839,7 +2951,8 @@ public final class StepPreviewJsonExporter {
             );
         }
         // Paraboloid surface: parametric payload for viewer rebuild
-        if (surface instanceof ParaboloidSurface paraboloid) {
+        if (surface instanceof ParaboloidSurface) {
+            ParaboloidSurface paraboloid = (ParaboloidSurface) surface;
             Axis2Placement3D pos = paraboloid.position();
             Vector3 normal = surface.normalAt(0.5, 0.5);
             if (!sameSense) {
@@ -2877,7 +2990,8 @@ public final class StepPreviewJsonExporter {
             );
         }
         // Hyperboloid surface: parametric payload for viewer rebuild
-        if (surface instanceof HyperboloidSurface hyperboloid) {
+        if (surface instanceof HyperboloidSurface) {
+            HyperboloidSurface hyperboloid = (HyperboloidSurface) surface;
             Axis2Placement3D pos = hyperboloid.position();
             Vector3 normal = surface.normalAt(0.5, 0.5);
             if (!sameSense) {
@@ -2915,7 +3029,8 @@ public final class StepPreviewJsonExporter {
             );
         }
         // Surface of translation: parametric payload for viewer rebuild
-        if (surface instanceof SurfaceOfTranslation3 translation) {
+        if (surface instanceof SurfaceOfTranslation3) {
+            SurfaceOfTranslation3 translation = (SurfaceOfTranslation3) surface;
             Vector3 dir = translation.direction();
             Vector3 normal = surface.normalAt(0.5, 0.5);
             if (!sameSense) {
@@ -2953,7 +3068,8 @@ public final class StepPreviewJsonExporter {
             );
         }
         // Surface of projection: parametric payload for viewer rebuild
-        if (surface instanceof SurfaceOfProjection3 projection) {
+        if (surface instanceof SurfaceOfProjection3) {
+            SurfaceOfProjection3 projection = (SurfaceOfProjection3) surface;
             Vector3 dir = projection.projectionDirection();
             Vector3 normal = surface.normalAt(0.5, 0.5);
             if (!sameSense) {
@@ -2991,71 +3107,82 @@ public final class StepPreviewJsonExporter {
             );
         }
         // Cylindrical surface: parametric payload
-        if (surface instanceof CylindricalSurface cyl) {
+        if (surface instanceof CylindricalSurface) {
+            CylindricalSurface cyl = (CylindricalSurface) surface;
             Axis2Placement3D pos = cyl.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "CYLINDRICAL_SURFACE", "cylindrical_surface",
                     pos, null, null, cyl.radius(), 0.0, 0.0, face.bounds());
         }
         // Conical surface: parametric payload
-        if (surface instanceof ConicalSurface cone) {
+        if (surface instanceof ConicalSurface) {
+            ConicalSurface cone = (ConicalSurface) surface;
             Axis2Placement3D pos = cone.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "CONICAL_SURFACE", "conical_surface",
                     pos, null, null, cone.radius(), cone.semiAngle(), 0.0, face.bounds());
         }
         // Spherical surface: parametric payload
-        if (surface instanceof SphericalSurface sphere) {
+        if (surface instanceof SphericalSurface) {
+            SphericalSurface sphere = (SphericalSurface) surface;
             Axis2Placement3D pos = sphere.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SPHERICAL_SURFACE", "spherical_surface",
                     pos, null, null, sphere.radius(), 0.0, 0.0, face.bounds());
         }
         // Toroidal surface: parametric payload
-        if (surface instanceof ToroidalSurface torus) {
+        if (surface instanceof ToroidalSurface) {
+            ToroidalSurface torus = (ToroidalSurface) surface;
             Axis2Placement3D pos = torus.position();
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "TOROIDAL_SURFACE", "toroidal_surface",
                     pos, null, null, torus.majorRadius(), torus.minorRadius(), 0.0, face.bounds());
         }
         // B-Spline surface: parametric payload
-        if (surface instanceof BSplineSurface3 bspline) {
+        if (surface instanceof BSplineSurface3) {
+            BSplineSurface3 bspline = (BSplineSurface3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "BSPLINE_SURFACE", "bspline_surface",
                     null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, face.bounds());
         }
         // Rational B-Spline surface: parametric payload
-        if (surface instanceof RationalBSplineSurface3 rational) {
+        if (surface instanceof RationalBSplineSurface3) {
+            RationalBSplineSurface3 rational = (RationalBSplineSurface3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
                     null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of linear extrusion: parametric payload
-        if (surface instanceof SurfaceOfLinearExtrusion3 extrusion) {
+        if (surface instanceof SurfaceOfLinearExtrusion3) {
+            SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
                     null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of revolution: parametric payload
-        if (surface instanceof SurfaceOfRevolution3 revolution) {
+        if (surface instanceof SurfaceOfRevolution3) {
+            SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_REVOLUTION", "surface_of_revolution",
                     null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Ruled surface: parametric payload
-        if (surface instanceof RuledSurface3 ruled) {
+        if (surface instanceof RuledSurface3) {
+            RuledSurface3 ruled = (RuledSurface3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "RULED_SURFACE", "ruled_surface",
                     null, null, null, 0.0, 0.0, 0.0, face.bounds());
         }
         // Surface of constant radius: parametric payload
-        if (surface instanceof SurfaceOfConstantRadius3 constRadius) {
+        if (surface instanceof SurfaceOfConstantRadius3) {
+            SurfaceOfConstantRadius3 constRadius = (SurfaceOfConstantRadius3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
                     null, null, null, constRadius.radius(), 0.0, 0.0, face.bounds());
         }
         // Offset surface: parametric payload
-        if (surface instanceof OffsetSurface3 offset) {
+        if (surface instanceof OffsetSurface3) {
+            OffsetSurface3 offset = (OffsetSurface3) surface;
             return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
                     "OFFSET_SURFACE", "offset_surface",
                     null, null, null, 0.0, offset.distance(), 0.0, face.bounds());
@@ -3171,33 +3298,34 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
 
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop)) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop)) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
         if (outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Line3)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
         }
 
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.getFirst();
-        OrientedEdge upperArc = circleEdges.getLast();
+        OrientedEdge lowerArc = circleEdges.get(0);
+        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
         if (averageAxialHeight(surface, sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface, sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.getLast();
-            upperArc = circleEdges.getFirst();
+            lowerArc = circleEdges.get(circleEdges.size() - 1);
+            upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = sampleOrientedEdge(lowerArc);
@@ -3219,19 +3347,19 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = cylindricalNormal(surface, angles.getFirst(), sameSense);
+        Vector3 startNormal = cylindricalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                toPointPayload(surfacePoint(surface, angles.getFirst(), lowerHeight)),
+                toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "cylindrical_strip",
@@ -3243,8 +3371,8 @@ public final class StepPreviewJsonExporter {
                         null,
                         lowerHeight,
                         upperHeight,
-                        angles.getFirst(),
-                        angles.getLast() - angles.getFirst(),
+                        angles.get(0),
+                        angles.get(angles.size() - 1) - angles.get(0),
                         null,
                         null,
                         null,
@@ -3264,29 +3392,29 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Line3)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
         }
 
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.getFirst();
-        OrientedEdge upperArc = circleEdges.getLast();
+        OrientedEdge lowerArc = circleEdges.get(0);
+        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
         if (averageAxialHeight(surface.position(), sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface.position(), sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.getLast();
-            upperArc = circleEdges.getFirst();
+            lowerArc = circleEdges.get(circleEdges.size() - 1);
+            upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = sampleOrientedEdge(lowerArc);
@@ -3308,19 +3436,19 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = conicalNormal(surface, angles.getFirst(), sameSense);
+        Vector3 startNormal = conicalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                toPointPayload(conicalSurfacePoint(surface, angles.getFirst(), lowerHeight)),
+                toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "conical_strip",
@@ -3332,8 +3460,8 @@ public final class StepPreviewJsonExporter {
                         surface.semiAngle(),
                         lowerHeight,
                         upperHeight,
-                        angles.getFirst(),
-                        angles.getLast() - angles.getFirst(),
+                        angles.get(0),
+                        angles.get(angles.size() - 1) - angles.get(0),
                         null,
                         null,
                         null,
@@ -3353,16 +3481,16 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 4) {
             return null;
         }
@@ -3374,8 +3502,8 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> points = sampleOrientedEdge(edge);
             List<Double> uValues = unwrapToroidalU(surface, points);
             List<Double> vValues = unwrapToroidalV(surface, points);
-            double uRange = Math.abs(uValues.getLast() - uValues.getFirst());
-            double vRange = Math.abs(vValues.getLast() - vValues.getFirst());
+            double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
+            double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
             if (uRange >= vRange) {
                 varyingUEdges.add(edge);
             } else {
@@ -3386,11 +3514,11 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        OrientedEdge lowerVEdge = varyingUEdges.getFirst();
-        OrientedEdge upperVEdge = varyingUEdges.getLast();
+        OrientedEdge lowerVEdge = varyingUEdges.get(0);
+        OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
         if (averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
-            lowerVEdge = varyingUEdges.getLast();
-            upperVEdge = varyingUEdges.getFirst();
+            lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
+            upperVEdge = varyingUEdges.get(0);
         }
 
         List<CartesianPoint> lowerPoints = sampleOrientedEdge(lowerVEdge);
@@ -3407,19 +3535,19 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.getFirst(), lowerV, sameSense);
+        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                toPointPayload(toroidalSurfacePoint(surface, uValues.getFirst(), lowerV)),
+                toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -3431,8 +3559,8 @@ public final class StepPreviewJsonExporter {
                         null,
                         lowerV,
                         upperV,
-                        uValues.getFirst(),
-                        uValues.getLast() - uValues.getFirst(),
+                        uValues.get(0),
+                        uValues.get(uValues.size() - 1) - uValues.get(0),
                         null,
                         null,
                         null,
@@ -3452,16 +3580,16 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
-                .toList();
+                .collect(Collectors.toList());
         if (circleEdges.size() != 4) {
             return null;
         }
@@ -3473,8 +3601,8 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> points = sampleOrientedEdge(edge);
             List<Double> uValues = unwrapToroidalU(surface, points);
             List<Double> vValues = unwrapToroidalV(surface, points);
-            double uRange = Math.abs(uValues.getLast() - uValues.getFirst());
-            double vRange = Math.abs(vValues.getLast() - vValues.getFirst());
+            double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
+            double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
             if (uRange >= vRange) {
                 varyingUEdges.add(edge);
             } else {
@@ -3485,11 +3613,11 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        OrientedEdge lowerVEdge = varyingUEdges.getFirst();
-        OrientedEdge upperVEdge = varyingUEdges.getLast();
+        OrientedEdge lowerVEdge = varyingUEdges.get(0);
+        OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
         if (averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
-            lowerVEdge = varyingUEdges.getLast();
-            upperVEdge = varyingUEdges.getFirst();
+            lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
+            upperVEdge = varyingUEdges.get(0);
         }
 
         List<CartesianPoint> lowerPoints = sampleOrientedEdge(lowerVEdge);
@@ -3506,19 +3634,19 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.getFirst(), lowerV, sameSense);
+        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS",
-                toPointPayload(toroidalSurfacePoint(surface, uValues.getFirst(), lowerV)),
+                toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -3530,8 +3658,8 @@ public final class StepPreviewJsonExporter {
                         null,
                         lowerV,
                         upperV,
-                        uValues.getFirst(),
-                        uValues.getLast() - uValues.getFirst(),
+                        uValues.get(0),
+                        uValues.get(uValues.size() - 1) - uValues.get(0),
                         null,
                         null,
                         null,
@@ -3551,10 +3679,10 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
 
@@ -3587,7 +3715,7 @@ public final class StepPreviewJsonExporter {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3595,25 +3723,32 @@ public final class StepPreviewJsonExporter {
     }
 
     private static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurface splineSurface) {
+        if (geometry instanceof StepBSplineSurface) {
+            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
             return builder.buildGenericBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+            StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
             return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
         }
-        if (geometry instanceof StepBezierSurface splineSurface) {
+        if (geometry instanceof StepBezierSurface) {
+            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
             return builder.buildBezierSurface(splineSurface.id());
         }
-        if (geometry instanceof StepUniformSurface splineSurface) {
+        if (geometry instanceof StepUniformSurface) {
+            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
             return builder.buildUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepQuasiUniformSurface splineSurface) {
+        if (geometry instanceof StepQuasiUniformSurface) {
+            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
             return builder.buildQuasiUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepPiecewiseBezierSurface splineSurface) {
+        if (geometry instanceof StepPiecewiseBezierSurface) {
+            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
         }
         throw new UnsupportedGeometryException(surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
@@ -3621,7 +3756,7 @@ public final class StepPreviewJsonExporter {
 
     private static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
         int uCount = surface.controlPoints().size();
-        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().getFirst().size();
+        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
         if (uCount < 2 || vCount < 2) {
             throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
         }
@@ -3662,7 +3797,7 @@ public final class StepPreviewJsonExporter {
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
         RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(stepSurface.id());
@@ -3688,7 +3823,7 @@ public final class StepPreviewJsonExporter {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3702,10 +3837,10 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.getFirst().outer()) {
+        if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.getFirst().loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
             return null;
         }
         SurfacePatch patch = buildFourSidedPatch(outerLoop);
@@ -3731,7 +3866,7 @@ public final class StepPreviewJsonExporter {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3906,7 +4041,7 @@ public final class StepPreviewJsonExporter {
                 metadata.transparency(),
                 toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.getFirst())))),
+                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -4141,7 +4276,7 @@ public final class StepPreviewJsonExporter {
 
     private static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
         List<PointPayload> triangles = new ArrayList<>();
-        if (grid.size() < 2 || grid.getFirst().size() < 2) {
+        if (grid.size() < 2 || grid.get(0).size() < 2) {
             return List.of();
         }
         for (int u = 0; u + 1 < grid.size(); u++) {
@@ -4193,8 +4328,8 @@ public final class StepPreviewJsonExporter {
                 previous = uv;
             }
             uvPoints = normalizePeriodicLoop(uvPoints, mapper);
-            uvPoints.set(0, uvPoints.getFirst());
-            uvPoints.set(uvPoints.size() - 1, uvPoints.getFirst());
+            uvPoints.set(0, uvPoints.get(0));
+            uvPoints.set(uvPoints.size() - 1, uvPoints.get(0));
             loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(uvPoints)));
         }
         return List.copyOf(loops);
@@ -4242,8 +4377,8 @@ public final class StepPreviewJsonExporter {
                 loopPoints = reverseClosedLoop(loopPoints);
             }
             loopPoints = normalizePeriodicLoop(loopPoints, mapper);
-            if (!sameUv(loopPoints.getFirst(), loopPoints.getLast())) {
-                loopPoints.add(loopPoints.getFirst());
+            if (!sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
+                loopPoints.add(loopPoints.get(0));
             }
             loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
         }
@@ -4274,8 +4409,8 @@ public final class StepPreviewJsonExporter {
             previous = normalizedPoint;
         }
         if (normalized.size() >= 2) {
-            UvPoint first = normalized.getFirst();
-            UvPoint last = normalized.getLast();
+            UvPoint first = normalized.get(0);
+            UvPoint last = normalized.get(normalized.size() - 1);
             double u = last.u();
             double v = last.v();
             if (uPeriod != null) {
@@ -4314,7 +4449,8 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         StepEntity surfaceGeometry = unwrapParametricPreviewSurface(geometry);
-        if (surfaceGeometry instanceof StepPlane stepPlane) {
+        if (surfaceGeometry instanceof StepPlane) {
+            StepPlane stepPlane = (StepPlane) surfaceGeometry;
             Plane plane = builder.buildPlane(stepPlane.id());
             Direction3 normal = plane.normal();
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -4338,7 +4474,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepCylindricalSurface cylindricalSurface) {
+        if (surfaceGeometry instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) surfaceGeometry;
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "cylindrical_strip",
@@ -4361,7 +4498,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepConicalSurface conicalSurface) {
+        if (surfaceGeometry instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) surfaceGeometry;
             ConicalSurface surface = builder.buildConicalSurface(conicalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "conical_strip",
@@ -4384,7 +4522,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepSphericalSurface sphericalSurface) {
+        if (surfaceGeometry instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) surfaceGeometry;
             SphericalSurface surface = builder.buildSphericalSurface(sphericalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "spherical_surface",
@@ -4407,7 +4546,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepToroidalSurface toroidalSurface) {
+        if (surfaceGeometry instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) surfaceGeometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "toroidal_strip",
@@ -4430,7 +4570,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepDegenerateToroidalSurface toroidalSurface) {
+        if (surfaceGeometry instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface toroidalSurface = (StepDegenerateToroidalSurface) surfaceGeometry;
             ToroidalSurface surface = builder.buildDegenerateToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "toroidal_strip",
@@ -4453,7 +4594,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        if (surfaceGeometry instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surfaceGeometry;
             SurfaceOfLinearExtrusion3 surface = builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             Direction3 axis = surface.extrusionVector().normalize();
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -4477,7 +4619,8 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepSurfaceOfRevolution revolutionSurface) {
+        if (surfaceGeometry instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surfaceGeometry;
             SurfaceOfRevolution3 surface = builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "surface_of_revolution",
@@ -4500,13 +4643,14 @@ public final class StepPreviewJsonExporter {
                     null
             ), geometry);
         }
-        if (surfaceGeometry instanceof StepRationalBSplineSurface splineSurface) {
+        if (surfaceGeometry instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) surfaceGeometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
             List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
                     .map(row -> row.stream()
                             .map(point -> List.of(point.x(), point.y(), point.z()))
-                            .toList())
-                    .toList();
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "rational_bspline_surface",
                     null,
@@ -4537,8 +4681,8 @@ public final class StepPreviewJsonExporter {
             List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
                     .map(row -> row.stream()
                             .map(point -> List.of(point.x(), point.y(), point.z()))
-                            .toList())
-                    .toList();
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "bspline_surface",
                     null,
@@ -4578,22 +4722,26 @@ public final class StepPreviewJsonExporter {
         Boolean implicitOuter = null;
         Double transformScale = null;
 
-        if (geometry instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (geometry instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             basisType = surfaceTypeName(trimmedSurface.basisSurface());
             basisStepId = trimmedSurface.basisSurface().id();
             trimU1 = trimmedSurface.u1();
             trimU2 = trimmedSurface.u2();
             trimV1 = trimmedSurface.v1();
             trimV2 = trimmedSurface.v2();
-        } else if (geometry instanceof StepCurveBoundedSurface boundedSurface) {
+        } else if (geometry instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
             basisType = surfaceTypeName(boundedSurface.basisSurface());
             basisStepId = boundedSurface.basisSurface().id();
             implicitOuter = boundedSurface.implicitOuter();
-        } else if (geometry instanceof StepOrientedSurface orientedSurface) {
+        } else if (geometry instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             basisType = surfaceTypeName(orientedSurface.surfaceElement());
             basisStepId = orientedSurface.surfaceElement().id();
             orientation = orientedSurface.orientation();
-        } else if (geometry instanceof StepOffsetSurface offsetSurface) {
+        } else if (geometry instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             basisType = surfaceTypeName(offsetSurface.basisSurface());
             basisStepId = offsetSurface.basisSurface().id();
             offsetDistance = offsetSurface.distance();
@@ -4660,11 +4808,12 @@ public final class StepPreviewJsonExporter {
                 : orientedEdge.edgeElement().start();
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
         StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity> pcurves = switch (associatedSource) {
-            case StepSurfaceCurve surfaceCurve -> matchingPcurves(surfaceCurve.associatedGeometry(), faceGeometry);
-            case StepSeamCurve seamCurve -> matchingPcurves(seamCurve.associatedGeometry(), faceGeometry);
-            default -> List.of();
-        };
+        List<StepEntity>     pcurves = null;
+    switch (associatedSource) {
+        default:
+            pcurves = List.of();
+            break;
+    };
         if (pcurves.isEmpty()) {
             if (shouldFallbackToProjectedEdge(edgeGeometry)) {
                 List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
@@ -4695,7 +4844,8 @@ public final class StepPreviewJsonExporter {
                 unsupportedPcurveCount++;
                 continue;
             }
-            if (built instanceof Line2 line) {
+            if (built instanceof Line2) {
+            Line2 line = (Line2) built;
                 UvPoint start = snapToLine(projectedStart, line);
                 UvPoint end = snapToLine(projectedEnd, line);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -4706,10 +4856,11 @@ public final class StepPreviewJsonExporter {
                 }
                 continue;
             }
-            if (built instanceof BSplineCurve2 spline) {
+            if (built instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) built;
                 List<UvPoint> samples = sampleSplinePcurve(spline, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
+                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -4717,7 +4868,8 @@ public final class StepPreviewJsonExporter {
                 }
                 continue;
             }
-            if (built instanceof Circle2 circle) {
+            if (built instanceof Circle2) {
+            Circle2 circle = (Circle2) built;
                 UvPoint start = snapToCircle(projectedStart, circle);
                 UvPoint end = snapToCircle(projectedEnd, circle);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -4728,7 +4880,8 @@ public final class StepPreviewJsonExporter {
                 }
                 continue;
             }
-            if (built instanceof Ellipse2 ellipse) {
+            if (built instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) built;
                 UvPoint start = snapToEllipse(projectedStart, ellipse);
                 UvPoint end = snapToEllipse(projectedEnd, ellipse);
                 double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
@@ -4739,10 +4892,11 @@ public final class StepPreviewJsonExporter {
                 }
                 continue;
             }
-            if (built instanceof TrimmedCurve2 trimmed) {
+            if (built instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) built;
                 List<UvPoint> samples = sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.getFirst()) + distanceSquared(projectedEnd, samples.getLast());
+                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -4792,11 +4946,16 @@ public final class StepPreviewJsonExporter {
     }
 
     private static boolean shouldFallbackToProjectedEdge(StepEntity edgeGeometry) {
-        return switch (unwrapAssociatedCurveGeometry(edgeGeometry)) {
-            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry().isEmpty();
-            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry().isEmpty();
-            default -> true;
-        };
+        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
+        if (unwrapped instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
+            return surfaceCurve.associatedGeometry().isEmpty();
+        } else if (unwrapped instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
+            return seamCurve.associatedGeometry().isEmpty();
+        } else {
+            return true;
+        }
     }
 
     private static List<CartesianPoint> sampleStepOrientedEdge(
@@ -4819,11 +4978,17 @@ public final class StepPreviewJsonExporter {
     }
 
     private static String associatedGeometrySummary(StepEntity edgeGeometry) {
-        List<StepEntity> associated = switch (unwrapAssociatedCurveGeometry(edgeGeometry)) {
-            case StepSurfaceCurve surfaceCurve -> surfaceCurve.associatedGeometry();
-            case StepSeamCurve seamCurve -> seamCurve.associatedGeometry();
-            default -> List.of();
-        };
+        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
+        List<StepEntity> associated;
+        if (unwrapped instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
+            associated = surfaceCurve.associatedGeometry();
+        } else if (unwrapped instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
+            associated = seamCurve.associatedGeometry();
+        } else {
+            associated = List.of();
+        }
         if (associated.isEmpty()) {
             return "[]";
         }
@@ -4835,7 +5000,8 @@ public final class StepPreviewJsonExporter {
     private static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
         StepEntity current = edgeGeometry;
         for (int depth = 0; depth < 16; depth++) {
-            if (current instanceof StepOrientedCurve orientedCurve) {
+            if (current instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
                 current = orientedCurve.curveElement();
                 continue;
             }
@@ -4843,27 +5009,33 @@ public final class StepPreviewJsonExporter {
                 current = replica.parent();
                 continue;
             }
-            if (current instanceof StepAnnotationCurveOccurrence occurrence) {
+            if (current instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
                 current = occurrence.item();
                 continue;
             }
-            if (current instanceof StepDimensionCurve dimensionCurve) {
+            if (current instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
                 current = dimensionCurve.item();
                 continue;
             }
-            if (current instanceof StepLeaderCurve leaderCurve) {
+            if (current instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
                 current = leaderCurve.item();
                 continue;
             }
-            if (current instanceof StepProjectionCurve projectionCurve) {
+            if (current instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
                 current = projectionCurve.item();
                 continue;
             }
-            if (current instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            if (current instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
                 current = annotationOccurrence.item();
                 continue;
             }
-            if (current instanceof StepTerminatorSymbol terminatorSymbol) {
+            if (current instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
                 current = terminatorSymbol.annotatedCurve();
                 continue;
             }
@@ -4875,10 +5047,12 @@ public final class StepPreviewJsonExporter {
     private static String pcurveBasisSurfaceSummary(List<StepEntity> pcurves) {
         return pcurves.stream()
                 .map(pcurve -> {
-                    if (pcurve instanceof StepPcurve exact) {
+                    if (pcurve instanceof StepPcurve) {
+            StepPcurve exact = (StepPcurve) pcurve;
                         return "#" + exact.id() + "->#" + exact.basisSurface().id();
                     }
-                    if (pcurve instanceof StepDegeneratePcurve degenerate) {
+                    if (pcurve instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve degenerate = (StepDegeneratePcurve) pcurve;
                         return "#" + degenerate.id() + "->#" + degenerate.basisSurface().id();
                     }
                     return "#" + pcurve.id();
@@ -4890,9 +5064,9 @@ public final class StepPreviewJsonExporter {
         Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
         List<StepEntity> matches = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
+            if (associated instanceof StepPcurve if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) { acceptableSurfaceIds.contains(((StepPcurve) associated).basisSurface().id())) { StepPcurve pcurve = (StepPcurve) associated;
                 matches.add(pcurve);
-            } else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
+            } else if (associated instanceof StepDegeneratePcurve } else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {} else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) { acceptableSurfaceIds.contains(((StepDegeneratePcurve) associated).basisSurface().id())) { StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
                 matches.add(pcurve);
             }
         }
@@ -4904,19 +5078,23 @@ public final class StepPreviewJsonExporter {
         StepEntity current = faceGeometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
             ids.add(current.id());
-            if (current instanceof StepRectangularTrimmedSurface trimmedSurface) {
+            if (current instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepCurveBoundedSurface boundedSurface) {
+            if (current instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepOrientedSurface orientedSurface) {
+            if (current instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof StepOffsetSurface offsetSurface) {
+            if (current instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
@@ -5055,19 +5233,24 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
-        if (curve instanceof Line2 line) {
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
             return sampleLinePcurve(line, start, end);
         }
-        if (curve instanceof Circle2 circle) {
+        if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
             return sampleCirclePcurve(circle, start, end);
         }
-        if (curve instanceof Ellipse2 ellipse) {
+        if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
             return sampleEllipsePcurve(ellipse, start, end);
         }
-        if (curve instanceof BSplineCurve2 spline) {
+        if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) curve;
             return sampleSplinePcurve(spline, start, end);
         }
-        if (curve instanceof TrimmedCurve2 trimmed) {
+        if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
             return sampleTrimmedPcurve(trimmed, start, end);
         }
         return List.of();
@@ -5077,7 +5260,7 @@ public final class StepPreviewJsonExporter {
         if (samples.isEmpty()) {
             return Double.POSITIVE_INFINITY;
         }
-        return distanceSquared(start, samples.getFirst()) + distanceSquared(end, samples.getLast());
+        return distanceSquared(start, samples.get(0)) + distanceSquared(end, samples.get(samples.size() - 1));
     }
 
     private static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
@@ -5085,8 +5268,8 @@ public final class StepPreviewJsonExporter {
             return samples;
         }
         List<UvPoint> aligned = new ArrayList<>(samples);
-        double forwardScore = distanceSquared(projectedStart, aligned.getFirst()) + distanceSquared(projectedEnd, aligned.getLast());
-        double reverseScore = distanceSquared(projectedStart, aligned.getLast()) + distanceSquared(projectedEnd, aligned.getFirst());
+        double forwardScore = distanceSquared(projectedStart, aligned.get(0)) + distanceSquared(projectedEnd, aligned.get(aligned.size() - 1));
+        double reverseScore = distanceSquared(projectedStart, aligned.get(aligned.size() - 1)) + distanceSquared(projectedEnd, aligned.get(0));
         if (reverseScore < forwardScore) {
             java.util.Collections.reverse(aligned);
         }
@@ -5162,7 +5345,7 @@ public final class StepPreviewJsonExporter {
         if (outer == null) {
             return List.of();
         }
-        List<ParametricLoopPayload> holes = loops.stream().filter(loop -> !loop.outer()).toList();
+        List<ParametricLoopPayload> holes = loops.stream().filter(loop -> !loop.outer()).collect(Collectors.toList());
         List<PointPayload> triangles = new ArrayList<>();
         for (int ui = 0; ui < uSegments; ui++) {
             double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
@@ -5315,13 +5498,16 @@ public final class StepPreviewJsonExporter {
     }
 
     private static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (geometry instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             return mapperForSurface(trimmedSurface.basisSurface(), builder);
         }
-        if (geometry instanceof StepCurveBoundedSurface boundedSurface) {
+        if (geometry instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
             return mapperForSurface(boundedSurface.basisSurface(), builder);
         }
-        if (geometry instanceof StepOrientedSurface orientedSurface) {
+        if (geometry instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(orientedSurface.surfaceElement(), builder);
             if (base == null) {
                 return null;
@@ -5356,7 +5542,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepOffsetSurface offsetSurface) {
+        if (geometry instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface.basisSurface(), builder);
             if (base == null) {
                 return null;
@@ -5391,7 +5578,8 @@ public final class StepPreviewJsonExporter {
             };
         }
         // Elliptical-axis surfaces — CadBuilder approximates these as standard surfaces
-        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis) {
+            StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis = (StepCylindricalSurfaceWithEllipticalAxis) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5416,7 +5604,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis) {
+            StepConicalSurfaceWithEllipticalAxis ellipticalAxis = (StepConicalSurfaceWithEllipticalAxis) geometry;
             ConicalSurface surface = builder.buildConicalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5441,7 +5630,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis) {
+            StepSphericalSurfaceWithEllipticalAxis ellipticalAxis = (StepSphericalSurfaceWithEllipticalAxis) geometry;
             SphericalSurface surface = builder.buildSphericalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5466,7 +5656,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis ellipticalAxis) {
+        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis) {
+            StepToroidalSurfaceWithCylindricalAxis ellipticalAxis = (StepToroidalSurfaceWithCylindricalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithCylindricalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5499,7 +5690,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis ellipticalAxis) {
+        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
+            StepToroidalSurfaceWithEllipticalAxis ellipticalAxis = (StepToroidalSurfaceWithEllipticalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5532,7 +5724,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepOffsetSurface2 offsetSurface2) {
+        if (geometry instanceof StepOffsetSurface2) {
+            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface2.basisSurface(), builder);
             if (base == null) {
                 return null;
@@ -5611,7 +5804,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepPlane stepPlane) {
+        if (geometry instanceof StepPlane) {
+            StepPlane stepPlane = (StepPlane) geometry;
             Axis2Placement3D placement = builder.buildPlacement(stepPlane.position().id());
             Plane plane = builder.buildPlane(stepPlane.id());
             Direction3 uDirection = placement.xDirection();
@@ -5637,7 +5831,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepCylindricalSurface cylindricalSurface) {
+        if (geometry instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5662,7 +5857,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepConicalSurface conicalSurface) {
+        if (geometry instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) geometry;
             ConicalSurface surface = builder.buildConicalSurface(conicalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5687,7 +5883,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepSphericalSurface sphericalSurface) {
+        if (geometry instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(sphericalSurface.position().id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5712,7 +5909,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        if (geometry instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(degenerateToroidalSurface.position().id());
             double majorRadius = degenerateToroidalSurface.majorRadius();
             double minorRadius = degenerateToroidalSurface.minorRadius();
@@ -5747,7 +5945,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepToroidalSurface toroidalSurface) {
+        if (geometry instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) geometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5780,7 +5979,8 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepRationalBSplineSurface splineSurface) {
+        if (geometry instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) geometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
@@ -5824,26 +6024,32 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) geometry;
             return extrusionMapper(extrusionSurface, builder);
         }
-        if (geometry instanceof StepSurfaceOfRevolution revolutionSurface) {
+        if (geometry instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) geometry;
             return revolutionMapper(revolutionSurface, builder);
         }
         // Rectangular composite surface: delegate to parent surface mapper
-        if (geometry instanceof StepRectangularCompositeSurface compositeSurface) {
+        if (geometry instanceof StepRectangularCompositeSurface) {
+            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) geometry;
             return mapperForSurface(compositeSurface.parentSurface(), builder);
         }
         // Surface patch: delegate to basis surface mapper
-        if (geometry instanceof StepSurfacePatch surfacePatch) {
+        if (geometry instanceof StepSurfacePatch) {
+            StepSurfacePatch surfacePatch = (StepSurfacePatch) geometry;
             return mapperForSurface(surfacePatch.basisSurface(), builder);
         }
         // Blended surface: delegate to primary surface mapper
-        if (geometry instanceof StepBlendedSurface blended) {
+        if (geometry instanceof StepBlendedSurface) {
+            StepBlendedSurface blended = (StepBlendedSurface) geometry;
             return mapperForSurface(blended.primarySurface(), builder);
         }
         // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
-        if (geometry instanceof StepFreeFormSurface freeForm) {
+        if (geometry instanceof StepFreeFormSurface) {
+            StepFreeFormSurface freeForm = (StepFreeFormSurface) geometry;
             BSplineSurface3 surface = buildFreeFormSurface(freeForm, builder);
             double uSpan = surface.uEnd() - surface.uStart();
             double vSpan = surface.vEnd() - surface.vStart();
@@ -6075,93 +6281,245 @@ public final class StepPreviewJsonExporter {
     }
 
     private static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
-        return switch (curve) {
-            case StepLine line -> {
-                Line3 geometry = builder.buildLine(line.id());
-                yield new CurveEvaluator() {
-                    @Override
-                    public double start() {
-                        return -1.0;
-                    }
-
-                    @Override
-                    public double end() {
-                        return 1.0;
-                    }
-
-                    @Override
-                    public CartesianPoint pointAt(double parameter) {
-                        return geometry.pointAt(parameter);
-                    }
-                };
-            }
-            case StepCircle circle -> {
-                Circle geometry = builder.buildCircle(circle.id());
-                yield new CurveEvaluator() {
-                    @Override
-                    public double start() {
-                        return 0.0;
-                    }
-
-                    @Override
-                    public double end() {
-                        return Math.PI * 2.0;
-                    }
-
-                    @Override
-                    public CartesianPoint pointAt(double parameter) {
-                        return geometry.pointAt(parameter);
-                    }
-                };
-            }
-            case StepEllipse ellipse -> {
-                Ellipse3 geometry = builder.buildEllipse(ellipse.id());
-                yield new CurveEvaluator() {
-                    @Override
-                    public double start() {
-                        return 0.0;
-                    }
-
-                    @Override
-                    public double end() {
-                        return Math.PI * 2.0;
-                    }
-
-                    @Override
-                    public CartesianPoint pointAt(double parameter) {
-                        return geometry.pointAt(parameter);
-                    }
-                };
-            }
-            case StepBSplineCurveWithKnots spline -> {
-                BSplineCurve3 geometry = builder.buildBSplineCurve(spline.id());
-                yield new CurveEvaluator() {
-                    @Override
-                    public double start() {
-                        return geometry.startParameter();
-                    }
-
-                    @Override
-                    public double end() {
-                        return geometry.endParameter();
-                    }
-
-                    @Override
-                    public CartesianPoint pointAt(double parameter) {
-                        return geometry.pointAt(parameter);
-                    }
-                };
-            }
-            case StepTrimmedCurve trimmedCurve -> curveEvaluator(trimmedCurve.basisCurve(), builder);
-            case StepSurfaceCurve surfaceCurve -> curveEvaluator(surfaceCurve.curve3d(), builder);
-            case StepRationalBSplineCurve spline -> {
-                com.minicad.geometry.RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve(spline.id());
-                yield new CurveEvaluator() {
-                    @Override public double start() { return geometry.startParameter(); }
-                    @Override public double end() { return geometry.endParameter(); }
-                    @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
-                };
-            }
+        // Converted from switch expression to if-else for Java 11 compatibility
+        if (curve instanceof StepLine) {
+            StepLine line = (StepLine) curve;
+            Line3 geometry = builder.buildLine(line.id());
+            return new CurveEvaluator() {
+                @Override
+                public double start() { return -1.0; }
+                @Override
+                public double end() { return 1.0; }
+                @Override
+                public CartesianPoint pointAt(double parameter) {
+                    return geometry.pointAt(parameter);
+                }
+            };
+        } else if (curve instanceof StepCircle) {
+            StepCircle circle = (StepCircle) curve;
+            Circle geometry = builder.buildCircle(circle.id());
+            return new CurveEvaluator() {
+                @Override
+                public double start() { return 0.0; }
+                @Override
+                public double end() { return Math.PI * 2.0; }
+                @Override
+                public CartesianPoint pointAt(double parameter) {
+                    return geometry.pointAt(parameter);
+                }
+            };
+        } else if (curve instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) curve;
+            Ellipse3 geometry = builder.buildEllipse(ellipse.id());
+            return new CurveEvaluator() {
+                @Override
+                public double start() { return 0.0; }
+                @Override
+                public double end() { return Math.PI * 2.0; }
+                @Override
+                public CartesianPoint pointAt(double parameter) {
+                    return geometry.pointAt(parameter);
+                }
+            };
+        } else if (curve instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) curve;
+            BSplineCurve3 geometry = builder.buildBSplineCurve(spline.id());
+            return new CurveEvaluator() {
+                @Override
+                public double start() { return geometry.startParameter(); }
+                @Override
+                public double end() { return geometry.endParameter(); }
+                @Override
+                public CartesianPoint pointAt(double parameter) {
+                    return geometry.pointAt(parameter);
+                }
+            };
+        } else if (curve instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) curve;
+            return curveEvaluator(trimmedCurve.basisCurve(), builder);
+        } else if (curve instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) curve;
+            return curveEvaluator(surfaceCurve.curve3d(), builder);
+        } else if (curve instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve spline = (StepRationalBSplineCurve) curve;
+            com.minicad.geometry.RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve(spline.id());
+            return new CurveEvaluator() {
+                @Override public double start() { return geometry.startParameter(); }
+                @Override public double end() { return geometry.endParameter(); }
+                @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
+            };
+        } else if (curve instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) curve;
+            Polyline3 geometry = builder.buildPolyline(polyline.id());
+            return new CurveEvaluator() {
+                @Override public double start() { return 0.0; }
+                @Override public double end() { return 1.0; }
+                @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
+            };
+        } else if (curve instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) curve;
+            CompositeCurve3 geometry = builder.buildCompositeCurve(compositeCurve.id());
+            return sampledCurveEvaluator(geometry);
+        } else if (curve instanceof StepBezierCurve) {
+            StepBezierCurve bezier = (StepBezierCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(bezier.id()));
+        } else if (curve instanceof StepUniformCurve) {
+            StepUniformCurve uniform = (StepUniformCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(uniform.id()));
+        } else if (curve instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve quasiUniform = (StepQuasiUniformCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(quasiUniform.id()));
+        } else if (curve instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve piecewiseBezier = (StepPiecewiseBezierCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(piecewiseBezier.id()));
+        } else if (curve instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) curve;
+            return sampledCurveEvaluator(builder.buildOffsetCurve3(offsetCurve3D.id()));
+        } else if (curve instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) curve;
+            List<CartesianPoint> points = sampleConicCurvePoints(conic, builder);
+            if (points == null || points.size() < 2) return null;
+            return sampledCurveEvaluator(new Polyline3(points));
+        } else if (curve instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) curve;
+            return curveEvaluator(orientedCurve.curveElement(), builder);
+        } else if (curve instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) curve;
+            return curveEvaluator(replica.parent(), builder);
+        } else if (curve instanceof StepBSplineCurve) {
+            StepBSplineCurve bspline = (StepBSplineCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(bspline.id()));
+        } else if (curve instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) curve;
+            return sampledCurveEvaluator(builder.buildSeamCurve(seamCurve.id()).curve3d());
+        } else if (curve instanceof StepCircle2D) {
+            StepCircle2D circle2D = (StepCircle2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(circle2D.id()));
+        } else if (curve instanceof StepEllipse2D) {
+            StepEllipse2D ellipse2D = (StepEllipse2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(ellipse2D.id()));
+        } else if (curve instanceof StepPolyline2D) {
+            StepPolyline2D polyline2D = (StepPolyline2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(polyline2D.id()));
+        } else if (curve instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(trimmedCurve2D.id()));
+        } else if (curve instanceof StepCompositeCurve2D) {
+            StepCompositeCurve2D compositeCurve2D = (StepCompositeCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(compositeCurve2D.id()));
+        } else if (curve instanceof StepBezierCurve2D) {
+            StepBezierCurve2D bezier2D = (StepBezierCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(bezier2D.id()));
+        } else if (curve instanceof StepQuasiUniformCurve2D) {
+            StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(quasiUniform2D.id()));
+        } else if (curve instanceof StepUniformCurve2D) {
+            StepUniformCurve2D uniform2D = (StepUniformCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(uniform2D.id()));
+        } else if (curve instanceof StepPiecewiseBezierCurve2D) {
+            StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(piecewiseBezier2D.id()));
+        } else if (curve instanceof StepIndexedPolyCurve2D) {
+            StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(polyCurve2D.id()));
+        } else if (curve instanceof StepDegenerateCurve2D) {
+            StepDegenerateCurve2D degenerateCurve2D = (StepDegenerateCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(degenerateCurve2D.id()));
+        } else if (curve instanceof StepBSplineCurve2D) {
+            StepBSplineCurve2D bspline2D = (StepBSplineCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(bspline2D.id()));
+        } else if (curve instanceof StepRationalBSplineCurve2D) {
+            StepRationalBSplineCurve2D rationalBspline2D = (StepRationalBSplineCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(rationalBspline2D.id()));
+        } else if (curve instanceof StepLine2D) {
+            StepLine2D line2D = (StepLine2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(line2D.id()));
+        } else if (curve instanceof StepCurve2D) {
+            StepCurve2D curve2D = (StepCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(curve2D.id()));
+        } else if (curve instanceof StepHyperbola2D) {
+            StepHyperbola2D hyperbola2D = (StepHyperbola2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(hyperbola2D.id()));
+        } else if (curve instanceof StepParabola2D) {
+            StepParabola2D parabola2D = (StepParabola2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(parabola2D.id()));
+        } else if (curve instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) curve;
+            return sampledCurveEvaluator(builder.buildCurve3From2D(offsetCurve2D.id()));
+        } else if (curve instanceof StepClothoid) {
+            StepClothoid clothoid = (StepClothoid) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(clothoid.id()));
+        } else if (curve instanceof StepIndexedPolyCurve) {
+            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(polyCurve.id()));
+        } else if (curve instanceof StepDegenerateCurve) {
+            StepDegenerateCurve degenerate = (StepDegenerateCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(degenerate.id()));
+        } else if (curve instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+            StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) curve;
+            return sampledCurveEvaluator(builder.buildBSplineCurveWithBreakpoints(splineBreak.id()));
+        } else if (curve instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface.id()));
+        } else if (curve instanceof StepCompositeCurveOnSurface3D) {
+            StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface3D.id()));
+        } else if (curve instanceof StepLineSegment) {
+            StepLineSegment lineSeg = (StepLineSegment) curve;
+            List<CartesianPoint> pts = List.of(
+                    builder.buildPoint(lineSeg.startPoint().id()),
+                    builder.buildPoint(lineSeg.endPoint().id())
+            );
+            return sampledCurveEvaluator(new Polyline3(pts));
+        } else if (curve instanceof StepPath) {
+            StepPath path = (StepPath) curve;
+            return sampledCurveEvaluator(builder.buildPath(path.id()));
+        } else if (curve instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) curve;
+            return sampledCurveEvaluator(builder.buildPath(openPath.id()));
+        } else if (curve instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) curve;
+            return sampledCurveEvaluator(builder.buildPath(subpath.id()));
+        } else if (curve instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) curve;
+            return sampledCurveEvaluator(builder.buildPath(orientedPath.id()));
+        } else if (curve instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(edgeCurve.id()));
+        } else if (curve instanceof StepSurfacedEdgeCurve) {
+            StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(surfacedEdge.id()));
+        } else if (curve instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) curve;
+            return curveEvaluator(occurrence.item(), builder);
+        } else if (curve instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) curve;
+            return curveEvaluator(dimensionCurve.item(), builder);
+        } else if (curve instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) curve;
+            return curveEvaluator(leaderCurve.item(), builder);
+        } else if (curve instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) curve;
+            return curveEvaluator(projectionCurve.item(), builder);
+        } else if (curve instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) curve;
+            return curveEvaluator(annotationOccurrence.item(), builder);
+        } else if (curve instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) curve;
+            return curveEvaluator(terminatorSymbol.annotatedCurve(), builder);
+        } else if (curve instanceof StepCurve) {
+            StepCurve abstractCurve = (StepCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(abstractCurve.id()));
+        } else if (curve instanceof StepBoundedCurve) {
+            StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
+            return sampledCurveEvaluator(builder.buildCurveReference3(boundedCurve.id()));
+        } else if (curve instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) curve;
+            return curveEvaluator(mappedItem.mappingTarget(), builder);
+        } else {
+            return null;
+        }
+    }
             case StepPolyline polyline -> {
                 Polyline3 geometry = builder.buildPolyline(polyline.id());
                 yield new CurveEvaluator() {
@@ -6438,10 +6796,10 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> top,
             List<CartesianPoint> left
     ) {
-        return close(bottom.getFirst(), left.getFirst())
-                && close(bottom.getLast(), right.getFirst())
-                && close(top.getFirst(), left.getLast())
-                && close(top.getLast(), right.getLast());
+        return close(bottom.get(0), left.get(0))
+                && close(bottom.get(bottom.size() - 1), right.get(0))
+                && close(top.get(0), left.get(left.size() - 1))
+                && close(top.get(top.size() - 1), right.get(right.size() - 1));
     }
 
     private static boolean close(CartesianPoint left, CartesianPoint right) {
@@ -6456,24 +6814,24 @@ public final class StepPreviewJsonExporter {
 
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
         if (points.size() < 2) {
-            return List.of(points.getFirst());
+            return List.of(points.get(0));
         }
         List<Double> lengths = new ArrayList<>(points.size());
         lengths.add(0.0);
         for (int i = 1; i < points.size(); i++) {
             lengths.add(lengths.get(i - 1) + points.get(i - 1).distanceTo(points.get(i)));
         }
-        double total = lengths.getLast();
+        double total = lengths.get(lengths.size() - 1);
         if (total <= Epsilon.EPS) {
-            return java.util.Collections.nCopies(segments + 1, points.getFirst());
+            return java.util.Collections.nCopies(segments + 1, points.get(0));
         }
         List<CartesianPoint> result = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double target = total * i / segments;
             result.add(pointAtDistance(points, lengths, target));
         }
-        result.set(0, points.getFirst());
-        result.set(result.size() - 1, points.getLast());
+        result.set(0, points.get(0));
+        result.set(result.size() - 1, points.get(points.size() - 1));
         return List.copyOf(result);
     }
 
@@ -6486,7 +6844,7 @@ public final class StepPreviewJsonExporter {
                 return interpolate(points.get(i - 1), points.get(i), alpha);
             }
         }
-        return points.getLast();
+        return points.get(points.size() - 1);
     }
 
     private static CartesianPoint interpolate(CartesianPoint a, CartesianPoint b, double alpha) {
@@ -6525,7 +6883,7 @@ public final class StepPreviewJsonExporter {
         for (CartesianPoint point : points) {
             double angle = cylindricalAngle(placement, point);
             if (!angles.isEmpty()) {
-                double previous = angles.getLast();
+                double previous = angles.get(angles.size() - 1);
                 while (angle - previous > Math.PI) {
                     angle -= Math.PI * 2.0;
                 }
@@ -6667,7 +7025,7 @@ public final class StepPreviewJsonExporter {
         for (CartesianPoint point : points) {
             double value = toroidalU(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -6685,7 +7043,7 @@ public final class StepPreviewJsonExporter {
         for (CartesianPoint point : points) {
             double value = toroidalV(surface, point);
             if (!values.isEmpty()) {
-                double previous = values.getLast();
+                double previous = values.get(values.size() - 1);
                 while (value - previous > Math.PI) {
                     value -= Math.PI * 2.0;
                 }
@@ -6731,22 +7089,25 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).toList();
+        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
         if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
-            FaceBound bound = bounds.getFirst();
+            FaceBound bound = bounds.get(0);
             return List.of(FaceBound.outer(bound.loop(), bound.orientation()));
         }
         return bounds;
     }
 
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace advancedFace) {
+        if (stepFace instanceof StepAdvancedFace) {
+            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
             return advancedFace.faceGeometry();
         }
-        if (stepFace instanceof StepFaceSurface faceSurface) {
+        if (stepFace instanceof StepFaceSurface) {
+            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
             return faceSurface.faceGeometry();
         }
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             return faceGeometry(orientedFace.faceElement());
         }
         return null;
@@ -6810,7 +7171,8 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepCompositeCurveOnSurface) {
             return "COMPOSITE_CURVE_ON_SURFACE";
         }
-        if (geometry instanceof StepConicCurve conic) {
+        if (geometry instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) geometry;
             return conic.entityName();
         }
         if (geometry instanceof StepOrientedCurve) {
@@ -6855,7 +7217,8 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepVertexLoop) {
             return "VERTEX_LOOP";
         }
-        if (geometry instanceof StepFaceBound faceBound) {
+        if (geometry instanceof StepFaceBound) {
+            StepFaceBound faceBound = (StepFaceBound) geometry;
             return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
         }
         if (geometry instanceof StepOrientedEdge) {
@@ -6996,7 +7359,8 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepOffsetSurface) {
             return "OFFSET_SURFACE";
         }
-        if (geometry instanceof StepSweptAreaSolid sweptAreaSolid) {
+        if (geometry instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) geometry;
             return sweptAreaSolid.entityName();
         }
         if (geometry instanceof StepSolidReplica) {
@@ -7011,7 +7375,8 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepCsgSolid) {
             return "CSG_SOLID";
         }
-        if (geometry instanceof StepCsgPrimitive primitive) {
+        if (geometry instanceof StepCsgPrimitive) {
+            StepCsgPrimitive primitive = (StepCsgPrimitive) geometry;
             return primitive.entityName();
         }
         if (geometry instanceof StepBooleanClippingResult) {
@@ -7026,31 +7391,31 @@ public final class StepPreviewJsonExporter {
         if (geometry instanceof StepComplexClippingResult) {
             return "COMPLEX_CLIPPING_RESULT";
         }
-        if (geometry instanceof StepGeometricReplica replica) {
+        if (geometry instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             return replica.entityName();
         }
         return geometry.getClass().getSimpleName();
     }
 
     private static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
-        return switch (surface) {
-            case Plane ignored -> "PLANE";
-            case CylindricalSurface ignored -> "CYLINDRICAL_SURFACE";
-            case ConicalSurface ignored -> "CONICAL_SURFACE";
-            case SphericalSurface ignored -> "SPHERICAL_SURFACE";
-            case ToroidalSurface ignored -> "TOROIDAL_SURFACE";
-            case BSplineSurface3 ignored -> "BSPLINE_SURFACE";
-            case RationalBSplineSurface3 ignored -> "RATIONAL_BSPLINE_SURFACE";
-            case RuledSurface3 ignored -> "RULED_SURFACE";
-            case SurfaceOfRevolution3 ignored -> "SURFACE_OF_REVOLUTION";
-            case OffsetSurface3 ignored -> "OFFSET_SURFACE";
-            case SurfaceOfLinearExtrusion3 ignored -> "SURFACE_OF_LINEAR_EXTRUSION";
-            case SurfaceOfConstantRadius3 ignored -> "SURFACE_OF_CONSTANT_RADIUS";
-            case ParaboloidSurface ignored -> "PARABOLOID_SURFACE";
-            case HyperboloidSurface ignored -> "HYPERBOLOID_SURFACE";
-            case SurfaceOfTranslation3 ignored -> "SURFACE_OF_TRANSLATION";
-            case SurfaceOfProjection3 ignored -> "SURFACE_OF_PROJECTION";
-        };
+        if (surface instanceof Plane) return "PLANE";
+        else if (surface instanceof CylindricalSurface) return "CYLINDRICAL_SURFACE";
+        else if (surface instanceof ConicalSurface) return "CONICAL_SURFACE";
+        else if (surface instanceof SphericalSurface) return "SPHERICAL_SURFACE";
+        else if (surface instanceof ToroidalSurface) return "TOROIDAL_SURFACE";
+        else if (surface instanceof BSplineSurface3) return "BSPLINE_SURFACE";
+        else if (surface instanceof RationalBSplineSurface3) return "RATIONAL_BSPLINE_SURFACE";
+        else if (surface instanceof RuledSurface3) return "RULED_SURFACE";
+        else if (surface instanceof SurfaceOfRevolution3) return "SURFACE_OF_REVOLUTION";
+        else if (surface instanceof OffsetSurface3) return "OFFSET_SURFACE";
+        else if (surface instanceof SurfaceOfLinearExtrusion3) return "SURFACE_OF_LINEAR_EXTRUSION";
+        else if (surface instanceof SurfaceOfConstantRadius3) return "SURFACE_OF_CONSTANT_RADIUS";
+        else if (surface instanceof ParaboloidSurface) return "PARABOLOID_SURFACE";
+        else if (surface instanceof HyperboloidSurface) return "HYPERBOLOID_SURFACE";
+        else if (surface instanceof SurfaceOfTranslation3) return "SURFACE_OF_TRANSLATION";
+        else if (surface instanceof SurfaceOfProjection3) return "SURFACE_OF_PROJECTION";
+        else throw new IllegalArgumentException("Unknown surface type: " + surface.getClass().getSimpleName());
     }
 
     private static UvPoint nearestUvOnRationalBSplineSurface(
@@ -7110,13 +7475,16 @@ public final class StepPreviewJsonExporter {
     }
 
     private static boolean faceSameSense(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace advancedFace) {
+        if (stepFace instanceof StepAdvancedFace) {
+            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
             return advancedFace.sameSense();
         }
-        if (stepFace instanceof StepFaceSurface faceSurface) {
+        if (stepFace instanceof StepFaceSurface) {
+            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
             return faceSurface.sameSense();
         }
-        if (stepFace instanceof StepOrientedFace orientedFace) {
+        if (stepFace instanceof StepOrientedFace) {
+            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             boolean base = faceSameSense(orientedFace.faceElement());
             return orientedFace.orientation() ? base : !base;
         }
@@ -7149,13 +7517,15 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<CartesianPoint> sampleLoop(FaceBound bound) {
-        if (bound.loop() instanceof VertexLoop vertexLoop) {
+        if (bound.loop() instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) bound.loop();
             return List.of(vertexLoop.vertex().point());
         }
-        if (bound.loop() instanceof PolyLoop polyLoop) {
+        if (bound.loop() instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) bound.loop();
             List<CartesianPoint> sampled = new ArrayList<>(polyLoop.points());
-            if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-                sampled.add(sampled.getFirst());
+            if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+                sampled.add(sampled.get(0));
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
@@ -7172,15 +7542,16 @@ public final class StepPreviewJsonExporter {
             }
             firstEdge = false;
         }
-        if (!sampled.isEmpty() && sampled.getFirst().distanceTo(sampled.getLast()) > 1.0e-9) {
-            sampled.add(sampled.getFirst());
+        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+            sampled.add(sampled.get(0));
         }
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
     private static void collectTopologyEdges(Face face, Set<Edge> edges) {
         for (FaceBound bound : face.bounds()) {
-            if (bound.loop() instanceof EdgeLoop edgeLoop) {
+            if (bound.loop() instanceof EdgeLoop) {
+                EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
                 for (OrientedEdge orientedEdge : edgeLoop.edges()) {
                     edges.add(orientedEdge.edge());
                 }
@@ -7193,10 +7564,10 @@ public final class StepPreviewJsonExporter {
             return points;
         }
         List<T> reversed = new ArrayList<>(points);
-        if (reversed.getFirst().equals(reversed.getLast())) {
+        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
             T start = reversed.removeLast();
             java.util.Collections.reverse(reversed);
-            reversed.add(reversed.getFirst());
+            reversed.add(reversed.get(0));
             reversed.set(0, start);
             reversed.set(reversed.size() - 1, start);
             return reversed;
@@ -7221,7 +7592,8 @@ public final class StepPreviewJsonExporter {
             return sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense());
         } catch (TopologyException ex) {
             StepEntity entity = resolved.get(edgeId);
-            if (!(entity instanceof StepEdgeCurve edge)) {
+            if (!(entity instanceof StepEdgeCurve)) {
+            StepEdgeCurve edge = (StepEdgeCurve) entity;
                 throw ex;
             }
             CartesianPoint start = pointFromStep(edge.start().point());
@@ -7248,7 +7620,8 @@ public final class StepPreviewJsonExporter {
         List<CartesianPoint> polyline = sampleEdgePreview(edgeId, resolved, builder);
         StepEntity entity = resolved.get(edgeId);
         ColorPayload color = resolveEdgeColor(edgeId, metadata);
-        if (entity instanceof StepEdgeCurve edge) {
+        if (entity instanceof StepEdgeCurve) {
+            StepEdgeCurve edge = (StepEdgeCurve) entity;
             CartesianPoint start = pointFromStep(edge.start().point());
             CartesianPoint end = pointFromStep(edge.end().point());
             return new EdgePayload(
@@ -7258,7 +7631,8 @@ public final class StepPreviewJsonExporter {
                     color
             );
         }
-        if (entity instanceof StepSeamEdge seamEdge) {
+        if (entity instanceof StepSeamEdge) {
+            StepSeamEdge seamEdge = (StepSeamEdge) entity;
             // Seam edge: curve geometry is resolved at the same ID in entitiesById.
             StepEntity actual = resolved.get(seamEdge.id());
             if (actual != null && actual != seamEdge) {
@@ -7271,21 +7645,23 @@ public final class StepPreviewJsonExporter {
                 }
             }
         }
-        if (entity instanceof StepFilletEdge filletEdge) {
+        if (entity instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) entity;
             // Fillet edge: sample the original edge geometry for preview.
             StepEntity original = filletEdge.originalEdge();
             if (original != null) {
-                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.getFirst(), polyline.getLast(), true, builder);
+                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.get(0), polyline.get(polyline.size() - 1), true, builder);
                 if (curvePayload != null) {
                     return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload, color);
                 }
             }
         }
-        if (entity instanceof StepChamferEdge chamferEdge) {
+        if (entity instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) entity;
             // Chamfer edge: sample the original edge geometry for preview.
             StepEntity original = chamferEdge.originalEdge();
             if (original != null) {
-                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.getFirst(), polyline.getLast(), true, builder);
+                EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.get(0), polyline.get(polyline.size() - 1), true, builder);
                 if (curvePayload != null) {
                     return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload, color);
                 }
@@ -7310,17 +7686,17 @@ public final class StepPreviewJsonExporter {
     private static EdgePayload toPolylineEdgePayload(StepPolyline polyline) {
         List<CartesianPoint> points = polyline.points().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
-                .toList();
+                .collect(Collectors.toList());
         return new EdgePayload(polyline.id(), toPointPayloads(points), null);
     }
 
     private static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
         List<CartesianPoint> points = polyLoop.polygon().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
-                .toList();
+                .collect(Collectors.toList());
         List<CartesianPoint> closed = new ArrayList<>(points);
-        if (!closed.isEmpty() && closed.getFirst().distanceTo(closed.getLast()) > 1.0e-9) {
-            closed.add(closed.getFirst());
+        if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
+            closed.add(closed.get(0));
         }
         return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null);
     }
@@ -7350,7 +7726,8 @@ public final class StepPreviewJsonExporter {
         List<String> associatedSurfaceTypes = previewCurveAssociatedSurfaceTypes(item);
         List<Integer> associatedSurfaceStepIds = previewCurveAssociatedSurfaceStepIds(item);
         try {
-            if (item instanceof StepCircle circle) {
+            if (item instanceof StepCircle) {
+            StepCircle circle = (StepCircle) item;
                 Circle geometry = builder.buildCircle(circle.id());
                 Axis2Placement3D placement = geometry.position();
                 return new EdgeCurvePayload(
@@ -7379,7 +7756,8 @@ public final class StepPreviewJsonExporter {
                         Math.PI * 2.0
                 );
             }
-            if (item instanceof StepEllipse ellipse) {
+            if (item instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) item;
                 Ellipse3 geometry = builder.buildEllipse(ellipse.id());
                 Axis2Placement3D placement = geometry.position();
                 return new EdgeCurvePayload(
@@ -7448,7 +7826,8 @@ public final class StepPreviewJsonExporter {
         if (item instanceof StepEllipse) {
             return "ELLIPSE";
         }
-        if (item instanceof StepConicCurve conic) {
+        if (item instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) item;
             return conic.entityName();
         }
         if (item instanceof StepBezierCurve) {
@@ -7469,7 +7848,8 @@ public final class StepPreviewJsonExporter {
         if (item instanceof com.minicad.step.model.geometry.StepRationalBSplineCurve) {
             return "RATIONAL_B_SPLINE_CURVE";
         }
-        if (item instanceof StepSurfaceCurve surfaceCurve) {
+        if (item instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
             return surfaceCurve.entityName();
         }
         if (item instanceof StepSeamCurve) {
@@ -7565,7 +7945,8 @@ public final class StepPreviewJsonExporter {
         if (item instanceof StepSubpath) {
             return "SUBPATH";
         }
-        if (item instanceof StepOrientedPath orientedPath) {
+        if (item instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) item;
             return "ORIENTED_PATH";
         }
         if (item instanceof StepCurve) {
@@ -7629,139 +8010,174 @@ public final class StepPreviewJsonExporter {
     }
 
     private static String previewCurveBasisTypeName(StepEntity item) {
-        if (item instanceof StepSurfaceCurve surfaceCurve) {
+        if (item instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
             return previewCurveTypeName(surfaceCurve.curve3d());
         }
-        if (item instanceof StepSeamCurve seamCurve) {
+        if (item instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
             return previewCurveTypeName(seamCurve.curve3d());
         }
-        if (item instanceof StepTrimmedCurve trimmedCurve) {
+        if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
             return previewCurveTypeName(trimmedCurve.basisCurve());
         }
-        if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
             return previewCurveTypeName(offsetCurve2D.basisCurve());
         }
-        if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
             return previewCurveTypeName(offsetCurve3D.basisCurve());
         }
-        if (item instanceof StepOrientedCurve orientedCurve) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
             return previewCurveTypeName(orientedCurve.curveElement());
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             return previewCurveTypeName(occurrence.item());
         }
-        if (item instanceof StepDimensionCurve dimensionCurve) {
+        if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
             return previewCurveTypeName(dimensionCurve.item());
         }
-        if (item instanceof StepLeaderCurve leaderCurve) {
+        if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
             return previewCurveTypeName(leaderCurve.item());
         }
-        if (item instanceof StepProjectionCurve projectionCurve) {
+        if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
             return previewCurveTypeName(projectionCurve.item());
         }
-        if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
             return previewCurveTypeName(annotationOccurrence.item());
         }
-        if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             return previewCurveTypeName(terminatorSymbol.annotatedCurve());
         }
         if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
             return previewCurveTypeName(replica.parent());
         }
-        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+        if (item instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
             return previewCurveTypeName(trimmedCurve2D.basisCurve());
         }
         return null;
     }
 
     private static Integer previewCurveBasisStepId(StepEntity item) {
-        if (item instanceof StepSurfaceCurve surfaceCurve) {
+        if (item instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
             return surfaceCurve.curve3d().id();
         }
-        if (item instanceof StepSeamCurve seamCurve) {
+        if (item instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
             return seamCurve.curve3d().id();
         }
-        if (item instanceof StepTrimmedCurve trimmedCurve) {
+        if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
             return trimmedCurve.basisCurve().id();
         }
-        if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
             return offsetCurve2D.basisCurve().id();
         }
-        if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
             return offsetCurve3D.basisCurve().id();
         }
-        if (item instanceof StepOrientedCurve orientedCurve) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
             return orientedCurve.curveElement().id();
         }
-        if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
             return occurrence.item().id();
         }
-        if (item instanceof StepDimensionCurve dimensionCurve) {
+        if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
             return dimensionCurve.item().id();
         }
-        if (item instanceof StepLeaderCurve leaderCurve) {
+        if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
             return leaderCurve.item().id();
         }
-        if (item instanceof StepProjectionCurve projectionCurve) {
+        if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
             return projectionCurve.item().id();
         }
-        if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
             return annotationOccurrence.item().id();
         }
-        if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             return terminatorSymbol.annotatedCurve().id();
         }
         if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
             return replica.parent().id();
         }
-        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+        if (item instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
             return trimmedCurve2D.basisCurve().id();
         }
         return null;
     }
 
     private static Boolean previewCurveOrientation(StepEntity item) {
-        if (item instanceof StepOrientedCurve orientedCurve) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
             return orientedCurve.orientation();
         }
         return null;
     }
 
     private static Boolean previewCurveSenseAgreement(StepEntity item) {
-        if (item instanceof StepTrimmedCurve trimmedCurve) {
+        if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
             return trimmedCurve.senseAgreement();
         }
-        if (item instanceof StepTrimmedCurve2D trimmedCurve2D) {
+        if (item instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
             return trimmedCurve2D.senseAgreement();
         }
         return null;
     }
 
     private static Double previewCurveOffsetDistance(StepEntity item) {
-        if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
             return offsetCurve2D.distance();
         }
-        if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
             return offsetCurve3D.distance();
         }
         return null;
     }
 
     private static Boolean previewCurveSelfIntersect(StepEntity item) {
-        if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
             return offsetCurve2D.selfIntersect();
         }
-        if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
             return offsetCurve3D.selfIntersect();
         }
-        if (item instanceof StepCompositeCurveOnSurface compositeOnSurface) {
+        if (item instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
             return compositeOnSurface.selfIntersect();
         }
         return null;
     }
 
     private static List<Double> previewCurveRefDirection(StepEntity item) {
-        if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
             return List.copyOf(offsetCurve3D.refDirection().directionRatios());
         }
         return null;
@@ -7776,10 +8192,12 @@ public final class StepPreviewJsonExporter {
 
     private static String previewCurveMasterRepresentation(StepEntity item) {
         StepEntity semanticCurve = previewCurveSemanticItem(item);
-        if (semanticCurve instanceof StepSurfaceCurve surfaceCurve) {
+        if (semanticCurve instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) semanticCurve;
             return surfaceCurve.masterRepresentation();
         }
-        if (semanticCurve instanceof StepSeamCurve seamCurve) {
+        if (semanticCurve instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) semanticCurve;
             return seamCurve.masterRepresentation();
         }
         return null;
@@ -7792,9 +8210,11 @@ public final class StepPreviewJsonExporter {
         }
         List<String> surfaceTypes = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve pcurve) {
+            if (associated instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) associated;
                 surfaceTypes.add(surfaceTypeName(pcurve.basisSurface()));
-            } else if (associated instanceof StepDegeneratePcurve pcurve) {
+            } else if (associated instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
                 surfaceTypes.add(surfaceTypeName(pcurve.basisSurface()));
             }
         }
@@ -7808,9 +8228,11 @@ public final class StepPreviewJsonExporter {
         }
         List<Integer> surfaceIds = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve pcurve) {
+            if (associated instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) associated;
                 surfaceIds.add(pcurve.basisSurface().id());
-            } else if (associated instanceof StepDegeneratePcurve pcurve) {
+            } else if (associated instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
                 surfaceIds.add(pcurve.basisSurface().id());
             }
         }
@@ -7819,10 +8241,12 @@ public final class StepPreviewJsonExporter {
 
     private static List<StepEntity> previewCurveAssociatedGeometry(StepEntity item) {
         StepEntity semanticCurve = previewCurveSemanticItem(item);
-        if (semanticCurve instanceof StepSurfaceCurve surfaceCurve) {
+        if (semanticCurve instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) semanticCurve;
             return surfaceCurve.associatedGeometry();
         }
-        if (semanticCurve instanceof StepSeamCurve seamCurve) {
+        if (semanticCurve instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) semanticCurve;
             return seamCurve.associatedGeometry();
         }
         return null;
@@ -7831,31 +8255,38 @@ public final class StepPreviewJsonExporter {
     private static StepEntity previewCurveSemanticItem(StepEntity item) {
         StepEntity current = item;
         while (true) {
-            if (current instanceof StepOrientedCurve orientedCurve) {
+            if (current instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
                 current = orientedCurve.curveElement();
                 continue;
             }
-            if (current instanceof StepAnnotationCurveOccurrence occurrence) {
+            if (current instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
                 current = occurrence.item();
                 continue;
             }
-            if (current instanceof StepDimensionCurve dimensionCurve) {
+            if (current instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
                 current = dimensionCurve.item();
                 continue;
             }
-            if (current instanceof StepLeaderCurve leaderCurve) {
+            if (current instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
                 current = leaderCurve.item();
                 continue;
             }
-            if (current instanceof StepProjectionCurve projectionCurve) {
+            if (current instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
                 current = projectionCurve.item();
                 continue;
             }
-            if (current instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            if (current instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
                 current = annotationOccurrence.item();
                 continue;
             }
-            if (current instanceof StepTerminatorSymbol terminatorSymbol) {
+            if (current instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
                 current = terminatorSymbol.annotatedCurve();
                 continue;
             }
@@ -7868,19 +8299,24 @@ public final class StepPreviewJsonExporter {
     }
 
     static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepAnnotationFillArea fillArea) {
+        if (item instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
             return sampleAnnotationFillAreaPoints(fillArea, builder);
         }
-        if (item instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (item instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
             return sampleAnnotationFillAreaPoints(fillAreaOccurrence.item(), builder);
         }
-        if (item instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (item instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
             return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
         }
-        if (item instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (item instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
             return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
         }
-        if (item instanceof StepAnnotationSymbol annotationSymbol) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
             return sampleMappedAnnotationPoints(
                     annotationSymbol.mappingSource().mappedRepresentation(),
                     annotationSymbol.mappingSource().mappedOrigin(),
@@ -7888,7 +8324,8 @@ public final class StepPreviewJsonExporter {
                     builder
             );
         }
-        if (item instanceof StepAnnotationText annotationText) {
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
             return sampleMappedAnnotationPoints(
                     annotationText.mappingSource().mappedRepresentation(),
                     annotationText.mappingSource().mappedOrigin(),
@@ -7896,7 +8333,8 @@ public final class StepPreviewJsonExporter {
                     builder
             );
         }
-        if (item instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
             return sampleMappedAnnotationPoints(
                     annotationTextCharacter.mappingSource().mappedRepresentation(),
                     annotationTextCharacter.mappingSource().mappedOrigin(),
@@ -7915,7 +8353,8 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(transformed);
         }
-        if (item instanceof StepOrientedCurve orientedCurve) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
             List<CartesianPoint> points = sampleLooseEdgePoints(orientedCurve.curveElement(), builder);
             if (points == null) {
                 return null;
@@ -7927,19 +8366,24 @@ public final class StepPreviewJsonExporter {
             Collections.reverse(reversed);
             return List.copyOf(reversed);
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return sampleGeometricCollectionPoints(geometricSet.elements(), builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return sampleGeometricCollectionPoints(curveSet.elements(), builder);
         }
-        if (item instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (item instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
             return sampleGeometricCollectionPoints(connectedEdgeSet.edges(), builder);
         }
-        if (item instanceof StepWireShell wireShell) {
+        if (item instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) item;
             return sampleWireShellPoints(wireShell, builder);
         }
-        if (item instanceof StepEdgeWire edgeWire) {
+        if (item instanceof StepEdgeWire) {
+            StepEdgeWire edgeWire = (StepEdgeWire) item;
             return sampleGeometricCollectionPoints(edgeWire.edges(), builder);
         }
         Curve3 curve = curveForLooseEdge(item, builder);
@@ -8042,44 +8486,57 @@ public final class StepPreviewJsonExporter {
 
     private static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
         try {
-            if (item instanceof StepLine line) {
+            if (item instanceof StepLine) {
+            StepLine line = (StepLine) item;
                 return builder.buildLine(line.id());
             }
-            if (item instanceof StepCircle circle) {
+            if (item instanceof StepCircle) {
+            StepCircle circle = (StepCircle) item;
                 return builder.buildCircle(circle.id());
             }
-            if (item instanceof StepEllipse ellipse) {
+            if (item instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) item;
                 return builder.buildEllipse(ellipse.id());
             }
-            if (item instanceof StepConicCurve conic) {
+            if (item instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) item;
                 List<CartesianPoint> points = sampleConicCurvePoints(conic, builder);
                 return points == null ? null : new Polyline3(points);
             }
-            if (item instanceof StepBezierCurve curve) {
+            if (item instanceof StepBezierCurve) {
+            StepBezierCurve curve = (StepBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepUniformCurve curve) {
+            if (item instanceof StepUniformCurve) {
+            StepUniformCurve curve = (StepUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepQuasiUniformCurve curve) {
+            if (item instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepPiecewiseBezierCurve curve) {
+            if (item instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
-            if (item instanceof StepBSplineCurveWithKnots spline) {
+            if (item instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
                 return builder.buildBSplineCurve(spline.id());
             }
-            if (item instanceof StepSurfaceCurve surfaceCurve) {
+            if (item instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
                 return builder.buildSurfaceCurve(surfaceCurve.id());
             }
-            if (item instanceof StepSeamCurve seamCurve) {
+            if (item instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id());
             }
-            if (item instanceof StepTrimmedCurve trimmedCurve) {
+            if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
                 return builder.buildTrimmedCurve(trimmedCurve.id());
             }
-            if (item instanceof StepPolyline polyline) {
+            if (item instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) item;
                 return builder.buildPolyline(polyline.id());
             }
             if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve compositeCurve) {
@@ -8091,88 +8548,121 @@ public final class StepPreviewJsonExporter {
             if (item instanceof com.minicad.step.model.geometry.StepRationalBSplineCurve spline) {
                 return builder.buildRationalBSplineCurve(spline.id());
             }
-            if (item instanceof StepOffsetCurve2D offsetCurve2D) {
+            if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
                 return liftCurve2(builder.buildOffsetCurve2(offsetCurve2D.id()));
             }
-            if (item instanceof StepOffsetCurve3D offsetCurve3D) {
+            if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
                 return builder.buildOffsetCurve3(offsetCurve3D.id());
             }
-            if (item instanceof StepPcurve pcurve) {
+            if (item instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
-                return built instanceof Curve2 curve2 ? liftCurve2(curve2) : null;
+                if (built instanceof Curve2) {
+                    Curve2 curve2 = (Curve2) built;
+                    return liftCurve2(curve2);
+                }
+                return null;
             }
-            if (item instanceof StepDegeneratePcurve pcurve) {
+            if (item instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
-                return built instanceof Curve2 curve2 ? liftCurve2(curve2) : null;
+                if (built instanceof Curve2) {
+                    Curve2 curve2 = (Curve2) built;
+                    return liftCurve2(curve2);
+                }
+                return null;
             }
-            if (item instanceof StepOrientedCurve orientedCurve) {
+            if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
                 return curveForLooseEdge(orientedCurve.curveElement(), builder);
             }
-            if (item instanceof StepAnnotationCurveOccurrence occurrence) {
+            if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
                 return curveForLooseEdge(occurrence.item(), builder);
             }
-            if (item instanceof StepDimensionCurve dimensionCurve) {
+            if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
                 return curveForLooseEdge(dimensionCurve.item(), builder);
             }
-            if (item instanceof StepLeaderCurve leaderCurve) {
+            if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
                 return curveForLooseEdge(leaderCurve.item(), builder);
             }
-            if (item instanceof StepProjectionCurve projectionCurve) {
+            if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
                 return curveForLooseEdge(projectionCurve.item(), builder);
             }
-            if (item instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
                 return curveForLooseEdge(annotationOccurrence.item(), builder);
             }
-            if (item instanceof StepTerminatorSymbol terminatorSymbol) {
+            if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
                 return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
             }
             if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
                 List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
                 return points == null ? null : new Polyline3(points);
             }
-            if (item instanceof StepIndexedPolyCurve polyCurve) {
+            if (item instanceof StepIndexedPolyCurve) {
+            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
                 return builder.buildCurveReference3(polyCurve.id());
             }
-            if (item instanceof StepClothoid clothoid) {
+            if (item instanceof StepClothoid) {
+            StepClothoid clothoid = (StepClothoid) item;
                 return builder.buildCurveReference3(clothoid.id());
             }
-            if (item instanceof StepDegenerateCurve degenerate) {
+            if (item instanceof StepDegenerateCurve) {
+            StepDegenerateCurve degenerate = (StepDegenerateCurve) item;
                 return builder.buildCurveReference3(degenerate.id());
             }
-            if (item instanceof StepBSplineCurve bspline) {
+            if (item instanceof StepBSplineCurve) {
+            StepBSplineCurve bspline = (StepBSplineCurve) item;
                 return builder.buildCurveReference3(bspline.id());
             }
-            if (item instanceof StepCompositeCurveOnSurface compositeOnSurface) {
+            if (item instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
                 return builder.buildCurveReference3(compositeOnSurface.id());
             }
-            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints splineBreak) {
+            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+            StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) item;
                 return builder.buildBSplineCurveWithBreakpoints(splineBreak.id());
             }
-            if (item instanceof StepLineSegment lineSeg) {
+            if (item instanceof StepLineSegment) {
+            StepLineSegment lineSeg = (StepLineSegment) item;
                 return new Polyline3(List.of(
                         builder.buildPoint(lineSeg.startPoint().id()),
                         builder.buildPoint(lineSeg.endPoint().id())
                 ));
             }
-            if (item instanceof StepEdgeCurve edgeCurve) {
+            if (item instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
                 return builder.buildCurveReference3(edgeCurve.id());
             }
-            if (item instanceof StepSurfacedEdgeCurve surfacedEdge) {
+            if (item instanceof StepSurfacedEdgeCurve) {
+            StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) item;
                 return builder.buildCurveReference3(surfacedEdge.id());
             }
-            if (item instanceof StepCompositeCurveOnSurface3D compositeOnSurface3D) {
+            if (item instanceof StepCompositeCurveOnSurface3D) {
+            StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) item;
                 return builder.buildCurveReference3(compositeOnSurface3D.id());
             }
-            if (item instanceof StepPath path) {
+            if (item instanceof StepPath) {
+            StepPath path = (StepPath) item;
                 return builder.buildPath(path.id());
             }
-            if (item instanceof StepOpenPath openPath) {
+            if (item instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) item;
                 return builder.buildPath(openPath.id());
             }
-            if (item instanceof StepSubpath subpath) {
+            if (item instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) item;
                 return builder.buildPath(subpath.id());
             }
-            if (item instanceof StepSeamCurve seamCurve) {
+            if (item instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id()).curve3d();
             }
             if (item instanceof StepCircle2D
@@ -8198,10 +8688,12 @@ public final class StepPreviewJsonExporter {
         } catch (UnsupportedGeometryException | StepResolutionException ex) {
             return null;
         }
-        if (item instanceof StepBoundedCurve bounded) {
+        if (item instanceof StepBoundedCurve) {
+            StepBoundedCurve bounded = (StepBoundedCurve) item;
             return builder.buildCurveReference3(bounded.id());
         }
-        if (item instanceof StepMappedItem mappedItem) {
+        if (item instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) item;
             return curveForLooseEdge(mappedItem.mappingTarget(), builder);
         }
         return null;
@@ -8212,17 +8704,15 @@ public final class StepPreviewJsonExporter {
         if (matrix == null) {
             return null;
         }
-        return switch (curve.entityName()) {
-            case "CIRCLE" -> sampleConicCirclePoints(curve, matrix);
-            case "ELLIPSE" -> sampleConicEllipsePoints(curve, matrix);
-            case "PARABOLA" -> sampleParabolaPoints(curve, matrix);
-            case "HYPERBOLA" -> sampleHyperbolaPoints(curve, matrix);
-            case "DEGENERATE_CONIC" -> {
-                CartesianPoint point = transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
-                yield List.of(point, point);
-            }
-            default -> null;
-        };
+        String entityName = curve.entityName();
+        if (entityName.equals("CIRCLE")) return sampleConicCirclePoints(curve, matrix);
+        else if (entityName.equals("ELLIPSE")) return sampleConicEllipsePoints(curve, matrix);
+        else if (entityName.equals("PARABOLA")) return sampleParabolaPoints(curve, matrix);
+        else if (entityName.equals("HYPERBOLA")) return sampleHyperbolaPoints(curve, matrix);
+        else if (entityName.equals("DEGENERATE_CONIC")) {
+            CartesianPoint point = transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
+            return List.of(point, point);
+        } else return null;
     }
 
     private static List<CartesianPoint> sampleConicCirclePoints(StepConicCurve curve, double[] matrix) {
@@ -8295,16 +8785,20 @@ public final class StepPreviewJsonExporter {
     }
 
     static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        if (curve instanceof TrimmedCurve3 trimmedCurve) {
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             return sampleTrimmedCurve3(trimmedCurve, 72);
         }
-        if (curve instanceof SurfaceCurve3 surfaceCurve) {
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             return sampleLooseCurve(surfaceCurve.curve3d());
         }
-        if (curve instanceof Polyline3 polyline) {
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
             return polyline.points();
         }
-        if (curve instanceof CompositeCurve3 compositeCurve) {
+        if (curve instanceof CompositeCurve3) {
+            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>();
             boolean first = true;
             for (Curve3 segment : compositeCurve.segments()) {
@@ -8334,37 +8828,48 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<Point2> sampleLooseCurve2(Curve2 curve) {
-        if (curve instanceof Line2 line) {
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
             return List.of(line.pointAt(0.0), line.pointAt(1.0));
         }
-        if (curve instanceof Circle2 circle) {
+        if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
             return sampleCircle2Points(circle, 72);
         }
-        if (curve instanceof Ellipse2 ellipse) {
+        if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
             return sampleEllipse2Points(ellipse, 72);
         }
-        if (curve instanceof Parabola2 parabola) {
+        if (curve instanceof Parabola2) {
+            Parabola2 parabola = (Parabola2) curve;
             return parabola.sample(72);
         }
-        if (curve instanceof Hyperbola2 hyperbola) {
+        if (curve instanceof Hyperbola2) {
+            Hyperbola2 hyperbola = (Hyperbola2) curve;
             return hyperbola.sample(72);
         }
-        if (curve instanceof DegenerateCurve2 degenerate) {
+        if (curve instanceof DegenerateCurve2) {
+            DegenerateCurve2 degenerate = (DegenerateCurve2) curve;
             return List.of(degenerate.point());
         }
-        if (curve instanceof BSplineCurve2 spline) {
+        if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) curve;
             return spline.sample(72);
         }
-        if (curve instanceof RationalBSplineCurve2 spline) {
+        if (curve instanceof RationalBSplineCurve2) {
+            RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
             return spline.sample(72);
         }
-        if (curve instanceof TrimmedCurve2 trimmedCurve) {
+        if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
             return sampleTrimmedCurve2(trimmedCurve, 72);
         }
-        if (curve instanceof Polyline2 polyline) {
+        if (curve instanceof Polyline2) {
+            Polyline2 polyline = (Polyline2) curve;
             return polyline.points();
         }
-        if (curve instanceof CompositeCurve2 compositeCurve) {
+        if (curve instanceof CompositeCurve2) {
+            CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
             List<Point2> points = new ArrayList<>();
             boolean first = true;
             for (Curve2 segment : compositeCurve.segments()) {
@@ -8385,7 +8890,7 @@ public final class StepPreviewJsonExporter {
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
-        boolean closed = sampled.getFirst().subtract(sampled.getLast()).norm() <= 1.0e-9;
+        boolean closed = sampled.get(0).subtract(sampled.get(sampled.size() - 1)).norm() <= 1.0e-9;
         List<Point2> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
         int startIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimStart());
         int endIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimEnd());
@@ -8447,7 +8952,7 @@ public final class StepPreviewJsonExporter {
     }
 
     private static void addDistinctPoint2(List<Point2> points, Point2 candidate) {
-        if (points.isEmpty() || points.getLast().subtract(candidate).norm() > 1.0e-9) {
+        if (points.isEmpty() || points.get(points.size() - 1).subtract(candidate).norm() > 1.0e-9) {
             points.add(candidate);
         }
     }
@@ -8559,7 +9064,8 @@ public final class StepPreviewJsonExporter {
             if (edgeGeometry instanceof StepLine) {
                 return sampledCurvePayload(edgeGeometry, builder);
             }
-            if (edgeGeometry instanceof StepCircle circle) {
+            if (edgeGeometry instanceof StepCircle) {
+            StepCircle circle = (StepCircle) edgeGeometry;
                 Circle geometry = builder.buildCircle(circle.id());
                 Axis2Placement3D placement = geometry.position();
                 double startAngle = geometry.angleOf(start);
@@ -8590,7 +9096,8 @@ public final class StepPreviewJsonExporter {
                         arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
                 );
             }
-            if (edgeGeometry instanceof StepEllipse ellipse) {
+            if (edgeGeometry instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) edgeGeometry;
                 Ellipse3 geometry = builder.buildEllipse(ellipse.id());
                 Axis2Placement3D placement = geometry.position();
                 double startAngle = geometry.angleOf(start);
@@ -8621,23 +9128,28 @@ public final class StepPreviewJsonExporter {
                         arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
                 );
             }
-            if (edgeGeometry instanceof StepBSplineCurveWithKnots bspline) {
+            if (edgeGeometry instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots bspline = (StepBSplineCurveWithKnots) edgeGeometry;
                 BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
                 return newBSplineCurvePayload(edgeGeometry.id(), geometry);
             }
-            if (edgeGeometry instanceof StepBSplineCurve bspline) {
+            if (edgeGeometry instanceof StepBSplineCurve) {
+            StepBSplineCurve bspline = (StepBSplineCurve) edgeGeometry;
                 BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
                 return newBSplineCurvePayload(edgeGeometry.id(), geometry);
             }
-            if (edgeGeometry instanceof StepRationalBSplineCurve rational) {
+            if (edgeGeometry instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve rational = (StepRationalBSplineCurve) edgeGeometry;
                 RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve3(rational.id());
                 return newRationalBSplineCurvePayload(edgeGeometry.id(), geometry);
             }
-            if (edgeGeometry instanceof StepPolyline polyline) {
+            if (edgeGeometry instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) edgeGeometry;
                 Polyline3 geometry = builder.buildPolyline(polyline.id());
                 return newPolylineCurvePayload(edgeGeometry.id(), geometry, start, end);
             }
-            if (edgeGeometry instanceof StepLine line) {
+            if (edgeGeometry instanceof StepLine) {
+            StepLine line = (StepLine) edgeGeometry;
                 return newLineCurvePayload(edgeGeometry.id(), builder, line, start, end);
             }
             EdgeCurvePayload generic = sampledCurvePayload(edgeGeometry, builder);
@@ -8687,7 +9199,8 @@ public final class StepPreviewJsonExporter {
 
 
     private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
-        if (curve instanceof TrimmedCurve3 trimmedCurve) {
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(sampleTrimmedCurve3(trimmedCurve, 72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8696,10 +9209,12 @@ public final class StepPreviewJsonExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-        if (curve instanceof SurfaceCurve3 surfaceCurve) {
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             return sampleEdge(start, end, surfaceCurve.curve3d(), naturalForward);
         }
-        if (curve instanceof BSplineCurve3 splineCurve) {
+        if (curve instanceof BSplineCurve3) {
+            BSplineCurve3 splineCurve = (BSplineCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8708,7 +9223,8 @@ public final class StepPreviewJsonExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-        if (curve instanceof RationalBSplineCurve3 splineCurve) {
+        if (curve instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 splineCurve = (RationalBSplineCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8720,13 +9236,16 @@ public final class StepPreviewJsonExporter {
         if (curve instanceof Line3) {
             return List.of(start, end);
         }
-        if (curve instanceof Circle circle) {
+        if (curve instanceof Circle) {
+            Circle circle = (Circle) curve;
             return sampleCircleArc(circle, start, end, naturalForward);
         }
-        if (curve instanceof Ellipse3 ellipse) {
+        if (curve instanceof Ellipse3) {
+            Ellipse3 ellipse = (Ellipse3) curve;
             return sampleEllipseArc(ellipse, start, end, naturalForward);
         }
-        if (curve instanceof Polyline3 polyline) {
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
             List<CartesianPoint> points = new ArrayList<>(polyline.points());
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8735,7 +9254,8 @@ public final class StepPreviewJsonExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-        if (curve instanceof CompositeCurve3 compositeCurve) {
+        if (curve instanceof CompositeCurve3) {
+            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>();
             boolean firstSegment = true;
             for (Curve3 segment : compositeCurve.segments()) {
@@ -8752,7 +9272,8 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Parabola3 parabola) {
+        if (curve instanceof Parabola3) {
+            Parabola3 parabola = (Parabola3) curve;
             List<CartesianPoint> points = new ArrayList<>(parabola.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8763,7 +9284,8 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Hyperbola3 hyperbola) {
+        if (curve instanceof Hyperbola3) {
+            Hyperbola3 hyperbola = (Hyperbola3) curve;
             List<CartesianPoint> points = new ArrayList<>(hyperbola.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8774,7 +9296,8 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Clothoid3 clothoid) {
+        if (curve instanceof Clothoid3) {
+            Clothoid3 clothoid = (Clothoid3) curve;
             List<CartesianPoint> points = new ArrayList<>(clothoid.sample(72));
             if (!naturalForward) {
                 java.util.Collections.reverse(points);
@@ -8785,7 +9308,8 @@ public final class StepPreviewJsonExporter {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof DegenerateCurve3 degenerate) {
+        if (curve instanceof DegenerateCurve3) {
+            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
             // Degenerate curve: a single collapsed point; return start-end as a degenerate edge
             return List.of(start, end);
         }
@@ -8797,7 +9321,7 @@ public final class StepPreviewJsonExporter {
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
-        boolean closed = sampled.getFirst().distanceTo(sampled.getLast()) <= 1.0e-9;
+        boolean closed = sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) <= 1.0e-9;
         List<CartesianPoint> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
         int startIndex = nearestPointIndex(basisPoints, trimmedCurve.trimStart());
         int endIndex = nearestPointIndex(basisPoints, trimmedCurve.trimEnd());
@@ -8859,7 +9383,7 @@ public final class StepPreviewJsonExporter {
     }
 
     private static void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.getLast().distanceTo(candidate) > 1.0e-9) {
+        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
             points.add(candidate);
         }
     }
@@ -8922,7 +9446,7 @@ public final class StepPreviewJsonExporter {
     }
 
     private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
-        return points.stream().map(StepPreviewJsonExporter::toPointPayload).toList();
+        return points.stream().map(StepPreviewJsonExporter::toPointPayload).collect(Collectors.toList());
     }
 
     private static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
@@ -8944,7 +9468,7 @@ public final class StepPreviewJsonExporter {
         }
         List<FacePayload> faces = payload.faces().stream()
                 .map(face -> reduceFacePayload(face, triangleFactor, loopFactor))
-                .toList();
+                .collect(Collectors.toList());
         List<RepresentationPayload> representations = payload.representations().stream()
                 .map(representation -> new RepresentationPayload(
                         representation.id(),
@@ -8954,9 +9478,9 @@ public final class StepPreviewJsonExporter {
                         representation.edges(),
                         representation.faces().stream()
                                 .map(face -> reduceFacePayload(face, triangleFactor, loopFactor))
-                                .toList()
+                                .collect(Collectors.toList())
                 ))
-                .toList();
+                .collect(Collectors.toList());
         PreviewPayload reduced = new PreviewPayload(
                 payload.stats(),
                 payload.bounds(),
@@ -9045,8 +9569,8 @@ public final class StepPreviewJsonExporter {
             for (int index = 0; index < loop.points().size(); index += factor) {
                 points.add(loop.points().get(index));
             }
-            PointPayload last = loop.points().getLast();
-            if (!points.getLast().equals(last)) {
+            PointPayload last = loop.points().get(loop.points().size() - 1);
+            if (!points.get(points.size() - 1).equals(last)) {
                 points.add(last);
             }
             reduced.add(new LoopPayload(loop.outer(), List.copyOf(points)));
@@ -9474,7 +9998,7 @@ public final class StepPreviewJsonExporter {
     ) {
         List<PointPayload> points = edge.points().stream()
                 .map(point -> transform(point, matrix))
-                .toList();
+                .collect(Collectors.toList());
         return new EdgePayload(
                 mappedPayloadId(mappedItemId, edge.stepId(), 1),
                 points,
@@ -9539,12 +10063,12 @@ public final class StepPreviewJsonExporter {
         List<LoopPayload> loops = face.loops().stream()
                 .map(loop -> new LoopPayload(
                         loop.outer(),
-                        loop.points().stream().map(point -> transform(point, matrix)).toList()
+                        loop.points().stream().map(point -> transform(point, matrix)).collect(Collectors.toList())
                 ))
-                .toList();
+                .collect(Collectors.toList());
         List<PointPayload> triangles = face.triangles().stream()
                 .map(point -> transform(point, matrix))
-                .toList();
+                .collect(Collectors.toList());
         int[] rgb = metadata.rgb() != null ? metadata.rgb() : null;
         ColorPayload color = rgb == null ? face.color() : toColorPayload(rgb);
         double transparency = metadata.transparency() > 0 ? metadata.transparency() : face.transparency();
@@ -9580,7 +10104,8 @@ public final class StepPreviewJsonExporter {
         Map<Integer, List<PmiTargetPayload>> targetsByUsageId = new LinkedHashMap<>();
         Map<Integer, List<String>> instanceIdsByTargetId = buildInstanceIdsByTargetId(assembly);
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepGeometricItemSpecificUsage usage) {
+            if (entity instanceof StepGeometricItemSpecificUsage) {
+            StepGeometricItemSpecificUsage usage = (StepGeometricItemSpecificUsage) entity;
                 appendPmiTarget(
                         targetsByUsageId,
                         usage.usage().id(),
@@ -9591,7 +10116,8 @@ public final class StepPreviewJsonExporter {
                         "GEOMETRIC_ITEM_SPECIFIC_USAGE",
                         usage.id()
                 );
-            } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage usage) {
+            } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
+            StepChainBasedGeometricItemSpecificUsage usage = (StepChainBasedGeometricItemSpecificUsage) entity;
                 appendPmiTarget(
                         targetsByUsageId,
                         usage.usage().id(),
@@ -9602,7 +10128,8 @@ public final class StepPreviewJsonExporter {
                         "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE",
                         usage.id()
                 );
-            } else if (entity instanceof StepItemIdentifiedRepresentationUsage usage) {
+            } else if (entity instanceof StepItemIdentifiedRepresentationUsage) {
+            StepItemIdentifiedRepresentationUsage usage = (StepItemIdentifiedRepresentationUsage) entity;
                 appendRepresentationBacklinkTarget(
                         targetsByUsageId,
                         usage.identifiedItem(),
@@ -9618,7 +10145,8 @@ public final class StepPreviewJsonExporter {
                         resolved,
                         instanceIdsByTargetId
                 );
-            } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage usage) {
+            } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
+            StepChainBasedItemIdentifiedRepresentationUsage usage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
                 appendRepresentationBacklinkTarget(
                         targetsByUsageId,
                         usage.identifiedItem(),
@@ -9634,25 +10162,29 @@ public final class StepPreviewJsonExporter {
                         resolved,
                         instanceIdsByTargetId
                 );
-            } else if (entity instanceof StepPlacedTarget usage) {
+            } else if (entity instanceof StepPlacedTarget) {
+            StepPlacedTarget usage = (StepPlacedTarget) entity;
                 appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PLACED_TARGET", usage.id());
                 appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
                 appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepDraughtingModelItemAssociation usage) {
+            } else if (entity instanceof StepDraughtingModelItemAssociation) {
+            StepDraughtingModelItemAssociation usage = (StepDraughtingModelItemAssociation) entity;
                 appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION", usage.id());
                 appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
                 appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder usage) {
+            } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
+            StepDraughtingModelItemAssociationWithPlaceholder usage = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
                 appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER", usage.id());
                 appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
                 appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
                 appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepPmiRequirementItemAssociation usage) {
+            } else if (entity instanceof StepPmiRequirementItemAssociation) {
+            StepPmiRequirementItemAssociation usage = (StepPmiRequirementItemAssociation) entity;
                 appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PMI_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
                 appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
                 appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
@@ -9661,7 +10193,8 @@ public final class StepPreviewJsonExporter {
                 appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
                 appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
                 appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.requirement(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation usage) {
+            } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
+            StepMechanicalDesignRequirementItemAssociation usage = (StepMechanicalDesignRequirementItemAssociation) entity;
                 appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
                 appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
                 appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
@@ -9673,18 +10206,21 @@ public final class StepPreviewJsonExporter {
             }
         }
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepDraughtingCalloutRelationship relationship) {
+            if (entity instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) entity;
                 propagateCalloutTargets(targetsByUsageId, relationship);
             }
         }
         List<PmiPayload> pmi = new ArrayList<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepDraughtingCallout callout) {
+            if (entity instanceof StepDraughtingCallout) {
+            StepDraughtingCallout callout = (StepDraughtingCallout) entity;
                 PmiPayload payload = toPmiPayload(callout, targetsByUsageId.getOrDefault(callout.id(), List.of()), builder);
                 if (payload != null) {
                     pmi.add(payload);
                 }
-            } else if (entity instanceof StepAnnotationTextOccurrence textOccurrence) {
+            } else if (entity instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
                 CartesianPoint position = pointFromAnnotationPoint(textOccurrence.position(), builder);
                 if (position == null) {
                     continue;
@@ -9695,82 +10231,97 @@ public final class StepPreviewJsonExporter {
                         textOccurrence.text(),
                         toPointPayload(position),
                         List.of(),
-                        targets.stream().map(PmiTargetPayload::id).toList(),
+                        targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                         targets
                 ));
-            } else if (entity instanceof StepAnnotationPointOccurrence pointOccurrence) {
+            } else if (entity instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
                 CartesianPoint position = pointFromAnnotationPoint(pointOccurrence.item(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(pointOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(pointOccurrence.id(), pointOccurrence.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+            } else if (entity instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
                 CartesianPoint position = pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillAreaOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(fillAreaOccurrence.id(), fillAreaOccurrence.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationPlaceholderOccurrence placeholderOccurrence) {
+            } else if (entity instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) entity;
                 appendPlaceholderPmi(
                         placeholderOccurrence,
                         pmi,
                         builder,
                         targetsByUsageId.getOrDefault(placeholderOccurrence.id(), List.of()));
-            } else if (entity instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+            } else if (entity instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) entity;
                 CartesianPoint position = pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(symbolOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(symbolOccurrence.id(), symbolOccurrence.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationSymbol annotationSymbol) {
+            } else if (entity instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
                 CartesianPoint position = pointFromAnnotationSymbol(annotationSymbol);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationSymbol.id(), List.of());
                     pmi.add(toStandalonePointPmi(annotationSymbol.id(), annotationSymbol.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationText annotationText) {
+            } else if (entity instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) entity;
                 CartesianPoint position = pointFromPlacement(annotationText.mappingTarget());
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationText.id(), List.of());
                     pmi.add(toStandalonePointPmi(annotationText.id(), annotationText.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+            } else if (entity instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
                 CartesianPoint position = pointFromPlacement(annotationTextCharacter.mappingTarget());
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationTextCharacter.id(), List.of());
                     pmi.add(toStandalonePointPmi(annotationTextCharacter.id(), annotationTextCharacter.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationFillArea fillArea) {
+            } else if (entity instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
                 CartesianPoint position = pointFromAnnotationFillArea(fillArea, builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillArea.id(), List.of());
                     pmi.add(toStandalonePointPmi(fillArea.id(), fillArea.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+            } else if (entity instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) entity;
                 CartesianPoint position = pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(subfigureOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(subfigureOccurrence.id(), subfigureOccurrence.name(), position, targets));
                 }
-            } else if (entity instanceof StepAnnotationPlane annotationPlane) {
+            } else if (entity instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) entity;
                 appendAnnotationPlanePmi(
                         annotationPlane,
                         pmi,
                         builder,
                         targetsByUsageId.getOrDefault(annotationPlane.id(), List.of()));
-            } else if (entity instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+            } else if (entity instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) entity;
                 appendDraughtingAnnotationPmi(
                         annotationOccurrence,
                         pmi,
                         builder,
                         targetsByUsageId.getOrDefault(annotationOccurrence.id(), List.of()));
-            } else if (entity instanceof StepAnnotationOccurrenceRelationship relationship) {
+            } else if (entity instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
                 appendAnnotationOccurrenceRelationshipPmi(relationship, pmi, builder);
-            } else if (entity instanceof StepPointSet pointSet) {
+            } else if (entity instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) entity;
                 appendPointSetPmi(pointSet, pmi, builder);
-            } else if (entity instanceof StepGeometricMeasurement measurement) {
+            } else if (entity instanceof StepGeometricMeasurement) {
+            StepGeometricMeasurement measurement = (StepGeometricMeasurement) entity;
                 appendGeometricMeasurementPmi(measurement, pmi, builder);
-            } else if (entity instanceof StepVertexShell vertexShell) {
+            } else if (entity instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) entity;
                 pmi.add(toStandalonePointPmi(
                         vertexShell.id(),
                         vertexShell.name(),
@@ -9781,23 +10332,32 @@ public final class StepPreviewJsonExporter {
                 if (position != null) {
                     pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
                 }
-            } else if (entity instanceof StepFillAreaWithOutline fillArea) {
+            } else if (entity instanceof StepFillAreaWithOutline) {
+            StepFillAreaWithOutline fillArea = (StepFillAreaWithOutline) entity;
                 appendFillAreaWithOutlinePmi(fillArea, pmi, builder);
-            } else if (entity instanceof StepGeometricTolerance tolerance) {
+            } else if (entity instanceof StepGeometricTolerance) {
+            StepGeometricTolerance tolerance = (StepGeometricTolerance) entity;
                 appendGeometricTolerancePmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithDatumReference tolerance) {
+            } else if (entity instanceof StepGeometricToleranceWithDatumReference) {
+            StepGeometricToleranceWithDatumReference tolerance = (StepGeometricToleranceWithDatumReference) entity;
                 appendGeometricToleranceWithDatumPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithDefinedAreaUnit tolerance) {
+            } else if (entity instanceof StepGeometricToleranceWithDefinedAreaUnit) {
+            StepGeometricToleranceWithDefinedAreaUnit tolerance = (StepGeometricToleranceWithDefinedAreaUnit) entity;
                 appendGeometricToleranceWithAreaUnitPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithMaximumTolerance tolerance) {
+            } else if (entity instanceof StepGeometricToleranceWithMaximumTolerance) {
+            StepGeometricToleranceWithMaximumTolerance tolerance = (StepGeometricToleranceWithMaximumTolerance) entity;
                 appendGeometricToleranceWithMaxPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepDimensionalLocation location) {
+            } else if (entity instanceof StepDimensionalLocation) {
+            StepDimensionalLocation location = (StepDimensionalLocation) entity;
                 appendDimensionalLocationPmi(location, pmi, builder);
-            } else if (entity instanceof StepToleranceZone zone) {
+            } else if (entity instanceof StepToleranceZone) {
+            StepToleranceZone zone = (StepToleranceZone) entity;
                 appendToleranceZonePmi(zone, pmi, builder);
-            } else if (entity instanceof StepDatum datum) {
+            } else if (entity instanceof StepDatum) {
+            StepDatum datum = (StepDatum) entity;
                 appendDatumPmi(datum, pmi, builder);
-            } else if (entity instanceof StepDatumTarget datumTarget) {
+            } else if (entity instanceof StepDatumTarget) {
+            StepDatumTarget datumTarget = (StepDatumTarget) entity;
                 appendDatumTargetPmi(datumTarget, pmi, builder);
             }
         }
@@ -9836,7 +10396,8 @@ public final class StepPreviewJsonExporter {
         int pointIndex = 0;
         for (StepEntity element : annotationPlane.elements()) {
             CartesianPoint position = null;
-            if (element instanceof StepGeometricSet geometricSet) {
+            if (element instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) element;
                 position = pointFromGeometricSet(geometricSet, builder);
             }
             if (position == null) {
@@ -10022,7 +10583,8 @@ public final class StepPreviewJsonExporter {
             StepCadBuilder builder
     ) {
         String zoneShape = null;
-        if (zone.form() instanceof StepToleranceZoneForm form) {
+        if (zone.form() instanceof StepToleranceZoneForm) {
+            StepToleranceZoneForm form = (StepToleranceZoneForm) zone.form();
             zoneShape = form.zoneShape();
         }
         CartesianPoint position = pointFromAnnotationPoint(zone.form(), builder);
@@ -10074,7 +10636,7 @@ public final class StepPreviewJsonExporter {
                 "",
                 toPointPayload(position),
                 List.of(),
-                targets.stream().map(PmiTargetPayload::id).toList(),
+                targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 targets
         );
     }
@@ -10097,22 +10659,28 @@ public final class StepPreviewJsonExporter {
     }
 
     private static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepCartesianPoint point) {
+        if (item instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) item;
             return pointFromStep(point);
         }
-        if (item instanceof StepVertexPoint vertexPoint) {
+        if (item instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) item;
             return pointFromStep(vertexPoint.point());
         }
-        if (item instanceof StepVertexShell vertexShell) {
+        if (item instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) item;
             return pointFromStep(vertexShell.extent().loopVertex().point());
         }
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             return pointFromPointSet(pointSet, builder);
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return pointFromGeometricSet(geometricSet, builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return pointFromGeometricCurveSet(curveSet, builder);
         }
         if (item instanceof StepAnnotationSymbol
@@ -10131,7 +10699,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepAnnotationPlane) {
             return pointFromAnnotationOccurrence(item, builder);
         }
-        if (builder != null && item instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+        if (builder != null && item instanceof StepGeometricReplica && "POINT_REPLICA".equals(replica.entityName())) {
             return pointFromReplica(replica, builder);
         }
         return null;
@@ -10149,41 +10717,84 @@ public final class StepPreviewJsonExporter {
         if (sampled == null || sampled.isEmpty()) {
             return null;
         }
-        return sampled.getFirst();
+        return sampled.get(0);
     }
 
     private static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
-        return switch (occurrence) {
-            case StepAnnotationPointOccurrence pointOccurrence -> pointFromAnnotationPoint(pointOccurrence.item(), builder);
-            case StepAnnotationCurveOccurrence curveOccurrence -> pointFromCurveCarrier(curveOccurrence.item(), builder);
-            case StepLeaderCurve leaderCurve -> pointFromCurveCarrier(leaderCurve.item(), builder);
-            case StepDimensionCurve dimensionCurve -> pointFromCurveCarrier(dimensionCurve.item(), builder);
-            case StepProjectionCurve projectionCurve -> pointFromCurveCarrier(projectionCurve.item(), builder);
-            case StepAnnotationFillAreaOccurrence fillAreaOccurrence -> pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
-            case StepAnnotationFillArea fillArea -> pointFromAnnotationFillArea(fillArea, builder);
-            case StepAnnotationSymbol annotationSymbol -> pointFromAnnotationSymbol(annotationSymbol);
-            case StepAnnotationSymbolOccurrence symbolOccurrence -> pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
-            case StepAnnotationSubfigureOccurrence subfigureOccurrence -> pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
-            case StepAnnotationPlaceholderOccurrence placeholderOccurrence -> pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
-            case StepAnnotationPlane annotationPlane -> pointFromAnnotationPlane(annotationPlane, builder);
-            case StepAnnotationText annotationText -> pointFromPlacement(annotationText.mappingTarget());
-            case StepAnnotationTextCharacter annotationTextCharacter -> pointFromPlacement(annotationTextCharacter.mappingTarget());
-            case StepAnnotationTextOccurrence textOccurrence -> pointFromAnnotationPoint(textOccurrence.position(), builder);
-            case StepDraughtingAnnotationOccurrence annotationOccurrence -> pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
-            case StepTerminatorSymbol terminatorSymbol -> {
-                CartesianPoint position = pointFromAnnotationOccurrence(terminatorSymbol.item(), builder);
-                if (position == null) {
-                    position = pointFromAnnotationOccurrence(terminatorSymbol.annotatedCurve(), builder);
-                }
-                yield position;
+        if (occurrence instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) occurrence;
+            return pointFromAnnotationPoint(pointOccurrence.item(), builder);
+        } else if (occurrence instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence curveOccurrence = (StepAnnotationCurveOccurrence) occurrence;
+            return pointFromCurveCarrier(curveOccurrence.item(), builder);
+        } else if (occurrence instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) occurrence;
+            return pointFromCurveCarrier(leaderCurve.item(), builder);
+        } else if (occurrence instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) occurrence;
+            return pointFromCurveCarrier(dimensionCurve.item(), builder);
+        } else if (occurrence instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) occurrence;
+            return pointFromCurveCarrier(projectionCurve.item(), builder);
+        } else if (occurrence instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) occurrence;
+            return pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+        } else if (occurrence instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) occurrence;
+            return pointFromAnnotationFillArea(fillArea, builder);
+        } else if (occurrence instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) occurrence;
+            return pointFromAnnotationSymbol(annotationSymbol);
+        } else if (occurrence instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
+        } else if (occurrence instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
+        } else if (occurrence instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) occurrence;
+            return pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
+        } else if (occurrence instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) occurrence;
+            return pointFromAnnotationPlane(annotationPlane, builder);
+        } else if (occurrence instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) occurrence;
+            return pointFromPlacement(annotationText.mappingTarget());
+        } else if (occurrence instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) occurrence;
+            return pointFromPlacement(annotationTextCharacter.mappingTarget());
+        } else if (occurrence instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) occurrence;
+            return pointFromAnnotationPoint(textOccurrence.position(), builder);
+        } else if (occurrence instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
+        } else if (occurrence instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) occurrence;
+            CartesianPoint position = pointFromAnnotationOccurrence(terminatorSymbol.item(), builder);
+            if (position == null) {
+                position = pointFromAnnotationOccurrence(terminatorSymbol.annotatedCurve(), builder);
             }
-            case StepPointSet pointSet -> pointFromPointSet(pointSet, builder);
-            case StepGeometricSet geometricSet -> pointFromGeometricSet(geometricSet, builder);
-            case StepGeometricCurveSet curveSet -> pointFromGeometricCurveSet(curveSet, builder);
-            case StepVertexShell vertexShell -> pointFromStep(vertexShell.extent().loopVertex().point());
-            case StepGeometricReplica replica when "POINT_REPLICA".equals(replica.entityName()) -> builder == null ? null : pointFromReplica(replica, builder);
-            default -> null;
-        };
+            return position;
+        } else if (occurrence instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) occurrence;
+            return pointFromPointSet(pointSet, builder);
+        } else if (occurrence instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) occurrence;
+            return pointFromGeometricSet(geometricSet, builder);
+        } else if (occurrence instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) occurrence;
+            return pointFromGeometricCurveSet(curveSet, builder);
+        } else if (occurrence instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) occurrence;
+            return pointFromStep(vertexShell.extent().loopVertex().point());
+        } else if (occurrence instanceof StepGeometricReplica
+                && "POINT_REPLICA".equals(((StepGeometricReplica) occurrence).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) occurrence;
+            return builder == null ? null : pointFromReplica(replica, builder);
+        } else {
+            return null;
+        }
     }
 
     private static CartesianPoint pointFromCurveCarrier(StepEntity item, StepCadBuilder builder) {
@@ -10191,7 +10802,7 @@ public final class StepPreviewJsonExporter {
         if (sampled == null || sampled.isEmpty()) {
             return null;
         }
-        return sampled.getFirst();
+        return sampled.get(0);
     }
 
     private static CartesianPoint pointFromGeometricSet(StepGeometricSet geometricSet, StepCadBuilder builder) {
@@ -10232,7 +10843,8 @@ public final class StepPreviewJsonExporter {
 
     private static CartesianPoint pointFromAnnotationPlane(StepAnnotationPlane annotationPlane, StepCadBuilder builder) {
         for (StepEntity element : annotationPlane.elements()) {
-            if (element instanceof StepGeometricSet geometricSet) {
+            if (element instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) element;
                 CartesianPoint point = pointFromGeometricSet(geometricSet, builder);
                 if (point != null) {
                     return point;
@@ -10261,16 +10873,20 @@ public final class StepPreviewJsonExporter {
     }
 
     private static CartesianPoint pointFromPlaceholderItem(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             return pointFromGeometricSet(geometricSet, builder);
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             return pointFromGeometricCurveSet(curveSet, builder);
         }
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             return pointFromPointSet(pointSet, builder);
         }
-        if (item instanceof StepAnnotationPlane annotationPlane) {
+        if (item instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
             return pointFromAnnotationPlane(annotationPlane, builder);
         }
         CartesianPoint point = pointFromAnnotationOccurrence(item, builder);
@@ -10285,25 +10901,29 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> positions,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepPointSet pointSet) {
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
             for (StepEntity point : pointSet.points()) {
                 collectPlaceholderPositions(point, positions, builder);
             }
             return;
         }
-        if (item instanceof StepGeometricSet geometricSet) {
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
             for (StepEntity element : geometricSet.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
             return;
         }
-        if (item instanceof StepGeometricCurveSet curveSet) {
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
             for (StepEntity element : curveSet.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
             return;
         }
-        if (item instanceof StepAnnotationPlane annotationPlane) {
+        if (item instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
             for (StepEntity element : annotationPlane.elements()) {
                 collectPlaceholderPositions(element, positions, builder);
             }
@@ -10319,10 +10939,12 @@ public final class StepPreviewJsonExporter {
     }
 
     private static CartesianPoint pointFromPlacement(StepEntity placement) {
-        if (placement instanceof StepAxis2Placement3D placement3D) {
+        if (placement instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
             return pointFromStep(placement3D.location());
         }
-        if (placement instanceof StepAxis2Placement2D placement2D) {
+        if (placement instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
             StepCartesianPoint point = placement2D.location();
             return new CartesianPoint(point.coordinates().get(0), point.coordinates().get(1), 0.0);
         }
@@ -10330,10 +10952,12 @@ public final class StepPreviewJsonExporter {
     }
 
     private static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
-        if (replica.parent() instanceof StepCartesianPoint point) {
+        if (replica.parent() instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) replica.parent();
             return transformPoint(pointFromStep(point), replica.transformation(), builder);
         }
-        if (replica.parent() instanceof StepVertexPoint vertexPoint) {
+        if (replica.parent() instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) replica.parent();
             return transformPoint(pointFromStep(vertexPoint.point()), replica.transformation(), builder);
         }
         return null;
@@ -10403,7 +11027,8 @@ public final class StepPreviewJsonExporter {
         StepAnnotationTextOccurrence text = null;
         List<PointPayload> leader = new ArrayList<>();
         for (StepEntity content : callout.contents()) {
-            if (content instanceof StepAnnotationTextOccurrence annotationText) {
+            if (content instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence annotationText = (StepAnnotationTextOccurrence) content;
                 text = annotationText;
             } else {
                 appendPmiLeader(content, leader, builder);
@@ -10421,7 +11046,7 @@ public final class StepPreviewJsonExporter {
                 text.text(),
                 toPointPayload(position),
                 List.copyOf(leader),
-                targets.stream().map(PmiTargetPayload::id).toList(),
+                targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 List.copyOf(targets)
         );
     }
@@ -10431,51 +11056,60 @@ public final class StepPreviewJsonExporter {
             List<PointPayload> leader,
             StepCadBuilder builder
     ) {
-        if (content instanceof StepGeometricSet geometricSet) {
+        if (content instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) content;
             for (StepEntity element : geometricSet.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepGeometricCurveSet curveSet) {
+        if (content instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) content;
             for (StepEntity element : curveSet.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepPointSet pointSet) {
+        if (content instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) content;
             for (StepEntity point : pointSet.points()) {
                 appendPmiLeader(point, leader, builder);
             }
             return;
         }
-        if (content instanceof StepAnnotationPlaceholderOccurrence placeholderOccurrence) {
+        if (content instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) content;
             appendPmiLeader(placeholderOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationPlane annotationPlane) {
+        if (content instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) content;
             for (StepEntity element : annotationPlane.elements()) {
                 appendPmiLeader(element, leader, builder);
             }
             return;
         }
-        if (content instanceof StepFaceBasedSurfaceModel surfaceModel) {
+        if (content instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) content;
             for (StepEntity faceSet : surfaceModel.faceSets()) {
                 appendPmiLeader(faceSet, leader, builder);
             }
             return;
         }
-        if (content instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (content instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) content;
             for (StepEntity shell : surfaceModel.shells()) {
                 appendPmiLeader(shell, leader, builder);
             }
             return;
         }
-        if (content instanceof StepManifoldSolidBrep solid) {
+        if (content instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) content;
             appendPmiLeader(solid.outer(), leader, builder);
             return;
         }
-        if (content instanceof StepBrepWithVoids solid) {
+        if (content instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) content;
             appendPmiLeader(solid.outer(), leader, builder);
             for (StepEntity voidShell : solid.voids()) {
                 appendPmiLeader(voidShell, leader, builder);
@@ -10497,73 +11131,87 @@ public final class StepPreviewJsonExporter {
             appendPmiLeaderForSolid(content, leader, builder);
             return;
         }
-        if (content instanceof StepAdvancedFace face) {
+        if (content instanceof StepAdvancedFace) {
+            StepAdvancedFace face = (StepAdvancedFace) content;
             for (StepFaceBound bound : face.bounds()) {
                 appendPmiLeader(bound, leader, builder);
             }
             return;
         }
-        if (content instanceof StepFaceSurface face) {
+        if (content instanceof StepFaceSurface) {
+            StepFaceSurface face = (StepFaceSurface) content;
             for (StepFaceBound bound : face.bounds()) {
                 appendPmiLeader(bound, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedFace face) {
+        if (content instanceof StepOrientedFace) {
+            StepOrientedFace face = (StepOrientedFace) content;
             appendPmiLeader(face.faceElement(), leader, builder);
             return;
         }
-        if (content instanceof StepFaceBound faceBound) {
+        if (content instanceof StepFaceBound) {
+            StepFaceBound faceBound = (StepFaceBound) content;
             appendPmiLeader(faceBound.loop(), leader, builder);
             return;
         }
-        if (content instanceof StepOpenShell shell) {
+        if (content instanceof StepOpenShell) {
+            StepOpenShell shell = (StepOpenShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepSurfacedOpenShell shell) {
+        if (content instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedOpenShell shell) {
+        if (content instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell shell = (StepOrientedOpenShell) content;
             appendPmiLeader(shell.openShellElement(), leader, builder);
             return;
         }
-        if (content instanceof StepClosedShell shell) {
+        if (content instanceof StepClosedShell) {
+            StepClosedShell shell = (StepClosedShell) content;
             for (StepFaceEntity face : shell.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepOrientedClosedShell shell) {
+        if (content instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell shell = (StepOrientedClosedShell) content;
             appendPmiLeader(shell.closedShellElement(), leader, builder);
             return;
         }
-        if (content instanceof StepConnectedFaceSet faceSet) {
+        if (content instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) content;
             for (StepFaceEntity face : faceSet.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepConnectedFaceSubSet faceSet) {
+        if (content instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) content;
             for (StepFaceEntity face : faceSet.faces()) {
                 appendPmiLeader(face, leader, builder);
             }
             return;
         }
-        if (content instanceof StepAnnotationPointOccurrence pointOccurrence) {
+        if (content instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) content;
             appendPmiLeader(pointOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationCurveOccurrence occurrence) {
+        if (content instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) content;
             appendPmiLeader(occurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationFillArea fillArea) {
+        if (content instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) content;
             List<CartesianPoint> sampled = sampleAnnotationFillAreaPoints(fillArea, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -10572,11 +11220,13 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (content instanceof StepAnnotationFillAreaOccurrence fillAreaOccurrence) {
+        if (content instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) content;
             appendPmiLeader(fillAreaOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationSymbol annotationSymbol) {
+        if (content instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) content;
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationSymbol, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -10585,15 +11235,18 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (content instanceof StepAnnotationSymbolOccurrence symbolOccurrence) {
+        if (content instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) content;
             appendPmiLeader(symbolOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationSubfigureOccurrence subfigureOccurrence) {
+        if (content instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) content;
             appendPmiLeader(subfigureOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepAnnotationText annotationText) {
+        if (content instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) content;
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationText, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -10602,7 +11255,8 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (content instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (content instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) content;
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationTextCharacter, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
@@ -10611,81 +11265,98 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (content instanceof StepDimensionCurve dimensionCurve) {
+        if (content instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) content;
             appendPmiLeader(dimensionCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepLeaderCurve leaderCurve) {
+        if (content instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) content;
             appendPmiLeader(leaderCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepProjectionCurve projectionCurve) {
+        if (content instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) content;
             appendPmiLeader(projectionCurve.item(), leader, builder);
             return;
         }
-        if (content instanceof StepDraughtingAnnotationOccurrence annotationOccurrence) {
+        if (content instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) content;
             appendPmiLeader(annotationOccurrence.item(), leader, builder);
             return;
         }
-        if (content instanceof StepTerminatorSymbol terminatorSymbol) {
+        if (content instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) content;
             appendPmiLeader(terminatorSymbol.annotatedCurve(), leader, builder);
             return;
         }
-        if (content instanceof StepPath path) {
+        if (content instanceof StepPath) {
+            StepPath path = (StepPath) content;
             appendPmiPathLeader(path.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepOpenPath path) {
+        if (content instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) content;
             appendPmiPathLeader(path.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepSubpath subpath) {
+        if (content instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) content;
             appendPmiPathLeader(subpath.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepOrientedPath orientedPath) {
+        if (content instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) content;
             appendPmiPathLeader(orientedPath.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepConnectedEdgeSet connectedEdgeSet) {
+        if (content instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) content;
             for (StepEntity edge : connectedEdgeSet.edges()) {
                 appendPmiLeader(edge, leader, builder);
             }
             return;
         }
-        if (content instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (content instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) content;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 appendPmiLeader(boundary, leader, builder);
             }
             return;
         }
-        if (content instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (content instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) content;
             for (StepEntity boundary : wireframeModel.boundaries()) {
                 appendPmiLeader(boundary, leader, builder);
             }
             return;
         }
-        if (content instanceof StepWireShell wireShell) {
+        if (content instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) content;
             for (StepEntity loop : wireShell.loops()) {
                 appendPmiLeader(loop, leader, builder);
             }
             return;
         }
-        if (content instanceof StepEdgeLoop edgeLoop) {
+        if (content instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) content;
             appendPmiPathLeader(edgeLoop.edges(), leader, builder);
             return;
         }
-        if (content instanceof StepVertexLoop vertexLoop) {
+        if (content instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) content;
             leader.add(toPointPayload(pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
-        if (content instanceof StepPolyLoop polyLoop) {
+        if (content instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
                 leader.add(toPointPayload(pointFromStep(point)));
             }
             return;
         }
-        if (content instanceof StepVertexShell vertexShell) {
+        if (content instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) content;
             leader.add(toPointPayload(pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
@@ -10696,11 +11367,13 @@ public final class StepPreviewJsonExporter {
             }
             return;
         }
-        if (content instanceof StepCartesianPoint point) {
+        if (content instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) content;
             leader.add(toPointPayload(pointFromStep(point)));
             return;
         }
-        if (content instanceof StepVertexPoint vertexPoint) {
+        if (content instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) content;
             leader.add(toPointPayload(pointFromStep(vertexPoint.point())));
             return;
         }
@@ -10748,17 +11421,20 @@ public final class StepPreviewJsonExporter {
             List<PointPayload> leader,
             StepCadBuilder builder
     ) {
-        if (loop instanceof EdgeLoop edgeLoop) {
+        if (loop instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) loop;
             for (OrientedEdge edge : edgeLoop.edges()) {
                 appendTopologyEdgeLeader(edge, leader);
             }
             return;
         }
-        if (loop instanceof VertexLoop vertexLoop) {
+        if (loop instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) loop;
             leader.add(toPointPayload(vertexLoop.vertex().point()));
             return;
         }
-        if (loop instanceof PolyLoop polyLoop) {
+        if (loop instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) loop;
             for (CartesianPoint point : polyLoop.points()) {
                 leader.add(toPointPayload(point));
             }
@@ -10885,133 +11561,175 @@ public final class StepPreviewJsonExporter {
     }
 
     private static String pmiTargetName(StepEntity target) {
-        if (target instanceof StepFaceEntity face) {
+        if (target instanceof StepFaceEntity) {
+            StepFaceEntity face = (StepFaceEntity) target;
             return faceDisplayName(face);
         }
         if (target instanceof com.minicad.step.model.topology.StepEdgeCurve edge) {
             return edge.name();
         }
-        if (target instanceof StepSubedge subedge) {
+        if (target instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) target;
             return subedge.name();
         }
-        if (target instanceof StepOrientedEdge orientedEdge) {
+        if (target instanceof StepOrientedEdge) {
+            StepOrientedEdge orientedEdge = (StepOrientedEdge) target;
             return orientedEdge.name();
         }
-        if (target instanceof StepPath path) {
+        if (target instanceof StepPath) {
+            StepPath path = (StepPath) target;
             return path.name();
         }
-        if (target instanceof StepOpenPath path) {
+        if (target instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) target;
             return path.name();
         }
-        if (target instanceof StepSubpath subpath) {
+        if (target instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) target;
             return subpath.name();
         }
-        if (target instanceof StepOrientedPath orientedPath) {
+        if (target instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) target;
             return orientedPath.name();
         }
-        if (target instanceof StepConnectedEdgeSet edgeSet) {
+        if (target instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) target;
             return edgeSet.name();
         }
-        if (target instanceof StepPointSet pointSet) {
+        if (target instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) target;
             return pointSet.name();
         }
-        if (target instanceof StepAnnotationSymbol annotationSymbol) {
+        if (target instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) target;
             return annotationSymbol.name();
         }
-        if (target instanceof StepAnnotationText annotationText) {
+        if (target instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) target;
             return annotationText.name();
         }
-        if (target instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        if (target instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) target;
             return annotationTextCharacter.name();
         }
-        if (target instanceof StepAnnotationFillArea fillArea) {
+        if (target instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) target;
             return fillArea.name();
         }
-        if (target instanceof StepGeometricSet geometricSet) {
+        if (target instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) target;
             return geometricSet.name();
         }
-        if (target instanceof StepGeometricCurveSet curveSet) {
+        if (target instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) target;
             return curveSet.name();
         }
-        if (target instanceof StepOpenShell openShell) {
+        if (target instanceof StepOpenShell) {
+            StepOpenShell openShell = (StepOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepSurfacedOpenShell openShell) {
+        if (target instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell openShell = (StepSurfacedOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepOrientedOpenShell openShell) {
+        if (target instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell openShell = (StepOrientedOpenShell) target;
             return openShell.name();
         }
-        if (target instanceof StepClosedShell closedShell) {
+        if (target instanceof StepClosedShell) {
+            StepClosedShell closedShell = (StepClosedShell) target;
             return closedShell.name();
         }
-        if (target instanceof StepOrientedClosedShell closedShell) {
+        if (target instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell closedShell = (StepOrientedClosedShell) target;
             return closedShell.name();
         }
-        if (target instanceof StepWireShell wireShell) {
+        if (target instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) target;
             return wireShell.name();
         }
-        if (target instanceof StepVertexShell vertexShell) {
+        if (target instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) target;
             return vertexShell.name();
         }
-        if (target instanceof StepEdgeLoop edgeLoop) {
+        if (target instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) target;
             return edgeLoop.name();
         }
-        if (target instanceof StepVertexLoop vertexLoop) {
+        if (target instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) target;
             return vertexLoop.name();
         }
-        if (target instanceof StepPolyLoop polyLoop) {
+        if (target instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) target;
             return polyLoop.name();
         }
-        if (target instanceof StepConnectedFaceSet faceSet) {
+        if (target instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) target;
             return faceSet.name();
         }
-        if (target instanceof StepConnectedFaceSubSet faceSet) {
+        if (target instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) target;
             return faceSet.name();
         }
-        if (target instanceof StepFaceBasedSurfaceModel surfaceModel) {
+        if (target instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) target;
             return surfaceModel.name();
         }
-        if (target instanceof StepShellBasedSurfaceModel surfaceModel) {
+        if (target instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) target;
             return surfaceModel.name();
         }
-        if (target instanceof StepEdgeBasedWireframeModel wireframeModel) {
+        if (target instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) target;
             return wireframeModel.name();
         }
-        if (target instanceof StepShellBasedWireframeModel wireframeModel) {
+        if (target instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) target;
             return wireframeModel.name();
         }
-        if (target instanceof StepManifoldSolidBrep solid) {
+        if (target instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) target;
             return solid.name();
         }
-        if (target instanceof StepBrepWithVoids solid) {
+        if (target instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) target;
             return solid.name();
         }
-        if (target instanceof StepSweptAreaSolid solid) {
+        if (target instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid solid = (StepSweptAreaSolid) target;
             return solid.name();
         }
-        if (target instanceof StepSolidReplica solid) {
+        if (target instanceof StepSolidReplica) {
+            StepSolidReplica solid = (StepSolidReplica) target;
             return solid.name();
         }
-        if (target instanceof StepCsgSolid solid) {
+        if (target instanceof StepCsgSolid) {
+            StepCsgSolid solid = (StepCsgSolid) target;
             return solid.name();
         }
-        if (target instanceof StepCsgPrimitive solid) {
+        if (target instanceof StepCsgPrimitive) {
+            StepCsgPrimitive solid = (StepCsgPrimitive) target;
             return solid.name();
         }
-        if (target instanceof StepBooleanResult solid) {
+        if (target instanceof StepBooleanResult) {
+            StepBooleanResult solid = (StepBooleanResult) target;
             return solid.name();
         }
-        if (target instanceof StepBooleanClippingResult solid) {
+        if (target instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult solid = (StepBooleanClippingResult) target;
             return solid.name();
         }
-        if (target instanceof StepSweptDiskSolid solid) {
+        if (target instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid solid = (StepSweptDiskSolid) target;
             return solid.name();
         }
-        if (target instanceof StepComplexClippingResult solid) {
+        if (target instanceof StepComplexClippingResult) {
+            StepComplexClippingResult solid = (StepComplexClippingResult) target;
             return solid.name();
         }
-        if (target instanceof StepRepresentation representation) {
+        if (target instanceof StepRepresentation) {
+            StepRepresentation representation = (StepRepresentation) target;
             return representation.name();
         }
         return "";
@@ -11181,7 +11899,8 @@ public final class StepPreviewJsonExporter {
         if (!isSupportedPmiUsageCarrier(identifiedItem)) {
             return;
         }
-        if (definition instanceof StepAnnotationOccurrenceRelationship relationship) {
+        if (definition instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) definition;
             appendPmiTarget(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11190,7 +11909,8 @@ public final class StepPreviewJsonExporter {
                     relationship.entityName(),
                     relationship.id()
             );
-        } else if (definition instanceof StepDraughtingCalloutRelationship relationship) {
+        } else if (definition instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) definition;
             appendPmiTarget(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11212,7 +11932,8 @@ public final class StepPreviewJsonExporter {
         if (!isSupportedPmiUsageCarrier(identifiedItem)) {
             return;
         }
-        if (definition instanceof StepAnnotationOccurrenceRelationship relationship) {
+        if (definition instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendRelationshipSemanticTargets(
                     targetsByUsageId,
@@ -11234,7 +11955,8 @@ public final class StepPreviewJsonExporter {
             );
             return;
         }
-        if (definition instanceof StepDraughtingCalloutRelationship relationship) {
+        if (definition instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendRelationshipSemanticTargets(
                     targetsByUsageId,
@@ -11256,7 +11978,8 @@ public final class StepPreviewJsonExporter {
             );
             return;
         }
-        if (definition instanceof StepPropertyDefinitionRelationship relationship) {
+        if (definition instanceof StepPropertyDefinitionRelationship) {
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendPropertyRepresentationLinkTargets(
                     targetsByUsageId,
@@ -11273,7 +11996,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
         }
-        if (definition instanceof StepPropertyDefinition propertyDefinition) {
+        if (definition instanceof StepPropertyDefinition) {
+            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) definition;
             appendPropertyDefinitionRelationshipTargets(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11295,7 +12019,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepGeneralPropertyRelationship relationship) {
+        } else if (definition instanceof StepGeneralPropertyRelationship) {
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
                     targetsByUsageId,
@@ -11315,7 +12040,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepShapeAspectRelationship relationship) {
+        } else if (definition instanceof StepShapeAspectRelationship) {
+            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
                     targetsByUsageId,
@@ -11335,7 +12061,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepGeneralProperty generalProperty) {
+        } else if (definition instanceof StepGeneralProperty) {
+            StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
             appendGeneralPropertyRelationshipTargets(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11343,7 +12070,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepShapeAspect shapeAspect) {
+        } else if (definition instanceof StepShapeAspect) {
+            StepShapeAspect shapeAspect = (StepShapeAspect) definition;
             appendShapeAspectRelationshipTargets(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11351,13 +12079,17 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepProduct product) {
+        } else if (definition instanceof StepProduct) {
+            StepProduct product = (StepProduct) definition;
             appendProductRelationshipTargets(targetsByUsageId, identifiedItem.id(), product, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionFormation formation) {
+        } else if (definition instanceof StepProductDefinitionFormation) {
+            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) definition;
             appendProductDefinitionFormationRelationshipTargets(targetsByUsageId, identifiedItem.id(), formation, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinition productDefinition) {
+        } else if (definition instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) definition;
             appendProductDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), productDefinition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductRelationship relationship) {
+        } else if (definition instanceof StepProductRelationship) {
+            StepProductRelationship relationship = (StepProductRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11378,7 +12110,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepProductDefinitionFormationRelationship relationship) {
+        } else if (definition instanceof StepProductDefinitionFormationRelationship) {
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11399,7 +12132,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepGroupRelationship relationship) {
+        } else if (definition instanceof StepGroupRelationship) {
+            StepGroupRelationship relationship = (StepGroupRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11420,7 +12154,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepDocumentRelationship relationship) {
+        } else if (definition instanceof StepDocumentRelationship) {
+            StepDocumentRelationship relationship = (StepDocumentRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11441,7 +12176,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepOrganizationRelationship relationship) {
+        } else if (definition instanceof StepOrganizationRelationship) {
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11462,7 +12198,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepEffectivityRelationship relationship) {
+        } else if (definition instanceof StepEffectivityRelationship) {
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11483,7 +12220,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepProductCategoryRelationship relationship) {
+        } else if (definition instanceof StepProductCategoryRelationship) {
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11504,11 +12242,13 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepGroup group) {
+        } else if (definition instanceof StepGroup) {
+            StepGroup group = (StepGroup) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, group, resolved, instanceIdsByTargetId);
             appendGroupRelationshipTargets(targetsByUsageId, identifiedItem.id(), group, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocument document) {
+        } else if (definition instanceof StepDocument) {
+            StepDocument document = (StepDocument) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, document, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, document, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -11518,7 +12258,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), document, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentReference reference) {
+        } else if (definition instanceof StepDocumentReference) {
+            StepDocumentReference reference = (StepDocumentReference) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -11534,7 +12275,8 @@ public final class StepPreviewJsonExporter {
                     reference.assignedDocument().kind(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedDocumentReference reference) {
+        } else if (definition instanceof StepAppliedDocumentReference) {
+            StepAppliedDocumentReference reference = (StepAppliedDocumentReference) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
             appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), reference.assignedDocument(), resolved, instanceIdsByTargetId);
@@ -11559,32 +12301,37 @@ public final class StepPreviewJsonExporter {
                     reference.assignedDocument().kind(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepApprovalAssignment assignment) {
+        } else if (definition instanceof StepApprovalAssignment) {
+            StepApprovalAssignment assignment = (StepApprovalAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedApproval(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval().status(), instanceIdsByTargetId);
             appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassificationAssignment assignment) {
+        } else if (definition instanceof StepSecurityClassificationAssignment) {
+            StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedSecurityClassification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification().securityLevel(), instanceIdsByTargetId);
-        } else if (definition instanceof StepContractAssignment assignment) {
+        } else if (definition instanceof StepContractAssignment) {
+            StepContractAssignment assignment = (StepContractAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedContract(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract().kind(), instanceIdsByTargetId);
-        } else if (definition instanceof StepCertificationAssignment assignment) {
+        } else if (definition instanceof StepCertificationAssignment) {
+            StepCertificationAssignment assignment = (StepCertificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedCertification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification().kind(), instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganizationAssignment assignment) {
+        } else if (definition instanceof StepPersonAndOrganizationAssignment) {
+            StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedPersonAndOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
@@ -11592,35 +12339,41 @@ public final class StepPreviewJsonExporter {
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().person(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().organization(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganizationAssignment assignment) {
+        } else if (definition instanceof StepOrganizationAssignment) {
+            StepOrganizationAssignment assignment = (StepOrganizationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedOrganization(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
-        } else if (definition instanceof StepLanguageAssignment assignment) {
+        } else if (definition instanceof StepLanguageAssignment) {
+            StepLanguageAssignment assignment = (StepLanguageAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedLanguage(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedLanguage(), instanceIdsByTargetId);
-        } else if (definition instanceof StepGroupAssignment assignment) {
+        } else if (definition instanceof StepGroupAssignment) {
+            StepGroupAssignment assignment = (StepGroupAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedGroup(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedGroup(), instanceIdsByTargetId);
-        } else if (definition instanceof StepClassificationAssignment assignment) {
+        } else if (definition instanceof StepClassificationAssignment) {
+            StepClassificationAssignment assignment = (StepClassificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedClass(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedClass(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
-        } else if (definition instanceof StepDateAssignment assignment) {
+        } else if (definition instanceof StepDateAssignment) {
+            StepDateAssignment assignment = (StepDateAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDate(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDate(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
-        } else if (definition instanceof StepDateTimeAssignment assignment) {
+        } else if (definition instanceof StepDateTimeAssignment) {
+            StepDateTimeAssignment assignment = (StepDateTimeAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDateAndTime(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
@@ -11629,20 +12382,24 @@ public final class StepPreviewJsonExporter {
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent().zone(), instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
-        } else if (definition instanceof StepIdentificationAssignment assignment) {
+        } else if (definition instanceof StepIdentificationAssignment) {
+            StepIdentificationAssignment assignment = (StepIdentificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternalIdentificationAssignment assignment) {
+        } else if (definition instanceof StepExternalIdentificationAssignment) {
+            StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
             appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
             appendExternallyDefinedItemTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganization organization) {
+        } else if (definition instanceof StepOrganization) {
+            StepOrganization organization = (StepOrganization) definition;
             appendOrganizationRelationshipTargets(targetsByUsageId, identifiedItem.id(), organization, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEffectivity effectivity) {
+        } else if (definition instanceof StepEffectivity) {
+            StepEffectivity effectivity = (StepEffectivity) definition;
             appendProductDefinitionEffectivityTargets(
                     targetsByUsageId,
                     identifiedItem.id(),
@@ -11651,9 +12408,11 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendEffectivityRelationshipTargets(targetsByUsageId, identifiedItem.id(), effectivity, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductCategory category) {
+        } else if (definition instanceof StepProductCategory) {
+            StepProductCategory category = (StepProductCategory) definition;
             appendProductCategoryRelationshipTargets(targetsByUsageId, identifiedItem.id(), category, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternalSource source) {
+        } else if (definition instanceof StepExternalSource) {
+            StepExternalSource source = (StepExternalSource) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, source, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
             appendExternallyDefinedItemTargets(
@@ -11664,12 +12423,14 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternallyDefinedItem item) {
+        } else if (definition instanceof StepExternallyDefinedItem) {
+            StepExternallyDefinedItem item = (StepExternallyDefinedItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, item.source(), instanceIdsByTargetId);
             appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentUsageConstraint documentUsageConstraint) {
+        } else if (definition instanceof StepDocumentUsageConstraint) {
+            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -11685,7 +12446,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), documentUsageConstraint.source(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentation representation) {
+        } else if (definition instanceof StepRepresentation) {
+            StepRepresentation representation = (StepRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representation, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -11706,7 +12468,8 @@ public final class StepPreviewJsonExporter {
             for (StepEntity item : representation.items()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepProductDefinitionShape productDefinitionShape) {
+        } else if (definition instanceof StepProductDefinitionShape) {
+            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
             appendProductDefinitionShapeRepresentationTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -11714,7 +12477,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepProductDefinition productDefinition) {
+        } else if (definition instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) definition;
             appendProductDefinitionRepresentationTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -11722,7 +12486,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepNextAssemblyUsageOccurrence occurrence) {
+        } else if (definition instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) definition;
             appendOccurrenceRepresentationTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -11730,7 +12495,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepShapeAspectOccurrence occurrence) {
+        } else if (definition instanceof StepShapeAspectOccurrence) {
+            StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(
                     targetsByUsageId,
@@ -11739,7 +12505,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepProductDefinitionRelationshipRelationship relationship) {
+        } else if (definition instanceof StepProductDefinitionRelationshipRelationship) {
+            StepProductDefinitionRelationshipRelationship relationship = (StepProductDefinitionRelationshipRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
                     targetsByUsageId,
@@ -11759,7 +12526,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepApprovalPersonOrganization assignment) {
+        } else if (definition instanceof StepApprovalPersonOrganization) {
+            StepApprovalPersonOrganization assignment = (StepApprovalPersonOrganization) definition;
             appendExistingRepresentationDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -11805,7 +12573,8 @@ public final class StepPreviewJsonExporter {
                     assignment.role(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepApprovalDateTime assignment) {
+        } else if (definition instanceof StepApprovalDateTime) {
+            StepApprovalDateTime assignment = (StepApprovalDateTime) definition;
             appendExistingRepresentationDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -11842,107 +12611,136 @@ public final class StepPreviewJsonExporter {
                     assignment.datedApproval().status(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepCalendarDate calendarDate) {
+        } else if (definition instanceof StepCalendarDate) {
+            StepCalendarDate calendarDate = (StepCalendarDate) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, calendarDate, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, calendarDate, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNameAttribute attribute) {
+        } else if (definition instanceof StepNameAttribute) {
+            StepNameAttribute attribute = (StepNameAttribute) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.namedItem(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDescriptionAttribute attribute) {
+        } else if (definition instanceof StepDescriptionAttribute) {
+            StepDescriptionAttribute attribute = (StepDescriptionAttribute) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.describedItem(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepIdAttribute attribute) {
+        } else if (definition instanceof StepIdAttribute) {
+            StepIdAttribute attribute = (StepIdAttribute) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.identifiedItem(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNameAssignment assignment) {
+        } else if (definition instanceof StepNameAssignment) {
+            StepNameAssignment assignment = (StepNameAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedNameAssignment assignment) {
+        } else if (definition instanceof StepAppliedNameAssignment) {
+            StepAppliedNameAssignment assignment = (StepAppliedNameAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             for (StepEntity item : assignment.items()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepDateAndTime dateAndTime) {
+        } else if (definition instanceof StepDateAndTime) {
+            StepDateAndTime dateAndTime = (StepDateAndTime) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, dateAndTime, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.dateComponent(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.timeComponent(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLocalTime localTime) {
+        } else if (definition instanceof StepLocalTime) {
+            StepLocalTime localTime = (StepLocalTime) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, localTime, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, localTime, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, localTime.zone(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCoordinatedUniversalTimeOffset zone) {
+        } else if (definition instanceof StepCoordinatedUniversalTimeOffset) {
+            StepCoordinatedUniversalTimeOffset zone = (StepCoordinatedUniversalTimeOffset) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, zone, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, zone, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalStatus status) {
+        } else if (definition instanceof StepApprovalStatus) {
+            StepApprovalStatus status = (StepApprovalStatus) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, status, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, status, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassificationLevel level) {
+        } else if (definition instanceof StepSecurityClassificationLevel) {
+            StepSecurityClassificationLevel level = (StepSecurityClassificationLevel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, level, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, level, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContractType kind) {
+        } else if (definition instanceof StepContractType) {
+            StepContractType kind = (StepContractType) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCertificationType kind) {
+        } else if (definition instanceof StepCertificationType) {
+            StepCertificationType kind = (StepCertificationType) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalRole role) {
+        } else if (definition instanceof StepApprovalRole) {
+            StepApprovalRole role = (StepApprovalRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganizationRole role) {
+        } else if (definition instanceof StepOrganizationRole) {
+            StepOrganizationRole role = (StepOrganizationRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganizationRole role) {
+        } else if (definition instanceof StepPersonAndOrganizationRole) {
+            StepPersonAndOrganizationRole role = (StepPersonAndOrganizationRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepClassificationRole role) {
+        } else if (definition instanceof StepClassificationRole) {
+            StepClassificationRole role = (StepClassificationRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateRole role) {
+        } else if (definition instanceof StepDateRole) {
+            StepDateRole role = (StepDateRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateTimeRole role) {
+        } else if (definition instanceof StepDateTimeRole) {
+            StepDateTimeRole role = (StepDateTimeRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepIdentificationRole role) {
+        } else if (definition instanceof StepIdentificationRole) {
+            StepIdentificationRole role = (StepIdentificationRole) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentType kind) {
+        } else if (definition instanceof StepDocumentType) {
+            StepDocumentType kind = (StepDocumentType) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApproval approval) {
+        } else if (definition instanceof StepApproval) {
+            StepApproval approval = (StepApproval) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, approval, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, approval.status(), resolved, instanceIdsByTargetId);
             appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassification classification) {
+        } else if (definition instanceof StepSecurityClassification) {
+            StepSecurityClassification classification = (StepSecurityClassification) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, classification, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, classification, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, classification.securityLevel(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContract contract) {
+        } else if (definition instanceof StepContract) {
+            StepContract contract = (StepContract) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, contract, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, contract, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, contract.kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCertification certification) {
+        } else if (definition instanceof StepCertification) {
+            StepCertification certification = (StepCertification) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, certification, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, certification, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, certification.kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPerson person) {
+        } else if (definition instanceof StepPerson) {
+            StepPerson person = (StepPerson) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, person, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, person, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganization personAndOrganization) {
+        } else if (definition instanceof StepPersonAndOrganization) {
+            StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, personAndOrganization, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.person(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.organization(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLanguage language) {
+        } else if (definition instanceof StepLanguage) {
+            StepLanguage language = (StepLanguage) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, language, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, language, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedClassificationAssignment assignment) {
+        } else if (definition instanceof StepAppliedClassificationAssignment) {
+            StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -11954,7 +12752,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedDateAssignment assignment) {
+        } else if (definition instanceof StepAppliedDateAssignment) {
+            StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -11978,7 +12777,8 @@ public final class StepPreviewJsonExporter {
                     assignment.role(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedDateTimeAssignment assignment) {
+        } else if (definition instanceof StepAppliedDateTimeAssignment) {
+            StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12014,7 +12814,8 @@ public final class StepPreviewJsonExporter {
                     assignment.role(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedApprovalAssignment assignment) {
+        } else if (definition instanceof StepAppliedApprovalAssignment) {
+            StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12039,7 +12840,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedSecurityClassificationAssignment assignment) {
+        } else if (definition instanceof StepAppliedSecurityClassificationAssignment) {
+            StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12063,7 +12865,8 @@ public final class StepPreviewJsonExporter {
                     assignment.assignedSecurityClassification().securityLevel(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedContractAssignment assignment) {
+        } else if (definition instanceof StepAppliedContractAssignment) {
+            StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12087,7 +12890,8 @@ public final class StepPreviewJsonExporter {
                     assignment.assignedContract().kind(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedCertificationAssignment assignment) {
+        } else if (definition instanceof StepAppliedCertificationAssignment) {
+            StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12111,7 +12915,8 @@ public final class StepPreviewJsonExporter {
                     assignment.assignedCertification().kind(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedPersonAndOrganizationAssignment assignment) {
+        } else if (definition instanceof StepAppliedPersonAndOrganizationAssignment) {
+            StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12147,7 +12952,8 @@ public final class StepPreviewJsonExporter {
                     assignment.role(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedOrganizationAssignment assignment) {
+        } else if (definition instanceof StepAppliedOrganizationAssignment) {
+            StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12171,7 +12977,8 @@ public final class StepPreviewJsonExporter {
                     assignment.role(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedLanguageAssignment assignment) {
+        } else if (definition instanceof StepAppliedLanguageAssignment) {
+            StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendDefinitionRelationshipTargets(
@@ -12189,7 +12996,8 @@ public final class StepPreviewJsonExporter {
                     assignment.assignedLanguage(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedGroupAssignment assignment) {
+        } else if (definition instanceof StepAppliedGroupAssignment) {
+            StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendExistingRepresentationDefinitionTargets(
@@ -12198,14 +13006,16 @@ public final class StepPreviewJsonExporter {
                     assignment.assignedGroup(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAppliedIdentificationAssignment assignment) {
+        } else if (definition instanceof StepAppliedIdentificationAssignment) {
+            StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
             for (StepEntity item : assignment.items()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepAppliedExternalIdentificationAssignment assignment) {
+        } else if (definition instanceof StepAppliedExternalIdentificationAssignment) {
+            StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
@@ -12227,177 +13037,231 @@ public final class StepPreviewJsonExporter {
             for (StepEntity item : assignment.items()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepAnnotationCurveOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationFillArea fillArea) {
+        } else if (definition instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, fillArea, instanceIdsByTargetId);
             for (StepEntity boundary : fillArea.boundaries()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepAnnotationFillAreaOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence occurrence = (StepAnnotationFillAreaOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.fillStyleTarget(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPlaceholderOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence occurrence = (StepAnnotationPlaceholderOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPointOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence occurrence = (StepAnnotationPointOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSymbolOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence occurrence = (StepAnnotationSymbolOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSubfigureOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence occurrence = (StepAnnotationSubfigureOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationTextOccurrence occurrence) {
+        } else if (definition instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence occurrence = (StepAnnotationTextOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.position(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingAnnotationOccurrence occurrence) {
+        } else if (definition instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence occurrence = (StepDraughtingAnnotationOccurrence) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTerminatorSymbol symbol) {
+        } else if (definition instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol symbol = (StepTerminatorSymbol) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.item(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.annotatedCurve(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPresentationStyleAssignment assignment) {
+        } else if (definition instanceof StepPresentationStyleAssignment) {
+            StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             for (StepEntity style : assignment.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepSurfaceStyleUsage usage) {
+        } else if (definition instanceof StepSurfaceStyleUsage) {
+            StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, usage, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, usage.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceSideStyle style) {
+        } else if (definition instanceof StepSurfaceSideStyle) {
+            StepSurfaceSideStyle style = (StepSurfaceSideStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             for (StepEntity component : style.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepSurfaceStyleFillArea style) {
+        } else if (definition instanceof StepSurfaceStyleFillArea) {
+            StepSurfaceStyleFillArea style = (StepSurfaceStyleFillArea) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.fillStyle(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFillAreaStyle style) {
+        } else if (definition instanceof StepFillAreaStyle) {
+            StepFillAreaStyle style = (StepFillAreaStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             for (StepFillAreaStyleColour component : style.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepFillAreaStyleColour style) {
+        } else if (definition instanceof StepFillAreaStyleColour) {
+            StepFillAreaStyleColour style = (StepFillAreaStyleColour) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurveStyle style) {
+        } else if (definition instanceof StepCurveStyle) {
+            StepCurveStyle style = (StepCurveStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.curveFont(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleBoundary style) {
+        } else if (definition instanceof StepSurfaceStyleBoundary) {
+            StepSurfaceStyleBoundary style = (StepSurfaceStyleBoundary) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleParameterLine style) {
+        } else if (definition instanceof StepSurfaceStyleParameterLine) {
+            StepSurfaceStyleParameterLine style = (StepSurfaceStyleParameterLine) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleControlGrid style) {
+        } else if (definition instanceof StepSurfaceStyleControlGrid) {
+            StepSurfaceStyleControlGrid style = (StepSurfaceStyleControlGrid) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleSegmentationCurve style) {
+        } else if (definition instanceof StepSurfaceStyleSegmentationCurve) {
+            StepSurfaceStyleSegmentationCurve style = (StepSurfaceStyleSegmentationCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleSilhouette style) {
+        } else if (definition instanceof StepSurfaceStyleSilhouette) {
+            StepSurfaceStyleSilhouette style = (StepSurfaceStyleSilhouette) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleStroke style) {
+        } else if (definition instanceof StepCharacterGlyphStyleStroke) {
+            StepCharacterGlyphStyleStroke style = (StepCharacterGlyphStyleStroke) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.strokeStyle(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleOutline style) {
+        } else if (definition instanceof StepCharacterGlyphStyleOutline) {
+            StepCharacterGlyphStyleOutline style = (StepCharacterGlyphStyleOutline) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleOutlineWithCharacteristics style) {
+        } else if (definition instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
+            StepCharacterGlyphStyleOutlineWithCharacteristics style = (StepCharacterGlyphStyleOutlineWithCharacteristics) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characteristics(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyle style) {
+        } else if (definition instanceof StepTextStyle) {
+            StepTextStyle style = (StepTextStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithSpacing style) {
+        } else if (definition instanceof StepTextStyleWithSpacing) {
+            StepTextStyleWithSpacing style = (StepTextStyleWithSpacing) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithBoxCharacteristics style) {
+        } else if (definition instanceof StepTextStyleWithBoxCharacteristics) {
+            StepTextStyleWithBoxCharacteristics style = (StepTextStyleWithBoxCharacteristics) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithJustification style) {
+        } else if (definition instanceof StepTextStyleWithJustification) {
+            StepTextStyleWithJustification style = (StepTextStyleWithJustification) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithMirror style) {
+        } else if (definition instanceof StepTextStyleWithMirror) {
+            StepTextStyleWithMirror style = (StepTextStyleWithMirror) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.mirrorPlacement(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleForDefinedFont style) {
+        } else if (definition instanceof StepTextStyleForDefinedFont) {
+            StepTextStyleForDefinedFont style = (StepTextStyleForDefinedFont) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.textColour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPointStyle style) {
+        } else if (definition instanceof StepPointStyle) {
+            StepPointStyle style = (StepPointStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.marker(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolColour style) {
+        } else if (definition instanceof StepSymbolColour) {
+            StepSymbolColour style = (StepSymbolColour) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolStyle style) {
+        } else if (definition instanceof StepSymbolStyle) {
+            StepSymbolStyle style = (StepSymbolStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.styleOfSymbol(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleTransparent style) {
+        } else if (definition instanceof StepSurfaceStyleTransparent) {
+            StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbient style) {
+        } else if (definition instanceof StepSurfaceStyleReflectanceAmbient) {
+            StepSurfaceStyleReflectanceAmbient style = (StepSurfaceStyleReflectanceAmbient) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuse style) {
+        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
+            StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular style) {
+        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
+            StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.specularColour(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedSurfaceSideStyle style) {
+        } else if (definition instanceof StepPreDefinedSurfaceSideStyle) {
+            StepPreDefinedSurfaceSideStyle style = (StepPreDefinedSurfaceSideStyle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedColour colour) {
+        } else if (definition instanceof StepPreDefinedColour) {
+            StepPreDefinedColour colour = (StepPreDefinedColour) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedColour colour) {
+        } else if (definition instanceof StepDraughtingPreDefinedColour) {
+            StepDraughtingPreDefinedColour colour = (StepDraughtingPreDefinedColour) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColourRgb colour) {
+        } else if (definition instanceof StepColourRgb) {
+            StepColourRgb colour = (StepColourRgb) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColourSpecification colour) {
+        } else if (definition instanceof StepColourSpecification) {
+            StepColourSpecification colour = (StepColourSpecification) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColour colour) {
+        } else if (definition instanceof StepColour) {
+            StepColour colour = (StepColour) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedCurveFont font) {
+        } else if (definition instanceof StepPreDefinedCurveFont) {
+            StepPreDefinedCurveFont font = (StepPreDefinedCurveFont) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedCurveFont font) {
+        } else if (definition instanceof StepDraughtingPreDefinedCurveFont) {
+            StepDraughtingPreDefinedCurveFont font = (StepDraughtingPreDefinedCurveFont) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedTextFont font) {
+        } else if (definition instanceof StepPreDefinedTextFont) {
+            StepPreDefinedTextFont font = (StepPreDefinedTextFont) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedTextFont font) {
+        } else if (definition instanceof StepDraughtingPreDefinedTextFont) {
+            StepDraughtingPreDefinedTextFont font = (StepDraughtingPreDefinedTextFont) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedTerminatorSymbol symbol) {
+        } else if (definition instanceof StepPreDefinedTerminatorSymbol) {
+            StepPreDefinedTerminatorSymbol symbol = (StepPreDefinedTerminatorSymbol) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedSymbol symbol) {
+        } else if (definition instanceof StepPreDefinedSymbol) {
+            StepPreDefinedSymbol symbol = (StepPreDefinedSymbol) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedDimensionSymbol symbol) {
+        } else if (definition instanceof StepPreDefinedDimensionSymbol) {
+            StepPreDefinedDimensionSymbol symbol = (StepPreDefinedDimensionSymbol) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedGeometricalToleranceSymbol symbol) {
+        } else if (definition instanceof StepPreDefinedGeometricalToleranceSymbol) {
+            StepPreDefinedGeometricalToleranceSymbol symbol = (StepPreDefinedGeometricalToleranceSymbol) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedItem item) {
+        } else if (definition instanceof StepPreDefinedItem) {
+            StepPreDefinedItem item = (StepPreDefinedItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPlane plane) {
+        } else if (definition instanceof StepAnnotationPlane) {
+            StepAnnotationPlane plane = (StepAnnotationPlane) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
             for (StepPresentationStyleAssignment style : plane.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
@@ -12406,53 +13270,63 @@ public final class StepPreviewJsonExporter {
             for (StepEntity element : plane.elements()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepDraughtingCallout callout) {
+        } else if (definition instanceof StepDraughtingCallout) {
+            StepDraughtingCallout callout = (StepDraughtingCallout) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, callout, instanceIdsByTargetId);
             for (StepEntity content : callout.contents()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, content, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepPresentationLayerAssignment assignment) {
+        } else if (definition instanceof StepPresentationLayerAssignment) {
+            StepPresentationLayerAssignment assignment = (StepPresentationLayerAssignment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
             for (StepEntity item : assignment.assignedItems()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepStyledItem styledItem) {
+        } else if (definition instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
             for (StepPresentationStyleAssignment style : styledItem.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
             }
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOverRidingStyledItem styledItem) {
+        } else if (definition instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
             for (StepPresentationStyleAssignment style : styledItem.styles()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
             }
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.overRiddenStyle(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationMap representationMap) {
+        } else if (definition instanceof StepRepresentationMap) {
+            StepRepresentationMap representationMap = (StepRepresentationMap) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
             appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolRepresentationMap representationMap) {
+        } else if (definition instanceof StepSymbolRepresentationMap) {
+            StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
             appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMappedItem mappedItem) {
+        } else if (definition instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingSource(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingTarget(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, mappedItem, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricReplica replica) {
+        } else if (definition instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, replica, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.parent(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.transformation(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, replica, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepItemDefinedTransformation transformation) {
+        } else if (definition instanceof StepItemDefinedTransformation) {
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem1(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem2(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCartesianTransformationOperator transformation) {
+        } else if (definition instanceof StepCartesianTransformationOperator) {
+            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
             if (transformation.axis1() != null) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis1(), resolved, instanceIdsByTargetId);
@@ -12465,314 +13339,376 @@ public final class StepPreviewJsonExporter {
             }
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.localOrigin(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis1Placement placement) {
+        } else if (definition instanceof StepAxis1Placement) {
+            StepAxis1Placement placement = (StepAxis1Placement) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis2Placement2D placement) {
+        } else if (definition instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement = (StepAxis2Placement2D) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCartesianPoint point) {
+        } else if (definition instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPoint point) {
+        } else if (definition instanceof StepPoint) {
+            StepPoint point = (StepPoint) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDirection direction) {
+        } else if (definition instanceof StepDirection) {
+            StepDirection direction = (StepDirection) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, direction, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, direction, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVector vector) {
+        } else if (definition instanceof StepVector) {
+            StepVector vector = (StepVector) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vector, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vector.orientation(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vector, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis2Placement3D placement) {
+        } else if (definition instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement = (StepAxis2Placement3D) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, placement, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPlane plane) {
+        } else if (definition instanceof StepPlane) {
+            StepPlane plane = (StepPlane) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, plane.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, plane, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricSet set) {
+        } else if (definition instanceof StepGeometricSet) {
+            StepGeometricSet set = (StepGeometricSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
             for (StepEntity element : set.elements()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricCurveSet set) {
+        } else if (definition instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet set = (StepGeometricCurveSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
             for (StepEntity element : set.elements()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPointSet set) {
+        } else if (definition instanceof StepPointSet) {
+            StepPointSet set = (StepPointSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
             for (StepEntity point : set.points()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPath path) {
+        } else if (definition instanceof StepPath) {
+            StepPath path = (StepPath) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
             for (StepOrientedEdge edge : path.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOpenPath path) {
+        } else if (definition instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
             for (StepOrientedEdge edge : path.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedPath path) {
+        } else if (definition instanceof StepOrientedPath) {
+            StepOrientedPath path = (StepOrientedPath) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.pathElement(), resolved, instanceIdsByTargetId);
             for (StepOrientedEdge edge : path.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSubpath path) {
+        } else if (definition instanceof StepSubpath) {
+            StepSubpath path = (StepSubpath) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.parentPath(), resolved, instanceIdsByTargetId);
             for (StepOrientedEdge edge : path.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeLoop loop) {
+        } else if (definition instanceof StepEdgeLoop) {
+            StepEdgeLoop loop = (StepEdgeLoop) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
             for (StepOrientedEdge edge : loop.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPolyLoop loop) {
+        } else if (definition instanceof StepPolyLoop) {
+            StepPolyLoop loop = (StepPolyLoop) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
             for (StepCartesianPoint point : loop.polygon()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedEdgeSet set) {
+        } else if (definition instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet set = (StepConnectedEdgeSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
             for (StepEntity edge : set.edges()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeBasedWireframeModel model) {
+        } else if (definition instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel model = (StepEdgeBasedWireframeModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             for (StepConnectedEdgeSet boundary : model.boundaries()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShellBasedWireframeModel model) {
+        } else if (definition instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel model = (StepShellBasedWireframeModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             for (StepEntity boundary : model.boundaries()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepWireShell shell) {
+        } else if (definition instanceof StepWireShell) {
+            StepWireShell shell = (StepWireShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             for (StepLoop loop : shell.loops()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexShell shell) {
+        } else if (definition instanceof StepVertexShell) {
+            StepVertexShell shell = (StepVertexShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.extent(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexLoop loop) {
+        } else if (definition instanceof StepVertexLoop) {
+            StepVertexLoop loop = (StepVertexLoop) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop.loopVertex(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedEdge edge) {
+        } else if (definition instanceof StepOrientedEdge) {
+            StepOrientedEdge edge = (StepOrientedEdge) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeElement(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeCurve edge) {
+        } else if (definition instanceof StepEdgeCurve) {
+            StepEdgeCurve edge = (StepEdgeCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.start(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.end(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeGeometry(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexPoint vertex) {
+        } else if (definition instanceof StepVertexPoint) {
+            StepVertexPoint vertex = (StepVertexPoint) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vertex.point(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAdvancedFace face) {
+        } else if (definition instanceof StepAdvancedFace) {
+            StepAdvancedFace face = (StepAdvancedFace) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
             for (StepFaceBound bound : face.bounds()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFaceSurface face) {
+        } else if (definition instanceof StepFaceSurface) {
+            StepFaceSurface face = (StepFaceSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
             for (StepFaceBound bound : face.bounds()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedFace face) {
+        } else if (definition instanceof StepOrientedFace) {
+            StepOrientedFace face = (StepOrientedFace) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceElement(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedFaceSet faceSet) {
+        } else if (definition instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
             for (StepFaceEntity face : faceSet.faces()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedFaceSubSet faceSet) {
+        } else if (definition instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
             for (StepFaceEntity face : faceSet.faces()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
             }
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet.parentFaceSet(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOpenShell shell) {
+        } else if (definition instanceof StepOpenShell) {
+            StepOpenShell shell = (StepOpenShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             for (StepFaceEntity face : shell.faces()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfacedOpenShell shell) {
+        } else if (definition instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             for (StepFaceEntity face : shell.faces()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepClosedShell shell) {
+        } else if (definition instanceof StepClosedShell) {
+            StepClosedShell shell = (StepClosedShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             for (StepFaceEntity face : shell.faces()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedOpenShell shell) {
+        } else if (definition instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell shell = (StepOrientedOpenShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.openShellElement(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedClosedShell shell) {
+        } else if (definition instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell shell = (StepOrientedClosedShell) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.closedShellElement(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFaceBasedSurfaceModel model) {
+        } else if (definition instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel model = (StepFaceBasedSurfaceModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             for (StepEntity faceSet : model.faceSets()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShellBasedSurfaceModel model) {
+        } else if (definition instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel model = (StepShellBasedSurfaceModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             for (StepEntity shell : model.shells()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepManifoldSolidBrep solid) {
+        } else if (definition instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBrepWithVoids solid) {
+        } else if (definition instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
             for (StepEntity voidShell : solid.voids()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, voidShell, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSweptAreaSolid solid) {
+        } else if (definition instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid solid = (StepSweptAreaSolid) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptArea(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.position(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweepReference(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSweptDiskSolid solid) {
+        } else if (definition instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid solid = (StepSweptDiskSolid) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptCurve(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepComplexClippingResult solid) {
+        } else if (definition instanceof StepComplexClippingResult) {
+            StepComplexClippingResult solid = (StepComplexClippingResult) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.firstOperand(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.secondOperand(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSolidReplica solid) {
+        } else if (definition instanceof StepSolidReplica) {
+            StepSolidReplica solid = (StepSolidReplica) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.parentSolid(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.transformation(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepHalfSpaceSolid solid) {
+        } else if (definition instanceof StepHalfSpaceSolid) {
+            StepHalfSpaceSolid solid = (StepHalfSpaceSolid) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.baseSurface(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.enclosure(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCsgSolid solid) {
+        } else if (definition instanceof StepCsgSolid) {
+            StepCsgSolid solid = (StepCsgSolid) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.treeRootExpression(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCsgPrimitive primitive) {
+        } else if (definition instanceof StepCsgPrimitive) {
+            StepCsgPrimitive primitive = (StepCsgPrimitive) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, primitive, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, primitive.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, primitive, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProfileDef profile) {
+        } else if (definition instanceof StepProfileDef) {
+            StepProfileDef profile = (StepProfileDef) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, profile, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, profile.position(), resolved, instanceIdsByTargetId);
             for (StepEntity curve : profile.curves()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, profile, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConicCurve curve) {
+        } else if (definition instanceof StepConicCurve) {
+            StepConicCurve curve = (StepConicCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineCurve curve) {
+        } else if (definition instanceof StepBSplineCurve) {
+            StepBSplineCurve curve = (StepBSplineCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineCurveWithKnots curve) {
+        } else if (definition instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots curve = (StepBSplineCurveWithKnots) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRationalBSplineCurve curve) {
+        } else if (definition instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve curve = (StepRationalBSplineCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBezierCurve curve) {
+        } else if (definition instanceof StepBezierCurve) {
+            StepBezierCurve curve = (StepBezierCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUniformCurve curve) {
+        } else if (definition instanceof StepUniformCurve) {
+            StepUniformCurve curve = (StepUniformCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepQuasiUniformCurve curve) {
+        } else if (definition instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPiecewiseBezierCurve curve) {
+        } else if (definition instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLine line) {
+        } else if (definition instanceof StepLine) {
+            StepLine line = (StepLine) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, line, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.point(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.vector(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, line, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCircle circle) {
+        } else if (definition instanceof StepCircle) {
+            StepCircle circle = (StepCircle) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, circle, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, circle.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, circle, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEllipse ellipse) {
+        } else if (definition instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, ellipse, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, ellipse.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, ellipse, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurve curve) {
+        } else if (definition instanceof StepCurve) {
+            StepCurve curve = (StepCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPolyline polyline) {
+        } else if (definition instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, polyline, instanceIdsByTargetId);
             for (StepCartesianPoint point : polyline.points()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, polyline, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTrimmedCurve curve) {
+        } else if (definition instanceof StepTrimmedCurve) {
+            StepTrimmedCurve curve = (StepTrimmedCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
             for (StepValue trim : curve.trim1()) {
@@ -12786,200 +13722,250 @@ public final class StepPreviewJsonExporter {
                 }
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetCurve2D curve) {
+        } else if (definition instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D curve = (StepOffsetCurve2D) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetCurve3D curve) {
+        } else if (definition instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D curve = (StepOffsetCurve3D) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.refDirection(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPcurve curve) {
+        } else if (definition instanceof StepPcurve) {
+            StepPcurve curve = (StepPcurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDegeneratePcurve curve) {
+        } else if (definition instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve curve = (StepDegeneratePcurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceCurve curve) {
+        } else if (definition instanceof StepSurfaceCurve) {
+            StepSurfaceCurve curve = (StepSurfaceCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
             for (StepEntity associated : curve.associatedGeometry()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSeamCurve curve) {
+        } else if (definition instanceof StepSeamCurve) {
+            StepSeamCurve curve = (StepSeamCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
             for (StepEntity associated : curve.associatedGeometry()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurve curve) {
+        } else if (definition instanceof StepCompositeCurve) {
+            StepCompositeCurve curve = (StepCompositeCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             for (StepCompositeCurveSegment segment : curve.segments()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurveOnSurface curve) {
+        } else if (definition instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface curve = (StepCompositeCurveOnSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             for (StepCompositeCurveSegment segment : curve.segments()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurveSegment segment) {
+        } else if (definition instanceof StepCompositeCurveSegment) {
+            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, segment, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment.parentCurve(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCylindricalSurface surface) {
+        } else if (definition instanceof StepCylindricalSurface) {
+            StepCylindricalSurface surface = (StepCylindricalSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConicalSurface surface) {
+        } else if (definition instanceof StepConicalSurface) {
+            StepConicalSurface surface = (StepConicalSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSphericalSurface surface) {
+        } else if (definition instanceof StepSphericalSurface) {
+            StepSphericalSurface surface = (StepSphericalSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepToroidalSurface surface) {
+        } else if (definition instanceof StepToroidalSurface) {
+            StepToroidalSurface surface = (StepToroidalSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceOfLinearExtrusion surface) {
+        } else if (definition instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion surface = (StepSurfaceOfLinearExtrusion) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.extrusionAxis(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceOfRevolution surface) {
+        } else if (definition instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution surface = (StepSurfaceOfRevolution) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.axisPosition(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRectangularTrimmedSurface surface) {
+        } else if (definition instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface surface = (StepRectangularTrimmedSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurveBoundedSurface surface) {
+        } else if (definition instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface surface = (StepCurveBoundedSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
             for (StepEntity boundary : surface.boundaries()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
             }
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedSurface surface) {
+        } else if (definition instanceof StepOrientedSurface) {
+            StepOrientedSurface surface = (StepOrientedSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.surfaceElement(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetSurface surface) {
+        } else if (definition instanceof StepOffsetSurface) {
+            StepOffsetSurface surface = (StepOffsetSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineSurface surface) {
+        } else if (definition instanceof StepBSplineSurface) {
+            StepBSplineSurface surface = (StepBSplineSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineSurfaceWithKnots surface) {
+        } else if (definition instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots surface = (StepBSplineSurfaceWithKnots) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRationalBSplineSurface surface) {
+        } else if (definition instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface surface = (StepRationalBSplineSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBezierSurface surface) {
+        } else if (definition instanceof StepBezierSurface) {
+            StepBezierSurface surface = (StepBezierSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUniformSurface surface) {
+        } else if (definition instanceof StepUniformSurface) {
+            StepUniformSurface surface = (StepUniformSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepQuasiUniformSurface surface) {
+        } else if (definition instanceof StepQuasiUniformSurface) {
+            StepQuasiUniformSurface surface = (StepQuasiUniformSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPiecewiseBezierSurface surface) {
+        } else if (definition instanceof StepPiecewiseBezierSurface) {
+            StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFace face) {
+        } else if (definition instanceof StepFace) {
+            StepFace face = (StepFace) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBoundedCurve curve) {
+        } else if (definition instanceof StepBoundedCurve) {
+            StepBoundedCurve curve = (StepBoundedCurve) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBoundedSurface surface) {
+        } else if (definition instanceof StepBoundedSurface) {
+            StepBoundedSurface surface = (StepBoundedSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurface surface) {
+        } else if (definition instanceof StepSurface) {
+            StepSurface surface = (StepSurface) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMeasureRepresentationItem item) {
+        } else if (definition instanceof StepMeasureRepresentationItem) {
+            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item.unit(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDescriptiveRepresentationItem item) {
+        } else if (definition instanceof StepDescriptiveRepresentationItem) {
+            StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepValueRepresentationItem item) {
+        } else if (definition instanceof StepValueRepresentationItem) {
+            StepValueRepresentationItem item = (StepValueRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceModel model) {
+        } else if (definition instanceof StepSurfaceModel) {
+            StepSurfaceModel model = (StepSurfaceModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSolidModel model) {
+        } else if (definition instanceof StepSolidModel) {
+            StepSolidModel model = (StepSolidModel) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationItem item) {
+        } else if (definition instanceof StepRepresentationItem) {
+            StepRepresentationItem item = (StepRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricRepresentationItem item) {
+        } else if (definition instanceof StepGeometricRepresentationItem) {
+            StepGeometricRepresentationItem item = (StepGeometricRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTopologicalRepresentationItem item) {
+        } else if (definition instanceof StepTopologicalRepresentationItem) {
+            StepTopologicalRepresentationItem item = (StepTopologicalRepresentationItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMeasureWithUnit measure) {
+        } else if (definition instanceof StepMeasureWithUnit) {
+            StepMeasureWithUnit measure = (StepMeasureWithUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTypedMeasureWithUnit measure) {
+        } else if (definition instanceof StepTypedMeasureWithUnit) {
+            StepTypedMeasureWithUnit measure = (StepTypedMeasureWithUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUncertaintyMeasureWithUnit measure) {
+        } else if (definition instanceof StepUncertaintyMeasureWithUnit) {
+            StepUncertaintyMeasureWithUnit measure = (StepUncertaintyMeasureWithUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConversionBasedUnit unit) {
+        } else if (definition instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit unit = (StepConversionBasedUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConversionBasedUnitWithOffset unit) {
+        } else if (definition instanceof StepConversionBasedUnitWithOffset) {
+            StepConversionBasedUnitWithOffset unit = (StepConversionBasedUnitWithOffset) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDerivedUnit unit) {
+        } else if (definition instanceof StepDerivedUnit) {
+            StepDerivedUnit unit = (StepDerivedUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
             for (StepDerivedUnitElement element : unit.elements()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepDerivedUnitElement element) {
+        } else if (definition instanceof StepDerivedUnitElement) {
+            StepDerivedUnitElement element = (StepDerivedUnitElement) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, element, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element.unit(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNamedUnit unit) {
+        } else if (definition instanceof StepNamedUnit) {
+            StepNamedUnit unit = (StepNamedUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepSiUnit unit) {
+        } else if (definition instanceof StepSiUnit) {
+            StepSiUnit unit = (StepSiUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepContextDependentUnit unit) {
+        } else if (definition instanceof StepContextDependentUnit) {
+            StepContextDependentUnit unit = (StepContextDependentUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationContext context) {
+        } else if (definition instanceof StepRepresentationContext) {
+            StepRepresentationContext context = (StepRepresentationContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricRepresentationContext context) {
+        } else if (definition instanceof StepGeometricRepresentationContext) {
+            StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
             if (context.globalUnitAssignedContext() != null) {
                 appendNestedDefinitionTargets(
@@ -12999,32 +13985,40 @@ public final class StepPreviewJsonExporter {
                         instanceIdsByTargetId
                 );
             }
-        } else if (definition instanceof StepGlobalUnitAssignedContext context) {
+        } else if (definition instanceof StepGlobalUnitAssignedContext) {
+            StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
             for (StepEntity unit : context.units()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepGlobalUncertaintyAssignedContext context) {
+        } else if (definition instanceof StepGlobalUncertaintyAssignedContext) {
+            StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
             for (StepUncertaintyMeasureWithUnit uncertainty : context.uncertainties()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, uncertainty, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepAddress address) {
+        } else if (definition instanceof StepAddress) {
+            StepAddress address = (StepAddress) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, address, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, address, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterizedObject characterizedObject) {
+        } else if (definition instanceof StepCharacterizedObject) {
+            StepCharacterizedObject characterizedObject = (StepCharacterizedObject) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, characterizedObject, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, characterizedObject, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDimensionalExponents exponents) {
+        } else if (definition instanceof StepDimensionalExponents) {
+            StepDimensionalExponents exponents = (StepDimensionalExponents) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, exponents, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, exponents, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertex vertex) {
+        } else if (definition instanceof StepVertex) {
+            StepVertex vertex = (StepVertex) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdge edge) {
+        } else if (definition instanceof StepEdge) {
+            StepEdge edge = (StepEdge) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAbstractVariable variable) {
+        } else if (definition instanceof StepAbstractVariable) {
+            StepAbstractVariable variable = (StepAbstractVariable) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13034,7 +14028,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRowVariable variable) {
+        } else if (definition instanceof StepRowVariable) {
+            StepRowVariable variable = (StepRowVariable) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13044,7 +14039,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepScalarVariable variable) {
+        } else if (definition instanceof StepScalarVariable) {
+            StepScalarVariable variable = (StepScalarVariable) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13054,7 +14050,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepForwardChainingRulePremise variable) {
+        } else if (definition instanceof StepForwardChainingRulePremise) {
+            StepForwardChainingRulePremise variable = (StepForwardChainingRulePremise) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13064,7 +14061,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBackChainingRuleBody variable) {
+        } else if (definition instanceof StepBackChainingRuleBody) {
+            StepBackChainingRuleBody variable = (StepBackChainingRuleBody) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13074,7 +14072,8 @@ public final class StepPreviewJsonExporter {
                     instanceIdsByTargetId
             );
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPropertyDefinitionRepresentation link) {
+        } else if (definition instanceof StepPropertyDefinitionRepresentation) {
+            StepPropertyDefinitionRepresentation link = (StepPropertyDefinitionRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13084,7 +14083,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepActionPropertyRepresentation link) {
+        } else if (definition instanceof StepActionPropertyRepresentation) {
+            StepActionPropertyRepresentation link = (StepActionPropertyRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13094,7 +14094,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepContactRatioRepresentation link) {
+        } else if (definition instanceof StepContactRatioRepresentation) {
+            StepContactRatioRepresentation link = (StepContactRatioRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13104,7 +14105,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepKinematicPropertyDefinitionRepresentation link) {
+        } else if (definition instanceof StepKinematicPropertyDefinitionRepresentation) {
+            StepKinematicPropertyDefinitionRepresentation link = (StepKinematicPropertyDefinitionRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13114,7 +14116,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepKinematicPropertyMechanismRepresentation link) {
+        } else if (definition instanceof StepKinematicPropertyMechanismRepresentation) {
+            StepKinematicPropertyMechanismRepresentation link = (StepKinematicPropertyMechanismRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13124,7 +14127,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepKinematicPropertyRepresentationRelation link) {
+        } else if (definition instanceof StepKinematicPropertyRepresentationRelation) {
+            StepKinematicPropertyRepresentationRelation link = (StepKinematicPropertyRepresentationRelation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13134,7 +14138,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepKinematicPropertyTopologyRepresentation link) {
+        } else if (definition instanceof StepKinematicPropertyTopologyRepresentation) {
+            StepKinematicPropertyTopologyRepresentation link = (StepKinematicPropertyTopologyRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13144,7 +14149,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepResourcePropertyRepresentation link) {
+        } else if (definition instanceof StepResourcePropertyRepresentation) {
+            StepResourcePropertyRepresentation link = (StepResourcePropertyRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13154,7 +14160,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAttributeAssertion assertion) {
+        } else if (definition instanceof StepAttributeAssertion) {
+            StepAttributeAssertion assertion = (StepAttributeAssertion) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assertion, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assertion.definition(), resolved, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
@@ -13164,7 +14171,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepShapeDefinitionRepresentation link) {
+        } else if (definition instanceof StepShapeDefinitionRepresentation) {
+            StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
             appendAttachedRepresentationRelationshipTargets(
                     targetsByUsageId,
@@ -13173,52 +14181,64 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepApplicationProtocolDefinition protocolDefinition) {
+        } else if (definition instanceof StepApplicationProtocolDefinition) {
+            StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition.application(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProduct product) {
+        } else if (definition instanceof StepProduct) {
+            StepProduct product = (StepProduct) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, product, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, product, resolved, instanceIdsByTargetId);
             for (StepProductContext context : product.frameOfReference()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, context, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepProductDefinitionFormation formation) {
+        } else if (definition instanceof StepProductDefinitionFormation) {
+            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, formation, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, formation, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, formation.ofProduct(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinition productDefinition) {
+        } else if (definition instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinition, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition.formation(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition.frameOfReference(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionShape productDefinitionShape) {
+        } else if (definition instanceof StepProductDefinitionShape) {
+            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionShape, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionShape, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionShape.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductContext productContext) {
+        } else if (definition instanceof StepProductContext) {
+            StepProductContext productContext = (StepProductContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productContext, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productContext, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productContext.frameOfReference(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionContext productDefinitionContext) {
+        } else if (definition instanceof StepProductDefinitionContext) {
+            StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionContext, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext.frameOfReference(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApplicationContext applicationContext) {
+        } else if (definition instanceof StepApplicationContext) {
+            StepApplicationContext applicationContext = (StepApplicationContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, applicationContext, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, applicationContext, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGroup group) {
+        } else if (definition instanceof StepGroup) {
+            StepGroup group = (StepGroup) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, group, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocument document) {
+        } else if (definition instanceof StepDocument) {
+            StepDocument document = (StepDocument) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, document, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, document, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, document.kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentReference reference) {
+        } else if (definition instanceof StepDocumentReference) {
+            StepDocumentReference reference = (StepDocumentReference) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument().kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedDocumentReference reference) {
+        } else if (definition instanceof StepAppliedDocumentReference) {
+            StepAppliedDocumentReference reference = (StepAppliedDocumentReference) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument(), resolved, instanceIdsByTargetId);
@@ -13226,41 +14246,50 @@ public final class StepPreviewJsonExporter {
             for (StepEntity item : reference.items()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepExternalSource source) {
+        } else if (definition instanceof StepExternalSource) {
+            StepExternalSource source = (StepExternalSource) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, source, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
             appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
             appendExternallyDefinedItemTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternallyDefinedItem item) {
+        } else if (definition instanceof StepExternallyDefinedItem) {
+            StepExternallyDefinedItem item = (StepExternallyDefinedItem) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
             appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentUsageConstraint documentUsageConstraint) {
+        } else if (definition instanceof StepDocumentUsageConstraint) {
+            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint.source(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint.source().kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductCategory category) {
+        } else if (definition instanceof StepProductCategory) {
+            StepProductCategory category = (StepProductCategory) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, category, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, category, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductRelatedProductCategory relatedCategory) {
+        } else if (definition instanceof StepProductRelatedProductCategory) {
+            StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relatedCategory, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relatedCategory, resolved, instanceIdsByTargetId);
             for (StepProduct product : relatedCategory.products()) {
                 appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, product, resolved, instanceIdsByTargetId);
             }
-        } else if (definition instanceof StepGeneralProperty generalProperty) {
+        } else if (definition instanceof StepGeneralProperty) {
+            StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, generalProperty, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, generalProperty, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionEffectivity effectivity) {
+        } else if (definition instanceof StepProductDefinitionEffectivity) {
+            StepProductDefinitionEffectivity effectivity = (StepProductDefinitionEffectivity) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, effectivity.productDefinition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEffectivity effectivity) {
+        } else if (definition instanceof StepEffectivity) {
+            StepEffectivity effectivity = (StepEffectivity) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationRelationship relationship) {
+        } else if (definition instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
                 appendPmiTarget(
@@ -13276,7 +14305,8 @@ public final class StepPreviewJsonExporter {
                         relationship.id()
                 );
             }
-        } else if (definition instanceof StepShapeRepresentationRelationship relationship) {
+        } else if (definition instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
                 appendPmiTarget(
@@ -13292,7 +14322,8 @@ public final class StepPreviewJsonExporter {
                         relationship.id()
                 );
             }
-        } else if (definition instanceof StepContextDependentShapeRepresentation shapeRepresentation) {
+        } else if (definition instanceof StepContextDependentShapeRepresentation) {
+            StepContextDependentShapeRepresentation shapeRepresentation = (StepContextDependentShapeRepresentation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shapeRepresentation, instanceIdsByTargetId);
             appendNestedDefinitionTargets(
                     targetsByUsageId,
@@ -13308,7 +14339,8 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepRepresentationRelationshipWithTransformation relationship) {
+        } else if (definition instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             appendNestedDefinitionTargets(
                     targetsByUsageId,
@@ -13317,24 +14349,30 @@ public final class StepPreviewJsonExporter {
                     resolved,
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepBoxDomain boxDomain) {
+        } else if (definition instanceof StepBoxDomain) {
+            StepBoxDomain boxDomain = (StepBoxDomain) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain.corner(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBooleanClippingResult result) {
+        } else if (definition instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult result = (StepBooleanClippingResult) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBooleanResult result) {
+        } else if (definition instanceof StepBooleanResult) {
+            StepBooleanResult result = (StepBooleanResult) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedMarker marker) {
+        } else if (definition instanceof StepPreDefinedMarker) {
+            StepPreDefinedMarker marker = (StepPreDefinedMarker) definition;
             appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedPointMarkerSymbol marker) {
+        } else if (definition instanceof StepPreDefinedPointMarkerSymbol) {
+            StepPreDefinedPointMarkerSymbol marker = (StepPreDefinedPointMarkerSymbol) definition;
             appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSymbol annotationSymbol) {
+        } else if (definition instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13342,7 +14380,8 @@ public final class StepPreviewJsonExporter {
                     annotationSymbol.mappingTarget(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAnnotationText annotationText) {
+        } else if (definition instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13350,7 +14389,8 @@ public final class StepPreviewJsonExporter {
                     annotationText.mappingTarget(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        } else if (definition instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13358,7 +14398,8 @@ public final class StepPreviewJsonExporter {
                     annotationTextCharacter.mappingTarget(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepUserDefinedCurveFont curveFont) {
+        } else if (definition instanceof StepUserDefinedCurveFont) {
+            StepUserDefinedCurveFont curveFont = (StepUserDefinedCurveFont) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13366,7 +14407,8 @@ public final class StepPreviewJsonExporter {
                     curveFont.mappingTarget(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepUserDefinedMarker marker) {
+        } else if (definition instanceof StepUserDefinedMarker) {
+            StepUserDefinedMarker marker = (StepUserDefinedMarker) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13374,7 +14416,8 @@ public final class StepPreviewJsonExporter {
                     marker.mappingTarget(),
                     instanceIdsByTargetId
             );
-        } else if (definition instanceof StepUserDefinedTerminatorSymbol symbol) {
+        } else if (definition instanceof StepUserDefinedTerminatorSymbol) {
+            StepUserDefinedTerminatorSymbol symbol = (StepUserDefinedTerminatorSymbol) definition;
             appendMappedDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -13429,7 +14472,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductRelationship relationship) {
+            if (candidate instanceof StepProductRelationship) {
+            StepProductRelationship relationship = (StepProductRelationship) candidate;
                 if (relationship.relatingProduct().id() == product.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedProduct(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
@@ -13451,7 +14495,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepProductDefinitionFormationRelationship relationship)) {
+            if (!(candidate instanceof StepProductDefinitionFormationRelationship)) {
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
                 continue;
             }
             if (relationship.relatingFormation().id() == formation.id()) {
@@ -13471,14 +14516,16 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionRelationship relationship) {
+            if (candidate instanceof StepProductDefinitionRelationship) {
+            StepProductDefinitionRelationship relationship = (StepProductDefinitionRelationship) candidate;
                 if (relationship.relatingProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedProductDefinition(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
                 if (relationship.relatedProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatingProductDefinition(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
-            } else if (candidate instanceof StepNextAssemblyUsageOccurrence occurrence) {
+            } else if (candidate instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) candidate;
                 if (occurrence.relatingProductDefinition().id() == productDefinition.id()
                         || occurrence.relatedProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, occurrence, relationshipTypeName(occurrence), occurrence.id(), resolved, instanceIdsByTargetId);
@@ -13534,7 +14581,8 @@ public final class StepPreviewJsonExporter {
                             resolved,
                             instanceIdsByTargetId
                     );
-                    if (contextDependent.representationRelationship() instanceof StepRepresentationRelationshipWithTransformation transformed) {
+                    if (contextDependent.representationRelationship() instanceof StepRepresentationRelationshipWithTransformation) {
+                        StepRepresentationRelationshipWithTransformation transformed = (StepRepresentationRelationshipWithTransformation) contextDependent.representationRelationship();
                         appendDefinitionRelationshipTargets(
                                 targetsByUsageId,
                                 identifiedItem.id(),
@@ -13690,7 +14738,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepPropertyDefinitionRelationship relationship)) {
+            if (!(candidate instanceof StepPropertyDefinitionRelationship)) {
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
                 continue;
             }
             if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
@@ -13986,7 +15035,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepGroupRelationship relationship)) {
+            if (!(candidate instanceof StepGroupRelationship)) {
+            StepGroupRelationship relationship = (StepGroupRelationship) candidate;
                 continue;
             }
             if (relationship.relatingGroup().id() == group.id()) {
@@ -14006,7 +15056,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepGeneralPropertyRelationship relationship)) {
+            if (!(candidate instanceof StepGeneralPropertyRelationship)) {
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
                 continue;
             }
             if (relationship.relatingGeneralProperty().id() == generalProperty.id()) {
@@ -14042,7 +15093,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepDocumentRelationship relationship)) {
+            if (!(candidate instanceof StepDocumentRelationship)) {
+            StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
                 continue;
             }
             if (relationship.relatingDocument().id() == document.id()) {
@@ -14163,7 +15215,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepOrganizationRelationship relationship)) {
+            if (!(candidate instanceof StepOrganizationRelationship)) {
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
                 continue;
             }
             if (relationship.relatingOrganization().id() == organization.id()) {
@@ -14183,7 +15236,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepEffectivityRelationship relationship)) {
+            if (!(candidate instanceof StepEffectivityRelationship)) {
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                 continue;
             }
             if (relationship.relatingEffectivity().id() == effectivity.id()) {
@@ -14203,7 +15257,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepProductCategoryRelationship relationship)) {
+            if (!(candidate instanceof StepProductCategoryRelationship)) {
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
                 continue;
             }
             if (relationship.category().id() == category.id()) {
@@ -14228,7 +15283,8 @@ public final class StepPreviewJsonExporter {
         do {
             changed = false;
             for (StepEntity candidate : resolved.values()) {
-                if (!(candidate instanceof StepEffectivityRelationship relationship)) {
+                if (!(candidate instanceof StepEffectivityRelationship)) {
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                     continue;
                 }
                 String relatingName = relationship.relatingEffectivity().name();
@@ -14265,7 +15321,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepExternalSourceRelationship relationship)) {
+            if (!(candidate instanceof StepExternalSourceRelationship)) {
+            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                 continue;
             }
             if (relationship.relatingSource().id() == source.id()) {
@@ -14290,7 +15347,8 @@ public final class StepPreviewJsonExporter {
         do {
             changed = false;
             for (StepEntity candidate : resolved.values()) {
-                if (!(candidate instanceof StepExternalSourceRelationship relationship)) {
+                if (!(candidate instanceof StepExternalSourceRelationship)) {
+            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                     continue;
                 }
                 int relatingId = relationship.relatingSource().id();
@@ -14324,9 +15382,11 @@ public final class StepPreviewJsonExporter {
                 mappingSource,
                 instanceIdsByTargetId
         );
-        if (mappingSource instanceof StepRepresentationMap representationMap) {
+        if (mappingSource instanceof StepRepresentationMap) {
+            StepRepresentationMap representationMap = (StepRepresentationMap) mappingSource;
             appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
-        } else if (mappingSource instanceof StepSymbolRepresentationMap representationMap) {
+        } else if (mappingSource instanceof StepSymbolRepresentationMap) {
+            StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) mappingSource;
             appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
         }
         appendPlacementDefinitionTargets(targetsByUsageId, identifiedItem, mappingTarget, instanceIdsByTargetId);
@@ -14459,7 +15519,8 @@ public final class StepPreviewJsonExporter {
                 placement,
                 instanceIdsByTargetId
         );
-        if (placement instanceof StepAxis1Placement axis1Placement) {
+        if (placement instanceof StepAxis1Placement) {
+            StepAxis1Placement axis1Placement = (StepAxis1Placement) placement;
             appendExistingRepresentationDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -14472,7 +15533,8 @@ public final class StepPreviewJsonExporter {
                     axis1Placement.axis(),
                     instanceIdsByTargetId
             );
-        } else if (placement instanceof StepAxis2Placement2D axis2Placement2D) {
+        } else if (placement instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D axis2Placement2D = (StepAxis2Placement2D) placement;
             appendExistingRepresentationDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -14487,7 +15549,8 @@ public final class StepPreviewJsonExporter {
                         instanceIdsByTargetId
                 );
             }
-        } else if (placement instanceof StepAxis2Placement3D axis2Placement3D) {
+        } else if (placement instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D axis2Placement3D = (StepAxis2Placement3D) placement;
             appendExistingRepresentationDefinitionTargets(
                     targetsByUsageId,
                     identifiedItem,
@@ -14521,7 +15584,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (!(candidate instanceof StepShapeAspectRelationship relationship)) {
+            if (!(candidate instanceof StepShapeAspectRelationship)) {
+            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) candidate;
                 continue;
             }
             if (relationship.relatingShapeAspect().id() == shapeAspect.id()) {
@@ -14558,7 +15622,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
-        if (relatedDefinition instanceof StepPropertyDefinition propertyDefinition) {
+        if (relatedDefinition instanceof StepPropertyDefinition) {
+            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) relatedDefinition;
             appendPropertyRepresentationLinkTargets(
                     targetsByUsageId,
                     usageId,
@@ -14621,7 +15686,7 @@ public final class StepPreviewJsonExporter {
     private static String tryEntityName(StepEntity definition) {
         try {
             Object value = definition.getClass().getMethod("entityName").invoke(definition);
-            if (value instanceof String name && !name.isBlank()) {
+            if (value instanceof String) { String name = (String) value;
                 return name;
             }
         } catch (ReflectiveOperationException ignored) {
@@ -14731,7 +15796,8 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepRepresentation) {
             targets.add(entity);
         }
-        if (entity instanceof StepPropertyDefinition propertyDefinition) {
+        if (entity instanceof StepPropertyDefinition) {
+            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
             targets.addAll(collectSemanticTargets(propertyDefinition.definition(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepPropertyDefinitionRepresentation representationLink
@@ -14767,7 +15833,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepPlacedDatumTargetFeature datumTargetFeature
                         && datumTargetFeature.definition().id() == propertyDefinition.id()) {
                     targets.add(datumTargetFeature.usedRepresentation());
-                } else if (candidate instanceof StepPropertyDefinitionRelationship relationship) {
+                } else if (candidate instanceof StepPropertyDefinitionRelationship) {
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
                     if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
                     }
@@ -14776,41 +15843,53 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepDescriptiveRepresentationItem item) {
+        } else if (entity instanceof StepDescriptiveRepresentationItem) {
+            StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepValueRepresentationItem item) {
+        } else if (entity instanceof StepValueRepresentationItem) {
+            StepValueRepresentationItem item = (StepValueRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepMeasureRepresentationItem item) {
+        } else if (entity instanceof StepMeasureRepresentationItem) {
+            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
             targets.addAll(collectSemanticTargets(item.unit(), resolved, visiting));
-        } else if (entity instanceof StepMeasureWithUnit measure) {
+        } else if (entity instanceof StepMeasureWithUnit) {
+            StepMeasureWithUnit measure = (StepMeasureWithUnit) entity;
             targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
-        } else if (entity instanceof StepTypedMeasureWithUnit measure) {
+        } else if (entity instanceof StepTypedMeasureWithUnit) {
+            StepTypedMeasureWithUnit measure = (StepTypedMeasureWithUnit) entity;
             targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
-        } else if (entity instanceof StepUncertaintyMeasureWithUnit measure) {
+        } else if (entity instanceof StepUncertaintyMeasureWithUnit) {
+            StepUncertaintyMeasureWithUnit measure = (StepUncertaintyMeasureWithUnit) entity;
             targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
             targets.addAll(collectTargetsForAssignedUncertainty(measure.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
-        } else if (entity instanceof StepCartesianPoint point) {
+        } else if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
             targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting));
-        } else if (entity instanceof StepDirection direction) {
+        } else if (entity instanceof StepDirection) {
+            StepDirection direction = (StepDirection) entity;
             targets.addAll(collectTargetsReferencingEntity(direction.id(), resolved, visiting));
-        } else if (entity instanceof StepVector vector) {
+        } else if (entity instanceof StepVector) {
+            StepVector vector = (StepVector) entity;
             targets.addAll(collectSemanticTargets(vector.orientation(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(vector.id(), resolved, visiting));
-        } else if (entity instanceof StepAxis1Placement placement) {
+        } else if (entity instanceof StepAxis1Placement) {
+            StepAxis1Placement placement = (StepAxis1Placement) entity;
             targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
             targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
-        } else if (entity instanceof StepAxis2Placement2D placement) {
+        } else if (entity instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement = (StepAxis2Placement2D) entity;
             targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
             if (placement.refDirection() != null) {
                 targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting));
             }
             targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
-        } else if (entity instanceof StepAxis2Placement3D placement) {
+        } else if (entity instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement = (StepAxis2Placement3D) entity;
             targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
             if (placement.axis() != null) {
                 targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting));
@@ -14819,68 +15898,91 @@ public final class StepPreviewJsonExporter {
                 targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting));
             }
             targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
-        } else if (entity instanceof StepAddress address) {
+        } else if (entity instanceof StepAddress) {
+            StepAddress address = (StepAddress) entity;
             targets.addAll(collectTargetsReferencingEntity(address.id(), resolved, visiting));
-        } else if (entity instanceof StepCharacterizedObject characterizedObject) {
+        } else if (entity instanceof StepCharacterizedObject) {
+            StepCharacterizedObject characterizedObject = (StepCharacterizedObject) entity;
             targets.addAll(collectTargetsReferencingEntity(characterizedObject.id(), resolved, visiting));
-        } else if (entity instanceof StepPoint point) {
+        } else if (entity instanceof StepPoint) {
+            StepPoint point = (StepPoint) entity;
             targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting));
-        } else if (entity instanceof StepPointSet pointSet) {
+        } else if (entity instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) entity;
             targets.addAll(collectSemanticTargets(pointSet.points(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(pointSet.id(), resolved, visiting));
-        } else if (entity instanceof StepPolyline polyline) {
+        } else if (entity instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) entity;
             targets.addAll(collectSemanticTargets(polyline.points(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(polyline.id(), resolved, visiting));
-        } else if (entity instanceof StepProfileDef profile) {
+        } else if (entity instanceof StepProfileDef) {
+            StepProfileDef profile = (StepProfileDef) entity;
             if (profile.position() != null) {
                 targets.addAll(collectSemanticTargets(profile.position(), resolved, visiting));
             }
             targets.addAll(collectSemanticTargets(profile.curves(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(profile.id(), resolved, visiting));
-        } else if (entity instanceof StepLine line) {
+        } else if (entity instanceof StepLine) {
+            StepLine line = (StepLine) entity;
             targets.addAll(collectSemanticTargets(line.point(), resolved, visiting));
             targets.addAll(collectSemanticTargets(line.vector(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(line.id(), resolved, visiting));
-        } else if (entity instanceof StepCircle circle) {
+        } else if (entity instanceof StepCircle) {
+            StepCircle circle = (StepCircle) entity;
             targets.addAll(collectSemanticTargets(circle.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(circle.id(), resolved, visiting));
-        } else if (entity instanceof StepEllipse ellipse) {
+        } else if (entity instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) entity;
             targets.addAll(collectSemanticTargets(ellipse.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(ellipse.id(), resolved, visiting));
-        } else if (entity instanceof StepCurve curve) {
+        } else if (entity instanceof StepCurve) {
+            StepCurve curve = (StepCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepBoundedCurve curve) {
+        } else if (entity instanceof StepBoundedCurve) {
+            StepBoundedCurve curve = (StepBoundedCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepConicCurve curve) {
+        } else if (entity instanceof StepConicCurve) {
+            StepConicCurve curve = (StepConicCurve) entity;
             targets.addAll(collectSemanticTargets(curve.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepBSplineCurve curve) {
+        } else if (entity instanceof StepBSplineCurve) {
+            StepBSplineCurve curve = (StepBSplineCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepBezierCurve curve) {
+        } else if (entity instanceof StepBezierCurve) {
+            StepBezierCurve curve = (StepBezierCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepBSplineCurveWithKnots curve) {
+        } else if (entity instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots curve = (StepBSplineCurveWithKnots) entity;
             targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepRationalBSplineCurve curve) {
+        } else if (entity instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve curve = (StepRationalBSplineCurve) entity;
             targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepPiecewiseBezierCurve curve) {
+        } else if (entity instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepUniformCurve curve) {
+        } else if (entity instanceof StepUniformCurve) {
+            StepUniformCurve curve = (StepUniformCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepQuasiUniformCurve curve) {
+        } else if (entity instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepOffsetCurve2D curve) {
+        } else if (entity instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D curve = (StepOffsetCurve2D) entity;
             targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepOffsetCurve3D curve) {
+        } else if (entity instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D curve = (StepOffsetCurve3D) entity;
             targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curve.refDirection(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedCurve curve) {
+        } else if (entity instanceof StepOrientedCurve) {
+            StepOrientedCurve curve = (StepOrientedCurve) entity;
             targets.addAll(collectSemanticTargets(curve.curveElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepTrimmedCurve curve) {
+        } else if (entity instanceof StepTrimmedCurve) {
+            StepTrimmedCurve curve = (StepTrimmedCurve) entity;
             targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
             for (StepValue trim : curve.trim1()) {
                 if (trim instanceof StepValue.ReferenceValue ref && resolved.containsKey(ref.id())) {
@@ -14893,213 +15995,280 @@ public final class StepPreviewJsonExporter {
                 }
             }
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceCurve curve) {
+        } else if (entity instanceof StepSurfaceCurve) {
+            StepSurfaceCurve curve = (StepSurfaceCurve) entity;
             targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepSeamCurve curve) {
+        } else if (entity instanceof StepSeamCurve) {
+            StepSeamCurve curve = (StepSeamCurve) entity;
             targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepPcurve curve) {
+        } else if (entity instanceof StepPcurve) {
+            StepPcurve curve = (StepPcurve) entity;
             targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepCompositeCurve curve) {
+        } else if (entity instanceof StepCompositeCurve) {
+            StepCompositeCurve curve = (StepCompositeCurve) entity;
             targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepCompositeCurveOnSurface curve) {
+        } else if (entity instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface curve = (StepCompositeCurveOnSurface) entity;
             targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepCompositeCurveSegment segment) {
+        } else if (entity instanceof StepCompositeCurveSegment) {
+            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) entity;
             targets.addAll(collectSemanticTargets(segment.parentCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(segment.id(), resolved, visiting));
-        } else if (entity instanceof StepSurface surface) {
+        } else if (entity instanceof StepSurface) {
+            StepSurface surface = (StepSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepBoundedSurface surface) {
+        } else if (entity instanceof StepBoundedSurface) {
+            StepBoundedSurface surface = (StepBoundedSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepBSplineSurface surface) {
+        } else if (entity instanceof StepBSplineSurface) {
+            StepBSplineSurface surface = (StepBSplineSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepBezierSurface surface) {
+        } else if (entity instanceof StepBezierSurface) {
+            StepBezierSurface surface = (StepBezierSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepBSplineSurfaceWithKnots surface) {
-            targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).toList(),
+        } else if (entity instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots surface = (StepBSplineSurfaceWithKnots) entity;
+            targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).collect(Collectors.toList()),
                     resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepRationalBSplineSurface surface) {
-            targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).toList(),
+        } else if (entity instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface surface = (StepRationalBSplineSurface) entity;
+            targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).collect(Collectors.toList()),
                     resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepPiecewiseBezierSurface surface) {
+        } else if (entity instanceof StepPiecewiseBezierSurface) {
+            StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepUniformSurface surface) {
+        } else if (entity instanceof StepUniformSurface) {
+            StepUniformSurface surface = (StepUniformSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepQuasiUniformSurface surface) {
+        } else if (entity instanceof StepQuasiUniformSurface) {
+            StepQuasiUniformSurface surface = (StepQuasiUniformSurface) entity;
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepPlane plane) {
+        } else if (entity instanceof StepPlane) {
+            StepPlane plane = (StepPlane) entity;
             targets.addAll(collectSemanticTargets(plane.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting));
-        } else if (entity instanceof StepCylindricalSurface surface) {
+        } else if (entity instanceof StepCylindricalSurface) {
+            StepCylindricalSurface surface = (StepCylindricalSurface) entity;
             targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepConicalSurface surface) {
+        } else if (entity instanceof StepConicalSurface) {
+            StepConicalSurface surface = (StepConicalSurface) entity;
             targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepToroidalSurface surface) {
+        } else if (entity instanceof StepToroidalSurface) {
+            StepToroidalSurface surface = (StepToroidalSurface) entity;
             targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceOfLinearExtrusion surface) {
+        } else if (entity instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion surface = (StepSurfaceOfLinearExtrusion) entity;
             targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting));
             targets.addAll(collectSemanticTargets(surface.extrusionAxis(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceOfRevolution surface) {
+        } else if (entity instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution surface = (StepSurfaceOfRevolution) entity;
             targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting));
             targets.addAll(collectSemanticTargets(surface.axisPosition(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepRectangularTrimmedSurface surface) {
+        } else if (entity instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface surface = (StepRectangularTrimmedSurface) entity;
             targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepCurveBoundedSurface surface) {
+        } else if (entity instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface surface = (StepCurveBoundedSurface) entity;
             targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
             targets.addAll(collectSemanticTargets(surface.boundaries(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedSurface surface) {
+        } else if (entity instanceof StepOrientedSurface) {
+            StepOrientedSurface surface = (StepOrientedSurface) entity;
             targets.addAll(collectSemanticTargets(surface.surfaceElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepOffsetSurface surface) {
+        } else if (entity instanceof StepOffsetSurface) {
+            StepOffsetSurface surface = (StepOffsetSurface) entity;
             targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepSphericalSurface surface) {
+        } else if (entity instanceof StepSphericalSurface) {
+            StepSphericalSurface surface = (StepSphericalSurface) entity;
             targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepDegenerateToroidalSurface surface) {
+        } else if (entity instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface surface = (StepDegenerateToroidalSurface) entity;
             targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
-        } else if (entity instanceof StepShellBasedSurfaceModel model) {
+        } else if (entity instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel model = (StepShellBasedSurfaceModel) entity;
             targets.addAll(collectSemanticTargets(model.shells(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepFaceBasedSurfaceModel model) {
+        } else if (entity instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel model = (StepFaceBasedSurfaceModel) entity;
             targets.addAll(collectSemanticTargets(model.faceSets(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceModel model) {
+        } else if (entity instanceof StepSurfaceModel) {
+            StepSurfaceModel model = (StepSurfaceModel) entity;
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepSolidModel model) {
+        } else if (entity instanceof StepSolidModel) {
+            StepSolidModel model = (StepSolidModel) entity;
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepGeometricCurveSet set) {
+        } else if (entity instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet set = (StepGeometricCurveSet) entity;
             targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting));
-        } else if (entity instanceof StepGeometricSet set) {
+        } else if (entity instanceof StepGeometricSet) {
+            StepGeometricSet set = (StepGeometricSet) entity;
             targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting));
-        } else if (entity instanceof StepBoxDomain boxDomain) {
+        } else if (entity instanceof StepBoxDomain) {
+            StepBoxDomain boxDomain = (StepBoxDomain) entity;
             targets.addAll(collectSemanticTargets(boxDomain.corner(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(boxDomain.id(), resolved, visiting));
-        } else if (entity instanceof StepDimensionalExponents exponents) {
+        } else if (entity instanceof StepDimensionalExponents) {
+            StepDimensionalExponents exponents = (StepDimensionalExponents) entity;
             targets.addAll(collectTargetsReferencingEntity(exponents.id(), resolved, visiting));
-        } else if (entity instanceof StepDegeneratePcurve curve) {
+        } else if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve curve = (StepDegeneratePcurve) entity;
             targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
-        } else if (entity instanceof StepHalfSpaceSolid halfSpaceSolid) {
+        } else if (entity instanceof StepHalfSpaceSolid) {
+            StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) entity;
             targets.addAll(collectSemanticTargets(halfSpaceSolid.baseSurface(), resolved, visiting));
             if (halfSpaceSolid.enclosure() != null) {
                 targets.addAll(collectSemanticTargets(halfSpaceSolid.enclosure(), resolved, visiting));
             }
             targets.addAll(collectTargetsReferencingEntity(halfSpaceSolid.id(), resolved, visiting));
-        } else if (entity instanceof StepVertex vertex) {
+        } else if (entity instanceof StepVertex) {
+            StepVertex vertex = (StepVertex) entity;
             targets.addAll(collectTargetsReferencingEntity(vertex.id(), resolved, visiting));
-        } else if (entity instanceof StepVertexPoint vertexPoint) {
+        } else if (entity instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) entity;
             targets.addAll(collectSemanticTargets(vertexPoint.point(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(vertexPoint.id(), resolved, visiting));
-        } else if (entity instanceof StepEdge edge) {
+        } else if (entity instanceof StepEdge) {
+            StepEdge edge = (StepEdge) entity;
             targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting));
-        } else if (entity instanceof StepConnectedEdgeSet edgeSet) {
+        } else if (entity instanceof StepConnectedEdgeSet) {
+            StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
             targets.addAll(collectSemanticTargets(edgeSet.edges(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(edgeSet.id(), resolved, visiting));
-        } else if (entity instanceof StepEdgeBasedWireframeModel model) {
+        } else if (entity instanceof StepEdgeBasedWireframeModel) {
+            StepEdgeBasedWireframeModel model = (StepEdgeBasedWireframeModel) entity;
             targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepPolyLoop loop) {
+        } else if (entity instanceof StepPolyLoop) {
+            StepPolyLoop loop = (StepPolyLoop) entity;
             targets.addAll(collectSemanticTargets(loop.polygon(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
-        } else if (entity instanceof StepLoop loop) {
+        } else if (entity instanceof StepLoop) {
+            StepLoop loop = (StepLoop) entity;
             targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
-        } else if (entity instanceof StepEdgeLoop loop) {
+        } else if (entity instanceof StepEdgeLoop) {
+            StepEdgeLoop loop = (StepEdgeLoop) entity;
             targets.addAll(collectSemanticTargets(loop.edges(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
-        } else if (entity instanceof StepVertexLoop loop) {
+        } else if (entity instanceof StepVertexLoop) {
+            StepVertexLoop loop = (StepVertexLoop) entity;
             targets.addAll(collectSemanticTargets(loop.loopVertex(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
         } else if (entity instanceof com.minicad.step.model.topology.StepFaceBound faceBound) {
             targets.addAll(collectSemanticTargets(faceBound.loop(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(faceBound.id(), resolved, visiting));
-        } else if (entity instanceof StepFace face) {
+        } else if (entity instanceof StepFace) {
+            StepFace face = (StepFace) entity;
             targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
-        } else if (entity instanceof StepAdvancedFace face) {
+        } else if (entity instanceof StepAdvancedFace) {
+            StepAdvancedFace face = (StepAdvancedFace) entity;
             targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting));
             targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
-        } else if (entity instanceof StepFaceSurface face) {
+        } else if (entity instanceof StepFaceSurface) {
+            StepFaceSurface face = (StepFaceSurface) entity;
             targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting));
             targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
-        } else if (entity instanceof StepOpenShell shell) {
+        } else if (entity instanceof StepOpenShell) {
+            StepOpenShell shell = (StepOpenShell) entity;
             targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfacedOpenShell shell) {
+        } else if (entity instanceof StepSurfacedOpenShell) {
+            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) entity;
             targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedOpenShell shell) {
+        } else if (entity instanceof StepOrientedOpenShell) {
+            StepOrientedOpenShell shell = (StepOrientedOpenShell) entity;
             targets.addAll(collectSemanticTargets(shell.openShellElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
-        } else if (entity instanceof StepClosedShell shell) {
+        } else if (entity instanceof StepClosedShell) {
+            StepClosedShell shell = (StepClosedShell) entity;
             targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedClosedShell shell) {
+        } else if (entity instanceof StepOrientedClosedShell) {
+            StepOrientedClosedShell shell = (StepOrientedClosedShell) entity;
             targets.addAll(collectSemanticTargets(shell.closedShellElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
-        } else if (entity instanceof StepConnectedFaceSet faceSet) {
+        } else if (entity instanceof StepConnectedFaceSet) {
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) entity;
             targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting));
-        } else if (entity instanceof StepConnectedFaceSubSet faceSet) {
+        } else if (entity instanceof StepConnectedFaceSubSet) {
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) entity;
             targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting));
             targets.addAll(collectSemanticTargets(faceSet.parentFaceSet(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedEdge edge) {
+        } else if (entity instanceof StepOrientedEdge) {
+            StepOrientedEdge edge = (StepOrientedEdge) entity;
             targets.addAll(collectSemanticTargets(edge.edgeElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedFace face) {
+        } else if (entity instanceof StepOrientedFace) {
+            StepOrientedFace face = (StepOrientedFace) entity;
             targets.addAll(collectSemanticTargets(face.faceElement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
-        } else if (entity instanceof StepPath path) {
+        } else if (entity instanceof StepPath) {
+            StepPath path = (StepPath) entity;
             targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
-        } else if (entity instanceof StepOpenPath path) {
+        } else if (entity instanceof StepOpenPath) {
+            StepOpenPath path = (StepOpenPath) entity;
             targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
-        } else if (entity instanceof StepSubpath subpath) {
+        } else if (entity instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) entity;
             targets.addAll(collectSemanticTargets(subpath.edges(), resolved, visiting));
             targets.addAll(collectSemanticTargets(subpath.parentPath(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(subpath.id(), resolved, visiting));
-        } else if (entity instanceof StepOrientedPath path) {
+        } else if (entity instanceof StepOrientedPath) {
+            StepOrientedPath path = (StepOrientedPath) entity;
             targets.addAll(collectSemanticTargets(path.pathElement(), resolved, visiting));
             targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
-        } else if (entity instanceof StepWireShell wireShell) {
+        } else if (entity instanceof StepWireShell) {
+            StepWireShell wireShell = (StepWireShell) entity;
             targets.addAll(collectSemanticTargets(wireShell.loops(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(wireShell.id(), resolved, visiting));
-        } else if (entity instanceof StepVertexShell vertexShell) {
+        } else if (entity instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) entity;
             targets.addAll(collectSemanticTargets(vertexShell.extent(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(vertexShell.id(), resolved, visiting));
-        } else if (entity instanceof StepShellBasedWireframeModel model) {
+        } else if (entity instanceof StepShellBasedWireframeModel) {
+            StepShellBasedWireframeModel model = (StepShellBasedWireframeModel) entity;
             targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
-        } else if (entity instanceof StepSubedge subedge) {
+        } else if (entity instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) entity;
             targets.addAll(collectSemanticTargets(subedge.start(), resolved, visiting));
             targets.addAll(collectSemanticTargets(subedge.end(), resolved, visiting));
             targets.addAll(collectSemanticTargets(subedge.parentEdge(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(subedge.id(), resolved, visiting));
-        } else if (entity instanceof StepCartesianTransformationOperator transformation) {
+        } else if (entity instanceof StepCartesianTransformationOperator) {
+            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) entity;
             if (transformation.axis1() != null) {
                 targets.addAll(collectSemanticTargets(transformation.axis1(), resolved, visiting));
             }
@@ -15111,50 +16280,63 @@ public final class StepPreviewJsonExporter {
             }
             targets.addAll(collectSemanticTargets(transformation.localOrigin(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(transformation.id(), resolved, visiting));
-        } else if (entity instanceof StepGeometricReplica replica) {
+        } else if (entity instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
             targets.addAll(collectSemanticTargets(replica.parent(), resolved, visiting));
             targets.addAll(collectSemanticTargets(replica.transformation(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(replica.id(), resolved, visiting));
-        } else if (entity instanceof StepSweptAreaSolid solid) {
+        } else if (entity instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid solid = (StepSweptAreaSolid) entity;
             targets.addAll(collectSemanticTargets(solid.sweptArea(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.position(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.sweepReference(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepSweptDiskSolid solid) {
+        } else if (entity instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid solid = (StepSweptDiskSolid) entity;
             targets.addAll(collectSemanticTargets(solid.sweptCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepComplexClippingResult solid) {
+        } else if (entity instanceof StepComplexClippingResult) {
+            StepComplexClippingResult solid = (StepComplexClippingResult) entity;
             targets.addAll(collectSemanticTargets(solid.firstOperand(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.secondOperand(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepSolidReplica solid) {
+        } else if (entity instanceof StepSolidReplica) {
+            StepSolidReplica solid = (StepSolidReplica) entity;
             targets.addAll(collectSemanticTargets(solid.parentSolid(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.transformation(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepManifoldSolidBrep solid) {
+        } else if (entity instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) entity;
             targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepBrepWithVoids solid) {
+        } else if (entity instanceof StepBrepWithVoids) {
+            StepBrepWithVoids solid = (StepBrepWithVoids) entity;
             targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting));
             targets.addAll(collectSemanticTargets(solid.voids(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepBooleanClippingResult result) {
+        } else if (entity instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult result = (StepBooleanClippingResult) entity;
             targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting));
             targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting));
-        } else if (entity instanceof StepBooleanResult result) {
+        } else if (entity instanceof StepBooleanResult) {
+            StepBooleanResult result = (StepBooleanResult) entity;
             targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting));
             targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting));
-        } else if (entity instanceof StepCsgSolid solid) {
+        } else if (entity instanceof StepCsgSolid) {
+            StepCsgSolid solid = (StepCsgSolid) entity;
             targets.addAll(collectSemanticTargets(solid.treeRootExpression(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
-        } else if (entity instanceof StepCsgPrimitive primitive) {
+        } else if (entity instanceof StepCsgPrimitive) {
+            StepCsgPrimitive primitive = (StepCsgPrimitive) entity;
             targets.addAll(collectSemanticTargets(primitive.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(primitive.id(), resolved, visiting));
-        } else if (entity instanceof StepRepresentationContext context) {
+        } else if (entity instanceof StepRepresentationContext) {
+            StepRepresentationContext context = (StepRepresentationContext) entity;
             targets.addAll(collectTargetsForRepresentationContext(context.id(), resolved, visiting));
-        } else if (entity instanceof StepGeometricRepresentationContext context) {
+        } else if (entity instanceof StepGeometricRepresentationContext) {
+            StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) entity;
             if (context.globalUnitAssignedContext() != null) {
                 targets.addAll(collectSemanticTargets(context.globalUnitAssignedContext(), resolved, visiting));
             }
@@ -15162,22 +16344,28 @@ public final class StepPreviewJsonExporter {
                 targets.addAll(collectSemanticTargets(context.globalUncertaintyAssignedContext(), resolved, visiting));
             }
             targets.addAll(collectTargetsForRepresentationContext(context.id(), resolved, visiting));
-        } else if (entity instanceof StepAbstractVariable variable) {
+        } else if (entity instanceof StepAbstractVariable) {
+            StepAbstractVariable variable = (StepAbstractVariable) entity;
             targets.add(variable.usedRepresentation());
             targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
-        } else if (entity instanceof StepScalarVariable variable) {
+        } else if (entity instanceof StepScalarVariable) {
+            StepScalarVariable variable = (StepScalarVariable) entity;
             targets.add(variable.usedRepresentation());
             targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
-        } else if (entity instanceof StepRowVariable variable) {
+        } else if (entity instanceof StepRowVariable) {
+            StepRowVariable variable = (StepRowVariable) entity;
             targets.add(variable.usedRepresentation());
             targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
-        } else if (entity instanceof StepForwardChainingRulePremise variable) {
+        } else if (entity instanceof StepForwardChainingRulePremise) {
+            StepForwardChainingRulePremise variable = (StepForwardChainingRulePremise) entity;
             targets.add(variable.usedRepresentation());
             targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
-        } else if (entity instanceof StepBackChainingRuleBody variable) {
+        } else if (entity instanceof StepBackChainingRuleBody) {
+            StepBackChainingRuleBody variable = (StepBackChainingRuleBody) entity;
             targets.add(variable.usedRepresentation());
             targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
-        } else if (entity instanceof StepApplicationContext applicationContext) {
+        } else if (entity instanceof StepApplicationContext) {
+            StepApplicationContext applicationContext = (StepApplicationContext) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepApplicationProtocolDefinition protocolDefinition
                         && protocolDefinition.application().id() == applicationContext.id()) {
@@ -15190,9 +16378,11 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(productDefinitionContext, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepApplicationProtocolDefinition protocolDefinition) {
+        } else if (entity instanceof StepApplicationProtocolDefinition) {
+            StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) entity;
             targets.addAll(collectSemanticTargets(protocolDefinition.application(), resolved, visiting));
-        } else if (entity instanceof StepProductContext productContext) {
+        } else if (entity instanceof StepProductContext) {
+            StepProductContext productContext = (StepProductContext) entity;
             targets.addAll(collectSemanticTargets(productContext.frameOfReference(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProduct product
@@ -15200,7 +16390,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(product, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepProductDefinitionContext productDefinitionContext) {
+        } else if (entity instanceof StepProductDefinitionContext) {
+            StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) entity;
             targets.addAll(collectSemanticTargets(productDefinitionContext.frameOfReference(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinition productDefinition
@@ -15208,10 +16399,12 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepGeneralProperty generalProperty) {
+        } else if (entity instanceof StepGeneralProperty) {
+            StepGeneralProperty generalProperty = (StepGeneralProperty) entity;
             targets.addAll(collectTargetsReferencingEntity(generalProperty.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepGeneralPropertyRelationship relationship) {
+                if (candidate instanceof StepGeneralPropertyRelationship) {
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
                     if (relationship.relatingGeneralProperty().id() == generalProperty.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting));
                     }
@@ -15220,7 +16413,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepDocument document) {
+        } else if (entity instanceof StepDocument) {
+            StepDocument document = (StepDocument) entity;
             targets.addAll(collectTargetsReferencingEntity(document.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDocumentReference reference
@@ -15229,7 +16423,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepAppliedDocumentReference reference
                         && reference.assignedDocument().id() == document.id()) {
                     targets.addAll(collectSemanticTargets(reference, resolved, visiting));
-                } else if (candidate instanceof StepDocumentRelationship relationship) {
+                } else if (candidate instanceof StepDocumentRelationship) {
+            StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
                     if (relationship.relatingDocument().id() == document.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting));
                     }
@@ -15238,9 +16433,11 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepDocumentUsageConstraint documentUsageConstraint) {
+        } else if (entity instanceof StepDocumentUsageConstraint) {
+            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) entity;
             targets.addAll(collectSemanticTargets(documentUsageConstraint.source(), resolved, visiting));
-        } else if (entity instanceof StepGroup group) {
+        } else if (entity instanceof StepGroup) {
+            StepGroup group = (StepGroup) entity;
             targets.addAll(collectTargetsReferencingEntity(group.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepGroupAssignment assignment
@@ -15255,7 +16452,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepAppliedClassificationAssignment assignment
                         && assignment.assignedClass().id() == group.id()) {
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepGroupRelationship relationship) {
+                } else if (candidate instanceof StepGroupRelationship) {
+            StepGroupRelationship relationship = (StepGroupRelationship) candidate;
                     if (relationship.relatingGroup().id() == group.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting));
                     }
@@ -15264,7 +16462,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepOrganization organization) {
+        } else if (entity instanceof StepOrganization) {
+            StepOrganization organization = (StepOrganization) entity;
             targets.addAll(collectTargetsReferencingEntity(organization.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedOrganizationAssignment assignment
@@ -15273,7 +16472,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepOrganizationAssignment assignment
                         && assignment.assignedOrganization().id() == organization.id()) {
                     targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting));
-                } else if (candidate instanceof StepOrganizationRelationship relationship) {
+                } else if (candidate instanceof StepOrganizationRelationship) {
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
                     if (relationship.relatingOrganization().id() == organization.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting));
                     }
@@ -15282,10 +16482,12 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepProductCategory productCategory) {
+        } else if (entity instanceof StepProductCategory) {
+            StepProductCategory productCategory = (StepProductCategory) entity;
             targets.addAll(collectTargetsReferencingEntity(productCategory.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepProductCategoryRelationship relationship) {
+                if (candidate instanceof StepProductCategoryRelationship) {
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
                     if (relationship.category().id() == productCategory.id()) {
                         targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting));
                     }
@@ -15297,9 +16499,11 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepProductRelatedProductCategory relatedCategory) {
+        } else if (entity instanceof StepProductRelatedProductCategory) {
+            StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) entity;
             targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting));
-        } else if (entity instanceof StepProduct product) {
+        } else if (entity instanceof StepProduct) {
+            StepProduct product = (StepProduct) entity;
             targets.addAll(collectTargetsReferencingEntity(product.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinitionFormation formation
@@ -15308,7 +16512,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepProductRelatedProductCategory relatedCategory
                         && relatedCategory.products().stream().anyMatch(related -> related.id() == product.id())) {
                     targets.addAll(collectSemanticTargets(relatedCategory, resolved, visiting));
-                } else if (candidate instanceof StepProductRelationship relationship) {
+                } else if (candidate instanceof StepProductRelationship) {
+            StepProductRelationship relationship = (StepProductRelationship) candidate;
                     if (relationship.relatingProduct().id() == product.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting));
                     }
@@ -15317,14 +16522,16 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepProductDefinitionFormation formation) {
+        } else if (entity instanceof StepProductDefinitionFormation) {
+            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) entity;
             targets.addAll(collectTargetsReferencingEntity(formation.id(), resolved, visiting));
             targets.addAll(collectSemanticTargets(formation.ofProduct(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinition productDefinition
                         && productDefinition.formation().id() == formation.id()) {
                     targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
-                } else if (candidate instanceof StepProductDefinitionFormationRelationship relationship) {
+                } else if (candidate instanceof StepProductDefinitionFormationRelationship) {
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
                     if (relationship.relatingFormation().id() == formation.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting));
                     }
@@ -15333,12 +16540,15 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepProductDefinitionEffectivity effectivity) {
+        } else if (entity instanceof StepProductDefinitionEffectivity) {
+            StepProductDefinitionEffectivity effectivity = (StepProductDefinitionEffectivity) entity;
             targets.addAll(collectSemanticTargets(effectivity.productDefinition(), resolved, visiting));
-        } else if (entity instanceof StepEffectivity effectivity) {
+        } else if (entity instanceof StepEffectivity) {
+            StepEffectivity effectivity = (StepEffectivity) entity;
             targets.addAll(collectTargetsReferencingEntity(effectivity.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepEffectivityRelationship relationship) {
+                if (candidate instanceof StepEffectivityRelationship) {
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                     if (relationship.relatingEffectivity().id() == effectivity.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting));
                     }
@@ -15347,7 +16557,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepCalendarDate calendarDate) {
+        } else if (entity instanceof StepCalendarDate) {
+            StepCalendarDate calendarDate = (StepCalendarDate) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDateAssignment assignment
                         && assignment.assignedDate().id() == calendarDate.id()) {
@@ -15360,7 +16571,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepDateAndTime dateAndTime) {
+        } else if (entity instanceof StepDateAndTime) {
+            StepDateAndTime dateAndTime = (StepDateAndTime) entity;
             targets.addAll(collectSemanticTargets(dateAndTime.dateComponent(), resolved, visiting));
             targets.addAll(collectSemanticTargets(dateAndTime.timeComponent(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
@@ -15375,7 +16587,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(approvalDateTime, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepLocalTime localTime) {
+        } else if (entity instanceof StepLocalTime) {
+            StepLocalTime localTime = (StepLocalTime) entity;
             targets.addAll(collectSemanticTargets(localTime.zone(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDateAndTime dateAndTime
@@ -15383,49 +16596,66 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepCoordinatedUniversalTimeOffset zone) {
+        } else if (entity instanceof StepCoordinatedUniversalTimeOffset) {
+            StepCoordinatedUniversalTimeOffset zone = (StepCoordinatedUniversalTimeOffset) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepLocalTime localTime
                         && localTime.zone().id() == zone.id()) {
                     targets.addAll(collectSemanticTargets(localTime, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepDateAssignment assignment) {
+        } else if (entity instanceof StepDateAssignment) {
+            StepDateAssignment assignment = (StepDateAssignment) entity;
             targets.addAll(collectTargetsForDateRole(assignment.role().id(), resolved, visiting));
-        } else if (entity instanceof StepDateTimeAssignment assignment) {
+        } else if (entity instanceof StepDateTimeAssignment) {
+            StepDateTimeAssignment assignment = (StepDateTimeAssignment) entity;
             targets.addAll(collectTargetsForDateTimeRole(assignment.role().id(), resolved, visiting));
-        } else if (entity instanceof StepPerson person) {
+        } else if (entity instanceof StepPerson) {
+            StepPerson person = (StepPerson) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepPersonAndOrganization personAndOrganization
                         && personAndOrganization.person().id() == person.id()) {
                     targets.addAll(collectSemanticTargets(personAndOrganization, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepApprovalStatus status) {
+        } else if (entity instanceof StepApprovalStatus) {
+            StepApprovalStatus status = (StepApprovalStatus) entity;
             targets.addAll(collectTargetsForApprovalStatus(status.id(), resolved, visiting));
-        } else if (entity instanceof StepSecurityClassificationLevel level) {
+        } else if (entity instanceof StepSecurityClassificationLevel) {
+            StepSecurityClassificationLevel level = (StepSecurityClassificationLevel) entity;
             targets.addAll(collectTargetsForSecurityLevel(level.id(), resolved, visiting));
-        } else if (entity instanceof StepContractType kind) {
+        } else if (entity instanceof StepContractType) {
+            StepContractType kind = (StepContractType) entity;
             targets.addAll(collectTargetsForContractType(kind.id(), resolved, visiting));
-        } else if (entity instanceof StepCertificationType kind) {
+        } else if (entity instanceof StepCertificationType) {
+            StepCertificationType kind = (StepCertificationType) entity;
             targets.addAll(collectTargetsForCertificationType(kind.id(), resolved, visiting));
-        } else if (entity instanceof StepApprovalRole role) {
+        } else if (entity instanceof StepApprovalRole) {
+            StepApprovalRole role = (StepApprovalRole) entity;
             targets.addAll(collectTargetsForApprovalRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepOrganizationRole role) {
+        } else if (entity instanceof StepOrganizationRole) {
+            StepOrganizationRole role = (StepOrganizationRole) entity;
             targets.addAll(collectTargetsForOrganizationRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepPersonAndOrganizationRole role) {
+        } else if (entity instanceof StepPersonAndOrganizationRole) {
+            StepPersonAndOrganizationRole role = (StepPersonAndOrganizationRole) entity;
             targets.addAll(collectTargetsForPersonAndOrganizationRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepClassificationRole role) {
+        } else if (entity instanceof StepClassificationRole) {
+            StepClassificationRole role = (StepClassificationRole) entity;
             targets.addAll(collectTargetsForClassificationRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepDateRole role) {
+        } else if (entity instanceof StepDateRole) {
+            StepDateRole role = (StepDateRole) entity;
             targets.addAll(collectTargetsForDateRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepDateTimeRole role) {
+        } else if (entity instanceof StepDateTimeRole) {
+            StepDateTimeRole role = (StepDateTimeRole) entity;
             targets.addAll(collectTargetsForDateTimeRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepIdentificationRole role) {
+        } else if (entity instanceof StepIdentificationRole) {
+            StepIdentificationRole role = (StepIdentificationRole) entity;
             targets.addAll(collectTargetsForIdentificationRole(role.id(), resolved, visiting));
-        } else if (entity instanceof StepDocumentType kind) {
+        } else if (entity instanceof StepDocumentType) {
+            StepDocumentType kind = (StepDocumentType) entity;
             targets.addAll(collectTargetsForDocumentType(kind.id(), resolved, visiting));
-        } else if (entity instanceof StepApproval approval) {
+        } else if (entity instanceof StepApproval) {
+            StepApproval approval = (StepApproval) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedApprovalAssignment assignment
                         && assignment.assignedApproval().id() == approval.id()) {
@@ -15441,7 +16671,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(approvalDateTime.dateTime(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepSecurityClassification classification) {
+        } else if (entity instanceof StepSecurityClassification) {
+            StepSecurityClassification classification = (StepSecurityClassification) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedSecurityClassificationAssignment assignment
                         && assignment.assignedSecurityClassification().id() == classification.id()) {
@@ -15451,7 +16682,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepContract contract) {
+        } else if (entity instanceof StepContract) {
+            StepContract contract = (StepContract) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedContractAssignment assignment
                         && assignment.assignedContract().id() == contract.id()) {
@@ -15461,7 +16693,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepCertification certification) {
+        } else if (entity instanceof StepCertification) {
+            StepCertification certification = (StepCertification) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedCertificationAssignment assignment
                         && assignment.assignedCertification().id() == certification.id()) {
@@ -15471,7 +16704,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepPersonAndOrganization personAndOrganization) {
+        } else if (entity instanceof StepPersonAndOrganization) {
+            StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedPersonAndOrganizationAssignment assignment
                         && assignment.assignedPersonAndOrganization().id() == personAndOrganization.id()) {
@@ -15481,7 +16715,8 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepLanguage language) {
+        } else if (entity instanceof StepLanguage) {
+            StepLanguage language = (StepLanguage) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedLanguageAssignment assignment
                         && assignment.assignedLanguage().id() == language.id()) {
@@ -15491,9 +16726,11 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepExternalIdentificationAssignment assignment) {
+        } else if (entity instanceof StepExternalIdentificationAssignment) {
+            StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.source(), resolved, visiting));
-        } else if (entity instanceof StepExternalSource source) {
+        } else if (entity instanceof StepExternalSource) {
+            StepExternalSource source = (StepExternalSource) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepExternallyDefinedItem item
                         && item.source().id() == source.id()) {
@@ -15501,7 +16738,8 @@ public final class StepPreviewJsonExporter {
                 } else if (candidate instanceof StepAppliedExternalIdentificationAssignment assignment
                         && assignment.source().id() == source.id()) {
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepExternalSourceRelationship relationship) {
+                } else if (candidate instanceof StepExternalSourceRelationship) {
+            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                     if (relationship.relatingSource().id() == source.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting));
                     }
@@ -15510,425 +16748,568 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             }
-        } else if (entity instanceof StepExternallyDefinedItem item) {
+        } else if (entity instanceof StepExternallyDefinedItem) {
+            StepExternallyDefinedItem item = (StepExternallyDefinedItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
             targets.addAll(collectSemanticTargets(item.source(), resolved, visiting));
-        } else if (entity instanceof StepGeneralPropertyRelationship relationship) {
+        } else if (entity instanceof StepGeneralPropertyRelationship) {
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingGeneralProperty(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting));
-        } else if (entity instanceof StepApprovalAssignment assignment) {
+        } else if (entity instanceof StepApprovalAssignment) {
+            StepApprovalAssignment assignment = (StepApprovalAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting));
-        } else if (entity instanceof StepClassificationAssignment assignment) {
+        } else if (entity instanceof StepClassificationAssignment) {
+            StepClassificationAssignment assignment = (StepClassificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting));
-        } else if (entity instanceof StepGroupAssignment assignment) {
+        } else if (entity instanceof StepGroupAssignment) {
+            StepGroupAssignment assignment = (StepGroupAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting));
-        } else if (entity instanceof StepSecurityClassificationAssignment assignment) {
+        } else if (entity instanceof StepSecurityClassificationAssignment) {
+            StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting));
-        } else if (entity instanceof StepContractAssignment assignment) {
+        } else if (entity instanceof StepContractAssignment) {
+            StepContractAssignment assignment = (StepContractAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting));
-        } else if (entity instanceof StepCertificationAssignment assignment) {
+        } else if (entity instanceof StepCertificationAssignment) {
+            StepCertificationAssignment assignment = (StepCertificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting));
-        } else if (entity instanceof StepPersonAndOrganizationAssignment assignment) {
+        } else if (entity instanceof StepPersonAndOrganizationAssignment) {
+            StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting));
-        } else if (entity instanceof StepOrganizationAssignment assignment) {
+        } else if (entity instanceof StepOrganizationAssignment) {
+            StepOrganizationAssignment assignment = (StepOrganizationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting));
-        } else if (entity instanceof StepLanguageAssignment assignment) {
+        } else if (entity instanceof StepLanguageAssignment) {
+            StepLanguageAssignment assignment = (StepLanguageAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting));
-        } else if (entity instanceof StepDocumentReference reference) {
+        } else if (entity instanceof StepDocumentReference) {
+            StepDocumentReference reference = (StepDocumentReference) entity;
             targets.addAll(collectSemanticTargets(reference.assignedDocument(), resolved, visiting));
-        } else if (entity instanceof StepPresentationLayerAssignment assignment) {
+        } else if (entity instanceof StepPresentationLayerAssignment) {
+            StepPresentationLayerAssignment assignment = (StepPresentationLayerAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.assignedItems(), resolved, visiting));
-        } else if (entity instanceof StepApprovalPersonOrganization approvalPersonOrganization) {
+        } else if (entity instanceof StepApprovalPersonOrganization) {
+            StepApprovalPersonOrganization approvalPersonOrganization = (StepApprovalPersonOrganization) entity;
             targets.addAll(collectSemanticTargets(approvalPersonOrganization.authorizedApproval(), resolved, visiting));
-        } else if (entity instanceof StepApprovalDateTime approvalDateTime) {
+        } else if (entity instanceof StepApprovalDateTime) {
+            StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) entity;
             targets.addAll(collectSemanticTargets(approvalDateTime.datedApproval(), resolved, visiting));
-        } else if (entity instanceof StepItemDefinedTransformation transformation) {
+        } else if (entity instanceof StepItemDefinedTransformation) {
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             targets.addAll(collectTargetsForItemDefinedTransformation(transformation.id(), resolved));
-        } else if (entity instanceof StepExternalSourceRelationship relationship) {
+        } else if (entity instanceof StepExternalSourceRelationship) {
+            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting));
-        } else if (entity instanceof StepDocumentRelationship relationship) {
+        } else if (entity instanceof StepDocumentRelationship) {
+            StepDocumentRelationship relationship = (StepDocumentRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingDocument(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting));
-        } else if (entity instanceof StepGroupRelationship relationship) {
+        } else if (entity instanceof StepGroupRelationship) {
+            StepGroupRelationship relationship = (StepGroupRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingGroup(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting));
-        } else if (entity instanceof StepOrganizationRelationship relationship) {
+        } else if (entity instanceof StepOrganizationRelationship) {
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingOrganization(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting));
-        } else if (entity instanceof StepProductCategoryRelationship relationship) {
+        } else if (entity instanceof StepProductCategoryRelationship) {
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting));
-        } else if (entity instanceof StepProductRelationship relationship) {
+        } else if (entity instanceof StepProductRelationship) {
+            StepProductRelationship relationship = (StepProductRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingProduct(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting));
-        } else if (entity instanceof StepProductDefinitionFormationRelationship relationship) {
+        } else if (entity instanceof StepProductDefinitionFormationRelationship) {
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingFormation(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting));
-        } else if (entity instanceof StepEffectivityRelationship relationship) {
+        } else if (entity instanceof StepEffectivityRelationship) {
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingEffectivity(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting));
-        } else if (entity instanceof StepRepresentationRelationship relationship) {
+        } else if (entity instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
-        } else if (entity instanceof StepRepresentationRelationshipWithTransformation relationship) {
+        } else if (entity instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
-        } else if (entity instanceof StepShapeRepresentationRelationship relationship) {
+        } else if (entity instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
-        } else if (entity instanceof StepGeometricItemSpecificUsage usage) {
+        } else if (entity instanceof StepGeometricItemSpecificUsage) {
+            StepGeometricItemSpecificUsage usage = (StepGeometricItemSpecificUsage) entity;
             targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-        } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage usage) {
+        } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
+            StepChainBasedGeometricItemSpecificUsage usage = (StepChainBasedGeometricItemSpecificUsage) entity;
             targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting));
             for (StepRepresentationRelationship relationship : usage.undirectedLinks()) {
                 targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
             }
-        } else if (entity instanceof StepItemIdentifiedRepresentationUsage usage) {
+        } else if (entity instanceof StepItemIdentifiedRepresentationUsage) {
+            StepItemIdentifiedRepresentationUsage usage = (StepItemIdentifiedRepresentationUsage) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-        } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage usage) {
+        } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
+            StepChainBasedItemIdentifiedRepresentationUsage usage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting));
             for (StepRepresentationRelationship relationship : usage.undirectedLinks()) {
                 targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
             }
-        } else if (entity instanceof StepPlacedTarget usage) {
+        } else if (entity instanceof StepPlacedTarget) {
+            StepPlacedTarget usage = (StepPlacedTarget) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingModelItemAssociation usage) {
+        } else if (entity instanceof StepDraughtingModelItemAssociation) {
+            StepDraughtingModelItemAssociation usage = (StepDraughtingModelItemAssociation) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder usage) {
+        } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
+            StepDraughtingModelItemAssociationWithPlaceholder usage = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.annotationPlaceholder(), resolved, visiting));
-        } else if (entity instanceof StepPmiRequirementItemAssociation usage) {
+        } else if (entity instanceof StepPmiRequirementItemAssociation) {
+            StepPmiRequirementItemAssociation usage = (StepPmiRequirementItemAssociation) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting));
-        } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation usage) {
+        } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
+            StepMechanicalDesignRequirementItemAssociation usage = (StepMechanicalDesignRequirementItemAssociation) entity;
             targets.add(usage.usedRepresentation());
             targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
             targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting));
-        } else if (entity instanceof StepStyledItem styledItem) {
+        } else if (entity instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) entity;
             targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting));
-        } else if (entity instanceof StepOverRidingStyledItem styledItem) {
+        } else if (entity instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
             targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting));
             targets.addAll(collectSemanticTargets(styledItem.overRiddenStyle(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting));
-        } else if (entity instanceof StepMappedItem mappedItem) {
+        } else if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
             targets.addAll(collectSemanticTargets(mappedItem.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(mappedItem.mappingTarget(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(mappedItem.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationCurveOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationFillArea fillArea) {
+        } else if (entity instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
             targets.addAll(collectSemanticTargets(fillArea.boundaries(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(fillArea.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationFillAreaOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence occurrence = (StepAnnotationFillAreaOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.fillStyleTarget(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationPlaceholderOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence occurrence = (StepAnnotationPlaceholderOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationPlane plane) {
+        } else if (entity instanceof StepAnnotationPlane) {
+            StepAnnotationPlane plane = (StepAnnotationPlane) entity;
             targets.addAll(collectSemanticTargets(plane.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(plane.item(), resolved, visiting));
             targets.addAll(collectSemanticTargets(plane.elements(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationPointOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence occurrence = (StepAnnotationPointOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationSymbolOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence occurrence = (StepAnnotationSymbolOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationSubfigureOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence occurrence = (StepAnnotationSubfigureOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationTextOccurrence occurrence) {
+        } else if (entity instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence occurrence = (StepAnnotationTextOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.position(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingAnnotationOccurrence occurrence) {
+        } else if (entity instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence occurrence = (StepDraughtingAnnotationOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepDimensionCurve occurrence) {
+        } else if (entity instanceof StepDimensionCurve) {
+            StepDimensionCurve occurrence = (StepDimensionCurve) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepLeaderCurve occurrence) {
+        } else if (entity instanceof StepLeaderCurve) {
+            StepLeaderCurve occurrence = (StepLeaderCurve) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepProjectionCurve occurrence) {
+        } else if (entity instanceof StepProjectionCurve) {
+            StepProjectionCurve occurrence = (StepProjectionCurve) entity;
             targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepTerminatorSymbol symbol) {
+        } else if (entity instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol symbol = (StepTerminatorSymbol) entity;
             targets.addAll(collectSemanticTargets(symbol.styles(), resolved, visiting));
             targets.addAll(collectSemanticTargets(symbol.item(), resolved, visiting));
             targets.addAll(collectSemanticTargets(symbol.annotatedCurve(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingCallout callout) {
+        } else if (entity instanceof StepDraughtingCallout) {
+            StepDraughtingCallout callout = (StepDraughtingCallout) entity;
             targets.addAll(collectSemanticTargets(callout.contents(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingCalloutRelationship relationship) {
+        } else if (entity instanceof StepDraughtingCalloutRelationship) {
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingCallout(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedCallout(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationOccurrenceRelationship relationship) {
+        } else if (entity instanceof StepAnnotationOccurrenceRelationship) {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingAnnotationOccurrence(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedAnnotationOccurrence(), resolved, visiting));
-        } else if (entity instanceof StepRepresentationMap mapping) {
+        } else if (entity instanceof StepRepresentationMap) {
+            StepRepresentationMap mapping = (StepRepresentationMap) entity;
             targets.add(mapping.mappedRepresentation());
             targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting));
-        } else if (entity instanceof StepSymbolRepresentationMap mapping) {
+        } else if (entity instanceof StepSymbolRepresentationMap) {
+            StepSymbolRepresentationMap mapping = (StepSymbolRepresentationMap) entity;
             targets.add(mapping.mappedRepresentation());
             targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationSymbol annotationSymbol) {
+        } else if (entity instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
             targets.addAll(collectSemanticTargets(annotationSymbol.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(annotationSymbol.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationText annotationText) {
+        } else if (entity instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) entity;
             targets.addAll(collectSemanticTargets(annotationText.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(annotationText.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepAnnotationTextCharacter annotationTextCharacter) {
+        } else if (entity instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
             targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepUserDefinedCurveFont curveFont) {
+        } else if (entity instanceof StepUserDefinedCurveFont) {
+            StepUserDefinedCurveFont curveFont = (StepUserDefinedCurveFont) entity;
             targets.addAll(collectSemanticTargets(curveFont.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curveFont.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepUserDefinedMarker marker) {
+        } else if (entity instanceof StepUserDefinedMarker) {
+            StepUserDefinedMarker marker = (StepUserDefinedMarker) entity;
             targets.addAll(collectSemanticTargets(marker.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(marker.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepUserDefinedTerminatorSymbol symbol) {
+        } else if (entity instanceof StepUserDefinedTerminatorSymbol) {
+            StepUserDefinedTerminatorSymbol symbol = (StepUserDefinedTerminatorSymbol) entity;
             targets.addAll(collectSemanticTargets(symbol.mappingSource(), resolved, visiting));
             targets.addAll(collectSemanticTargets(symbol.mappingTarget(), resolved, visiting));
-        } else if (entity instanceof StepPresentationStyleAssignment assignment) {
+        } else if (entity instanceof StepPresentationStyleAssignment) {
+            StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.styles(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(assignment.id(), resolved, visiting));
-        } else if (entity instanceof StepFillAreaStyle fillAreaStyle) {
+        } else if (entity instanceof StepFillAreaStyle) {
+            StepFillAreaStyle fillAreaStyle = (StepFillAreaStyle) entity;
             targets.addAll(collectSemanticTargets(fillAreaStyle.styles(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(fillAreaStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepFillAreaStyleColour fillAreaStyleColour) {
+        } else if (entity instanceof StepFillAreaStyleColour) {
+            StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) entity;
             targets.addAll(collectSemanticTargets(fillAreaStyleColour.colour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(fillAreaStyleColour.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleFillArea style) {
+        } else if (entity instanceof StepSurfaceStyleFillArea) {
+            StepSurfaceStyleFillArea style = (StepSurfaceStyleFillArea) entity;
             targets.addAll(collectSemanticTargets(style.fillStyle(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepCharacterGlyphStyleStroke style) {
+        } else if (entity instanceof StepCharacterGlyphStyleStroke) {
+            StepCharacterGlyphStyleStroke style = (StepCharacterGlyphStyleStroke) entity;
             targets.addAll(collectSemanticTargets(style.strokeStyle(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepCharacterGlyphStyleOutline style) {
+        } else if (entity instanceof StepCharacterGlyphStyleOutline) {
+            StepCharacterGlyphStyleOutline style = (StepCharacterGlyphStyleOutline) entity;
             targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics style) {
+        } else if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
+            StepCharacterGlyphStyleOutlineWithCharacteristics style = (StepCharacterGlyphStyleOutlineWithCharacteristics) entity;
             targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting));
             targets.addAll(collectSemanticTargets(style.characteristics(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedCurveFont curveFont) {
+        } else if (entity instanceof StepPreDefinedCurveFont) {
+            StepPreDefinedCurveFont curveFont = (StepPreDefinedCurveFont) entity;
             targets.addAll(collectTargetsForCurveFont(curveFont.id(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingPreDefinedCurveFont curveFont) {
+        } else if (entity instanceof StepDraughtingPreDefinedCurveFont) {
+            StepDraughtingPreDefinedCurveFont curveFont = (StepDraughtingPreDefinedCurveFont) entity;
             targets.addAll(collectTargetsForCurveFont(curveFont.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedMarker marker) {
+        } else if (entity instanceof StepPreDefinedMarker) {
+            StepPreDefinedMarker marker = (StepPreDefinedMarker) entity;
             targets.addAll(collectTargetsForPointMarker(marker.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedPointMarkerSymbol marker) {
+        } else if (entity instanceof StepPreDefinedPointMarkerSymbol) {
+            StepPreDefinedPointMarkerSymbol marker = (StepPreDefinedPointMarkerSymbol) entity;
             targets.addAll(collectTargetsForPointMarker(marker.id(), resolved, visiting));
-        } else if (entity instanceof StepColour colour) {
+        } else if (entity instanceof StepColour) {
+            StepColour colour = (StepColour) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
-        } else if (entity instanceof StepColourSpecification colour) {
+        } else if (entity instanceof StepColourSpecification) {
+            StepColourSpecification colour = (StepColourSpecification) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
-        } else if (entity instanceof StepColourRgb colour) {
+        } else if (entity instanceof StepColourRgb) {
+            StepColourRgb colour = (StepColourRgb) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
-        } else if (entity instanceof StepConversionBasedUnit unit) {
+        } else if (entity instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit unit = (StepConversionBasedUnit) entity;
             targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepConversionBasedUnitWithOffset unit) {
+        } else if (entity instanceof StepConversionBasedUnitWithOffset) {
+            StepConversionBasedUnitWithOffset unit = (StepConversionBasedUnitWithOffset) entity;
             targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepDerivedUnit unit) {
+        } else if (entity instanceof StepDerivedUnit) {
+            StepDerivedUnit unit = (StepDerivedUnit) entity;
             targets.addAll(collectSemanticTargets(unit.elements(), resolved, visiting));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepDerivedUnitElement element) {
+        } else if (entity instanceof StepDerivedUnitElement) {
+            StepDerivedUnitElement element = (StepDerivedUnitElement) entity;
             targets.addAll(collectSemanticTargets(element.unit(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(element.id(), resolved, visiting));
-        } else if (entity instanceof StepNamedUnit unit) {
+        } else if (entity instanceof StepNamedUnit) {
+            StepNamedUnit unit = (StepNamedUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepSiUnit unit) {
+        } else if (entity instanceof StepSiUnit) {
+            StepSiUnit unit = (StepSiUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepContextDependentUnit unit) {
+        } else if (entity instanceof StepContextDependentUnit) {
+            StepContextDependentUnit unit = (StepContextDependentUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
-        } else if (entity instanceof StepGlobalUncertaintyAssignedContext context) {
+        } else if (entity instanceof StepGlobalUncertaintyAssignedContext) {
+            StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) entity;
             targets.addAll(collectSemanticTargets(context.uncertainties(), resolved, visiting));
             targets.addAll(collectTargetsForGlobalUncertaintyContext(context.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting));
-        } else if (entity instanceof StepGlobalUnitAssignedContext context) {
+        } else if (entity instanceof StepGlobalUnitAssignedContext) {
+            StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) entity;
             targets.addAll(collectSemanticTargets(context.units(), resolved, visiting));
             targets.addAll(collectTargetsForGlobalUnitContext(context.id(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting));
-        } else if (entity instanceof StepRepresentationItem item) {
+        } else if (entity instanceof StepRepresentationItem) {
+            StepRepresentationItem item = (StepRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepGeometricRepresentationItem item) {
+        } else if (entity instanceof StepGeometricRepresentationItem) {
+            StepGeometricRepresentationItem item = (StepGeometricRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepTopologicalRepresentationItem item) {
+        } else if (entity instanceof StepTopologicalRepresentationItem) {
+            StepTopologicalRepresentationItem item = (StepTopologicalRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedColour colour) {
+        } else if (entity instanceof StepPreDefinedColour) {
+            StepPreDefinedColour colour = (StepPreDefinedColour) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingPreDefinedColour colour) {
+        } else if (entity instanceof StepDraughtingPreDefinedColour) {
+            StepDraughtingPreDefinedColour colour = (StepDraughtingPreDefinedColour) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
-        } else if (entity instanceof StepCurveStyle curveStyle) {
+        } else if (entity instanceof StepCurveStyle) {
+            StepCurveStyle curveStyle = (StepCurveStyle) entity;
             targets.addAll(collectSemanticTargets(curveStyle.curveFont(), resolved, visiting));
             targets.addAll(collectSemanticTargets(curveStyle.colour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(curveStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepPointStyle pointStyle) {
+        } else if (entity instanceof StepPointStyle) {
+            StepPointStyle pointStyle = (StepPointStyle) entity;
             targets.addAll(collectSemanticTargets(pointStyle.marker(), resolved, visiting));
             targets.addAll(collectSemanticTargets(pointStyle.colour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(pointStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepSymbolColour symbolColour) {
+        } else if (entity instanceof StepSymbolColour) {
+            StepSymbolColour symbolColour = (StepSymbolColour) entity;
             targets.addAll(collectSemanticTargets(symbolColour.colour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(symbolColour.id(), resolved, visiting));
-        } else if (entity instanceof StepSymbolStyle symbolStyle) {
+        } else if (entity instanceof StepSymbolStyle) {
+            StepSymbolStyle symbolStyle = (StepSymbolStyle) entity;
             targets.addAll(collectSemanticTargets(symbolStyle.styleOfSymbol(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(symbolStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyleForDefinedFont textStyle) {
+        } else if (entity instanceof StepTextStyleForDefinedFont) {
+            StepTextStyleForDefinedFont textStyle = (StepTextStyleForDefinedFont) entity;
             targets.addAll(collectSemanticTargets(textStyle.textColour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyle textStyle) {
+        } else if (entity instanceof StepTextStyle) {
+            StepTextStyle textStyle = (StepTextStyle) entity;
             targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyleWithSpacing textStyle) {
+        } else if (entity instanceof StepTextStyleWithSpacing) {
+            StepTextStyleWithSpacing textStyle = (StepTextStyleWithSpacing) entity;
             targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyleWithJustification textStyle) {
+        } else if (entity instanceof StepTextStyleWithJustification) {
+            StepTextStyleWithJustification textStyle = (StepTextStyleWithJustification) entity;
             targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyleWithBoxCharacteristics textStyle) {
+        } else if (entity instanceof StepTextStyleWithBoxCharacteristics) {
+            StepTextStyleWithBoxCharacteristics textStyle = (StepTextStyleWithBoxCharacteristics) entity;
             targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepTextStyleWithMirror textStyle) {
+        } else if (entity instanceof StepTextStyleWithMirror) {
+            StepTextStyleWithMirror textStyle = (StepTextStyleWithMirror) entity;
             targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
             targets.addAll(collectSemanticTargets(textStyle.mirrorPlacement(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleBoundary style) {
+        } else if (entity instanceof StepSurfaceStyleBoundary) {
+            StepSurfaceStyleBoundary style = (StepSurfaceStyleBoundary) entity;
             targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleParameterLine style) {
+        } else if (entity instanceof StepSurfaceStyleParameterLine) {
+            StepSurfaceStyleParameterLine style = (StepSurfaceStyleParameterLine) entity;
             targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleSegmentationCurve style) {
+        } else if (entity instanceof StepSurfaceStyleSegmentationCurve) {
+            StepSurfaceStyleSegmentationCurve style = (StepSurfaceStyleSegmentationCurve) entity;
             targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleSilhouette style) {
+        } else if (entity instanceof StepSurfaceStyleSilhouette) {
+            StepSurfaceStyleSilhouette style = (StepSurfaceStyleSilhouette) entity;
             targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleControlGrid style) {
+        } else if (entity instanceof StepSurfaceStyleControlGrid) {
+            StepSurfaceStyleControlGrid style = (StepSurfaceStyleControlGrid) entity;
             targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceSideStyle sideStyle) {
+        } else if (entity instanceof StepSurfaceSideStyle) {
+            StepSurfaceSideStyle sideStyle = (StepSurfaceSideStyle) entity;
             targets.addAll(collectSemanticTargets(sideStyle.styles(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(sideStyle.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleUsage usage) {
+        } else if (entity instanceof StepSurfaceStyleUsage) {
+            StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) entity;
             targets.addAll(collectSemanticTargets(usage.style(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(usage.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleTransparent style) {
+        } else if (entity instanceof StepSurfaceStyleTransparent) {
+            StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) entity;
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleReflectanceAmbient style) {
+        } else if (entity instanceof StepSurfaceStyleReflectanceAmbient) {
+            StepSurfaceStyleReflectanceAmbient style = (StepSurfaceStyleReflectanceAmbient) entity;
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuse style) {
+        } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
+            StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) entity;
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular style) {
+        } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
+            StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) entity;
             targets.addAll(collectSemanticTargets(style.specularColour(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedSurfaceSideStyle style) {
+        } else if (entity instanceof StepPreDefinedSurfaceSideStyle) {
+            StepPreDefinedSurfaceSideStyle style = (StepPreDefinedSurfaceSideStyle) entity;
             targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedTextFont textFont) {
+        } else if (entity instanceof StepPreDefinedTextFont) {
+            StepPreDefinedTextFont textFont = (StepPreDefinedTextFont) entity;
             targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting));
-        } else if (entity instanceof StepDraughtingPreDefinedTextFont textFont) {
+        } else if (entity instanceof StepDraughtingPreDefinedTextFont) {
+            StepDraughtingPreDefinedTextFont textFont = (StepDraughtingPreDefinedTextFont) entity;
             targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedTerminatorSymbol symbol) {
+        } else if (entity instanceof StepPreDefinedTerminatorSymbol) {
+            StepPreDefinedTerminatorSymbol symbol = (StepPreDefinedTerminatorSymbol) entity;
             targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedSymbol symbol) {
+        } else if (entity instanceof StepPreDefinedSymbol) {
+            StepPreDefinedSymbol symbol = (StepPreDefinedSymbol) entity;
             targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedDimensionSymbol symbol) {
+        } else if (entity instanceof StepPreDefinedDimensionSymbol) {
+            StepPreDefinedDimensionSymbol symbol = (StepPreDefinedDimensionSymbol) entity;
             targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedGeometricalToleranceSymbol symbol) {
+        } else if (entity instanceof StepPreDefinedGeometricalToleranceSymbol) {
+            StepPreDefinedGeometricalToleranceSymbol symbol = (StepPreDefinedGeometricalToleranceSymbol) entity;
             targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
-        } else if (entity instanceof StepPreDefinedItem item) {
+        } else if (entity instanceof StepPreDefinedItem) {
+            StepPreDefinedItem item = (StepPreDefinedItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-        } else if (entity instanceof StepDescriptionAttribute descriptionAttribute) {
+        } else if (entity instanceof StepDescriptionAttribute) {
+            StepDescriptionAttribute descriptionAttribute = (StepDescriptionAttribute) entity;
             targets.addAll(collectSemanticTargets(descriptionAttribute.describedItem(), resolved, visiting));
-        } else if (entity instanceof StepNameAttribute nameAttribute) {
+        } else if (entity instanceof StepNameAttribute) {
+            StepNameAttribute nameAttribute = (StepNameAttribute) entity;
             targets.addAll(collectSemanticTargets(nameAttribute.namedItem(), resolved, visiting));
-        } else if (entity instanceof StepIdAttribute idAttribute) {
+        } else if (entity instanceof StepIdAttribute) {
+            StepIdAttribute idAttribute = (StepIdAttribute) entity;
             targets.addAll(collectSemanticTargets(idAttribute.identifiedItem(), resolved, visiting));
-        } else if (entity instanceof StepAppliedNameAssignment assignment) {
+        } else if (entity instanceof StepAppliedNameAssignment) {
+            StepAppliedNameAssignment assignment = (StepAppliedNameAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedIdentificationAssignment assignment) {
+        } else if (entity instanceof StepAppliedIdentificationAssignment) {
+            StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedExternalIdentificationAssignment assignment) {
+        } else if (entity instanceof StepAppliedExternalIdentificationAssignment) {
+            StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedGroupAssignment assignment) {
+        } else if (entity instanceof StepAppliedGroupAssignment) {
+            StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedClassificationAssignment assignment) {
+        } else if (entity instanceof StepAppliedClassificationAssignment) {
+            StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedDateAssignment assignment) {
+        } else if (entity instanceof StepAppliedDateAssignment) {
+            StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedDateTimeAssignment assignment) {
+        } else if (entity instanceof StepAppliedDateTimeAssignment) {
+            StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedApprovalAssignment assignment) {
+        } else if (entity instanceof StepAppliedApprovalAssignment) {
+            StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedSecurityClassificationAssignment assignment) {
+        } else if (entity instanceof StepAppliedSecurityClassificationAssignment) {
+            StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedDocumentReference assignment) {
+        } else if (entity instanceof StepAppliedDocumentReference) {
+            StepAppliedDocumentReference assignment = (StepAppliedDocumentReference) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedContractAssignment assignment) {
+        } else if (entity instanceof StepAppliedContractAssignment) {
+            StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedCertificationAssignment assignment) {
+        } else if (entity instanceof StepAppliedCertificationAssignment) {
+            StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedPersonAndOrganizationAssignment assignment) {
+        } else if (entity instanceof StepAppliedPersonAndOrganizationAssignment) {
+            StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedOrganizationAssignment assignment) {
+        } else if (entity instanceof StepAppliedOrganizationAssignment) {
+            StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAppliedLanguageAssignment assignment) {
+        } else if (entity instanceof StepAppliedLanguageAssignment) {
+            StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) entity;
             targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-        } else if (entity instanceof StepAttributeAssertion attributeAssertion) {
+        } else if (entity instanceof StepAttributeAssertion) {
+            StepAttributeAssertion attributeAssertion = (StepAttributeAssertion) entity;
             targets.add(attributeAssertion.usedRepresentation());
             targets.addAll(collectSemanticTargets(attributeAssertion.definition(), resolved, visiting));
         } else if (entity instanceof StepIdentificationAssignment
                 || entity instanceof StepNameAssignment) {
             // Pure assignment metadata without item references contributes no target by itself.
-        } else if (entity instanceof StepShapeDefinitionRepresentation shapeDefinitionRepresentation) {
+        } else if (entity instanceof StepShapeDefinitionRepresentation) {
+            StepShapeDefinitionRepresentation shapeDefinitionRepresentation = (StepShapeDefinitionRepresentation) entity;
             targets.add(shapeDefinitionRepresentation.usedRepresentation());
             targets.addAll(collectSemanticTargets(shapeDefinitionRepresentation.definition(), resolved, visiting));
-        } else if (entity instanceof StepContextDependentShapeRepresentation contextDependent) {
+        } else if (entity instanceof StepContextDependentShapeRepresentation) {
+            StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(contextDependent.representationRelationship()));
             targets.addAll(collectSemanticTargets(contextDependent.representedProductRelation(), resolved, visiting));
-        } else if (entity instanceof StepProductDefinitionShape productDefinitionShape) {
+        } else if (entity instanceof StepProductDefinitionShape) {
+            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
             targets.addAll(collectSemanticTargets(productDefinitionShape.definition(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepShapeDefinitionRepresentation link
@@ -15945,26 +17326,34 @@ public final class StepPreviewJsonExporter {
                     targets.addAll(collectSemanticTargets(occurrence, resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepProductDefinition productDefinition) {
+        } else if (entity instanceof StepProductDefinition) {
+            StepProductDefinition productDefinition = (StepProductDefinition) entity;
             targets.addAll(collectTargetsForProductDefinition(productDefinition.id(), resolved, visiting));
-        } else if (entity instanceof StepNextAssemblyUsageOccurrence occurrence) {
+        } else if (entity instanceof StepNextAssemblyUsageOccurrence) {
+            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.relatedProductDefinition(), resolved, visiting));
             targets.addAll(collectTargetsForOccurrence(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepProductDefinitionRelationship relationship) {
+        } else if (entity instanceof StepProductDefinitionRelationship) {
+            StepProductDefinitionRelationship relationship = (StepProductDefinitionRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingProductDefinition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedProductDefinition(), resolved, visiting));
-        } else if (entity instanceof StepProductDefinitionRelationshipRelationship relationship) {
+        } else if (entity instanceof StepProductDefinitionRelationshipRelationship) {
+            StepProductDefinitionRelationshipRelationship relationship = (StepProductDefinitionRelationshipRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relating(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.related(), resolved, visiting));
-        } else if (entity instanceof StepPropertyDefinitionRelationship relationship) {
+        } else if (entity instanceof StepPropertyDefinitionRelationship) {
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
-        } else if (entity instanceof StepShapeAspectOccurrence occurrence) {
+        } else if (entity instanceof StepShapeAspectOccurrence) {
+            StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) entity;
             targets.addAll(collectSemanticTargets(occurrence.definition(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
-        } else if (entity instanceof StepShapeAspect shapeAspect) {
+        } else if (entity instanceof StepShapeAspect) {
+            StepShapeAspect shapeAspect = (StepShapeAspect) entity;
             targets.addAll(collectTargetsReferencingEntity(shapeAspect.id(), resolved, visiting));
-        } else if (entity instanceof StepShapeAspectRelationship relationship) {
+        } else if (entity instanceof StepShapeAspectRelationship) {
+            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) entity;
             targets.addAll(collectSemanticTargets(relationship.relatingShapeAspect(), resolved, visiting));
             targets.addAll(collectSemanticTargets(relationship.relatedShapeAspect(), resolved, visiting));
         }
@@ -15974,13 +17363,16 @@ public final class StepPreviewJsonExporter {
 
     private static Set<StepEntity> collectRepresentationTargetsFromRelationship(StepEntity relationship) {
         Set<StepEntity> targets = new LinkedHashSet<>();
-        if (relationship instanceof StepRepresentationRelationship representationRelationship) {
+        if (relationship instanceof StepRepresentationRelationship) {
+            StepRepresentationRelationship representationRelationship = (StepRepresentationRelationship) relationship;
             targets.add(representationRelationship.rep1());
             targets.add(representationRelationship.rep2());
-        } else if (relationship instanceof StepRepresentationRelationshipWithTransformation representationRelationship) {
+        } else if (relationship instanceof StepRepresentationRelationshipWithTransformation) {
+            StepRepresentationRelationshipWithTransformation representationRelationship = (StepRepresentationRelationshipWithTransformation) relationship;
             targets.add(representationRelationship.rep1());
             targets.add(representationRelationship.rep2());
-        } else if (relationship instanceof StepShapeRepresentationRelationship representationRelationship) {
+        } else if (relationship instanceof StepShapeRepresentationRelationship) {
+            StepShapeRepresentationRelationship representationRelationship = (StepShapeRepresentationRelationship) relationship;
             targets.add(representationRelationship.rep1());
             targets.add(representationRelationship.rep2());
         }
@@ -16429,7 +17821,8 @@ public final class StepPreviewJsonExporter {
         int okCount = 0;
         int warnCount = 0;
         for (StepEntity entity : resolved.values()) {
-            if (!(entity instanceof StepMeasureRepresentationItem item)) {
+            if (!(entity instanceof StepMeasureRepresentationItem)) {
+            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) entity;
                 continue;
             }
             String propertyId = StepValidationMatcher.matchPropertyId(item.name(), item.measureType());

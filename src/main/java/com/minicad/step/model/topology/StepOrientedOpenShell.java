@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.minicad.step.model.geometry.StepSurfacedOpenShell;
 import com.minicad.step.model.base.StepFaceEntity;
+import java.util.Objects;
 
 /**
  * Resolved ORIENTED_OPEN_SHELL.
@@ -16,29 +17,58 @@ import com.minicad.step.model.base.StepFaceEntity;
  * @param openShellElement referenced base open shell
  * @param orientation orientation flag
  */
-public record StepOrientedOpenShell(
-    int id, String name, StepEntity openShellElement, boolean orientation) implements StepEntity {
+/**
+ * Resolved ORIENTED_OPEN_SHELL.
+ *
+ * @param id STEP id
+ * @param name STEP label
+ * @param openShellElement referenced base open shell
+ * @param orientation orientation flag
+ */
+public final class StepOrientedOpenShell implements StepEntity {
+    private final int id;
+    private final String name;
+    private final StepEntity openShellElement;
+    private final boolean orientation;
 
-  public List<StepFaceEntity> faces() {
-    List<StepFaceEntity> faces = shellFaces(openShellElement);
-    if (orientation) {
-      return faces;
+    public StepOrientedOpenShell(int id, String name, StepEntity openShellElement, boolean orientation) {
+        this.id = id;
+        this.name = name;
+        this.openShellElement = openShellElement;
+        this.orientation = orientation;
     }
-    List<StepFaceEntity> reversed = new ArrayList<>(faces);
-    Collections.reverse(reversed);
-    return List.copyOf(reversed);
-  }
 
-  private static List<StepFaceEntity> shellFaces(StepEntity shell) {
-    if (shell instanceof StepOpenShell openShell) {
-      return openShell.faces();
+    public int getId() {
+        return id;
     }
-    if (shell instanceof StepSurfacedOpenShell surfacedOpenShell) {
-      return surfacedOpenShell.faces();
+
+    public String getName() {
+        return name;
     }
-    if (shell instanceof StepOrientedOpenShell orientedOpenShell) {
-      return orientedOpenShell.faces();
+
+    public StepEntity getOpenShellElement() {
+        return openShellElement;
     }
-    throw new IllegalArgumentException("ORIENTED_OPEN_SHELL requires OPEN_SHELL-compatible entity");
-  }
+
+    public boolean isOrientation() {
+        return orientation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepOrientedOpenShell that = (StepOrientedOpenShell) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(openShellElement, that.openShellElement) && orientation == that.orientation;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, openShellElement, orientation);
+    }
+
+    @Override
+    public String toString() {
+        return "StepOrientedOpenShell{" + "id=" + id + "name=" + name + "openShellElement=" + openShellElement + "orientation=" + orientation + "}";
+    }
 }

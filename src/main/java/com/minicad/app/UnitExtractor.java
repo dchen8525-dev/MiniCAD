@@ -63,23 +63,27 @@ final class UnitExtractor {
         Double scaleToMeters = null;
 
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepGlobalUnitAssignedContext ctx) {
+            if (entity instanceof StepGlobalUnitAssignedContext) {
+            StepGlobalUnitAssignedContext ctx = (StepGlobalUnitAssignedContext) entity;
                 for (StepEntity unit : ctx.units()) {
-                    if (unit instanceof StepSiUnit si) {
+                    if (unit instanceof StepSiUnit) {
+            StepSiUnit si = (StepSiUnit) unit;
                         if ("LENGTH_UNIT".equals(si.unitKind())) {
                             lengthUnit = formatSiUnit(si);
                             scaleToMeters = computeScaleToMeters(si);
                         } else if ("PLANE_ANGLE_UNIT".equals(si.unitKind())) {
                             angleUnit = formatSiUnit(si);
                         }
-                    } else if (unit instanceof StepNamedUnit named) {
+                    } else if (unit instanceof StepNamedUnit) {
+            StepNamedUnit named = (StepNamedUnit) unit;
                         // NamedUnit has no unitName, just unitKind
                         if ("LENGTH_UNIT".equals(named.unitKind())) {
                             lengthUnit = "named_length_unit";
                         } else if ("PLANE_ANGLE_UNIT".equals(named.unitKind())) {
                             angleUnit = "named_angle_unit";
                         }
-                    } else if (unit instanceof StepConversionBasedUnit conv) {
+                    } else if (unit instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit conv = (StepConversionBasedUnit) unit;
                         if ("LENGTH_UNIT".equals(conv.unitKind())) {
                             lengthUnit = conv.name() != null ? conv.name() : "conversion_unit";
                             scaleToMeters = computeScaleToMeters(conv);
@@ -93,7 +97,8 @@ final class UnitExtractor {
 
         for (StepEntity entity : resolved.values()) {
             // Also scan standalone units not referenced by GLOBAL_UNIT_ASSIGNED_CONTEXT.
-            if (entity instanceof StepSiUnit si) {
+            if (entity instanceof StepSiUnit) {
+            StepSiUnit si = (StepSiUnit) entity;
                 if (lengthUnit == null && "LENGTH_UNIT".equals(si.unitKind())) {
                     lengthUnit = formatSiUnit(si);
                     scaleToMeters = computeScaleToMeters(si);
@@ -101,7 +106,8 @@ final class UnitExtractor {
                 if (angleUnit == null && "PLANE_ANGLE_UNIT".equals(si.unitKind())) {
                     angleUnit = formatSiUnit(si);
                 }
-            } else if (entity instanceof StepConversionBasedUnit conv) {
+            } else if (entity instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit conv = (StepConversionBasedUnit) entity;
                 if ("LENGTH_UNIT".equals(conv.unitKind())) {
                     lengthUnit = conv.name() != null ? conv.name() : "conversion_unit";
                     scaleToMeters = computeScaleToMeters(conv);
@@ -121,9 +127,11 @@ final class UnitExtractor {
         }
         StepEntity baseUnit = unit.conversionFactor().unitComponent();
         Double baseScale = null;
-        if (baseUnit instanceof StepSiUnit si) {
+        if (baseUnit instanceof StepSiUnit) {
+            StepSiUnit si = (StepSiUnit) baseUnit;
             baseScale = computeScaleToMeters(si);
-        } else if (baseUnit instanceof StepConversionBasedUnit conversionBasedUnit) {
+        } else if (baseUnit instanceof StepConversionBasedUnit) {
+            StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) baseUnit;
             baseScale = computeScaleToMeters(conversionBasedUnit);
         }
         return baseScale == null ? null : unit.conversionFactor().valueComponent() * baseScale;

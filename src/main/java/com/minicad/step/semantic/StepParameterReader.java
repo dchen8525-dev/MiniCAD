@@ -9,6 +9,7 @@ import com.minicad.step.syntax.StepValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.Objects;
 
 /**
  * Utility class for reading typed parameter values from STEP entity instances.
@@ -125,16 +126,18 @@ public final class StepParameterReader {
 
   public static String valueType(StepValue value) {
     StepValue unwrapped = unwrapTyped(value);
-    return switch (unwrapped) {
-      case StepValue.StringValue ignored -> "string";
-      case StepValue.NumberValue ignored -> "number";
-      case StepValue.EnumValue ignored -> "enum";
-      case StepValue.ReferenceValue ignored -> "reference";
-      case StepValue.OmittedValue ignored -> "omitted";
-      case StepValue.NotProvidedValue ignored -> "not-provided";
-      case StepValue.ListValue ignored -> "list";
-      case StepValue.TypedValue typedValue -> "typed " + typedValue.typeName();
-    };
+    if (unwrapped instanceof StepValue.StringValue) return "string";
+    if (unwrapped instanceof StepValue.NumberValue) return "number";
+    if (unwrapped instanceof StepValue.EnumValue) return "enum";
+    if (unwrapped instanceof StepValue.ReferenceValue) return "reference";
+    if (unwrapped instanceof StepValue.OmittedValue) return "omitted";
+    if (unwrapped instanceof StepValue.NotProvidedValue) return "not-provided";
+    if (unwrapped instanceof StepValue.ListValue) return "list";
+    if (unwrapped instanceof StepValue.TypedValue) {
+      StepValue.TypedValue typedValue = (StepValue.TypedValue) unwrapped;
+      return "typed " + typedValue.typeName();
+    }
+    throw new IllegalArgumentException("Unknown value type: " + unwrapped);
   }
 
   // ---------------------------------------------------------------------------
@@ -167,7 +170,8 @@ public final class StepParameterReader {
    */
   public static StepValue unwrapTyped(StepValue value) {
     StepValue current = value;
-    while (current instanceof StepValue.TypedValue typedValue) {
+    while (current instanceof StepValue.TypedValue) {
+      StepValue.TypedValue typedValue = (StepValue.TypedValue) current;
       current = typedValue.value();
     }
     return current;
@@ -179,7 +183,8 @@ public final class StepParameterReader {
   public static TypedSelection typedSelection(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = definition.parameters().get(index);
-    if (value instanceof StepValue.TypedValue typedValue) {
+    if (value instanceof StepValue.TypedValue) {
+      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
       return new TypedSelection(typedValue.typeName(), unwrapTyped(typedValue.value()));
     }
     throw new StepResolutionException(
@@ -204,27 +209,69 @@ public final class StepParameterReader {
    * @param typeName wrapper type name
    * @param value unwrapped payload
    */
-  public record TypedSelection(String typeName, StepValue value) {
+  public static final class TypedSelection {
+    private final String typeName;
+    private final StepValue value;
+
+    public TypedSelection(String typeName, StepValue value) {
+      this.typeName = typeName;
+      this.value = value;
+    }
+
+    public String getTypeName() {
+      return typeName;
+    }
+
+    public StepValue getValue() {
+      return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      TypedSelection that = (TypedSelection) o;
+      return Objects.equals(typeName, that.typeName) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(typeName, value);
+    }
+
+    @Override
+    public String toString() {
+      return "TypedSelection{typeName=" + typeName + ", value=" + value + "}";
+    }
   }
 
   /**
    * Converts a StepValue back to its STEP literal text representation.
    */
   public static String literalText(StepValue value) {
-    return switch (value) {
-      case StepValue.StringValue stringValue -> stringValue.value();
-      case StepValue.NumberValue numberValue -> numberValue.raw();
-      case StepValue.EnumValue enumValue -> "." + enumValue.value() + ".";
-      case StepValue.ReferenceValue referenceValue -> "#" + referenceValue.id();
-      case StepValue.OmittedValue ignored -> "$";
-      case StepValue.NotProvidedValue ignored -> "*";
-      case StepValue.ListValue listValue ->
-          listValue.elements().stream()
-              .map(StepParameterReader::literalText)
-              .collect(java.util.stream.Collectors.joining(",", "(", ")"));
-      case StepValue.TypedValue typedValue ->
-          typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
-    };
+    if (value instanceof StepValue.StringValue) {
+      StepValue.StringValue stringValue = (StepValue.StringValue) value;
+      return stringValue.value();
+    }
+    if (value instanceof StepValue.NumberValue) {
+      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
+      return numberValue.raw();
+    }
+    if (value instanceof StepValue.EnumValue) {
+      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
+      return "." + enumValue.value() + ".";
+    }
+    if (value instanceof StepValue.ReferenceValue) {
+      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
+      return "#" + referenceValue.id();
+    }
+    if (value instanceof StepValue.OmittedValue) return "$";
+    if (value instanceof StepValue.NotProvidedValue) return "*";
+    if (value instanceof StepValue.TypedValue) {
+      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
+      return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
+    }
+    throw new IllegalArgumentException();
   }
 
   // ---------------------------------------------------------------------------
@@ -239,7 +286,8 @@ public final class StepParameterReader {
   public static String stringValue(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.StringValue stringValue) {
+    if (value instanceof StepValue.StringValue) {
+      StepValue.StringValue stringValue = (StepValue.StringValue) value;
       return stringValue.value();
     }
     throw parameterTypeMismatch(definition, index, entityName, "string");
@@ -263,7 +311,8 @@ public final class StepParameterReader {
   public static double numberValue(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.NumberValue numberValue) {
+    if (value instanceof StepValue.NumberValue) {
+      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
       return numberValue.value();
     }
     throw parameterTypeMismatch(definition, index, entityName, "number");
@@ -317,7 +366,8 @@ public final class StepParameterReader {
   public static String enumValue(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.EnumValue enumValue) {
+    if (value instanceof StepValue.EnumValue) {
+      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
       return enumValue.value();
     }
     throw parameterTypeMismatch(definition, index, entityName, "enum");
@@ -328,18 +378,19 @@ public final class StepParameterReader {
    */
   public static boolean booleanValue(
       StepEntityDefinition definition, int index, String entityName) {
-    return switch (enumValue(definition, index, entityName)) {
-      case "T" -> true;
-      case "F" -> false;
-      default ->
+    String enumVal = enumValue(definition, index, entityName);
+    switch (enumVal) {
+      case "T": return true;
+      case "F": return false;
+      default:
           throw new StepResolutionException(
               entityName
                   + " parameter "
                   + index
                   + " type mismatch: expected boolean enum .T. or .F., actual enum ."
-                  + enumValue(definition, index, entityName)
+                  + enumVal
                   + ".");
-    };
+    }
   }
 
   /**
@@ -349,10 +400,12 @@ public final class StepParameterReader {
   public static String logicalValue(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.EnumValue enumValue) {
+    if (value instanceof StepValue.EnumValue) {
+      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
       return enumValue.value();
     }
-    if (value instanceof StepValue.StringValue strValue) {
+    if (value instanceof StepValue.StringValue) {
+      StepValue.StringValue strValue = (StepValue.StringValue) value;
       return strValue.value();
     }
     throw parameterTypeMismatch(definition, index, entityName, "LOGICAL value (.T., .F., or .U.)");
@@ -368,7 +421,8 @@ public final class StepParameterReader {
   public static int referenceId(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.ReferenceValue referenceValue) {
+    if (value instanceof StepValue.ReferenceValue) {
+      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
       return referenceValue.id();
     }
     throw parameterTypeMismatch(definition, index, entityName, "reference");
@@ -386,7 +440,8 @@ public final class StepParameterReader {
     if (value instanceof StepValue.OmittedValue || value instanceof StepValue.NotProvidedValue) {
       return null;
     }
-    if (value instanceof StepValue.ReferenceValue referenceValue) {
+    if (value instanceof StepValue.ReferenceValue) {
+      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
       return resolver.apply(referenceValue.id());
     }
     throw new StepResolutionException(
@@ -478,9 +533,10 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index,
       int minSize, int maxSize, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     if (listValue.elements().size() < minSize || listValue.elements().size() > maxSize) {
       throw new StepResolutionException(
           entityName + " only supports " + minSize + "D to " + maxSize + "D coordinates");
@@ -488,7 +544,8 @@ public final class StepParameterReader {
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (unwrapped instanceof StepValue.NumberValue numberValue) {
+      if (unwrapped instanceof StepValue.NumberValue) {
+        StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
         result.add(numberValue.value());
       } else {
         throw parameterElementTypeMismatch(entityName, index, "coordinate element", "number", element);
@@ -511,15 +568,17 @@ public final class StepParameterReader {
   public static List<Double> doubleList(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
+      if (!(unwrapped instanceof StepValue.NumberValue)) {
         throw parameterElementTypeMismatch(entityName, index, "numeric list element", "number", element);
       }
+      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
       result.add(numberValue.value());
     }
     return List.copyOf(result);
@@ -531,15 +590,17 @@ public final class StepParameterReader {
   public static List<Integer> intList(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<Integer> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
+      if (!(unwrapped instanceof StepValue.NumberValue)) {
         throw parameterElementTypeMismatch(entityName, index, "integer list element", "number", element);
       }
+      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
       double dv = numberValue.value();
       if (dv != Math.rint(dv)) {
         throw new StepResolutionException(
@@ -559,15 +620,17 @@ public final class StepParameterReader {
   public static List<String> stringList(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.StringValue strValue)) {
+      if (!(unwrapped instanceof StepValue.StringValue)) {
         throw parameterElementTypeMismatch(entityName, index, "string list element", "string", element);
       }
+      StepValue.StringValue strValue = (StepValue.StringValue) unwrapped;
       result.add(strValue.value());
     }
     return List.copyOf(result);
@@ -583,15 +646,17 @@ public final class StepParameterReader {
       return List.of();
     }
     StepValue unwrapped = unwrapTyped(value);
-    if (!(unwrapped instanceof StepValue.ListValue listValue)) {
+    if (!(unwrapped instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "string list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) unwrapped;
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrappedElement = unwrapTyped(element);
-      if (!(unwrappedElement instanceof StepValue.StringValue stringValue)) {
+      if (!(unwrappedElement instanceof StepValue.StringValue)) {
         throw parameterElementTypeMismatch(entityName, index, "string list element", "string", element);
       }
+      StepValue.StringValue stringValue = (StepValue.StringValue) unwrappedElement;
       result.add(stringValue.value());
     }
     return List.copyOf(result);
@@ -628,19 +693,21 @@ public final class StepParameterReader {
    * Useful when the caller has already handled nested list unwrapping.
    */
   public static List<Double> extractNumberList(StepValue value, String paramName) {
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw new StepResolutionException(
           paramName + " parameter type mismatch: expected list, actual " + valueType(value));
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<Double> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
+      if (!(unwrapped instanceof StepValue.NumberValue)) {
         throw new StepResolutionException(
             paramName
                 + " numeric list element type mismatch: expected number, actual "
                 + valueType(element));
       }
+      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
       result.add(numberValue.value());
     }
     return List.copyOf(result);
@@ -652,9 +719,10 @@ public final class StepParameterReader {
   public static List<StepValue> listElements(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     return List.copyOf(listValue.elements());
   }
 
@@ -664,9 +732,10 @@ public final class StepParameterReader {
   public static List<String> literalList(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<String> result = new ArrayList<>(listValue.elements().size());
     for (StepValue element : listValue.elements()) {
       result.add(literalText(element));
@@ -680,21 +749,24 @@ public final class StepParameterReader {
   public static List<List<Double>> numberGrid(
       StepEntityDefinition definition, int index, String entityName) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue outerList)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw parameterTypeMismatch(definition, index, entityName, "nested list");
     }
+    StepValue.ListValue outerList = (StepValue.ListValue) value;
     List<List<Double>> grid = new ArrayList<>(outerList.elements().size());
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
-      if (!(row instanceof StepValue.ListValue rowList)) {
+      if (!(row instanceof StepValue.ListValue)) {
         throw parameterElementTypeMismatch(entityName, index, "grid row", "list", rowValue);
       }
+      StepValue.ListValue rowList = (StepValue.ListValue) row;
       List<Double> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
-        if (!(unwrapped instanceof StepValue.NumberValue numberValue)) {
+        if (!(unwrapped instanceof StepValue.NumberValue)) {
           throw parameterElementTypeMismatch(entityName, index, "grid element", "number", element);
         }
+        StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
         entries.add(numberValue.value());
       }
       grid.add(List.copyOf(entries));
@@ -713,16 +785,18 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String message,
       Function<Integer, StepEntity> resolver) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue listValue)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw new StepResolutionException(
           definition.name() + " parameter " + index + " must be a list");
     }
+    StepValue.ListValue listValue = (StepValue.ListValue) value;
     List<StepEntity> result = new ArrayList<>();
     for (StepValue element : listValue.elements()) {
       StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.ReferenceValue referenceValue)) {
+      if (!(unwrapped instanceof StepValue.ReferenceValue)) {
         throw new StepResolutionException(message);
       }
+      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrapped;
       result.add(resolver.apply(referenceValue.id()));
     }
     return List.copyOf(result);
@@ -735,22 +809,25 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index,
       Class<T> type, String message, Function<Integer, StepEntity> resolver) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue outerList)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw new StepResolutionException(
           definition.name() + " parameter " + index + " must be a nested list");
     }
+    StepValue.ListValue outerList = (StepValue.ListValue) value;
     List<List<T>> grid = new ArrayList<>(outerList.elements().size());
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
-      if (!(row instanceof StepValue.ListValue rowList)) {
+      if (!(row instanceof StepValue.ListValue)) {
         throw new StepResolutionException(message);
       }
+      StepValue.ListValue rowList = (StepValue.ListValue) row;
       List<T> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
-        if (!(unwrapped instanceof StepValue.ReferenceValue referenceValue)) {
+        if (!(unwrapped instanceof StepValue.ReferenceValue)) {
           throw new StepResolutionException(message);
         }
+        StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrapped;
         StepEntity entity = resolver.apply(referenceValue.id());
         if (!type.isInstance(entity)) {
           throw new StepResolutionException(
@@ -770,24 +847,27 @@ public final class StepParameterReader {
       StepEntityDefinition definition, int index, String message,
       Function<Integer, StepEntity> resolver) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue outerList)) {
+    if (!(value instanceof StepValue.ListValue)) {
       throw new StepResolutionException(
           definition.name() + " parameter " + index + " must be a nested list");
     }
+    StepValue.ListValue outerList = (StepValue.ListValue) value;
     List<List<StepEntity>> result = new ArrayList<>();
     for (StepValue outerElement : outerList.elements()) {
       StepValue unwrappedOuter = unwrapTyped(outerElement);
-      if (!(unwrappedOuter instanceof StepValue.ListValue innerList)) {
+      if (!(unwrappedOuter instanceof StepValue.ListValue)) {
         throw new StepResolutionException(
             definition.name() + " parameter " + index + " must contain nested lists");
       }
+      StepValue.ListValue innerList = (StepValue.ListValue) unwrappedOuter;
       List<StepEntity> row = new ArrayList<>();
       for (StepValue innerElement : innerList.elements()) {
         StepValue unwrappedInner = unwrapTyped(innerElement);
-        if (!(unwrappedInner instanceof StepValue.ReferenceValue referenceValue)) {
+        if (!(unwrappedInner instanceof StepValue.ReferenceValue)) {
           throw new StepResolutionException(
               definition.name() + " parameter " + index + " inner elements must be references");
         }
+        StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrappedInner;
         row.add(resolver.apply(referenceValue.id()));
       }
       result.add(List.copyOf(row));

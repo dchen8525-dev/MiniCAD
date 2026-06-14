@@ -6,7 +6,7 @@ import com.minicad.geometry.CartesianPoint;
 /**
  * Marker interface for topological loop subtypes.
  */
-public sealed interface Loop permits EdgeLoop, VertexLoop, PolyLoop {
+public interface Loop {
 
     /**
      * Returns the bounding box enclosing the loop.

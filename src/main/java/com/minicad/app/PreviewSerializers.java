@@ -183,16 +183,16 @@ public final class PreviewSerializers {
                 payload.issues(),
                 payload.unsupportedBooleans(),
                 payload.unsupportedFaces(),
-                payload.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
-                payload.faces().stream().map(face -> toBinaryFace(face, geometry)).toList(),
+                payload.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).collect(Collectors.toList()),
+                payload.faces().stream().map(face -> toBinaryFace(face, geometry)).collect(Collectors.toList()),
                 payload.representations().stream().map(representation -> new BinaryRepresentationPayload(
                         representation.id(),
                         representation.name(),
                         representation.layers(),
                         representation.color(),
-                        representation.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).toList(),
-                        representation.faces().stream().map(face -> toBinaryFace(face, geometry)).toList()
-                )).toList(),
+                        representation.edges().stream().map(edge -> toBinaryEdge(edge, geometry)).collect(Collectors.toList()),
+                        representation.faces().stream().map(face -> toBinaryFace(face, geometry)).collect(Collectors.toList())
+                )).collect(Collectors.toList()),
                 payload.instances()
         );
     }
@@ -209,7 +209,7 @@ public final class PreviewSerializers {
                     PointRange range = geometry.append(loop.points());
                     return new BinaryLoopPayload(loop.outer(), range.offset(), range.count());
                 })
-                .toList();
+                .collect(Collectors.toList());
         return new BinaryFacePayload(
                 face.stepId(),
                 face.name(),
@@ -438,7 +438,8 @@ public final class PreviewSerializers {
             json.append("null");
             return;
         }
-        if (value instanceof String text) {
+        if (value instanceof String) {
+            String text = (String) value;
             json.append(quote(text));
             return;
         }
@@ -450,7 +451,8 @@ public final class PreviewSerializers {
             json.append(format(((Number) value).doubleValue()));
             return;
         }
-        if (value instanceof Map<?, ?> map) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
             json.append('{');
             boolean first = true;
             for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -464,7 +466,8 @@ public final class PreviewSerializers {
             json.append('}');
             return;
         }
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             json.append('[');
             for (int i = 0; i < list.size(); i++) {
                 if (i > 0) {
@@ -513,7 +516,7 @@ public final class PreviewSerializers {
             map.put("name", item.name());
             map.put("text", item.text());
             map.put("position", pointList(item.position()));
-            map.put("leader", item.leader().stream().map(PreviewSerializers::pointList).toList());
+            map.put("leader", item.leader().stream().map(PreviewSerializers::pointList).collect(Collectors.toList()));
             map.put("targetIds", item.targetIds());
             map.put("targets", item.targets().stream().map(target -> {
                 Map<String, Object> targetMap = new LinkedHashMap<>();
@@ -540,7 +543,7 @@ public final class PreviewSerializers {
                     targetMap.put("viaDefinitionId", target.viaDefinitionId());
                 }
                 return targetMap;
-            }).toList());
+            }).collect(Collectors.toList()));
             list.add(map);
         }
         return List.copyOf(list);
@@ -1082,21 +1085,24 @@ public final class PreviewSerializers {
         escaped.append('"');
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            switch (ch) {
-                case '\\' -> escaped.append("\\\\");
-                case '"' -> escaped.append("\\\"");
-                case '\n' -> escaped.append("\\n");
-                case '\r' -> escaped.append("\\r");
-                case '\t' -> escaped.append("\\t");
-                case '\b' -> escaped.append("\\b");
-                case '\f' -> escaped.append("\\f");
-                default -> {
-                    if (ch < 0x20) {
-                        escaped.append(String.format("\\u%04x", (int) ch));
-                    } else {
-                        escaped.append(ch);
-                    }
-                }
+            if (ch == '\\') {
+                escaped.append("\\\\");
+            } else if (ch == '"') {
+                escaped.append("\\\"");
+            } else if (ch == '\n') {
+                escaped.append("\\n");
+            } else if (ch == '\r') {
+                escaped.append("\\r");
+            } else if (ch == '\t') {
+                escaped.append("\\t");
+            } else if (ch == '\b') {
+                escaped.append("\\b");
+            } else if (ch == '\f') {
+                escaped.append("\\f");
+            } else if (ch < 0x20) {
+                escaped.append(String.format("\\u%04x", (int) ch));
+            } else {
+                escaped.append(ch);
             }
         }
         escaped.append('"');
@@ -1199,7 +1205,7 @@ public final class PreviewSerializers {
                     "outer", loop.outer(),
                     "points", loop.points().stream()
                             .map(point -> List.of(point.u(), point.v()))
-                            .toList()
+                            .collect(Collectors.toList())
             ));
         }
         return List.copyOf(values);
@@ -1784,8 +1790,8 @@ public final class PreviewSerializers {
                     List.of("STEP", "#" + edge.stepId()),
                     List.of("采样点", String.valueOf(edge.points().size())),
                     List.of("线段数", String.valueOf(Math.max(0, edge.points().size() - 1))),
-                    List.of("起点", formatPointValue(pointList(edge.points().getFirst()))),
-                    List.of("终点", formatPointValue(pointList(edge.points().getLast())))
+                    List.of("起点", formatPointValue(pointList(edge.points().get(0)))),
+                    List.of("终点", formatPointValue(pointList(edge.points().get(edge.points().size() - 1))))
             ));
             return extras;
         }
@@ -1800,8 +1806,8 @@ public final class PreviewSerializers {
                     List.of("实例", instance.id()),
                     List.of("采样点", String.valueOf(edge.points().size())),
                     List.of("线段数", String.valueOf(Math.max(0, edge.points().size() - 1))),
-                    List.of("起点", formatPointValue(pointList(edge.points().getFirst()))),
-                    List.of("终点", formatPointValue(pointList(edge.points().getLast())))
+                    List.of("起点", formatPointValue(pointList(edge.points().get(0)))),
+                    List.of("终点", formatPointValue(pointList(edge.points().get(edge.points().size() - 1))))
             ));
             return extras;
         }
@@ -1826,7 +1832,7 @@ public final class PreviewSerializers {
             for (LoopPayload loop : loops) {
                 values.add(Map.of(
                         "outer", loop.outer(),
-                        "points", loop.points().stream().map(PreviewSerializers::pointList).toList()
+                        "points", loop.points().stream().map(PreviewSerializers::pointList).collect(Collectors.toList())
                 ));
             }
             return values;
@@ -1922,7 +1928,7 @@ public final class PreviewSerializers {
                         "outer", loop.outer(),
                         "points", loop.points().stream()
                                 .map(point -> List.of(point.u(), point.v()))
-                                .toList()
+                                .collect(Collectors.toList())
                 ));
             }
             return values;

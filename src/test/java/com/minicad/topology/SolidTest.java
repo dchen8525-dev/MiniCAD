@@ -22,8 +22,8 @@ class SolidTest {
 
         Solid solid = new Solid(shell);
 
-        assertEquals(shell, solid.outerShell());
-        assertEquals(0, solid.voidShells().size());
+        assertEquals(shell, solid.getOuterShell());
+        assertEquals(0, solid.getVoidShells().size());
     }
 
     @Test
@@ -42,7 +42,7 @@ class SolidTest {
 
         Solid solid = new Solid(shell, List.of(voidShell));
 
-        assertEquals(1, solid.voidShells().size());
+        assertEquals(1, solid.getVoidShells().size());
     }
 
     private static Face faceOnZ0() {
@@ -66,6 +66,6 @@ class SolidTest {
     }
 
     private static Line3 line(Vertex start, Vertex end) {
-        return new Line3(start.point(), Direction3.from(end.point().subtract(start.point())));
+        return new Line3(start.getPoint(), Direction3.from(end.getPoint().subtract(start.getPoint())));
     }
 }

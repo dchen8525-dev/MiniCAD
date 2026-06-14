@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.minicad.step.model.base.StepFaceEntity;
+import java.util.Objects;
 
 /**
  * Resolved ORIENTED_CLOSED_SHELL.
@@ -15,26 +16,58 @@ import com.minicad.step.model.base.StepFaceEntity;
  * @param closedShellElement referenced base closed shell
  * @param orientation orientation flag
  */
-public record StepOrientedClosedShell(
-    int id, String name, StepEntity closedShellElement, boolean orientation) implements StepEntity {
+/**
+ * Resolved ORIENTED_CLOSED_SHELL.
+ *
+ * @param id STEP id
+ * @param name STEP label
+ * @param closedShellElement referenced base closed shell
+ * @param orientation orientation flag
+ */
+public final class StepOrientedClosedShell implements StepEntity {
+    private final int id;
+    private final String name;
+    private final StepEntity closedShellElement;
+    private final boolean orientation;
 
-  public List<StepFaceEntity> faces() {
-    List<StepFaceEntity> faces = shellFaces(closedShellElement);
-    if (orientation) {
-      return faces;
+    public StepOrientedClosedShell(int id, String name, StepEntity closedShellElement, boolean orientation) {
+        this.id = id;
+        this.name = name;
+        this.closedShellElement = closedShellElement;
+        this.orientation = orientation;
     }
-    List<StepFaceEntity> reversed = new ArrayList<>(faces);
-    Collections.reverse(reversed);
-    return List.copyOf(reversed);
-  }
 
-  private static List<StepFaceEntity> shellFaces(StepEntity shell) {
-    if (shell instanceof StepClosedShell closedShell) {
-      return closedShell.faces();
+    public int getId() {
+        return id;
     }
-    if (shell instanceof StepOrientedClosedShell orientedClosedShell) {
-      return orientedClosedShell.faces();
+
+    public String getName() {
+        return name;
     }
-    throw new IllegalArgumentException("ORIENTED_CLOSED_SHELL requires CLOSED_SHELL-compatible entity");
-  }
+
+    public StepEntity getClosedShellElement() {
+        return closedShellElement;
+    }
+
+    public boolean isOrientation() {
+        return orientation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepOrientedClosedShell that = (StepOrientedClosedShell) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(closedShellElement, that.closedShellElement) && orientation == that.orientation;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, closedShellElement, orientation);
+    }
+
+    @Override
+    public String toString() {
+        return "StepOrientedClosedShell{" + "id=" + id + "name=" + name + "closedShellElement=" + closedShellElement + "orientation=" + orientation + "}";
+    }
 }

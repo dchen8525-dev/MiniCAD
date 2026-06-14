@@ -1,19 +1,51 @@
 package com.minicad.step.model.classification;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal EXTERNAL_SOURCE metadata.
  *
  * @param id STEP instance id
  * @param sourceId external source identifier
  */
-public record StepExternalSource(
-        int id,
-        String sourceId
-) implements StepEntity {
+/**
+ * Minimal EXTERNAL_SOURCE metadata.
+ *
+ * @param id STEP instance id
+ * @param sourceId external source identifier
+ */
+public final class StepExternalSource implements StepEntity {
+    private final int id;
+    private final String sourceId;
+
+    public StepExternalSource(int id, String sourceId) {
+        this.id = id;
+        this.sourceId = sourceId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
 
     @Override
-    public String name() {
-        return sourceId;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepExternalSource that = (StepExternalSource) o;
+        return id == that.id && Objects.equals(sourceId, that.sourceId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, sourceId);
+    }
+
+    @Override
+    public String toString() {
+        return "StepExternalSource{" + "id=" + id + "sourceId=" + sourceId + "}";
     }
 }

@@ -1,40 +1,47 @@
 package com.minicad.step.syntax;
 
 import java.util.List;
+import java.util.Objects;
 /**
  * Parsed HEADER section FileDescription entry.
  * Contains protocol names and implementation level.
  */
-public record StepFileDescription(
-    List<String> description,
-    String implementationLevel) {
+/**
+ * Parsed HEADER section FileDescription entry.
+ * Contains protocol names and implementation level.
+ */
+public final class StepFileDescription {
+    private final List<String> description;
+    private final String implementationLevel;
 
-    public static StepFileDescription from(StepHeaderEntry entry) {
-        if (!"FILE_DESCRIPTION".equalsIgnoreCase(entry.name())) {
-            throw new IllegalArgumentException("Expected FILE_DESCRIPTION, got " + entry.name());
-        }
-        List<StepValue> params = entry.parameters();
-        List<String> desc = extractStringList(params.get(0));
-        String level = extractString(params.get(1));
-        return new StepFileDescription(desc, level);
+    public StepFileDescription(List<String> description, String implementationLevel) {
+        this.description = description == null ? null : java.util.List.copyOf(description);
+        this.implementationLevel = implementationLevel;
     }
 
-    private static List<String> extractStringList(StepValue value) {
-        if (value instanceof StepValue.ListValue list) {
-            return list.elements().stream()
-                .map(v -> v instanceof StepValue.StringValue sv ? sv.value() : v.toString())
-                .toList();
-        }
-        return List.of();
+    public List<String> getDescription() {
+        return description;
     }
 
-    private static String extractString(StepValue value) {
-        value = unwrap(value);
-        return value instanceof StepValue.StringValue sv ? sv.value() : "";
+    public String getImplementationLevel() {
+        return implementationLevel;
     }
 
-    private static StepValue unwrap(StepValue value) {
-        if (value instanceof StepValue.TypedValue tv) return tv.value();
-        return value;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepFileDescription that = (StepFileDescription) o;
+        return Objects.equals(description, that.description) && Objects.equals(implementationLevel, that.implementationLevel);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, implementationLevel);
+    }
+
+    @Override
+    public String toString() {
+        return "StepFileDescription{" + "description=" + description + "implementationLevel=" + implementationLevel + "}";
     }
 }

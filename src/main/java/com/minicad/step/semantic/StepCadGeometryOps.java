@@ -57,6 +57,7 @@ import com.minicad.step.model.geometry.StepDirection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class StepCadGeometryOps {
 
@@ -70,7 +71,7 @@ final class StepCadGeometryOps {
         List<Point2> points2 = sampleCurve2(curve2, 72);
         List<CartesianPoint> points3 = points2.stream()
                 .map(point -> new CartesianPoint(point.x(), point.y(), 0.0))
-                .toList();
+                .collect(Collectors.toList());
         return new Polyline3(points3);
     }
 
@@ -104,24 +105,28 @@ final class StepCadGeometryOps {
     }
 
     List<Point2> sampleCurve2(Curve2 curve, int segments) {
-        if (curve instanceof Line2 line) {
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
             return List.of(line.pointAt(0.0), line.pointAt(1.0));
         }
-        if (curve instanceof Circle2 circle) {
+        if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
             List<Point2> points = new ArrayList<>(segments + 1);
             for (int index = 0; index <= segments; index++) {
                 points.add(circle.pointAt(Math.PI * 2.0 * index / segments));
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Ellipse2 ellipse) {
+        if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
             List<Point2> points = new ArrayList<>(segments + 1);
             for (int index = 0; index <= segments; index++) {
                 points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
             }
             return List.copyOf(points);
         }
-        if (curve instanceof BSplineCurve2 spline) {
+        if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) curve;
             List<Point2> points = new ArrayList<>(segments + 1);
             double start = spline.startParameter();
             double end = spline.endParameter();
@@ -130,16 +135,20 @@ final class StepCadGeometryOps {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof RationalBSplineCurve2 spline) {
+        if (curve instanceof RationalBSplineCurve2) {
+            RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
             return spline.sample(segments);
         }
-        if (curve instanceof TrimmedCurve2 trimmedCurve) {
+        if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
             return sampleTrimmedCurve2(trimmedCurve, segments);
         }
-        if (curve instanceof Polyline2 polyline) {
+        if (curve instanceof Polyline2) {
+            Polyline2 polyline = (Polyline2) curve;
             return polyline.points();
         }
-        if (curve instanceof CompositeCurve2 compositeCurve) {
+        if (curve instanceof CompositeCurve2) {
+            CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
             List<Point2> points = new ArrayList<>();
             boolean first = true;
             for (Curve2 segment : compositeCurve.segments()) {
@@ -152,7 +161,8 @@ final class StepCadGeometryOps {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Parabola2 parabola) {
+        if (curve instanceof Parabola2) {
+            Parabola2 parabola = (Parabola2) curve;
             List<Point2> points = new ArrayList<>(segments + 1);
             double tMin = -2.0;
             double tMax = 2.0;
@@ -162,7 +172,8 @@ final class StepCadGeometryOps {
             }
             return List.copyOf(points);
         }
-        if (curve instanceof Hyperbola2 hyperbola) {
+        if (curve instanceof Hyperbola2) {
+            Hyperbola2 hyperbola = (Hyperbola2) curve;
             List<Point2> points = new ArrayList<>(segments + 1);
             double tMin = 1.0;
             double tMax = 2.0;
@@ -188,8 +199,8 @@ final class StepCadGeometryOps {
         if (normalized.size() < 3) {
             throw new UnsupportedGeometryException("profile loop must contain at least 3 distinct points");
         }
-        if (normalized.getFirst().subtract(normalized.getLast()).norm() > 1.0e-9) {
-            normalized.add(normalized.getFirst());
+        if (normalized.get(0).subtract(normalized.get(normalized.size() - 1)).norm() > 1.0e-9) {
+            normalized.add(normalized.get(0));
         }
         return List.copyOf(normalized);
     }
@@ -199,14 +210,14 @@ final class StepCadGeometryOps {
         for (int index = points.size() - 2; index >= 0; index--) {
             reversed.add(points.get(index));
         }
-        reversed.add(reversed.getFirst());
+        reversed.add(reversed.get(0));
         return List.copyOf(reversed);
     }
 
     List<CartesianPoint> closeLoop3(List<CartesianPoint> points) {
         List<CartesianPoint> closed = new ArrayList<>(points);
-        if (closed.getFirst().distanceTo(closed.getLast()) > 1.0e-9) {
-            closed.add(closed.getFirst());
+        if (closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
+            closed.add(closed.get(0));
         }
         return List.copyOf(closed);
     }
@@ -217,21 +228,25 @@ final class StepCadGeometryOps {
         for (int index = closed.size() - 2; index >= 0; index--) {
             reversed.add(closed.get(index));
         }
-        reversed.add(reversed.getFirst());
+        reversed.add(reversed.get(0));
         return List.copyOf(reversed);
     }
 
     List<CartesianPoint> sampleCurve3(Curve3 curve, int segments) {
-        if (curve instanceof TrimmedCurve3 trimmedCurve) {
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             return sampleTrimmedCurve3(trimmedCurve, segments);
         }
-        if (curve instanceof SurfaceCurve3 surfaceCurve) {
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             return sampleCurve3(surfaceCurve.curve3d(), segments);
         }
-        if (curve instanceof Polyline3 polyline) {
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
             return polyline.points();
         }
-        if (curve instanceof CompositeCurve3 compositeCurve) {
+        if (curve instanceof CompositeCurve3) {
+            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>();
             boolean first = true;
             for (Curve3 segment : compositeCurve.segments()) {
@@ -254,6 +269,7 @@ final class StepCadGeometryOps {
     Curve3 transformCurve3(Curve3 curve, StepCartesianTransformationOperator transformation) {
         double scale = transformationScale(transformation);
         return switch (curve) {
+        // TODO: JDK11 - Convert switch expression above
             case Line3 line -> new Line3(
                     transformPoint3(line.origin(), transformation),
                     transformDirection3(line.direction(), transformation),
@@ -267,15 +283,15 @@ final class StepCadGeometryOps {
                     ellipse.semiAxis2() * scale);
             case Polyline3 polyline -> new Polyline3(polyline.points().stream()
                     .map(point -> transformPoint3(point, transformation))
-                    .toList());
+                    .collect(Collectors.toList()));
             case BSplineCurve3 spline -> new BSplineCurve3(
                     spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).toList(),
+                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
                     spline.knotMultiplicities(),
                     spline.knots());
             case RationalBSplineCurve3 spline -> new RationalBSplineCurve3(
                     spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).toList(),
+                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
                     spline.weights(),
                     spline.knotMultiplicities(),
                     spline.knots());
@@ -285,7 +301,7 @@ final class StepCadGeometryOps {
                             .map(binding -> new SurfaceCurve3.ParametricCurve(
                                     transformSurfaceGeometry(binding.surface(), transformation),
                                     binding.curve2()))
-                            .toList());
+                            .collect(Collectors.toList()));
             case TrimmedCurve3 trimmedCurve -> new TrimmedCurve3(
                     transformCurve3(trimmedCurve.basisCurve(), transformation),
                     trimmedCurve.trimParamStart(),
@@ -294,7 +310,7 @@ final class StepCadGeometryOps {
             case CompositeCurve3 compositeCurve -> new CompositeCurve3(
                     compositeCurve.segments().stream()
                             .map(segment -> transformCurve3(segment, transformation))
-                            .toList());
+                            .collect(Collectors.toList()));
             case Parabola3 parabola -> new Parabola3(
                     transformPlacement(parabola.position(), transformation),
                     parabola.focalDistance() * scale);
@@ -315,6 +331,7 @@ final class StepCadGeometryOps {
     Curve2 transformCurve2(Curve2 curve, StepCartesianTransformationOperator transformation) {
         double scale = transformationScale(transformation);
         return switch (curve) {
+        // TODO: JDK11 - Convert switch expression above
             case Line2 line -> new Line2(
                     transformPoint2(line.origin(), transformation),
                     transformDirection2(line.direction(), transformation),
@@ -330,15 +347,15 @@ final class StepCadGeometryOps {
                     ellipse.semiAxis2() * scale);
             case Polyline2 polyline -> new Polyline2(polyline.points().stream()
                     .map(point -> transformPoint2(point, transformation))
-                    .toList());
+                    .collect(Collectors.toList()));
             case BSplineCurve2 spline -> new BSplineCurve2(
                     spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).toList(),
+                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
                     spline.knotMultiplicities(),
                     spline.knots());
             case RationalBSplineCurve2 spline -> new RationalBSplineCurve2(
                     spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).toList(),
+                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
                     spline.weights(),
                     spline.knotMultiplicities(),
                     spline.knots());
@@ -350,7 +367,7 @@ final class StepCadGeometryOps {
             case CompositeCurve2 compositeCurve -> new CompositeCurve2(
                     compositeCurve.segments().stream()
                             .map(segment -> transformCurve2(segment, transformation))
-                            .toList());
+                            .collect(Collectors.toList()));
             case Parabola2 parabola -> new Parabola2(
                     transformPoint2(parabola.vertex(), transformation),
                     transformDirection2(parabola.axisDirection(), transformation),
@@ -367,6 +384,7 @@ final class StepCadGeometryOps {
     SurfaceGeometry transformSurfaceGeometry(SurfaceGeometry surface, StepCartesianTransformationOperator transformation) {
         double scale = Math.abs(transformationScale(transformation));
         return switch (surface) {
+        // TODO: JDK11 - Convert switch expression above
             case Plane plane -> transformPlane(plane, transformation);
             case OffsetSurface3 offsetSurface -> new OffsetSurface3(
                     transformSurfaceGeometry(offsetSurface.basisSurface(), transformation),
@@ -389,8 +407,8 @@ final class StepCadGeometryOps {
                     splineSurface.uDegree(),
                     splineSurface.vDegree(),
                     splineSurface.controlPoints().stream()
-                            .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).toList())
-                            .toList(),
+                            .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()))
+                            .collect(Collectors.toList()),
                     splineSurface.uMultiplicities(),
                     splineSurface.vMultiplicities(),
                     splineSurface.uKnots(),
@@ -399,8 +417,8 @@ final class StepCadGeometryOps {
                     splineSurface.uDegree(),
                     splineSurface.vDegree(),
                     splineSurface.controlPoints().stream()
-                            .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).toList())
-                            .toList(),
+                            .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()))
+                            .collect(Collectors.toList()),
                     splineSurface.weightsData(),
                     splineSurface.uMultiplicities(),
                     splineSurface.vMultiplicities(),
@@ -516,7 +534,7 @@ final class StepCadGeometryOps {
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
-        boolean closed = sampled.getFirst().subtract(sampled.getLast()).norm() <= 1.0e-9;
+        boolean closed = sampled.get(0).subtract(sampled.get(sampled.size() - 1)).norm() <= 1.0e-9;
         List<Point2> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
         int startIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimStart());
         int endIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimEnd());
@@ -578,7 +596,7 @@ final class StepCadGeometryOps {
     }
 
     private void addDistinctPoint2(List<Point2> points, Point2 candidate) {
-        if (points.isEmpty() || points.getLast().subtract(candidate).norm() > 1.0e-9) {
+        if (points.isEmpty() || points.get(points.size() - 1).subtract(candidate).norm() > 1.0e-9) {
             points.add(candidate);
         }
     }
@@ -588,7 +606,7 @@ final class StepCadGeometryOps {
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
-        boolean closed = sampled.getFirst().distanceTo(sampled.getLast()) <= 1.0e-9;
+        boolean closed = sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) <= 1.0e-9;
         List<CartesianPoint> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
         int startIndex = nearestPointIndex3(basisPoints, trimmedCurve.trimStart());
         int endIndex = nearestPointIndex3(basisPoints, trimmedCurve.trimEnd());
@@ -650,7 +668,7 @@ final class StepCadGeometryOps {
     }
 
     private void addDistinctPoint3(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.getLast().distanceTo(candidate) > 1.0e-9) {
+        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
             points.add(candidate);
         }
     }

@@ -1,0 +1,165 @@
+// Final entities to reach verified 95%
+      registry.put(
+          "A3MA_ASSEMBLY_AND_SHAPE_CRITERIA_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MA_ASSEMBLY_AND_SHAPE_CRITERIA_RELATIONSHIP"));
+      registry.put(
+          "A3MA_EQUIVALENCE_CRITERION_ASSESSMENT_THRESHOLD_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MA_EQUIVALENCE_CRITERION_ASSESSMENT_THRESHOLD_RELATIONSHIP"));
+      registry.put(
+          "A3MA_EQUIVALENCE_INSPECTION_RESULT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MA_EQUIVALENCE_INSPECTION_RESULT"));
+      registry.put(
+          "A3MA_LENGTH_MEASURE_AND_CONTEXT_DEPENDENT_MEASURE_PAIR",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MA_LENGTH_MEASURE_AND_CONTEXT_DEPENDENT_MEASURE_PAIR"));
+      registry.put(
+          "A3MS_EQUIVALENCE_CRITERION_WITH_SPECIFIED_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MS_EQUIVALENCE_CRITERION_WITH_SPECIFIED_ELEMENTS"));
+      registry.put(
+          "A3MS_EQUIVALENCE_INSPECTION_RESULT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3MS_EQUIVALENCE_INSPECTION_RESULT"));
+      registry.put(
+          "A3M_EQUIVALENCE_ACCURACY_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_ACCURACY_ASSOCIATION"));
+      registry.put(
+          "A3M_EQUIVALENCE_ASSESSMENT_BY_LOGICAL_TEST",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_ASSESSMENT_BY_LOGICAL_TEST"));
+      registry.put(
+          "A3M_EQUIVALENCE_ASSESSMENT_BY_NUMERICAL_TEST",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_ASSESSMENT_BY_NUMERICAL_TEST"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERIA_REPRESENTATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERIA_REPRESENTATION"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_FOR_ASSEMBLY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_FOR_ASSEMBLY"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_FOR_SHAPE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_FOR_SHAPE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_ASSEMBLY_DATA_STRUCTURE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_ASSEMBLY_DATA_STRUCTURE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_COMPONENT_PROPERTY_DIFFERENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_COMPONENT_PROPERTY_DIFFERENCE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_DETAILED_ASSEMBLY_DATA_CONTENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_DETAILED_ASSEMBLY_DATA_CONTENT"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_DETAILED_SHAPE_DATA_CONTENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_DETAILED_SHAPE_DATA_CONTENT"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_REPRESENTATIVE_ASSEMBLY_PROPERTY_VALUE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_REPRESENTATIVE_ASSEMBLY_PROPERTY_VALUE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_REPRESENTATIVE_SHAPE_PROPERTY_VALUE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_REPRESENTATIVE_SHAPE_PROPERTY_VALUE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_OF_SHAPE_DATA_STRUCTURE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_OF_SHAPE_DATA_STRUCTURE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_REPORT_ITEM_WITH_MEASURED_VALUE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_REPORT_ITEM_WITH_MEASURED_VALUE"));
+      registry.put(
+          "A3M_EQUIVALENCE_CRITERION_WITH_SPECIFIED_ELEMENTS",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_CRITERION_WITH_SPECIFIED_ELEMENTS"));
+      registry.put(
+          "A3M_EQUIVALENCE_INSPECTION_INSTANCE_REPORT_ITEM",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_INSPECTION_INSTANCE_REPORT_ITEM"));
+      registry.put(
+          "A3M_EQUIVALENCE_INSPECTION_REQUIREMENT_WITH_VALUES",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_INSPECTION_REQUIREMENT_WITH_VALUES"));
+      registry.put(
+          "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION"));
+      registry.put(
+          "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_ASSEMBLY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_ASSEMBLY"));
+      registry.put(
+          "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_SHAPE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION_FOR_SHAPE"));
+      registry.put(
+          "A3M_EQUIVALENCE_SUMMARY_REPORT_REQUEST_WITH_REPRESENTATIVE_VALUE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_EQUIVALENCE_SUMMARY_REPORT_REQUEST_WITH_REPRESENTATIVE_VALUE"));
+      registry.put(
+          "A3M_INSPECTED_MODEL_AND_INSPECTION_RESULT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "A3M_INSPECTED_MODEL_AND_INSPECTION_RESULT_RELATIONSHIP"));
+      registry.put(
+          "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "ATOMIC_FORMULA",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATOMIC_FORMULA"));
+      registry.put(
+          "ATOM_BASED_LITERAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATOM_BASED_LITERAL"));
+      registry.put(
+          "ATTACHMENT_SLOT_AS_PLANNED",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_AS_PLANNED"));
+      registry.put(
+          "ATTACHMENT_SLOT_AS_REALIZED",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_AS_REALIZED"));
+      registry.put(
+          "ATTACHMENT_SLOT_DESIGN",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_DESIGN"));
+      registry.put(
+          "ATTACHMENT_SLOT_DESIGN_TO_PLANNED",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_DESIGN_TO_PLANNED"));
+      registry.put(
+          "ATTACHMENT_SLOT_DESIGN_TO_REALIZED",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_DESIGN_TO_REALIZED"));
+      registry.put(
+          "ATTACHMENT_SLOT_ON_PRODUCT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_ON_PRODUCT"));
+      registry.put(
+          "ATTACHMENT_SLOT_PLANNED_TO_REALIZED",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_PLANNED_TO_REALIZED"));
+      registry.put(
+          "AXIS1_PLACEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AXIS1_PLACEMENT"));
+      registry.put(
+          "AXIS2_PLACEMENT_2D",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AXIS2_PLACEMENT_2D"));

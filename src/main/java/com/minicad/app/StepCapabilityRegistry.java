@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Declarative STEP entity capability registry.
@@ -78,14 +79,76 @@ public final class StepCapabilityRegistry {
         throw new IOException("invalid boolean '" + text + "' at line " + lineNumber);
     }
 
-    public record Capability(
-            String entity,
-            String level,
-            boolean parsed,
-            boolean resolved,
-            boolean built,
-            boolean exported,
-            boolean tested,
-            String limitations) {
+    
+public final class Capability {
+    private final String entity;
+    private final String level;
+    private final boolean parsed;
+    private final boolean resolved;
+    private final boolean built;
+    private final boolean exported;
+    private final boolean tested;
+    private final String limitations;
+
+    public Capability(String entity, String level, boolean parsed, boolean resolved, boolean built, boolean exported, boolean tested, String limitations) {
+        this.entity = entity;
+        this.level = level;
+        this.parsed = parsed;
+        this.resolved = resolved;
+        this.built = built;
+        this.exported = exported;
+        this.tested = tested;
+        this.limitations = limitations;
     }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public boolean isParsed() {
+        return parsed;
+    }
+
+    public boolean isResolved() {
+        return resolved;
+    }
+
+    public boolean isBuilt() {
+        return built;
+    }
+
+    public boolean isExported() {
+        return exported;
+    }
+
+    public boolean isTested() {
+        return tested;
+    }
+
+    public String getLimitations() {
+        return limitations;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Capability that = (Capability) o;
+        return Objects.equals(entity, that.entity) && Objects.equals(level, that.level) && parsed == that.parsed && resolved == that.resolved && built == that.built && exported == that.exported && tested == that.tested && Objects.equals(limitations, that.limitations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entity, level, parsed, resolved, built, exported, tested, limitations);
+    }
+
+    @Override
+    public String toString() {
+        return "Capability{" + "entity=" + entity + "level=" + level + "parsed=" + parsed + "resolved=" + resolved + "built=" + built + "exported=" + exported + "tested=" + tested + "limitations=" + limitations + "}";
+    }
+}
 }

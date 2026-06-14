@@ -4,7 +4,6 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.Plane;
-import com.minicad.geometry.Vector3;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -34,7 +33,7 @@ class TopologyValidatorTest {
 
         TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
 
-        assertTrue(result.ok(), () -> result.issues().toString());
+        assertTrue(result.ok(), () -> result.getIssues().toString());
     }
 
     @Test
@@ -100,7 +99,7 @@ class TopologyValidatorTest {
 
         TopologyValidator.ValidationResult result = TopologyValidator.validateSolid(solid);
 
-        assertTrue(result.ok(), () -> result.issues().toString());
+        assertTrue(result.ok(), () -> result.getIssues().toString());
     }
 
     @Test
@@ -164,7 +163,7 @@ class TopologyValidatorTest {
     }
 
     private static Edge edge(Vertex start, Vertex end) {
-        return new Edge(start, end, new Line3(start.point(), Direction3.from(end.point().subtract(start.point()))), true);
+        return new Edge(start, end, new Line3(start.getPoint(), Direction3.from(end.getPoint().subtract(start.getPoint()))), true);
     }
 
     private static Vertex vertex(double x, double y, double z) {
@@ -193,8 +192,8 @@ class TopologyValidatorTest {
                 orientedEdge(vertices.get(1), vertices.get(2), edges),
                 orientedEdge(vertices.get(2), vertices.get(0), edges)
         ));
-        CartesianPoint p0 = vertices.get(0).point();
-        Vector3 normal = vertices.get(1).point().subtract(p0).cross(vertices.get(2).point().subtract(p0));
+        CartesianPoint p0 = vertices.get(0).getPoint();
+        com.minicad.geometry.Vector3 normal = vertices.get(1).getPoint().subtract(p0).cross(vertices.get(2).getPoint().subtract(p0));
         return new Face(new Plane(p0, Direction3.from(normal)), List.of(FaceBound.outer(loop, true)), true);
     }
 
@@ -219,7 +218,7 @@ class TopologyValidatorTest {
     }
 
     private static String vertexKey(Vertex vertex) {
-        CartesianPoint point = vertex.point();
+        CartesianPoint point = vertex.getPoint();
         return point.x() + "," + point.y() + "," + point.z();
     }
 }

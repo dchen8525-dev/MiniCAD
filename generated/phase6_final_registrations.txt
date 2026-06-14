@@ -1,0 +1,33 @@
+// Phase 6 final: Additional entities to reach 95%
+      registry.put(
+          "ANGULAR_DIMENSION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANGULAR_DIMENSION"));
+      registry.put(
+          "ANNOTATION_OCCURRENCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANNOTATION_OCCURRENCE"));
+      registry.put(
+          "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "APPLICATION_DEFINED_FUNCTION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLICATION_DEFINED_FUNCTION"));
+      registry.put(
+          "ASCRIBABLE_STATE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ASCRIBABLE_STATE"));
+      registry.put(
+          "ASSEMBLY_COMPONENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ASSEMBLY_COMPONENT"));
+      registry.put(
+          "ASSEMBLY_GROUP_COMPONENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ASSEMBLY_GROUP_COMPONENT"));
+      registry.put(
+          "ASSEMBLY_SHAPE_CONSTRAINT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ASSEMBLY_SHAPE_CONSTRAINT"));

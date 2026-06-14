@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -105,7 +106,7 @@ public final class StepCapabilityReportApp {
                         testedEntities.contains(entity),
                         declaredCapabilities.get(entity)))
                 .sorted(Comparator.comparing(CapabilityRow::entity))
-                .toList();
+                .collect(Collectors.toList());
 
         return new CapabilityReport(
                 modelEntities,
@@ -132,7 +133,7 @@ public final class StepCapabilityReportApp {
                             capabilityRow == null ? null : capabilityRow.declaredCapability());
                 })
                 .sorted(Comparator.comparing(SchemaCoverageRow::entity))
-                .toList();
+                .collect(Collectors.toList());
         return new SchemaCoverageReport(schemaName, schemaPath.normalize(), schemaEntities, rows);
     }
 
@@ -224,7 +225,7 @@ public final class StepCapabilityReportApp {
             return stream
                     .filter(path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(".java"))
                     .sorted()
-                    .toList();
+                    .collect(Collectors.toList());
         }
     }
 

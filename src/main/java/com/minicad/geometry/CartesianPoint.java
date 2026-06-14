@@ -1,24 +1,35 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Preconditions;
+import java.util.Objects;
 
 /**
  * Immutable 3D Cartesian point.
- *
- * @param x x coordinate
- * @param y y coordinate
- * @param z z coordinate
  */
-public record CartesianPoint(double x, double y, double z) {
+public final class CartesianPoint {
+    private final double x;
+    private final double y;
+    private final double z;
 
-    /**
-     * Creates a point and validates its coordinates.
-     *
-     */
-    public CartesianPoint {
+    public CartesianPoint(double x, double y, double z) {
         Preconditions.requireFinite(x, "x");
         Preconditions.requireFinite(y, "y");
         Preconditions.requireFinite(z, "z");
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public double z() {
+        return z;
     }
 
     /**
@@ -243,5 +254,23 @@ public record CartesianPoint(double x, double y, double z) {
             throw new IllegalArgumentException("coordinate array must have exactly 3 elements");
         }
         return new CartesianPoint(coords[0], coords[1], coords[2]);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CartesianPoint that = (CartesianPoint) o;
+        return x == that.x && y == that.y && z == that.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        return "CartesianPoint{x=" + x + ", y=" + y + ", z=" + z + "}";
     }
 }

@@ -1,6 +1,7 @@
 package com.minicad.step.model.product;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal product definition.
  *
@@ -10,16 +11,65 @@ import com.minicad.step.model.base.StepEntity;
  * @param formation referenced formation
  * @param frameOfReference referenced definition context
  */
-public record StepProductDefinition(
-        int id,
-        String identifier,
-        String description,
-        StepProductDefinitionFormation formation,
-        StepProductDefinitionContext frameOfReference
-) implements StepEntity {
+/**
+ * Minimal product definition.
+ *
+ * @param id STEP instance id
+ * @param identifier business identifier
+ * @param description optional description
+ * @param formation referenced formation
+ * @param frameOfReference referenced definition context
+ */
+public final class StepProductDefinition implements StepEntity {
+    private final int id;
+    private final String identifier;
+    private final String description;
+    private final StepProductDefinitionFormation formation;
+    private final StepProductDefinitionContext frameOfReference;
+
+    public StepProductDefinition(int id, String identifier, String description, StepProductDefinitionFormation formation, StepProductDefinitionContext frameOfReference) {
+        this.id = id;
+        this.identifier = identifier;
+        this.description = description;
+        this.formation = formation;
+        this.frameOfReference = frameOfReference;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public StepProductDefinitionFormation getFormation() {
+        return formation;
+    }
+
+    public StepProductDefinitionContext getFrameOfReference() {
+        return frameOfReference;
+    }
 
     @Override
-    public String name() {
-        return identifier;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepProductDefinition that = (StepProductDefinition) o;
+        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(description, that.description) && Objects.equals(formation, that.formation) && Objects.equals(frameOfReference, that.frameOfReference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, identifier, description, formation, frameOfReference);
+    }
+
+    @Override
+    public String toString() {
+        return "StepProductDefinition{" + "id=" + id + "identifier=" + identifier + "description=" + description + "formation=" + formation + "frameOfReference=" + frameOfReference + "}";
     }
 }

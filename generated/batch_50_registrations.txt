@@ -1,0 +1,201 @@
+// Batch of 50 entities
+      registry.put(
+          "CHARACTERISTIC_DATA_COLUMN_HEADER",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTERISTIC_DATA_COLUMN_HEADER"));
+      registry.put(
+          "CHARACTERISTIC_DATA_COLUMN_HEADER_LINK",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTERISTIC_DATA_COLUMN_HEADER_LINK"));
+      registry.put(
+          "CHARACTERISTIC_DATA_TABLE_HEADER",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTERISTIC_DATA_TABLE_HEADER"));
+      registry.put(
+          "CHARACTERISTIC_DATA_TABLE_HEADER_DECOMPOSITION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTERISTIC_DATA_TABLE_HEADER_DECOMPOSITION"));
+      registry.put(
+          "CHARACTERIZED_LOCATION_OBJECT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHARACTERIZED_LOCATION_OBJECT"));
+      registry.put(
+          "CIRCULAR_INVOLUTE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CIRCULAR_INVOLUTE"));
+      registry.put(
+          "CIRCULAR_PATH",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CIRCULAR_PATH"));
+      registry.put(
+          "CIRCULAR_RUNOUT_TOLERANCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CIRCULAR_RUNOUT_TOLERANCE"));
+      registry.put(
+          "CLGC_WITH_DIMENSION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CLGC_WITH_DIMENSION"));
+      registry.put(
+          "COAXIALITY_TOLERANCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COAXIALITY_TOLERANCE"));
+      registry.put(
+          "COLLECTION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COLLECTION"));
+      registry.put(
+          "COLLECTION_MEMBERSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COLLECTION_MEMBERSHIP"));
+      registry.put(
+          "COLLECTION_VERSION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COLLECTION_VERSION"));
+      registry.put(
+          "COMPARISON_EQUAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_EQUAL"));
+      registry.put(
+          "COMPARISON_GREATER",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_GREATER"));
+      registry.put(
+          "COMPARISON_GREATER_EQUAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_GREATER_EQUAL"));
+      registry.put(
+          "COMPARISON_LESS",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_LESS"));
+      registry.put(
+          "COMPARISON_LESS_EQUAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_LESS_EQUAL"));
+      registry.put(
+          "COMPARISON_NOT_EQUAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPARISON_NOT_EQUAL"));
+      registry.put(
+          "COMPLEX_CLAUSE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPLEX_CLAUSE"));
+      registry.put(
+          "COMPLEX_CONJUNCTIVE_CLAUSE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPLEX_CONJUNCTIVE_CLAUSE"));
+      registry.put(
+          "COMPLEX_DISJUNCTIVE_CLAUSE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPLEX_DISJUNCTIVE_CLAUSE"));
+      registry.put(
+          "COMPLEX_NUMBER_LITERAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPLEX_NUMBER_LITERAL"));
+      registry.put(
+          "COMPLEX_NUMBER_LITERAL_POLAR",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPLEX_NUMBER_LITERAL_POLAR"));
+      registry.put(
+          "COMPONENT_MATING_CONSTRAINT_CONDITION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPONENT_MATING_CONSTRAINT_CONDITION"));
+      registry.put(
+          "COMPONENT_PATH_SHAPE_ASPECT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPONENT_PATH_SHAPE_ASPECT"));
+      registry.put(
+          "COMPONENT_TERMINAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPONENT_TERMINAL"));
+      registry.put(
+          "COMPOSITE_ASSEMBLY_TABLE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPOSITE_ASSEMBLY_TABLE"));
+      registry.put(
+          "COMPOSITE_MATERIAL_DESIGNATION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPOSITE_MATERIAL_DESIGNATION"));
+      registry.put(
+          "COMPOSITE_TEXT_WITH_BLANKING_BOX",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPOSITE_TEXT_WITH_BLANKING_BOX"));
+      registry.put(
+          "COMPOSITE_TEXT_WITH_EXTENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COMPOSITE_TEXT_WITH_EXTENT"));
+      registry.put(
+          "CONCENTRICITY_TOLERANCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONCENTRICITY_TOLERANCE"));
+      registry.put(
+          "CONDITION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONDITION"));
+      registry.put(
+          "CONDITIONAL_EFFECTIVITY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONDITIONAL_EFFECTIVITY"));
+      registry.put(
+          "CONIC",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONIC"));
+      registry.put(
+          "CONSTANT_FUNCTION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONSTANT_FUNCTION"));
+      registry.put(
+          "CONSTITUENT_SHAPE_ASPECT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONSTITUENT_SHAPE_ASPECT"));
+      registry.put(
+          "CONTAINING_MESSAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONTAINING_MESSAGE"));
+      registry.put(
+          "CONVEX_HEXAHEDRON",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONVEX_HEXAHEDRON"));
+      registry.put(
+          "CURRENCY",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CURRENCY"));
+      registry.put(
+          "CYLINDRICITY_TOLERANCE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CYLINDRICITY_TOLERANCE"));
+      registry.put(
+          "DATA_ENVIRONMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_ENVIRONMENT"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_INSTANCE_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_EQUIVALENCE_INSPECTION_INSTANCE_REPORT"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_EQUIVALENCE_INSPECTION_REPORT"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_RESULT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_EQUIVALENCE_INSPECTION_RESULT"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_RESULT_WITH_JUDGEMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_EQUIVALENCE_INSPECTION_RESULT_WITH_JUDGEMENT"));
+      registry.put(
+          "DATA_EQUIVALENCE_REPORT_REQUEST",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_EQUIVALENCE_REPORT_REQUEST"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_INSTANCE_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_INSPECTION_INSTANCE_REPORT"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_REPORT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_INSPECTION_REPORT"));
+      registry.put(
+          "DATA_QUALITY_INSPECTION_RESULT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATA_QUALITY_INSPECTION_RESULT"));

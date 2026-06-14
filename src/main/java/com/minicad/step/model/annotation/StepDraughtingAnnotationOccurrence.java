@@ -2,6 +2,7 @@ package com.minicad.step.model.annotation;
 
 import com.minicad.step.model.base.StepEntity;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Minimal draughting annotation occurrence.
@@ -11,14 +12,58 @@ import java.util.List;
  * @param styles assigned styles
  * @param item styled target item
  */
-public record StepDraughtingAnnotationOccurrence(
-        int id,
-        String name,
-        List<StepPresentationStyleAssignment> styles,
-        StepEntity item
-) implements StepEntity {
+/**
+ * Minimal draughting annotation occurrence.
+ *
+ * @param id STEP instance id
+ * @param name occurrence name
+ * @param styles assigned styles
+ * @param item styled target item
+ */
+public final class StepDraughtingAnnotationOccurrence implements StepEntity {
+    private final int id;
+    private final String name;
+    private final List<StepPresentationStyleAssignment> styles;
+    private final StepEntity item;
 
-    public StepDraughtingAnnotationOccurrence {
-        styles = List.copyOf(styles);
+    public StepDraughtingAnnotationOccurrence(int id, String name, List<StepPresentationStyleAssignment> styles, StepEntity item) {
+        this.id = id;
+        this.name = name;
+        this.styles = styles == null ? null : java.util.List.copyOf(styles);
+        this.item = item;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<StepPresentationStyleAssignment> getStyles() {
+        return styles;
+    }
+
+    public StepEntity getItem() {
+        return item;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepDraughtingAnnotationOccurrence that = (StepDraughtingAnnotationOccurrence) o;
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, styles, item);
+    }
+
+    @Override
+    public String toString() {
+        return "StepDraughtingAnnotationOccurrence{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "}";
     }
 }

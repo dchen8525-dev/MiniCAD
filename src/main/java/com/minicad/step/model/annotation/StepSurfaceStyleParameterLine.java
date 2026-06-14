@@ -1,16 +1,51 @@
 package com.minicad.step.model.annotation;
 
 import com.minicad.step.model.base.StepEntity;
+import java.util.Objects;
 /**
  * Minimal SURFACE_STYLE_PARAMETER_LINE.
  *
  * @param id STEP instance id
  * @param style referenced curve style
  */
-public record StepSurfaceStyleParameterLine(int id, StepCurveStyle style) implements StepEntity {
+/**
+ * Minimal SURFACE_STYLE_PARAMETER_LINE.
+ *
+ * @param id STEP instance id
+ * @param style referenced curve style
+ */
+public final class StepSurfaceStyleParameterLine implements StepEntity {
+    private final int id;
+    private final StepCurveStyle style;
+
+    public StepSurfaceStyleParameterLine(int id, StepCurveStyle style) {
+        this.id = id;
+        this.style = style;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public StepCurveStyle getStyle() {
+        return style;
+    }
 
     @Override
-    public String name() {
-        return "";
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepSurfaceStyleParameterLine that = (StepSurfaceStyleParameterLine) o;
+        return id == that.id && Objects.equals(style, that.style);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, style);
+    }
+
+    @Override
+    public String toString() {
+        return "StepSurfaceStyleParameterLine{" + "id=" + id + "style=" + style + "}";
     }
 }

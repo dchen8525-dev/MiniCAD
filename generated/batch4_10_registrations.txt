@@ -1,0 +1,729 @@
+// Phase 2 Batch 4-10: Alias family entities (auto-generated)
+      registry.put(
+          "ACTION_ACTUAL",
+          (resolver, instance) ->
+              resolver.resolveGenericActual(instance, "ACTION_ACTUAL"));
+      registry.put(
+          "ACTION_DIRECTIVE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ACTION_DIRECTIVE_RELATIONSHIP"));
+      registry.put(
+          "ACTION_HAPPENING",
+          (resolver, instance) ->
+              resolver.resolveGenericActual(instance, "ACTION_HAPPENING"));
+      registry.put(
+          "ACTION_METHOD_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ACTION_METHOD_ASSIGNMENT"));
+      registry.put(
+          "ACTION_REQUEST_STATUS",
+          (resolver, instance) ->
+              resolver.resolveGenericStatus(instance, "ACTION_REQUEST_STATUS"));
+      registry.put(
+          "ACTION_RESOURCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ACTION_RESOURCE_RELATIONSHIP"));
+      registry.put(
+          "ACTION_RESOURCE_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "ACTION_RESOURCE_REQUIREMENT"));
+      registry.put(
+          "ACTION_RESOURCE_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "ACTION_RESOURCE_TYPE"));
+      registry.put(
+          "ADDITIVE_MANUFACTURING_BUILD_PLATE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ADDITIVE_MANUFACTURING_BUILD_PLATE_RELATIONSHIP"));
+      registry.put(
+          "ADDITIVE_MANUFACTURING_SETUP",
+          (resolver, instance) ->
+              resolver.resolveGenericSetup(instance, "ADDITIVE_MANUFACTURING_SETUP"));
+      registry.put(
+          "ADDITIVE_MANUFACTURING_SETUP_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ADDITIVE_MANUFACTURING_SETUP_RELATIONSHIP"));
+      registry.put(
+          "ADDITIVE_MANUFACTURING_SETUP_WORKPIECE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ADDITIVE_MANUFACTURING_SETUP_WORKPIECE_RELATIONSHIP"));
+      registry.put(
+          "ADDITIVE_MANUFACTURING_SUPPORT_STRUCTURE_GEOMETRY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ADDITIVE_MANUFACTURING_SUPPORT_STRUCTURE_GEOMETRY_RELATIONSHIP"));
+      registry.put(
+          "ALTERNATIVE_SOLUTION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ALTERNATIVE_SOLUTION_RELATIONSHIP"));
+      registry.put(
+          "ANALYSIS_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ANALYSIS_ASSIGNMENT"));
+      registry.put(
+          "ANALYSIS_REPRESENTATION_CONTEXT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "ANALYSIS_REPRESENTATION_CONTEXT"));
+      registry.put(
+          "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "APPLIED_ACTION_METHOD_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_ACTION_METHOD_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_ATTRIBUTE_CLASSIFICATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_ATTRIBUTE_CLASSIFICATION_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_CLASSIFICATION_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_CLASSIFICATION_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "APPLIED_DESCRIPTION_TEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_DESCRIPTION_TEXT_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_DESCRIPTION_TEXT_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_DESCRIPTION_TEXT_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "APPLIED_DIRECTED_ACTION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_DIRECTED_ACTION_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_EFFECTIVITY_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_EFFECTIVITY_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_EVENT_OCCURRENCE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_EVENT_OCCURRENCE_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "APPLIED_INEFFECTIVITY_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_INEFFECTIVITY_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_LOCATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_LOCATION_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_LOCATION_REPRESENTATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_LOCATION_REPRESENTATION_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_ORGANIZATIONAL_PROJECT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_ORGANIZATIONAL_PROJECT_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_ORGANIZATION_TYPE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_ORGANIZATION_TYPE_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_STATE_OBSERVED_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_STATE_OBSERVED_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_STATE_TYPE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_STATE_TYPE_ASSIGNMENT"));
+      registry.put(
+          "APPLIED_TIME_INTERVAL_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "APPLIED_TIME_INTERVAL_ASSIGNMENT"));
+      registry.put(
+          "APPROVAL_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "APPROVAL_RELATIONSHIP"));
+      registry.put(
+          "ASCRIBABLE_STATE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ASCRIBABLE_STATE_RELATIONSHIP"));
+      registry.put(
+          "ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP"));
+      registry.put(
+          "ASSEMBLY_SHAPE_JOINT_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ASSEMBLY_SHAPE_JOINT_ITEM_RELATIONSHIP"));
+      registry.put(
+          "ASSIGNED_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "ASSIGNED_REQUIREMENT"));
+      registry.put(
+          "ASSIGNMENT_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ASSIGNMENT_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "ATTRIBUTE_CLASSIFICATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTRIBUTE_CLASSIFICATION_ASSIGNMENT"));
+      registry.put(
+          "ATTRIBUTE_LANGUAGE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTRIBUTE_LANGUAGE_ASSIGNMENT"));
+      registry.put(
+          "ATTRIBUTE_VALUE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ATTRIBUTE_VALUE_ASSIGNMENT"));
+      registry.put(
+          "ATTRIBUTE_VALUE_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "ATTRIBUTE_VALUE_ROLE"));
+      registry.put(
+          "BREAKDOWN_ELEMENT_GROUP_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BREAKDOWN_ELEMENT_GROUP_ASSIGNMENT"));
+      registry.put(
+          "CHANGE_COMPOSITION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CHANGE_COMPOSITION_RELATIONSHIP"));
+      registry.put(
+          "CHANGE_GROUP_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CHANGE_GROUP_ASSIGNMENT"));
+      registry.put(
+          "CHARACTERISTIC_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "CHARACTERISTIC_TYPE"));
+      registry.put(
+          "CHARACTERIZED_OBJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CHARACTERIZED_OBJECT_RELATIONSHIP"));
+      registry.put(
+          "CLASSIFICATION_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CLASSIFICATION_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "CLASS_USAGE_EFFECTIVITY_CONTEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CLASS_USAGE_EFFECTIVITY_CONTEXT_ASSIGNMENT"));
+      registry.put(
+          "COLLECTION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "COLLECTION_ASSIGNMENT"));
+      registry.put(
+          "COLLECTION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "COLLECTION_RELATIONSHIP"));
+      registry.put(
+          "COLLECTION_VERSION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "COLLECTION_VERSION_RELATIONSHIP"));
+      registry.put(
+          "COLLECTION_VERSION_SEQUENCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "COLLECTION_VERSION_SEQUENCE_RELATIONSHIP"));
+      registry.put(
+          "COMPONENT_FEATURE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "COMPONENT_FEATURE_RELATIONSHIP"));
+      registry.put(
+          "CONCEPT_FEATURE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONCEPT_FEATURE_RELATIONSHIP"));
+      registry.put(
+          "CONCEPT_FEATURE_RELATIONSHIP_WITH_CONDITION",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONCEPT_FEATURE_RELATIONSHIP_WITH_CONDITION"));
+      registry.put(
+          "CONFIGURATION_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONFIGURATION_ITEM_RELATIONSHIP"));
+      registry.put(
+          "CONFIGURED_EFFECTIVITY_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONFIGURED_EFFECTIVITY_ASSIGNMENT"));
+      registry.put(
+          "CONFIGURED_EFFECTIVITY_CONTEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CONFIGURED_EFFECTIVITY_CONTEXT_ASSIGNMENT"));
+      registry.put(
+          "CONNECTION_ZONE_INTERFACE_PLANE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONNECTION_ZONE_INTERFACE_PLANE_RELATIONSHIP"));
+      registry.put(
+          "CONNECTIVITY_DEFINITION_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONNECTIVITY_DEFINITION_ITEM_RELATIONSHIP"));
+      registry.put(
+          "CONTACT_FEATURE_DEFINITION_FIT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONTACT_FEATURE_DEFINITION_FIT_RELATIONSHIP"));
+      registry.put(
+          "CONTACT_FEATURE_FIT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONTACT_FEATURE_FIT_RELATIONSHIP"));
+      registry.put(
+          "CONTRACT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "CONTRACT_RELATIONSHIP"));
+      registry.put(
+          "CURRENT_CHANGE_ELEMENT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "CURRENT_CHANGE_ELEMENT_ASSIGNMENT"));
+      registry.put(
+          "DATA_EQUIVALENCE_DEFINITION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DATA_EQUIVALENCE_DEFINITION_RELATIONSHIP"));
+      registry.put(
+          "DATA_EQUIVALENCE_INSPECTION_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_EQUIVALENCE_INSPECTION_REQUIREMENT"));
+      registry.put(
+          "DATA_QUALITY_DEFINITION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DATA_QUALITY_DEFINITION_RELATIONSHIP"));
+      registry.put(
+          "DATA_QUALITY_MEASUREMENT_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "DATA_QUALITY_MEASUREMENT_REQUIREMENT"));
+      registry.put(
+          "DATE_AND_TIME_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DATE_AND_TIME_ASSIGNMENT"));
+      registry.put(
+          "DESCRIPTION_TEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DESCRIPTION_TEXT_ASSIGNMENT"));
+      registry.put(
+          "DESCRIPTION_TEXT_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DESCRIPTION_TEXT_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "DESIGN_MAKE_FROM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DESIGN_MAKE_FROM_RELATIONSHIP"));
+      registry.put(
+          "DIFFERENT_ASSEMBLY_CONSTRAINT_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "DIFFERENT_ASSEMBLY_CONSTRAINT_TYPE"));
+      registry.put(
+          "DIFFERENT_COMPONENT_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "DIFFERENT_COMPONENT_TYPE"));
+      registry.put(
+          "DIMENSION_CALLOUT_COMPONENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DIMENSION_CALLOUT_COMPONENT_RELATIONSHIP"));
+      registry.put(
+          "DIMENSION_CALLOUT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DIMENSION_CALLOUT_RELATIONSHIP"));
+      registry.put(
+          "DIRECTED_ACTION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DIRECTED_ACTION_ASSIGNMENT"));
+      registry.put(
+          "DISALLOWED_ASSEMBLY_RELATIONSHIP_USAGE",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "DISALLOWED_ASSEMBLY_RELATIONSHIP_USAGE"));
+      registry.put(
+          "DOCUMENT_IDENTIFIER",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DOCUMENT_IDENTIFIER"));
+      registry.put(
+          "DOCUMENT_IDENTIFIER_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DOCUMENT_IDENTIFIER_ASSIGNMENT"));
+      registry.put(
+          "DOCUMENT_REPRESENTATION_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "DOCUMENT_REPRESENTATION_TYPE"));
+      registry.put(
+          "DOCUMENT_USAGE_CONSTRAINT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "DOCUMENT_USAGE_CONSTRAINT_ASSIGNMENT"));
+      registry.put(
+          "DOCUMENT_USAGE_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "DOCUMENT_USAGE_ROLE"));
+      registry.put(
+          "EFFECTIVITY_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "EFFECTIVITY_ASSIGNMENT"));
+      registry.put(
+          "EFFECTIVITY_CONTEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "EFFECTIVITY_CONTEXT_ASSIGNMENT"));
+      registry.put(
+          "EFFECTIVITY_CONTEXT_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "EFFECTIVITY_CONTEXT_ROLE"));
+      registry.put(
+          "ENVELOPE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ENVELOPE_RELATIONSHIP"));
+      registry.put(
+          "ERRONEOUS_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ERRONEOUS_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP"));
+      registry.put(
+          "EVENT_OCCURRENCE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "EVENT_OCCURRENCE_ASSIGNMENT"));
+      registry.put(
+          "EVENT_OCCURRENCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "EVENT_OCCURRENCE_RELATIONSHIP"));
+      registry.put(
+          "EVENT_OCCURRENCE_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "EVENT_OCCURRENCE_ROLE"));
+      registry.put(
+          "EXPLICIT_PROCEDURAL_GEOMETRIC_REPRESENTATION_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "EXPLICIT_PROCEDURAL_GEOMETRIC_REPRESENTATION_ITEM_RELATIONSHIP"));
+      registry.put(
+          "EXPLICIT_PROCEDURAL_REPRESENTATION_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "EXPLICIT_PROCEDURAL_REPRESENTATION_ITEM_RELATIONSHIP"));
+      registry.put(
+          "EXTERNALLY_DEFINED_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "EXTERNALLY_DEFINED_ITEM_RELATIONSHIP"));
+      registry.put(
+          "EXTERNAL_IDENTIFICATION_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "EXTERNAL_IDENTIFICATION_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "FACT_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "FACT_TYPE"));
+      registry.put(
+          "FINAL_SOLUTION",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "FINAL_SOLUTION"));
+      registry.put(
+          "FREE_FORM_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "FREE_FORM_ASSIGNMENT"));
+      registry.put(
+          "FROZEN_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "FROZEN_ASSIGNMENT"));
+      registry.put(
+          "GENERAL_MATERIAL_PROPERTY",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "GENERAL_MATERIAL_PROPERTY"));
+      registry.put(
+          "GENERAL_PROPERTY_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "GENERAL_PROPERTY_ASSOCIATION"));
+      registry.put(
+          "GENERIC_PROPERTY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "GENERIC_PROPERTY_RELATIONSHIP"));
+      registry.put(
+          "GEOMETRIC_MODEL_ELEMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "GEOMETRIC_MODEL_ELEMENT_RELATIONSHIP"));
+      registry.put(
+          "GEOMETRIC_REPRESENTATION_CONTEXT_WITH_PARAMETER",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "GEOMETRIC_REPRESENTATION_CONTEXT_WITH_PARAMETER"));
+      registry.put(
+          "GEOMETRIC_TOLERANCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "GEOMETRIC_TOLERANCE_RELATIONSHIP"));
+      registry.put(
+          "GLOBAL_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "GLOBAL_ASSIGNMENT"));
+      registry.put(
+          "IDENTIFICATION_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "IDENTIFICATION_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "IDRM_CLASSIFICATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "IDRM_CLASSIFICATION_ASSIGNMENT"));
+      registry.put(
+          "IMPLICIT_EXPLICIT_POSITIONED_SKETCH_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "IMPLICIT_EXPLICIT_POSITIONED_SKETCH_RELATIONSHIP"));
+      registry.put(
+          "INAPT_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "INAPT_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP"));
+      registry.put(
+          "INSTANCE_USAGE_CONTEXT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "INSTANCE_USAGE_CONTEXT_ASSIGNMENT"));
+      registry.put(
+          "ITEM_LINK_MOTION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ITEM_LINK_MOTION_RELATIONSHIP"));
+      registry.put(
+          "LINK_MOTION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "LINK_MOTION_RELATIONSHIP"));
+      registry.put(
+          "LOCATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "LOCATION_ASSIGNMENT"));
+      registry.put(
+          "LOCATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "LOCATION_RELATIONSHIP"));
+      registry.put(
+          "LOCATION_REPRESENTATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "LOCATION_REPRESENTATION_ASSIGNMENT"));
+      registry.put(
+          "LOCATION_REPRESENTATION_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "LOCATION_REPRESENTATION_ROLE"));
+      registry.put(
+          "LOCATION_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "LOCATION_ROLE"));
+      registry.put(
+          "MATED_PART_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "MATED_PART_RELATIONSHIP"));
+      registry.put(
+          "MESSAGE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "MESSAGE_RELATIONSHIP"));
+      registry.put(
+          "MULTI_LANGUAGE_ATTRIBUTE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "MULTI_LANGUAGE_ATTRIBUTE_ASSIGNMENT"));
+      registry.put(
+          "NEAR_POINT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "NEAR_POINT_RELATIONSHIP"));
+      registry.put(
+          "OBJECT_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "OBJECT_ROLE"));
+      registry.put(
+          "ORGANIZATIONAL_PROJECT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ORGANIZATIONAL_PROJECT_ASSIGNMENT"));
+      registry.put(
+          "ORGANIZATIONAL_PROJECT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "ORGANIZATIONAL_PROJECT_RELATIONSHIP"));
+      registry.put(
+          "ORGANIZATIONAL_PROJECT_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "ORGANIZATIONAL_PROJECT_ROLE"));
+      registry.put(
+          "ORGANIZATION_TYPE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "ORGANIZATION_TYPE_ASSIGNMENT"));
+      registry.put(
+          "ORGANIZATION_TYPE_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "ORGANIZATION_TYPE_ROLE"));
+      registry.put(
+          "OVERCOMPLEX_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "OVERCOMPLEX_TOPOLOGY_AND_GEOMETRY_RELATIONSHIP"));
+      registry.put(
+          "PARAMETRIC_REPRESENTATION_CONTEXT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "PARAMETRIC_REPRESENTATION_CONTEXT"));
+      registry.put(
+          "PARTIAL_DOCUMENT_WITH_STRUCTURED_TEXT_REPRESENTATION_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PARTIAL_DOCUMENT_WITH_STRUCTURED_TEXT_REPRESENTATION_ASSIGNMENT"));
+      registry.put(
+          "PATH_PARAMETER_REPRESENTATION_CONTEXT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "PATH_PARAMETER_REPRESENTATION_CONTEXT"));
+      registry.put(
+          "PREVIOUS_CHANGE_ELEMENT_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PREVIOUS_CHANGE_ELEMENT_ASSIGNMENT"));
+      registry.put(
+          "PROCESS_PROPERTY_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "PROCESS_PROPERTY_ASSOCIATION"));
+      registry.put(
+          "PRODUCT_DATA_AND_DATA_EQUIVALENCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_DATA_AND_DATA_EQUIVALENCE_RELATIONSHIP"));
+      registry.put(
+          "PRODUCT_DATA_AND_DATA_QUALITY_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_DATA_AND_DATA_QUALITY_RELATIONSHIP"));
+      registry.put(
+          "PRODUCT_DEFINITION_CONTEXT_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "PRODUCT_DEFINITION_CONTEXT_ROLE"));
+      registry.put(
+          "PRODUCT_DEFINITION_ELEMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_DEFINITION_ELEMENT_RELATIONSHIP"));
+      registry.put(
+          "PRODUCT_DEFINITION_GROUP_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_DEFINITION_GROUP_ASSIGNMENT"));
+      registry.put(
+          "PRODUCT_DEFINITION_OCCURRENCE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_DEFINITION_OCCURRENCE_RELATIONSHIP"));
+      registry.put(
+          "PRODUCT_DEFINITION_RELATIONSHIP_KINEMATICS",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_DEFINITION_RELATIONSHIP_KINEMATICS"));
+      registry.put(
+          "PRODUCT_GROUP_ATTRIBUTE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_GROUP_ATTRIBUTE_ASSIGNMENT"));
+      registry.put(
+          "PRODUCT_GROUP_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_GROUP_RELATIONSHIP"));
+      registry.put(
+          "PRODUCT_GROUP_RULE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "PRODUCT_GROUP_RULE_ASSIGNMENT"));
+      registry.put(
+          "PRODUCT_MATERIAL_COMPOSITION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "PRODUCT_MATERIAL_COMPOSITION_RELATIONSHIP"));
+      registry.put(
+          "REPRESENTATION_ITEM_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "REPRESENTATION_ITEM_RELATIONSHIP"));
+      registry.put(
+          "RESOURCE_PROPERTY",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "RESOURCE_PROPERTY"));
+      registry.put(
+          "RESOURCE_REQUIREMENT_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "RESOURCE_REQUIREMENT_TYPE"));
+      registry.put(
+          "RULE_SUPERSEDED_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "RULE_SUPERSEDED_ASSIGNMENT"));
+      registry.put(
+          "SAME_AS_EXTERNAL_ITEM_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "SAME_AS_EXTERNAL_ITEM_ASSIGNMENT"));
+      registry.put(
+          "SATISFIED_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SATISFIED_REQUIREMENT"));
+      registry.put(
+          "SATISFIES_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SATISFIES_REQUIREMENT"));
+      registry.put(
+          "SCANNER_PROPERTY",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SCANNER_PROPERTY"));
+      registry.put(
+          "SHAPE_ASPECT_RELATIONSHIP_REPRESENTATION_ASSOCIATION",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "SHAPE_ASPECT_RELATIONSHIP_REPRESENTATION_ASSOCIATION"));
+      registry.put(
+          "SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP"));
+      registry.put(
+          "SHAPE_FEATURE_DEFINITION_FIT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "SHAPE_FEATURE_DEFINITION_FIT_RELATIONSHIP"));
+      registry.put(
+          "SHAPE_FEATURE_DEFINITION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "SHAPE_FEATURE_DEFINITION_RELATIONSHIP"));
+      registry.put(
+          "SINGLE_PROPERTY_IS_DEFINITION",
+          (resolver, instance) ->
+              resolver.resolveGenericProperty(instance, "SINGLE_PROPERTY_IS_DEFINITION"));
+      registry.put(
+          "SOURCED_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SOURCED_REQUIREMENT"));
+      registry.put(
+          "SOURCE_FOR_REQUIREMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericRequirement(instance, "SOURCE_FOR_REQUIREMENT"));
+      registry.put(
+          "STATECHAR_RELATIONSHIP_OBJECT",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "STATECHAR_RELATIONSHIP_OBJECT"));
+      registry.put(
+          "STATECHAR_TYPE_APPLIED_OBJECT",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "STATECHAR_TYPE_APPLIED_OBJECT"));
+      registry.put(
+          "STATECHAR_TYPE_OBJECT",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "STATECHAR_TYPE_OBJECT"));
+      registry.put(
+          "STATECHAR_TYPE_RELATIONSHIP_OBJECT",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "STATECHAR_TYPE_RELATIONSHIP_OBJECT"));
+      registry.put(
+          "STATE_DEFINITION_TO_STATE_ASSIGNMENT_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "STATE_DEFINITION_TO_STATE_ASSIGNMENT_RELATIONSHIP"));
+      registry.put(
+          "STATE_OBSERVED_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "STATE_OBSERVED_ASSIGNMENT"));
+      registry.put(
+          "STATE_OBSERVED_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "STATE_OBSERVED_RELATIONSHIP"));
+      registry.put(
+          "STATE_OBSERVED_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "STATE_OBSERVED_ROLE"));
+      registry.put(
+          "STATE_TYPE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "STATE_TYPE"));
+      registry.put(
+          "STATE_TYPE_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "STATE_TYPE_ASSIGNMENT"));
+      registry.put(
+          "STATE_TYPE_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "STATE_TYPE_RELATIONSHIP"));
+      registry.put(
+          "STATE_TYPE_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "STATE_TYPE_ROLE"));
+      registry.put(
+          "SUPPLIED_PART_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "SUPPLIED_PART_RELATIONSHIP"));
+      registry.put(
+          "TIME_INTERVAL_ASSIGNMENT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "TIME_INTERVAL_ASSIGNMENT"));
+      registry.put(
+          "TIME_INTERVAL_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "TIME_INTERVAL_RELATIONSHIP"));
+      registry.put(
+          "TIME_INTERVAL_ROLE",
+          (resolver, instance) ->
+              resolver.resolveGenericRole(instance, "TIME_INTERVAL_ROLE"));
+      registry.put(
+          "UNIFORM_RESOURCE_IDENTIFIER",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "UNIFORM_RESOURCE_IDENTIFIER"));
+      registry.put(
+          "VALUE_FORMAT_TYPE_QUALIFIER",
+          (resolver, instance) ->
+              resolver.resolveGenericType(instance, "VALUE_FORMAT_TYPE_QUALIFIER"));
+      registry.put(
+          "VERSIONED_ACTION_REQUEST_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveGenericRelationship(instance, "VERSIONED_ACTION_REQUEST_RELATIONSHIP"));

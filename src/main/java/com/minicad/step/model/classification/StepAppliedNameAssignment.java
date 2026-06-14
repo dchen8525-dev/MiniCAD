@@ -2,6 +2,7 @@ package com.minicad.step.model.classification;
 
 import com.minicad.step.model.base.StepEntity;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Minimal APPLIED_NAME_ASSIGNMENT metadata.
@@ -10,18 +11,51 @@ import java.util.List;
  * @param assignedName assigned name
  * @param items assigned target items
  */
-public record StepAppliedNameAssignment(
-        int id,
-        String assignedName,
-        List<StepEntity> items
-) implements StepEntity {
+/**
+ * Minimal APPLIED_NAME_ASSIGNMENT metadata.
+ *
+ * @param id STEP instance id
+ * @param assignedName assigned name
+ * @param items assigned target items
+ */
+public final class StepAppliedNameAssignment implements StepEntity {
+    private final int id;
+    private final String assignedName;
+    private final List<StepEntity> items;
 
-    public StepAppliedNameAssignment {
-        items = List.copyOf(items);
+    public StepAppliedNameAssignment(int id, String assignedName, List<StepEntity> items) {
+        this.id = id;
+        this.assignedName = assignedName;
+        this.items = items == null ? null : java.util.List.copyOf(items);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getAssignedName() {
+        return assignedName;
+    }
+
+    public List<StepEntity> getItems() {
+        return items;
     }
 
     @Override
-    public String name() {
-        return assignedName;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepAppliedNameAssignment that = (StepAppliedNameAssignment) o;
+        return id == that.id && Objects.equals(assignedName, that.assignedName) && Objects.equals(items, that.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, assignedName, items);
+    }
+
+    @Override
+    public String toString() {
+        return "StepAppliedNameAssignment{" + "id=" + id + "assignedName=" + assignedName + "items=" + items + "}";
     }
 }

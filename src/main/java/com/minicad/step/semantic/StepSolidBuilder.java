@@ -48,6 +48,7 @@ import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 final class StepSolidBuilder {
 
@@ -59,141 +60,179 @@ final class StepSolidBuilder {
 
     Solid buildSolid(int id) {
         StepEntity entity = builder.requireExistingEntity(id);
-        if (entity instanceof StepManifoldSolidBrep solidBrep) {
+        if (entity instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) entity;
             return new Solid(builder.buildShell(solidBrep.outer().id()));
         }
-        if (entity instanceof StepFacettedBrep facettedBrep) {
+        if (entity instanceof StepFacettedBrep) {
+            StepFacettedBrep facettedBrep = (StepFacettedBrep) entity;
             return new Solid(builder.buildShell(facettedBrep.outer().id()));
         }
-        if (entity instanceof StepBrepWithVoids brepWithVoids) {
+        if (entity instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) entity;
             Shell outerShell = builder.buildShell(brepWithVoids.outer().id());
             List<Shell> voidShells = brepWithVoids.voids().stream()
                     .map(voidShell -> builder.buildShell(voidShell.id()))
-                    .toList();
+                    .collect(Collectors.toList());
             return new Solid(outerShell, voidShells);
         }
-        if (entity instanceof StepCsgPrimitive csgPrimitive) {
+        if (entity instanceof StepCsgPrimitive) {
+            StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) entity;
             return builder.buildCsgPrimitive(csgPrimitive);
         }
-        if (entity instanceof StepCsgSolid csgSolid) {
+        if (entity instanceof StepCsgSolid) {
+            StepCsgSolid csgSolid = (StepCsgSolid) entity;
             return builder.buildBooleanOperandSolid(csgSolid.treeRootExpression());
         }
-        if (entity instanceof StepSolidReplica solidReplica) {
+        if (entity instanceof StepSolidReplica) {
+            StepSolidReplica solidReplica = (StepSolidReplica) entity;
             return builder.transformSolid(
                     builder.buildSolid(solidReplica.parentSolid().id()),
                     solidReplica.transformation()
             );
         }
-        if (entity instanceof StepSweptAreaSolid sweptAreaSolid) {
+        if (entity instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
             return builder.buildSweptAreaSolid(sweptAreaSolid);
         }
-        if (entity instanceof StepSweptDiskSolid sweptDiskSolid) {
+        if (entity instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid sweptDiskSolid = (StepSweptDiskSolid) entity;
             return builder.buildSweptDiskSolid(sweptDiskSolid);
         }
-        if (entity instanceof StepExtrudedAreaSolidTapered taperedExtrusion) {
+        if (entity instanceof StepExtrudedAreaSolidTapered) {
+            StepExtrudedAreaSolidTapered taperedExtrusion = (StepExtrudedAreaSolidTapered) entity;
             return builder.buildExtrudedAreaSolidTapered(taperedExtrusion);
         }
-        if (entity instanceof StepRevolvedAreaSolidTapered taperedRevolution) {
+        if (entity instanceof StepRevolvedAreaSolidTapered) {
+            StepRevolvedAreaSolidTapered taperedRevolution = (StepRevolvedAreaSolidTapered) entity;
             return builder.buildRevolvedAreaSolidTapered(taperedRevolution);
         }
-        if (entity instanceof StepSurfaceCurveSweptAreaSolid surfaceCurveSweep) {
+        if (entity instanceof StepSurfaceCurveSweptAreaSolid) {
+            StepSurfaceCurveSweptAreaSolid surfaceCurveSweep = (StepSurfaceCurveSweptAreaSolid) entity;
             return builder.buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
         }
-        if (entity instanceof StepBooleanClippingResult clippingResult) {
+        if (entity instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) entity;
             return builder.buildBooleanResult(
                     clippingResult.operator(),
                     clippingResult.firstOperand(),
                     clippingResult.secondOperand()
             );
         }
-        if (entity instanceof StepBooleanResult booleanResult) {
+        if (entity instanceof StepBooleanResult) {
+            StepBooleanResult booleanResult = (StepBooleanResult) entity;
             return builder.buildBooleanResult(
                     booleanResult.operator(),
                     booleanResult.firstOperand(),
                     booleanResult.secondOperand()
             );
         }
-        if (entity instanceof StepNonManifoldSolidBrep nonManifoldBrep) {
+        if (entity instanceof StepNonManifoldSolidBrep) {
+            StepNonManifoldSolidBrep nonManifoldBrep = (StepNonManifoldSolidBrep) entity;
             return new Solid(builder.buildShell(nonManifoldBrep.outer().id()));
         }
-        if (entity instanceof StepAdvancedBrep advancedBrep) {
+        if (entity instanceof StepAdvancedBrep) {
+            StepAdvancedBrep advancedBrep = (StepAdvancedBrep) entity;
             Shell outerShell = builder.buildShell(advancedBrep.outer().id());
             List<Shell> voidShells = advancedBrep.voids().stream()
                     .map(v -> builder.buildShell(v.id()))
-                    .toList();
+                    .collect(Collectors.toList());
             return new Solid(outerShell, voidShells);
         }
-        if (entity instanceof StepComplexClippingResult clippingResult) {
+        if (entity instanceof StepComplexClippingResult) {
+            StepComplexClippingResult clippingResult = (StepComplexClippingResult) entity;
             return builder.buildBooleanResult(
                     clippingResult.operator(),
                     clippingResult.firstOperand(),
                     clippingResult.secondOperand()
             );
         }
-        if (entity instanceof StepCsgVolume csgVolume) {
+        if (entity instanceof StepCsgVolume) {
+            StepCsgVolume csgVolume = (StepCsgVolume) entity;
             return builder.buildCsgVolumeSolid(csgVolume);
         }
-        if (entity instanceof StepBlockVolume blockVolume) {
+        if (entity instanceof StepBlockVolume) {
+            StepBlockVolume blockVolume = (StepBlockVolume) entity;
             return builder.buildBlockVolume(blockVolume);
         }
-        if (entity instanceof StepHalfSpaceSolid halfSpace) {
+        if (entity instanceof StepHalfSpaceSolid) {
+            StepHalfSpaceSolid halfSpace = (StepHalfSpaceSolid) entity;
             return builder.buildHalfSpaceSolid(halfSpace);
         }
-        if (entity instanceof StepPolygonalBoundedHalfSpace polyHalfSpace) {
+        if (entity instanceof StepPolygonalBoundedHalfSpace) {
+            StepPolygonalBoundedHalfSpace polyHalfSpace = (StepPolygonalBoundedHalfSpace) entity;
             return builder.buildPolygonalBoundedHalfSpace(polyHalfSpace);
         }
-        if (entity instanceof StepTessellatedFaceSet tessellatedFaceSet) {
+        if (entity instanceof StepTessellatedFaceSet) {
+            StepTessellatedFaceSet tessellatedFaceSet = (StepTessellatedFaceSet) entity;
             return new Solid(builder.buildTessellatedShell(tessellatedFaceSet));
         }
-        if (entity instanceof StepTessellatedFace tessellatedFace) {
+        if (entity instanceof StepTessellatedFace) {
+            StepTessellatedFace tessellatedFace = (StepTessellatedFace) entity;
             return new Solid(builder.buildTessellatedFaceShell(tessellatedFace));
         }
-        if (entity instanceof StepTriangulatedFace triangulatedFace) {
+        if (entity instanceof StepTriangulatedFace) {
+            StepTriangulatedFace triangulatedFace = (StepTriangulatedFace) entity;
             return new Solid(builder.buildTriangulatedFaceShell(triangulatedFace));
         }
-        if (entity instanceof StepComplexTriangulatedFace complexFace) {
+        if (entity instanceof StepComplexTriangulatedFace) {
+            StepComplexTriangulatedFace complexFace = (StepComplexTriangulatedFace) entity;
             return new Solid(builder.buildComplexTriangulatedFaceShell(complexFace));
         }
-        if (entity instanceof StepCubicBezierTriangulatedFace bezierFace) {
+        if (entity instanceof StepCubicBezierTriangulatedFace) {
+            StepCubicBezierTriangulatedFace bezierFace = (StepCubicBezierTriangulatedFace) entity;
             return new Solid(builder.buildCubicBezierTriangulatedFaceShell(bezierFace));
         }
-        if (entity instanceof StepExtrudedFaceSolid extrudedFace) {
+        if (entity instanceof StepExtrudedFaceSolid) {
+            StepExtrudedFaceSolid extrudedFace = (StepExtrudedFaceSolid) entity;
             return builder.buildExtrudedFaceSolid(extrudedFace);
         }
-        if (entity instanceof StepRevolvedFaceSolid revolvedFace) {
+        if (entity instanceof StepRevolvedFaceSolid) {
+            StepRevolvedFaceSolid revolvedFace = (StepRevolvedFaceSolid) entity;
             return builder.buildRevolvedFaceSolid(revolvedFace);
         }
-        if (entity instanceof StepSweptFaceSolid sweptFace) {
+        if (entity instanceof StepSweptFaceSolid) {
+            StepSweptFaceSolid sweptFace = (StepSweptFaceSolid) entity;
             return builder.buildSweptFaceSolid(sweptFace);
         }
-        if (entity instanceof StepCylinderVolume cylVolume) {
+        if (entity instanceof StepCylinderVolume) {
+            StepCylinderVolume cylVolume = (StepCylinderVolume) entity;
             return builder.buildCylinderVolume(cylVolume);
         }
-        if (entity instanceof StepSphereVolume sphereVolume) {
+        if (entity instanceof StepSphereVolume) {
+            StepSphereVolume sphereVolume = (StepSphereVolume) entity;
             return builder.buildSphereVolume(sphereVolume);
         }
-        if (entity instanceof StepTorusVolume torusVolume) {
+        if (entity instanceof StepTorusVolume) {
+            StepTorusVolume torusVolume = (StepTorusVolume) entity;
             return builder.buildTorusVolume(torusVolume);
         }
-        if (entity instanceof StepPrismVolume prismVolume) {
+        if (entity instanceof StepPrismVolume) {
+            StepPrismVolume prismVolume = (StepPrismVolume) entity;
             return builder.buildPrismVolume(prismVolume);
         }
-        if (entity instanceof StepRightCircularConeVolume coneVolume) {
+        if (entity instanceof StepRightCircularConeVolume) {
+            StepRightCircularConeVolume coneVolume = (StepRightCircularConeVolume) entity;
             return builder.buildRightCircularConeVolume(coneVolume);
         }
-        if (entity instanceof StepFiniteElementMesh femMesh) {
+        if (entity instanceof StepFiniteElementMesh) {
+            StepFiniteElementMesh femMesh = (StepFiniteElementMesh) entity;
             return new Solid(builder.buildFiniteElementMeshShell(femMesh));
         }
-        if (entity instanceof StepFlatPattern flatPattern) {
-            if (flatPattern.flatGeometry() instanceof StepFaceEntity faceEntity) {
+        if (entity instanceof StepFlatPattern) {
+            StepFlatPattern flatPattern = (StepFlatPattern) entity;
+            if (flatPattern.flatGeometry() instanceof StepFaceEntity) {
+                StepFaceEntity faceEntity = (StepFaceEntity) flatPattern.flatGeometry();
                 return new Solid(new Shell(List.of(builder.buildFace(faceEntity.id())), false));
             }
-            if (flatPattern.flatGeometry() instanceof StepOpenShell openShell) {
+            if (flatPattern.flatGeometry() instanceof StepOpenShell) {
+                StepOpenShell openShell = (StepOpenShell) flatPattern.flatGeometry();
                 return new Solid(builder.buildShell(openShell.id()));
             }
             throw new UnsupportedGeometryException("FLAT_PATTERN flat geometry must be FACE or OPEN_SHELL");
         }
-        if (entity instanceof StepSolidModel solidModel) {
+        if (entity instanceof StepSolidModel) {
+            StepSolidModel solidModel = (StepSolidModel) entity;
             StepEntity actual = builder.resolvedEntity(solidModel.id());
             if (actual != null && actual != solidModel && canBuildAsSolid(actual)) {
                 return builder.buildSolid(solidModel.id());
@@ -202,16 +241,19 @@ final class StepSolidBuilder {
                     "entity #" + id + " is an abstract SOLID_MODEL with no concrete subtype"
             );
         }
-        if (entity instanceof StepMappedItem mappedItem) {
+        if (entity instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) entity;
             return builder.buildSolid(mappedItem.mappingTarget().id());
         }
-        if (entity instanceof StepContextDependentShapeRepresentation cdsr) {
+        if (entity instanceof StepContextDependentShapeRepresentation) {
+            StepContextDependentShapeRepresentation cdsr = (StepContextDependentShapeRepresentation) entity;
             StepEntity actual = builder.resolvedEntity(cdsr.id());
             if (actual != null && actual != cdsr && canBuildAsSolid(actual)) {
                 return builder.buildSolid(actual.id());
             }
         }
-        if (entity instanceof StepItemDefinedTransformation transformation) {
+        if (entity instanceof StepItemDefinedTransformation) {
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             StepEntity actual = builder.resolvedEntity(transformation.id());
             if (actual != null && actual != transformation && canBuildAsSolid(actual)) {
                 return builder.buildSolid(actual.id());

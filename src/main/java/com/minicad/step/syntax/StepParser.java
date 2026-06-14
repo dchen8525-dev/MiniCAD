@@ -125,28 +125,31 @@ public final class StepParser {
     }
 
     private StepValue parseValue() {
-        return switch (current.type()) {
-            case HASH -> parseReference();
-            case INTEGER, NUMBER -> parseNumber();
-            case STRING -> new StepValue.StringValue(consume().text());
-            case ENUM -> new StepValue.EnumValue(consume().text());
-            case STAR -> {
-                consume();
-                yield new StepValue.NotProvidedValue();
-            }
-            case DOLLAR -> {
-                consume();
-                yield new StepValue.OmittedValue();
-            }
-            case LPAREN -> parseList();
-            case IDENTIFIER -> {
-                rejectSpecialFloatingLiteral(current);
-                yield parseTypedValue();
-            }
-            default -> throw new StepParseException(
+        StepTokenType type = current.type();
+        if (type == StepTokenType.HASH) {
+            return parseReference();
+        } else if (type == StepTokenType.INTEGER || type == StepTokenType.NUMBER) {
+            return parseNumber();
+        } else if (type == StepTokenType.STRING) {
+            return new StepValue.StringValue(consume().text());
+        } else if (type == StepTokenType.ENUM) {
+            return new StepValue.EnumValue(consume().text());
+        } else if (type == StepTokenType.STAR) {
+            consume();
+            return new StepValue.NotProvidedValue();
+        } else if (type == StepTokenType.DOLLAR) {
+            consume();
+            return new StepValue.OmittedValue();
+        } else if (type == StepTokenType.LPAREN) {
+            return parseList();
+        } else if (type == StepTokenType.IDENTIFIER) {
+            rejectSpecialFloatingLiteral(current);
+            return parseTypedValue();
+        } else {
+            throw new StepParseException(
                     "unexpected token " + current.type() + " at position " + current.position()
             );
-        };
+        }
     }
 
     private StepValue.TypedValue parseTypedValue() {
@@ -162,7 +165,7 @@ public final class StepParser {
         }
         expect(StepTokenType.RPAREN, "expected ')' after typed value payload");
         StepValue wrapped = values.size() == 1
-                ? values.getFirst()
+                ? values.get(0)
                 : new StepValue.ListValue(values);
         return new StepValue.TypedValue(typeName, wrapped);
     }

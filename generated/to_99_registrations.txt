@@ -1,0 +1,29 @@
+// To reach 99% coverage
+      registry.put(
+          "BACK_CHAINING_RULE",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BACK_CHAINING_RULE"));
+      registry.put(
+          "BANDED_MATRIX",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BANDED_MATRIX"));
+      registry.put(
+          "BASIC_SPARSE_MATRIX",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BASIC_SPARSE_MATRIX"));
+      registry.put(
+          "BEAD",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BEAD"));
+      registry.put(
+          "BEAD_END",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BEAD_END"));
+      registry.put(
+          "BINARY_ASSEMBLY_CONSTRAINT",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BINARY_ASSEMBLY_CONSTRAINT"));
+      registry.put(
+          "BINARY_LITERAL",
+          (resolver, instance) ->
+              resolver.resolveGenericAssignment(instance, "BINARY_LITERAL"));

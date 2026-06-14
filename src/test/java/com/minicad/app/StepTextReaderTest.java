@@ -15,11 +15,10 @@ class StepTextReaderTest {
     @Test
     void shouldReadUtf8StepFiles() throws IOException {
         Path file = Files.createTempFile("minicad-utf8", ".step");
-        String expected = """
-                DATA;
-                #1=EXAMPLE('UTF-8 name');
-                ENDSEC;
-                """;
+        String expected = 
+        "DATA;\n"
+        + "#1=EXAMPLE('UTF-8 name');\n"
+        + "ENDSEC;"
         Files.writeString(file, expected, StandardCharsets.UTF_8);
 
         String text = StepTextReader.read(file);
@@ -31,11 +30,10 @@ class StepTextReaderTest {
     @Test
     void shouldFallbackToGb18030ForLocalizedCadExports() throws IOException {
         Path file = Files.createTempFile("minicad-gb18030", ".step");
-        String expected = """
-                DATA;
-                #1=EXAMPLE('齿轮');
-                ENDSEC;
-                """;
+        String expected = 
+        "DATA;\n"
+        + "#1=EXAMPLE('齿轮');\n"
+        + "ENDSEC;"
         Files.write(file, expected.getBytes(Charset.forName("GB18030")));
 
         String text = StepTextReader.read(file);
@@ -51,11 +49,10 @@ class StepTextReaderTest {
     @Test
     void shouldFallbackToLatin1WhenUtf8AndGb18030Fail() throws IOException {
         Path file = Files.createTempFile("minicad-latin1", ".step");
-        String expected = """
-                DATA;
-                #1=EXAMPLE('café');
-                ENDSEC;
-                """;
+        String expected = 
+        "DATA;\n"
+        + "#1=EXAMPLE('café');\n"
+        + "ENDSEC;"
         Files.write(file, expected.getBytes(StandardCharsets.ISO_8859_1));
 
         String text = StepTextReader.read(file);

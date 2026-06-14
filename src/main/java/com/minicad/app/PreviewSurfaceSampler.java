@@ -36,25 +36,32 @@ public final class PreviewSurfaceSampler {
     // ─── B-spline surface construction ───────────────────────────────────
 
     public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurface splineSurface) {
+        if (geometry instanceof StepBSplineSurface) {
+            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
             return builder.buildGenericBSplineSurface(splineSurface.id());
         }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface) {
+        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+            StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
             return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
         }
-        if (geometry instanceof StepBezierSurface splineSurface) {
+        if (geometry instanceof StepBezierSurface) {
+            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
             return builder.buildBezierSurface(splineSurface.id());
         }
-        if (geometry instanceof StepUniformSurface splineSurface) {
+        if (geometry instanceof StepUniformSurface) {
+            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
             return builder.buildUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepQuasiUniformSurface splineSurface) {
+        if (geometry instanceof StepQuasiUniformSurface) {
+            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
             return builder.buildQuasiUniformSurface(splineSurface.id());
         }
-        if (geometry instanceof StepPiecewiseBezierSurface splineSurface) {
+        if (geometry instanceof StepPiecewiseBezierSurface) {
+            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
         }
         throw new UnsupportedGeometryException(surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
@@ -62,7 +69,7 @@ public final class PreviewSurfaceSampler {
 
     public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
         int uCount = surface.controlPoints().size();
-        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().getFirst().size();
+        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
         if (uCount < 2 || vCount < 2) {
             throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
         }
@@ -70,7 +77,8 @@ public final class PreviewSurfaceSampler {
         for (List<StepEntity> row : surface.controlPoints()) {
             List<CartesianPoint> pointRow = new ArrayList<>(row.size());
             for (StepEntity pt : row) {
-                if (pt instanceof StepCartesianPoint cartesianPoint) {
+                if (pt instanceof StepCartesianPoint) {
+            StepCartesianPoint cartesianPoint = (StepCartesianPoint) pt;
                     pointRow.add(builder.buildPoint(cartesianPoint.id()));
                 } else {
                     throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
@@ -118,7 +126,7 @@ public final class PreviewSurfaceSampler {
 
     public static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
         List<PointPayload> triangles = new ArrayList<>();
-        if (grid.size() < 2 || grid.getFirst().size() < 2) {
+        if (grid.size() < 2 || grid.get(0).size() < 2) {
             return List.of();
         }
         for (int u = 0; u + 1 < grid.size(); u++) {
@@ -172,10 +180,10 @@ public final class PreviewSurfaceSampler {
             List<CartesianPoint> top,
             List<CartesianPoint> left
     ) {
-        return close(bottom.getFirst(), left.getFirst())
-                && close(bottom.getLast(), right.getFirst())
-                && close(top.getFirst(), left.getLast())
-                && close(top.getLast(), right.getLast());
+        return close(bottom.get(0), left.get(0))
+                && close(bottom.get(bottom.size() - 1), right.get(0))
+                && close(top.get(0), left.get(left.size() - 1))
+                && close(top.get(top.size() - 1), right.get(right.size() - 1));
     }
 
     private static boolean close(CartesianPoint left, CartesianPoint right) {
@@ -190,24 +198,24 @@ public final class PreviewSurfaceSampler {
 
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
         if (points.size() < 2) {
-            return List.of(points.getFirst());
+            return List.of(points.get(0));
         }
         List<Double> lengths = new ArrayList<>(points.size());
         lengths.add(0.0);
         for (int i = 1; i < points.size(); i++) {
             lengths.add(lengths.get(i - 1) + points.get(i - 1).distanceTo(points.get(i)));
         }
-        double total = lengths.getLast();
+        double total = lengths.get(lengths.size() - 1);
         if (total <= Epsilon.EPS) {
-            return java.util.Collections.nCopies(segments + 1, points.getFirst());
+            return java.util.Collections.nCopies(segments + 1, points.get(0));
         }
         List<CartesianPoint> result = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double target = total * i / segments;
             result.add(pointAtDistance(points, lengths, target));
         }
-        result.set(0, points.getFirst());
-        result.set(result.size() - 1, points.getLast());
+        result.set(0, points.get(0));
+        result.set(result.size() - 1, points.get(points.size() - 1));
         return List.copyOf(result);
     }
 
@@ -220,7 +228,7 @@ public final class PreviewSurfaceSampler {
                 return interpolate(points.get(i - 1), points.get(i), alpha);
             }
         }
-        return points.getLast();
+        return points.get(points.size() - 1);
     }
 
     private static CartesianPoint interpolate(CartesianPoint a, CartesianPoint b, double alpha) {
