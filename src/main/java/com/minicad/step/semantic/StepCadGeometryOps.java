@@ -362,7 +362,6 @@ final class StepCadGeometryOps {
                     transformPoint3(degenerate.point(), transformation));
         }
         throw new UnsupportedGeometryException("curve replica for " + curveTypeName(curve) + " is unsupported");
-        };
     }
 
     Curve2 transformCurve2(Curve2 curve, StepCartesianTransformationOperator transformation) {
