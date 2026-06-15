@@ -55,6 +55,15 @@ public final class Direction3 {
         return new Direction3(vector.x() / length, vector.y() / length, vector.z() / length);
     }
 
+    /**
+     * Returns this direction as a vector.
+     *
+     * @return vector representation
+     */
+    public Vector3 asVector() {
+        return new Vector3(x, y, z);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

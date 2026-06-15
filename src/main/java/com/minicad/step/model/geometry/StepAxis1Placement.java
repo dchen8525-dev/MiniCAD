@@ -47,6 +47,12 @@ public final class StepAxis1Placement implements StepEntity {
         return axis;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepCartesianPoint location() { return getLocation(); }
+    public StepDirection axis() { return getAxis(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

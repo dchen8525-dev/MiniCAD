@@ -55,6 +55,13 @@ public final class StepAxis2Placement3D implements StepEntity {
         return refDirection;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepCartesianPoint location() { return getLocation(); }
+    public StepDirection axis() { return getAxis(); }
+    public StepDirection refDirection() { return getRefDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

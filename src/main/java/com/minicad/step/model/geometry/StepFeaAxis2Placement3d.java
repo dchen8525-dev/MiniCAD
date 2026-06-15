@@ -45,6 +45,13 @@ public final class StepFeaAxis2Placement3d implements StepEntity {
         return refDirection;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity location() { return getLocation(); }
+    public StepEntity axis() { return getAxis(); }
+    public StepEntity refDirection() { return getRefDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

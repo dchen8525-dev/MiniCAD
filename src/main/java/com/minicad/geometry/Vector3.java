@@ -41,6 +41,20 @@ public final class Vector3 {
         return z;
     }
 
+    // Record-style accessors
+    public double x() { return getX(); }
+    public double y() { return getY(); }
+    public double z() { return getZ(); }
+
+    /**
+     * Returns true if this vector is approximately zero.
+     *
+     * @return true if zero
+     */
+    public boolean isZero() {
+        return Math.abs(x) < Epsilon.get() && Math.abs(y) < Epsilon.get() && Math.abs(z) < Epsilon.get();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
