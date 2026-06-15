@@ -5293,69 +5293,91 @@ public final class StepCadBuilder {
      * For unsupported types, returns the original curve (reversal not implemented).
      */
     private Curve3 reverseCurve3(Curve3 curve) {
-        return switch (curve) {
-        // TODO: JDK11 - Convert switch expression above
-            case Line3 line -> new Line3(line.origin(), line.direction().reverse(), line.parameterScale());
-            case Polyline3 polyline -> {
-                List<CartesianPoint> reversedPoints = new java.util.ArrayList<>(polyline.points().reversed());
-                yield new Polyline3(reversedPoints);
-            }
-            case CompositeCurve3 composite -> reverseCompositeCurve(composite);
-            case Circle circle -> {
-                Axis2Placement3D p = circle.position();
-                yield new Circle(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        circle.radius());
-            }
-            case Ellipse3 ellipse -> {
-                Axis2Placement3D p = ellipse.position();
-                yield new Ellipse3(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        ellipse.semiAxis1(), ellipse.semiAxis2());
-            }
-            case Parabola3 parabola -> {
-                Axis2Placement3D p = parabola.position();
-                yield new Parabola3(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        parabola.focalLength());
-            }
-            case Hyperbola3 hyperbola -> {
-                Axis2Placement3D p = hyperbola.position();
-                yield new Hyperbola3(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        hyperbola.semiAxisA(), hyperbola.semiAxisB());
-            }
-            case Clothoid3 clothoid -> {
-                Axis2Placement3D p = clothoid.position();
-                yield new Clothoid3(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        clothoid.xAxisIntercept(), clothoid.curvature());
-            }
-            case DegenerateCurve3 degenerate -> new DegenerateCurve3(degenerate.point());
-            case TrimmedCurve3 trimmed -> {
-                // Swap trim parameters and flip sense to reverse the curve
-                yield new TrimmedCurve3(
-                        reverseCurve3(trimmed.basisCurve()),
-                        trimmed.trimParamEnd(),
-                        trimmed.trimParamStart(),
-                        !trimmed.senseAgreement());
-            }
-            case SurfaceCurve3 surfaceCurve -> new SurfaceCurve3(
+        if (curve instanceof Line3) {
+            Line3 line = (Line3) curve;
+            return new Line3(line.origin(), line.direction().reverse(), line.parameterScale());
+        }
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
+            List<CartesianPoint> reversedPoints = new java.util.ArrayList<>(polyline.points().reversed());
+            return new Polyline3(reversedPoints);
+        }
+        if (curve instanceof CompositeCurve3) {
+            CompositeCurve3 composite = (CompositeCurve3) curve;
+            return reverseCompositeCurve(composite);
+        }
+        if (curve instanceof Circle) {
+            Circle circle = (Circle) curve;
+            Axis2Placement3D p = circle.position();
+            return new Circle(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    circle.radius());
+        }
+        if (curve instanceof Ellipse3) {
+            Ellipse3 ellipse = (Ellipse3) curve;
+            Axis2Placement3D p = ellipse.position();
+            return new Ellipse3(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    ellipse.semiAxis1(), ellipse.semiAxis2());
+        }
+        if (curve instanceof Parabola3) {
+            Parabola3 parabola = (Parabola3) curve;
+            Axis2Placement3D p = parabola.position();
+            return new Parabola3(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    parabola.focalLength());
+        }
+        if (curve instanceof Hyperbola3) {
+            Hyperbola3 hyperbola = (Hyperbola3) curve;
+            Axis2Placement3D p = hyperbola.position();
+            return new Hyperbola3(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    hyperbola.semiAxisA(), hyperbola.semiAxisB());
+        }
+        if (curve instanceof Clothoid3) {
+            Clothoid3 clothoid = (Clothoid3) curve;
+            Axis2Placement3D p = clothoid.position();
+            return new Clothoid3(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    clothoid.xAxisIntercept(), clothoid.curvature());
+        }
+        if (curve instanceof DegenerateCurve3) {
+            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
+            return new DegenerateCurve3(degenerate.point());
+        }
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmed = (TrimmedCurve3) curve;
+            // Swap trim parameters and flip sense to reverse the curve
+            return new TrimmedCurve3(
+                    reverseCurve3(trimmed.basisCurve()),
+                    trimmed.trimParamEnd(),
+                    trimmed.trimParamStart(),
+                    !trimmed.senseAgreement());
+        }
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
+            return new SurfaceCurve3(
                     reverseCurve3(surfaceCurve.curve3d()),
                     surfaceCurve.parametricCurves());
-            case BSplineCurve3 bspline -> new BSplineCurve3(
+        }
+        if (curve instanceof BSplineCurve3) {
+            BSplineCurve3 bspline = (BSplineCurve3) curve;
+            return new BSplineCurve3(
                     bspline.degree(),
                     new java.util.ArrayList<>(bspline.controlPoints().reversed()),
                     bspline.knotMultiplicities(),
                     bspline.knots());
-            case RationalBSplineCurve3 rational -> new RationalBSplineCurve3(
+        }
+        if (curve instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
+            return new RationalBSplineCurve3(
                     rational.degree(),
                     new java.util.ArrayList<>(rational.controlPoints().reversed()),
                     rational.weights(),
                     rational.knotMultiplicities(),
                     rational.knots());
-            default -> curve;
-        };
+        }
+        return curve;
     }
 
     /**
@@ -5363,50 +5385,70 @@ public final class StepCadBuilder {
      * When an ORIENTED_SURFACE has orientation=false, the surface normal should be flipped.
      */
     private SurfaceGeometry reverseSurfaceSense(SurfaceGeometry surface) {
-        return switch (surface) {
-        // TODO: JDK11 - Convert switch expression above
-            case Plane plane -> new Plane(plane.origin(), plane.normal().reverse());
-            case CylindricalSurface cyl -> {
-                Axis2Placement3D p = cyl.position();
-                yield new CylindricalSurface(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        cyl.radius());
-            }
-            case ConicalSurface conic -> {
-                Axis2Placement3D p = conic.position();
-                yield new ConicalSurface(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        conic.radius(), conic.semiAngle());
-            }
-            case SphericalSurface sphere -> {
-                Axis2Placement3D p = sphere.position();
-                yield new SphericalSurface(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        sphere.radius());
-            }
-            case ToroidalSurface torus -> {
-                Axis2Placement3D p = torus.position();
-                yield new ToroidalSurface(
-                        new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
-                        torus.majorRadius(), torus.minorRadius());
-            }
-            case SurfaceOfLinearExtrusion3 extrusion ->
-                    new SurfaceOfLinearExtrusion3(extrusion.sweptCurve(), extrusion.extrusionVector().negate());
-            case SurfaceOfRevolution3 revolution ->
-                    new SurfaceOfRevolution3(
-                            revolution.sweptCurve(),
-                            revolution.axisOrigin(),
-                            revolution.axisDirection().reverse());
-            case RuledSurface3 ruled -> new RuledSurface3(
+        if (surface instanceof Plane) {
+            Plane plane = (Plane) surface;
+            return new Plane(plane.origin(), plane.normal().reverse());
+        }
+        if (surface instanceof CylindricalSurface) {
+            CylindricalSurface cyl = (CylindricalSurface) surface;
+            Axis2Placement3D p = cyl.position();
+            return new CylindricalSurface(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    cyl.radius());
+        }
+        if (surface instanceof ConicalSurface) {
+            ConicalSurface conic = (ConicalSurface) surface;
+            Axis2Placement3D p = conic.position();
+            return new ConicalSurface(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    conic.radius(), conic.semiAngle());
+        }
+        if (surface instanceof SphericalSurface) {
+            SphericalSurface sphere = (SphericalSurface) surface;
+            Axis2Placement3D p = sphere.position();
+            return new SphericalSurface(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    sphere.radius());
+        }
+        if (surface instanceof ToroidalSurface) {
+            ToroidalSurface torus = (ToroidalSurface) surface;
+            Axis2Placement3D p = torus.position();
+            return new ToroidalSurface(
+                    new Axis2Placement3D(p.location(), p.axis(), p.xDirection().reverse()),
+                    torus.majorRadius(), torus.minorRadius());
+        }
+        if (surface instanceof SurfaceOfLinearExtrusion3) {
+            SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
+            return new SurfaceOfLinearExtrusion3(extrusion.sweptCurve(), extrusion.extrusionVector().negate());
+        }
+        if (surface instanceof SurfaceOfRevolution3) {
+            SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
+            return new SurfaceOfRevolution3(
+                    revolution.sweptCurve(),
+                    revolution.axisOrigin(),
+                    revolution.axisDirection().reverse());
+        }
+        if (surface instanceof RuledSurface3) {
+            RuledSurface3 ruled = (RuledSurface3) surface;
+            return new RuledSurface3(
                     reverseCurve3(ruled.directrix1()),
                     reverseCurve3(ruled.directrix2()));
-            case SurfaceOfConstantRadius3 constant -> new SurfaceOfConstantRadius3(
+        }
+        if (surface instanceof SurfaceOfConstantRadius3) {
+            SurfaceOfConstantRadius3 constant = (SurfaceOfConstantRadius3) surface;
+            return new SurfaceOfConstantRadius3(
                     reverseSurfaceSense(constant.sweptSurface()),
                     constant.radius());
-            case OffsetSurface3 offset -> new OffsetSurface3(
+        }
+        if (surface instanceof OffsetSurface3) {
+            OffsetSurface3 offset = (OffsetSurface3) surface;
+            return new OffsetSurface3(
                     reverseSurfaceSense(offset.basisSurface()),
                     offset.distance());
-            case BSplineSurface3 bspline -> new BSplineSurface3(
+        }
+        if (surface instanceof BSplineSurface3) {
+            BSplineSurface3 bspline = (BSplineSurface3) surface;
+            return new BSplineSurface3(
                     bspline.uDegree(),
                     bspline.vDegree(),
                     reverseBSplineControlGrid(bspline.controlPoints()),
@@ -5414,7 +5456,10 @@ public final class StepCadBuilder {
                     bspline.vMultiplicities(),
                     bspline.uKnots(),
                     bspline.vKnots());
-            case RationalBSplineSurface3 rational -> new RationalBSplineSurface3(
+        }
+        if (surface instanceof RationalBSplineSurface3) {
+            RationalBSplineSurface3 rational = (RationalBSplineSurface3) surface;
+            return new RationalBSplineSurface3(
                     rational.uDegree(),
                     rational.vDegree(),
                     reverseBSplineControlGrid(rational.controlPoints()),
@@ -5423,26 +5468,34 @@ public final class StepCadBuilder {
                     rational.vMultiplicities(),
                     rational.uKnots(),
                     rational.vKnots());
-            case ParaboloidSurface paraboloid -> {
-                Axis2Placement3D pp = paraboloid.position();
-                yield new ParaboloidSurface(
-                        new Axis2Placement3D(pp.location(), pp.axis(), pp.xDirection().reverse()),
-                        paraboloid.focalLength());
-            }
-            case HyperboloidSurface hyperboloid -> {
-                Axis2Placement3D hp = hyperboloid.position();
-                yield new HyperboloidSurface(
-                        new Axis2Placement3D(hp.location(), hp.axis(), hp.xDirection().reverse()),
-                        hyperboloid.radius(), hyperboloid.semiAxis());
-            }
-            case SurfaceOfTranslation3 translation -> new SurfaceOfTranslation3(
+        }
+        if (surface instanceof ParaboloidSurface) {
+            ParaboloidSurface paraboloid = (ParaboloidSurface) surface;
+            Axis2Placement3D pp = paraboloid.position();
+            return new ParaboloidSurface(
+                    new Axis2Placement3D(pp.location(), pp.axis(), pp.xDirection().reverse()),
+                    paraboloid.focalLength());
+        }
+        if (surface instanceof HyperboloidSurface) {
+            HyperboloidSurface hyperboloid = (HyperboloidSurface) surface;
+            Axis2Placement3D hp = hyperboloid.position();
+            return new HyperboloidSurface(
+                    new Axis2Placement3D(hp.location(), hp.axis(), hp.xDirection().reverse()),
+                    hyperboloid.radius(), hyperboloid.semiAxis());
+        }
+        if (surface instanceof SurfaceOfTranslation3) {
+            SurfaceOfTranslation3 translation = (SurfaceOfTranslation3) surface;
+            return new SurfaceOfTranslation3(
                     reverseCurve3(translation.profile()),
                     translation.direction());
-            case SurfaceOfProjection3 projection -> new SurfaceOfProjection3(
+        }
+        if (surface instanceof SurfaceOfProjection3) {
+            SurfaceOfProjection3 projection = (SurfaceOfProjection3) surface;
+            return new SurfaceOfProjection3(
                     reverseCurve3(projection.profile()),
                     projection.projectionDirection());
-            default -> surface;
-        };
+        }
+        return surface;
     }
 
     private static java.util.List<java.util.List<CartesianPoint>> reverseBSplineControlGrid(
@@ -5572,22 +5625,25 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
         }
-        return switch (conic.entityName()) {
-        // TODO: JDK11 - Convert switch expression above
-            case "PARABOLA" -> buildParabola(conic.id());
-            case "HYPERBOLA" -> buildHyperbola(conic.id());
-            case "DEGENERATE_CONIC" -> new DegenerateCurve3(buildPlacement(placement3D.id()).location());
-            case "CONIC_CURVE" -> {
+        String entityName = conic.entityName();
+        switch (entityName) {
+            case "PARABOLA":
+                return buildParabola(conic.id());
+            case "HYPERBOLA":
+                return buildHyperbola(conic.id());
+            case "DEGENERATE_CONIC":
+                return new DegenerateCurve3(buildPlacement(placement3D.id()).location());
+            case "CONIC_CURVE":
                 // Generic CONIC_CURVE: try parabola first (most common in STEP files),
                 // then hyperbola if parameters don't match.
                 try {
-                    yield buildParabola(conic.id());
+                    return buildParabola(conic.id());
                 } catch (UnsupportedGeometryException e) {
-                    yield buildHyperbola(conic.id());
+                    return buildHyperbola(conic.id());
                 }
-            }
-            default -> throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
-        };
+            default:
+                throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
+        }
     }
 
     private Curve2 buildConicCurve2(StepConicCurve conic) {
@@ -5596,20 +5652,23 @@ public final class StepCadBuilder {
         }
         Point2 origin = buildPoint2(placement2D.location().id());
         Direction2 xDirection = buildDirection2(placement2D.refDirection().id());
-        return switch (conic.entityName()) {
-        // TODO: JDK11 - Convert switch expression above
-            case "PARABOLA" -> buildParabola2(origin, xDirection, conic.parameters());
-            case "HYPERBOLA" -> buildHyperbola2(origin, xDirection, conic.parameters());
-            case "DEGENERATE_CONIC" -> new Polyline2(List.of(origin, origin));
-            case "CONIC_CURVE" -> {
+        String entityName = conic.entityName();
+        switch (entityName) {
+            case "PARABOLA":
+                return buildParabola2(origin, xDirection, conic.parameters());
+            case "HYPERBOLA":
+                return buildHyperbola2(origin, xDirection, conic.parameters());
+            case "DEGENERATE_CONIC":
+                return new Polyline2(List.of(origin, origin));
+            case "CONIC_CURVE":
                 try {
-                    yield buildParabola2(origin, xDirection, conic.parameters());
+                    return buildParabola2(origin, xDirection, conic.parameters());
                 } catch (UnsupportedGeometryException e) {
-                    yield buildHyperbola2(origin, xDirection, conic.parameters());
+                    return buildHyperbola2(origin, xDirection, conic.parameters());
                 }
-            }
-            default -> throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
-        };
+            default:
+                throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
+        }
     }
 
     private Parabola2 buildParabola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
@@ -7187,14 +7246,19 @@ public final class Axis1Placement {
      */
     public SurfaceGeometry buildSurfaceGeometry(int id) {
         StepEntity entity = requireExistingEntity(id);
-        return switch (entity) {
-        // TODO: JDK11 - Convert switch expression above
-            case StepParaboloidSurface paraboloid -> buildParaboloidSurface(id);
-            case StepHyperboloidSurface hyperboloid -> buildHyperboloidSurface(id);
-            case StepSurfaceOfTranslation translation -> buildSurfaceOfTranslation(id);
-            case StepSurfaceOfProjection projection -> buildSurfaceOfProjection(id);
-            default -> throw new UnsupportedGeometryException("entity #" + id + " is not a supported parametric surface");
-        };
+        if (entity instanceof StepParaboloidSurface) {
+            return buildParaboloidSurface(id);
+        }
+        if (entity instanceof StepHyperboloidSurface) {
+            return buildHyperboloidSurface(id);
+        }
+        if (entity instanceof StepSurfaceOfTranslation) {
+            return buildSurfaceOfTranslation(id);
+        }
+        if (entity instanceof StepSurfaceOfProjection) {
+            return buildSurfaceOfProjection(id);
+        }
+        throw new UnsupportedGeometryException("entity #" + id + " is not a supported parametric surface");
     }
 
     private Vector3 buildVector3(StepEntity entity) {
