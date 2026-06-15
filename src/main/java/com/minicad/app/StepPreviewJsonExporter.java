@@ -14687,8 +14687,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionShape shape
-                    && shape.definition().id() == occurrence.id()) {
+            if (candidate instanceof StepProductDefinitionShape
+                    && ((StepProductDefinitionShape) candidate).definition().id() == occurrence.id()) {
+                StepProductDefinitionShape shape = (StepProductDefinitionShape) candidate;
                 appendProductDefinitionShapeRepresentationTargets(
                         targetsByUsageId,
                         identifiedItem,
@@ -15098,8 +15099,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepApprovalPersonOrganization personOrganization
-                    && personOrganization.authorizedApproval().id() == approval.id()) {
+            if (candidate instanceof StepApprovalPersonOrganization
+                    && ((StepApprovalPersonOrganization) candidate).authorizedApproval().id() == approval.id()) {
+                StepApprovalPersonOrganization personOrganization = (StepApprovalPersonOrganization) candidate;
                 appendExistingRepresentationDefinitionTargets(
                         targetsByUsageId,
                         identifiedItem,
@@ -15283,8 +15285,9 @@ public final class StepPreviewJsonExporter {
             }
         } while (changed);
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionEffectivity productDefinitionEffectivity
-                    && linkedEffectivityNames.contains(productDefinitionEffectivity.effectivityId())) {
+            if (candidate instanceof StepProductDefinitionEffectivity
+                    && linkedEffectivityNames.contains(((StepProductDefinitionEffectivity) candidate).effectivityId())) {
+                StepProductDefinitionEffectivity productDefinitionEffectivity = (StepProductDefinitionEffectivity) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         usageId,
@@ -15785,37 +15788,49 @@ public final class StepPreviewJsonExporter {
             StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
             targets.addAll(collectSemanticTargets(propertyDefinition.definition(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepPropertyDefinitionRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepActionPropertyRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepContactRatioRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepKinematicPropertyRepresentationRelation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepResourcePropertyRepresentation representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepForwardChainingRulePremise representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepBackChainingRuleBody representationLink
-                        && representationLink.definition().id() == propertyDefinition.id()) {
-                    targets.add(representationLink.usedRepresentation());
-                } else if (candidate instanceof StepPlacedDatumTargetFeature datumTargetFeature
+                if (candidate instanceof StepPropertyDefinitionRepresentation
+                    && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepActionPropertyRepresentation
+                    && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepContactRatioRepresentation
+                    && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
+                    && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation
+                    && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepKinematicPropertyRepresentationRelation
+                    && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation
+                    && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepResourcePropertyRepresentation
+                    && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepForwardChainingRulePremise
+                    && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinition.id()) {
+                StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepBackChainingRuleBody
+                    && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinition.id()) {
+                StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
+                targets.add(representationLink.usedRepresentation());
+            } else if (candidate instanceof StepPlacedDatumTargetFeature
+                    && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinition.id()) {
+                StepPlacedDatumTargetFeature datumTargetFeature = (StepPlacedDatumTargetFeature) candidate;
                         && datumTargetFeature.definition().id() == propertyDefinition.id()) {
                     targets.add(datumTargetFeature.usedRepresentation());
                 } else if (candidate instanceof StepPropertyDefinitionRelationship) {
@@ -17565,8 +17580,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionShape shape
-                    && shape.definition().id() == productDefinitionId) {
+            if (candidate instanceof StepProductDefinitionShape
+                    && ((StepProductDefinitionShape) candidate).definition().id() == productDefinitionId) {
+                StepProductDefinitionShape shape = (StepProductDefinitionShape) candidate;
                 targets.addAll(collectSemanticTargets(shape, resolved, visiting));
             }
         }
@@ -17580,8 +17596,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionShape shape
-                    && shape.definition().id() == occurrenceId) {
+            if (candidate instanceof StepProductDefinitionShape
+                    && ((StepProductDefinitionShape) candidate).definition().id() == occurrenceId) {
+                StepProductDefinitionShape shape = (StepProductDefinitionShape) candidate;
                 targets.addAll(collectSemanticTargets(shape, resolved, visiting));
             }
         }
