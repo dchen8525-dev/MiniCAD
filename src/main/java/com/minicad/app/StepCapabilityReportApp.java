@@ -460,14 +460,37 @@ public final class StepCapabilityReportApp {
         return text.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
-    record CapabilityReport(
-            Set<String> modelEntities,
-            Set<String> registeredEntities,
-            Set<String> builderEntities,
-            Set<String> exporterEntities,
-            Set<String> testedEntities,
-            Map<String, StepCapabilityRegistry.Capability> declaredCapabilities,
-            List<CapabilityRow> rows) {
+    static class CapabilityReport {
+        private final Set<String> modelEntities;
+        private final Set<String> registeredEntities;
+        private final Set<String> builderEntities;
+        private final Set<String> exporterEntities;
+        private final Set<String> testedEntities;
+        private final Map<String, StepCapabilityRegistry.Capability> declaredCapabilities;
+        private final List<CapabilityRow> rows;
+
+        CapabilityReport(Set<String> modelEntities, Set<String> registeredEntities,
+                          Set<String> builderEntities, Set<String> exporterEntities,
+                          Set<String> testedEntities,
+                          Map<String, StepCapabilityRegistry.Capability> declaredCapabilities,
+                          List<CapabilityRow> rows) {
+            this.modelEntities = modelEntities;
+            this.registeredEntities = registeredEntities;
+            this.builderEntities = builderEntities;
+            this.exporterEntities = exporterEntities;
+            this.testedEntities = testedEntities;
+            this.declaredCapabilities = declaredCapabilities;
+            this.rows = rows;
+        }
+
+        Set<String> modelEntities() { return modelEntities; }
+        Set<String> registeredEntities() { return registeredEntities; }
+        Set<String> builderEntities() { return builderEntities; }
+        Set<String> exporterEntities() { return exporterEntities; }
+        Set<String> testedEntities() { return testedEntities; }
+        Map<String, StepCapabilityRegistry.Capability> declaredCapabilities() { return declaredCapabilities; }
+        List<CapabilityRow> rows() { return rows; }
+
         Map<String, CapabilityRow> rowByEntity() {
             Map<String, CapabilityRow> byEntity = new TreeMap<>();
             for (CapabilityRow row : rows) {
@@ -477,25 +500,60 @@ public final class StepCapabilityReportApp {
         }
     }
 
-    record CapabilityRow(
-            String entity,
-            boolean modelClass,
-            boolean registered,
-            boolean builderReferenced,
-            boolean exporterReferenced,
-            boolean testReferenced,
-            StepCapabilityRegistry.Capability declaredCapability) {
+    static class CapabilityRow {
+        private final String entity;
+        private final boolean modelClass;
+        private final boolean registered;
+        private final boolean builderReferenced;
+        private final boolean exporterReferenced;
+        private final boolean testReferenced;
+        private final StepCapabilityRegistry.Capability declaredCapability;
+
+        CapabilityRow(String entity, boolean modelClass, boolean registered,
+                      boolean builderReferenced, boolean exporterReferenced,
+                      boolean testReferenced, StepCapabilityRegistry.Capability declaredCapability) {
+            this.entity = entity;
+            this.modelClass = modelClass;
+            this.registered = registered;
+            this.builderReferenced = builderReferenced;
+            this.exporterReferenced = exporterReferenced;
+            this.testReferenced = testReferenced;
+            this.declaredCapability = declaredCapability;
+        }
+
+        String entity() { return entity; }
+        boolean modelClass() { return modelClass; }
+        boolean registered() { return registered; }
+        boolean builderReferenced() { return builderReferenced; }
+        boolean exporterReferenced() { return exporterReferenced; }
+        boolean testReferenced() { return testReferenced; }
+        StepCapabilityRegistry.Capability declaredCapability() { return declaredCapability; }
+
         String qualityLevel() {
             return StepCapabilityReportApp.qualityLevel(
                     modelClass, registered, builderReferenced, exporterReferenced, testReferenced);
         }
     }
 
-    record SchemaCoverageReport(
-            String schemaName,
-            Path schemaPath,
-            Set<String> schemaEntities,
-            List<SchemaCoverageRow> rows) {
+    static class SchemaCoverageReport {
+        private final String schemaName;
+        private final Path schemaPath;
+        private final Set<String> schemaEntities;
+        private final List<SchemaCoverageRow> rows;
+
+        SchemaCoverageReport(String schemaName, Path schemaPath,
+                              Set<String> schemaEntities, List<SchemaCoverageRow> rows) {
+            this.schemaName = schemaName;
+            this.schemaPath = schemaPath;
+            this.schemaEntities = schemaEntities;
+            this.rows = rows;
+        }
+
+        String schemaName() { return schemaName; }
+        Path schemaPath() { return schemaPath; }
+        Set<String> schemaEntities() { return schemaEntities; }
+        List<SchemaCoverageRow> rows() { return rows; }
+
         long modelCount() {
             return rows.stream().filter(SchemaCoverageRow::modelClass).count();
         }
