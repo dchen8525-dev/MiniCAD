@@ -111,6 +111,20 @@ public final class Direction3 {
         return new Direction3(-x, -y, -z);
     }
 
+    /**
+     * Returns a perpendicular direction (rotated 90 degrees in the XY plane).
+     *
+     * @return perpendicular direction
+     */
+    public Direction3 perpendicular() {
+        // For a direction in 3D, find a perpendicular direction
+        if (Math.abs(z) < Math.abs(x)) {
+            return new Direction3(-y, x, 0).normalize();
+        } else {
+            return new Direction3(0, -z, y).normalize();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

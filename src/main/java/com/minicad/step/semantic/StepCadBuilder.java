@@ -2855,9 +2855,9 @@ public final class StepCadBuilder {
     Solid buildPolygonalBoundedHalfSpace(StepPolygonalBoundedHalfSpace polyHalfSpace) {
         SurfaceGeometry basisSurface = buildSupportedFaceGeometry(polyHalfSpace.basisSurface(), "SURFACE");
         if (!(basisSurface instanceof Plane)) {
-            Plane plane = (Plane) basisSurface;
             throw new UnsupportedGeometryException("POLYGONAL_BOUNDED_HALF_SPACE requires a planar basis surface");
         }
+        Plane plane = (Plane) basisSurface;
         // Build polygon points as a face boundary
         List<CartesianPoint> polyPoints = polyHalfSpace.polygonPoints().stream()
                 .map(cp -> buildPoint(cp.id()))
@@ -2945,9 +2945,9 @@ public final class StepCadBuilder {
     Solid buildExtrudedFaceSolid(StepExtrudedFaceSolid extrudedFace) {
         StepEntity faceGeometry = extrudedFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity)) {
-            StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID swept_face must be a face entity");
         }
+        StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
         SurfaceGeometry surface = buildSupportedFaceGeometry(faceGeometry(stepFace), "EXTRUDED_FACE_SOLID");
         List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
         if (localProfilePoints.isEmpty()) {
@@ -2956,6 +2956,7 @@ public final class StepCadBuilder {
         if (!(extrudedFace.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) extrudedFace.position();
         Axis2Placement3D solidPlacement = buildPlacement(placement.id());
         double depth = extrudedFace.depth() != null ? extrudedFace.depth() : 1.0;
         if (depth <= 0.0) {
@@ -2973,9 +2974,9 @@ public final class StepCadBuilder {
     Solid buildRevolvedFaceSolid(StepRevolvedFaceSolid revolvedFace) {
         StepEntity faceGeometry = revolvedFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity)) {
-            StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID swept_face must be a face entity");
         }
+        StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
         SurfaceGeometry surface = buildSupportedFaceGeometry(faceGeometry(stepFace), "REVOLVED_FACE_SOLID");
         List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
         if (localProfilePoints.isEmpty()) {
@@ -2984,6 +2985,7 @@ public final class StepCadBuilder {
         if (!(revolvedFace.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) revolvedFace.position();
         Axis2Placement3D solidPlacement = buildPlacement(placement.id());
         double angle = revolvedFace.angle() != null ? revolvedFace.angle() : 2 * Math.PI;
         if (Math.abs(angle) <= 1.0e-9) {
@@ -3011,9 +3013,9 @@ public final class StepCadBuilder {
         // Sweep a face along a trajectory curve
         StepEntity faceGeometry = sweptFace.sweptFace();
         if (!(faceGeometry instanceof StepFaceEntity)) {
-            StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
             throw new UnsupportedGeometryException("SWEPT_FACE_SOLID swept_face must be a face entity");
         }
+        StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
         SurfaceGeometry surface = buildSupportedFaceGeometry(stepFace, "SWEPT_FACE_SOLID");
         List<CartesianPoint> profilePoints = sampleFaceBoundary(surface, 72);
         if (profilePoints.isEmpty()) {

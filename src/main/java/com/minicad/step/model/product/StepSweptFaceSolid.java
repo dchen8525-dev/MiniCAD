@@ -45,6 +45,13 @@ public final class StepSweptFaceSolid implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptFace() { return getSweptFace(); }
+    public StepEntity trajectory() { return getTrajectory(); }
+    public String entityName() { return getEntityName(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

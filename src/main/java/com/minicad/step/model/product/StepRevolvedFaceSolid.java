@@ -51,6 +51,14 @@ public final class StepRevolvedFaceSolid implements StepEntity {
         return angle;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptFace() { return getSweptFace(); }
+    public StepEntity position() { return getPosition(); }
+    public StepEntity axis() { return getAxis(); }
+    public Double angle() { return getAngle(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

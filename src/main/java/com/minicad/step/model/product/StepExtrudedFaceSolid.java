@@ -51,6 +51,14 @@ public final class StepExtrudedFaceSolid implements StepEntity {
         return depth;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptFace() { return getSweptFace(); }
+    public StepEntity position() { return getPosition(); }
+    public StepEntity direction() { return getDirection(); }
+    public Double depth() { return getDepth(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

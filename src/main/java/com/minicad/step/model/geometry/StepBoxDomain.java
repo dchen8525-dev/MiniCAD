@@ -41,6 +41,11 @@ public final class StepBoxDomain implements StepEntity {
         return dimensions;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public StepCartesianPoint corner() { return getCorner(); }
+    public List<Double> dimensions() { return getDimensions(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

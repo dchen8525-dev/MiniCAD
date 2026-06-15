@@ -67,6 +67,33 @@ public final class Axis2Placement3D {
         return Direction3.from(z.asVector().cross(x.asVector()));
     }
 
+    /**
+     * Transforms a local direction to world coordinates.
+     *
+     * @param localDir local direction
+     * @return world direction
+     */
+    public Direction3 transformDirectionToWorld(Direction3 localDir) {
+        Vector3 localVec = localDir.asVector();
+        Vector3 worldVec = xDirection().asVector().scale(localVec.x())
+                .add(yDirection().asVector().scale(localVec.y()))
+                .add(axis.asVector().scale(localVec.z()));
+        return Direction3.from(worldVec);
+    }
+
+    /**
+     * Transforms a local point to world coordinates.
+     *
+     * @param localPoint local point
+     * @return world point
+     */
+    public CartesianPoint transformToWorld(CartesianPoint localPoint) {
+        Vector3 offset = xDirection().asVector().scale(localPoint.x())
+                .add(yDirection().asVector().scale(localPoint.y()))
+                .add(axis.asVector().scale(localPoint.z()));
+        return location.add(offset);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

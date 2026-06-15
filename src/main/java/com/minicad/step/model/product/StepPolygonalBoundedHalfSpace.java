@@ -70,6 +70,14 @@ public final class StepPolygonalBoundedHalfSpace implements StepEntity {
         return sameSense;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public List<StepCartesianPoint> polygonPoints() { return getPolygonPoints(); }
+    public boolean sameSense() { return isSameSense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
