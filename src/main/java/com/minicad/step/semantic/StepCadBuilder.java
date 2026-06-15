@@ -3587,6 +3587,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("BLOCK position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.position();
         if (csgPrimitive.dimensions().size() < 3) {
             throw new UnsupportedGeometryException("BLOCK requires x, y and z dimensions");
         }

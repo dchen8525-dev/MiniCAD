@@ -135,8 +135,17 @@ public final class Vector3 {
      *
      * @return direction
      */
-    public Direction3 asVector() {
+    public Direction3 asDirection() {
         return Direction3.from(this);
+    }
+
+    /**
+     * Returns this vector (identity conversion for API compatibility).
+     *
+     * @return this vector
+     */
+    public Vector3 asVector() {
+        return this;
     }
 
     @Override
