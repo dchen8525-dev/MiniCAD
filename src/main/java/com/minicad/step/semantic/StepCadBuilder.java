@@ -4946,17 +4946,23 @@ public final class StepCadBuilder {
     }
 
     private Loop transformLoop(Loop loop, StepCartesianTransformationOperator transformation) {
-        return switch (loop) {
-        // TODO: JDK11 - Convert switch expression above
-            case EdgeLoop edgeLoop -> new EdgeLoop(edgeLoop.edges().stream()
+        if (loop instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) loop;
+            return new EdgeLoop(edgeLoop.edges().stream()
                     .map(edge -> transformOrientedEdge(edge, transformation))
                     .collect(Collectors.toList()));
-            case VertexLoop vertexLoop -> new VertexLoop(transformVertex(vertexLoop.vertex(), transformation));
-            case PolyLoop polyLoop -> new PolyLoop(polyLoop.points().stream()
+        }
+        if (loop instanceof VertexLoop) {
+            VertexLoop vertexLoop = (VertexLoop) loop;
+            return new VertexLoop(transformVertex(vertexLoop.vertex(), transformation));
+        }
+        if (loop instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) loop;
+            return new PolyLoop(polyLoop.points().stream()
                     .map(point -> transformPoint3(point, transformation))
                     .collect(Collectors.toList()));
-            default -> throw new UnsupportedGeometryException("loop replica for " + loopTypeName(loop) + " is unsupported");
-        };
+        }
+        throw new UnsupportedGeometryException("loop replica for " + loopTypeName(loop) + " is unsupported");
     }
 
     private OrientedEdge transformOrientedEdge(OrientedEdge edge, StepCartesianTransformationOperator transformation) {
@@ -4994,120 +5000,276 @@ public final class StepCadBuilder {
     }
 
     private Curve3 buildCurve3(StepEntity curve) {
-        return switch (curve) {
-        // TODO: JDK11 - Convert switch expression above
-            case StepLine line -> buildLine(line.id());
-            case StepCircle circle -> buildCircle(circle.id());
-            case StepEllipse ellipse -> buildEllipse(ellipse.id());
-            case StepPolyline polyline -> buildPolyline(polyline.id());
-            case StepBezierCurve spline -> buildImplicitBSplineCurve3(spline);
-            case StepUniformCurve spline -> buildImplicitBSplineCurve3(spline);
-            case StepQuasiUniformCurve spline -> buildImplicitBSplineCurve3(spline);
-            case StepPiecewiseBezierCurve spline -> buildImplicitBSplineCurve3(spline);
-            case StepBSplineCurveWithKnots spline -> buildBSplineCurve(spline.id());
-            case StepBSplineCurve spline -> buildBSplineCurve(spline.id());
-            case StepRationalBSplineCurve spline -> buildRationalBSplineCurve3(spline.id());
-            case StepSurfaceCurve surfaceCurve -> buildSurfaceCurve(surfaceCurve.id());
-            case StepSeamCurve seamCurve -> buildSeamCurve(seamCurve.id());
-            case StepTrimmedCurve trimmedCurve -> buildTrimmedCurve(trimmedCurve.id());
-            case StepCompositeCurve compositeCurve -> buildCompositeCurve(compositeCurve.id());
-            case StepCompositeCurveOnSurface compositeCurveOnSurface -> buildCompositeCurve(compositeCurveOnSurface.id());
-            case StepPath path -> buildPath(path.id());
-            case StepOpenPath openPath -> buildPath(openPath.id());
-            case StepSubpath subpath -> buildPath(subpath.id());
-            case StepOrientedPath orientedPath -> buildPath(orientedPath.id());
-            case StepConicCurve conic -> buildConicCurve3(conic);
-            case StepOffsetCurve2D offsetCurve2D -> liftCurve2(buildOffsetCurve2(offsetCurve2D.id()));
-            case StepOffsetCurve3D offsetCurve3D -> buildOffsetCurve3(offsetCurve3D.id());
-            case StepOrientedCurve orientedCurve -> {
-                Curve3 baseCurve = buildCurve3(orientedCurve.curveElement());
-                if (!orientedCurve.orientation() && baseCurve instanceof CompositeCurve3) {
-                    CompositeCurve3 composite = (CompositeCurve3) baseCurve;
-                    // Reverse composite curve: reverse segment order and reverse each segment.
-                    yield reverseCompositeCurve(composite);
-                }
-                yield baseCurve;
+        if (curve instanceof StepLine) {
+            StepLine line = (StepLine) curve;
+            return buildLine(line.id());
+        }
+        if (curve instanceof StepCircle) {
+            StepCircle circle = (StepCircle) curve;
+            return buildCircle(circle.id());
+        }
+        if (curve instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) curve;
+            return buildEllipse(ellipse.id());
+        }
+        if (curve instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) curve;
+            return buildPolyline(polyline.id());
+        }
+        if (curve instanceof StepBezierCurve) {
+            StepBezierCurve spline = (StepBezierCurve) curve;
+            return buildImplicitBSplineCurve3(spline);
+        }
+        if (curve instanceof StepUniformCurve) {
+            StepUniformCurve spline = (StepUniformCurve) curve;
+            return buildImplicitBSplineCurve3(spline);
+        }
+        if (curve instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve spline = (StepQuasiUniformCurve) curve;
+            return buildImplicitBSplineCurve3(spline);
+        }
+        if (curve instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve spline = (StepPiecewiseBezierCurve) curve;
+            return buildImplicitBSplineCurve3(spline);
+        }
+        if (curve instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) curve;
+            return buildBSplineCurve(spline.id());
+        }
+        if (curve instanceof StepBSplineCurve) {
+            StepBSplineCurve spline = (StepBSplineCurve) curve;
+            return buildBSplineCurve(spline.id());
+        }
+        if (curve instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve spline = (StepRationalBSplineCurve) curve;
+            return buildRationalBSplineCurve3(spline.id());
+        }
+        if (curve instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) curve;
+            return buildSurfaceCurve(surfaceCurve.id());
+        }
+        if (curve instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) curve;
+            return buildSeamCurve(seamCurve.id());
+        }
+        if (curve instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) curve;
+            return buildTrimmedCurve(trimmedCurve.id());
+        }
+        if (curve instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) curve;
+            return buildCompositeCurve(compositeCurve.id());
+        }
+        if (curve instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) curve;
+            return buildCompositeCurve(compositeCurveOnSurface.id());
+        }
+        if (curve instanceof StepPath) {
+            StepPath path = (StepPath) curve;
+            return buildPath(path.id());
+        }
+        if (curve instanceof StepOpenPath) {
+            StepOpenPath openPath = (StepOpenPath) curve;
+            return buildPath(openPath.id());
+        }
+        if (curve instanceof StepSubpath) {
+            StepSubpath subpath = (StepSubpath) curve;
+            return buildPath(subpath.id());
+        }
+        if (curve instanceof StepOrientedPath) {
+            StepOrientedPath orientedPath = (StepOrientedPath) curve;
+            return buildPath(orientedPath.id());
+        }
+        if (curve instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) curve;
+            return buildConicCurve3(conic);
+        }
+        if (curve instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) curve;
+            return liftCurve2(buildOffsetCurve2(offsetCurve2D.id()));
+        }
+        if (curve instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) curve;
+            return buildOffsetCurve3(offsetCurve3D.id());
+        }
+        if (curve instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) curve;
+            Curve3 baseCurve = buildCurve3(orientedCurve.curveElement());
+            if (!orientedCurve.orientation() && baseCurve instanceof CompositeCurve3) {
+                CompositeCurve3 composite = (CompositeCurve3) baseCurve;
+                // Reverse composite curve: reverse segment order and reverse each segment.
+                return reverseCompositeCurve(composite);
             }
-            case StepGeometricReplica replica -> buildReplicaCurve3(replica);
-            case StepAnnotationCurveOccurrence occurrence -> buildCurve3(occurrence.item());
-            case StepDimensionCurve dimensionCurve -> buildCurve3(dimensionCurve.item());
-            case StepLeaderCurve leaderCurve -> buildCurve3(leaderCurve.item());
-            case StepProjectionCurve projectionCurve -> buildCurve3(projectionCurve.item());
-            case StepDraughtingAnnotationOccurrence annotationOccurrence -> buildCurve3(annotationOccurrence.item());
-            case StepTerminatorSymbol terminatorSymbol -> buildCurve3(terminatorSymbol.annotatedCurve());
-            case StepClothoid clothoid -> buildClothoidCurve(clothoid);
-            case StepIndexedPolyCurve polyCurve -> buildIndexedPolyCurve3(polyCurve);
-            case StepPolyline3D polyline3D -> buildPolyline3D(polyline3D);
-            case StepDegenerateCurve degenerateCurve -> buildDegenerateCurve3(degenerateCurve);
-            case StepLineSegment lineSegment -> {
-                CartesianPoint startPoint = buildPoint(lineSegment.startPoint().id());
-                CartesianPoint endPoint = buildPoint(lineSegment.endPoint().id());
-                Vector3 dir = endPoint.subtract(startPoint);
-                yield new Line3(startPoint, Direction3.from(dir));
+            return baseCurve;
+        }
+        if (curve instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) curve;
+            return buildReplicaCurve3(replica);
+        }
+        if (curve instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) curve;
+            return buildCurve3(occurrence.item());
+        }
+        if (curve instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) curve;
+            return buildCurve3(dimensionCurve.item());
+        }
+        if (curve instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) curve;
+            return buildCurve3(leaderCurve.item());
+        }
+        if (curve instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) curve;
+            return buildCurve3(projectionCurve.item());
+        }
+        if (curve instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) curve;
+            return buildCurve3(annotationOccurrence.item());
+        }
+        if (curve instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) curve;
+            return buildCurve3(terminatorSymbol.annotatedCurve());
+        }
+        if (curve instanceof StepClothoid) {
+            StepClothoid clothoid = (StepClothoid) curve;
+            return buildClothoidCurve(clothoid);
+        }
+        if (curve instanceof StepIndexedPolyCurve) {
+            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) curve;
+            return buildIndexedPolyCurve3(polyCurve);
+        }
+        if (curve instanceof StepPolyline3D) {
+            StepPolyline3D polyline3D = (StepPolyline3D) curve;
+            return buildPolyline3D(polyline3D);
+        }
+        if (curve instanceof StepDegenerateCurve) {
+            StepDegenerateCurve degenerateCurve = (StepDegenerateCurve) curve;
+            return buildDegenerateCurve3(degenerateCurve);
+        }
+        if (curve instanceof StepLineSegment) {
+            StepLineSegment lineSegment = (StepLineSegment) curve;
+            CartesianPoint startPoint = buildPoint(lineSegment.startPoint().id());
+            CartesianPoint endPoint = buildPoint(lineSegment.endPoint().id());
+            Vector3 dir = endPoint.subtract(startPoint);
+            return new Line3(startPoint, Direction3.from(dir));
+        }
+        if (curve instanceof StepBoundedCurve) {
+            StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
+            // BoundedCurve is a marker type with no geometry data.
+            // In complex entity syntax, the actual curve type may be stored at the same ID.
+            // Check if another entity was resolved at this ID.
+            StepEntity actual = entitiesById.get(boundedCurve.id());
+            if (actual != null && actual != boundedCurve) {
+                return buildCurve3(actual);
             }
-            case StepBoundedCurve boundedCurve -> {
-                // BoundedCurve is a marker type with no geometry data.
-                // In complex entity syntax, the actual curve type may be stored at the same ID.
-                // Check if another entity was resolved at this ID.
-                StepEntity actual = entitiesById.get(boundedCurve.id());
-                if (actual != null && actual != boundedCurve) {
-                    yield buildCurve3(actual);
-                }
-                throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
+            throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
+        }
+        if (curve instanceof StepSurfacedEdgeCurve) {
+            StepSurfacedEdgeCurve surfacedEdgeCurve = (StepSurfacedEdgeCurve) curve;
+            // SurfacedEdgeCurve wraps an underlying curve with surface associations.
+            // Build the curve geometry from the edgeGeometry reference.
+            return buildCurve3(surfacedEdgeCurve.edgeGeometry());
+        }
+        if (curve instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) curve;
+            // EdgeCurve wraps an underlying curve with vertex endpoints.
+            // Build the curve geometry from the edgeGeometry reference.
+            return buildCurve3(edgeCurve.edgeGeometry());
+        }
+        if (curve instanceof StepCompositeCurveOnSurface3D) {
+            StepCompositeCurveOnSurface3D compositeCurve3D = (StepCompositeCurveOnSurface3D) curve;
+            // Composite curve on 3D surface: build from segments like regular composite curve
+            return buildCompositeCurve(compositeCurve3D.id());
+        }
+        if (curve instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+            StepBSplineCurveWithKnotsAndBreakpoints splineWithBreakpoints = (StepBSplineCurveWithKnotsAndBreakpoints) curve;
+            // B-spline curve with explicit breakpoints: build like regular BSplineCurve
+            return buildBSplineCurveWithBreakpoints(splineWithBreakpoints.id());
+        }
+        if (curve instanceof StepCurve) {
+            StepCurve abstractCurve = (StepCurve) curve;
+            // Curve is an abstract base type. In complex entity syntax, the actual
+            // curve type may be stored at the same ID.
+            StepEntity actual = entitiesById.get(abstractCurve.id());
+            if (actual != null && actual != abstractCurve) {
+                return buildCurve3(actual);
             }
-            case StepSurfacedEdgeCurve surfacedEdgeCurve -> {
-                // SurfacedEdgeCurve wraps an underlying curve with surface associations.
-                // Build the curve geometry from the edgeGeometry reference.
-                yield buildCurve3(surfacedEdgeCurve.edgeGeometry());
-            }
-            case StepEdgeCurve edgeCurve -> {
-                // EdgeCurve wraps an underlying curve with vertex endpoints.
-                // Build the curve geometry from the edgeGeometry reference.
-                yield buildCurve3(edgeCurve.edgeGeometry());
-            }
-            case StepCompositeCurveOnSurface3D compositeCurve3D -> {
-                // Composite curve on 3D surface: build from segments like regular composite curve
-                yield buildCompositeCurve(compositeCurve3D.id());
-            }
-            case StepBSplineCurveWithKnotsAndBreakpoints splineWithBreakpoints -> {
-                // B-spline curve with explicit breakpoints: build like regular BSplineCurve
-                yield buildBSplineCurveWithBreakpoints(splineWithBreakpoints.id());
-            }
-            case StepCurve abstractCurve -> {
-                // Curve is an abstract base type. In complex entity syntax, the actual
-                // curve type may be stored at the same ID.
-                StepEntity actual = entitiesById.get(abstractCurve.id());
-                if (actual != null && actual != abstractCurve) {
-                    yield buildCurve3(actual);
-                }
-                throw new UnsupportedGeometryException("CURVE is an abstract base type with no concrete geometry");
-            }
-            case StepMappedItem mappedItem -> {
-                // MAPPED_ITEM references a representation map with a target item.
-                // Dispatch through to the mapping target for geometry.
-                yield buildCurve3(mappedItem.mappingTarget());
-            }
-            // 2D-specific curve types lifted to 3D via sampling
-            case StepCompositeCurve2D composite2D -> liftCurve2(buildCompositeCurve2D(composite2D));
-            case StepTrimmedCurve2D trimmed2D -> liftCurve2(buildTrimmedCurve2D(trimmed2D));
-            case StepBSplineCurve2D spline2D -> liftCurve2(buildBSplineCurve2D(spline2D));
-            case StepRationalBSplineCurve2D rational2D -> liftCurve2(buildRationalBSplineCurve2D(rational2D));
-            case StepBezierCurve2D bezier2D -> liftCurve2(buildBezierCurve2D(bezier2D));
-            case StepQuasiUniformCurve2D quasiUniform2D -> liftCurve2(buildQuasiUniformCurve2D(quasiUniform2D));
-            case StepUniformCurve2D uniform2D -> liftCurve2(buildUniformCurve2D(uniform2D));
-            case StepPiecewiseBezierCurve2D piecewiseBezier2D -> liftCurve2(buildPiecewiseBezierCurve2D(piecewiseBezier2D));
-            case StepIndexedPolyCurve2D polyCurve2D -> liftCurve2(buildIndexedPolyCurve2D(polyCurve2D));
-            case StepDegenerateCurve2D degenerate2D -> liftCurve2(buildDegenerateCurve2D(degenerate2D));
-            case StepCircle2D circle2D -> liftCurve2(buildCircle2D(circle2D));
-            case StepEllipse2D ellipse2D -> liftCurve2(buildEllipse2D(ellipse2D));
-            case StepLine2D line2D -> liftCurve2(buildLine2D(line2D));
-            case StepPolyline2D polyline2D -> liftCurve2(buildPolyline2D(polyline2D));
-            case StepHyperbola2D hyperbola2D -> liftCurve2(buildHyperbola2D(hyperbola2D));
-            case StepParabola2D parabola2D -> liftCurve2(buildParabola2D(parabola2D));
-            default -> throw new UnsupportedGeometryException(
-                    "curve type " + curve.getClass().getSimpleName() + " is not a supported 3D curve"
-            );
-        };
+            throw new UnsupportedGeometryException("CURVE is an abstract base type with no concrete geometry");
+        }
+        if (curve instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) curve;
+            // MAPPED_ITEM references a representation map with a target item.
+            // Dispatch through to the mapping target for geometry.
+            return buildCurve3(mappedItem.mappingTarget());
+        }
+        // 2D-specific curve types lifted to 3D via sampling
+        if (curve instanceof StepCompositeCurve2D) {
+            StepCompositeCurve2D composite2D = (StepCompositeCurve2D) curve;
+            return liftCurve2(buildCompositeCurve2D(composite2D));
+        }
+        if (curve instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmed2D = (StepTrimmedCurve2D) curve;
+            return liftCurve2(buildTrimmedCurve2D(trimmed2D));
+        }
+        if (curve instanceof StepBSplineCurve2D) {
+            StepBSplineCurve2D spline2D = (StepBSplineCurve2D) curve;
+            return liftCurve2(buildBSplineCurve2D(spline2D));
+        }
+        if (curve instanceof StepRationalBSplineCurve2D) {
+            StepRationalBSplineCurve2D rational2D = (StepRationalBSplineCurve2D) curve;
+            return liftCurve2(buildRationalBSplineCurve2D(rational2D));
+        }
+        if (curve instanceof StepBezierCurve2D) {
+            StepBezierCurve2D bezier2D = (StepBezierCurve2D) curve;
+            return liftCurve2(buildBezierCurve2D(bezier2D));
+        }
+        if (curve instanceof StepQuasiUniformCurve2D) {
+            StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) curve;
+            return liftCurve2(buildQuasiUniformCurve2D(quasiUniform2D));
+        }
+        if (curve instanceof StepUniformCurve2D) {
+            StepUniformCurve2D uniform2D = (StepUniformCurve2D) curve;
+            return liftCurve2(buildUniformCurve2D(uniform2D));
+        }
+        if (curve instanceof StepPiecewiseBezierCurve2D) {
+            StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) curve;
+            return liftCurve2(buildPiecewiseBezierCurve2D(piecewiseBezier2D));
+        }
+        if (curve instanceof StepIndexedPolyCurve2D) {
+            StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) curve;
+            return liftCurve2(buildIndexedPolyCurve2D(polyCurve2D));
+        }
+        if (curve instanceof StepDegenerateCurve2D) {
+            StepDegenerateCurve2D degenerate2D = (StepDegenerateCurve2D) curve;
+            return liftCurve2(buildDegenerateCurve2D(degenerate2D));
+        }
+        if (curve instanceof StepCircle2D) {
+            StepCircle2D circle2D = (StepCircle2D) curve;
+            return liftCurve2(buildCircle2D(circle2D));
+        }
+        if (curve instanceof StepEllipse2D) {
+            StepEllipse2D ellipse2D = (StepEllipse2D) curve;
+            return liftCurve2(buildEllipse2D(ellipse2D));
+        }
+        if (curve instanceof StepLine2D) {
+            StepLine2D line2D = (StepLine2D) curve;
+            return liftCurve2(buildLine2D(line2D));
+        }
+        if (curve instanceof StepPolyline2D) {
+            StepPolyline2D polyline2D = (StepPolyline2D) curve;
+            return liftCurve2(buildPolyline2D(polyline2D));
+        }
+        if (curve instanceof StepHyperbola2D) {
+            StepHyperbola2D hyperbola2D = (StepHyperbola2D) curve;
+            return liftCurve2(buildHyperbola2D(hyperbola2D));
+        }
+        if (curve instanceof StepParabola2D) {
+            StepParabola2D parabola2D = (StepParabola2D) curve;
+            return liftCurve2(buildParabola2D(parabola2D));
+        }
+        throw new UnsupportedGeometryException(
+                "curve type " + curve.getClass().getSimpleName() + " is not a supported 3D curve"
+        );
     }
 
     private Curve3 buildClothoidCurve(StepClothoid clothoid) {
