@@ -2032,55 +2032,67 @@ public final class StepDumpApp {
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             return 1;
         }
-        if (entity instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        if (entity instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) entity;
             builder.buildBSplineSurface(splineSurface.id());
             return 1;
         }
-        if (entity instanceof StepRationalBSplineSurface rationalSplineSurface) {
+        if (entity instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) entity;
             builder.buildRationalBSplineSurface(rationalSplineSurface.id());
             return 1;
         }
-        if (entity instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        if (entity instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) entity;
             builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             return validateSummaryEntity(extrusionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(extrusionSurface.extrusionAxis(), builder);
         }
-        if (entity instanceof StepSurfaceOfRevolution revolutionSurface) {
+        if (entity instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) entity;
             builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return validateSummaryEntity(revolutionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(revolutionSurface.axisPosition(), builder);
         }
-        if (entity instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        if (entity instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) entity;
             builder.buildRectangularTrimmedSurface(trimmedSurface.id());
             return validateSummaryEntity(trimmedSurface.basisSurface(), builder);
         }
-        if (entity instanceof StepCurveBoundedSurface boundedSurface) {
+        if (entity instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) entity;
             builder.buildCurveBoundedSurface(boundedSurface.id());
             return validateSummaryEntity(boundedSurface.basisSurface(), builder)
                     + validateSummaryItems(boundedSurface.boundaries(), builder);
         }
-        if (entity instanceof StepOrientedSurface orientedSurface) {
+        if (entity instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) entity;
             builder.buildOrientedSurface(orientedSurface.id());
             return validateSummaryEntity(orientedSurface.surfaceElement(), builder);
         }
-        if (entity instanceof StepOffsetSurface offsetSurface) {
+        if (entity instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) entity;
             builder.buildOffsetSurface(offsetSurface.id());
             return validateSummaryEntity(offsetSurface.basisSurface(), builder);
         }
-        if (entity instanceof StepAxis2Placement3D placement3D) {
+        if (entity instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) entity;
             builder.buildPlacement(placement3D.id());
             return 1;
         }
-        if (entity instanceof StepAxis1Placement axis1Placement) {
+        if (entity instanceof StepAxis1Placement) {
+            StepAxis1Placement axis1Placement = (StepAxis1Placement) entity;
             builder.buildAxis1Placement(axis1Placement.id());
             return 1;
         }
-        if (entity instanceof StepAxis2Placement2D placement2D) {
+        if (entity instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) entity;
             validatePoint(placement2D.location(), builder);
             validateDirection(placement2D.refDirection(), builder);
             return 1;
         }
-        if (entity instanceof StepCartesianTransformationOperator transformation) {
+        if (entity instanceof StepCartesianTransformationOperator) {
+            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) entity;
             if (transformation.axis1() != null) {
                 validateDirection(transformation.axis1(), builder);
             }
@@ -2093,16 +2105,19 @@ public final class StepDumpApp {
             validatePoint(transformation.localOrigin(), builder);
             return 1;
         }
-        if (entity instanceof StepItemDefinedTransformation transformation) {
+        if (entity instanceof StepItemDefinedTransformation) {
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             builder.buildPlacement(transformation.transformItem1().id());
             builder.buildPlacement(transformation.transformItem2().id());
             return 1;
         }
-        if (entity instanceof StepEdgeCurve edgeCurve) {
+        if (entity instanceof StepEdgeCurve) {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
             builder.buildEdge(edgeCurve.id());
             return 1;
         }
-        if (entity instanceof StepSubedge subedge) {
+        if (entity instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) entity;
             builder.buildEdge(subedge.id());
             return 1;
         }
