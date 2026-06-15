@@ -45,8 +45,6 @@ public final class StepVertexPoint implements StepEntity {
     public int id() { return getId(); }
     public String name() { return getName(); }
     public StepCartesianPoint point() { return getPoint(); }
-        return point;
-    }
 
     @Override
     public boolean equals(Object o) {
