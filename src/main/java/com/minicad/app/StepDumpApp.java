@@ -1988,7 +1988,8 @@ public final class StepDumpApp {
             return validateSummaryEntity(degeneratePcurve.basisSurface(), builder)
                     + validateSummaryEntity(degeneratePcurve.referenceToCurve(), builder);
         }
-        if (entity instanceof StepGeometricReplica replica) {
+        if (entity instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
             if ("POINT_REPLICA".equals(replica.entityName())) {
                 builder.buildPointReference(replica.id());
             }
@@ -2001,27 +2002,33 @@ public final class StepDumpApp {
             return validateSummaryEntity(replica.parent(), builder)
                     + validateSummaryEntity(replica.transformation(), builder);
         }
-        if (entity instanceof StepPlane plane) {
+        if (entity instanceof StepPlane) {
+            StepPlane plane = (StepPlane) entity;
             builder.buildPlane(plane.id());
             return 1;
         }
-        if (entity instanceof StepCylindricalSurface cylindricalSurface) {
+        if (entity instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) entity;
             builder.buildCylindricalSurface(cylindricalSurface.id());
             return 1;
         }
-        if (entity instanceof StepConicalSurface conicalSurface) {
+        if (entity instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) entity;
             builder.buildConicalSurface(conicalSurface.id());
             return 1;
         }
-        if (entity instanceof StepToroidalSurface toroidalSurface) {
+        if (entity instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) entity;
             builder.buildToroidalSurface(toroidalSurface.id());
             return 1;
         }
-        if (entity instanceof StepSphericalSurface sphericalSurface) {
+        if (entity instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) entity;
             builder.buildSphericalSurface(sphericalSurface.id());
             return 1;
         }
-        if (entity instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        if (entity instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) entity;
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             return 1;
         }
