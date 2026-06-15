@@ -76,6 +76,15 @@ public final class StepTrimmedCurve implements StepEntity {
         return masterRepresentation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisCurve() { return getBasisCurve(); }
+    public List<StepValue> trim1() { return getTrim1(); }
+    public List<StepValue> trim2() { return getTrim2(); }
+    public boolean senseAgreement() { return isSenseAgreement(); }
+    public String masterRepresentation() { return getMasterRepresentation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
