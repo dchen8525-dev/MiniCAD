@@ -71,6 +71,10 @@ public final class StepAddress implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return internalLocation != null ? internalLocation : "";
+    }
+
     public String getInternalLocation() {
         return internalLocation;
     }

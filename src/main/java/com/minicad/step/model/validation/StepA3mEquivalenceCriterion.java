@@ -21,21 +21,21 @@ public final class StepA3mEquivalenceCriterion implements StepEntity {
     private final int id;
     private final String name;
     private final Object assessmentSpecification; // a3m_equivalence_assessment_specification_select reference
-    private final List<Object> comparingElementTypes; // LIST [1:?] OF a3m_element_type_name
-    private final List<Object> comparedElementTypes; // LIST [1:?] OF a3m_element_type_name
+    private final List<String> comparingElementTypes; // LIST [1:?] OF a3m_element_type_name
+    private final List<String> comparedElementTypes; // LIST [1:?] OF a3m_element_type_name
     private final Object measuredDataType; // a3m_measured_data_type_name
-    private final List<Object> detectedDifferenceTypes; // LIST [0:?] OF a3m_detected_difference_type_name
-    private final List<Object> accuracyTypes; // LIST [0:?] OF a3m_accuracy_type_name
+    private final List<String> detectedDifferenceTypes; // LIST [0:?] OF a3m_detected_difference_type_name
+    private final List<String> accuracyTypes; // LIST [0:?] OF a3m_accuracy_type_name
 
     public StepA3mEquivalenceCriterion(
         int id,
         String name,
         Object assessmentSpecification,
-        List<Object> comparingElementTypes,
-        List<Object> comparedElementTypes,
+        List<String> comparingElementTypes,
+        List<String> comparedElementTypes,
         Object measuredDataType,
-        List<Object> detectedDifferenceTypes,
-        List<Object> accuracyTypes) {
+        List<String> detectedDifferenceTypes,
+        List<String> accuracyTypes) {
         this.id = id;
         this.name = name;
         this.assessmentSpecification = assessmentSpecification;
@@ -60,11 +60,11 @@ public final class StepA3mEquivalenceCriterion implements StepEntity {
         return assessmentSpecification;
     }
 
-    public List<Object> getComparingElementTypes() {
+    public List<String> getComparingElementTypes() {
         return comparingElementTypes;
     }
 
-    public List<Object> getComparedElementTypes() {
+    public List<String> getComparedElementTypes() {
         return comparedElementTypes;
     }
 
@@ -72,11 +72,11 @@ public final class StepA3mEquivalenceCriterion implements StepEntity {
         return measuredDataType;
     }
 
-    public List<Object> getDetectedDifferenceTypes() {
+    public List<String> getDetectedDifferenceTypes() {
         return detectedDifferenceTypes;
     }
 
-    public List<Object> getAccuracyTypes() {
+    public List<String> getAccuracyTypes() {
         return accuracyTypes;
     }
 

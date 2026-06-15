@@ -80,7 +80,7 @@ public final class StepCapabilityRegistry {
     }
 
     
-public final class Capability {
+public static final class Capability {
     private final String entity;
     private final String level;
     private final boolean parsed;
@@ -132,6 +132,11 @@ public final class Capability {
     public String getLimitations() {
         return limitations;
     }
+
+    // Record-style accessors
+    public String entity() { return entity; }
+    public String level() { return level; }
+    public String limitations() { return limitations; }
 
     @Override
     public boolean equals(Object o) {

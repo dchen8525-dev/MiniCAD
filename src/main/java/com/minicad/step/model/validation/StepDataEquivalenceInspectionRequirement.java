@@ -10,23 +10,23 @@ import java.util.Objects;
  *
  * @param id STEP instance id
  * @param name entity label
- * @param appliedValues reference to SET of measure_representation_item (for A3M_EQUIVALENCE_INSPECTION_REQUIREMENT_WITH_VALUES)
+ * @param appliedValue reference to measure_representation_item (for A3M_EQUIVALENCE_INSPECTION_REQUIREMENT_WITH_VALUES)
  * @param entityName actual entity type name (for subtype handling)
  */
 public final class StepDataEquivalenceInspectionRequirement implements StepEntity {
     private final int id;
     private final String name;
-    private final List<Object> appliedValues; // SET [1:?] OF measure_representation_item references
+    private final Object appliedValue; // measure_representation_item reference
     private final String entityName;
 
     public StepDataEquivalenceInspectionRequirement(
         int id,
         String name,
-        List<Object> appliedValues,
+        Object appliedValue,
         String entityName) {
         this.id = id;
         this.name = name;
-        this.appliedValues = appliedValues;
+        this.appliedValue = appliedValue;
         this.entityName = entityName;
     }
 
@@ -40,8 +40,8 @@ public final class StepDataEquivalenceInspectionRequirement implements StepEntit
         return name;
     }
 
-    public List<Object> getAppliedValues() {
-        return appliedValues;
+    public Object getAppliedValue() {
+        return appliedValue;
     }
 
     public String getEntityName() {
@@ -66,7 +66,7 @@ public final class StepDataEquivalenceInspectionRequirement implements StepEntit
         return "StepDataEquivalenceInspectionRequirement{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", appliedValues=" + appliedValues +
+            ", appliedValue=" + appliedValue +
             ", entityName='" + entityName + '\'' +
             '}';
     }

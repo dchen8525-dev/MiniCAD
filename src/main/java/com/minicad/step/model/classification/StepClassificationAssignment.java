@@ -31,6 +31,10 @@ public final class StepClassificationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepGroup getAssignedClass() {
         return assignedClass;
     }

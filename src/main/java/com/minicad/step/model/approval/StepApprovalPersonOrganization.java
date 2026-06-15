@@ -37,6 +37,10 @@ public final class StepApprovalPersonOrganization implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepPersonAndOrganization getPersonOrganization() {
         return personOrganization;
     }

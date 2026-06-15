@@ -1785,7 +1785,7 @@ public final class MiscRegistry {
       registry.put(
           "CONVERSION_BASED_UNIT_WITH_OFFSET",
           StepEntityResolver::resolveConversionBasedUnitWithOffset);
-      registry.put("CONVERSION_BASED_UNIT", StepEntityResolver::resolveConversionBasedUnit);
+      registry.put("CONVERSION_BASED_UNIT", (resolver, instance) -> resolver.resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT"));
       registry.put("CONTEXT_DEPENDENT_UNIT", StepEntityResolver::resolveContextDependentUnit);
       registry.put("NAMED_UNIT", StepEntityResolver::resolveNamedUnit);
       registry.put(
@@ -8395,7 +8395,7 @@ public final class MiscRegistry {
       registry.put("TABULATION_REPRESENTATION", StepEntityResolver::resolveTabulationRepresentation);
       registry.put("ZONE_REPRESENTATION", StepEntityResolver::resolveZoneRepresentation);
       registry.put("CSG_PRIMITIVE_3D", StepEntityResolver::resolveCsgPrimitive3D);
-      registry.put("COMPOUND_REPRESENTATION_ITEM", StepEntityResolver::resolveCompoundRepresentationItem);
+      registry.put("COMPOUND_REPRESENTATION_ITEM", (resolver, instance) -> resolver.resolveCompoundRepresentationItem(instance, "COMPOUND_REPRESENTATION_ITEM"));
       registry.put("CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION", StepEntityResolver::resolveContextDependentGeometricShapeRepresentation);
       registry.put("USAGE_ASSOCIATION", StepEntityResolver::resolveUsageAssociation);
       registry.put("BUY_FROM_USAGE_OPTION", StepEntityResolver::resolveBuyFromUsageOption);

@@ -13,14 +13,6 @@ import java.util.Objects;
  * @param faceElement referenced base face
  * @param orientation orientation flag
  */
-/**
- * Resolved ORIENTED_FACE.
- *
- * @param id step id
- * @param name step label
- * @param faceElement referenced base face
- * @param orientation orientation flag
- */
 public final class StepOrientedFace implements StepFaceEntity {
     private final int id;
     private final String name;
@@ -48,6 +40,12 @@ public final class StepOrientedFace implements StepFaceEntity {
 
     public boolean isOrientation() {
         return orientation;
+    }
+
+    // StepFaceEntity interface implementation
+    @Override
+    public List<StepFaceBound> bounds() {
+        return faceElement != null ? faceElement.bounds() : List.of();
     }
 
     // Record-style accessors

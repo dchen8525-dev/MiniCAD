@@ -37,6 +37,10 @@ public final class StepAppliedSecurityClassificationAssignment implements StepEn
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getEntityName() {
         return entityName;
     }

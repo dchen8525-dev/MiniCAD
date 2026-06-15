@@ -35,6 +35,10 @@ public final class StepTypedMeasureWithUnit implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getEntityName() {
         return entityName;
     }

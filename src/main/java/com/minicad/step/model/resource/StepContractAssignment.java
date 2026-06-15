@@ -27,6 +27,10 @@ public final class StepContractAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepContract getAssignedContract() {
         return assignedContract;
     }

@@ -31,6 +31,10 @@ public final class StepDateTimeAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepDateAndTime getAssignedDateAndTime() {
         return assignedDateAndTime;
     }

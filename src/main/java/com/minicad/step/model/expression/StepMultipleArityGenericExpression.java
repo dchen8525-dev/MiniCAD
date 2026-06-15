@@ -16,13 +16,13 @@ import java.util.Objects;
 public final class StepMultipleArityGenericExpression implements StepEntity {
     private final int id;
     private final String name;
-    private final List<Object> operands; // LIST [1:?] OF generic_expression references
+    private final List<String> operands; // LIST [1:?] OF generic_expression literal names
     private final String entityName;
 
     public StepMultipleArityGenericExpression(
         int id,
         String name,
-        List<Object> operands,
+        List<String> operands,
         String entityName) {
         this.id = id;
         this.name = name;
@@ -40,7 +40,7 @@ public final class StepMultipleArityGenericExpression implements StepEntity {
         return name;
     }
 
-    public List<Object> getOperands() {
+    public List<String> getOperands() {
         return operands;
     }
 

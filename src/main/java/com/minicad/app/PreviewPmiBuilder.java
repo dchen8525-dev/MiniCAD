@@ -1301,8 +1301,11 @@ public final class PreviewPmiBuilder {
                 || item instanceof StepAnnotationPlane) {
             return pointFromAnnotationOccurrence(item, builder);
         }
-        if (builder != null && item instanceof StepGeometricReplica && "POINT_REPLICA".equals(replica.entityName())) {
-            return pointFromReplica(replica, builder);
+        if (builder != null && item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            if ("POINT_REPLICA".equals(replica.entityName())) {
+                return pointFromReplica(replica, builder);
+            }
         }
         return null;
     }

@@ -5602,14 +5602,15 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 1)));
   }
 
-  StepCompoundRepresentationItem resolveCompoundRepresentationItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOUND_REPRESENTATION_ITEM");
+  StepCompoundRepresentationItem resolveCompoundRepresentationItem(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
     return new StepCompoundRepresentationItem(
         instance.id(),
         stringValue(instance, definition, 0),
         entityReferenceList(instance, definition, 1,
-            "COMPOUND_REPRESENTATION_ITEM items must contain entity references"));
+            entityName + " items must contain entity references"),
+        entityName);
   }
 
   StepContextDependentGeometricShapeRepresentation resolveContextDependentGeometricShapeRepresentation(
@@ -8741,28 +8742,29 @@ public final class StepEntityResolver {
         deriveUnitKind(instance));
   }
 
-  StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT");
+  StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 2);
     validateNamedUnitDimensions(instance);
     StepEntity conversionFactor = resolve(referenceId(instance, definition, 1));
     if (!(conversionFactor instanceof StepMeasureWithUnit)) {
       throw new StepResolutionException(
-          "CONVERSION_BASED_UNIT conversion_factor must reference MEASURE_WITH_UNIT");
+          entityName + " conversion_factor must reference MEASURE_WITH_UNIT");
     }
     StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) conversionFactor;
     return new StepConversionBasedUnit(
         instance.id(),
         stringValue(instance, definition, 0),
         deriveUnitKind(instance),
-        measureWithUnit);
+        measureWithUnit,
+        entityName);
   }
 
   StepConversionBasedUnitWithOffset resolveConversionBasedUnitWithOffset(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT_WITH_OFFSET");
     requireParameterCount(instance, definition, 1);
-    StepConversionBasedUnit base = resolveConversionBasedUnit(instance);
+    StepConversionBasedUnit base = resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT_WITH_OFFSET");
     return new StepConversionBasedUnitWithOffset(
         instance.id(),
         base.name(),
@@ -12909,14 +12911,13 @@ public final class StepEntityResolver {
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "A3M_EQUIVALENCE_ACCURACY_ASSOCIATION");
     requireParameterCount(instance, definition, 4);
-    String description = optionalStringValue(instance, definition, 2);
+    String description = optionalStringValue(instance, definition, 1);
     return new StepA3mEquivalenceAccuracyAssociation(
         instance.id(),
         stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
         description,
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)));
   }
 
   StepA3mInspectedModelAndInspectionResultRelationship resolveA3mInspectedModelAndInspectionResultRelationship(
@@ -12934,28 +12935,26 @@ public final class StepEntityResolver {
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "A3MA_EQUIVALENCE_INSPECTION_RESULT");
     requireParameterCount(instance, definition, 4);
-    String description = optionalStringValue(instance, definition, 2);
+    String description = optionalStringValue(instance, definition, 1);
     return new StepA3maEquivalenceInspectionResult(
         instance.id(),
         stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
         description,
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)));
   }
 
   StepA3msEquivalenceInspectionResult resolveA3msEquivalenceInspectionResult(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "A3MS_EQUIVALENCE_INSPECTION_RESULT");
     requireParameterCount(instance, definition, 4);
-    String description = optionalStringValue(instance, definition, 2);
+    String description = optionalStringValue(instance, definition, 1);
     return new StepA3msEquivalenceInspectionResult(
         instance.id(),
         stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
         description,
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+        resolve(referenceId(instance, definition, 2)),
+        resolve(referenceId(instance, definition, 3)));
   }
 
   StepA3mEquivalenceCriterion resolveA3mEquivalenceCriterion(StepEntityInstance instance) {
@@ -12992,11 +12991,10 @@ public final class StepEntityResolver {
       StepEntityInstance instance, String entityName) {
     StepEntityDefinition definition = definition(instance, entityName);
     requireParameterCount(instance, definition, 3);
-    String description = optionalStringValue(instance, definition, 2);
+    String description = optionalStringValue(instance, definition, 1);
     return new StepDataEquivalenceAssessmentSpecification(
         instance.id(),
         stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
         description,
         entityName);
   }

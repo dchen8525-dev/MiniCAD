@@ -1,5 +1,7 @@
 package com.minicad.step.model.base;
 
+import java.util.Objects;
+
 /**
  * Minimal representation item marker.
  *

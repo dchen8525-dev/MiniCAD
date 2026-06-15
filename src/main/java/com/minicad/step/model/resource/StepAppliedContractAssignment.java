@@ -37,6 +37,10 @@ public final class StepAppliedContractAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getEntityName() {
         return entityName;
     }

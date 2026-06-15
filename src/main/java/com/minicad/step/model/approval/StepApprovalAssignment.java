@@ -27,6 +27,10 @@ public final class StepApprovalAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepApproval getAssignedApproval() {
         return assignedApproval;
     }

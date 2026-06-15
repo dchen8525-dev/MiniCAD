@@ -33,6 +33,10 @@ public final class StepAppliedNameAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return assignedName != null ? assignedName : "";
+    }
+
     public String getAssignedName() {
         return assignedName;
     }

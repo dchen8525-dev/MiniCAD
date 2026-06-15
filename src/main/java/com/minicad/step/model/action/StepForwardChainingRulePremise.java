@@ -34,6 +34,10 @@ public final class StepForwardChainingRulePremise implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepPropertyDefinition getDefinition() {
         return definition;
     }

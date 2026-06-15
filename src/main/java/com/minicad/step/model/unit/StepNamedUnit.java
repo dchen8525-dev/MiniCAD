@@ -27,6 +27,10 @@ public final class StepNamedUnit implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getUnitKind() {
         return unitKind;
     }

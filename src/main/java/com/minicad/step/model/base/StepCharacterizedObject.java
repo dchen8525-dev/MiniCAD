@@ -1,5 +1,7 @@
 package com.minicad.step.model.base;
 
+import java.util.Objects;
+
 /**
  * Minimal CHARACTERIZED_OBJECT/FEATURE_DEFINITION metadata.
  *

@@ -45,6 +45,10 @@ public final class StepGeometricRepresentationContext implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return contextIdentifier != null ? contextIdentifier : "";
+    }
+
     public int getCoordinateSpaceDimension() {
         return coordinateSpaceDimension;
     }
