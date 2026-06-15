@@ -595,14 +595,35 @@ public final class StepCapabilityReportApp {
         }
     }
 
-    record SchemaCoverageRow(
-            String entity,
-            boolean modelClass,
-            boolean registered,
-            boolean builderReferenced,
-            boolean exporterReferenced,
-            boolean testReferenced,
-            StepCapabilityRegistry.Capability declaredCapability) {
+    static class SchemaCoverageRow {
+        private final String entity;
+        private final boolean modelClass;
+        private final boolean registered;
+        private final boolean builderReferenced;
+        private final boolean exporterReferenced;
+        private final boolean testReferenced;
+        private final StepCapabilityRegistry.Capability declaredCapability;
+
+        SchemaCoverageRow(String entity, boolean modelClass, boolean registered,
+                          boolean builderReferenced, boolean exporterReferenced,
+                          boolean testReferenced, StepCapabilityRegistry.Capability declaredCapability) {
+            this.entity = entity;
+            this.modelClass = modelClass;
+            this.registered = registered;
+            this.builderReferenced = builderReferenced;
+            this.exporterReferenced = exporterReferenced;
+            this.testReferenced = testReferenced;
+            this.declaredCapability = declaredCapability;
+        }
+
+        String entity() { return entity; }
+        boolean modelClass() { return modelClass; }
+        boolean registered() { return registered; }
+        boolean builderReferenced() { return builderReferenced; }
+        boolean exporterReferenced() { return exporterReferenced; }
+        boolean testReferenced() { return testReferenced; }
+        StepCapabilityRegistry.Capability declaredCapability() { return declaredCapability; }
+
         String qualityLevel() {
             return StepCapabilityReportApp.qualityLevel(
                     modelClass, registered, builderReferenced, exporterReferenced, testReferenced);

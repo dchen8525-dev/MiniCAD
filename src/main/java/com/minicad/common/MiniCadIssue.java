@@ -27,7 +27,25 @@ public final class MiniCadIssue {
     private final String entityType;
     private final String message;
 
+    /**
+     * Diagnostic severity.
+     */
+    public enum Severity {
+        INFO,
+        WARNING,
+        ERROR
+    }
+
     public MiniCadIssue(Severity severity, String code, Integer entityId, String entityType, String message) {
+        Preconditions.requireNonNull(severity, "severity");
+        Preconditions.requireNonNull(code, "code");
+        Preconditions.requireNonNull(message, "message");
+        if (code.isBlank()) {
+            throw new IllegalArgumentException("code must not be blank");
+        }
+        if (message.isBlank()) {
+            throw new IllegalArgumentException("message must not be blank");
+        }
         this.severity = severity;
         this.code = code;
         this.entityId = entityId;
@@ -35,23 +53,35 @@ public final class MiniCadIssue {
         this.message = message;
     }
 
-    public Severity getSeverity() {
+    public static MiniCadIssue error(String code, Integer entityId, String entityType, String message) {
+        return new MiniCadIssue(Severity.ERROR, code, entityId, entityType, message);
+    }
+
+    public static MiniCadIssue warning(String code, Integer entityId, String entityType, String message) {
+        return new MiniCadIssue(Severity.WARNING, code, entityId, entityType, message);
+    }
+
+    public static MiniCadIssue unsupported(Integer entityId, String entityType, String message) {
+        return warning("step.unsupported", entityId, entityType, message);
+    }
+
+    public Severity severity() {
         return severity;
     }
 
-    public String getCode() {
+    public String code() {
         return code;
     }
 
-    public Integer getEntityId() {
+    public Integer entityId() {
         return entityId;
     }
 
-    public String getEntityType() {
+    public String entityType() {
         return entityType;
     }
 
-    public String getMessage() {
+    public String message() {
         return message;
     }
 

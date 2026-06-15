@@ -3765,7 +3765,7 @@ public final class StepCadBuilder {
         if (csgPrimitive.position() instanceof StepAxis1Placement) {
             StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.position();
             axis = buildAxis1Placement(placement.id());
-        if (csgPrimitive.position() instanceof StepAxis2Placement3D) {
+        } else if (csgPrimitive.position() instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.position();
             // Use the z-axis direction from AXIS2_PLACEMENT_3D as the cone axis
             Axis2Placement3D pl = buildPlacement(placement.id());

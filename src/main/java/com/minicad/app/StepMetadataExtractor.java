@@ -291,12 +291,47 @@ public final class DisplayMetadata {
      * @param specularExponent glossiness exponent (higher = shinier)
      * @param specularColor specular color tint, or null for white
      */
-    public record PbrMetadata(
-            double diffuse,
-            double specular,
-            Double specularExponent,
-            int[] specularColor
-    ) {}
+    public static final class PbrMetadata {
+        private final double diffuse;
+        private final double specular;
+        private final Double specularExponent;
+        private final int[] specularColor;
+
+        public PbrMetadata(double diffuse, double specular, Double specularExponent, int[] specularColor) {
+            this.diffuse = diffuse;
+            this.specular = specular;
+            this.specularExponent = specularExponent;
+            this.specularColor = specularColor == null ? null : specularColor.clone();
+        }
+
+        public double diffuse() { return diffuse; }
+        public double specular() { return specular; }
+        public Double specularExponent() { return specularExponent; }
+        public int[] specularColor() { return specularColor == null ? null : specularColor.clone(); }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PbrMetadata that = (PbrMetadata) o;
+            return Double.compare(diffuse, that.diffuse) == 0 && Double.compare(specular, that.specular) == 0
+                    && Objects.equals(specularExponent, that.specularExponent)
+                    && java.util.Arrays.equals(specularColor, that.specularColor);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(diffuse, specular, specularExponent);
+            result = 31 * result + java.util.Arrays.hashCode(specularColor);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "PbrMetadata{diffuse=" + diffuse + ", specular=" + specular
+                    + ", specularExponent=" + specularExponent + ", specularColor=" + java.util.Arrays.toString(specularColor) + "}";
+        }
+    }
 
     private static final class MutableMetadata {
         private int[] rgb;

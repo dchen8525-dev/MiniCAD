@@ -931,6 +931,37 @@ final class StepCadGeometryOps {
         return tangent.isZero() ? new Vector3(1.0, 0.0, 0.0) : tangent;
     }
 
-    private record TransformBasis3(Vector3 x, Vector3 y, Vector3 z) {
+    private static final class TransformBasis3 {
+        private final Vector3 x;
+        private final Vector3 y;
+        private final Vector3 z;
+
+        TransformBasis3(Vector3 x, Vector3 y, Vector3 z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        Vector3 x() { return x; }
+        Vector3 y() { return y; }
+        Vector3 z() { return z; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TransformBasis3 that = (TransformBasis3) o;
+            return Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(z, that.z);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, z);
+        }
+
+        @Override
+        public String toString() {
+            return "TransformBasis3{x=" + x + ", y=" + y + ", z=" + z + "}";
+        }
     }
 }

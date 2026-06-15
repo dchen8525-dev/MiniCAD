@@ -865,13 +865,132 @@ public final class StepMeshExporter {
             return du * du + dv * dv;
         }
 
-        private record ProjectedVertex(CartesianPoint point, double u, double v) {}
+        private static final class ProjectedVertex {
+            private final CartesianPoint point;
+            private final double u;
+            private final double v;
 
-        private record ProjectedLoop(List<ProjectedVertex> vertices, boolean outer) {}
+            ProjectedVertex(CartesianPoint point, double u, double v) {
+                this.point = point;
+                this.u = u;
+                this.v = v;
+            }
 
-        private record UvPoint(double u, double v) {}
+            CartesianPoint point() { return point; }
+            double u() { return u; }
+            double v() { return v; }
 
-        private record ParametricLoop(boolean outer, List<UvPoint> points) {}
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProjectedVertex that = (ProjectedVertex) o;
+                return Objects.equals(point, that.point) && Double.compare(u, that.u) == 0 && Double.compare(v, that.v) == 0;
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(point, u, v);
+            }
+
+            @Override
+            public String toString() {
+                return "ProjectedVertex{point=" + point + ", u=" + u + ", v=" + v + "}";
+            }
+        }
+
+        private static final class ProjectedLoop {
+            private final List<ProjectedVertex> vertices;
+            private final boolean outer;
+
+            ProjectedLoop(List<ProjectedVertex> vertices, boolean outer) {
+                this.vertices = vertices == null ? null : List.copyOf(vertices);
+                this.outer = outer;
+            }
+
+            List<ProjectedVertex> vertices() { return vertices; }
+            boolean outer() { return outer; }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProjectedLoop that = (ProjectedLoop) o;
+                return outer == that.outer && Objects.equals(vertices, that.vertices);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(vertices, outer);
+            }
+
+            @Override
+            public String toString() {
+                return "ProjectedLoop{vertices=" + vertices + ", outer=" + outer + "}";
+            }
+        }
+
+        private static final class UvPoint {
+            private final double u;
+            private final double v;
+
+            UvPoint(double u, double v) {
+                this.u = u;
+                this.v = v;
+            }
+
+            double u() { return u; }
+            double v() { return v; }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                UvPoint that = (UvPoint) o;
+                return Double.compare(u, that.u) == 0 && Double.compare(v, that.v) == 0;
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(u, v);
+            }
+
+            @Override
+            public String toString() {
+                return "UvPoint{u=" + u + ", v=" + v + "}";
+            }
+        }
+
+        private static final class ParametricLoop {
+            private final boolean outer;
+            private final List<UvPoint> points;
+
+            ParametricLoop(boolean outer, List<UvPoint> points) {
+                this.outer = outer;
+                this.points = points == null ? null : List.copyOf(points);
+            }
+
+            boolean outer() { return outer; }
+            List<UvPoint> points() { return points; }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ParametricLoop that = (ParametricLoop) o;
+                return outer == that.outer && Objects.equals(points, that.points);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(outer, points);
+            }
+
+            @Override
+            public String toString() {
+                return "ParametricLoop{outer=" + outer + ", points=" + points + "}";
+            }
+        }
 
         private static class UvBounds {
             private final double minU;

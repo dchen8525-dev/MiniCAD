@@ -57,6 +57,34 @@ final class StepTextReader {
         return decoded.toString();
     }
 
-    record DecodedStepText(String text, Charset charset) {
+    static final class DecodedStepText {
+        private final String text;
+        private final Charset charset;
+
+        DecodedStepText(String text, Charset charset) {
+            this.text = text;
+            this.charset = charset;
+        }
+
+        String text() { return text; }
+        Charset charset() { return charset; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DecodedStepText that = (DecodedStepText) o;
+            return Objects.equals(text, that.text) && Objects.equals(charset, that.charset);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(text, charset);
+        }
+
+        @Override
+        public String toString() {
+            return "DecodedStepText{text=" + text + ", charset=" + charset + "}";
+        }
     }
 }

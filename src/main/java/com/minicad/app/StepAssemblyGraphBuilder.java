@@ -356,20 +356,102 @@ public final class AssemblyGraph {
     }
 }
 
-    public record AssemblyRepresentation(int representationId, String name) {
+    public static final class AssemblyRepresentation {
+        private final int representationId;
+        private final String name;
+
+        public AssemblyRepresentation(int representationId, String name) {
+            this.representationId = representationId;
+            this.name = name;
+        }
+
+        public int representationId() { return representationId; }
+        public String name() { return name; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AssemblyRepresentation that = (AssemblyRepresentation) o;
+            return representationId == that.representationId && Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(representationId, name);
+        }
+
+        @Override
+        public String toString() {
+            return "AssemblyRepresentation{representationId=" + representationId + ", name=" + name + "}";
+        }
     }
 
-    public record AssemblyNode(
-            String id,
-            String parentId,
-            int productDefinitionId,
-            Integer occurrenceId,
-            String label,
-            String description,
-            List<Integer> representationIds,
-            double[] localMatrix,
-            double[] worldMatrix,
-            int depth
-    ) {
+    public static final class AssemblyNode {
+        private final String id;
+        private final String parentId;
+        private final int productDefinitionId;
+        private final Integer occurrenceId;
+        private final String label;
+        private final String description;
+        private final List<Integer> representationIds;
+        private final double[] localMatrix;
+        private final double[] worldMatrix;
+        private final int depth;
+
+        public AssemblyNode(String id, String parentId, int productDefinitionId,
+                            Integer occurrenceId, String label, String description,
+                            List<Integer> representationIds, double[] localMatrix,
+                            double[] worldMatrix, int depth) {
+            this.id = id;
+            this.parentId = parentId;
+            this.productDefinitionId = productDefinitionId;
+            this.occurrenceId = occurrenceId;
+            this.label = label;
+            this.description = description;
+            this.representationIds = representationIds == null ? null : List.copyOf(representationIds);
+            this.localMatrix = localMatrix == null ? null : localMatrix.clone();
+            this.worldMatrix = worldMatrix == null ? null : worldMatrix.clone();
+            this.depth = depth;
+        }
+
+        public String id() { return id; }
+        public String parentId() { return parentId; }
+        public int productDefinitionId() { return productDefinitionId; }
+        public Integer occurrenceId() { return occurrenceId; }
+        public String label() { return label; }
+        public String description() { return description; }
+        public List<Integer> representationIds() { return representationIds; }
+        public double[] localMatrix() { return localMatrix == null ? null : localMatrix.clone(); }
+        public double[] worldMatrix() { return worldMatrix == null ? null : worldMatrix.clone(); }
+        public int depth() { return depth; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AssemblyNode that = (AssemblyNode) o;
+            return productDefinitionId == that.productDefinitionId && depth == that.depth
+                    && Objects.equals(id, that.id) && Objects.equals(parentId, that.parentId)
+                    && Objects.equals(occurrenceId, that.occurrenceId) && Objects.equals(label, that.label)
+                    && Objects.equals(description, that.description) && Objects.equals(representationIds, that.representationIds)
+                    && java.util.Arrays.equals(localMatrix, that.localMatrix)
+                    && java.util.Arrays.equals(worldMatrix, that.worldMatrix);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(id, parentId, productDefinitionId, occurrenceId, label, description, representationIds, depth);
+            result = 31 * result + java.util.Arrays.hashCode(localMatrix);
+            result = 31 * result + java.util.Arrays.hashCode(worldMatrix);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "AssemblyNode{id=" + id + ", parentId=" + parentId + ", productDefinitionId=" + productDefinitionId
+                    + ", occurrenceId=" + occurrenceId + ", label=" + label + ", description=" + description
+                    + ", representationIds=" + representationIds + ", depth=" + depth + "}";
+        }
     }
 }
