@@ -4076,7 +4076,18 @@ public final class StepCadBuilder {
         return samples;
     }
 
-    private record Curve3Sample(CartesianPoint point, Direction3 tangent) {}
+    private static class Curve3Sample {
+        private final CartesianPoint point;
+        private final Direction3 tangent;
+
+        Curve3Sample(CartesianPoint point, Direction3 tangent) {
+            this.point = point;
+            this.tangent = tangent;
+        }
+
+        CartesianPoint point() { return point; }
+        Direction3 tangent() { return tangent; }
+    }
 
     private Solid buildEllipsoidLike(
             Axis2Placement3D placement,
@@ -6966,23 +6977,55 @@ public final class StepCadBuilder {
         return geometryOps.transformCurve2(curve, transformation);
     }
 
-    private record ImplicitBSplineCurveData(
-            int degree,
-            List<StepCartesianPoint> controlPoints,
-            List<Integer> knotMultiplicities,
-            List<Double> knots
-    ) {
+    private static class ImplicitBSplineCurveData {
+        private final int degree;
+        private final List<StepCartesianPoint> controlPoints;
+        private final List<Integer> knotMultiplicities;
+        private final List<Double> knots;
+
+        ImplicitBSplineCurveData(int degree, List<StepCartesianPoint> controlPoints,
+                                  List<Integer> knotMultiplicities, List<Double> knots) {
+            this.degree = degree;
+            this.controlPoints = controlPoints;
+            this.knotMultiplicities = knotMultiplicities;
+            this.knots = knots;
+        }
+
+        int degree() { return degree; }
+        List<StepCartesianPoint> controlPoints() { return controlPoints; }
+        List<Integer> knotMultiplicities() { return knotMultiplicities; }
+        List<Double> knots() { return knots; }
     }
 
-    private record ImplicitBSplineSurfaceData(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            List<Integer> uMultiplicities,
-            List<Integer> vMultiplicities,
-            List<Double> uKnots,
-            List<Double> vKnots
-    ) {
+    private static class ImplicitBSplineSurfaceData {
+        private final int uDegree;
+        private final int vDegree;
+        private final List<List<StepCartesianPoint>> controlPoints;
+        private final List<Integer> uMultiplicities;
+        private final List<Integer> vMultiplicities;
+        private final List<Double> uKnots;
+        private final List<Double> vKnots;
+
+        ImplicitBSplineSurfaceData(int uDegree, int vDegree,
+                                    List<List<StepCartesianPoint>> controlPoints,
+                                    List<Integer> uMultiplicities, List<Integer> vMultiplicities,
+                                    List<Double> uKnots, List<Double> vKnots) {
+            this.uDegree = uDegree;
+            this.vDegree = vDegree;
+            this.controlPoints = controlPoints;
+            this.uMultiplicities = uMultiplicities;
+            this.vMultiplicities = vMultiplicities;
+            this.uKnots = uKnots;
+            this.vKnots = vKnots;
+        }
+
+        int uDegree() { return uDegree; }
+        int vDegree() { return vDegree; }
+        List<List<StepCartesianPoint>> controlPoints() { return controlPoints; }
+        List<Integer> uMultiplicities() { return uMultiplicities; }
+        List<Integer> vMultiplicities() { return vMultiplicities; }
+        List<Double> uKnots() { return uKnots; }
+        List<Double> vKnots() { return vKnots; }
     }
 
     static String stepEntityTypeName(StepEntity entity) {
@@ -7309,7 +7352,18 @@ public final class Axis1Placement {
         return new Axis1Placement(location, axis);
     }
 
-    private record CircularFrame(Vector3 x, Vector3 y) {
+    private static class CircularFrame {
+        private final Vector3 x;
+        private final Vector3 y;
+
+        CircularFrame(Vector3 x, Vector3 y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        Vector3 x() { return x; }
+        Vector3 y() { return y; }
+
         Direction3 radialAtAngle(double angle) {
             return Direction3.from(x.scale(Math.cos(angle)).add(y.scale(Math.sin(angle))));
         }
