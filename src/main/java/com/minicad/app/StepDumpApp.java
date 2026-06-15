@@ -900,7 +900,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepWireShell wireShell) {
+            } else if (entity instanceof StepWireShell) {
+                StepWireShell wireShell = (StepWireShell) entity;
                 standaloneContainerEntities++;
                 try {
                     int loopCount = validateWireShell(wireShell, builder);
@@ -915,7 +916,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepVertexShell vertexShell) {
+            } else if (entity instanceof StepVertexShell) {
+                StepVertexShell vertexShell = (StepVertexShell) entity;
                 standaloneContainerEntities++;
                 try {
                     builder.buildVertexLoop(vertexShell.extent().id());
@@ -930,7 +932,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepEdgeBasedWireframeModel wireframeModel) {
+            } else if (entity instanceof StepEdgeBasedWireframeModel) {
+                StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) entity;
                 standaloneContainerEntities++;
                 try {
                     int edgeCount = 0;
@@ -948,7 +951,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShellBasedWireframeModel wireframeModel) {
+            } else if (entity instanceof StepShellBasedWireframeModel) {
+                StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateShellBasedWireframeModel(wireframeModel, builder);
@@ -963,7 +967,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepFaceBasedSurfaceModel surfaceModel) {
+            } else if (entity instanceof StepFaceBasedSurfaceModel) {
+                StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) entity;
                 standaloneContainerEntities++;
                 try {
                     FaceBuildCounts counts = validateFaceBasedSurfaceModel(surfaceModel, builder);
@@ -984,7 +989,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShellBasedSurfaceModel surfaceModel) {
+            } else if (entity instanceof StepShellBasedSurfaceModel) {
+                StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) entity;
                 standaloneContainerEntities++;
                 try {
                     FaceBuildCounts counts = validateShellBasedSurfaceModel(surfaceModel, builder);
@@ -1005,7 +1011,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepGeometricCurveSet curveSet) {
+            } else if (entity instanceof StepGeometricCurveSet) {
+                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateGeometricCurveSet(curveSet, builder);
@@ -1020,7 +1027,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepPointSet pointSet) {
+            } else if (entity instanceof StepPointSet) {
+                StepPointSet pointSet = (StepPointSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validatePointSet(pointSet, builder);
@@ -1035,7 +1043,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepGeometricSet geometricSet) {
+            } else if (entity instanceof StepGeometricSet) {
+                StepGeometricSet geometricSet = (StepGeometricSet) entity;
                 standaloneContainerEntities++;
                 try {
                     int memberCount = validateGeometricSet(geometricSet, builder);
@@ -1050,7 +1059,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentation representation) {
+            } else if (entity instanceof StepRepresentation) {
+                StepRepresentation representation = (StepRepresentation) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentation(representation, builder);
@@ -1070,7 +1080,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationMap representationMap) {
+            } else if (entity instanceof StepRepresentationMap) {
+                StepRepresentationMap representationMap = (StepRepresentationMap) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationMap(representationMap, builder);
@@ -1085,7 +1096,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepMappedItem mappedItem) {
+            } else if (entity instanceof StepMappedItem) {
+                StepMappedItem mappedItem = (StepMappedItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateMappedItem(mappedItem, builder);
@@ -1100,7 +1112,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepStyledItem styledItem) {
+            } else if (entity instanceof StepStyledItem) {
+                StepStyledItem styledItem = (StepStyledItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateStyledItem(styledItem, builder);
@@ -1115,7 +1128,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepOverRidingStyledItem styledItem) {
+            } else if (entity instanceof StepOverRidingStyledItem) {
+                StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateOverridingStyledItem(styledItem, builder);
@@ -1130,7 +1144,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationRelationship relationship) {
+            } else if (entity instanceof StepRepresentationRelationship) {
+                StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationRelationship(relationship, builder);
