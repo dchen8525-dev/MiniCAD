@@ -32,6 +32,10 @@ public final class StepEntityDefinition {
         return parameters;
     }
 
+    // Record-style accessors
+    public String name() { return getName(); }
+    public List<StepValue> parameters() { return getParameters(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -33,6 +33,10 @@ public final class StepRepresentationMap implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepEntity getMappedOrigin() {
         return mappedOrigin;
     }
@@ -40,6 +44,12 @@ public final class StepRepresentationMap implements StepEntity {
     public StepRepresentation getMappedRepresentation() {
         return mappedRepresentation;
     }
+
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity mappedOrigin() { return getMappedOrigin(); }
+    public StepRepresentation mappedRepresentation() { return getMappedRepresentation(); }
 
     @Override
     public boolean equals(Object o) {

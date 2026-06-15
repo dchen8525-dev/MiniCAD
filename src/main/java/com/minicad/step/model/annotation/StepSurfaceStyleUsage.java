@@ -31,6 +31,10 @@ public final class StepSurfaceStyleUsage implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getSide() {
         return side;
     }
@@ -38,6 +42,12 @@ public final class StepSurfaceStyleUsage implements StepEntity {
     public StepSurfaceSideStyle getStyle() {
         return style;
     }
+
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public String side() { return getSide(); }
+    public StepSurfaceSideStyle style() { return getStyle(); }
 
     @Override
     public boolean equals(Object o) {

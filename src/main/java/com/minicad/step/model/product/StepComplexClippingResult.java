@@ -59,6 +59,13 @@ public final class StepComplexClippingResult implements StepEntity {
         return operator;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity firstOperand() { return getFirstOperand(); }
+    public StepEntity secondOperand() { return getSecondOperand(); }
+    public String operator() { return getOperator(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

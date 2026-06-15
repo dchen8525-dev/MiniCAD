@@ -75,6 +75,15 @@ public final class StepFlatPattern implements StepEntity {
         return unfoldingSequence;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity flatGeometry() { return getFlatGeometry(); }
+    public List<StepEntity> bendLines() { return getBendLines(); }
+    public List<StepEntity> formingFeatures() { return getFormingFeatures(); }
+    public StepEntity grainDirection() { return getGrainDirection(); }
+    public List<StepEntity> unfoldingSequence() { return getUnfoldingSequence(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

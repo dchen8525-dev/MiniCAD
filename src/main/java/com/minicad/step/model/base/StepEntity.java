@@ -1116,4 +1116,8 @@ public interface StepEntity {
      * @return label or empty string
      */
     String getName();
+
+    // Record-style accessors for compatibility
+    default int id() { return getId(); }
+    default String name() { return getName(); }
 }

@@ -95,7 +95,7 @@ public final class StepEntityInstance {
         }
         StringBuilder builder = new StringBuilder();
         for (StepEntityDefinition definition : definitions) {
-            if (!builder.isEmpty()) {
+            if (builder.length() > 0) {
                 builder.append('+');
             }
             builder.append(definition.name());

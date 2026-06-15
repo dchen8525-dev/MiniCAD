@@ -29,6 +29,10 @@ public final class Solid {
         this.voidShells = voidShells == null ? null : java.util.List.copyOf(voidShells);
     }
 
+    public Solid(Shell outerShell) {
+        this(outerShell, List.of());
+    }
+
     public Shell getOuterShell() {
         return outerShell;
     }
@@ -36,6 +40,10 @@ public final class Solid {
     public List<Shell> getVoidShells() {
         return voidShells;
     }
+
+    // Record-style accessors
+    public Shell outerShell() { return getOuterShell(); }
+    public List<Shell> voidShells() { return getVoidShells(); }
 
     @Override
     public boolean equals(Object o) {

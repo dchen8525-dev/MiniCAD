@@ -27,9 +27,18 @@ public final class StepSymbolColour implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepEntity getColour() {
         return colour;
     }
+
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity colour() { return getColour(); }
 
     @Override
     public boolean equals(Object o) {
