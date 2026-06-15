@@ -17,6 +17,7 @@ class UnitExtractorTest {
         + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;"
+        );
 
         UnitExtractor.UnitInfo units = UnitExtractor.extract(compiled.resolved());
 
@@ -32,6 +33,7 @@ class UnitExtractorTest {
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);\n"
         + "#3=(CONVERSION_BASED_UNIT('INCH',#2) NAMED_UNIT(*) LENGTH_UNIT());\n"
         + "ENDSEC;"
+        );
 
         UnitExtractor.UnitInfo units = UnitExtractor.extract(compiled.resolved());
 

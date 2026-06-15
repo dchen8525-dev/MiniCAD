@@ -364,6 +364,7 @@ class StepEntityResolverTest {
         + "#4=VECTOR('VEC0',#3,1.0);\n"
         + "#30=LINE('L0',#1,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -388,6 +389,7 @@ class StepEntityResolverTest {
         + "#10=ORIENTED_EDGE('',*,*,#8,.T.);\n"
         + "#11=ORIENTED_EDGE('',*,*,#8,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -439,6 +441,7 @@ class StepEntityResolverTest {
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -496,6 +499,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=VERTEX_POINT('V0',#99);\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -511,6 +515,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=EDGE_LOOP('',(#99));\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -526,6 +531,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0');\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -543,6 +549,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=CARTESIAN_POINT(1.0,(0.0,0.0,0.0));\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -560,6 +567,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0','not-a-list');\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -577,6 +585,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=VECTOR('V0',1.0,2.0);\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException exception = assertThrows(
                 StepResolutionException.class,
@@ -597,6 +606,7 @@ class StepEntityResolverTest {
         + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
         + "#4=B_SPLINE_CURVE('C0',2,(#1,#2,#3),.UNSPECIFIED.,.F.,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -619,6 +629,7 @@ class StepEntityResolverTest {
         + "#7=FACE_OUTER_BOUND('B0',#6,.T.);\n"
         + "#8=ADVANCED_FACE('F0',(#7),#5,.T.);\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException exception = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -637,6 +648,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#42=UNKNOWN_ENTITY('x');\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException exception = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -659,6 +671,7 @@ class StepEntityResolverTest {
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#5,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -681,6 +694,7 @@ class StepEntityResolverTest {
         + "#9=SURFACE_OF_LINEAR_EXTRUSION('',#7,#6);\n"
         + "#10=SURFACE_OF_REVOLUTION('',#7,#8);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -718,6 +732,7 @@ class StepEntityResolverTest {
         + "#13=ORIENTED_FACE('OF0',#12,.F.);\n"
         + "#14=OPEN_SHELL('OS',(#13));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -743,6 +758,7 @@ class StepEntityResolverTest {
         + "#13=ORIENTED_FACE('OF0',#12,.F.);\n"
         + "#14=ORIENTED_FACE('OF1',#13,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -768,6 +784,7 @@ class StepEntityResolverTest {
         + "#11=ORIENTED_OPEN_SHELL('OOS',#9,.F.);\n"
         + "#12=ORIENTED_CLOSED_SHELL('OCS',#10,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -800,6 +817,7 @@ class StepEntityResolverTest {
         + "#13=ORIENTED_CLOSED_SHELL('OCS0',#10,.F.);\n"
         + "#14=ORIENTED_CLOSED_SHELL('OCS1',#13,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -825,6 +843,7 @@ class StepEntityResolverTest {
         + "#8=EDGE_CURVE('E0',#3,#4,#7,.T.);\n"
         + "#9=ORIENTED_EDGE('OE0',#4,#3,#8,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -848,6 +867,7 @@ class StepEntityResolverTest {
         + "#9=SURFACED_OPEN_SHELL('SOS',(#8));\n"
         + "#10=ORIENTED_OPEN_SHELL('OOS',#9,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -867,6 +887,7 @@ class StepEntityResolverTest {
         + "#2=VERTEX_POINT('V0',#1);\n"
         + "#3=VERTEX_LOOP('VL0',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -883,6 +904,7 @@ class StepEntityResolverTest {
         + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
         + "#4=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -901,6 +923,7 @@ class StepEntityResolverTest {
         + "#3=VERTEX_LOOP('VL0',#2);\n"
         + "#4=VERTEX_SHELL('VS0',#3);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -923,6 +946,7 @@ class StepEntityResolverTest {
         + "#8=ADVANCED_FACE('FACE0',(#7),#5,.T.);\n"
         + "#9=CONNECTED_FACE_SET('CFS0',(#8));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -947,6 +971,7 @@ class StepEntityResolverTest {
         + "#9=CONNECTED_FACE_SET('CFS0',(#8));\n"
         + "#10=(CONNECTED_FACE_SUB_SET('CFSS0',(#8),#9) CONNECTED_FACE_SET('CFSS0',(#8)));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -974,6 +999,7 @@ class StepEntityResolverTest {
         + "#9=ORIENTED_EDGE('OE0',$,$,#8,.T.);\n"
         + "#10=PATH('PTH',(#9));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -998,6 +1024,7 @@ class StepEntityResolverTest {
         + "#9=ORIENTED_EDGE('OE0',$,$,#8,.T.);\n"
         + "#10=OPEN_PATH('OP',(#9));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1023,6 +1050,7 @@ class StepEntityResolverTest {
         + "#10=PATH('PTH',(#9));\n"
         + "#11=SUBPATH('SP0',(#9),#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1048,6 +1076,7 @@ class StepEntityResolverTest {
         + "#10=EDGE_LOOP('EL0',(#9));\n"
         + "#11=WIRE_SHELL('WS0',(#10));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1067,6 +1096,7 @@ class StepEntityResolverTest {
         + "#4=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "#5=WIRE_SHELL('WS0',(#4));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1094,6 +1124,7 @@ class StepEntityResolverTest {
         + "#12=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "#13=WIRE_SHELL('WS0',(#11,#12));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1125,6 +1156,7 @@ class StepEntityResolverTest {
         + "#15=PATH('PTH',(#13,#14));\n"
         + "#16=ORIENTED_PATH('OPTH',#15,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1158,6 +1190,7 @@ class StepEntityResolverTest {
         + "#15=OPEN_PATH('OP0',(#13,#14));\n"
         + "#16=ORIENTED_PATH('OOP',#15,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1192,6 +1225,7 @@ class StepEntityResolverTest {
         + "#16=ORIENTED_PATH('OP0',#15,.F.);\n"
         + "#17=ORIENTED_PATH('OP1',#16,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1224,6 +1258,7 @@ class StepEntityResolverTest {
         + "#14=ORIENTED_EDGE('OE1',$,$,#12,.F.);\n"
         + "#15=OPEN_PATH('OP0',(#13,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1244,6 +1279,7 @@ class StepEntityResolverTest {
         + "#4=VERTEX_SHELL('VS0',#3);\n"
         + "#5=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#4));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1271,6 +1307,7 @@ class StepEntityResolverTest {
         + "#9=CONNECTED_FACE_SET('CFS0',(#8));\n"
         + "#10=(FACE_BASED_SURFACE_MODEL('FBSM',(#9)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('fbsm-item'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1298,6 +1335,7 @@ class StepEntityResolverTest {
         + "#10=(CONNECTED_FACE_SUB_SET('CFSS0',(#8),#9) CONNECTED_FACE_SET('CFSS0',(#8)));\n"
         + "#11=(FACE_BASED_SURFACE_MODEL('FBSM',(#10)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('fbsm-item'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1324,6 +1362,7 @@ class StepEntityResolverTest {
         + "#9=OPEN_SHELL('OS0',(#8));\n"
         + "#10=(FACE_BASED_SURFACE_MODEL('FBSM',(#9)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('fbsm-item'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1347,6 +1386,7 @@ class StepEntityResolverTest {
         + "#8=CIRCLE('C0',#4,2.0);\n"
         + "#9=TRIMMED_CURVE('TC0',#8,(#6),(#7),.T.,.CARTESIAN.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1372,6 +1412,7 @@ class StepEntityResolverTest {
         + "#13=(B_SPLINE_CURVE('B0',2,(#10,#11,#12),.UNSPECIFIED.,.F.,.F.)\n"
         + "     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1404,6 +1445,7 @@ class StepEntityResolverTest {
         + "#15=DEGENERATE_CONIC('DC0',#4);\n"
         + "#16=GEOMETRIC_CURVE_SET('GCS',(#5,#6,#15));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1441,6 +1483,7 @@ class StepEntityResolverTest {
         + "     B_SPLINE_CURVE(3,(#10,#11,#12,#13),.UNSPECIFIED.,.F.,.F.)\n"
         + "     B_SPLINE_CURVE_WITH_KNOTS((4,4),(0.0,1.0),.UNSPECIFIED.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1456,6 +1499,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(BOUNDED_CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1475,6 +1519,7 @@ class StepEntityResolverTest {
         + "#20=(B_SPLINE_CURVE('RB',2,(#10,#11,#12),.UNSPECIFIED.,.F.,.F.)\n"
         + "     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0)));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1495,6 +1540,7 @@ class StepEntityResolverTest {
         + "     B_SPLINE_CURVE_WITH_KNOTS((3,3),(0.0,1.0),.UNSPECIFIED.)\n"
         + "     RATIONAL_B_SPLINE_CURVE((1.0,0.5,1.0)));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1532,6 +1578,7 @@ class StepEntityResolverTest {
         + "#25=AXIS1_PLACEMENT('A1',#1,#5);\n"
         + "#26=SURFACE_OF_REVOLUTION('REV',#20,#25);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1559,6 +1606,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(UNIFORM_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('uc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1574,6 +1622,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(QUASI_UNIFORM_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('quc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1589,6 +1638,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(BEZIER_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1604,6 +1654,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1626,6 +1677,7 @@ class StepEntityResolverTest {
         + "#12=(QUASI_UNIFORM_CURVE() B_SPLINE_CURVE(2,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('quc'));\n"
         + "#13=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() B_SPLINE_CURVE(1,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbc'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1667,6 +1719,7 @@ class StepEntityResolverTest {
         + "#21=LINE('L3D',#17,#20);\n"
         + "#22=SURFACE_CURVE('SC0',#21,(#16),.PCURVE_S1.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1703,6 +1756,7 @@ class StepEntityResolverTest {
         + "#21=LINE('L3D',#17,#20);\n"
         + "#22=SURFACE_CURVE('SC0',#21,(#16),.PCURVE_S1.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1722,6 +1776,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('A2',#1,#2);\n"
         + "#4=CIRCLE('PC',#3,0.5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1756,6 +1811,7 @@ class StepEntityResolverTest {
         + "#21=PCURVE('PC1',#5,#20);\n"
         + "#22=SEAM_CURVE('SEAM0',#6,(#16,#21),.PCURVE_S1.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1775,6 +1831,7 @@ class StepEntityResolverTest {
         + "#10=(B_SPLINE_SURFACE(1,1,((#1,#3),(#2,#4)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
         + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1795,6 +1852,7 @@ class StepEntityResolverTest {
         + "#4=CARTESIAN_POINT('P11',(2.0,2.0,1.0));\n"
         + "#10=B_SPLINE_SURFACE(1,1,((#1,#3),(#2,#4)),.UNSPECIFIED.,.F.,.F.,.F.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1811,6 +1869,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(BOUNDED_SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bs'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1831,6 +1890,7 @@ class StepEntityResolverTest {
         + "#10=(B_SPLINE_SURFACE(1,1,((#1,#3),(#2,#4)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
         + "     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,0.5))));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1855,6 +1915,7 @@ class StepEntityResolverTest {
         + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)\n"
         + "     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,0.5))));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1882,6 +1943,7 @@ class StepEntityResolverTest {
         + "#13=ADVANCED_FACE('AF',(#12),#10,.T.);\n"
         + "#14=FACE_SURFACE('FS',(#12),#10,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1900,6 +1962,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(UNIFORM_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('us'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1915,6 +1978,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(QUASI_UNIFORM_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('qus'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1930,6 +1994,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(BEZIER_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bsz'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1945,6 +2010,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbs'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1967,6 +2033,7 @@ class StepEntityResolverTest {
         + "#12=(QUASI_UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('qus'));\n"
         + "#13=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbs'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -1996,6 +2063,7 @@ class StepEntityResolverTest {
         + "#5=DIRECTION('DZ',(0.0,0.0,1.0));\n"
         + "#6=OFFSET_CURVE_3D('OC3',#4,2.5,.F.,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2018,6 +2086,7 @@ class StepEntityResolverTest {
         + "#5=PLANE('PL0',#4);\n"
         + "#6=OFFSET_SURFACE('OS0',#5,1.5,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2038,6 +2107,7 @@ class StepEntityResolverTest {
         + "#4=LINE('L0',#1,#3);\n"
         + "#5=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2058,6 +2128,7 @@ class StepEntityResolverTest {
         + "#5=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#4);\n"
         + "#6=(COMPOSITE_CURVE('CC0',(#5),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('cc-name'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2087,6 +2158,7 @@ class StepEntityResolverTest {
         + "#11=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#10);\n"
         + "#12=(COMPOSITE_CURVE_ON_SURFACE('CCS0',(#11),.F.) COMPOSITE_CURVE('CCS0',(#11),.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('ccs-name'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2116,6 +2188,7 @@ class StepEntityResolverTest {
         + "#14=SURFACE_CURVE('SC0',#13,(),.T.);\n"
         + "#15=TRIMMED_CURVE('TC0',#14,(#10),(#12),.T.,.CARTESIAN.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2142,6 +2215,7 @@ class StepEntityResolverTest {
         + "#8=ADVANCED_FACE('F0',(#7),#5,.T.);\n"
         + "#9=GEOMETRIC_SET('SET',(#5));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2169,6 +2243,7 @@ class StepEntityResolverTest {
         + "#7=FACE_OUTER_BOUND('B0',#6,.T.);\n"
         + "#8=ADVANCED_FACE('F0',(#7),#5,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2200,6 +2275,7 @@ class StepEntityResolverTest {
         + "#27=STYLED_ITEM('FACE_STYLE',(#26),#8);\n"
         + "#28=PRESENTATION_LAYER_ASSIGNMENT('Inspection','Layer for QA',(#8));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2224,6 +2300,7 @@ class StepEntityResolverTest {
         + "#6=SURFACE_SIDE_STYLE('',(#4,#5));\n"
         + "#7=SURFACE_STYLE_USAGE(.BOTH.,#6);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2247,6 +2324,7 @@ class StepEntityResolverTest {
         + "#3=SURFACE_SIDE_STYLE('',(#1,#2));\n"
         + "#4=SURFACE_STYLE_USAGE(.BOTH.,#3);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2275,6 +2353,7 @@ class StepEntityResolverTest {
         + "#5=SURFACE_SIDE_STYLE('',(#4));\n"
         + "#6=SURFACE_STYLE_USAGE(.BOTH.,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2304,6 +2383,7 @@ class StepEntityResolverTest {
         + "#8=SURFACE_SIDE_STYLE('',(#4,#5,#6,#7));\n"
         + "#9=SURFACE_STYLE_USAGE(.BOTH.,#8);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2331,6 +2411,7 @@ class StepEntityResolverTest {
         + "#4=SURFACE_SIDE_STYLE('',(#1,#3));\n"
         + "#5=SURFACE_STYLE_USAGE(.BOTH.,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2361,6 +2442,7 @@ class StepEntityResolverTest {
         + "#2=COLOUR_RGB('Red',1.0,0.0,0.0);\n"
         + "#3=POINT_STYLE('Pts',#1,2.5,#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2379,6 +2461,7 @@ class StepEntityResolverTest {
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
         + "#3=TEXT_STYLE('TS0',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2398,6 +2481,7 @@ class StepEntityResolverTest {
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
         + "#3=TEXT_STYLE_WITH_SPACING('TS1',#2,0.15);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2416,6 +2500,7 @@ class StepEntityResolverTest {
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
         + "#3=TEXT_STYLE_WITH_JUSTIFICATION('TS2',#2,.LEFT.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2437,6 +2522,7 @@ class StepEntityResolverTest {
         + "#5=AXIS2_PLACEMENT_2D('M',#3,#4);\n"
         + "#6=TEXT_STYLE_WITH_MIRROR('TS3',#2,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2455,6 +2541,7 @@ class StepEntityResolverTest {
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
         + "#3=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS4',#2,(BOX_HEIGHT(1.2),BOX_WIDTH(0.8)));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2478,6 +2565,7 @@ class StepEntityResolverTest {
         + "#7=CHARACTER_GLYPH_STYLE_OUTLINE(#3);\n"
         + "#8=CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS(#3,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2501,6 +2589,7 @@ class StepEntityResolverTest {
         + "#2=SYMBOL_COLOUR(#1);\n"
         + "#3=SYMBOL_STYLE('SS0',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2518,6 +2607,7 @@ class StepEntityResolverTest {
         + "#1=COLOUR();\n"
         + "#2=COLOUR_SPECIFICATION('amber');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2535,6 +2625,7 @@ class StepEntityResolverTest {
         + "    COLOUR_SPECIFICATION('Amber')\n"
         + "    COLOUR());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2550,6 +2641,7 @@ class StepEntityResolverTest {
         + "#3=CURVE_STYLE('C0',#1,0.25,#2);\n"
         + "#4=FILL_AREA_STYLE_COLOUR('',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2566,6 +2658,7 @@ class StepEntityResolverTest {
         + "#1=PRE_DEFINED_COLOUR('black');\n"
         + "#2=PRE_DEFINED_CURVE_FONT('solid');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2583,6 +2676,7 @@ class StepEntityResolverTest {
         + "    COLOUR_SPECIFICATION('black')\n"
         + "    COLOUR());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2596,6 +2690,7 @@ class StepEntityResolverTest {
         + "#1=(DRAUGHTING_PRE_DEFINED_COLOUR('black') PRE_DEFINED_COLOUR('black'));\n"
         + "#2=(DRAUGHTING_PRE_DEFINED_CURVE_FONT('solid') PRE_DEFINED_CURVE_FONT('solid'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2612,6 +2707,7 @@ class StepEntityResolverTest {
         + "#3=CURVE_STYLE('C0',#1,0.25,#2);\n"
         + "#4=FILL_AREA_STYLE_COLOUR('',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2629,6 +2725,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=PRE_DEFINED_TEXT_FONT('iso_3098');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2642,6 +2739,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(DRAUGHTING_PRE_DEFINED_TEXT_FONT('iso_3098') PRE_DEFINED_TEXT_FONT('iso_3098'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2659,6 +2757,7 @@ class StepEntityResolverTest {
         + "#5=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('position');\n"
         + "#6=PRE_DEFINED_TERMINATOR_SYMBOL('filled_arrow');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2678,6 +2777,7 @@ class StepEntityResolverTest {
         + "    PRE_DEFINED_MARKER('dot')\n"
         + "    PRE_DEFINED_SYMBOL('dot'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2692,6 +2792,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=PRE_DEFINED_ITEM('generic-item');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2708,6 +2809,7 @@ class StepEntityResolverTest {
         + "    PRE_DEFINED_SYMBOL('dot')\n"
         + "    PRE_DEFINED_ITEM('dot'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2732,6 +2834,7 @@ class StepEntityResolverTest {
         + "#12=MEASURE_REPRESENTATION_ITEM('surface area',AREA_MEASURE(2.0),#7);\n"
         + "#13=GEOMETRIC_ITEM_SPECIFIC_USAGE('callout->face','semantic PMI link',#5,#6);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2762,6 +2865,7 @@ class StepEntityResolverTest {
         + "#7=POINT_REPLICA('PR0',#1,#6);\n"
         + "#8=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#7);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2788,6 +2892,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2807,6 +2912,7 @@ class StepEntityResolverTest {
         + "#2=VERTEX_POINT('VP0',#1);\n"
         + "#3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2837,6 +2943,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2866,6 +2973,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2884,6 +2992,7 @@ class StepEntityResolverTest {
         + "#4=GEOMETRIC_SET('GS0',(#2));\n"
         + "#5=GEOMETRIC_CURVE_SET('GCS0',(#2));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2905,6 +3014,7 @@ class StepEntityResolverTest {
         + "#4=GEOMETRIC_CURVE_SET('GCS0',(#2));\n"
         + "#5=GEOMETRIC_SET('GS0',(#3,#4));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2927,6 +3037,7 @@ class StepEntityResolverTest {
         + "#7=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#4,#6,2.0,#5);\n"
         + "#8=POINT_REPLICA('PR0',#2,#7);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -2947,6 +3058,7 @@ class StepEntityResolverTest {
         + "#6=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#2,#3,#5,2.0,#4);\n"
         + "#7=POINT_REPLICA('PR0',#1,#6);\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException error = assertThrows(
                 StepResolutionException.class,
@@ -2974,6 +3086,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         StepResolutionException error = assertThrows(
                 StepResolutionException.class,
@@ -2991,6 +3104,7 @@ class StepEntityResolverTest {
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException error = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -3023,6 +3137,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3054,6 +3169,7 @@ class StepEntityResolverTest {
         + "#15=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMIA','assoc',#4,#3,#12);\n"
         + "#16=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#12,#13);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3097,6 +3213,7 @@ class StepEntityResolverTest {
         + "#16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);\n"
         + "#17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3141,6 +3258,7 @@ class StepEntityResolverTest {
         + "#18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);\n"
         + "#19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3187,6 +3305,7 @@ class StepEntityResolverTest {
         + "#33=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SOLID','',#22,#24);\n"
         + "#34=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SET','',#22,#27);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3241,6 +3360,7 @@ class StepEntityResolverTest {
         + "#24=ROUGHNESS_CALLOUT('RC',(#2,#3));\n"
         + "#25=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','callout-link',#15,#16);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3310,6 +3430,7 @@ class StepEntityResolverTest {
         + "#22=DRAUGHTING_CALLOUT('TEXT_CHAR_CALLOUT',(#19,#16));\n"
         + "#23=DRAUGHTING_CALLOUT('FILL_CALLOUT',(#19,#17));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3349,6 +3470,7 @@ class StepEntityResolverTest {
         + "#14=DRAUGHTING_CALLOUT('PH_CALLOUT',(#3,#7));\n"
         + "#15=DRAUGHTING_CALLOUT('AP_CALLOUT',(#3,#12));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3370,6 +3492,7 @@ class StepEntityResolverTest {
         + "#4=GEOMETRIC_SET('GS',(#2));\n"
         + "#5=DRAUGHTING_CALLOUT('GS_CALLOUT',(#3,#4));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3401,6 +3524,7 @@ class StepEntityResolverTest {
         + "#17=DRAUGHTING_CALLOUT('EDGESET_CALLOUT',(#15,#12));\n"
         + "#18=DRAUGHTING_CALLOUT('WIRE_CALLOUT',(#15,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3436,6 +3560,7 @@ class StepEntityResolverTest {
         + "#18=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct',#1);\n"
         + "#19=DRAUGHTING_CALLOUT('DIRECT_CALLOUT',(#18,#1,#5,#17,#11,#12,#13,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3469,6 +3594,7 @@ class StepEntityResolverTest {
         + "#13=ANNOTATION_TEXT_OCCURRENCE('NOTE','advanced',#1);\n"
         + "#14=DRAUGHTING_CALLOUT('ADV_CALLOUT',(#13,#8,#9,#12));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3511,6 +3637,7 @@ class StepEntityResolverTest {
         + "#26=DRAUGHTING_CALLOUT('EBWM_CALLOUT',(#22,#16));\n"
         + "#27=DRAUGHTING_CALLOUT('SBWM_CALLOUT',(#22,#21));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3592,6 +3719,7 @@ class StepEntityResolverTest {
         + "#103=DRAUGHTING_CALLOUT('FBSM_CALLOUT',(#92,#90));\n"
         + "#104=DRAUGHTING_CALLOUT('SBSM_CALLOUT',(#92,#91));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3655,6 +3783,7 @@ class StepEntityResolverTest {
         + "#85=DRAUGHTING_CALLOUT('MSB_CALLOUT',(#84,#82));\n"
         + "#86=DRAUGHTING_CALLOUT('BWV_CALLOUT',(#84,#83));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3696,6 +3825,7 @@ class StepEntityResolverTest {
         + "#35=DRAUGHTING_CALLOUT('EX_CALLOUT',(#30,#25));\n"
         + "#36=DRAUGHTING_CALLOUT('SR_CALLOUT',(#30,#29));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3733,6 +3863,7 @@ class StepEntityResolverTest {
         + "#17=DRAUGHTING_CALLOUT('SUB_CALLOUT',(#16,#13));\n"
         + "#18=DRAUGHTING_CALLOUT('DAO_CALLOUT',(#16,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3756,6 +3887,7 @@ class StepEntityResolverTest {
         + "#8=DRAUGHTING_CALLOUT('CALLOUT',(#6,#7));\n"
         + "#9=PLACED_TARGET('PT','target',#4,#3,#8);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3789,6 +3921,7 @@ class StepEntityResolverTest {
         + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('PRIA','req',#6,#4,#10,#6);\n"
         + "#19=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDRIA','mdreq',#6,#4,#10,#6);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3841,6 +3974,7 @@ class StepEntityResolverTest {
         + "#15=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDRIA','mdreq',#7,#3,#10,#7);\n"
         + "#16=PLACED_TARGET('PT','target',#7,#3,#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3894,6 +4028,7 @@ class StepEntityResolverTest {
         + "#34=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGIU','',#14,(#3,#4),(#5),#2);\n"
         + "#35=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','',#6,#2,#19,#26);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3928,6 +4063,7 @@ class StepEntityResolverTest {
         + "#14=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#11,#12);\n"
         + "#15=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#12,#13);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3963,6 +4099,7 @@ class StepEntityResolverTest {
         + "#6=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#3),#4);\n"
         + "#7=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#3),#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -3999,6 +4136,7 @@ class StepEntityResolverTest {
         + "#19=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#12,#18);\n"
         + "#20=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#18,#17);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4028,6 +4166,7 @@ class StepEntityResolverTest {
         + "#10=ANNOTATION_TEXT('AT0',#6,#9);\n"
         + "#11=ANNOTATION_TEXT_CHARACTER('ATC0',#6,#9);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4062,6 +4201,7 @@ class StepEntityResolverTest {
         + "#9=AXIS2_PLACEMENT_2D('TGT',#7,#8);\n"
         + "#10=ANNOTATION_SYMBOL('AS0',#6,#9);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4093,6 +4233,7 @@ class StepEntityResolverTest {
         + "#11=PRESENTATION_STYLE_ASSIGNMENT(());\n"
         + "#12=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4131,6 +4272,7 @@ class StepEntityResolverTest {
         + "    REPRESENTATION_ITEM('LC0'));\n"
         + "#19=TERMINATOR_SYMBOL('TS0',(#11),#10,#18);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4164,6 +4306,7 @@ class StepEntityResolverTest {
         + "    REPRESENTATION_ITEM('PC0'));\n"
         + "#10=TERMINATOR_SYMBOL('TS0',(#3),#5,#9);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4198,6 +4341,7 @@ class StepEntityResolverTest {
         + "#15=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#14),#13);\n"
         + "#16=ANNOTATION_OCCURRENCE_RELATIONSHIP('rel','links point to symbol',#3,#15);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4233,6 +4377,7 @@ class StepEntityResolverTest {
         + "#18=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);\n"
         + "#19=ANNOTATION_OCCURRENCE_RELATIONSHIP('rel','links symbol to terminator',#18,#17);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4263,6 +4408,7 @@ class StepEntityResolverTest {
         + "#13=POINT_STYLE('PS0',#10,1.5,#12);\n"
         + "#14=CURVE_STYLE('CS0',#11,0.25,#12);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4293,6 +4439,7 @@ class StepEntityResolverTest {
         + "#9=AXIS2_PLACEMENT_2D('TGT',#7,#8);\n"
         + "#10=USER_DEFINED_TERMINATOR_SYMBOL('UT0',#6,#9);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4319,6 +4466,7 @@ class StepEntityResolverTest {
         + "#11=POLYLINE('PL0',(#1,#9,#10));\n"
         + "#8=GEOMETRIC_SET('GS0',(#1,#4,#7,#11));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4336,6 +4484,7 @@ class StepEntityResolverTest {
         + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
         + "#4=POLYLINE('PL0',(#1,#2,#3));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4355,6 +4504,7 @@ class StepEntityResolverTest {
         + "#4=POLYLINE('PL0',(#1,#2,#3));\n"
         + "#5=GEOMETRIC_CURVE_SET('GC0',(#4,#1));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4384,6 +4534,7 @@ class StepEntityResolverTest {
         + "#14=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "#15=GEOMETRIC_CURVE_SET('GCS0',(#9,#13,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4418,6 +4569,7 @@ class StepEntityResolverTest {
         + "#17=POLY_LOOP('PL0',(#6,#7,#8));\n"
         + "#18=GEOMETRIC_SET('GS0',(#5,#15,#17));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4451,6 +4603,7 @@ class StepEntityResolverTest {
         + "#16=GEOMETRIC_CURVE_SET('GCS0',(#12,#14));\n"
         + "#17=GEOMETRIC_SET('GS0',(#12,#14,#13,#15));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4492,6 +4645,7 @@ class StepEntityResolverTest {
         + "#17=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#15,#14));\n"
         + "#18=GEOMETRIC_CURVE_SET('GCS0',(#11,#12,#13,#15,#16,#17));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4527,6 +4681,7 @@ class StepEntityResolverTest {
         + "#14=BLOCK('BLK',#7,1.0,1.0,1.0);\n"
         + "#15=GEOMETRIC_SET('GS0',(#12,#13,#14));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4552,6 +4707,7 @@ class StepEntityResolverTest {
         + "#9=GEOMETRIC_CURVE_SET('OUTER_GCS',(#6,#8,#7));\n"
         + "#10=GEOMETRIC_SET('OUTER_GS',(#8,#9));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4575,6 +4731,7 @@ class StepEntityResolverTest {
         + "#2=CARTESIAN_POINT('P1',(1.0,1.0,0.0));\n"
         + "#3=POINT_SET('PS0',(#1,#2));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4589,6 +4746,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(SURFACE_MODEL() REPRESENTATION_ITEM('sm0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4605,6 +4763,7 @@ class StepEntityResolverTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=AXIS2_PLACEMENT_3D('AX',#1,$,$);\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException exception = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -4629,6 +4788,7 @@ class StepEntityResolverTest {
         + "#9=ORIENTED_EDGE('',*,*,#8,.T.);\n"
         + "#10=ORIENTED_EDGE('',$,$,#8,.T.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4647,6 +4807,7 @@ class StepEntityResolverTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#1=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
         + "ENDSEC;"
+        );
 
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
@@ -4660,6 +4821,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4674,6 +4836,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4691,6 +4854,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4709,6 +4873,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=SHAPE_REPRESENTATION('POINT_REP',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4724,6 +4889,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4739,6 +4905,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=LENGTH_UNIT();\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4753,6 +4920,7 @@ class StepEntityResolverTest {
         + "#1=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);\n"
         + "#2=(LENGTH_UNIT() NAMED_UNIT(#1) SI_UNIT($,.METRE.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4771,6 +4939,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT($) SI_UNIT($,.METRE.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4785,6 +4954,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT('bad') SI_UNIT($,.METRE.));\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException exception = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -4810,6 +4980,7 @@ class StepEntityResolverTest {
         + "#8=LUMINOUS_INTENSITY_UNIT();\n"
         + "#9=RATIO_UNIT();\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4858,6 +5029,7 @@ class StepEntityResolverTest {
         + "#19=VELOCITY_UNIT();\n"
         + "#20=THERMAL_RESISTANCE_UNIT();\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4889,6 +5061,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(FORCE_UNIT() NAMED_UNIT(*) SI_UNIT($,.NEWTON.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4905,6 +5078,7 @@ class StepEntityResolverTest {
         + "#2=MEASURE_WITH_UNIT(PLANE_ANGLE_MEASURE(0.0174532925199433),#1);\n"
         + "#3=(CONVERSION_BASED_UNIT('DEGREE',#2) NAMED_UNIT(*) PLANE_ANGLE_UNIT());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4922,6 +5096,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(CONTEXT_DEPENDENT_UNIT('BOX') NAMED_UNIT(*));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4943,6 +5118,7 @@ class StepEntityResolverTest {
         + "    NAMED_UNIT(*)\n"
         + "    THERMODYNAMIC_TEMPERATURE_UNIT());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -4981,6 +5157,7 @@ class StepEntityResolverTest {
         + "#19=THERMODYNAMIC_TEMPERATURE_MEASURE_WITH_UNIT(THERMODYNAMIC_TEMPERATURE_MEASURE(300.0),#9);\n"
         + "#20=ELECTRIC_CURRENT_MEASURE_WITH_UNIT(ELECTRIC_CURRENT_MEASURE(1.2),#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5025,6 +5202,7 @@ class StepEntityResolverTest {
         + "#31=LUMINOUS_FLUX_MEASURE_WITH_UNIT(LUMINOUS_FLUX_MEASURE(800.0),#11);\n"
         + "#32=LUMINOUS_INTENSITY_MEASURE_WITH_UNIT(LUMINOUS_INTENSITY_MEASURE(120.0),#12);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5069,6 +5247,7 @@ class StepEntityResolverTest {
         + "#30=VELOCITY_MEASURE_WITH_UNIT(VELOCITY_MEASURE(12.0),#10);\n"
         + "#31=THERMAL_RESISTANCE_MEASURE_WITH_UNIT(THERMAL_RESISTANCE_MEASURE(0.15),#11);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5126,6 +5305,7 @@ class StepEntityResolverTest {
         + "#37=ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT(ROTATIONAL_STIFFNESS_MEASURE(250.0),#17);\n"
         + "#38=LINEAR_MOMENT_MEASURE_WITH_UNIT(LINEAR_MOMENT_MEASURE(6.0),#18);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
         List<String> unitKinds = List.of(
@@ -5163,6 +5343,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(SOLID_MODEL() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('solid-item'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(markerStep));
 
@@ -5183,6 +5364,7 @@ class StepEntityResolverTest {
         + "#10=CLOSED_SHELL('CS0',(#9));\n"
         + "#11=(MANIFOLD_SOLID_BREP('MSB0',#10) SOLID_MODEL() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('solid-item'));\n"
         + "ENDSEC;"
+        );
 
         resolved = StepEntityResolver.resolveAll(StepParser.parse(brepStep));
 
@@ -5195,6 +5377,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=REPRESENTATION_ITEM('item-1');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5208,6 +5391,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5229,6 +5413,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5253,6 +5438,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AC0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5278,6 +5464,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('LC0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5300,6 +5487,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5327,6 +5515,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5363,6 +5552,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5399,6 +5589,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5445,6 +5636,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5468,6 +5660,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PH0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5497,6 +5690,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PH_GCS'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5528,6 +5722,7 @@ class StepEntityResolverTest {
         + "#8=(ANNOTATION_POINT_OCCURRENCE('AP_NESTED',(#2),#7)\n"
         + "    DRAUGHTING_ANNOTATION_OCCURRENCE('AP_NESTED',(#2),#7));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5586,6 +5781,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5625,6 +5821,7 @@ class StepEntityResolverTest {
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "#10=POINT_SET('PS0',(#3,#9));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5650,6 +5847,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5681,6 +5879,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5710,6 +5909,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5734,6 +5934,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "ENDSEC;"
+        );
 
         UnsupportedStepEntityException exception = assertThrows(
                 UnsupportedStepEntityException.class,
@@ -5759,6 +5960,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PC0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5784,6 +5986,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('DC0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5840,6 +6043,7 @@ class StepEntityResolverTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PC0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5855,6 +6059,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('geom-item'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5870,6 +6075,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('p'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5885,6 +6091,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(REPRESENTATION_ITEM('p') GEOMETRIC_REPRESENTATION_ITEM() POINT());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5900,6 +6107,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('c'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5915,6 +6123,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('s'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5930,6 +6139,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=TOPOLOGICAL_REPRESENTATION_ITEM('topo');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5946,6 +6156,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('v'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5961,6 +6172,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('e'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5976,6 +6188,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('f'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -5999,6 +6212,7 @@ class StepEntityResolverTest {
         + "#8=EDGE_CURVE('E0',#6,#7,#5,.T.);\n"
         + "#9=(SUBEDGE('SE0',#6,#7,#8) EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('subedge'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6025,6 +6239,7 @@ class StepEntityResolverTest {
         + "#8=EDGE_CURVE('E0',#6,#7,#5,.T.);\n"
         + "#9=CONNECTED_EDGE_SET('CES0',(#8));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6049,6 +6264,7 @@ class StepEntityResolverTest {
         + "#9=CONNECTED_EDGE_SET('CES0',(#8));\n"
         + "#10=(EDGE_BASED_WIREFRAME_MODEL('WBM',(#9)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('wire'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6066,6 +6282,7 @@ class StepEntityResolverTest {
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6089,6 +6306,7 @@ class StepEntityResolverTest {
         + "#8=EDGE_LOOP('LOOP',(#7));\n"
         + "#9=(FACE_OUTER_BOUND('B0',#8,.T.) FACE_BOUND());\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6106,6 +6324,7 @@ class StepEntityResolverTest {
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#1);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6130,6 +6349,7 @@ class StepEntityResolverTest {
         + "#10=SHAPE_REPRESENTATION('BODY',(#8),#9);\n"
         + "#11=SHAPE_DEFINITION_REPRESENTATION(#7,#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6159,6 +6379,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=EDGE_BASED_WIREFRAME_SHAPE_REPRESENTATION('WIRE',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6177,6 +6398,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=GEOMETRICALLY_BOUNDED_WIREFRAME_SHAPE_REPRESENTATION('GBW',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6193,6 +6415,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','PLAN'));\n"
         + "#3=GEOMETRICALLY_BOUNDED_2D_WIREFRAME_REPRESENTATION('GB2D',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6209,6 +6432,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=SHELL_BASED_WIREFRAME_SHAPE_REPRESENTATION('SBW',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6225,6 +6449,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=MANIFOLD_SURFACE_SHAPE_REPRESENTATION('SURF',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6241,6 +6466,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=SURFACE_SHAPE_REPRESENTATION('SSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6257,6 +6483,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=GEOMETRICALLY_BOUNDED_SURFACE_SHAPE_REPRESENTATION('GBSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6276,6 +6503,7 @@ class StepEntityResolverTest {
         + "#5=POINT_PLACEMENT_SHAPE_REPRESENTATION('PPSR',(#1),#2);\n"
         + "#6=SHAPE_DIMENSION_REPRESENTATION('SDR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6304,6 +6532,7 @@ class StepEntityResolverTest {
         + "#5=NEUTRAL_SKETCH_REPRESENTATION('NSR',(#1),#2);\n"
         + "#6=PROCEDURAL_SHAPE_REPRESENTATION('PSR2',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6332,6 +6561,7 @@ class StepEntityResolverTest {
         + "#5=DIRECTION_SHAPE_REPRESENTATION('DSR',(#1),#2);\n"
         + "#6=TESSELLATED_SHAPE_REPRESENTATION('TSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6360,6 +6590,7 @@ class StepEntityResolverTest {
         + "#5=SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION('SB2D',(#1),#2);\n"
         + "#6=NGON_SHAPE_REPRESENTATION('NGON',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6388,6 +6619,7 @@ class StepEntityResolverTest {
         + "#5=SCAN_DATA_SHAPE_REPRESENTATION('SDSR',(#1),#2);\n"
         + "#6=TESSELLATED_SHAPE_REPRESENTATION_WITH_ACCURACY_PARAMETERS('TSAP',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6417,6 +6649,7 @@ class StepEntityResolverTest {
         + "#4=COMPOSITE_SHEET_REPRESENTATION('CSHEET',(#1),#2);\n"
         + "#5=SHAPE_REPRESENTATION_WITH_PARAMETERS('SRWP',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6439,6 +6672,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=PATH_SHAPE_REPRESENTATION('PSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6455,6 +6689,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=WIREFRAME_SHAPE_REPRESENTATION('WSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6471,6 +6706,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=FACE_SHAPE_REPRESENTATION('FSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6487,6 +6723,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
         + "#3=PRESENTATION_REPRESENTATION('PR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6503,6 +6740,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','DRAWING'));\n"
         + "#3=DRAUGHTING_MODEL('DM',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6522,6 +6760,7 @@ class StepEntityResolverTest {
         + "#5=MECHANICAL_DESIGN_SHADED_PRESENTATION_REPRESENTATION('MSPR',(#1),#2);\n"
         + "#6=VISUAL_APPEARANCE_REPRESENTATION('VAR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6554,6 +6793,7 @@ class StepEntityResolverTest {
         + "#5=PRESENTATION_VIEW('PV',(#1),#2);\n"
         + "#6=PICTURE_REPRESENTATION('PIC',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6585,6 +6825,7 @@ class StepEntityResolverTest {
         + "#4=TEXT_STRING_REPRESENTATION('TSR',(#1),#2);\n"
         + "#5=STRUCTURED_TEXT_REPRESENTATION('STR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6613,6 +6854,7 @@ class StepEntityResolverTest {
         + "#5=PATH_PARAMETER_REPRESENTATION('PPR',(#1),#2);\n"
         + "#6=PRESCRIBED_PATH('PPATH',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6645,6 +6887,7 @@ class StepEntityResolverTest {
         + "#5=CHARACTER_GLYPH_SYMBOL_OUTLINE('CGSO',(#1),#2);\n"
         + "#6=CHARACTER_GLYPH_SYMBOL_STROKE('CGSS',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6676,6 +6919,7 @@ class StepEntityResolverTest {
         + "#4=MECHANICAL_DESIGN_SHADED_PRESENTATION_AREA('MDSPA',(#1),#2);\n"
         + "#5=GENERIC_CHARACTER_GLYPH_SYMBOL('GCGS',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6704,6 +6948,7 @@ class StepEntityResolverTest {
         + "#5=SURFACE_TEXTURE_REPRESENTATION('STRX',(#1),#2);\n"
         + "#6=TACTILE_APPEARANCE_REPRESENTATION('TAR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6736,6 +6981,7 @@ class StepEntityResolverTest {
         + "#5=PRESENTATION_SIZE('PSIZE',(#1),#2);\n"
         + "#6=VARIATIONAL_REPRESENTATION('VREP',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6769,6 +7015,7 @@ class StepEntityResolverTest {
         + "#6=EDGE_BASED_TOPOLOGICAL_REPRESENTATION_WITH_LENGTH_CONSTRAINT('EBTRWLC',(#1),#2);\n"
         + "#7=EVALUATED_CHARACTERISTIC('EC',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6805,6 +7052,7 @@ class StepEntityResolverTest {
         + "#5=MOMENTS_OF_INERTIA_REPRESENTATION('MOI',(#1),#2);\n"
         + "#6=UNCERTAINTY_ASSIGNED_REPRESENTATION('UAR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6837,6 +7085,7 @@ class StepEntityResolverTest {
         + "#5=KINEMATIC_GROUND_REPRESENTATION('KGR',(#1),#2);\n"
         + "#6=KINEMATIC_LINK_REPRESENTATION('KLR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6869,6 +7118,7 @@ class StepEntityResolverTest {
         + "#5=KINEMATIC_TOPOLOGY_STRUCTURE('KTS',(#1),#2);\n"
         + "#6=KINEMATIC_TOPOLOGY_SUBSTRUCTURE('KTSS',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6901,6 +7151,7 @@ class StepEntityResolverTest {
         + "#5=RIGID_LINK_REPRESENTATION('RLR',(#1),#2);\n"
         + "#6=MECHANISM_REPRESENTATION('MR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6933,6 +7184,7 @@ class StepEntityResolverTest {
         + "#5=REINFORCEMENT_ORIENTATION_BASIS('ROB',(#1),#2);\n"
         + "#6=CONNECTED_EDGE_WITH_LENGTH_SET_REPRESENTATION('CEWLSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6965,6 +7217,7 @@ class StepEntityResolverTest {
         + "#5=DATA_QUALITY_CRITERIA_REPRESENTATION('DQCR',(#1),#2);\n"
         + "#6=DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION('DQIR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -6997,6 +7250,7 @@ class StepEntityResolverTest {
         + "#5=A3M_EQUIVALENCE_CRITERIA_REPRESENTATION('A3MECR',(#1),#2);\n"
         + "#6=A3M_EQUIVALENCE_INSPECTION_RESULT_REPRESENTATION('A3MEIR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7029,6 +7283,7 @@ class StepEntityResolverTest {
         + "#5=SHAPE_DATA_QUALITY_CRITERIA_REPRESENTATION('SDQCR',(#1),#2);\n"
         + "#6=SHAPE_DATA_QUALITY_INSPECTION_RESULT_REPRESENTATION('SDQIR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7061,6 +7316,7 @@ class StepEntityResolverTest {
         + "#5=SHAPE_CRITERIA_REPRESENTATION_WITH_ACCURACY('SCRA',(#1),#2);\n"
         + "#6=SHAPE_INSPECTION_RESULT_REPRESENTATION_WITH_ACCURACY('SIRA',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7093,6 +7349,7 @@ class StepEntityResolverTest {
         + "#5=MESSAGE_CONTENTS_ASSIGNMENT('MSG',(#1),#2);\n"
         + "#6=MACHINING_TOOL_DIRECTION_REPRESENTATION('MTDR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7129,6 +7386,7 @@ class StepEntityResolverTest {
         + "#5=SIMPLIFIED_COUNTERDRILL_HOLE_DEFINITION('SCDH',(#1),#2);\n"
         + "#6=SIMPLIFIED_COUNTERSINK_HOLE_DEFINITION('SCSH',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7165,6 +7423,7 @@ class StepEntityResolverTest {
         + "#5=MACHINING_FEED_SPEED_REPRESENTATION('MFSR',(#1),#2);\n"
         + "#6=MACHINING_OFFSET_VECTOR_REPRESENTATION('MOVR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7197,6 +7456,7 @@ class StepEntityResolverTest {
         + "#5=MACHINING_TOOL_DIMENSION_REPRESENTATION('MTDR2',(#1),#2);\n"
         + "#6=MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION('MTSPR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7233,6 +7493,7 @@ class StepEntityResolverTest {
         + "#5=DEFAULT_TOLERANCE_TABLE('DTT',(#1),#2);\n"
         + "#6=OTHER_LIST_TABLE_REPRESENTATION('OLTR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7269,6 +7530,7 @@ class StepEntityResolverTest {
         + "#5=CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION('CCBIWR',(#1),#2);\n"
         + "#6=EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT('ECPITR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7309,6 +7571,7 @@ class StepEntityResolverTest {
         + "#9=FORWARD_CHAINING_RULE_PREMISE(#4,#3);\n"
         + "#10=BACK_CHAINING_RULE_BODY(#4,#3);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7355,6 +7618,7 @@ class StepEntityResolverTest {
         + "#11=PLACED_DATUM_TARGET_FEATURE(#4,#3);\n"
         + "#12=RESOURCE_PROPERTY_REPRESENTATION(#4,#3);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7438,6 +7702,7 @@ class StepEntityResolverTest {
         + "#40=MECHANISM_REPRESENTATION_RELATIONSHIP('MRR','mechanism',#3,#4);\n"
         + "#41=MECHANISM_STATE_REPRESENTATION_RELATIONSHIP('MSRR','state',#3,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7503,6 +7768,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=FACETED_BREP_SHAPE_REPRESENTATION('FBSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7519,6 +7785,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=ELEMENTARY_BREP_SHAPE_REPRESENTATION('EBSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7535,6 +7802,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=CSG_SHAPE_REPRESENTATION('CSG',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7561,6 +7829,7 @@ class StepEntityResolverTest {
         + "#12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#13=CSG_SHAPE_REPRESENTATION('CSG',(#6,#7,#8,#9,#10,#11),#12);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7608,6 +7877,7 @@ class StepEntityResolverTest {
         + "#13=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#14=CSG_SHAPE_REPRESENTATION('CSG',(#10,#12),#13);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7645,6 +7915,7 @@ class StepEntityResolverTest {
         + "#14=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#15=CSG_SHAPE_REPRESENTATION('SWEPT',(#12,#13),#14);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7696,6 +7967,7 @@ class StepEntityResolverTest {
         + "#16=HALF_SPACE_SOLID('HS',#14,.T.);\n"
         + "#17=BOXED_HALF_SPACE('BHS',#14,.F.,#15);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7742,6 +8014,7 @@ class StepEntityResolverTest {
         + "#10=POLYLINE('INNER',(#5,#6,#7,#8,#5));\n"
         + "#11=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#9,(#10));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7777,6 +8050,7 @@ class StepEntityResolverTest {
         + "#18=FACETED_BREP('FB1',#16);\n"
         + "#19=(BOOLEAN_RESULT(.UNION.,#17,#18) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7813,6 +8087,7 @@ class StepEntityResolverTest {
         + "#18=FACETED_BREP('FB1',#16);\n"
         + "#19=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#17,#18) BOOLEAN_RESULT(.DIFFERENCE.,#17,#18) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7833,6 +8108,7 @@ class StepEntityResolverTest {
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#3=NON_MANIFOLD_SURFACE_SHAPE_REPRESENTATION('NMSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7862,6 +8138,7 @@ class StepEntityResolverTest {
         + "#15=CLOSED_SHELL('CS',(#13));\n"
         + "#16=FACETED_BREP('FB',#15);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7891,6 +8168,7 @@ class StepEntityResolverTest {
         + "#15=OPEN_SHELL('OS',(#13));\n"
         + "#16=SHELL_BASED_SURFACE_MODEL('SBSM',(#15));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7925,6 +8203,7 @@ class StepEntityResolverTest {
         + "#16=CLOSED_SHELL('VOID0',(#13));\n"
         + "#17=BREP_WITH_VOIDS('BWV',#15,(#16));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7951,6 +8230,7 @@ class StepEntityResolverTest {
         + "#10=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9);\n"
         + "#11=PRODUCT_DEFINITION_SHAPE('shape','occurrence shape',#10);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -7973,6 +8253,7 @@ class StepEntityResolverTest {
         + "#5=SHAPE_REPRESENTATION('REP_B',(#2),#3);\n"
         + "#6=SHAPE_REPRESENTATION_RELATIONSHIP('map','assembly link',#4,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8006,6 +8287,7 @@ class StepEntityResolverTest {
         + "#16=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9);\n"
         + "#17=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#15,#16);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8047,6 +8329,7 @@ class StepEntityResolverTest {
         + "#16=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9);\n"
         + "#17=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#15,#16);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8077,6 +8360,7 @@ class StepEntityResolverTest {
         + "#9=PRODUCT_DEFINITION('prt-def','part def',#6,#7);\n"
         + "#10=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','component 1','mounted',#8,#9,'A-01');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8108,6 +8392,7 @@ class StepEntityResolverTest {
         + "#15=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#16=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#12,#11);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8135,6 +8420,7 @@ class StepEntityResolverTest {
         + "    GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#4))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8165,6 +8451,7 @@ class StepEntityResolverTest {
         + "#3=PRODUCT('PRT','part','',(#2));\n"
         + "#4=PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE('v1','first release',#3,.NOT_KNOWN.);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8183,6 +8470,7 @@ class StepEntityResolverTest {
         + "#4=PRODUCT('PRT','part','machined part',(#2));\n"
         + "#5=PRODUCT_RELATIONSHIP('PR','contains','assembly contains part',#3,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8224,6 +8512,7 @@ class StepEntityResolverTest {
         + "#22=ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE('ACUS','usage substitute','alternate usage',#10,#11);\n"
         + "#23=PRODUCT_DEFINITION_SUBSTITUTE('PDS','definition substitute','alternate definition',#10,#11);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8277,6 +8566,7 @@ class StepEntityResolverTest {
         + "#3=GROUP_RELATIONSHIP('group rel','relates groups',#1,#2);\n"
         + "#4=CLASS_SYSTEM('classification system','class system description');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8308,6 +8598,7 @@ class StepEntityResolverTest {
         + "#9=PERSON_AND_ORGANIZATION(#5,#7);\n"
         + "#10=ORGANIZATION_RELATIONSHIP('org rel','supplier link',#7,#8);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8364,6 +8655,7 @@ class StepEntityResolverTest {
         + "#16=SECURITY_CLASSIFICATION_LEVEL('unclassified');\n"
         + "#17=SECURITY_CLASSIFICATION('sec','export control',#16);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8452,6 +8744,7 @@ class StepEntityResolverTest {
         + "#37=DATE_ASSIGNMENT(#10,#36);\n"
         + "#38=APPLIED_DATE_ASSIGNMENT(#10,#36,(#3));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8572,6 +8865,7 @@ class StepEntityResolverTest {
         + "#39=ORGANIZATION_ROLE('design supplier');\n"
         + "#40=CC_DESIGN_ORGANIZATION_ASSIGNMENT(#8,#39,(#3,#6));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8647,6 +8941,7 @@ class StepEntityResolverTest {
         + "#7=EFFECTIVITY('E-1');\n"
         + "#8=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#6);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8721,6 +9016,7 @@ class StepEntityResolverTest {
         + "#56=EXTERNALLY_DEFINED_TEXT_STYLE('text-style-1',#16);\n"
         + "#57=EXTERNALLY_DEFINED_TILE('tile-1',#16);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -8932,6 +9228,7 @@ class StepEntityResolverTest {
         + "#53=SHAPE_DEFINING_RELATIONSHIP('SDR','shape defining',#8,#9);\n"
         + "#54=SHAPE_FEATURE_FIT_RELATIONSHIP('SFFR','fit',#11,#12);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9035,6 +9332,7 @@ class StepEntityResolverTest {
         + "#52=COUNTERDRILL_HOLE_DEFINITION('CDHD','counterdrill definition');\n"
         + "#53=COUNTERSINK_HOLE_DEFINITION('CSHD','countersink definition');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9092,6 +9390,7 @@ class StepEntityResolverTest {
         + "#8=SHAPE_ASPECT('SA0','base',#7,.T.);\n"
         + "#9=SHAPE_ASPECT_OCCURRENCE('SAO0','occ',#7,.T.,#8);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9154,6 +9453,7 @@ class StepEntityResolverTest {
         + "#45=THREAD('TH','thread');\n"
         + "#46=TURNED_KNURL('TK','turned knurl');\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9191,6 +9491,7 @@ class StepEntityResolverTest {
         + "#13=(REPRESENTATION_RELATIONSHIP('rr','with transform',#11,#12)\n"
         + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#7));\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9225,6 +9526,7 @@ class StepEntityResolverTest {
         + "#12=MAPPED_ITEM(#10,#11);\n"
         + "#13=CARTESIAN_TRANSFORMATION_OPERATOR_2D('T2',$,#3,#1,$);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9289,6 +9591,7 @@ class StepEntityResolverTest {
         + "#33=REPRESENTATION('PCURVE_OFFSET_REP',(#32),#15);\n"
         + "#34=PCURVE('PC_OFFSET',#13,#33);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9360,6 +9663,7 @@ class StepEntityResolverTest {
         + "#7=SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION('SBSMSR',(#1),#2);\n"
         + "#8=SURFACE_MODEL_SHAPE_REPRESENTATION('SMSR',(#1),#2);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9395,6 +9699,7 @@ class StepEntityResolverTest {
         + "#5=REPRESENTATION('REP_B',(#2),#3);\n"
         + "#6=REPRESENTATION_RELATIONSHIP('rr','plain relation',#4,#5);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9421,6 +9726,7 @@ class StepEntityResolverTest {
         + "#7=KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP('KFRR','frame link',#3,#4);\n"
         + "#8=COAXIAL_ASSEMBLY_CONSTRAINT('CAC','coaxial',#3,#4);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9443,6 +9749,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=I_SHAPE_PROFILE_DEF(.AREA.,'I_BEAM',#3,100.0,50.0,50.0,10.0,8.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9460,6 +9767,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=T_SHAPE_PROFILE_DEF(.AREA.,'T_BEAM',#3,80.0,40.0,10.0,8.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9477,6 +9785,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=L_SHAPE_PROFILE_DEF(.AREA.,'L_ANGLE',#3,60.0,40.0,8.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9494,6 +9803,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=U_SHAPE_PROFILE_DEF(.AREA.,'U_CHANNEL',#3,50.0,30.0,8.0,5.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9511,6 +9821,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=Z_SHAPE_PROFILE_DEF(.AREA.,'Z_BEAM',#3,60.0,40.0,30.0,8.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9528,6 +9839,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=HAT_SHAPE_PROFILE_DEF(.AREA.,'HAT',#3,50.0,30.0,20.0,8.0,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9545,6 +9857,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=FLAT_BAR_PROFILE_DEF(.AREA.,'FLAT',#3,50.0,10.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -9562,6 +9875,7 @@ class StepEntityResolverTest {
         + "#3=AXIS2_PLACEMENT_2D('AX2',#1,#2);\n"
         + "#4=DOVE_TAIL_PROFILE_DEF(.AREA.,'DOVE',#3,30.0,15.0,0.3,5.0);\n"
         + "ENDSEC;"
+        );
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 

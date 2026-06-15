@@ -61,6 +61,7 @@ class StepPreviewJsonExporterTest {
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
         + "ENDSEC;"
+        );
 
         byte[] direct = StepPreviewJsonExporter.exportGlb(compiled.stepText());
         byte[] compiledBinary = StepPreviewJsonExporter.exportGlb(compiled);
@@ -110,6 +111,7 @@ class StepPreviewJsonExporterTest {
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
         + "ENDSEC;"
+        );
 
         assertTrue(binary.length > 16);
         assertEquals('g', binary[0]);
@@ -372,7 +374,7 @@ class StepPreviewJsonExporterTest {
         + "#5=DIRECTION('DZ',(0.0,0.0,1.0));\n"
         + "#6=OFFSET_CURVE_3D('OC3',#4,0.5,.F.,#5);\n"
         + "#7=GEOMETRIC_CURVE_SET('GCS0',(#6));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -799,6 +801,7 @@ class StepPreviewJsonExporterTest {
         + "#23=ANNOTATION_TEXT_OCCURRENCE('NOTE','occurrence-links',#15);\n"
         + "#24=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#4,#3,#23,#22);\n"
         + "ENDSEC;"
+        );
 
         String calloutBinary = metadataFromBinary(StepPreviewJsonExporter.exportBinary(calloutStep));
         String calloutGlb = metadataFromGlb(StepPreviewJsonExporter.exportGlb(calloutStep));
@@ -10652,6 +10655,7 @@ class StepPreviewJsonExporterTest {
         + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;"
+        );
 
         assertTrue(json.contains("\"units\":{\"lengthUnit\":\"INCH\",\"scaleToMeters\":0.0254"), json);
         assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
@@ -10694,6 +10698,7 @@ class StepPreviewJsonExporterTest {
         + "#28=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
         + "#29=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#28);\n"
         + "ENDSEC;"
+        );
 
         JSONObject payload = JSONObject.parseObject(json);
         JSONObject units = payload.getJSONObject("units");

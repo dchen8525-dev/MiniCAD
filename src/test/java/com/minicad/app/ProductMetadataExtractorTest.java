@@ -23,6 +23,7 @@ class ProductMetadataExtractorTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
     @Test
     void shouldExtractHeaderMetadata() {
@@ -46,6 +47,7 @@ class ProductMetadataExtractorTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         StepFile stepFile = StepParser.parse(stepText);
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
@@ -65,6 +67,7 @@ class ProductMetadataExtractorTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         StepFile stepFile = StepParser.parse(stepText);
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);

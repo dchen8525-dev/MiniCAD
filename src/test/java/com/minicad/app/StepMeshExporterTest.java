@@ -57,6 +57,7 @@ class StepMeshExporterTest {
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
     @Test
     void shouldExportObj() {
@@ -140,6 +141,7 @@ class StepMeshExporterTest {
         + "#5=BLOCK('B',#4,1.0,2.0,3.0);\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         String obj = StepMeshExporter.exportObj(stepText);
         assertTrue(obj.contains("v "));
@@ -189,6 +191,7 @@ class StepMeshExporterTest {
         + "#12=MANIFOLD_SOLID_BREP('S',#11);\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         String obj = StepMeshExporter.exportObj(stepText);
         assertTrue(obj.contains("v "));
@@ -262,6 +265,7 @@ class StepMeshExporterTest {
         + "#90=OPEN_SHELL('OS',(#80));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         String obj = StepMeshExporter.exportObj(stepText);
 
@@ -433,6 +437,7 @@ class StepMeshExporterTest {
         + "#73=OPEN_SHELL('OS',(#72));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         assertTrue(obj.contains("f "));
         assertEquals(4.0, planarAreaFromObj(obj), 0.15);
@@ -493,6 +498,7 @@ class StepMeshExporterTest {
         + "#63=OPEN_SHELL('OS',(#62));\n"
         + "ENDSEC;\n"
         + "END-ISO-10303-21;"
+        );
 
         assertTrue(obj.contains("f "));
         assertEquals(7.0 * Math.PI / 4.0, planarAreaFromObj(obj), 0.35);
