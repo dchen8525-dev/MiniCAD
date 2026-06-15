@@ -39,6 +39,9 @@ public final class StepContextDependentUnit implements StepEntity {
         return unitKind;
     }
 
+    // Record-style accessor
+    public String unitKind() { return unitKind; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

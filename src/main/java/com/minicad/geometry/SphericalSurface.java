@@ -38,6 +38,29 @@ public final class SphericalSurface implements SurfaceGeometry {
     public Axis2Placement3D position() { return getPosition(); }
     public double radius() { return getRadius(); }
 
+    /**
+     * Returns a point on the spherical surface at the given parametric coordinates.
+     *
+     * @param u longitude angle around the sphere axis (radians)
+     * @param v latitude angle from equator (radians)
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        CartesianPoint origin = position.location();
+        Vector3 axis = position.axis().asVector();
+        Vector3 xDir = position.xDirection().asVector();
+        Vector3 yDir = position.yDirection().asVector();
+        double cosU = Math.cos(u);
+        double sinU = Math.sin(u);
+        double cosV = Math.cos(v);
+        double sinV = Math.sin(v);
+        Vector3 radial = xDir.scale(radius * cosV * cosU).add(yDir.scale(radius * cosV * sinU));
+        Vector3 axial = axis.scale(radius * sinV);
+        return origin.add(radial).add(axial);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

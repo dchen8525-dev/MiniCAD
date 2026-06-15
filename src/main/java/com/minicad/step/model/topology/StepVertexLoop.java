@@ -1,5 +1,7 @@
 package com.minicad.step.model.topology;
 
+import java.util.Objects;
+
 /**
  * Resolved VERTEX_LOOP.
  *

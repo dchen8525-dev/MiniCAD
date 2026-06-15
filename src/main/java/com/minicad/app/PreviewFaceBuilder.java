@@ -359,7 +359,6 @@ public final class PreviewFaceBuilder {
                         null,
                         null,
                         null,
-                        null,
                         null
                 ),
                 null
@@ -449,7 +448,6 @@ public final class PreviewFaceBuilder {
                         null,
                         null,
                         null,
-                        null,
                         null
                 ),
                 null
@@ -515,7 +513,6 @@ public final class PreviewFaceBuilder {
                         upperV,
                         lowerU.get(0),
                         lowerU.get(lowerU.size() - 1) - lowerU.get(0),
-                        null,
                         null,
                         null,
                         null,
@@ -620,7 +617,6 @@ public final class PreviewFaceBuilder {
                         null,
                         null,
                         null,
-                        null,
                         null
                 ),
                 null
@@ -706,7 +702,7 @@ public final class PreviewFaceBuilder {
                 new FaceSurfacePayload(
                         "ruled_surface", null, null, null, 0.0, null, null,
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null
                 ),
                 null
         );
@@ -795,7 +791,7 @@ public final class PreviewFaceBuilder {
                 new FaceSurfacePayload(
                         "linear_extrusion", null, null, null, 0.0, null, null,
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null
                 ),
                 null
         );
@@ -840,7 +836,7 @@ public final class PreviewFaceBuilder {
                 new FaceSurfacePayload(
                         "surface_of_revolution", null, null, null, 0.0, null, null,
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null
                 ),
                 null
         );
@@ -887,7 +883,7 @@ public final class PreviewFaceBuilder {
                 new FaceSurfacePayload(
                         "offset_surface", null, null, null, 0.0, null, surface.distance(),
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null
                 ),
                 null
         );
@@ -1790,9 +1786,9 @@ public final class PreviewFaceBuilder {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepEntity entity : resolved.values()) {
             if (!(entity instanceof StepRepresentationRelationshipWithTransformation)) {
-            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 continue;
             }
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
             if (!relationship.rep1().shapeRepresentation()
                     || !relationship.rep2().shapeRepresentation()
                     || relationship.rep2().id() != representation.id()) {
@@ -1899,6 +1895,7 @@ public final class PreviewFaceBuilder {
         if (!(bound.loop() instanceof EdgeLoop)) {
             throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
         }
+        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -1952,6 +1949,7 @@ public final class PreviewFaceBuilder {
         return new EdgePayload(
                 edgeId,
                 toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
+                null,
                 null
         );
     }
@@ -1960,7 +1958,7 @@ public final class PreviewFaceBuilder {
         List<CartesianPoint> points = polyline.points().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
                 .collect(Collectors.toList());
-        return new EdgePayload(polyline.id(), toPointPayloads(points), null);
+        return new EdgePayload(polyline.id(), toPointPayloads(points), null, null);
     }
 
     public static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
@@ -1971,7 +1969,7 @@ public final class PreviewFaceBuilder {
         if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
             closed.add(closed.get(0));
         }
-        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null);
+        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null, null);
     }
 
     // ─── Shell/vertex utilities ──────────────────────────────────────────
@@ -2270,7 +2268,7 @@ public final class PreviewFaceBuilder {
         Vector3 reference = Math.abs(axis.x()) < 0.9
                 ? new Vector3(1.0, 0.0, 0.0)
                 : new Vector3(0.0, 1.0, 0.0);
-        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize();
+        Direction3 xDirection = Direction3.from(reference.subtract(axis.scale(reference.dot(axis))).normalize());
         return List.of(xDirection.x(), xDirection.y(), xDirection.z());
     }
 

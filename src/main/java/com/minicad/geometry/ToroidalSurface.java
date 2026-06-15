@@ -47,6 +47,30 @@ public final class ToroidalSurface implements SurfaceGeometry {
     public double majorRadius() { return getMajorRadius(); }
     public double minorRadius() { return getMinorRadius(); }
 
+    /**
+     * Returns a point on the toroidal surface at the given parametric coordinates.
+     *
+     * @param u revolution angle around the torus axis (radians)
+     * @param v angle around the tube cross-section (radians)
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        CartesianPoint origin = position.location();
+        Vector3 axis = position.axis().asVector();
+        Vector3 xDir = position.xDirection().asVector();
+        Vector3 yDir = position.yDirection().asVector();
+        double cosU = Math.cos(u);
+        double sinU = Math.sin(u);
+        double cosV = Math.cos(v);
+        double sinV = Math.sin(v);
+        double tubeCenterR = majorRadius + minorRadius * cosV;
+        Vector3 radial = xDir.scale(tubeCenterR * cosU).add(yDir.scale(tubeCenterR * sinU));
+        Vector3 tubeOffset = axis.scale(minorRadius * sinV);
+        return origin.add(radial).add(tubeOffset);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Exports STEP files to OBJ and STL mesh formats.
@@ -262,7 +263,8 @@ public final class StepMeshExporter {
         }
 
         void triangulateSolid(Solid solid) {
-            for (Shell shell : solid.allShells()) {
+            triangulateShell(solid.outerShell());
+            for (Shell shell : solid.voidShells()) {
                 triangulateShell(shell);
             }
         }
@@ -352,8 +354,12 @@ public final class StepMeshExporter {
             int uSegs = DEFAULT_CURVE_SEGMENTS;
             int vSegs = DEFAULT_CURVE_SEGMENTS;
 
-            BoundingBox3 bbox = face.boundingBox();
-            double diag = bbox.diagonal();
+            BoundingBox3 bbox = surface.boundingBox();
+            double diag = Math.sqrt(
+                Math.pow(bbox.maxX() - bbox.minX(), 2) +
+                Math.pow(bbox.maxY() - bbox.minY(), 2) +
+                Math.pow(bbox.maxZ() - bbox.minZ(), 2)
+            );
             if (diag > 0) {
                 int base = Math.max(MIN_CURVE_SEGMENTS,
                     Math.min(MAX_CURVE_SEGMENTS, (int) Math.ceil(diag * BBOX_SEGMENT_MULTIPLIER)));
@@ -499,7 +505,7 @@ public final class StepMeshExporter {
             EdgeLoop edgeLoop = (EdgeLoop) loop;
                 List<CartesianPoint> points = new ArrayList<>();
                 for (OrientedEdge oe : edgeLoop.edges()) {
-                    List<CartesianPoint> edgePoints = orientSamples(oe, oe.edge().sample(DEFAULT_CURVE_SEGMENTS));
+                    List<CartesianPoint> edgePoints = orientSamples(oe, oe.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
                     int startIndex = points.isEmpty() ? 0 : 1;
                     for (int i = startIndex; i < edgePoints.size(); i++) {
                         points.add(edgePoints.get(i));
@@ -1350,6 +1356,7 @@ public final class StepMeshExporter {
                 if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop)) {
                     return List.of();
                 }
+                com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
                 List<UvPoint> loopPoints = new ArrayList<>();
                 boolean firstEdge = true;
                 for (com.minicad.step.model.topology.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -1439,9 +1446,9 @@ public final class StepMeshExporter {
             for (StepEntity pcurve : pcurves) {
                 Object built = builder.buildPcurve2(pcurve.id());
                 if (!(built instanceof Curve2)) {
-            Curve2 curve2 = (Curve2) built;
                     continue;
                 }
+                Curve2 curve2 = (Curve2) built;
                 List<UvPoint> sampled = sampleCurve2(curve2, projectedStart, projectedEnd);
                 if (sampled.isEmpty()) {
                     continue;
@@ -1458,7 +1465,7 @@ public final class StepMeshExporter {
 
             Edge edge = builder.buildEdge(orientedEdge.edgeElement().id());
             OrientedEdge built = new OrientedEdge(edge, orientedEdge.orientation());
-            List<CartesianPoint> points3d = orientSamples(built, built.edge().sample(DEFAULT_CURVE_SEGMENTS));
+            List<CartesianPoint> points3d = orientSamples(built, built.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
             List<UvPoint> uvPoints = new ArrayList<>();
             UvPoint previous = null;
             for (CartesianPoint point : points3d) {
@@ -2034,7 +2041,7 @@ public final class StepMeshExporter {
             if (!pcurvePoints.isEmpty()) {
                 return pcurvePoints;
             }
-            List<CartesianPoint> points3d = orientSamples(orientedEdge, orientedEdge.edge().sample(DEFAULT_CURVE_SEGMENTS));
+            List<CartesianPoint> points3d = orientSamples(orientedEdge, orientedEdge.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
             List<UvPoint> uvPoints = new ArrayList<>();
             UvPoint previous = null;
             for (CartesianPoint point : points3d) {

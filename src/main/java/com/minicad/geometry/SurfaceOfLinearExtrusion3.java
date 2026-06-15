@@ -38,6 +38,20 @@ public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
     public Curve3 sweptCurve() { return getSweptCurve(); }
     public Vector3 extrusionVector() { return getExtrusionVector(); }
 
+    /**
+     * Returns a point on the surface of linear extrusion at the given parametric coordinates.
+     *
+     * @param u parameter along the swept curve
+     * @param v extrusion parameter (0 = base, 1 = full extrusion)
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        CartesianPoint curvePoint = sweptCurve.pointAt(u);
+        return curvePoint.add(extrusionVector.scale(v));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

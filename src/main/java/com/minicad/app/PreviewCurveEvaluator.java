@@ -1059,7 +1059,7 @@ public final class PreviewCurveEvaluator {
                         List.of(placement.location().x(), placement.location().y(), placement.location().z()),
                         List.of(placement.axis().x(), placement.axis().y(), placement.axis().z()),
                         List.of(placement.xDirection().x(), placement.xDirection().y(), placement.xDirection().z()),
-                        null, geometry.semiAxis1(), geometry.semiAxis2(), null, null, null, null, null, null, null, null, null,
+                        null, geometry.semiAxis1(), geometry.semiAxis2(), null, null, null, null, null, null, null, null, null, null, null,
                         startAngle, arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward));
             }
             if (edgeGeometry instanceof StepBSplineCurveWithKnots) {

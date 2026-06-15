@@ -47,6 +47,30 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
     public CartesianPoint axisOrigin() { return getAxisOrigin(); }
     public Direction3 axisDirection() { return getAxisDirection(); }
 
+    /**
+     * Returns a point on the surface of revolution at the given parametric coordinates.
+     *
+     * @param u revolution angle (radians)
+     * @param v parameter along the swept curve
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        CartesianPoint curvePoint = sweptCurve.pointAt(v);
+        Vector3 axis = axisDirection.asVector();
+        Vector3 offset = curvePoint.subtract(axisOrigin);
+        Vector3 axial = axis.scale(offset.dot(axis));
+        Vector3 radial = offset.subtract(axial);
+        double cosU = Math.cos(u);
+        double sinU = Math.sin(u);
+        // Rotate radial component around axis using perpendicular directions
+        Vector3 perp1 = radial.normalize().asVector();
+        Vector3 perp2 = axis.cross(perp1).normalize().asVector();
+        Vector3 rotatedRadial = perp1.scale(radial.norm() * cosU).add(perp2.scale(radial.norm() * sinU));
+        return axisOrigin.add(axial).add(rotatedRadial);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

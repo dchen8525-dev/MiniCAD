@@ -49,6 +49,7 @@ public final class StepDerivedUnit implements StepEntity {
     public List<StepDerivedUnitElement> elements() {
         return elements;
     }
+    public String unitKind() { return unitKind; }
 
     @Override
     public boolean equals(Object o) {

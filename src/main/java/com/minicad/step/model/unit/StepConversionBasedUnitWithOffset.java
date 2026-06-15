@@ -59,6 +59,7 @@ public final class StepConversionBasedUnitWithOffset implements StepEntity {
     public StepMeasureWithUnit conversionFactor() {
         return conversionFactor;
     }
+    public String unitKind() { return unitKind; }
 
     @Override
     public boolean equals(Object o) {

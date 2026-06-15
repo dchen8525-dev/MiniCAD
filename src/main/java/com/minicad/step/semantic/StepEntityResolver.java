@@ -2474,8 +2474,14 @@ public final class StepEntityResolver {
     }
     boolean orientation = booleanValue(instance, definition, pathIndex + 1);
     List<StepOrientedEdge> sourceEdges = pathEdges(pathElement);
-    List<StepOrientedEdge> edges =
-        orientation ? sourceEdges : sourceEdges.reversed();
+    List<StepOrientedEdge> edges;
+    if (orientation) {
+      edges = sourceEdges;
+    } else {
+      List<StepOrientedEdge> reversed = new ArrayList<>(sourceEdges);
+      Collections.reverse(reversed);
+      edges = reversed;
+    }
     return new StepOrientedPath(instance.id(), name, pathElement, orientation, edges);
   }
 
@@ -8741,10 +8747,10 @@ public final class StepEntityResolver {
     validateNamedUnitDimensions(instance);
     StepEntity conversionFactor = resolve(referenceId(instance, definition, 1));
     if (!(conversionFactor instanceof StepMeasureWithUnit)) {
-            StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) conversionFactor;
       throw new StepResolutionException(
           "CONVERSION_BASED_UNIT conversion_factor must reference MEASURE_WITH_UNIT");
     }
+    StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) conversionFactor;
     return new StepConversionBasedUnit(
         instance.id(),
         stringValue(instance, definition, 0),
@@ -8874,7 +8880,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "UNIFORM_CURVE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_CURVE")) {
-      return new StepUniformCurve(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepUniformCurve(instance.id(), inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
     }
     ResolvedBSplineCurveData spline = resolveInheritedBSplineCurveData(instance);
     return new StepUniformCurve(
@@ -8891,7 +8897,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "BEZIER_CURVE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_CURVE")) {
-      return new StepBezierCurve(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepBezierCurve(instance.id(), inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
     }
     ResolvedBSplineCurveData spline = resolveInheritedBSplineCurveData(instance);
     return new StepBezierCurve(
@@ -8908,7 +8914,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "PIECEWISE_BEZIER_CURVE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_CURVE")) {
-      return new StepPiecewiseBezierCurve(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepPiecewiseBezierCurve(instance.id(), inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
     }
     ResolvedBSplineCurveData spline = resolveInheritedBSplineCurveData(instance);
     return new StepPiecewiseBezierCurve(
@@ -8925,7 +8931,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "QUASI_UNIFORM_CURVE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_CURVE")) {
-      return new StepQuasiUniformCurve(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepQuasiUniformCurve(instance.id(), inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
     }
     ResolvedBSplineCurveData spline = resolveInheritedBSplineCurveData(instance);
     return new StepQuasiUniformCurve(
@@ -8948,7 +8954,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "UNIFORM_SURFACE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
-      return new StepUniformSurface(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepUniformSurface(instance.id(), inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
     }
     ResolvedBSplineSurfaceData surface = resolveInheritedBSplineSurfaceData(instance);
     return new StepUniformSurface(
@@ -8967,7 +8973,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "BEZIER_SURFACE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
-      return new StepBezierSurface(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepBezierSurface(instance.id(), inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
     }
     ResolvedBSplineSurfaceData surface = resolveInheritedBSplineSurfaceData(instance);
     return new StepBezierSurface(
@@ -8986,7 +8992,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "PIECEWISE_BEZIER_SURFACE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
-      return new StepPiecewiseBezierSurface(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepPiecewiseBezierSurface(instance.id(), inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
     }
     ResolvedBSplineSurfaceData surface = resolveInheritedBSplineSurfaceData(instance);
     return new StepPiecewiseBezierSurface(
@@ -9005,7 +9011,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "QUASI_UNIFORM_SURFACE");
     requireParameterCount(instance, definition, 0);
     if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
-      return new StepQuasiUniformSurface(instance.id(), inheritedRepresentationItemName(instance));
+      return new StepQuasiUniformSurface(instance.id(), inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
     }
     ResolvedBSplineSurfaceData surface = resolveInheritedBSplineSurfaceData(instance);
     return new StepQuasiUniformSurface(
@@ -11270,10 +11276,10 @@ public final class StepEntityResolver {
     List<StepCartesianPoint> coordinates = new ArrayList<>();
     for (StepEntity entity : coordinateEntities) {
       if (!(entity instanceof StepCartesianPoint)) {
-            StepCartesianPoint point = (StepCartesianPoint) entity;
         throw new StepResolutionException(
             "TESSELLATED_FACE_SET coordinates must contain CARTESIAN_POINT entities");
       }
+      StepCartesianPoint point = (StepCartesianPoint) entity;
       coordinates.add(point);
     }
     StepValue value = unwrapTyped(definition.parameters().get(3));
@@ -12875,7 +12881,7 @@ public final class StepEntityResolver {
     StepExternallyDefinedItem item = requireEntity(
         referenceId(instance, definition, 1),
         StepExternallyDefinedItem.class,
-        this);
+        "EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT item must reference EXTERNALLY_DEFINED_ITEM");
     return new StepExternallyDefinedConversionBasedUnit(
         instance.id(),
         stringValue(instance, definition, 0),
