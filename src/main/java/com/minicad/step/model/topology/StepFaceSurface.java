@@ -59,6 +59,13 @@ public final class StepFaceSurface implements StepFaceEntity {
         return sameSense;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepFaceBound> bounds() { return getBounds(); }
+    public StepEntity faceGeometry() { return getFaceGeometry(); }
+    public boolean sameSense() { return isSameSense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -53,6 +53,14 @@ public final class StepRightCircularConeVolume implements StepEntity {
         return topRadius;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public Double height() { return getHeight(); }
+    public Double bottomRadius() { return getBottomRadius(); }
+    public Double topRadius() { return getTopRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

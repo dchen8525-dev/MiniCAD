@@ -80,6 +80,16 @@ public final class Vector3 {
     }
 
     /**
+     * Adds another vector to this one.
+     *
+     * @param other the other vector
+     * @return sum vector
+     */
+    public Vector3 add(Vector3 other) {
+        return new Vector3(x + other.x, y + other.y, z + other.z);
+    }
+
+    /**
      * Returns the squared norm (magnitude squared) of this vector.
      *
      * @return squared norm

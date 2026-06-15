@@ -45,6 +45,13 @@ public final class StepTorusVolume implements StepEntity {
         return minorRadius;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public Double majorRadius() { return getMajorRadius(); }
+    public Double minorRadius() { return getMinorRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -39,6 +39,12 @@ public final class StepSphereVolume implements StepEntity {
         return radius;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity center() { return getCenter(); }
+    public Double radius() { return getRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

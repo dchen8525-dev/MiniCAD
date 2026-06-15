@@ -45,6 +45,13 @@ public final class StepCylinderVolume implements StepEntity {
         return height;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public Double radius() { return getRadius(); }
+    public Double height() { return getHeight(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -50,6 +50,12 @@ public final class StepOrientedFace implements StepFaceEntity {
         return orientation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepFaceEntity faceElement() { return getFaceElement(); }
+    public boolean orientation() { return isOrientation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
