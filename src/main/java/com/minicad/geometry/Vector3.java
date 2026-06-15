@@ -55,6 +55,30 @@ public final class Vector3 {
         return Math.abs(x) < Epsilon.get() && Math.abs(y) < Epsilon.get() && Math.abs(z) < Epsilon.get();
     }
 
+    /**
+     * Scales this vector by a scalar.
+     *
+     * @param factor the scaling factor
+     * @return scaled vector
+     */
+    public Vector3 scale(double factor) {
+        return new Vector3(x * factor, y * factor, z * factor);
+    }
+
+    /**
+     * Computes the cross product of this vector with another.
+     *
+     * @param other the other vector
+     * @return cross product
+     */
+    public Vector3 cross(Vector3 other) {
+        return new Vector3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -49,6 +49,12 @@ public final class StepSurfaceOfConstantRadius implements StepEntity {
         return radius;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptSurface() { return getSweptSurface(); }
+    public double radius() { return getRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

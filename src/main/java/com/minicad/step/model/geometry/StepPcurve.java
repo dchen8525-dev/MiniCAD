@@ -49,6 +49,12 @@ public final class StepPcurve implements StepEntity {
         return referenceToCurve;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public StepRepresentation referenceToCurve() { return getReferenceToCurve(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

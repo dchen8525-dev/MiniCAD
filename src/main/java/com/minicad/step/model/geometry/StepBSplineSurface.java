@@ -89,6 +89,17 @@ public final class StepBSplineSurface implements StepEntity {
         return selfIntersect;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public int uDegree() { return getUDegree(); }
+    public int vDegree() { return getVDegree(); }
+    public List<List<StepCartesianPoint>> controlPoints() { return getControlPoints(); }
+    public String surfaceForm() { return getSurfaceForm(); }
+    public boolean uClosed() { return isUClosed(); }
+    public boolean vClosed() { return isVClosed(); }
+    public boolean selfIntersect() { return isSelfIntersect(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

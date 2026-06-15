@@ -29,6 +29,16 @@ public final class Line2 implements Curve2 {
         this.parameterScale = parameterScale;
     }
 
+    /**
+     * Creates a line with default parameter scale of 1.0.
+     *
+     * @param origin line origin
+     * @param direction line direction
+     */
+    public Line2(Point2 origin, Direction2 direction) {
+        this(origin, direction, 1.0);
+    }
+
     public Point2 getOrigin() {
         return origin;
     }

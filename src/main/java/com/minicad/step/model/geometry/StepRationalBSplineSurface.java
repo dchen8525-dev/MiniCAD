@@ -137,6 +137,23 @@ public final class StepRationalBSplineSurface implements StepEntity {
         return knotSpec;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public int uDegree() { return getUDegree(); }
+    public int vDegree() { return getVDegree(); }
+    public List<List<StepCartesianPoint>> controlPoints() { return getControlPoints(); }
+    public String surfaceForm() { return getSurfaceForm(); }
+    public boolean uClosed() { return isUClosed(); }
+    public boolean vClosed() { return isVClosed(); }
+    public boolean selfIntersect() { return isSelfIntersect(); }
+    public List<List<Double>> weightsData() { return getWeightsData(); }
+    public List<Integer> uMultiplicities() { return getUMultiplicities(); }
+    public List<Integer> vMultiplicities() { return getVMultiplicities(); }
+    public List<Double> uKnots() { return getUKnots(); }
+    public List<Double> vKnots() { return getVKnots(); }
+    public String knotSpec() { return getKnotSpec(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

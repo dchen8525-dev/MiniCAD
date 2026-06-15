@@ -66,18 +66,6 @@ public final class StepAdvancedFace implements StepFaceEntity {
     public StepEntity faceGeometry() { return getFaceGeometry(); }
     public boolean sameSense() { return isSameSense(); }
 
-    public List<StepFaceBound> getBounds() {
-        return bounds;
-    }
-
-    public StepEntity getFaceGeometry() {
-        return faceGeometry;
-    }
-
-    public boolean isSameSense() {
-        return sameSense;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -63,6 +63,14 @@ public final class StepTrimmedCurve2D implements StepEntity {
         return senseAgreement;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepCurve basisCurve() { return getBasisCurve(); }
+    public double trim1() { return getTrim1(); }
+    public double trim2() { return getTrim2(); }
+    public boolean senseAgreement() { return isSenseAgreement(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

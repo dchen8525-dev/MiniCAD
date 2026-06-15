@@ -32,6 +32,20 @@ public final class Point2 {
         return y;
     }
 
+    // Record-style accessors
+    public double x() { return getX(); }
+    public double y() { return getY(); }
+
+    /**
+     * Adds a vector to this point.
+     *
+     * @param vector the vector to add
+     * @return new point
+     */
+    public Point2 add(Vector2 vector) {
+        return new Point2(x + vector.x(), y + vector.y());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

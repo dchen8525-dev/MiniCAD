@@ -33,6 +33,30 @@ public final class Vector2 {
         return y;
     }
 
+    // Record-style accessors
+    public double x() { return getX(); }
+    public double y() { return getY(); }
+
+    /**
+     * Scales this vector by a scalar.
+     *
+     * @param factor the scaling factor
+     * @return scaled vector
+     */
+    public Vector2 scale(double factor) {
+        return new Vector2(x * factor, y * factor);
+    }
+
+    /**
+     * Adds another vector to this one.
+     *
+     * @param other the other vector
+     * @return sum vector
+     */
+    public Vector2 add(Vector2 other) {
+        return new Vector2(x + other.x, y + other.y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

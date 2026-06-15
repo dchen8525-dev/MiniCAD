@@ -53,14 +53,6 @@ public final class StepCylindricalSurface implements StepEntity {
     public StepAxis2Placement3D position() { return getPosition(); }
     public double radius() { return getRadius(); }
 
-    public StepAxis2Placement3D getPosition() {
-        return position;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

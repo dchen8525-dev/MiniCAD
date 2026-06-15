@@ -49,6 +49,12 @@ public final class StepBezierCurve2D implements StepEntity {
         return controlPoints;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public int degree() { return getDegree(); }
+    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

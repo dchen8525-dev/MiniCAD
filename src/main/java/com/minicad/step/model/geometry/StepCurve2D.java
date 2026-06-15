@@ -49,6 +49,12 @@ public final class StepCurve2D implements StepEntity {
         return equation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepAxis2Placement2D position() { return getPosition(); }
+    public double[] equation() { return getEquation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

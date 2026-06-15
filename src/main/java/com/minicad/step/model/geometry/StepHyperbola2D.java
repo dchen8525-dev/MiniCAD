@@ -55,6 +55,11 @@ public final class StepHyperbola2D implements StepEntity {
         return semiAxis2;
     }
 
+    // Record-style accessors
+    public StepAxis2Placement2D position() { return getPosition(); }
+    public double semiAxis1() { return getSemiAxis1(); }
+    public double semiAxis2() { return getSemiAxis2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

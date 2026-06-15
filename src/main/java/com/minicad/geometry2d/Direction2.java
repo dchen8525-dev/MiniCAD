@@ -53,6 +53,15 @@ public final class Direction2 {
         return new Direction2(vector.x() / length, vector.y() / length);
     }
 
+    /**
+     * Returns this direction as a vector.
+     *
+     * @return vector representation
+     */
+    public Vector2 asVector() {
+        return new Vector2(x, y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

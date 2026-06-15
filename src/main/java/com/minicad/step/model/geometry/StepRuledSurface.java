@@ -57,6 +57,13 @@ public final class StepRuledSurface implements StepEntity {
         return directrix2;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public StepEntity directrix1() { return getDirectrix1(); }
+    public StepEntity directrix2() { return getDirectrix2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

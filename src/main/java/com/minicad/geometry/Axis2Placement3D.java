@@ -42,6 +42,31 @@ public final class Axis2Placement3D {
         return refDirection;
     }
 
+    // Record-style accessors
+    public CartesianPoint location() { return getLocation(); }
+    public Direction3 axis() { return getAxis(); }
+    public Direction3 refDirection() { return getRefDirection(); }
+
+    /**
+     * Returns the local X direction (refDirection normalized).
+     *
+     * @return X direction
+     */
+    public Direction3 xDirection() {
+        return refDirection != null ? refDirection : Direction3.xAxis();
+    }
+
+    /**
+     * Returns the local Y direction (computed from axis and refDirection).
+     *
+     * @return Y direction
+     */
+    public Direction3 yDirection() {
+        Direction3 z = axis != null ? axis : Direction3.zAxis();
+        Direction3 x = xDirection();
+        return Direction3.from(z.asVector().cross(x.asVector()));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

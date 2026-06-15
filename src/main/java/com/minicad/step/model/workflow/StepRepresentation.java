@@ -65,6 +65,14 @@ public final class StepRepresentation implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepEntity> items() { return getItems(); }
+    public StepEntity context() { return getContext(); }
+    public boolean shapeRepresentation() { return isShapeRepresentation(); }
+    public String entityName() { return getEntityName(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

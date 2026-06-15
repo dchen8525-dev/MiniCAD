@@ -57,6 +57,13 @@ public final class StepCurveBoundedSurface implements StepEntity {
         return implicitOuter;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public List<StepEntity> boundaries() { return getBoundaries(); }
+    public boolean implicitOuter() { return isImplicitOuter(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

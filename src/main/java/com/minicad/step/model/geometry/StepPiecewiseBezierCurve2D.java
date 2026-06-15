@@ -49,6 +49,10 @@ public final class StepPiecewiseBezierCurve2D implements StepEntity {
         return controlPoints;
     }
 
+    // Record-style accessors
+    public int degree() { return getDegree(); }
+    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

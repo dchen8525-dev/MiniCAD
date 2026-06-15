@@ -55,6 +55,13 @@ public final class StepConicalSurface implements StepEntity {
         return semiAngle;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public double radius() { return getRadius(); }
+    public double semiAngle() { return getSemiAngle(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

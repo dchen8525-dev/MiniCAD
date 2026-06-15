@@ -791,9 +791,9 @@ public final class StepCadBuilder {
         for (StepCompositeCurveSegment segment : segments) {
             Object built = buildCurve2(segment.parentCurve());
             if (!(built instanceof Curve2)) {
-            Curve2 curve = (Curve2) built;
                 throw new UnsupportedGeometryException("COMPOSITE_CURVE segment is not a supported 2D curve");
             }
+            Curve2 curve = (Curve2) built;
             curves.add(curve);
         }
         CompositeCurve2 built = new CompositeCurve2(curves);
@@ -810,9 +810,9 @@ public final class StepCadBuilder {
         for (StepCompositeCurveSegment segment : compositeCurve2D.segments()) {
             Object built = buildCurve2(segment.parentCurve());
             if (!(built instanceof Curve2)) {
-            Curve2 curve = (Curve2) built;
                 throw new UnsupportedGeometryException("COMPOSITE_CURVE_2D segment is not a supported 2D curve");
             }
+            Curve2 curve = (Curve2) built;
             curves.add(curve);
         }
         CompositeCurve2 built = new CompositeCurve2(curves);
@@ -1348,9 +1348,9 @@ public final class StepCadBuilder {
         StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
         Object basis = buildCurve2(trimmedCurve.basisCurve());
         if (!(basis instanceof Curve2)) {
-            Curve2 basisCurve = (Curve2) basis;
             throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
         }
+        Curve2 basisCurve = (Curve2) basis;
         double trimParamStart = trimResolver.resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
         double trimParamEnd = trimResolver.resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
         TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimParamStart, trimParamEnd, trimmedCurve.senseAgreement());
@@ -1362,9 +1362,9 @@ public final class StepCadBuilder {
         StepOffsetCurve2D offsetCurve = requireEntity(id, StepOffsetCurve2D.class, "OFFSET_CURVE_2D");
         Object basisObject = buildCurve2(offsetCurve.basisCurve());
         if (!(basisObject instanceof Curve2)) {
-            Curve2 basisCurve = (Curve2) basisObject;
             throw new UnsupportedGeometryException("OFFSET_CURVE_2D basis curve is not a supported 2D curve");
         }
+        Curve2 basisCurve = (Curve2) basisObject;
         return approximateOffsetCurve2(basisCurve, offsetCurve.distance());
     }
 
@@ -1422,6 +1422,7 @@ public final class StepCadBuilder {
         if (!(ellipse.position() instanceof StepAxis2Placement3D)) {
             throw new StepResolutionException("entity #" + id + " is not a 3D ELLIPSE");
         }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) ellipse.position();
         Ellipse3 built = new Ellipse3(buildPlacement(placement3d.id()), ellipse.semiAxis1(), ellipse.semiAxis2());
         ellipses.put(id, built);
         return built;
@@ -1975,9 +1976,9 @@ public final class StepCadBuilder {
             }
             Object builtCurve = buildPcurveCurve2(geometry);
             if (!(builtCurve instanceof Curve2)) {
-            Curve2 curve2 = (Curve2) builtCurve;
                 continue;
             }
+            Curve2 curve2 = (Curve2) builtCurve;
             SurfaceGeometry surface = buildSupportedFaceGeometry(basisSurfaceEntity, "PCURVE");
             bindings.add(new SurfaceCurve3.ParametricCurve(surface, curve2));
         }
@@ -2013,6 +2014,7 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement3D)) {
             throw new StepResolutionException("entity #" + id + " is not a 3D PARABOLA");
         }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) conic.position();
         if (conic.parameters().isEmpty()) {
             throw new UnsupportedGeometryException("PARABOLA requires focal distance");
         }
@@ -2043,6 +2045,7 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement3D)) {
             throw new StepResolutionException("entity #" + id + " is not a 3D HYPERBOLA");
         }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) conic.position();
         if (conic.parameters().size() < 2) {
             throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
         }
@@ -2093,9 +2096,9 @@ public final class StepCadBuilder {
             return buildPlacement(placement3D.id());
         }
         if (!(position instanceof StepAxis2Placement2D)) {
-            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) position;
             throw new StepResolutionException("position must be AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) position;
         Point2 origin = buildPoint2(placement2D.location().id());
         Direction2 refDir = buildDirection2(placement2D.refDirection().id());
         // Create 3D placement: location at (x, y, 0), Z axis as normal, X direction from 2D
@@ -7211,6 +7214,10 @@ public final class Axis1Placement {
     public Direction3 getAxis() {
         return axis;
     }
+
+    // Record-style accessors
+    public CartesianPoint location() { return getLocation(); }
+    public Direction3 axis() { return getAxis(); }
 
     @Override
     public boolean equals(Object o) {

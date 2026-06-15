@@ -47,6 +47,12 @@ public final class StepSurfaceOfLinearExtrusion implements StepEntity {
         return extrusionAxis;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptCurve() { return getSweptCurve(); }
+    public StepVector extrusionAxis() { return getExtrusionAxis(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

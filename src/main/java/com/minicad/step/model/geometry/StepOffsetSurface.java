@@ -55,6 +55,13 @@ public final class StepOffsetSurface implements StepEntity {
         return selfIntersect;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public double distance() { return getDistance(); }
+    public boolean selfIntersect() { return isSelfIntersect(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

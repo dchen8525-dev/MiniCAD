@@ -45,6 +45,13 @@ public final class StepIndexedPolyCurve implements StepEntity {
         return closed;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepCartesianPoint> points() { return getPoints(); }
+    public List<Integer> indices() { return getIndices(); }
+    public boolean closed() { return isClosed(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -47,6 +47,12 @@ public final class StepSurfaceOfRevolution implements StepEntity {
         return axisPosition;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity sweptCurve() { return getSweptCurve(); }
+    public StepAxis1Placement axisPosition() { return getAxisPosition(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

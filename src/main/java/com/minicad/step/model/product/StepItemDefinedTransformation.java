@@ -57,6 +57,13 @@ public final class StepItemDefinedTransformation implements StepEntity {
         return transformItem2;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public String description() { return getDescription(); }
+    public StepAxis2Placement3D transformItem1() { return getTransformItem1(); }
+    public StepAxis2Placement3D transformItem2() { return getTransformItem2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -55,6 +55,13 @@ public final class StepClothoid implements StepEntity {
         return curvature;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public double xAxisIntercept() { return getXAxisIntercept(); }
+    public double curvature() { return getCurvature(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

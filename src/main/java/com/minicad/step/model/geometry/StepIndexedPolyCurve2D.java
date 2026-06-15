@@ -49,6 +49,10 @@ public final class StepIndexedPolyCurve2D implements StepEntity {
         return indices;
     }
 
+    // Record-style accessors
+    public List<StepCartesianPoint> points() { return getPoints(); }
+    public List<Integer> indices() { return getIndices(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -64,6 +64,33 @@ public final class Direction3 {
         return new Vector3(x, y, z);
     }
 
+    /**
+     * Returns the Z-axis direction (0, 0, 1).
+     *
+     * @return Z-axis direction
+     */
+    public static Direction3 zAxis() {
+        return new Direction3(0, 0, 1);
+    }
+
+    /**
+     * Returns the X-axis direction (1, 0, 0).
+     *
+     * @return X-axis direction
+     */
+    public static Direction3 xAxis() {
+        return new Direction3(1, 0, 0);
+    }
+
+    /**
+     * Returns the Y-axis direction (0, 1, 0).
+     *
+     * @return Y-axis direction
+     */
+    public static Direction3 yAxis() {
+        return new Direction3(0, 1, 0);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

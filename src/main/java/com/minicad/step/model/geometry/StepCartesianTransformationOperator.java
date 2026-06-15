@@ -79,6 +79,16 @@ public final class StepCartesianTransformationOperator implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepDirection axis1() { return getAxis1(); }
+    public StepDirection axis2() { return getAxis2(); }
+    public StepCartesianPoint localOrigin() { return getLocalOrigin(); }
+    public Double scale() { return getScale(); }
+    public StepDirection axis3() { return getAxis3(); }
+    public String entityName() { return getEntityName(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

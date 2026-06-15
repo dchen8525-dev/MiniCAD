@@ -87,6 +87,17 @@ public final class StepRectangularTrimmedSurface implements StepEntity {
         return vsense;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public double u1() { return getU1(); }
+    public double u2() { return getU2(); }
+    public double v1() { return getV1(); }
+    public double v2() { return getV2(); }
+    public boolean usense() { return isUsense(); }
+    public boolean vsense() { return isVsense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

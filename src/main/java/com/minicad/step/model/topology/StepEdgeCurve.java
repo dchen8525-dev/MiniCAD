@@ -71,22 +71,6 @@ public final class StepEdgeCurve implements StepEntity {
     public StepEntity edgeGeometry() { return getEdgeGeometry(); }
     public boolean sameSense() { return isSameSense(); }
 
-    public StepVertexPoint getStart() {
-        return start;
-    }
-
-    public StepVertexPoint getEnd() {
-        return end;
-    }
-
-    public StepEntity getEdgeGeometry() {
-        return edgeGeometry;
-    }
-
-    public boolean isSameSense() {
-        return sameSense;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

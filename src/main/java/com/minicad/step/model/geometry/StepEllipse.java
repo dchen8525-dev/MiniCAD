@@ -55,6 +55,13 @@ public final class StepEllipse implements StepEntity {
         return semiAxis2;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public double semiAxis1() { return getSemiAxis1(); }
+    public double semiAxis2() { return getSemiAxis2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -47,6 +47,12 @@ public final class StepLine2D implements StepEntity {
         return direction2d;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepCartesianPoint point2d() { return getPoint2d(); }
+    public StepDirection direction2d() { return getDirection2d(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

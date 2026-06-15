@@ -76,6 +76,15 @@ public final class StepToroidalSurfaceWithSpecifiedBends implements StepEntity {
         return minorAxisCurve;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public double majorRadius() { return getMajorRadius(); }
+    public double minorRadius() { return getMinorRadius(); }
+    public StepEntity majorAxisCurve() { return getMajorAxisCurve(); }
+    public StepEntity minorAxisCurve() { return getMinorAxisCurve(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

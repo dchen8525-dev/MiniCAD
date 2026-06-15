@@ -47,6 +47,12 @@ public final class StepCompositeCurveSegment implements StepEntity {
         return parentCurve;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String transition() { return getTransition(); }
+    public boolean sameSense() { return isSameSense(); }
+    public StepEntity parentCurve() { return getParentCurve(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

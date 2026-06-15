@@ -39,6 +39,9 @@ public final class StepDegenerateCurve2D implements StepEntity {
         return point;
     }
 
+    // Record-style accessors
+    public StepCartesianPoint point() { return getPoint(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -57,6 +57,13 @@ public final class StepSeamCurve implements StepEntity {
         return masterRepresentation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity curve3d() { return getCurve3d(); }
+    public List<StepEntity> associatedGeometry() { return getAssociatedGeometry(); }
+    public String masterRepresentation() { return getMasterRepresentation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

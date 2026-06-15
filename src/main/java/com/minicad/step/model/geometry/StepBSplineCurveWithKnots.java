@@ -97,6 +97,18 @@ public final class StepBSplineCurveWithKnots implements StepEntity {
         return knotSpec;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public int degree() { return getDegree(); }
+    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
+    public String curveForm() { return getCurveForm(); }
+    public boolean closedCurve() { return isClosedCurve(); }
+    public boolean selfIntersect() { return isSelfIntersect(); }
+    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
+    public List<Double> knots() { return getKnots(); }
+    public String knotSpec() { return getKnotSpec(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
