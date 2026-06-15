@@ -39,6 +39,11 @@ public final class StepPlane implements StepEntity {
         return position;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepAxis2Placement3D position() { return getPosition(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
