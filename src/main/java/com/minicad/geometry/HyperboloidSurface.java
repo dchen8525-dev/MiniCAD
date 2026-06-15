@@ -44,6 +44,11 @@ public final class HyperboloidSurface implements SurfaceGeometry {
         return semiAxis;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return getPosition(); }
+    public double radius() { return getRadius(); }
+    public double semiAxis() { return getSemiAxis(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

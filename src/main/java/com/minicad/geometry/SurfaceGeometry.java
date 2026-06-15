@@ -19,13 +19,13 @@ public interface SurfaceGeometry {
         if (grid.isEmpty()) {
             return BoundingBox3.empty();
         }
-        BoundingBox3.Box box = BoundingBox3.mutable();
+        BoundingBox3 result = BoundingBox3.empty();
         for (java.util.List<CartesianPoint> row : grid) {
             for (CartesianPoint point : row) {
-                box.expand(point);
+                result = result.expand(point);
             }
         }
-        return box.toImmutable();
+        return result;
     }
 
     /**

@@ -39,6 +39,10 @@ public final class StepSurfaceOfTranslation implements StepEntity {
         return direction;
     }
 
+    // Record-style accessors
+    public StepEntity profile() { return getProfile(); }
+    public StepEntity direction() { return getDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

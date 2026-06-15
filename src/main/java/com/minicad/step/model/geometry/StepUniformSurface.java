@@ -89,6 +89,11 @@ public final class StepUniformSurface implements StepEntity {
         return selfIntersect;
     }
 
+    // Record-style accessors
+    public int uDegree() { return getUDegree(); }
+    public int vDegree() { return getVDegree(); }
+    public List<List<StepCartesianPoint>> controlPoints() { return getControlPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

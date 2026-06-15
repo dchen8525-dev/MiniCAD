@@ -32,6 +32,9 @@ public final class StepCsgPrimitive3D implements StepEntity {
         return position;
     }
 
+    // Record-style accessor
+    public StepEntity position() { return getPosition(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

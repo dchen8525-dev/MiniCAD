@@ -37,6 +37,10 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
         return radius;
     }
 
+    // Record-style accessors
+    public SurfaceGeometry sweptSurface() { return getSweptSurface(); }
+    public double radius() { return getRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -57,6 +57,11 @@ public final class StepToroidalSurfaceWithCylindricalAxis implements StepEntity 
         return minorRadius;
     }
 
+    // Record-style accessors
+    public StepAxis1Placement position() { return getPosition(); }
+    public double majorRadius() { return getMajorRadius(); }
+    public double minorRadius() { return getMinorRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

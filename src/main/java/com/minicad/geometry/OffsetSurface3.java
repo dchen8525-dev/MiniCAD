@@ -35,6 +35,10 @@ public final class OffsetSurface3 implements SurfaceGeometry {
         return distance;
     }
 
+    // Record-style accessors
+    public SurfaceGeometry basisSurface() { return getBasisSurface(); }
+    public double distance() { return getDistance(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

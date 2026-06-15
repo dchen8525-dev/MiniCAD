@@ -65,6 +65,66 @@ public final class BoundingBox3 {
         return maxZ;
     }
 
+    /**
+     * Returns an empty bounding box (all coordinates are 0).
+     *
+     * @return empty bounding box
+     */
+    public static BoundingBox3 empty() {
+        return new BoundingBox3(0, 0, 0, 0, 0, 0);
+    }
+
+    /**
+     * Returns the center point of the bounding box.
+     *
+     * @return center point
+     */
+    public CartesianPoint center() {
+        return new CartesianPoint(
+            (minX + maxX) / 2.0,
+            (minY + maxY) / 2.0,
+            (minZ + maxZ) / 2.0
+        );
+    }
+
+    /**
+     * Expands this bounding box to include a point.
+     *
+     * @param point point to include
+     * @return expanded bounding box
+     */
+    public BoundingBox3 expand(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return new BoundingBox3(
+            Math.min(minX, point.x()),
+            Math.min(minY, point.y()),
+            Math.min(minZ, point.z()),
+            Math.max(maxX, point.x()),
+            Math.max(maxY, point.y()),
+            Math.max(maxZ, point.z())
+        );
+    }
+
+    /**
+     * Checks if this bounding box is empty (has zero volume).
+     *
+     * @return true if empty
+     */
+    public boolean isEmpty() {
+        return minX == maxX && minY == maxY && minZ == maxZ;
+    }
+
+    /**
+     * Returns a new bounding box that includes the given point.
+     * Alias for expand().
+     *
+     * @param point point to include
+     * @return expanded bounding box
+     */
+    public BoundingBox3 union(CartesianPoint point) {
+        return expand(point);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

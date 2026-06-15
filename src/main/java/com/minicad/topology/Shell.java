@@ -35,6 +35,10 @@ public final class Shell {
         return closed;
     }
 
+    // Record-style accessors
+    public List<Face> faces() { return getFaces(); }
+    public boolean closed() { return isClosed(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

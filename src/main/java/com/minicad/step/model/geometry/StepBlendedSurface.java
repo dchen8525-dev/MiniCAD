@@ -75,6 +75,10 @@ public final class StepBlendedSurface implements StepEntity {
         return blendCurve;
     }
 
+    // Record-style accessors
+    public StepEntity primarySurface() { return getPrimarySurface(); }
+    public StepEntity secondarySurface() { return getSecondarySurface(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

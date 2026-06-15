@@ -41,6 +41,9 @@ public final class StepMachinedSurface implements StepEntity {
         return face;
     }
 
+    // Record-style accessor
+    public StepEntity face() { return getFace(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

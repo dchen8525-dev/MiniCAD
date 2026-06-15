@@ -65,7 +65,11 @@ public final class StepSurfacedEdgeCurve implements StepEntity {
         return sameSurface;
     }
 
-    // Record-style accessor
+    // Record-style accessors
+    public StepEntity edgeGeometry() { return getEdgeGeometry(); }
+    public StepEntity surface1() { return getSurface1(); }
+    public StepEntity surface2() { return getSurface2(); }
+    public boolean sameSurface() { return isSameSurface(); }
     public boolean reversed() { return false; }
 
     @Override

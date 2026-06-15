@@ -36,6 +36,10 @@ public final class SurfaceOfTranslation3 implements SurfaceGeometry {
         return direction;
     }
 
+    // Record-style accessors
+    public Curve3 profile() { return getProfile(); }
+    public Vector3 direction() { return getDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

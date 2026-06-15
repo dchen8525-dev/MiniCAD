@@ -73,6 +73,10 @@ public final class StepProfileDef implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public StepEntity position() { return getPosition(); }
+    public String entityName() { return getEntityName(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

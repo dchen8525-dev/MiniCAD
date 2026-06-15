@@ -56,6 +56,17 @@ public final class FaceBound {
         return new FaceBound(loop, true, outer);
     }
 
+    /**
+     * Creates an inner FaceBound with a given loop and orientation.
+     *
+     * @param loop the loop
+     * @param orientation orientation relative to the face
+     * @return new FaceBound marked as inner
+     */
+    public static FaceBound inner(Loop loop, boolean orientation) {
+        return new FaceBound(loop, orientation, false);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

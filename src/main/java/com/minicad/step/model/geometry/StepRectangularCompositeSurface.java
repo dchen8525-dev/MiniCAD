@@ -73,6 +73,9 @@ public final class StepRectangularCompositeSurface implements StepEntity {
         return v2;
     }
 
+    // Record-style accessor
+    public StepEntity parentSurface() { return getParentSurface(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

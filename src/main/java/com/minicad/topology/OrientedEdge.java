@@ -34,6 +34,30 @@ public final class OrientedEdge {
         return orientation;
     }
 
+    // Record-style accessors
+    public Edge edge() { return getEdge(); }
+    public boolean orientation() { return isOrientation(); }
+
+    /**
+     * Returns the start vertex considering orientation.
+     * If orientation is true, returns edge.start(); otherwise returns edge.end().
+     *
+     * @return start vertex
+     */
+    public Vertex startVertex() {
+        return orientation ? edge.start() : edge.end();
+    }
+
+    /**
+     * Returns the end vertex considering orientation.
+     * If orientation is true, returns edge.end(); otherwise returns edge.start().
+     *
+     * @return end vertex
+     */
+    public Vertex endVertex() {
+        return orientation ? edge.end() : edge.start();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

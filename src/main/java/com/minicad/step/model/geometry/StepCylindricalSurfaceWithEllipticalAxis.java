@@ -57,6 +57,11 @@ public final class StepCylindricalSurfaceWithEllipticalAxis implements StepEntit
         return semiAxisB;
     }
 
+    // Record-style accessors
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public double semiAxisA() { return getSemiAxisA(); }
+    public double semiAxisB() { return getSemiAxisB(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

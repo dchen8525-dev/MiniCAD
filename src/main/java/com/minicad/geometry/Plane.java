@@ -38,6 +38,19 @@ public final class Plane implements SurfaceGeometry {
     public CartesianPoint origin() { return getOrigin(); }
     public Direction3 normal() { return getNormal(); }
 
+    /**
+     * Computes the signed distance from a point to this plane.
+     * Positive distance means the point is on the side where the normal points.
+     *
+     * @param point the point to measure distance from
+     * @return signed distance from point to plane
+     */
+    public double signedDistanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 offset = point.subtract(origin);
+        return offset.dot(normal.asVector());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

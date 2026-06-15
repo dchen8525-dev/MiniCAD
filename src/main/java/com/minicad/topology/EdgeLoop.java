@@ -29,6 +29,9 @@ public final class EdgeLoop implements Loop {
         return edges;
     }
 
+    // Record-style accessor
+    public List<OrientedEdge> edges() { return getEdges(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

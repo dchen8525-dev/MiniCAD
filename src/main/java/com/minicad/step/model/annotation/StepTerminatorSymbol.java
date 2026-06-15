@@ -57,6 +57,10 @@ public final class StepTerminatorSymbol implements StepEntity {
         return annotatedCurve;
     }
 
+    // Record-style accessors
+    public StepEntity item() { return getItem(); }
+    public StepEntity annotatedCurve() { return getAnnotatedCurve(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -35,6 +35,10 @@ public final class RuledSurface3 implements SurfaceGeometry {
         return directrix2;
     }
 
+    // Record-style accessors
+    public Curve3 directrix1() { return getDirectrix1(); }
+    public Curve3 directrix2() { return getDirectrix2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

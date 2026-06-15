@@ -36,6 +36,10 @@ public final class ParaboloidSurface implements SurfaceGeometry {
         return focalLength;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return getPosition(); }
+    public double focalLength() { return getFocalLength(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

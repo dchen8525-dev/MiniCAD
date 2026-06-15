@@ -49,6 +49,10 @@ public final class StepSurfacePatch implements StepEntity {
         return sameSense;
     }
 
+    // Record-style accessors
+    public StepEntity basisSurface() { return getBasisSurface(); }
+    public boolean sameSense() { return isSameSense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

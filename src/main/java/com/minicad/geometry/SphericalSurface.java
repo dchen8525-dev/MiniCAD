@@ -35,7 +35,8 @@ public final class SphericalSurface implements SurfaceGeometry {
     }
 
     // Record-style accessor
-    public Axis2Placement3D position() { return position; }
+    public Axis2Placement3D position() { return getPosition(); }
+    public double radius() { return getRadius(); }
 
     @Override
     public boolean equals(Object o) {

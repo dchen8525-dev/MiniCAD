@@ -26,6 +26,9 @@ public final class VertexLoop implements Loop {
         return vertex;
     }
 
+    // Record-style accessor
+    public Vertex vertex() { return getVertex(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

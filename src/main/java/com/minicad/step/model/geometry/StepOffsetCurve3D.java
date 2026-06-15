@@ -63,6 +63,11 @@ public final class StepOffsetCurve3D implements StepEntity {
         return refDirection;
     }
 
+    // Record-style accessors
+    public StepEntity basisCurve() { return getBasisCurve(); }
+    public double distance() { return getDistance(); }
+    public StepDirection refDirection() { return getRefDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

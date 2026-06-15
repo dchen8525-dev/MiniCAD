@@ -47,6 +47,11 @@ public final class Face {
         return sameSense;
     }
 
+    // Record-style accessors
+    public SurfaceGeometry surface() { return getSurface(); }
+    public List<FaceBound> bounds() { return getBounds(); }
+    public boolean sameSense() { return isSameSense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -34,6 +34,10 @@ public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
         return extrusionVector;
     }
 
+    // Record-style accessors
+    public Curve3 sweptCurve() { return getSweptCurve(); }
+    public Vector3 extrusionVector() { return getExtrusionVector(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

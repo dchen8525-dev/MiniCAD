@@ -11,6 +11,16 @@ public final class Epsilon {
     public static final double EPS = 1.0e-9;
 
     /**
+     * Returns the global epsilon value.
+     * Java 11 compatible accessor.
+     *
+     * @return epsilon value
+     */
+    public static double get() {
+        return EPS;
+    }
+
+    /**
      * Tolerance for STEP import topology connectivity after geometric projection.
      */
     public static final double IMPORT_TOPOLOGY_TOLERANCE = 1.0e-2;

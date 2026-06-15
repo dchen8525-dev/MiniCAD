@@ -45,6 +45,11 @@ public final class StepHyperboloidSurface implements StepEntity {
         return semiAxis;
     }
 
+    // Record-style accessors
+    public StepEntity position() { return getPosition(); }
+    public Double radius() { return getRadius(); }
+    public Double semiAxis() { return getSemiAxis(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

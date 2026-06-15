@@ -3630,6 +3630,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("SPHERE position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.position();
         if (csgPrimitive.dimensions().isEmpty()) {
             throw new UnsupportedGeometryException("SPHERE requires a radius");
         }
@@ -3644,6 +3645,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("ELLIPSOID position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.position();
         if (csgPrimitive.dimensions().size() < 3) {
             throw new UnsupportedGeometryException("ELLIPSOID requires three semi axes");
         }
@@ -3660,6 +3662,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER position must be an AXIS1_PLACEMENT");
         }
+        StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.position();
         if (csgPrimitive.dimensions().size() < 2) {
             throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER requires height and radius");
         }
@@ -3690,6 +3693,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("TORUS position must be an AXIS1_PLACEMENT");
         }
+        StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.position();
         if (csgPrimitive.dimensions().size() < 2) {
             throw new UnsupportedGeometryException("TORUS requires major and minor radii");
         }
@@ -3736,6 +3740,7 @@ public final class StepCadBuilder {
         if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.position();
         if (csgPrimitive.dimensions().size() < 4) {
             throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE requires x, y, z and ltx dimensions");
         }
@@ -4375,6 +4380,7 @@ public final class StepCadBuilder {
                     halfSpaceSolid.entityName() + " construction with "
                             + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
         }
+        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
         return clipSolidWithBoxDomain(clipped, boxDomain, "BOOLEAN_RESULT clipping");
     }
 
@@ -4397,6 +4403,7 @@ public final class StepCadBuilder {
                             + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
         }
         // Build box domain geometry and merge with solid
+        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
         Solid boxSolid = buildBoxDomainSolid(boxDomain);
         // Clip box to half-space agreement side
         boolean keepAgreementSide = halfSpaceSolid.agreementFlag();
@@ -4530,6 +4537,7 @@ public final class StepCadBuilder {
         if (!(sweptAreaSolid.sweepReference() instanceof StepDirection)) {
             throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID extrusion direction must be a DIRECTION");
         }
+        StepDirection direction = (StepDirection) sweptAreaSolid.sweepReference();
         Vector3 extrusion = buildDirection(direction.id()).asVector().scale(sweptAreaSolid.parameter());
         if (extrusion.isZero()) {
             throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID requires a non-zero extrusion depth");
@@ -4593,6 +4601,7 @@ public final class StepCadBuilder {
         if (!(sweptAreaSolid.sweepReference() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID axis must be an AXIS1_PLACEMENT");
         }
+        StepAxis1Placement axisPlacement = (StepAxis1Placement) sweptAreaSolid.sweepReference();
         double angle = sweptAreaSolid.parameter();
         if (Math.abs(angle) <= 1.0e-9) {
             throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID requires a non-zero revolution angle");
@@ -4915,7 +4924,7 @@ public final class StepCadBuilder {
         if (!fallback.isZero() && normal.dot(fallback) < 0.0) {
             normal = normal.scale(-1.0);
         }
-        return normal.normalize();
+        return Direction3.from(normal.normalize());
     }
 
     private Direction3 quadNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c, CartesianPoint d) {
@@ -4926,7 +4935,7 @@ public final class StepCadBuilder {
         if (normal.isZero()) {
             throw new UnsupportedGeometryException("revolved side face is degenerate");
         }
-        return normal.normalize();
+        return Direction3.from(normal.normalize());
     }
 
     Solid transformSolid(Solid solid, StepCartesianTransformationOperator transformation) {
@@ -5169,7 +5178,7 @@ public final class StepCadBuilder {
             CartesianPoint startPoint = buildPoint(lineSegment.startPoint().id());
             CartesianPoint endPoint = buildPoint(lineSegment.endPoint().id());
             Vector3 dir = endPoint.subtract(startPoint);
-            return new Line3(startPoint, Direction3.from(dir));
+            return new Line3(startPoint, Direction3.from(dir), dir.norm());
         }
         if (curve instanceof StepBoundedCurve) {
             StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
@@ -5384,7 +5393,7 @@ public final class StepCadBuilder {
             BSplineCurve3 bspline = (BSplineCurve3) curve;
             return new BSplineCurve3(
                     bspline.degree(),
-                    new java.util.ArrayList<>(bspline.controlPoints().reversed()),
+                    reverseList(bspline.controlPoints()),
                     bspline.knotMultiplicities(),
                     bspline.knots());
         }
@@ -5392,7 +5401,7 @@ public final class StepCadBuilder {
             RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
             return new RationalBSplineCurve3(
                     rational.degree(),
-                    new java.util.ArrayList<>(rational.controlPoints().reversed()),
+                    reverseList(rational.controlPoints()),
                     rational.weights(),
                     rational.knotMultiplicities(),
                     rational.knots());
@@ -5522,9 +5531,20 @@ public final class StepCadBuilder {
             java.util.List<java.util.List<CartesianPoint>> grid) {
         java.util.List<java.util.List<CartesianPoint>> result = new java.util.ArrayList<>(grid.size());
         for (java.util.List<CartesianPoint> row : grid) {
-            result.add(java.util.List.copyOf(row.reversed()));
+            result.add(reverseList(row));
         }
         return java.util.List.copyOf(result);
+    }
+
+    /**
+     * Reverses a list in Java 11 compatible way.
+     */
+    private static <T> java.util.List<T> reverseList(java.util.List<T> list) {
+        java.util.List<T> reversed = new java.util.ArrayList<>(list.size());
+        for (int i = list.size() - 1; i >= 0; i--) {
+            reversed.add(list.get(i));
+        }
+        return reversed;
     }
 
     private double fresnelC(double x) {
@@ -5635,9 +5655,9 @@ public final class StepCadBuilder {
     private Curve2 buildReplicaCurve2(StepGeometricReplica replica) {
         Object built = buildCurve2(replica.parent());
         if (!(built instanceof Curve2)) {
-            Curve2 parent = (Curve2) built;
             throw new UnsupportedGeometryException(replica.entityName() + " parent is not a supported 2D curve");
         }
+        Curve2 parent = (Curve2) built;
         return transformCurve2(parent, replica.transformation());
     }
 
@@ -5645,6 +5665,7 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement3D = (StepAxis2Placement3D) conic.position();
         String entityName = conic.entityName();
         switch (entityName) {
             case "PARABOLA":
@@ -5670,6 +5691,7 @@ public final class StepCadBuilder {
         if (!(conic.position() instanceof StepAxis2Placement2D)) {
             throw new UnsupportedGeometryException("2D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_2D");
         }
+        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) conic.position();
         Point2 origin = buildPoint2(placement2D.location().id());
         Direction2 xDirection = buildDirection2(placement2D.refDirection().id());
         String entityName = conic.entityName();

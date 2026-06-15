@@ -139,6 +139,15 @@ public final class StepBSplineSurfaceWithKnotsAndBreakpoints implements StepEnti
         return selfIntersect;
     }
 
+    // Record-style accessors
+    public List<List<StepCartesianPoint>> controlPoints() { return getControlPoints(); }
+    public int uDegree() { return getUDegree(); }
+    public int vDegree() { return getVDegree(); }
+    public List<Integer> uKnotMultiplicities() { return getUKnotMultiplicities(); }
+    public List<Integer> vKnotMultiplicities() { return getVKnotMultiplicities(); }
+    public List<Double> uKnots() { return getUKnots(); }
+    public List<Double> vKnots() { return getVKnots(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

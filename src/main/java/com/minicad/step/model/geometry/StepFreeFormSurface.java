@@ -83,6 +83,12 @@ public final class StepFreeFormSurface implements StepEntity {
         return weights;
     }
 
+    // Record-style accessors
+    public int degreeU() { return getDegreeU(); }
+    public int degreeV() { return getDegreeV(); }
+    public List<List<StepEntity>> controlPoints() { return getControlPoints(); }
+    public List<Double> knotVectors() { return getKnotVectors(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

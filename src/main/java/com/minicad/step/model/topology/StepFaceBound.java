@@ -55,6 +55,11 @@ public final class StepFaceBound implements StepEntity {
         return outer;
     }
 
+    // Record-style accessors
+    public StepLoop loop() { return getLoop(); }
+    public boolean orientation() { return isOrientation(); }
+    public boolean outer() { return isOuter(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

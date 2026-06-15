@@ -28,6 +28,9 @@ public final class PolyLoop implements Loop {
         return points;
     }
 
+    // Record-style accessor
+    public List<CartesianPoint> points() { return getPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -51,6 +51,10 @@ public final class StepLineSegment implements StepEntity {
         return endPoint;
     }
 
+    // Record-style accessors
+    public StepCartesianPoint startPoint() { return getStartPoint(); }
+    public StepCartesianPoint endPoint() { return getEndPoint(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

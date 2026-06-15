@@ -33,6 +33,9 @@ public final class StepPolyline3D implements StepEntity {
         return points;
     }
 
+    // Record-style accessor
+    public List<StepEntity> points() { return getPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

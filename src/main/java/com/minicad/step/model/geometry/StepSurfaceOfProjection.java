@@ -45,6 +45,10 @@ public final class StepSurfaceOfProjection implements StepEntity {
         return targetPlane;
     }
 
+    // Record-style accessors
+    public StepEntity profile() { return getProfile(); }
+    public StepEntity projectionDirection() { return getProjectionDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

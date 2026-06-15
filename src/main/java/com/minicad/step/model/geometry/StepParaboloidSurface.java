@@ -39,6 +39,10 @@ public final class StepParaboloidSurface implements StepEntity {
         return focalLength;
     }
 
+    // Record-style accessors
+    public StepEntity position() { return getPosition(); }
+    public Double focalLength() { return getFocalLength(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

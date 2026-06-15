@@ -90,6 +90,25 @@ public final class Vector3 {
     }
 
     /**
+     * Subtracts another vector from this one.
+     *
+     * @param other the other vector
+     * @return difference vector
+     */
+    public Vector3 subtract(Vector3 other) {
+        return new Vector3(x - other.x, y - other.y, z - other.z);
+    }
+
+    /**
+     * Negates this vector.
+     *
+     * @return negated vector
+     */
+    public Vector3 negate() {
+        return new Vector3(-x, -y, -z);
+    }
+
+    /**
      * Returns the squared norm (magnitude squared) of this vector.
      *
      * @return squared norm

@@ -65,6 +65,11 @@ public final class StepToroidalSurfaceWithEllipticalAxis implements StepEntity {
         return ellipticalRatio;
     }
 
+    // Record-style accessors
+    public StepAxis2Placement3D position() { return getPosition(); }
+    public double majorRadius() { return getMajorRadius(); }
+    public double minorRadius() { return getMinorRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

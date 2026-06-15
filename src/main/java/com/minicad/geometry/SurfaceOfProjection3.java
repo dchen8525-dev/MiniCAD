@@ -40,6 +40,10 @@ public final class SurfaceOfProjection3 implements SurfaceGeometry {
         return projectionDirection;
     }
 
+    // Record-style accessors
+    public Curve3 profile() { return getProfile(); }
+    public Vector3 projectionDirection() { return getProjectionDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -42,6 +42,11 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
         return axisDirection;
     }
 
+    // Record-style accessors
+    public Curve3 sweptCurve() { return getSweptCurve(); }
+    public CartesianPoint axisOrigin() { return getAxisOrigin(); }
+    public Direction3 axisDirection() { return getAxisDirection(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

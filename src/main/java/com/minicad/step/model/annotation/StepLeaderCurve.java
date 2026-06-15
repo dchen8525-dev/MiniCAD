@@ -49,6 +49,9 @@ public final class StepLeaderCurve implements StepEntity {
         return item;
     }
 
+    // Record-style accessor
+    public StepEntity item() { return getItem(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
