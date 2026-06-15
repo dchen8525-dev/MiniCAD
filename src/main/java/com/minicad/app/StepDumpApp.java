@@ -1599,23 +1599,31 @@ public final class StepDumpApp {
                     || element instanceof StepBooleanResult
                     || element instanceof StepBooleanClippingResult) {
                 validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPath path) {
+            } else if (element instanceof StepPath) {
+                StepPath path = (StepPath) element;
                 validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath openPath) {
+            } else if (element instanceof StepOpenPath) {
+                StepOpenPath openPath = (StepOpenPath) element;
                 validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath subpath) {
+            } else if (element instanceof StepSubpath) {
+                StepSubpath subpath = (StepSubpath) element;
                 validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath orientedPath) {
+            } else if (element instanceof StepOrientedPath) {
+                StepOrientedPath orientedPath = (StepOrientedPath) element;
                 validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop polyLoop) {
+            } else if (element instanceof StepPolyLoop) {
+                StepPolyLoop polyLoop = (StepPolyLoop) element;
                 validatePolyLoop(polyLoop, builder);
             } else if (isSupportedGeometricSetSurface(element)) {
                 validateSupportedSurfaceReference(element, builder);
-            } else if (element instanceof StepPointSet pointSet) {
+            } else if (element instanceof StepPointSet) {
+                StepPointSet pointSet = (StepPointSet) element;
                 validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet nestedGeometricSet) {
+            } else if (element instanceof StepGeometricSet) {
+                StepGeometricSet nestedGeometricSet = (StepGeometricSet) element;
                 validateGeometricSet(nestedGeometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet curveSet) {
+            } else if (element instanceof StepGeometricCurveSet) {
+                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) element;
                 validateGeometricCurveSet(curveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1627,13 +1635,17 @@ public final class StepDumpApp {
     }
 
     private static void validateSupportedSurfaceReference(StepEntity surface, StepCadBuilder builder) {
-        if (surface instanceof StepPlane plane) {
+        if (surface instanceof StepPlane) {
+            StepPlane plane = (StepPlane) surface;
             builder.buildPlane(plane.id());
-        } else if (surface instanceof StepCylindricalSurface cylindricalSurface) {
+        } else if (surface instanceof StepCylindricalSurface) {
+            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) surface;
             builder.buildCylindricalSurface(cylindricalSurface.id());
-        } else if (surface instanceof StepConicalSurface conicalSurface) {
+        } else if (surface instanceof StepConicalSurface) {
+            StepConicalSurface conicalSurface = (StepConicalSurface) surface;
             builder.buildConicalSurface(conicalSurface.id());
-        } else if (surface instanceof StepSphericalSurface sphericalSurface) {
+        } else if (surface instanceof StepSphericalSurface) {
+            StepSphericalSurface sphericalSurface = (StepSphericalSurface) surface;
             builder.buildSphericalSurface(sphericalSurface.id());
         } else if (surface instanceof StepToroidalSurface toroidalSurface) {
             builder.buildToroidalSurface(toroidalSurface.id());
