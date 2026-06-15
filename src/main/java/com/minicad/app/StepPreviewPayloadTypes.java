@@ -8,7 +8,7 @@ import com.minicad.geometry.Vector3;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class PreviewPayload {
+final class PreviewPayload {
     private final PreviewStats stats;
     private final BoundsPayload bounds;
     private final ValidationPayload validation;
@@ -90,7 +90,7 @@ public final class PreviewPayload {
     }
 }
 
-public final class AssemblyData {
+final class AssemblyData {
     private final List<RepresentationPayload> representations;
     private final List<InstancePayload> instances;
     private final List<UnsupportedFacePayload> unsupportedFaces;
@@ -135,7 +135,7 @@ public final class AssemblyData {
     }
 }
 
-public final class AssemblyMetrics {
+final class AssemblyMetrics {
     private final GeometrySummary summary;
     private final BoundsPayload bounds;
 
@@ -167,7 +167,7 @@ public final class AssemblyMetrics {
     }
 }
 
-public final class GeometryCollection {
+final class GeometryCollection {
     private final List<EdgePayload> edges;
     private final List<FacePayload> faces;
     private final List<UnsupportedFacePayload> unsupportedFaces;
@@ -204,7 +204,7 @@ public final class GeometryCollection {
     }
 }
 
-public final class RepresentationBuildResult {
+final class RepresentationBuildResult {
     private final RepresentationPayload payload;
     private final List<UnsupportedFacePayload> unsupportedFaces;
 
@@ -235,7 +235,7 @@ public final class RepresentationBuildResult {
     }
 }
 
-public final class PreviewStats {
+final class PreviewStats {
     private final int entityCount;
     private final int solidCount;
     private final int shellCount;
@@ -292,7 +292,7 @@ public final class PreviewStats {
     }
 }
 
-public final class BoundsPayload {
+final class BoundsPayload {
     private final PointPayload min;
     private final PointPayload max;
 
@@ -327,7 +327,7 @@ public final class BoundsPayload {
     }
 }
 
-public final class ValidationPayload {
+final class ValidationPayload {
     private final int representationCount;
     private final int instanceCount;
     private final int renderedFaceCount;
@@ -389,7 +389,7 @@ public final class ValidationPayload {
     }
 }
 
-public final class ValidationReportPayload {
+final class ValidationReportPayload {
     private final String status;
     private final int okCount;
     private final int warnCount;
@@ -428,7 +428,7 @@ public final class ValidationReportPayload {
     }
 }
 
-public final class ValidationCheckPayload {
+final class ValidationCheckPayload {
     private final String propertyId;
     private final String name;
     private final String measureType;
@@ -490,7 +490,7 @@ public final class ValidationCheckPayload {
     }
 }
 
-public final class ValidationContext {
+final class ValidationContext {
     private final int representationCount;
     private final int instanceCount;
     private final PointPayload center;
@@ -542,7 +542,7 @@ public final class ValidationContext {
     }
 }
 
-public final class PmiPayload {
+final class PmiPayload {
     private final String name;
     private final String text;
     private final PointPayload position;
@@ -591,7 +591,7 @@ public final class PmiPayload {
     }
 }
 
-public final class PmiTargetPayload {
+final class PmiTargetPayload {
     private final int id;
     private final String type;
     private final String name;
@@ -654,7 +654,7 @@ public final class PmiTargetPayload {
     }
 }
 
-public final class RepresentationPayload {
+final class RepresentationPayload {
     private final int id;
     private final String name;
     private final List<String> layers;
@@ -703,7 +703,7 @@ public final class RepresentationPayload {
     }
 }
 
-public final class InstancePayload {
+final class InstancePayload {
     private final String id;
     private final String parentId;
     private final int productDefinitionId;
@@ -772,7 +772,7 @@ public final class InstancePayload {
     }
 }
 
-public final class BinaryPreviewPayload {
+final class BinaryPreviewPayload {
     private final PreviewStats stats;
     private final BoundsPayload bounds;
     private final ValidationPayload validation;
@@ -854,7 +854,7 @@ public final class BinaryPreviewPayload {
     }
 }
 
-public final class BinaryRepresentationPayload {
+final class BinaryRepresentationPayload {
     private final int id;
     private final String name;
     private final List<String> layers;
@@ -903,7 +903,7 @@ public final class BinaryRepresentationPayload {
     }
 }
 
-public final class BinaryEdgePayload {
+final class BinaryEdgePayload {
     private final int stepId;
     private final int pointOffset;
     private final int pointCount;
@@ -953,7 +953,7 @@ public final class BinaryEdgePayload {
     }
 }
 
-public final class BinaryFacePayload {
+final class BinaryFacePayload {
     private final int stepId;
     private final String name;
     private final String surfaceType;
@@ -1030,7 +1030,7 @@ public final class BinaryFacePayload {
     }
 }
 
-public final class BinaryLoopPayload {
+final class BinaryLoopPayload {
     private final boolean outer;
     private final int pointOffset;
     private final int pointCount;
@@ -1070,7 +1070,7 @@ public final class BinaryLoopPayload {
     }
 }
 
-public final class PointRange {
+final class PointRange {
     private final int offset;
     private final int count;
 
@@ -1105,7 +1105,7 @@ public final class PointRange {
     }
 }
 
-public final class UvPoint {
+final class UvPoint {
     private final double u;
     private final double v;
 
@@ -1140,7 +1140,7 @@ public final class UvPoint {
     }
 }
 
-public final class ParametricLoopPayload {
+final class ParametricLoopPayload {
     private final boolean outer;
 
     public ParametricLoopPayload(boolean outer) {
@@ -1170,7 +1170,7 @@ public final class ParametricLoopPayload {
     }
 }
 
-public final class UvBounds {
+final class UvBounds {
     private final double minU;
     private final double minV;
     private final double maxU;
@@ -1215,7 +1215,7 @@ public final class UvBounds {
     }
 }
 
-public final class EdgePayload {
+final class EdgePayload {
     private final int stepId;
     private final EdgeCurvePayload curve;
     private final ColorPayload color;
@@ -1253,7 +1253,7 @@ public final class EdgePayload {
     }
 }
 
-public final class EdgeCurvePayload {
+final class EdgeCurvePayload {
     private final int stepId;
     private final String type;
     private final String basisType;
@@ -1373,7 +1373,7 @@ public final class EdgeCurvePayload {
     }
 }
 
-public final class FaceSurfacePayload {
+final class FaceSurfacePayload {
     private final String type;
     private final List<Double> center;
     private final List<Double> axis;
@@ -1523,7 +1523,7 @@ public final class FaceSurfacePayload {
     }
 }
 
-public final class FacePayload {
+final class FacePayload {
     private final int stepId;
     private final String name;
     private final String surfaceType;
@@ -1605,7 +1605,7 @@ public final class FacePayload {
     }
 }
 
-public final class UnsupportedFacePayload {
+final class UnsupportedFacePayload {
     private final int stepId;
     private final String name;
     private final String surfaceType;
@@ -1647,7 +1647,7 @@ public final class UnsupportedFacePayload {
     }
 }
 
-public final class UnsupportedBooleanPayload {
+final class UnsupportedBooleanPayload {
     private final int stepId;
     private final String name;
     private final String type;
@@ -1689,7 +1689,7 @@ public final class UnsupportedBooleanPayload {
     }
 }
 
-public final class PreviewFaceResult {
+final class PreviewFaceResult {
     private final FacePayload face;
     private final UnsupportedFacePayload unsupportedFace;
 
@@ -1724,7 +1724,7 @@ public final class PreviewFaceResult {
     }
 }
 
-public final class SurfacePatch {
+final class SurfacePatch {
     private final List<CartesianPoint> bottom;
     private final List<CartesianPoint> top;
     private final List<CartesianPoint> left;
@@ -1854,7 +1854,7 @@ public final class SurfacePatch {
     }
 }
 
-public final class LoopPayload {
+final class LoopPayload {
     private final boolean outer;
 
     public LoopPayload(boolean outer) {
@@ -1884,7 +1884,7 @@ public final class LoopPayload {
     }
 }
 
-public final class PointPayload {
+final class PointPayload {
     private final double x;
     private final double y;
     private final double z;
@@ -1924,7 +1924,7 @@ public final class PointPayload {
     }
 }
 
-public final class VectorPayload {
+final class VectorPayload {
     private final double x;
     private final double y;
     private final double z;
@@ -1964,7 +1964,7 @@ public final class VectorPayload {
     }
 }
 
-public final class ColorPayload {
+final class ColorPayload {
     private final int red;
     private final int green;
     private final int blue;
@@ -2004,7 +2004,7 @@ public final class ColorPayload {
     }
 }
 
-public final class PbrPayload {
+final class PbrPayload {
     private final double diffuse;
     private final double specular;
     private final Double specularExponent;
@@ -2046,7 +2046,7 @@ public final class PbrPayload {
     }
 }
 
-public final class GeometrySummary {
+final class GeometrySummary {
     private final int faceCount;
     private final int edgeCount;
     private final double approxSurfaceArea;
@@ -2091,7 +2091,7 @@ public final class GeometrySummary {
     }
 }
 
-public final class RepresentationMeshes {
+final class RepresentationMeshes {
     private final String name;
 
     public RepresentationMeshes(String name) {
@@ -2122,7 +2122,7 @@ public final class RepresentationMeshes {
     }
 }
 
-public final class FaceNode {
+final class FaceNode {
     private final FacePayload face;
     private final int meshIndex;
     private final String name;
@@ -2162,7 +2162,7 @@ public final class FaceNode {
     }
 }
 
-public final class EdgeNode {
+final class EdgeNode {
     private final EdgePayload edge;
     private final int meshIndex;
     private final String name;
@@ -2202,7 +2202,7 @@ public final class EdgeNode {
     }
 }
 
-public final class FloatArrayData {
+final class FloatArrayData {
     private final float[] values;
     private final int count;
     private final float[] min;
@@ -2246,7 +2246,7 @@ public final class FloatArrayData {
     }
 }
 
-public final class IntArrayData {
+final class IntArrayData {
     private final int[] values;
     private final int count;
 
@@ -2280,7 +2280,7 @@ public final class IntArrayData {
     }
 }
 
-public final class IndexedTriangleMesh {
+final class IndexedTriangleMesh {
     private final FloatArrayData positions;
     private final FloatArrayData normals;
     private final IntArrayData indices;

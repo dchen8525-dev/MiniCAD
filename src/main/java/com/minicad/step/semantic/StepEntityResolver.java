@@ -13086,23 +13086,66 @@ public final class StepEntityResolver {
         entityName);
   }
 
-  private record ResolvedBSplineCurveData(
-      String name,
-      int degree,
-      List<StepCartesianPoint> controlPoints,
-      String curveForm,
-      boolean closedCurve,
-      boolean selfIntersect) {}
+  private static final class ResolvedBSplineCurveData {
+      private final String name;
+      private final int degree;
+      private final List<StepCartesianPoint> controlPoints;
+      private final String curveForm;
+      private final boolean closedCurve;
+      private final boolean selfIntersect;
 
-  private record ResolvedBSplineSurfaceData(
-      String name,
-      int uDegree,
-      int vDegree,
-      List<List<StepCartesianPoint>> controlPoints,
-      String surfaceForm,
-      boolean uClosed,
-      boolean vClosed,
-      boolean selfIntersect) {}
+      ResolvedBSplineCurveData(String name, int degree, List<StepCartesianPoint> controlPoints,
+                                String curveForm, boolean closedCurve, boolean selfIntersect) {
+          this.name = name;
+          this.degree = degree;
+          this.controlPoints = controlPoints == null ? null : List.copyOf(controlPoints);
+          this.curveForm = curveForm;
+          this.closedCurve = closedCurve;
+          this.selfIntersect = selfIntersect;
+      }
+
+      String name() { return name; }
+      int degree() { return degree; }
+      List<StepCartesianPoint> controlPoints() { return controlPoints; }
+      String curveForm() { return curveForm; }
+      boolean closedCurve() { return closedCurve; }
+      boolean selfIntersect() { return selfIntersect; }
+  }
+
+  private static final class ResolvedBSplineSurfaceData {
+      private final String name;
+      private final int uDegree;
+      private final int vDegree;
+      private final List<List<StepCartesianPoint>> controlPoints;
+      private final String surfaceForm;
+      private final boolean uClosed;
+      private final boolean vClosed;
+      private final boolean selfIntersect;
+
+      ResolvedBSplineSurfaceData(String name, int uDegree, int vDegree,
+                                  List<List<StepCartesianPoint>> controlPoints,
+                                  String surfaceForm, boolean uClosed, boolean vClosed, boolean selfIntersect) {
+          this.name = name;
+          this.uDegree = uDegree;
+          this.vDegree = vDegree;
+          this.controlPoints = controlPoints == null ? null : controlPoints.stream()
+              .map(row -> row == null ? null : List.copyOf(row))
+              .collect(Collectors.toList());
+          this.surfaceForm = surfaceForm;
+          this.uClosed = uClosed;
+          this.vClosed = vClosed;
+          this.selfIntersect = selfIntersect;
+      }
+
+      String name() { return name; }
+      int uDegree() { return uDegree; }
+      int vDegree() { return vDegree; }
+      List<List<StepCartesianPoint>> controlPoints() { return controlPoints; }
+      String surfaceForm() { return surfaceForm; }
+      boolean uClosed() { return uClosed; }
+      boolean vClosed() { return vClosed; }
+      boolean selfIntersect() { return selfIntersect; }
+  }
 
   // Phase 2 Batch 4-10: Generic helper resolver methods for alias families
 

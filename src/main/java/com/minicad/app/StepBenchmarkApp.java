@@ -219,35 +219,98 @@ public final class StepBenchmarkApp {
         return runtime.totalMemory() - runtime.freeMemory();
     }
 
-    record BuildSummary(
-            int facesBuilt,
-            int faceBuildFailures,
-            int shellsBuilt,
-            int shellBuildFailures,
-            int solidsBuilt,
-            int solidBuildFailures,
-            String firstFaceBuildFailure,
-            String firstShellBuildFailure,
-            String firstSolidBuildFailure
-    ) {
+    static final class BuildSummary {
+        private final int facesBuilt;
+        private final int faceBuildFailures;
+        private final int shellsBuilt;
+        private final int shellBuildFailures;
+        private final int solidsBuilt;
+        private final int solidBuildFailures;
+        private final String firstFaceBuildFailure;
+        private final String firstShellBuildFailure;
+        private final String firstSolidBuildFailure;
+
+        BuildSummary(int facesBuilt, int faceBuildFailures, int shellsBuilt,
+                     int shellBuildFailures, int solidsBuilt, int solidBuildFailures,
+                     String firstFaceBuildFailure, String firstShellBuildFailure,
+                     String firstSolidBuildFailure) {
+            this.facesBuilt = facesBuilt;
+            this.faceBuildFailures = faceBuildFailures;
+            this.shellsBuilt = shellsBuilt;
+            this.shellBuildFailures = shellBuildFailures;
+            this.solidsBuilt = solidsBuilt;
+            this.solidBuildFailures = solidBuildFailures;
+            this.firstFaceBuildFailure = firstFaceBuildFailure;
+            this.firstShellBuildFailure = firstShellBuildFailure;
+            this.firstSolidBuildFailure = firstSolidBuildFailure;
+        }
+
+        int facesBuilt() { return facesBuilt; }
+        int faceBuildFailures() { return faceBuildFailures; }
+        int shellsBuilt() { return shellsBuilt; }
+        int shellBuildFailures() { return shellBuildFailures; }
+        int solidsBuilt() { return solidsBuilt; }
+        int solidBuildFailures() { return solidBuildFailures; }
+        String firstFaceBuildFailure() { return firstFaceBuildFailure; }
+        String firstShellBuildFailure() { return firstShellBuildFailure; }
+        String firstSolidBuildFailure() { return firstSolidBuildFailure; }
     }
 
-    record BenchmarkResult(
-            String label,
-            long inputBytes,
-            int textLength,
-            int entityCount,
-            int resolvedCount,
-            long readElapsedNanos,
-            long parseElapsedNanos,
-            long resolveElapsedNanos,
-            long buildElapsedNanos,
-            long previewExportElapsedNanos,
-            long meshExportElapsedNanos,
-            long approxUsedMemoryBytes,
-            BuildSummary buildSummary,
-            int previewJsonLength,
-            int meshObjLength
-    ) {
+    static final class BenchmarkResult {
+        private final String label;
+        private final long inputBytes;
+        private final int textLength;
+        private final int entityCount;
+        private final int resolvedCount;
+        private final long readElapsedNanos;
+        private final long parseElapsedNanos;
+        private final long resolveElapsedNanos;
+        private final long buildElapsedNanos;
+        private final long previewExportElapsedNanos;
+        private final long meshExportElapsedNanos;
+        private final long approxUsedMemoryBytes;
+        private final BuildSummary buildSummary;
+        private final int previewJsonLength;
+        private final int meshObjLength;
+
+        BenchmarkResult(String label, long inputBytes, int textLength,
+                        int entityCount, int resolvedCount, long readElapsedNanos,
+                        long parseElapsedNanos, long resolveElapsedNanos,
+                        long buildElapsedNanos, long previewExportElapsedNanos,
+                        long meshExportElapsedNanos, long approxUsedMemoryBytes,
+                        BuildSummary buildSummary, int previewJsonLength,
+                        int meshObjLength) {
+            this.label = label;
+            this.inputBytes = inputBytes;
+            this.textLength = textLength;
+            this.entityCount = entityCount;
+            this.resolvedCount = resolvedCount;
+            this.readElapsedNanos = readElapsedNanos;
+            this.parseElapsedNanos = parseElapsedNanos;
+            this.resolveElapsedNanos = resolveElapsedNanos;
+            this.buildElapsedNanos = buildElapsedNanos;
+            this.previewExportElapsedNanos = previewExportElapsedNanos;
+            this.meshExportElapsedNanos = meshExportElapsedNanos;
+            this.approxUsedMemoryBytes = approxUsedMemoryBytes;
+            this.buildSummary = buildSummary;
+            this.previewJsonLength = previewJsonLength;
+            this.meshObjLength = meshObjLength;
+        }
+
+        String label() { return label; }
+        long inputBytes() { return inputBytes; }
+        int textLength() { return textLength; }
+        int entityCount() { return entityCount; }
+        int resolvedCount() { return resolvedCount; }
+        long readElapsedNanos() { return readElapsedNanos; }
+        long parseElapsedNanos() { return parseElapsedNanos; }
+        long resolveElapsedNanos() { return resolveElapsedNanos; }
+        long buildElapsedNanos() { return buildElapsedNanos; }
+        long previewExportElapsedNanos() { return previewExportElapsedNanos; }
+        long meshExportElapsedNanos() { return meshExportElapsedNanos; }
+        long approxUsedMemoryBytes() { return approxUsedMemoryBytes; }
+        BuildSummary buildSummary() { return buildSummary; }
+        int previewJsonLength() { return previewJsonLength; }
+        int meshObjLength() { return meshObjLength; }
     }
 }
