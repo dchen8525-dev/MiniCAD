@@ -106,13 +106,20 @@ final class StepTopologyBuilder {
 
     com.minicad.topology.FaceBound buildFaceBound(int id) {
         StepFaceBound stepFaceBound = builder.requireEntity(id, StepFaceBound.class, "FACE_BOUND");
-        Loop builtLoop = switch (stepFaceBound.loop()) {
-            case StepEdgeLoop edgeLoop -> builder.buildEdgeLoop(edgeLoop.id());
-            case StepVertexLoop vertexLoop -> builder.buildVertexLoop(vertexLoop.id());
-            case StepPolyLoop polyLoop -> builder.buildPolyLoop(polyLoop.id());
-            default -> throw new UnsupportedGeometryException(
+        Loop builtLoop;
+        if (stepFaceBound.loop() instanceof StepEdgeLoop) {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) stepFaceBound.loop();
+            builtLoop = builder.buildEdgeLoop(edgeLoop.id());
+        } else if (stepFaceBound.loop() instanceof StepVertexLoop) {
+            StepVertexLoop vertexLoop = (StepVertexLoop) stepFaceBound.loop();
+            builtLoop = builder.buildVertexLoop(vertexLoop.id());
+        } else if (stepFaceBound.loop() instanceof StepPolyLoop) {
+            StepPolyLoop polyLoop = (StepPolyLoop) stepFaceBound.loop();
+            builtLoop = builder.buildPolyLoop(polyLoop.id());
+        } else {
+            throw new UnsupportedGeometryException(
                     "FACE_BOUND construction requires EDGE_LOOP, VERTEX_LOOP, or POLY_LOOP");
-        };
+        }
         return stepFaceBound.outer()
                 ? com.minicad.topology.FaceBound.outer(builtLoop, stepFaceBound.orientation())
                 : com.minicad.topology.FaceBound.inner(builtLoop, stepFaceBound.orientation());

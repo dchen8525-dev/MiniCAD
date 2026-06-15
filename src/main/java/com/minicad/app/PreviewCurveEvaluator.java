@@ -1450,14 +1450,17 @@ public final class PreviewCurveEvaluator {
                     annotationTextCharacter.mappingSource().mappedOrigin(),
                     annotationTextCharacter.mappingTarget(), builder);
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
-            List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
-            if (parentPoints == null) return null;
-            List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
-            for (CartesianPoint point : parentPoints) {
-                transformed.add(transformPoint(point, replica.transformation(), builder));
+        if (item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            if ("CURVE_REPLICA".equals(replica.entityName())) {
+                List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
+                if (parentPoints == null) return null;
+                List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
+                for (CartesianPoint point : parentPoints) {
+                    transformed.add(transformPoint(point, replica.transformation(), builder));
+                }
+                return List.copyOf(transformed);
             }
-            return List.copyOf(transformed);
         }
         if (item instanceof StepOrientedCurve) {
             StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
@@ -1544,8 +1547,11 @@ public final class PreviewCurveEvaluator {
             if (item instanceof StepProjectionCurve) return curveForLooseEdge(projectionCurve.item(), builder);
             if (item instanceof StepDraughtingAnnotationOccurrence) return curveForLooseEdge(annotationOccurrence.item(), builder);
             if (item instanceof StepTerminatorSymbol) return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
-            if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
-                return curveForLooseEdge(replica.parent(), builder);
+            if (item instanceof StepGeometricReplica) {
+                StepGeometricReplica replica = (StepGeometricReplica) item;
+                if ("CURVE_REPLICA".equals(replica.entityName())) {
+                    return curveForLooseEdge(replica.parent(), builder);
+                }
             }
             if (item instanceof StepPath) return builder.buildPath(path.id());
             if (item instanceof StepOpenPath) return builder.buildPath(openPath.id());

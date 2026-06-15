@@ -80,10 +80,14 @@ import java.util.Objects;
 public final class CompiledStepDocument {
     private final String stepText;
     private final StepFile stepFile;
-    private final StepEntity> resolved;
+    private final Map<Integer, StepEntity> resolved;
     private final StepCadBuilder builder;
 
-    public CompiledStepDocument(String stepText, StepFile stepFile, StepEntity> resolved, StepCadBuilder builder) {
+    public CompiledStepDocument(String stepText, StepFile stepFile, Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        this.stepText = stepText;
+        this.stepFile = stepFile;
+        this.resolved = resolved;
+        this.builder = builder;
     }
 
     public String getStepText() {
@@ -92,7 +96,7 @@ public final class CompiledStepDocument {
     public StepFile getStepFile() {
         return stepFile;
     }
-    public StepEntity> getResolved() {
+    public Map<Integer, StepEntity> getResolved() {
         return resolved;
     }
     public StepCadBuilder getBuilder() {
@@ -103,14 +107,29 @@ public final class CompiledStepDocument {
         if (this == o) return true;
         if (!(o instanceof CompiledStepDocument)) return false;
         CompiledStepDocument that = (CompiledStepDocument) o;
-        return java.util.Objects.equals(stepText, that.stepText) && java.util.Objects.equals(stepFile, that.stepFile) && java.util.Objects.equals(resolved, that.resolved) && java.util.Objects.equals(builder, that.builder);
+        return Objects.equals(stepText, that.stepText) && Objects.equals(stepFile, that.stepFile) && Objects.equals(resolved, that.resolved) && Objects.equals(builder, that.builder);
     }
 
     @Override public int hashCode() {
-        return java.util.Objects.hash(stepText, stepFile, resolved, builder);
+        return Objects.hash(stepText, stepFile, resolved, builder);
     }
 
     @Override public String toString() {
-        return "CompiledStepDocument{" + "stepText=stepText, stepFile=stepFile, resolved=resolved, builder=builder" + "}";
+        return "CompiledStepDocument{stepText=" + stepText + ", stepFile=" + stepFile + ", resolved=" + resolved + ", builder=" + builder + "}";
+    }
+
+    /**
+     * Compiles a STEP file from raw text through parsing, resolution, and CAD build.
+     *
+     * @param stepText the raw STEP exchange file text
+     * @return a compiled document ready for export operations
+     * @throws StepParseException if syntax parsing fails
+     * @throws StepResolutionException if semantic resolution fails
+     */
+    public static CompiledStepDocument compile(String stepText) throws StepParseException, StepResolutionException {
+        StepFile stepFile = StepParser.parse(stepText);
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        return new CompiledStepDocument(stepText, stepFile, resolved, builder);
     }
 }

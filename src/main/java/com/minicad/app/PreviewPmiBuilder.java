@@ -1323,50 +1323,87 @@ public final class PreviewPmiBuilder {
     }
 
     static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
-            switch (occurrence) {
-      case StepAnnotationPointOccurrence __:
-        return pointFromAnnotationPoint(pointOccurrence.item(), builder);
-      case StepAnnotationCurveOccurrence __:
-        return pointFromCurveCarrier(curveOccurrence.item(), builder);
-      case StepLeaderCurve __:
-        return pointFromCurveCarrier(leaderCurve.item(), builder);
-      case StepDimensionCurve __:
-        return pointFromCurveCarrier(dimensionCurve.item(), builder);
-      case StepProjectionCurve __:
-        return pointFromCurveCarrier(projectionCurve.item(), builder);
-      case StepAnnotationFillAreaOccurrence __:
-        return pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
-      case StepAnnotationFillArea __:
-        return pointFromAnnotationFillArea(fillArea, builder);
-      case StepAnnotationSymbol __:
-        return pointFromAnnotationSymbol(annotationSymbol);
-      case StepAnnotationSymbolOccurrence __:
-        return pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
-      case StepAnnotationSubfigureOccurrence __:
-        return pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
-      case StepAnnotationPlaceholderOccurrence __:
-        return pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
-      case StepAnnotationPlane __:
-        return pointFromAnnotationPlane(annotationPlane, builder);
-      case StepAnnotationText __:
-        return pointFromPlacement(annotationText.mappingTarget());
-      case StepAnnotationTextCharacter __:
-        return pointFromPlacement(annotationTextCharacter.mappingTarget());
-      case StepAnnotationTextOccurrence __:
-        return pointFromAnnotationPoint(textOccurrence.position(), builder);
-      case StepDraughtingAnnotationOccurrence __:
-        return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
-      case StepPointSet __:
-        return pointFromPointSet(pointSet, builder);
-      case StepGeometricSet __:
-        return pointFromGeometricSet(geometricSet, builder);
-      case StepGeometricCurveSet __:
-        return pointFromGeometricCurveSet(curveSet, builder);
-      case StepVertexShell __:
-        return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
-      default:
+        if (occurrence instanceof StepAnnotationPointOccurrence) {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) occurrence;
+            return pointFromAnnotationPoint(pointOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence curveOccurrence = (StepAnnotationCurveOccurrence) occurrence;
+            return pointFromCurveCarrier(curveOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) occurrence;
+            return pointFromCurveCarrier(leaderCurve.item(), builder);
+        }
+        if (occurrence instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) occurrence;
+            return pointFromCurveCarrier(dimensionCurve.item(), builder);
+        }
+        if (occurrence instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) occurrence;
+            return pointFromCurveCarrier(projectionCurve.item(), builder);
+        }
+        if (occurrence instanceof StepAnnotationFillAreaOccurrence) {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) occurrence;
+            return pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+        }
+        if (occurrence instanceof StepAnnotationFillArea) {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) occurrence;
+            return pointFromAnnotationFillArea(fillArea, builder);
+        }
+        if (occurrence instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) occurrence;
+            return pointFromAnnotationSymbol(annotationSymbol);
+        }
+        if (occurrence instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepAnnotationPlaceholderOccurrence) {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) occurrence;
+            return pointFromPlaceholderItem(placeholderOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepAnnotationPlane) {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) occurrence;
+            return pointFromAnnotationPlane(annotationPlane, builder);
+        }
+        if (occurrence instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) occurrence;
+            return pointFromPlacement(annotationText.mappingTarget());
+        }
+        if (occurrence instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) occurrence;
+            return pointFromPlacement(annotationTextCharacter.mappingTarget());
+        }
+        if (occurrence instanceof StepAnnotationTextOccurrence) {
+            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) occurrence;
+            return pointFromAnnotationPoint(textOccurrence.position(), builder);
+        }
+        if (occurrence instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) occurrence;
+            return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
+        }
+        if (occurrence instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) occurrence;
+            return pointFromPointSet(pointSet, builder);
+        }
+        if (occurrence instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) occurrence;
+            return pointFromGeometricSet(geometricSet, builder);
+        }
+        if (occurrence instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) occurrence;
+            return pointFromGeometricCurveSet(curveSet, builder);
+        }
+        if (occurrence instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) occurrence;
+            return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
+        }
         throw new IllegalArgumentException("Unknown value type: " + occurrence);
-    }
     }
 
     public static CartesianPoint pointFromCurveCarrier(StepEntity item, StepCadBuilder builder) {

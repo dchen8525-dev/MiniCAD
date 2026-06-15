@@ -2126,7 +2126,8 @@ public final class StepCadBuilder {
             // VERTEX is the abstract base type. In complex entity syntax,
             // the actual vertex subtype (VERTEX_POINT) may be resolved at the same ID.
             StepEntity actual = entitiesById.get(vertex.id());
-            if (actual != null && actual != vertex && actual instanceof StepVertexPoint vp) {
+            if (actual != null && actual != vertex && actual instanceof StepVertexPoint) {
+                StepVertexPoint vp = (StepVertexPoint) actual;
                 built = new Vertex(buildPoint(vp.point().id()));
             } else {
                 throw new StepResolutionException("entity #" + id + " is an abstract VERTEX with no concrete VERTEX_POINT subtype");
@@ -2248,19 +2249,23 @@ public final class StepCadBuilder {
      * Handles all supported curve types.
      */
     private static CartesianPoint projectOntoCurve(CartesianPoint point, Curve3 curve) {
-        if (curve instanceof com.minicad.geometry.BSplineCurve3 bspline) {
+        if (curve instanceof com.minicad.geometry.BSplineCurve3) {
+            com.minicad.geometry.BSplineCurve3 bspline = (com.minicad.geometry.BSplineCurve3) curve;
             return bspline.closestPointTo(point);
         }
-        if (curve instanceof com.minicad.geometry.RationalBSplineCurve3 rational) {
+        if (curve instanceof com.minicad.geometry.RationalBSplineCurve3) {
+            com.minicad.geometry.RationalBSplineCurve3 rational = (com.minicad.geometry.RationalBSplineCurve3) curve;
             return rational.closestPointTo(point);
         }
-        if (curve instanceof com.minicad.geometry.Line3 line) {
+        if (curve instanceof com.minicad.geometry.Line3) {
+            com.minicad.geometry.Line3 line = (com.minicad.geometry.Line3) curve;
             // Project onto infinite line: t is signed distance along direction
             Vector3 offset = point.subtract(line.origin());
             double t = offset.dot(line.direction().asVector());
             return line.origin().add(line.direction().asVector().scale(t));
         }
-        if (curve instanceof com.minicad.geometry.Circle circle) {
+        if (curve instanceof com.minicad.geometry.Circle) {
+            com.minicad.geometry.Circle circle = (com.minicad.geometry.Circle) curve;
             // Project onto circle: normalize vector from center, scale by radius
             CartesianPoint center = circle.position().location();
             Vector3 fromCenter = point.subtract(center);
@@ -2271,21 +2276,26 @@ public final class StepCadBuilder {
             }
             return center.add(fromCenter.normalize().asVector().scale(circle.radius()));
         }
-        if (curve instanceof com.minicad.geometry.Ellipse3 ellipse) {
+        if (curve instanceof com.minicad.geometry.Ellipse3) {
+            com.minicad.geometry.Ellipse3 ellipse = (com.minicad.geometry.Ellipse3) curve;
             // Approximate by sampling - good enough for projection
             return ellipse.closestPointTo(point);
         }
-        if (curve instanceof com.minicad.geometry.Polyline3 polyline) {
+        if (curve instanceof com.minicad.geometry.Polyline3) {
+            com.minicad.geometry.Polyline3 polyline = (com.minicad.geometry.Polyline3) curve;
             // Find closest point on polyline segments
             return polylineClosestPoint(point, polyline);
         }
-        if (curve instanceof com.minicad.geometry.TrimmedCurve3 trimmed) {
+        if (curve instanceof com.minicad.geometry.TrimmedCurve3) {
+            com.minicad.geometry.TrimmedCurve3 trimmed = (com.minicad.geometry.TrimmedCurve3) curve;
             return projectOntoCurve(point, trimmed.basisCurve());
         }
-        if (curve instanceof com.minicad.geometry.SurfaceCurve3 sc) {
+        if (curve instanceof com.minicad.geometry.SurfaceCurve3) {
+            com.minicad.geometry.SurfaceCurve3 sc = (com.minicad.geometry.SurfaceCurve3) curve;
             return projectOntoCurve(point, sc.curve3d());
         }
-        if (curve instanceof com.minicad.geometry.CompositeCurve3 composite) {
+        if (curve instanceof com.minicad.geometry.CompositeCurve3) {
+            com.minicad.geometry.CompositeCurve3 composite = (com.minicad.geometry.CompositeCurve3) curve;
             // Find closest point across all segments
             CartesianPoint closest = null;
             double minDist = Double.POSITIVE_INFINITY;
@@ -3017,9 +3027,13 @@ public final class StepCadBuilder {
         if (radius <= 0 || height <= 0) {
             throw new UnsupportedGeometryException("CYLINDER_VOLUME requires positive dimensions");
         }
-        Axis2Placement3D placement = cyl.position() instanceof StepAxis2Placement3D a2
-                ? buildPlacement(a2.id())
-                : null;
+        Axis2Placement3D placement;
+        if (cyl.position() instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D a2 = (StepAxis2Placement3D) cyl.position();
+            placement = buildPlacement(a2.id());
+        } else {
+            placement = null;
+        }
         // Create cylinder: sample circular profile in local XY plane, extrude along local Z
         List<CartesianPoint> localRing = buildCircleRing(radius, 72);
         List<CartesianPoint> ring = placement != null
@@ -3036,9 +3050,13 @@ public final class StepCadBuilder {
         if (radius <= 0) {
             throw new UnsupportedGeometryException("SPHERE_VOLUME requires positive radius");
         }
-        CartesianPoint center = sphere.center() instanceof StepCartesianPoint cp
-                ? buildPoint(cp.id())
-                : new CartesianPoint(0, 0, 0);
+        CartesianPoint center;
+        if (sphere.center() instanceof StepCartesianPoint) {
+            StepCartesianPoint cp = (StepCartesianPoint) sphere.center();
+            center = buildPoint(cp.id());
+        } else {
+            center = new CartesianPoint(0, 0, 0);
+        }
         // Tessellate sphere centered at the specified center point
         List<Face> faces = tessellateSphereAt(center, radius, 24, 48);
         return new Solid(new Shell(faces, true));
@@ -3050,9 +3068,13 @@ public final class StepCadBuilder {
         if (majorR <= 0 || minorR <= 0) {
             throw new UnsupportedGeometryException("TORUS_VOLUME requires positive radii");
         }
-        Axis2Placement3D placement = torus.position() instanceof StepAxis2Placement3D a2
-                ? buildPlacement(a2.id())
-                : null;
+        Axis2Placement3D placement;
+        if (torus.position() instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D a2 = (StepAxis2Placement3D) torus.position();
+            placement = buildPlacement(a2.id());
+        } else {
+            placement = null;
+        }
         List<Face> faces = placement != null
                 ? tessellateTorusAt(placement, majorR, minorR, 36, 24)
                 : tessellateTorus(majorR, minorR, 36, 24);
@@ -3066,9 +3088,13 @@ public final class StepCadBuilder {
         if (w <= 0 || d <= 0 || h <= 0) {
             throw new UnsupportedGeometryException("PRISM_VOLUME requires positive dimensions");
         }
-        Axis2Placement3D placement = prism.position() instanceof StepAxis2Placement3D a2
-                ? buildPlacement(a2.id())
-                : null;
+        Axis2Placement3D placement;
+        if (prism.position() instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D a2 = (StepAxis2Placement3D) prism.position();
+            placement = buildPlacement(a2.id());
+        } else {
+            placement = null;
+        }
         // Build prism in local coordinate system: XY rectangle, extrude along local Z
         CartesianPoint origin = placement != null ? placement.location() : new CartesianPoint(0, 0, 0);
         com.minicad.geometry.Vector3 xDir = placement != null ? placement.xDirection().asVector() : new com.minicad.geometry.Vector3(1, 0, 0);
@@ -3530,17 +3556,25 @@ public final class StepCadBuilder {
     }
 
     Solid buildCsgPrimitive(StepCsgPrimitive csgPrimitive) {
-        return switch (csgPrimitive.entityName()) {
-        // TODO: JDK11 - Convert switch expression above
-            case "BLOCK" -> buildBlockPrimitive(csgPrimitive);
-            case "SPHERE" -> buildSpherePrimitive(csgPrimitive);
-            case "ELLIPSOID" -> buildEllipsoidPrimitive(csgPrimitive);
-            case "RIGHT_CIRCULAR_CYLINDER" -> buildRightCircularCylinderPrimitive(csgPrimitive);
-            case "TORUS" -> buildTorusPrimitive(csgPrimitive);
-            case "RIGHT_ANGULAR_WEDGE" -> buildRightAngularWedgePrimitive(csgPrimitive);
-            case "RIGHT_CIRCULAR_CONE" -> buildRightCircularConePrimitive(csgPrimitive);
-            default -> throw new UnsupportedGeometryException(csgPrimitive.entityName() + " construction is unsupported");
-        };
+        String entityName = csgPrimitive.entityName();
+        switch (entityName) {
+            case "BLOCK":
+                return buildBlockPrimitive(csgPrimitive);
+            case "SPHERE":
+                return buildSpherePrimitive(csgPrimitive);
+            case "ELLIPSOID":
+                return buildEllipsoidPrimitive(csgPrimitive);
+            case "RIGHT_CIRCULAR_CYLINDER":
+                return buildRightCircularCylinderPrimitive(csgPrimitive);
+            case "TORUS":
+                return buildTorusPrimitive(csgPrimitive);
+            case "RIGHT_ANGULAR_WEDGE":
+                return buildRightAngularWedgePrimitive(csgPrimitive);
+            case "RIGHT_CIRCULAR_CONE":
+                return buildRightCircularConePrimitive(csgPrimitive);
+            default:
+                throw new UnsupportedGeometryException(entityName + " construction is unsupported");
+        }
     }
 
     private Solid buildBlockPrimitive(StepCsgPrimitive csgPrimitive) {
@@ -4161,44 +4195,44 @@ public final class StepCadBuilder {
 
     Solid buildBooleanResult(String operator, StepEntity first, StepEntity second) {
         String normalizedOperator = operator == null ? "" : operator.replace(".", "").trim().toUpperCase();
-        return switch (normalizedOperator) {
-        // TODO: JDK11 - Convert switch expression above
-            case "DIFFERENCE" -> {
+        switch (normalizedOperator) {
+            case "DIFFERENCE": {
                 StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
                 if (halfSpaceSolid != null) {
-                    yield clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, false);
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, false);
                 }
                 throw new UnsupportedGeometryException(
                         "BOOLEAN_RESULT difference requires HALF_SPACE_SOLID or BOXED_HALF_SPACE second operand");
             }
-            case "INTERSECTION" -> {
+            case "INTERSECTION": {
                 StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
                 if (halfSpaceSolid != null) {
-                    yield clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, true);
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, true);
                 }
                 halfSpaceSolid = asHalfSpaceOperand(first);
                 if (halfSpaceSolid != null) {
-                    yield clipSolidWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid, true);
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid, true);
                 }
                 throw new UnsupportedGeometryException(
                         "BOOLEAN_RESULT intersection requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand");
             }
-            case "UNION" -> {
+            case "UNION": {
                 // UNION with half-space: extend solid into half-space region
                 // This is the inverse of DIFFERENCE with half-space
                 StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
                 if (halfSpaceSolid != null) {
-                    yield unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid);
+                    return unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid);
                 }
                 halfSpaceSolid = asHalfSpaceOperand(first);
                 if (halfSpaceSolid != null) {
-                    yield unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid);
+                    return unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid);
                 }
                 throw new UnsupportedGeometryException(
                         "BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported");
             }
-            default -> throw new UnsupportedGeometryException("BOOLEAN_RESULT operator " + normalizedOperator + " is unsupported");
-        };
+            default:
+                throw new UnsupportedGeometryException("BOOLEAN_RESULT operator " + normalizedOperator + " is unsupported");
+        }
     }
 
     private StepHalfSpaceSolid asHalfSpaceOperand(StepEntity operand) {
@@ -4210,47 +4244,102 @@ public final class StepCadBuilder {
     }
 
     Solid buildBooleanOperandSolid(StepEntity operand) {
-        return switch (operand) {
-        // TODO: JDK11 - Convert switch expression above
-            case StepManifoldSolidBrep solidBrep -> buildSolid(solidBrep.id());
-            case StepFacettedBrep facettedBrep -> buildSolid(facettedBrep.id());
-            case StepBrepWithVoids brepWithVoids -> buildSolid(brepWithVoids.id());
-            case StepNonManifoldSolidBrep nonManifold -> buildSolid(nonManifold.id());
-            case StepAdvancedBrep advancedBrep -> buildSolid(advancedBrep.id());
-            case StepCsgPrimitive csgPrimitive -> buildCsgPrimitive(csgPrimitive);
-            case StepCsgPrimitive3D csg3D -> {
-                // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
-                StepEntity actual = entitiesById.get(csg3D.position().id());
-                if (actual != null && actual instanceof StepCsgPrimitive) {
-                    yield buildCsgPrimitive(primitive);
-                }
-                throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
+        if (operand instanceof StepManifoldSolidBrep) {
+            StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) operand;
+            return buildSolid(solidBrep.id());
+        }
+        if (operand instanceof StepFacettedBrep) {
+            StepFacettedBrep facettedBrep = (StepFacettedBrep) operand;
+            return buildSolid(facettedBrep.id());
+        }
+        if (operand instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) operand;
+            return buildSolid(brepWithVoids.id());
+        }
+        if (operand instanceof StepNonManifoldSolidBrep) {
+            StepNonManifoldSolidBrep nonManifold = (StepNonManifoldSolidBrep) operand;
+            return buildSolid(nonManifold.id());
+        }
+        if (operand instanceof StepAdvancedBrep) {
+            StepAdvancedBrep advancedBrep = (StepAdvancedBrep) operand;
+            return buildSolid(advancedBrep.id());
+        }
+        if (operand instanceof StepCsgPrimitive) {
+            StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) operand;
+            return buildCsgPrimitive(csgPrimitive);
+        }
+        if (operand instanceof StepCsgPrimitive3D) {
+            StepCsgPrimitive3D csg3D = (StepCsgPrimitive3D) operand;
+            // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
+            StepEntity actual = entitiesById.get(csg3D.position().id());
+            if (actual != null && actual instanceof StepCsgPrimitive) {
+                StepCsgPrimitive primitive = (StepCsgPrimitive) actual;
+                return buildCsgPrimitive(primitive);
             }
-            case StepCsgVolume csgVolume -> buildCsgVolumeSolid(csgVolume);
-            case StepCsgSolid csgSolid -> buildBooleanOperandSolid(csgSolid.treeRootExpression());
-            case StepSolidReplica solidReplica -> buildSolid(solidReplica.id());
-            case StepSweptAreaSolid sweptAreaSolid -> buildSweptAreaSolid(sweptAreaSolid);
-            case StepSweptDiskSolid sweptDiskSolid -> buildSweptDiskSolid(sweptDiskSolid);
-            case StepExtrudedAreaSolidTapered taperedExtrusion -> buildExtrudedAreaSolidTapered(taperedExtrusion);
-            case StepRevolvedAreaSolidTapered taperedRevolution -> buildRevolvedAreaSolidTapered(taperedRevolution);
-            case StepSurfaceCurveSweptAreaSolid surfaceCurveSweep -> buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
-            case StepBooleanClippingResult clippingResult ->
-                    buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
-            case StepBooleanResult booleanResult ->
-                    buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
-            case StepHalfSpaceSolid halfSpace -> buildHalfSpaceSolidAsSolid(halfSpace);
-            case StepPolygonalBoundedHalfSpace polyHalfSpace -> buildPolygonalBoundedHalfSpaceAsSolid(polyHalfSpace);
-            case StepSolidModel solidModel -> {
-                // SolidModel is the abstract base type; check for concrete subtype at same ID.
-                StepEntity actual = entitiesById.get(solidModel.id());
-                if (actual != null && actual != solidModel && canBuildAsSolid(actual)) {
-                    yield buildSolid(solidModel.id());
-                }
-                throw new StepResolutionException("entity #" + solidModel.id() + " is an abstract SOLID_MODEL with no concrete subtype");
+            throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
+        }
+        if (operand instanceof StepCsgVolume) {
+            StepCsgVolume csgVolume = (StepCsgVolume) operand;
+            return buildCsgVolumeSolid(csgVolume);
+        }
+        if (operand instanceof StepCsgSolid) {
+            StepCsgSolid csgSolid = (StepCsgSolid) operand;
+            return buildBooleanOperandSolid(csgSolid.treeRootExpression());
+        }
+        if (operand instanceof StepSolidReplica) {
+            StepSolidReplica solidReplica = (StepSolidReplica) operand;
+            return buildSolid(solidReplica.id());
+        }
+        if (operand instanceof StepSweptAreaSolid) {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) operand;
+            return buildSweptAreaSolid(sweptAreaSolid);
+        }
+        if (operand instanceof StepSweptDiskSolid) {
+            StepSweptDiskSolid sweptDiskSolid = (StepSweptDiskSolid) operand;
+            return buildSweptDiskSolid(sweptDiskSolid);
+        }
+        if (operand instanceof StepExtrudedAreaSolidTapered) {
+            StepExtrudedAreaSolidTapered taperedExtrusion = (StepExtrudedAreaSolidTapered) operand;
+            return buildExtrudedAreaSolidTapered(taperedExtrusion);
+        }
+        if (operand instanceof StepRevolvedAreaSolidTapered) {
+            StepRevolvedAreaSolidTapered taperedRevolution = (StepRevolvedAreaSolidTapered) operand;
+            return buildRevolvedAreaSolidTapered(taperedRevolution);
+        }
+        if (operand instanceof StepSurfaceCurveSweptAreaSolid) {
+            StepSurfaceCurveSweptAreaSolid surfaceCurveSweep = (StepSurfaceCurveSweptAreaSolid) operand;
+            return buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
+        }
+        if (operand instanceof StepBooleanClippingResult) {
+            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) operand;
+            return buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
+        }
+        if (operand instanceof StepBooleanResult) {
+            StepBooleanResult booleanResult = (StepBooleanResult) operand;
+            return buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
+        }
+        if (operand instanceof StepHalfSpaceSolid) {
+            StepHalfSpaceSolid halfSpace = (StepHalfSpaceSolid) operand;
+            return buildHalfSpaceSolidAsSolid(halfSpace);
+        }
+        if (operand instanceof StepPolygonalBoundedHalfSpace) {
+            StepPolygonalBoundedHalfSpace polyHalfSpace = (StepPolygonalBoundedHalfSpace) operand;
+            return buildPolygonalBoundedHalfSpaceAsSolid(polyHalfSpace);
+        }
+        if (operand instanceof StepSolidModel) {
+            StepSolidModel solidModel = (StepSolidModel) operand;
+            // SolidModel is the abstract base type; check for concrete subtype at same ID.
+            StepEntity actual = entitiesById.get(solidModel.id());
+            if (actual != null && actual != solidModel && canBuildAsSolid(actual)) {
+                return buildSolid(solidModel.id());
             }
-            case StepMappedItem mappedItem -> buildBooleanOperandSolid(mappedItem.mappingTarget());
-            default -> throw new UnsupportedGeometryException("boolean operand " + stepEntityTypeName(operand) + " is unsupported");
-        };
+            throw new StepResolutionException("entity #" + solidModel.id() + " is an abstract SOLID_MODEL with no concrete subtype");
+        }
+        if (operand instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) operand;
+            return buildBooleanOperandSolid(mappedItem.mappingTarget());
+        }
+        throw new UnsupportedGeometryException("boolean operand " + stepEntityTypeName(operand) + " is unsupported");
     }
 
     private Solid clipSolidWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid, boolean keepAgreementSide) {
@@ -4932,7 +5021,8 @@ public final class StepCadBuilder {
             case StepOffsetCurve3D offsetCurve3D -> buildOffsetCurve3(offsetCurve3D.id());
             case StepOrientedCurve orientedCurve -> {
                 Curve3 baseCurve = buildCurve3(orientedCurve.curveElement());
-                if (!orientedCurve.orientation() && baseCurve instanceof CompositeCurve3 composite) {
+                if (!orientedCurve.orientation() && baseCurve instanceof CompositeCurve3) {
+                    CompositeCurve3 composite = (CompositeCurve3) baseCurve;
                     // Reverse composite curve: reverse segment order and reverse each segment.
                     yield reverseCompositeCurve(composite);
                 }
@@ -5600,7 +5690,8 @@ public final class StepCadBuilder {
             StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             return offsetSupportedSurfaceGeometry(offsetSurface, faceType);
         }
-        if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             String replicaRestriction = unsupportedReplicaSurfaceTransformation(replica.transformation());
             if (replicaRestriction != null) {
                 return null;
@@ -6168,7 +6259,8 @@ public final class StepCadBuilder {
             buildOffsetSurface(offsetSurface.id());
             return;
         }
-        if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             buildSurfaceReplica(replica.id());
             return;
         }
@@ -6387,7 +6479,8 @@ public final class StepCadBuilder {
             buildOffsetSurface(offsetSurface.id());
             return describeUnsupportedFaceGeometry(offsetSurface.basisSurface());
         }
-        if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             buildSurfaceReplica(replica.id());
             return describeUnsupportedFaceGeometry(replica.parent());
         }

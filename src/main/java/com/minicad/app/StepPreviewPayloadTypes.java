@@ -323,7 +323,7 @@ public final class BoundsPayload {
 
     @Override
     public String toString() {
-        return "BoundsPayload{" + "min=min, max=max + "}";
+        return "BoundsPayload{min=" + min + ", max=" + max + "}";
     }
 }
 
@@ -949,7 +949,7 @@ public final class BinaryEdgePayload {
 
     @Override
     public String toString() {
-        return "BinaryEdgePayload{" + "stepId=stepId, pointOffset=pointOffset, pointCount=pointCount, curve=curve, color=color + "}";
+        return "BinaryEdgePayload{stepId=" + stepId + ", pointOffset=" + pointOffset + ", pointCount=" + pointCount + ", curve=" + curve + ", color=" + color + "}";
     }
 }
 
@@ -1066,7 +1066,7 @@ public final class BinaryLoopPayload {
 
     @Override
     public String toString() {
-        return "BinaryLoopPayload{" + "outer=outer, pointOffset=pointOffset, pointCount=pointCount + "}";
+        return "BinaryLoopPayload{outer=" + outer + ", pointOffset=" + pointOffset + ", pointCount=" + pointCount + "}";
     }
 }
 
@@ -1101,7 +1101,7 @@ public final class PointRange {
 
     @Override
     public String toString() {
-        return "PointRange{" + "offset=offset, count=count + "}";
+        return "PointRange{offset=" + offset + ", count=" + count + "}";
     }
 }
 
@@ -1136,7 +1136,7 @@ public final class UvPoint {
 
     @Override
     public String toString() {
-        return "UvPoint{" + "u=u, v=v + "}";
+        return "UvPoint{u=" + u + ", v=" + v + "}";
     }
 }
 
@@ -1166,7 +1166,7 @@ public final class ParametricLoopPayload {
 
     @Override
     public String toString() {
-        return "ParametricLoopPayload{" + "outer=outer + "}";
+        return "ParametricLoopPayload{outer=" + outer + "}";
     }
 }
 
@@ -1211,7 +1211,7 @@ public final class UvBounds {
 
     @Override
     public String toString() {
-        return "UvBounds{" + "minU=minU, minV=minV, maxU=maxU, maxV=maxV + "}";
+        return "UvBounds{minU=" + minU + ", minV=" + minV + ", maxU=" + maxU + ", maxV=" + maxV + "}";
     }
 }
 
@@ -1249,7 +1249,7 @@ public final class EdgePayload {
 
     @Override
     public String toString() {
-        return "EdgePayload{" + "stepId=stepId, curve=curve, color=color + "}";
+        return "EdgePayload{stepId=" + stepId + ", curve=" + curve + ", color=" + color + "}";
     }
 }
 
@@ -1720,7 +1720,7 @@ public final class PreviewFaceResult {
 
     @Override
     public String toString() {
-        return "PreviewFaceResult{" + "face=face, unsupportedFace=unsupportedFace + "}";
+        return "PreviewFaceResult{face=" + face + ", unsupportedFace=" + unsupportedFace + "}";
     }
 }
 
@@ -1880,7 +1880,7 @@ public final class LoopPayload {
 
     @Override
     public String toString() {
-        return "LoopPayload{" + "outer=outer + "}";
+        return "LoopPayload{outer=" + outer + "}";
     }
 }
 
@@ -1920,7 +1920,7 @@ public final class PointPayload {
 
     @Override
     public String toString() {
-        return "PointPayload{" + "x=x, y=y, z=z + "}";
+        return "PointPayload{x=" + x + ", y=" + y + ", z=" + z + "}";
     }
 }
 
@@ -1960,7 +1960,7 @@ public final class VectorPayload {
 
     @Override
     public String toString() {
-        return "VectorPayload{" + "x=x, y=y, z=z + "}";
+        return "VectorPayload{x=" + x + ", y=" + y + ", z=" + z + "}";
     }
 }
 
@@ -2000,7 +2000,7 @@ public final class ColorPayload {
 
     @Override
     public String toString() {
-        return "ColorPayload{" + "red=red, green=green, blue=blue + "}";
+        return "ColorPayload{red=" + red + ", green=" + green + ", blue=" + blue + "}";
     }
 }
 
@@ -2042,7 +2042,7 @@ public final class PbrPayload {
 
     @Override
     public String toString() {
-        return "PbrPayload{" + "diffuse=diffuse, specular=specular, specularExponent=specularExponent, specularColor=java.util.Arrays.toString(specularColor) + "}";
+        return "PbrPayload{diffuse=" + diffuse + ", specular=" + specular + ", specularExponent=" + specularExponent + ", specularColor=" + java.util.Arrays.toString(specularColor) + "}";
     }
 }
 
@@ -2087,7 +2087,7 @@ public final class GeometrySummary {
 
     @Override
     public String toString() {
-        return "GeometrySummary{" + "faceCount=faceCount, edgeCount=edgeCount, approxSurfaceArea=approxSurfaceArea, approxEdgeLength=approxEdgeLength + "}";
+        return "GeometrySummary{faceCount=" + faceCount + ", edgeCount=" + edgeCount + ", approxSurfaceArea=" + approxSurfaceArea + ", approxEdgeLength=" + approxEdgeLength + "}";
     }
 }
 
@@ -2118,7 +2118,7 @@ public final class RepresentationMeshes {
 
     @Override
     public String toString() {
-        return "RepresentationMeshes{" + "name=name + "}";
+        return "RepresentationMeshes{name=" + name + "}";
     }
 }
 
@@ -2158,7 +2158,7 @@ public final class FaceNode {
 
     @Override
     public String toString() {
-        return "FaceNode{" + "face=face, meshIndex=meshIndex, name=name + "}";
+        return "FaceNode{face=" + face + ", meshIndex=" + meshIndex + ", name=" + name + "}";
     }
 }
 
@@ -2198,7 +2198,7 @@ public final class EdgeNode {
 
     @Override
     public String toString() {
-        return "EdgeNode{" + "edge=edge, meshIndex=meshIndex, name=name + "}";
+        return "EdgeNode{edge=" + edge + ", meshIndex=" + meshIndex + ", name=" + name + "}";
     }
 }
 
@@ -2242,7 +2242,7 @@ public final class FloatArrayData {
 
     @Override
     public String toString() {
-        return "FloatArrayData{" + "values=java.util.Arrays.toString(values), count=count, min=java.util.Arrays.toString(min), max=java.util.Arrays.toString(max) + "}";
+        return "FloatArrayData{values=" + java.util.Arrays.toString(values) + ", count=" + count + ", min=" + java.util.Arrays.toString(min) + ", max=" + java.util.Arrays.toString(max) + "}";
     }
 }
 
@@ -2276,7 +2276,7 @@ public final class IntArrayData {
 
     @Override
     public String toString() {
-        return "IntArrayData{" + "values=java.util.Arrays.toString(values), count=count + "}";
+        return "IntArrayData{values=" + java.util.Arrays.toString(values) + ", count=" + count + "}";
     }
 }
 
@@ -2316,7 +2316,7 @@ public final class IndexedTriangleMesh {
 
     @Override
     public String toString() {
-        return "IndexedTriangleMesh{" + "positions=positions, normals=normals, indices=indices + "}";
+        return "IndexedTriangleMesh{positions=" + positions + ", normals=" + normals + ", indices=" + indices + "}";
     }
 }
 

@@ -2208,42 +2208,41 @@ public final class PreviewFaceBuilder {
     }
 
     public static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
-            switch (surface) {
-      case Plane __:
-        return "PLANE";
-      case CylindricalSurface __:
-        return "CYLINDRICAL_SURFACE";
-      case ConicalSurface __:
-        return "CONICAL_SURFACE";
-      case SphericalSurface __:
-        return "SPHERICAL_SURFACE";
-      case ToroidalSurface __:
-        return "TOROIDAL_SURFACE";
-      case BSplineSurface3 __:
-        return "BSPLINE_SURFACE";
-      case RationalBSplineSurface3 __:
-        return "RATIONAL_BSPLINE_SURFACE";
-      case RuledSurface3 __:
-        return "RULED_SURFACE";
-      case SurfaceOfRevolution3 __:
-        return "SURFACE_OF_REVOLUTION";
-      case OffsetSurface3 __:
-        return "OFFSET_SURFACE";
-      case SurfaceOfLinearExtrusion3 __:
-        return "SURFACE_OF_LINEAR_EXTRUSION";
-      case SurfaceOfConstantRadius3 __:
-        return "SURFACE_OF_CONSTANT_RADIUS";
-      case ParaboloidSurface __:
-        return "PARABOLOID_SURFACE";
-      case HyperboloidSurface __:
-        return "HYPERBOLOID_SURFACE";
-      case SurfaceOfTranslation3 __:
-        return "SURFACE_OF_TRANSLATION";
-      case SurfaceOfProjection3 __:
-        return "SURFACE_OF_PROJECTION";
-      default:
-        throw new IllegalArgumentException("Unknown value type: " + surface);
-    }
+        if (surface instanceof Plane) {
+            return "PLANE";
+        } else if (surface instanceof CylindricalSurface) {
+            return "CYLINDRICAL_SURFACE";
+        } else if (surface instanceof ConicalSurface) {
+            return "CONICAL_SURFACE";
+        } else if (surface instanceof SphericalSurface) {
+            return "SPHERICAL_SURFACE";
+        } else if (surface instanceof ToroidalSurface) {
+            return "TOROIDAL_SURFACE";
+        } else if (surface instanceof BSplineSurface3) {
+            return "BSPLINE_SURFACE";
+        } else if (surface instanceof RationalBSplineSurface3) {
+            return "RATIONAL_BSPLINE_SURFACE";
+        } else if (surface instanceof RuledSurface3) {
+            return "RULED_SURFACE";
+        } else if (surface instanceof SurfaceOfRevolution3) {
+            return "SURFACE_OF_REVOLUTION";
+        } else if (surface instanceof OffsetSurface3) {
+            return "OFFSET_SURFACE";
+        } else if (surface instanceof SurfaceOfLinearExtrusion3) {
+            return "SURFACE_OF_LINEAR_EXTRUSION";
+        } else if (surface instanceof SurfaceOfConstantRadius3) {
+            return "SURFACE_OF_CONSTANT_RADIUS";
+        } else if (surface instanceof ParaboloidSurface) {
+            return "PARABOLOID_SURFACE";
+        } else if (surface instanceof HyperboloidSurface) {
+            return "HYPERBOLOID_SURFACE";
+        } else if (surface instanceof SurfaceOfTranslation3) {
+            return "SURFACE_OF_TRANSLATION";
+        } else if (surface instanceof SurfaceOfProjection3) {
+            return "SURFACE_OF_PROJECTION";
+        } else {
+            throw new IllegalArgumentException("Unknown value type: " + surface);
+        }
     }
 
     // ─── Local helper methods (copied from StepPreviewJsonExporter) ──────

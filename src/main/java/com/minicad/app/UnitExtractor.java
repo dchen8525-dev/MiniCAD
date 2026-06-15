@@ -16,11 +16,21 @@ final class UnitExtractor {
     private UnitExtractor() {
     }
 
-    record UnitInfo(
-            String lengthUnit,
-            Double scaleToMeters,
-            String angleUnit
-    ) {
+    static final class UnitInfo {
+        private final String lengthUnit;
+        private final Double scaleToMeters;
+        private final String angleUnit;
+
+        UnitInfo(String lengthUnit, Double scaleToMeters, String angleUnit) {
+            this.lengthUnit = lengthUnit;
+            this.scaleToMeters = scaleToMeters;
+            this.angleUnit = angleUnit;
+        }
+
+        String lengthUnit() { return lengthUnit; }
+        Double scaleToMeters() { return scaleToMeters; }
+        String angleUnit() { return angleUnit; }
+
         boolean isEmpty() {
             return lengthUnit == null && angleUnit == null;
         }
