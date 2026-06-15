@@ -423,7 +423,8 @@ public final class StepDumpApp {
     }
 
     private static String stepEntityTypeName(StepEntity entity) {
-        if (entity instanceof com.minicad.step.model.topology.StepFaceBound faceBound) {
+        if (entity instanceof com.minicad.step.model.topology.StepFaceBound) {
+            com.minicad.step.model.topology.StepFaceBound faceBound = (com.minicad.step.model.topology.StepFaceBound) entity;
             return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
         }
         if (entity instanceof StepAxis2Placement2D) {
@@ -438,7 +439,8 @@ public final class StepDumpApp {
         if (entity instanceof StepOffsetCurve3D) {
             return "OFFSET_CURVE_3D";
         }
-        if (entity instanceof com.minicad.step.model.workflow.StepRepresentation representation) {
+        if (entity instanceof com.minicad.step.model.workflow.StepRepresentation) {
+            com.minicad.step.model.workflow.StepRepresentation representation = (com.minicad.step.model.workflow.StepRepresentation) entity;
             if (representation.entityName() != null
                     && !representation.entityName().isBlank()
                     && !"REPRESENTATION".equals(representation.entityName())
@@ -1468,11 +1470,14 @@ public final class StepDumpApp {
                     || element instanceof StepEdgeBasedWireframeModel
                     || element instanceof StepShellBasedWireframeModel) {
                 validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPointSet pointSet) {
+            } else if (element instanceof StepPointSet) {
+                StepPointSet pointSet = (StepPointSet) element;
                 validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet geometricSet) {
+            } else if (element instanceof StepGeometricSet) {
+                StepGeometricSet geometricSet = (StepGeometricSet) element;
                 validateGeometricSet(geometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet nestedCurveSet) {
+            } else if (element instanceof StepGeometricCurveSet) {
+                StepGeometricCurveSet nestedCurveSet = (StepGeometricCurveSet) element;
                 validateGeometricCurveSet(nestedCurveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1486,11 +1491,14 @@ public final class StepDumpApp {
     private static int validatePointSet(StepPointSet pointSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity point : pointSet.points()) {
-            if (point instanceof StepCartesianPoint cartesianPoint) {
+            if (point instanceof StepCartesianPoint) {
+                StepCartesianPoint cartesianPoint = (StepCartesianPoint) point;
                 builder.buildPoint(cartesianPoint.id());
-            } else if (point instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (point instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) point).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) point;
                 builder.buildPointReference(replica.id());
-            } else if (point instanceof StepVertexPoint vertexPoint) {
+            } else if (point instanceof StepVertexPoint) {
+                StepVertexPoint vertexPoint = (StepVertexPoint) point;
                 builder.buildVertex(vertexPoint.id());
             } else if (point instanceof StepVertexShell
                     || point instanceof StepAnnotationSymbol
