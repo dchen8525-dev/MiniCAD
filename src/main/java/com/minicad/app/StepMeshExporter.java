@@ -465,7 +465,7 @@ public final class StepMeshExporter {
                     }
                 }
                 if (points.size() > 2 && points.get(0).equals(points.get(points.size() - 1))) {
-                    points.removeLast();
+                    points.remove(points.size() - 1);
                 }
                 return points;
             }
@@ -536,7 +536,7 @@ public final class StepMeshExporter {
                 }
             }
             if (projected.size() > 1 && samePoint(projected.get(0), projected.get(projected.size() - 1))) {
-                projected.removeLast();
+                projected.remove(projected.size() - 1);
             }
             removeCollinear(projected);
             return new ProjectedLoop(projected, outer);
@@ -1170,7 +1170,7 @@ public final class StepMeshExporter {
             boolean promoteSingleOuter = stepFace.bounds().size() == 1
                     && stepFace.bounds().stream().noneMatch(com.minicad.step.model.topology.StepFaceBound::outer);
             for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-                if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop)) {
+                if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop)) {
                     return List.of();
                 }
                 List<UvPoint> loopPoints = new ArrayList<>();
@@ -1230,7 +1230,7 @@ public final class StepMeshExporter {
                     }
                 }
                 if (uvPoints.size() > 1 && sameUv(uvPoints.get(0), uvPoints.get(uvPoints.size() - 1))) {
-                    uvPoints.removeLast();
+                    uvPoints.remove(uvPoints.size() - 1);
                 }
                 return uvPoints;
             }

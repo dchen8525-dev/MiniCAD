@@ -2211,7 +2211,7 @@ public final class PreviewUvMapper {
         }
         List<T> reversed = new ArrayList<>(points);
         if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.removeLast();
+            T start = reversed.remove(reversed.size() - 1);
             java.util.Collections.reverse(reversed);
             reversed.add(reversed.get(0));
             reversed.set(0, start);

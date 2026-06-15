@@ -11324,7 +11324,7 @@ public final class StepEntityResolver {
       for (StepValue typeElement : typeList.elements()) {
         if (typeElement instanceof StepValue.StringValue sv) {
           elementTypes.add(sv.value());
-        } else if (typeElement instanceof StepValue.TypedValue tv && tv.value() instanceof StepValue.StringValue sv) {
+        } else if (typeElement instanceof StepValue.TypedValue tv && tv.value() instanceof StepValue.StringValue) { StepValue.StringValue sv = (StepValue.StringValue) tv.value();
           elementTypes.add(sv.value());
         }
       }

@@ -1324,7 +1324,9 @@ public final class PreviewCurveEvaluator {
     }
 
     public static Double previewCurveTransformScale(StepEntity item) {
-        if (item instanceof StepGeometricReplica if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) return replica.transformation().scale();if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) return replica.transformation().scale(); "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) return ((StepGeometricReplica) item).transformation().scale();
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            return ((StepGeometricReplica) item).transformation().scale();
+        }
         return null;
     }
 
@@ -1392,8 +1394,15 @@ public final class PreviewCurveEvaluator {
             if (current instanceof StepDraughtingAnnotationOccurrence) {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current; current = annotationOccurrence.item(); continue; }
             if (current instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current; current = terminatorSymbol.annotatedCurve(); continue; }
-            if (current instanceof StepGeometricReplica if (current instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) { current = replica.parent(); continue; }if (current instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) { current = replica.parent(); continue; } "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) { StepGeometricReplica replica = (StepGeometricReplica) current; current = replica.parent(); continue; }
+                StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
+                current = terminatorSymbol.annotatedCurve();
+                continue;
+            }
+            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
+                current = replica.parent();
+                continue;
+            }
             return current;
         }
     }

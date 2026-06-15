@@ -2736,7 +2736,7 @@ public final class StepCadBuilder {
      * Similar to BLOCK CSG primitive but with explicit StepBlockVolume entity.
      */
     Solid buildBlockVolume(StepBlockVolume blockVolume) {
-        if (!(blockVolume.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(blockVolume.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("BLOCK_VOLUME position must be an AXIS2_PLACEMENT_3D");
         }
         double x = blockVolume.xLength();
@@ -2939,7 +2939,7 @@ public final class StepCadBuilder {
         if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID could not extract boundary points");
         }
-        if (!(extrudedFace.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(extrudedFace.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
         }
         Axis2Placement3D solidPlacement = buildPlacement(placement.id());
@@ -2967,7 +2967,7 @@ public final class StepCadBuilder {
         if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID could not extract boundary points");
         }
-        if (!(revolvedFace.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(revolvedFace.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID position must be an AXIS2_PLACEMENT_3D");
         }
         Axis2Placement3D solidPlacement = buildPlacement(placement.id());
@@ -3544,7 +3544,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildBlockPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("BLOCK position must be an AXIS2_PLACEMENT_3D");
         }
         if (csgPrimitive.dimensions().size() < 3) {
@@ -3586,7 +3586,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildSpherePrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("SPHERE position must be an AXIS2_PLACEMENT_3D");
         }
         if (csgPrimitive.dimensions().isEmpty()) {
@@ -3600,7 +3600,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildEllipsoidPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("ELLIPSOID position must be an AXIS2_PLACEMENT_3D");
         }
         if (csgPrimitive.dimensions().size() < 3) {
@@ -3616,7 +3616,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildRightCircularCylinderPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis1Placement placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER position must be an AXIS1_PLACEMENT");
         }
         if (csgPrimitive.dimensions().size() < 2) {
@@ -3646,7 +3646,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildTorusPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis1Placement placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("TORUS position must be an AXIS1_PLACEMENT");
         }
         if (csgPrimitive.dimensions().size() < 2) {
@@ -3692,7 +3692,7 @@ public final class StepCadBuilder {
     }
 
     private Solid buildRightAngularWedgePrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D placement)) {
+        if (!(csgPrimitive.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE position must be an AXIS2_PLACEMENT_3D");
         }
         if (csgPrimitive.dimensions().size() < 4) {
@@ -4263,7 +4263,7 @@ public final class StepCadBuilder {
         if (halfSpaceSolid.enclosure() == null) {
             return clipped;
         }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain boxDomain)) {
+        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
             throw new UnsupportedGeometryException(
                     halfSpaceSolid.entityName() + " construction with "
                             + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
@@ -4284,7 +4284,7 @@ public final class StepCadBuilder {
             throw new UnsupportedGeometryException(
                     "BOOLEAN_RESULT union with unbounded HALF_SPACE_SOLID is not supported");
         }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain boxDomain)) {
+        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
             throw new UnsupportedGeometryException(
                     halfSpaceSolid.entityName() + " union with "
                             + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
@@ -4420,7 +4420,7 @@ public final class StepCadBuilder {
             throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID requires at least 3 profile points");
         }
         Axis2Placement3D solidPlacement = buildPlacement(sweptAreaSolid.position().id());
-        if (!(sweptAreaSolid.sweepReference() instanceof StepDirection direction)) {
+        if (!(sweptAreaSolid.sweepReference() instanceof StepDirection)) {
             throw new UnsupportedGeometryException("EXTRUDED_AREA_SOLID extrusion direction must be a DIRECTION");
         }
         Vector3 extrusion = buildDirection(direction.id()).asVector().scale(sweptAreaSolid.parameter());
@@ -4483,7 +4483,7 @@ public final class StepCadBuilder {
         if (profileLoops.outer().size() < 3) {
             throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID requires at least 3 profile points");
         }
-        if (!(sweptAreaSolid.sweepReference() instanceof StepAxis1Placement axisPlacement)) {
+        if (!(sweptAreaSolid.sweepReference() instanceof StepAxis1Placement)) {
             throw new UnsupportedGeometryException("REVOLVED_AREA_SOLID axis must be an AXIS1_PLACEMENT");
         }
         double angle = sweptAreaSolid.parameter();
@@ -5317,7 +5317,7 @@ public final class StepCadBuilder {
     }
 
     private Curve3 buildConicCurve3(StepConicCurve conic) {
-        if (!(conic.position() instanceof StepAxis2Placement3D placement3D)) {
+        if (!(conic.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
         }
         return switch (conic.entityName()) {
@@ -5339,7 +5339,7 @@ public final class StepCadBuilder {
     }
 
     private Curve2 buildConicCurve2(StepConicCurve conic) {
-        if (!(conic.position() instanceof StepAxis2Placement2D placement2D)) {
+        if (!(conic.position() instanceof StepAxis2Placement2D)) {
             throw new UnsupportedGeometryException("2D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_2D");
         }
         Point2 origin = buildPoint2(placement2D.location().id());

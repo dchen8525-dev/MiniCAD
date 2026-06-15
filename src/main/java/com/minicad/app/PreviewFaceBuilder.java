@@ -251,8 +251,9 @@ public final class PreviewFaceBuilder {
             StepBlendedSurface blended = (StepBlendedSurface) surface;
             return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
         }
-        if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
-            if (replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation) {
+        if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) surface;
+            if (replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator) { com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
                 double scale = transformation.scale() == null ? 1.0 : transformation.scale();
                 if (Math.abs(scale) <= 1.0e-9) {
                     return "SURFACE_REPLICA zero scale preview is unsupported";
@@ -282,9 +283,10 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop)) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop)) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
         if (outerLoop.edges().size() != 4) {
             return null;
         }
@@ -374,9 +376,10 @@ public final class PreviewFaceBuilder {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
@@ -463,9 +466,10 @@ public final class PreviewFaceBuilder {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         SphericalSurface surface = builder.buildSphericalSurface(stepSurface.id());
         OrientedEdge lowerArc = outerLoop.edges().get(0);
@@ -533,9 +537,10 @@ public final class PreviewFaceBuilder {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
@@ -717,9 +722,10 @@ public final class PreviewFaceBuilder {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
         SurfacePatch patch = PreviewSurfaceSampler.buildFourSidedPatch(outerLoop);
         if (patch == null) {
             return null;
@@ -1280,7 +1286,7 @@ public final class PreviewFaceBuilder {
                             processedFaces, faces.size(), unsupportedFaces.size(), uniqueEdgeIds.size());
                 }
                 for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-                    if (bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop) {
+                    if (bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop) { com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
                         for (StepOrientedEdge edge : edgeLoop.edges()) {
                             uniqueEdgeIds.add(edge.edgeElement().id());
                         }
@@ -1890,7 +1896,7 @@ public final class PreviewFaceBuilder {
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
-        if (!(bound.loop() instanceof EdgeLoop edgeLoop)) {
+        if (!(bound.loop() instanceof EdgeLoop)) {
             throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
         }
         List<CartesianPoint> sampled = new ArrayList<>();
@@ -1926,7 +1932,7 @@ public final class PreviewFaceBuilder {
         }
         List<T> reversed = new ArrayList<>(points);
         if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.removeLast();
+            T start = reversed.remove(reversed.size() - 1);
             java.util.Collections.reverse(reversed);
             reversed.add(reversed.get(0));
             reversed.set(0, start);
@@ -2105,7 +2111,7 @@ public final class PreviewFaceBuilder {
                 || item instanceof StepCurve2D
                 || item instanceof StepHyperbola2D
                 || item instanceof StepParabola2D
-                || (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName()));
+|| (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()));
     }
 
     public static boolean isStandaloneEdgeSource(StepEntity item) {

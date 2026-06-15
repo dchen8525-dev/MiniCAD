@@ -184,7 +184,7 @@ public final class TopologyValidator {
         double volume = 0.0;
         for (Face face : shell.faces()) {
             FaceBound outer = face.outerBound();
-            if (outer != null && outer.loop() instanceof EdgeLoop edgeLoop) {
+            if (outer != null && outer.loop() instanceof EdgeLoop) { EdgeLoop edgeLoop = (EdgeLoop) outer.loop();
                 double contribution = signedLoopVolume(edgeLoop.vertices());
                 volume += face.sameSense() ? contribution : -contribution;
             }

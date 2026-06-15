@@ -1511,7 +1511,7 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepCurve2D
                 || item instanceof StepHyperbola2D
                 || item instanceof StepParabola2D
-                || (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName()));
+                || (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()));
     }
 
     private static StepEntity unwrapStyledItem(StepEntity item) {
@@ -2065,7 +2065,8 @@ public final class StepPreviewJsonExporter {
                 current = mappedItem.mappingTarget();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -3395,9 +3396,10 @@ public final class StepPreviewJsonExporter {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
@@ -3484,9 +3486,10 @@ public final class StepPreviewJsonExporter {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
@@ -3583,9 +3586,10 @@ public final class StepPreviewJsonExporter {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
                 .filter(edge -> edge.edge().curve() instanceof Circle)
@@ -3682,9 +3686,10 @@ public final class StepPreviewJsonExporter {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         SurfacePatch patch = buildFourSidedPatch(outerLoop);
         if (patch == null) {
@@ -3764,7 +3769,8 @@ public final class StepPreviewJsonExporter {
         for (List<StepEntity> row : surface.controlPoints()) {
             List<CartesianPoint> pointRow = new ArrayList<>(row.size());
             for (StepEntity pt : row) {
-                if (pt instanceof com.minicad.step.model.geometry.StepCartesianPoint cartesianPoint) {
+                if (pt instanceof com.minicad.step.model.geometry.StepCartesianPoint) {
+                    com.minicad.step.model.geometry.StepCartesianPoint cartesianPoint = (com.minicad.step.model.geometry.StepCartesianPoint) pt;
                     pointRow.add(builder.buildPoint(cartesianPoint.id()));
                 } else {
                     throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
@@ -3840,9 +3846,10 @@ public final class StepPreviewJsonExporter {
         if (bounds.size() != 1 || !bounds.get(0).outer()) {
             return null;
         }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop outerLoop) || outerLoop.edges().size() != 4) {
+        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
             return null;
         }
+        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
         SurfacePatch patch = buildFourSidedPatch(outerLoop);
         if (patch == null) {
             return null;
@@ -4345,11 +4352,12 @@ public final class StepPreviewJsonExporter {
         boolean promoteSingleOuter = stepFace.bounds().size() == 1
                 && stepFace.bounds().stream().noneMatch(com.minicad.step.model.topology.StepFaceBound::outer);
         for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-            if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop)) {
+            if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop)) {
                 log.debug("stage={} faceId={}, surfaceType={}, boundId={}, reason={}", "parametric_loop_build_failed",
                         stepFace.id(), surfaceTypeName(geometry), bound.id(), "bound loop is not EDGE_LOOP");
                 return List.of();
             }
+            com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
             List<UvPoint> loopPoints = new ArrayList<>();
             boolean firstEdge = true;
             for (com.minicad.step.model.topology.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -4745,7 +4753,8 @@ public final class StepPreviewJsonExporter {
             basisType = surfaceTypeName(offsetSurface.basisSurface());
             basisStepId = offsetSurface.basisSurface().id();
             offsetDistance = offsetSurface.distance();
-        } else if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        } else if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
             basisType = surfaceTypeName(replica.parent());
             basisStepId = replica.parent().id();
             transformScale = replica.transformation().scale();
@@ -5005,7 +5014,8 @@ public final class StepPreviewJsonExporter {
                 current = orientedCurve.curveElement();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -5064,9 +5074,11 @@ public final class StepPreviewJsonExporter {
         Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
         List<StepEntity> matches = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {if (associated instanceof StepPcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) { acceptableSurfaceIds.contains(((StepPcurve) associated).basisSurface().id())) { StepPcurve pcurve = (StepPcurve) associated;
+            if (associated instanceof StepPcurve && acceptableSurfaceIds.contains(((StepPcurve) associated).basisSurface().id())) {
+                StepPcurve pcurve = (StepPcurve) associated;
                 matches.add(pcurve);
-            } else if (associated instanceof StepDegeneratePcurve } else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {} else if (associated instanceof StepDegeneratePcurve pcurve && acceptableSurfaceIds.contains(pcurve.basisSurface().id())) { acceptableSurfaceIds.contains(((StepDegeneratePcurve) associated).basisSurface().id())) { StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
+            } else if (associated instanceof StepDegeneratePcurve && acceptableSurfaceIds.contains(((StepDegeneratePcurve) associated).basisSurface().id())) {
+                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
                 matches.add(pcurve);
             }
         }
@@ -5098,7 +5110,8 @@ public final class StepPreviewJsonExporter {
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -5760,10 +5773,12 @@ public final class StepPreviewJsonExporter {
                 }
             };
         }
-        if (geometry instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
-            if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation)) {
+        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
+            if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator)) {
                 return null;
             }
+            com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
             ParametricSurfaceMapper base = mapperForSurface(replica.parent(), builder);
             if (base == null) {
                 return null;
@@ -6519,81 +6534,6 @@ public final class StepPreviewJsonExporter {
         } else {
             return null;
         }
-    }
-            case StepPolyline polyline -> {
-                Polyline3 geometry = builder.buildPolyline(polyline.id());
-                yield new CurveEvaluator() {
-                    @Override public double start() { return 0.0; }
-                    @Override public double end() { return 1.0; }
-                    @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
-                };
-            }
-            case com.minicad.step.model.geometry.StepCompositeCurve compositeCurve -> {
-                CompositeCurve3 geometry = builder.buildCompositeCurve(compositeCurve.id());
-                yield sampledCurveEvaluator(geometry);
-            }
-            case StepBezierCurve bezier -> sampledCurveEvaluator(builder.buildCurveReference3(bezier.id()));
-            case StepUniformCurve uniform -> sampledCurveEvaluator(builder.buildCurveReference3(uniform.id()));
-            case StepQuasiUniformCurve quasiUniform -> sampledCurveEvaluator(builder.buildCurveReference3(quasiUniform.id()));
-            case StepPiecewiseBezierCurve piecewiseBezier -> sampledCurveEvaluator(builder.buildCurveReference3(piecewiseBezier.id()));
-            case StepOffsetCurve3D offsetCurve3D -> sampledCurveEvaluator(builder.buildOffsetCurve3(offsetCurve3D.id()));
-            case StepConicCurve conic -> {
-                List<CartesianPoint> points = sampleConicCurvePoints(conic, builder);
-                if (points == null || points.size() < 2) yield null;
-                yield sampledCurveEvaluator(new Polyline3(points));
-            }
-            case StepOrientedCurve orientedCurve -> curveEvaluator(orientedCurve.curveElement(), builder);
-            case StepGeometricReplica replica -> curveEvaluator(replica.parent(), builder);
-            case StepBSplineCurve bspline -> sampledCurveEvaluator(builder.buildCurveReference3(bspline.id()));
-            case StepSeamCurve seamCurve -> sampledCurveEvaluator(builder.buildSeamCurve(seamCurve.id()).curve3d());
-            case StepCircle2D circle2D -> sampledCurveEvaluator(builder.buildCurve3From2D(circle2D.id()));
-            case StepEllipse2D ellipse2D -> sampledCurveEvaluator(builder.buildCurve3From2D(ellipse2D.id()));
-            case StepPolyline2D polyline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(polyline2D.id()));
-            case StepTrimmedCurve2D trimmedCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(trimmedCurve2D.id()));
-            case StepCompositeCurve2D compositeCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(compositeCurve2D.id()));
-            case StepBezierCurve2D bezier2D -> sampledCurveEvaluator(builder.buildCurve3From2D(bezier2D.id()));
-            case StepQuasiUniformCurve2D quasiUniform2D -> sampledCurveEvaluator(builder.buildCurve3From2D(quasiUniform2D.id()));
-            case StepUniformCurve2D uniform2D -> sampledCurveEvaluator(builder.buildCurve3From2D(uniform2D.id()));
-            case StepPiecewiseBezierCurve2D piecewiseBezier2D -> sampledCurveEvaluator(builder.buildCurve3From2D(piecewiseBezier2D.id()));
-            case StepIndexedPolyCurve2D polyCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(polyCurve2D.id()));
-            case StepDegenerateCurve2D degenerateCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(degenerateCurve2D.id()));
-            case StepBSplineCurve2D bspline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(bspline2D.id()));
-            case StepRationalBSplineCurve2D rationalBspline2D -> sampledCurveEvaluator(builder.buildCurve3From2D(rationalBspline2D.id()));
-            case StepLine2D line2D -> sampledCurveEvaluator(builder.buildCurve3From2D(line2D.id()));
-            case StepCurve2D curve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(curve2D.id()));
-            case StepHyperbola2D hyperbola2D -> sampledCurveEvaluator(builder.buildCurve3From2D(hyperbola2D.id()));
-            case StepParabola2D parabola2D -> sampledCurveEvaluator(builder.buildCurve3From2D(parabola2D.id()));
-            case StepOffsetCurve2D offsetCurve2D -> sampledCurveEvaluator(builder.buildCurve3From2D(offsetCurve2D.id()));
-            case StepClothoid clothoid -> sampledCurveEvaluator(builder.buildCurveReference3(clothoid.id()));
-            case StepIndexedPolyCurve polyCurve -> sampledCurveEvaluator(builder.buildCurveReference3(polyCurve.id()));
-            case StepDegenerateCurve degenerate -> sampledCurveEvaluator(builder.buildCurveReference3(degenerate.id()));
-            case StepBSplineCurveWithKnotsAndBreakpoints splineBreak -> sampledCurveEvaluator(builder.buildBSplineCurveWithBreakpoints(splineBreak.id()));
-            case StepCompositeCurveOnSurface compositeOnSurface -> sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface.id()));
-            case StepCompositeCurveOnSurface3D compositeOnSurface3D -> sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface3D.id()));
-            case StepLineSegment lineSeg -> {
-                List<CartesianPoint> pts = List.of(
-                        builder.buildPoint(lineSeg.startPoint().id()),
-                        builder.buildPoint(lineSeg.endPoint().id())
-                );
-                yield sampledCurveEvaluator(new Polyline3(pts));
-            }
-            case StepPath path -> sampledCurveEvaluator(builder.buildPath(path.id()));
-            case StepOpenPath openPath -> sampledCurveEvaluator(builder.buildPath(openPath.id()));
-            case StepSubpath subpath -> sampledCurveEvaluator(builder.buildPath(subpath.id()));
-            case StepOrientedPath orientedPath -> sampledCurveEvaluator(builder.buildPath(orientedPath.id()));
-            case StepEdgeCurve edgeCurve -> sampledCurveEvaluator(builder.buildCurveReference3(edgeCurve.id()));
-            case StepSurfacedEdgeCurve surfacedEdge -> sampledCurveEvaluator(builder.buildCurveReference3(surfacedEdge.id()));
-            case StepAnnotationCurveOccurrence occurrence -> curveEvaluator(occurrence.item(), builder);
-            case StepDimensionCurve dimensionCurve -> curveEvaluator(dimensionCurve.item(), builder);
-            case StepLeaderCurve leaderCurve -> curveEvaluator(leaderCurve.item(), builder);
-            case StepProjectionCurve projectionCurve -> curveEvaluator(projectionCurve.item(), builder);
-            case StepDraughtingAnnotationOccurrence annotationOccurrence -> curveEvaluator(annotationOccurrence.item(), builder);
-            case StepTerminatorSymbol terminatorSymbol -> curveEvaluator(terminatorSymbol.annotatedCurve(), builder);
-            case StepCurve abstractCurve -> sampledCurveEvaluator(builder.buildCurveReference3(abstractCurve.id()));
-            case StepBoundedCurve boundedCurve -> sampledCurveEvaluator(builder.buildCurveReference3(boundedCurve.id()));
-            case StepMappedItem mappedItem -> curveEvaluator(mappedItem.mappingTarget(), builder);
-            default -> null;
-        };
     }
 
     private static CurveEvaluator sampledCurveEvaluator(Curve3 curve) {
@@ -7529,9 +7469,10 @@ public final class StepPreviewJsonExporter {
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
-        if (!(bound.loop() instanceof EdgeLoop edgeLoop)) {
+        if (!(bound.loop() instanceof EdgeLoop)) {
             throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
         }
+        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -7565,7 +7506,7 @@ public final class StepPreviewJsonExporter {
         }
         List<T> reversed = new ArrayList<>(points);
         if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.removeLast();
+            T start = reversed.remove(reversed.size() - 1);
             java.util.Collections.reverse(reversed);
             reversed.add(reversed.get(0));
             reversed.set(0, start);
@@ -7900,7 +7841,8 @@ public final class StepPreviewJsonExporter {
         if (item instanceof StepTerminatorSymbol) {
             return "TERMINATOR_SYMBOL";
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
             return "CURVE_REPLICA";
         }
         if (item instanceof StepBSplineCurve) {
@@ -8058,7 +8000,8 @@ public final class StepPreviewJsonExporter {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             return previewCurveTypeName(terminatorSymbol.annotatedCurve());
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
             return previewCurveTypeName(replica.parent());
         }
         if (item instanceof StepTrimmedCurve2D) {
@@ -8117,7 +8060,8 @@ public final class StepPreviewJsonExporter {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
             return terminatorSymbol.annotatedCurve().id();
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
             return replica.parent().id();
         }
         if (item instanceof StepTrimmedCurve2D) {
@@ -8184,7 +8128,8 @@ public final class StepPreviewJsonExporter {
     }
 
     private static Double previewCurveTransformScale(StepEntity item) {
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
             return replica.transformation().scale();
         }
         return null;
@@ -8290,7 +8235,8 @@ public final class StepPreviewJsonExporter {
                 current = terminatorSymbol.annotatedCurve();
                 continue;
             }
-            if (current instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
                 current = replica.parent();
                 continue;
             }
@@ -8342,7 +8288,8 @@ public final class StepPreviewJsonExporter {
                     builder
             );
         }
-        if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
             List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
             if (parentPoints == null) {
                 return null;
@@ -8539,13 +8486,16 @@ public final class StepPreviewJsonExporter {
             StepPolyline polyline = (StepPolyline) item;
                 return builder.buildPolyline(polyline.id());
             }
-            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve compositeCurve) {
+            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve) {
+                com.minicad.step.model.geometry.StepCompositeCurve compositeCurve = (com.minicad.step.model.geometry.StepCompositeCurve) item;
                 return builder.buildCompositeCurve(compositeCurve.id());
             }
-            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurveOnSurface compositeCurveOnSurface) {
+            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurveOnSurface) {
+                com.minicad.step.model.geometry.StepCompositeCurveOnSurface compositeCurveOnSurface = (com.minicad.step.model.geometry.StepCompositeCurveOnSurface) item;
                 return builder.buildCompositeCurve(compositeCurveOnSurface.id());
             }
-            if (item instanceof com.minicad.step.model.geometry.StepRationalBSplineCurve spline) {
+            if (item instanceof com.minicad.step.model.geometry.StepRationalBSplineCurve) {
+                com.minicad.step.model.geometry.StepRationalBSplineCurve spline = (com.minicad.step.model.geometry.StepRationalBSplineCurve) item;
                 return builder.buildRationalBSplineCurve(spline.id());
             }
             if (item instanceof StepOffsetCurve2D) {
@@ -8602,7 +8552,8 @@ public final class StepPreviewJsonExporter {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
                 return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
             }
-            if (item instanceof StepGeometricReplica replica && "CURVE_REPLICA".equals(replica.entityName())) {
+            if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
                 List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
                 return points == null ? null : new Polyline3(points);
             }
@@ -9936,14 +9887,17 @@ public final class StepPreviewJsonExporter {
 
     static double[] mappedItemMatrix(StepMappedItem mappedItem, StepCadBuilder builder) {
         StepRepresentationMap mappingSource = mappedItem.mappingSource();
-        if (!(mappingSource.mappedOrigin() instanceof com.minicad.step.model.geometry.StepAxis2Placement3D originPlacement)) {
+        if (!(mappingSource.mappedOrigin() instanceof com.minicad.step.model.geometry.StepAxis2Placement3D)) {
             return null;
         }
+        com.minicad.step.model.geometry.StepAxis2Placement3D originPlacement = (com.minicad.step.model.geometry.StepAxis2Placement3D) mappingSource.mappedOrigin();
         double[] sourceMatrix = StepAssemblyGraphBuilder.matrixForPlacement(originPlacement);
         double[] targetMatrix;
-        if (mappedItem.mappingTarget() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation) {
+        if (mappedItem.mappingTarget() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator) {
+            com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) mappedItem.mappingTarget();
             targetMatrix = matrixForTransformationOperator(transformation, builder);
-        } else if (mappedItem.mappingTarget() instanceof com.minicad.step.model.geometry.StepAxis2Placement3D targetPlacement) {
+        } else if (mappedItem.mappingTarget() instanceof com.minicad.step.model.geometry.StepAxis2Placement3D) {
+            com.minicad.step.model.geometry.StepAxis2Placement3D targetPlacement = (com.minicad.step.model.geometry.StepAxis2Placement3D) mappedItem.mappingTarget();
             targetMatrix = StepAssemblyGraphBuilder.matrixForPlacement(targetPlacement);
         } else {
             return null;
@@ -10327,7 +10281,8 @@ public final class StepPreviewJsonExporter {
                         vertexShell.name(),
                         pointFromStep(vertexShell.extent().loopVertex().point())
                 ));
-            } else if (entity instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (entity instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) entity).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
                 CartesianPoint position = pointFromReplica(replica, builder);
                 if (position != null) {
                     pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
@@ -11360,7 +11315,8 @@ public final class StepPreviewJsonExporter {
             leader.add(toPointPayload(pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
-        if (content instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+        if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) content;
             CartesianPoint point = pointFromReplica(replica, builder);
             if (point != null) {
                 leader.add(toPointPayload(point));
@@ -11565,7 +11521,8 @@ public final class StepPreviewJsonExporter {
             StepFaceEntity face = (StepFaceEntity) target;
             return faceDisplayName(face);
         }
-        if (target instanceof com.minicad.step.model.topology.StepEdgeCurve edge) {
+        if (target instanceof com.minicad.step.model.topology.StepEdgeCurve) {
+            com.minicad.step.model.topology.StepEdgeCurve edge = (com.minicad.step.model.topology.StepEdgeCurve) target;
             return edge.name();
         }
         if (target instanceof StepSubedge) {
@@ -13712,12 +13669,14 @@ public final class StepPreviewJsonExporter {
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
             for (StepValue trim : curve.trim1()) {
-                if (trim instanceof StepValue.ReferenceValue ref) {
+                if (trim instanceof StepValue.ReferenceValue) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
                     appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
                 }
             }
             for (StepValue trim : curve.trim2()) {
-                if (trim instanceof StepValue.ReferenceValue ref) {
+                if (trim instanceof StepValue.ReferenceValue) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
                     appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
                 }
             }
@@ -14450,8 +14409,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPropertyDefinition propertyDefinition
-                    && propertyDefinition.definition().id() == definition.id()) {
+            if (candidate instanceof StepPropertyDefinition
+                    && ((StepPropertyDefinition) candidate).definition().id() == definition.id()) {
+                StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) candidate;
                 appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, propertyDefinition, instanceIdsByTargetId);
                 appendPropertyRepresentationLinkTargets(
                         targetsByUsageId,
@@ -14480,8 +14440,9 @@ public final class StepPreviewJsonExporter {
                 if (relationship.relatedProduct().id() == product.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatingProduct(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
-            } else if (candidate instanceof StepProductRelatedProductCategory relatedCategory
-                    && relatedCategory.products().stream().anyMatch(related -> related.id() == product.id())) {
+            } else if (candidate instanceof StepProductRelatedProductCategory
+                    && ((StepProductRelatedProductCategory) candidate).products().stream().anyMatch(related -> related.id() == product.id())) {
+                StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) candidate;
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relatedCategory, relationshipTypeName(relatedCategory), relatedCategory.id(), resolved, instanceIdsByTargetId);
             }
         }
@@ -14542,8 +14503,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepShapeDefinitionRepresentation link
-                    && link.definition().id() == productDefinitionShape.id()) {
+            if (candidate instanceof StepShapeDefinitionRepresentation
+                    && ((StepShapeDefinitionRepresentation) candidate).definition().id() == productDefinitionShape.id()) {
+                StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         identifiedItem.id(),
@@ -14560,8 +14522,9 @@ public final class StepPreviewJsonExporter {
                         resolved,
                         instanceIdsByTargetId
                 );
-            } else if (candidate instanceof StepContextDependentShapeRepresentation contextDependent
-                    && contextDependent.representedProductRelation().id() == productDefinitionShape.id()) {
+            } else if (candidate instanceof StepContextDependentShapeRepresentation
+                    && ((StepContextDependentShapeRepresentation) candidate).representedProductRelation().id() == productDefinitionShape.id()) {
+                StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         identifiedItem.id(),
@@ -14620,8 +14583,10 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepRepresentationRelationship relationship
-                    && referencesRepresentation(relationship.rep1(), relationship.rep2(), representation.id())) {
+            if (candidate instanceof StepRepresentationRelationship
+                    && referencesRepresentation(((StepRepresentationRelationship) candidate).rep1(),
+                            ((StepRepresentationRelationship) candidate).rep2(), representation.id())) {
+                StepRepresentationRelationship relationship = (StepRepresentationRelationship) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         identifiedItem.id(),
@@ -14631,8 +14596,10 @@ public final class StepPreviewJsonExporter {
                         resolved,
                         instanceIdsByTargetId
                 );
-            } else if (candidate instanceof StepRepresentationRelationshipWithTransformation transformed
-                    && referencesRepresentation(transformed.rep1(), transformed.rep2(), representation.id())) {
+            } else if (candidate instanceof StepRepresentationRelationshipWithTransformation
+                    && referencesRepresentation(((StepRepresentationRelationshipWithTransformation) candidate).rep1(),
+                            ((StepRepresentationRelationshipWithTransformation) candidate).rep2(), representation.id())) {
+                StepRepresentationRelationshipWithTransformation transformed = (StepRepresentationRelationshipWithTransformation) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         identifiedItem.id(),
@@ -14665,8 +14632,10 @@ public final class StepPreviewJsonExporter {
                         resolved,
                         instanceIdsByTargetId
                 );
-            } else if (candidate instanceof StepShapeRepresentationRelationship relationship
-                    && referencesRepresentation(relationship.rep1(), relationship.rep2(), representation.id())) {
+            } else if (candidate instanceof StepShapeRepresentationRelationship
+                    && referencesRepresentation(((StepShapeRepresentationRelationship) candidate).rep1(),
+                            ((StepShapeRepresentationRelationship) candidate).rep2(), representation.id())) {
+                StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) candidate;
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
                         identifiedItem.id(),
@@ -14696,8 +14665,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionShape shape
-                    && shape.definition().id() == productDefinition.id()) {
+            if (candidate instanceof StepProductDefinitionShape
+                    && ((StepProductDefinitionShape) candidate).definition().id() == productDefinition.id()) {
+                StepProductDefinitionShape shape = (StepProductDefinitionShape) candidate;
                 appendProductDefinitionShapeRepresentationTargets(
                         targetsByUsageId,
                         identifiedItem,
@@ -14803,8 +14773,9 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPropertyDefinitionRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            if (candidate instanceof StepPropertyDefinitionRepresentation
+                    && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14817,8 +14788,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepAttributeAssertion representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepAttributeAssertion
+                    && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinition.id()) {
+                StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14831,8 +14803,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepActionPropertyRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepActionPropertyRepresentation
+                    && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14845,8 +14818,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepContactRatioRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepContactRatioRepresentation
+                    && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14859,8 +14833,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
+                    && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14873,8 +14848,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation
+                    && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14887,8 +14863,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepKinematicPropertyRepresentationRelation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepKinematicPropertyRepresentationRelation
+                    && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14901,8 +14878,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation
+                    && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14915,8 +14893,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepResourcePropertyRepresentation representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepResourcePropertyRepresentation
+                    && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
+                StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14929,8 +14908,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepForwardChainingRulePremise representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepForwardChainingRulePremise
+                    && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinition.id()) {
+                StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14943,8 +14923,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepBackChainingRuleBody representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepBackChainingRuleBody
+                    && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinition.id()) {
+                StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14957,8 +14938,9 @@ public final class StepPreviewJsonExporter {
                         definitionTypeName(representationLink),
                         representationLink.id()
                 );
-            } else if (candidate instanceof StepPlacedDatumTargetFeature representationLink
-                    && representationLink.definition().id() == propertyDefinition.id()) {
+            } else if (candidate instanceof StepPlacedDatumTargetFeature
+                    && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinition.id()) {
+                StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
@@ -14980,7 +14962,9 @@ public final class StepPreviewJsonExporter {
                 && representationLink.definition().id() == propertyDefinitionId) {
             return representationLink.usedRepresentation();
         }
-        if (candidate instanceof StepAttributeAssertion representationLink
+        if (candidate instanceof StepAttributeAssertion
+                    && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinitionId) {
+                StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
                 && representationLink.definition().id() == propertyDefinitionId) {
             return representationLink.usedRepresentation();
         }
@@ -15190,7 +15174,8 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPointStyle pointStyle && pointStyle.marker().id() == markerId) {
+            if (candidate instanceof StepPointStyle && ((StepPointStyle) candidate).marker().id() == markerId) {
+            StepPointStyle pointStyle = (StepPointStyle) candidate;
                 appendExistingRepresentationDefinitionTargets(
                         targetsByUsageId,
                         identifiedItem,
@@ -15985,12 +15970,14 @@ public final class StepPreviewJsonExporter {
             StepTrimmedCurve curve = (StepTrimmedCurve) entity;
             targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
             for (StepValue trim : curve.trim1()) {
-                if (trim instanceof StepValue.ReferenceValue ref && resolved.containsKey(ref.id())) {
+                if (trim instanceof StepValue.ReferenceValue && resolved.containsKey(((StepValue.ReferenceValue) trim).id())) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
                     targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
                 }
             }
             for (StepValue trim : curve.trim2()) {
-                if (trim instanceof StepValue.ReferenceValue ref && resolved.containsKey(ref.id())) {
+                if (trim instanceof StepValue.ReferenceValue && resolved.containsKey(((StepValue.ReferenceValue) trim).id())) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
                     targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
                 }
             }
@@ -16178,7 +16165,8 @@ public final class StepPreviewJsonExporter {
             StepVertexLoop loop = (StepVertexLoop) entity;
             targets.addAll(collectSemanticTargets(loop.loopVertex(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
-        } else if (entity instanceof com.minicad.step.model.topology.StepFaceBound faceBound) {
+        } else if (entity instanceof com.minicad.step.model.topology.StepFaceBound) {
+            com.minicad.step.model.topology.StepFaceBound faceBound = (com.minicad.step.model.topology.StepFaceBound) entity;
             targets.addAll(collectSemanticTargets(faceBound.loop(), resolved, visiting));
             targets.addAll(collectTargetsReferencingEntity(faceBound.id(), resolved, visiting));
         } else if (entity instanceof StepFace) {
@@ -17413,7 +17401,8 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepCurveStyle curveStyle && curveStyle.curveFont().id() == curveFontId) {
+            if (candidate instanceof StepCurveStyle && ((StepCurveStyle) candidate).curveFont().id() == curveFontId) {
+            StepCurveStyle curveStyle = (StepCurveStyle) candidate;
                 targets.addAll(collectSemanticTargets(curveStyle, resolved, visiting));
             }
         }
@@ -17531,7 +17520,8 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPointStyle pointStyle && pointStyle.marker().id() == markerId) {
+            if (candidate instanceof StepPointStyle && ((StepPointStyle) candidate).marker().id() == markerId) {
+            StepPointStyle pointStyle = (StepPointStyle) candidate;
                 targets.addAll(collectSemanticTargets(pointStyle, resolved, visiting));
             }
         }

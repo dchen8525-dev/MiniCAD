@@ -63,50 +63,50 @@ public final class ProfileLoops {
         if (!"AREA".equals(profile.profileType())) {
             throw new UnsupportedGeometryException(profile.entityName() + " must be an AREA profile");
         }
-        return switch (profile.entityName()) {
-        // TODO: JDK11 - Convert switch expression above
-            case "RECTANGLE_PROFILE_DEF", "CENTERED_RECTANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(rectangleProfile(profile)), List.of());
-            case "CIRCLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(circleProfile(profile)), List.of());
-            case "ELLIPSE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(ellipseProfile(profile)), List.of());
-            case "ROUNDED_RECTANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(roundedRectangleProfile(profile)), List.of());
-            case "CIRCULAR_HOLLOW_PROFILE_DEF" ->
-                    circularHollowProfile(profile);
-            case "RECTANGLE_HOLLOW_PROFILE_DEF" ->
-                    rectangleHollowProfile(profile);
-            case "CENTERED_CIRCLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(centeredCircleProfile(profile)), List.of());
-            case "CENTRE_LINE_ARC_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(centreLineArcProfile(profile)), List.of());
-            case "ARBITRARY_CLOSED_PROFILE_DEF", "ARBITRARY_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
-            case "ARBITRARY_PROFILE_DEF_WITH_VOIDS" ->
-                    arbitraryProfileWithVoids(profile);
-            case "I_SHAPE_PROFILE_DEF", "I_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(iShapeProfile(profile)), List.of());
-            case "T_SHAPE_PROFILE_DEF", "T_PROFILE_DEF", "TEE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(tShapeProfile(profile)), List.of());
-            case "L_SHAPE_PROFILE_DEF", "L_PROFILE_DEF", "ANGLE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(lShapeProfile(profile)), List.of());
-            case "U_SHAPE_PROFILE_DEF", "U_PROFILE_DEF", "CHANNEL_PROFILE_DEF", "C_SHAPE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(uShapeProfile(profile)), List.of());
-            case "Z_SHAPE_PROFILE_DEF", "Z_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(zShapeProfile(profile)), List.of());
-            case "HAT_SHAPE_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(hatShapeProfile(profile)), List.of());
-            case "FLAT_BAR_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(flatBarProfile(profile)), List.of());
-            case "DOVE_TAIL_PROFILE_DEF" ->
-                    new ProfileLoops(normalizeOuterLoop(doveTailProfile(profile)), List.of());
-            case "ARBITRARY_OPEN_PROFILE_DEF" ->
-                    buildArbitraryOpenProfile(profile);
-            case "PARAMETERIZED_PROFILE_DEF" ->
-                    buildParameterizedProfile(profile);
-            default -> throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
-        };
+        String entityName = profile.entityName();
+        if ("RECTANGLE_PROFILE_DEF".equals(entityName) || "CENTERED_RECTANGLE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(rectangleProfile(profile)), List.of());
+        } else if ("CIRCLE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(circleProfile(profile)), List.of());
+        } else if ("ELLIPSE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(ellipseProfile(profile)), List.of());
+        } else if ("ROUNDED_RECTANGLE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(roundedRectangleProfile(profile)), List.of());
+        } else if ("CIRCULAR_HOLLOW_PROFILE_DEF".equals(entityName)) {
+            return circularHollowProfile(profile);
+        } else if ("RECTANGLE_HOLLOW_PROFILE_DEF".equals(entityName)) {
+            return rectangleHollowProfile(profile);
+        } else if ("CENTERED_CIRCLE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(centeredCircleProfile(profile)), List.of());
+        } else if ("CENTRE_LINE_ARC_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(centreLineArcProfile(profile)), List.of());
+        } else if ("ARBITRARY_CLOSED_PROFILE_DEF".equals(entityName) || "ARBITRARY_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
+        } else if ("ARBITRARY_PROFILE_DEF_WITH_VOIDS".equals(entityName)) {
+            return arbitraryProfileWithVoids(profile);
+        } else if ("I_SHAPE_PROFILE_DEF".equals(entityName) || "I_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(iShapeProfile(profile)), List.of());
+        } else if ("T_SHAPE_PROFILE_DEF".equals(entityName) || "T_PROFILE_DEF".equals(entityName) || "TEE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(tShapeProfile(profile)), List.of());
+        } else if ("L_SHAPE_PROFILE_DEF".equals(entityName) || "L_PROFILE_DEF".equals(entityName) || "ANGLE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(lShapeProfile(profile)), List.of());
+        } else if ("U_SHAPE_PROFILE_DEF".equals(entityName) || "U_PROFILE_DEF".equals(entityName) || "CHANNEL_PROFILE_DEF".equals(entityName) || "C_SHAPE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(uShapeProfile(profile)), List.of());
+        } else if ("Z_SHAPE_PROFILE_DEF".equals(entityName) || "Z_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(zShapeProfile(profile)), List.of());
+        } else if ("HAT_SHAPE_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(hatShapeProfile(profile)), List.of());
+        } else if ("FLAT_BAR_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(flatBarProfile(profile)), List.of());
+        } else if ("DOVE_TAIL_PROFILE_DEF".equals(entityName)) {
+            return new ProfileLoops(normalizeOuterLoop(doveTailProfile(profile)), List.of());
+        } else if ("ARBITRARY_OPEN_PROFILE_DEF".equals(entityName)) {
+            return buildArbitraryOpenProfile(profile);
+        } else if ("PARAMETERIZED_PROFILE_DEF".equals(entityName)) {
+            return buildParameterizedProfile(profile);
+        } else {
+            throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
+        }
     }
 
     private List<Point2> rectangleProfile(StepProfileDef profile) {

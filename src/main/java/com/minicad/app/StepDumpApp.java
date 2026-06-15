@@ -1994,7 +1994,7 @@ public final class StepDumpApp {
                 || surface instanceof StepCurveBoundedSurface
                 || surface instanceof StepOrientedSurface
                 || surface instanceof StepOffsetSurface
-                || surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName());
+|| (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName()));
     }
 
     private static int validateRepresentation(StepRepresentation representation, StepCadBuilder builder) {
@@ -3461,7 +3461,7 @@ public final class StepDumpApp {
 
     private static boolean is2dPlacement(StepEntity placement) {
         return placement instanceof StepAxis2Placement2D
-                || placement instanceof StepCartesianPoint point && point.coordinates().size() == 2;
+|| (placement instanceof StepCartesianPoint && ((StepCartesianPoint) placement).coordinates().size() == 2);
     }
 
     private static Iterable<StepFaceEntity> shellFaces(StepEntity entity) {

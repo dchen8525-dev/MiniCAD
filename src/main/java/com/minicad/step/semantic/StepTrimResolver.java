@@ -46,11 +46,13 @@ final class StepTrimResolver {
      */
     void validateTrimValue(StepValue trim, Curve3 basis, String slot) {
         StepValue unwrapped = unwrapTyped(trim);
-        if (unwrapped instanceof StepValue.ListValue innerList) {
+        if (unwrapped instanceof StepValue.ListValue) {
+            StepValue.ListValue innerList = (StepValue.ListValue) unwrapped;
             validateTrimValue(innerList.elements().get(0), basis, slot);
             return;
         }
-        if (unwrapped instanceof StepValue.ReferenceValue ref) {
+        if (unwrapped instanceof StepValue.ReferenceValue) {
+            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) unwrapped;
             if (ref.id() == 0) {
                 throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference is invalid");
             }
@@ -69,13 +71,16 @@ final class StepTrimResolver {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
         StepValue trim = unwrapTyped(trims.get(0));
-        if (trim instanceof StepValue.ListValue innerList) {
+        if (trim instanceof StepValue.ListValue) {
+            StepValue.ListValue innerList = (StepValue.ListValue) trim;
             return resolveTrimParameter(innerList.elements(), basis, slot);
         }
-        if (trim instanceof StepValue.NumberValue num) {
+        if (trim instanceof StepValue.NumberValue) {
+            StepValue.NumberValue num = (StepValue.NumberValue) trim;
             return num.value();
         }
-        if (trim instanceof StepValue.ReferenceValue ref) {
+        if (trim instanceof StepValue.ReferenceValue) {
+            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
             StepEntity entity = entitiesById.get(ref.id());
             if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
@@ -98,10 +103,12 @@ final class StepTrimResolver {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
         StepValue trim = unwrapTyped(trims.get(0));
-        if (trim instanceof StepValue.ListValue innerList) {
+        if (trim instanceof StepValue.ListValue) {
+            StepValue.ListValue innerList = (StepValue.ListValue) trim;
             return resolveTrimPoint3(innerList.elements(), basis, slot);
         }
-        if (trim instanceof StepValue.ReferenceValue ref) {
+        if (trim instanceof StepValue.ReferenceValue) {
+            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
             StepEntity entity = entitiesById.get(ref.id());
             if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
@@ -112,7 +119,8 @@ final class StepTrimResolver {
             }
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
         }
-        if (trim instanceof StepValue.NumberValue num) {
+        if (trim instanceof StepValue.NumberValue) {
+            StepValue.NumberValue num = (StepValue.NumberValue) trim;
             return basis.pointAt(num.value());
         }
         throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
@@ -137,10 +145,12 @@ final class StepTrimResolver {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
         StepValue trim = unwrapTyped(trims.get(0));
-        if (trim instanceof StepValue.ListValue innerList) {
+        if (trim instanceof StepValue.ListValue) {
+            StepValue.ListValue innerList = (StepValue.ListValue) trim;
             return resolveTrimPoint2(innerList.elements(), basisCurve, slot);
         }
-        if (trim instanceof StepValue.ReferenceValue ref) {
+        if (trim instanceof StepValue.ReferenceValue) {
+            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
             StepEntity entity = entitiesById.get(ref.id());
             if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
@@ -152,7 +162,8 @@ final class StepTrimResolver {
             }
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
         }
-        if (trim instanceof StepValue.NumberValue num) {
+        if (trim instanceof StepValue.NumberValue) {
+            StepValue.NumberValue num = (StepValue.NumberValue) trim;
             return evaluateCurve2AtParameter(basisCurve, num.value());
         }
         throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
@@ -166,10 +177,12 @@ final class StepTrimResolver {
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
         }
         StepValue trim = unwrapTyped(trims.get(0));
-        if (trim instanceof StepValue.ListValue innerList) {
+        if (trim instanceof StepValue.ListValue) {
+            StepValue.ListValue innerList = (StepValue.ListValue) trim;
             return resolveTrimParam2(innerList.elements(), basisCurve, slot);
         }
-        if (trim instanceof StepValue.ReferenceValue ref) {
+        if (trim instanceof StepValue.ReferenceValue) {
+            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
             StepEntity entity = entitiesById.get(ref.id());
             if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
@@ -181,7 +194,8 @@ final class StepTrimResolver {
             }
             throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
         }
-        if (trim instanceof StepValue.NumberValue num) {
+        if (trim instanceof StepValue.NumberValue) {
+            StepValue.NumberValue num = (StepValue.NumberValue) trim;
             return num.value();
         }
         throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
