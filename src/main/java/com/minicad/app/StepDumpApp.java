@@ -1701,7 +1701,7 @@ public final class StepDumpApp {
                 || surface instanceof StepCurveBoundedSurface
                 || surface instanceof StepOrientedSurface
                 || surface instanceof StepOffsetSurface
-                || surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName());
+                || surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName());
     }
 
     private static int validateRepresentation(StepRepresentation representation, StepCadBuilder builder) {
@@ -1879,42 +1879,52 @@ public final class StepDumpApp {
     }
 
     private static int validateSummaryEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepCartesianPoint point) {
+        if (entity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) entity;
             validatePoint(point, builder);
             return 1;
         }
-        if (entity instanceof StepDirection direction) {
+        if (entity instanceof StepDirection) {
+            StepDirection direction = (StepDirection) entity;
             validateDirection(direction, builder);
             return 1;
         }
-        if (entity instanceof StepVector vector) {
+        if (entity instanceof StepVector) {
+            StepVector vector = (StepVector) entity;
             builder.buildVector(vector.id());
             return 1;
         }
-        if (entity instanceof StepVertexPoint vertexPoint) {
+        if (entity instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) entity;
             builder.buildVertex(vertexPoint.id());
             return 1;
         }
-        if (entity instanceof StepConicCurve conicCurve) {
+        if (entity instanceof StepConicCurve) {
+            StepConicCurve conicCurve = (StepConicCurve) entity;
             return validateSummaryEntity(conicCurve.position(), builder);
         }
-        if (entity instanceof StepLine line) {
+        if (entity instanceof StepLine) {
+            StepLine line = (StepLine) entity;
             validateLine(line, builder);
             return 1;
         }
-        if (entity instanceof StepCircle circle) {
+        if (entity instanceof StepCircle) {
+            StepCircle circle = (StepCircle) entity;
             validateCircle(circle, builder);
             return 1;
         }
-        if (entity instanceof StepEllipse ellipse) {
+        if (entity instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) entity;
             validateEllipse(ellipse, builder);
             return 1;
         }
-        if (entity instanceof StepPolyline polyline) {
+        if (entity instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) entity;
             validatePolyline(polyline, builder);
             return 1;
         }
-        if (entity instanceof StepBSplineCurveWithKnots splineCurve) {
+        if (entity instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots splineCurve = (StepBSplineCurveWithKnots) entity;
             builder.buildBSplineCurve(splineCurve.id());
             return 1;
         }
