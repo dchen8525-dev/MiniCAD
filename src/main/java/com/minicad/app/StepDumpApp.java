@@ -1160,7 +1160,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepRepresentationRelationshipWithTransformation relationship) {
+            } else if (entity instanceof StepRepresentationRelationshipWithTransformation) {
+                StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateRepresentationRelationshipWithTransformation(relationship, builder);
@@ -1175,7 +1176,8 @@ public final class StepDumpApp {
                     unsupportedReasons.merge(reason, 1, Integer::sum);
                     unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
                 }
-            } else if (entity instanceof StepShapeRepresentationRelationship relationship) {
+            } else if (entity instanceof StepShapeRepresentationRelationship) {
+                StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
                 standaloneContainerEntities++;
                 try {
                     int itemCount = validateShapeRepresentationRelationship(relationship, builder);
