@@ -16456,18 +16456,22 @@ public final class StepPreviewJsonExporter {
             StepGroup group = (StepGroup) entity;
             targets.addAll(collectTargetsReferencingEntity(group.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepGroupAssignment assignment
-                        && assignment.assignedGroup().id() == group.id()) {
-                    targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting));
-                } else if (candidate instanceof StepAppliedGroupAssignment assignment
-                        && assignment.assignedGroup().id() == group.id()) {
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepClassificationAssignment assignment
-                        && assignment.assignedClass().id() == group.id()) {
-                    targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting));
-                } else if (candidate instanceof StepAppliedClassificationAssignment assignment
-                        && assignment.assignedClass().id() == group.id()) {
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                if (candidate instanceof StepGroupAssignment
+                    && ((StepGroupAssignment) candidate).assignedGroup().id() == group.id()) {
+                StepGroupAssignment assignment = (StepGroupAssignment) candidate;
+                targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting));
+            } else if (candidate instanceof StepAppliedGroupAssignment
+                    && ((StepAppliedGroupAssignment) candidate).assignedGroup().id() == group.id()) {
+                StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) candidate;
+                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            } else if (candidate instanceof StepClassificationAssignment
+                    && ((StepClassificationAssignment) candidate).assignedClass().id() == group.id()) {
+                StepClassificationAssignment assignment = (StepClassificationAssignment) candidate;
+                targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting));
+            } else if (candidate instanceof StepAppliedClassificationAssignment
+                    && ((StepAppliedClassificationAssignment) candidate).assignedClass().id() == group.id()) {
+                StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) candidate;
+                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
                 } else if (candidate instanceof StepGroupRelationship) {
             StepGroupRelationship relationship = (StepGroupRelationship) candidate;
                     if (relationship.relatingGroup().id() == group.id()) {
@@ -16482,8 +16486,9 @@ public final class StepPreviewJsonExporter {
             StepOrganization organization = (StepOrganization) entity;
             targets.addAll(collectTargetsReferencingEntity(organization.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedOrganizationAssignment assignment
-                        && assignment.assignedOrganization().id() == organization.id()) {
+                if (candidate instanceof StepAppliedOrganizationAssignment
+                    && ((StepAppliedOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
+                StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
                 } else if (candidate instanceof StepOrganizationAssignment assignment
                         && assignment.assignedOrganization().id() == organization.id()) {
