@@ -1339,11 +1339,14 @@ public final class StepDumpApp {
     private static int validateWireShell(StepWireShell wireShell, StepCadBuilder builder) {
         int count = 0;
         for (var loop : wireShell.loops()) {
-            if (loop instanceof StepEdgeLoop edgeLoop) {
+            if (loop instanceof StepEdgeLoop) {
+                StepEdgeLoop edgeLoop = (StepEdgeLoop) loop;
                 builder.buildEdgeLoop(edgeLoop.id());
-            } else if (loop instanceof StepVertexLoop vertexLoop) {
+            } else if (loop instanceof StepVertexLoop) {
+                StepVertexLoop vertexLoop = (StepVertexLoop) loop;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (loop instanceof StepPolyLoop polyLoop) {
+            } else if (loop instanceof StepPolyLoop) {
+                StepPolyLoop polyLoop = (StepPolyLoop) loop;
                 validatePolyLoop(polyLoop, builder);
             } else {
                 throw new UnsupportedGeometryException("WIRE_SHELL requires EDGE_LOOP, VERTEX_LOOP or POLY_LOOP members");
@@ -1356,9 +1359,11 @@ public final class StepDumpApp {
     private static int validateShellBasedWireframeModel(StepShellBasedWireframeModel wireframeModel, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity boundary : wireframeModel.boundaries()) {
-            if (boundary instanceof StepWireShell wireShell) {
+            if (boundary instanceof StepWireShell) {
+                StepWireShell wireShell = (StepWireShell) boundary;
                 validateWireShell(wireShell, builder);
-            } else if (boundary instanceof StepVertexShell vertexShell) {
+            } else if (boundary instanceof StepVertexShell) {
+                StepVertexShell vertexShell = (StepVertexShell) boundary;
                 builder.buildVertexLoop(vertexShell.extent().id());
             } else {
                 throw new UnsupportedGeometryException("SHELL_BASED_WIREFRAME_MODEL requires WIRE_SHELL or VERTEX_SHELL boundaries");
@@ -1371,9 +1376,11 @@ public final class StepDumpApp {
     private static FaceBuildCounts validateFaceBasedSurfaceModel(StepFaceBasedSurfaceModel surfaceModel, StepCadBuilder builder) {
         FaceBuildCounts counts = new FaceBuildCounts(0, 0, Map.of(), Map.of());
         for (StepEntity faceSet : surfaceModel.faceSets()) {
-            if (faceSet instanceof StepConnectedFaceSet connectedFaceSet) {
+            if (faceSet instanceof StepConnectedFaceSet) {
+                StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) faceSet;
                 counts = counts.plus(summarizeShell(connectedFaceSet.faces(), builder));
-            } else if (faceSet instanceof StepConnectedFaceSubSet connectedFaceSubSet) {
+            } else if (faceSet instanceof StepConnectedFaceSubSet) {
+                StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) faceSet;
                 counts = counts.plus(summarizeShell(connectedFaceSubSet.faces(), builder));
             } else if (faceSet instanceof StepOpenShell
                     || faceSet instanceof StepSurfacedOpenShell
@@ -1400,43 +1407,62 @@ public final class StepDumpApp {
     private static int validateGeometricCurveSet(StepGeometricCurveSet curveSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity element : curveSet.elements()) {
-            if (element instanceof StepCartesianPoint point) {
+            if (element instanceof StepCartesianPoint) {
+                StepCartesianPoint point = (StepCartesianPoint) element;
                 builder.buildPoint(point.id());
-            } else if (element instanceof StepVertexPoint vertexPoint) {
+            } else if (element instanceof StepVertexPoint) {
+                StepVertexPoint vertexPoint = (StepVertexPoint) element;
                 builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (element instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) element;
                 builder.buildPointReference(replica.id());
-            } else if (element instanceof StepLine line) {
+            } else if (element instanceof StepLine) {
+                StepLine line = (StepLine) element;
                 builder.buildLine(line.id());
-            } else if (element instanceof StepCircle circle) {
+            } else if (element instanceof StepCircle) {
+                StepCircle circle = (StepCircle) element;
                 builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse ellipse) {
+            } else if (element instanceof StepEllipse) {
+                StepEllipse ellipse = (StepEllipse) element;
                 builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline polyline) {
+            } else if (element instanceof StepPolyline) {
+                StepPolyline polyline = (StepPolyline) element;
                 builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve edgeCurve) {
+            } else if (element instanceof StepEdgeCurve) {
+                StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
                 builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge subedge) {
+            } else if (element instanceof StepSubedge) {
+                StepSubedge subedge = (StepSubedge) element;
                 builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge orientedEdge) {
+            } else if (element instanceof StepOrientedEdge) {
+                StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
                 builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet edgeSet) {
+            } else if (element instanceof StepConnectedEdgeSet) {
+                StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
                 validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop edgeLoop) {
+            } else if (element instanceof StepEdgeLoop) {
+                StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
                 validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop vertexLoop) {
+            } else if (element instanceof StepVertexLoop) {
+                StepVertexLoop vertexLoop = (StepVertexLoop) element;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepPath path) {
+            } else if (element instanceof StepPath) {
+                StepPath path = (StepPath) element;
                 validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath openPath) {
+            } else if (element instanceof StepOpenPath) {
+                StepOpenPath openPath = (StepOpenPath) element;
                 validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath subpath) {
+            } else if (element instanceof StepSubpath) {
+                StepSubpath subpath = (StepSubpath) element;
                 validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath orientedPath) {
+            } else if (element instanceof StepOrientedPath) {
+                StepOrientedPath orientedPath = (StepOrientedPath) element;
                 validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop polyLoop) {
+            } else if (element instanceof StepPolyLoop) {
+                StepPolyLoop polyLoop = (StepPolyLoop) element;
                 validatePolyLoop(polyLoop, builder);
-            } else if (element instanceof StepWireShell wireShell) {
+            } else if (element instanceof StepWireShell) {
+                StepWireShell wireShell = (StepWireShell) element;
                 validateWireShell(wireShell, builder);
             } else if (element instanceof StepVertexShell
                     || element instanceof StepEdgeBasedWireframeModel
