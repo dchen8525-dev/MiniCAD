@@ -53,6 +53,12 @@ public final class TrimmedCurve3 implements Curve3 {
         return senseAgreement;
     }
 
+    // Record-style accessors
+    public Curve3 basisCurve() { return getBasisCurve(); }
+    public double trimParamStart() { return getTrimParamStart(); }
+    public double trimParamEnd() { return getTrimParamEnd(); }
+    public boolean senseAgreement() { return isSenseAgreement(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -34,6 +34,10 @@ public final class Plane implements SurfaceGeometry {
         return normal;
     }
 
+    // Record-style accessors
+    public CartesianPoint origin() { return getOrigin(); }
+    public Direction3 normal() { return getNormal(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

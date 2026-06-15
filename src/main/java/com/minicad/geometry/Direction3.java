@@ -91,6 +91,26 @@ public final class Direction3 {
         return new Direction3(0, 1, 0);
     }
 
+    /**
+     * Returns this direction scaled by a factor.
+     * Note: the result may not be a unit direction.
+     *
+     * @param factor the scaling factor
+     * @return scaled direction
+     */
+    public Direction3 scale(double factor) {
+        return new Direction3(x * factor, y * factor, z * factor);
+    }
+
+    /**
+     * Returns the reverse (negated) direction.
+     *
+     * @return reversed direction
+     */
+    public Direction3 reverse() {
+        return new Direction3(-x, -y, -z);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

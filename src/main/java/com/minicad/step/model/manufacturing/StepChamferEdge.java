@@ -75,6 +75,15 @@ public final class StepChamferEdge implements StepEntity {
         return chamferType;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity originalEdge() { return getOriginalEdge(); }
+    public double chamferAngle() { return getChamferAngle(); }
+    public double chamferWidth() { return getChamferWidth(); }
+    public List<StepEntity> adjacentFaces() { return getAdjacentFaces(); }
+    public String chamferType() { return getChamferType(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

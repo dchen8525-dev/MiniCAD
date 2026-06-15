@@ -64,6 +64,12 @@ public final class Edge {
         return sameSense;
     }
 
+    // Record-style accessors
+    public Vertex start() { return getStart(); }
+    public Vertex end() { return getEnd(); }
+    public Curve3 curve() { return getCurve(); }
+    public boolean sameSense() { return isSameSense(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

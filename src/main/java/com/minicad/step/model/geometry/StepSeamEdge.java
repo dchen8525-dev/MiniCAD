@@ -49,6 +49,12 @@ public final class StepSeamEdge implements StepEntity {
         return edgeEnd;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity edgeStart() { return getEdgeStart(); }
+    public StepEntity edgeEnd() { return getEdgeEnd(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -41,6 +41,12 @@ public final class StepComplexTriangulatedFace implements StepEntity {
         return vertices;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepEntity> boundaries() { return getBoundaries(); }
+    public List<StepEntity> vertices() { return getVertices(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

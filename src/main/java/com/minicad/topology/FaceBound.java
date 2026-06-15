@@ -40,6 +40,22 @@ public final class FaceBound {
         return outer;
     }
 
+    // Record-style accessors
+    public Loop loop() { return getLoop(); }
+    public boolean orientation() { return isOrientation(); }
+    public boolean outer() { return isOuter(); }
+
+    /**
+     * Creates a FaceBound with a given loop and outer flag, with default orientation true.
+     *
+     * @param loop the loop
+     * @param outer whether this is an outer boundary
+     * @return new FaceBound
+     */
+    public static FaceBound outer(Loop loop, boolean outer) {
+        return new FaceBound(loop, true, outer);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

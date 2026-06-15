@@ -65,6 +65,14 @@ public final class StepBlockVolume implements StepEntity {
         return zLength;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity position() { return getPosition(); }
+    public double xLength() { return getXLength(); }
+    public double yLength() { return getYLength(); }
+    public double zLength() { return getZLength(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

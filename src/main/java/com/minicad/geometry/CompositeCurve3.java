@@ -27,6 +27,9 @@ public final class CompositeCurve3 implements Curve3 {
         return segments;
     }
 
+    // Record-style accessor
+    public List<Curve3> segments() { return getSegments(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

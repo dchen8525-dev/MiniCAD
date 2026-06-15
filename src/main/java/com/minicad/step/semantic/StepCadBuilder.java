@@ -2752,6 +2752,7 @@ public final class StepCadBuilder {
         if (!(blockVolume.position() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("BLOCK_VOLUME position must be an AXIS2_PLACEMENT_3D");
         }
+        StepAxis2Placement3D placement = (StepAxis2Placement3D) blockVolume.position();
         double x = blockVolume.xLength();
         double y = blockVolume.yLength();
         double z = blockVolume.zLength();

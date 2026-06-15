@@ -63,6 +63,14 @@ public final class StepHalfSpaceSolid implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity baseSurface() { return getBaseSurface(); }
+    public boolean agreementFlag() { return isAgreementFlag(); }
+    public StepEntity enclosure() { return getEnclosure(); }
+    public String entityName() { return getEntityName(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

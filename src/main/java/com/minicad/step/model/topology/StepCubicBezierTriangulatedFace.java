@@ -41,6 +41,12 @@ public final class StepCubicBezierTriangulatedFace implements StepEntity {
         return indices;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepEntity> controlPoints() { return getControlPoints(); }
+    public List<Integer> indices() { return getIndices(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

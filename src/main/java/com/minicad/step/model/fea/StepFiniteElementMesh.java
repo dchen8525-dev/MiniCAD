@@ -75,6 +75,15 @@ public final class StepFiniteElementMesh implements StepEntity {
         return meshDensity;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public String meshType() { return getMeshType(); }
+    public List<StepEntity> nodes() { return getNodes(); }
+    public List<StepEntity> elements() { return getElements(); }
+    public List<String> elementTypes() { return getElementTypes(); }
+    public double meshDensity() { return getMeshDensity(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

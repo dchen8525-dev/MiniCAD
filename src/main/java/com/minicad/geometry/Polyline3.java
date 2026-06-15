@@ -27,6 +27,9 @@ public final class Polyline3 implements Curve3 {
         return points;
     }
 
+    // Record-style accessor
+    public List<CartesianPoint> points() { return getPoints(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

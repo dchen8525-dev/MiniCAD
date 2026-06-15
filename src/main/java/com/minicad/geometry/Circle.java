@@ -34,6 +34,10 @@ public final class Circle implements Curve3 {
         return radius;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return getPosition(); }
+    public double radius() { return getRadius(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

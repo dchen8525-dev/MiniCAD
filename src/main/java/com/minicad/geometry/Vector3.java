@@ -79,6 +79,56 @@ public final class Vector3 {
         );
     }
 
+    /**
+     * Returns the squared norm (magnitude squared) of this vector.
+     *
+     * @return squared norm
+     */
+    public double normSquared() {
+        return x * x + y * y + z * z;
+    }
+
+    /**
+     * Returns the norm (magnitude) of this vector.
+     *
+     * @return norm
+     */
+    public double norm() {
+        return Math.sqrt(normSquared());
+    }
+
+    /**
+     * Returns the dot product of this vector with another.
+     *
+     * @param other the other vector
+     * @return dot product
+     */
+    public double dot(Vector3 other) {
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    /**
+     * Returns a normalized (unit) version of this vector.
+     *
+     * @return normalized vector
+     */
+    public Vector3 normalize() {
+        double n = norm();
+        if (n < Epsilon.get()) {
+            throw new GeometryException("cannot normalize zero-length vector");
+        }
+        return new Vector3(x / n, y / n, z / n);
+    }
+
+    /**
+     * Returns this vector as a Direction3 (normalized).
+     *
+     * @return direction
+     */
+    public Direction3 asVector() {
+        return Direction3.from(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

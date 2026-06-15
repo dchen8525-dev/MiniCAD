@@ -41,6 +41,11 @@ public final class StepCsgVolume implements StepEntity {
         return treeRoot;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity treeRoot() { return getTreeRoot(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

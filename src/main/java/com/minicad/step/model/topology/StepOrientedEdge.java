@@ -47,6 +47,12 @@ public final class StepOrientedEdge implements StepEntity {
         return orientation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEdgeCurve edgeElement() { return getEdgeElement(); }
+    public boolean orientation() { return isOrientation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

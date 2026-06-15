@@ -43,6 +43,11 @@ public final class StepTessellatedFace implements StepEntity {
         return triangles;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepEntity> triangles() { return getTriangles(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

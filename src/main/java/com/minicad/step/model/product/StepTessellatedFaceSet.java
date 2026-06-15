@@ -53,6 +53,12 @@ public final class StepTessellatedFaceSet implements StepEntity {
         return faceIndices;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public List<StepCartesianPoint> coordinates() { return getCoordinates(); }
+    public List<List<Integer>> faceIndices() { return getFaceIndices(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -67,6 +67,14 @@ public final class StepFilletEdge implements StepEntity {
         return filletType;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity originalEdge() { return getOriginalEdge(); }
+    public double filletRadius() { return getFilletRadius(); }
+    public List<StepEntity> adjacentFaces() { return getAdjacentFaces(); }
+    public String filletType() { return getFilletType(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

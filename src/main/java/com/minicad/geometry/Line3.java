@@ -41,6 +41,11 @@ public final class Line3 implements Curve3 {
         return parameterScale;
     }
 
+    // Record-style accessors
+    public CartesianPoint origin() { return getOrigin(); }
+    public Direction3 direction() { return getDirection(); }
+    public double parameterScale() { return getParameterScale(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

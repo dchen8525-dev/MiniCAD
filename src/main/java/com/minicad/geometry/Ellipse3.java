@@ -42,6 +42,11 @@ public final class Ellipse3 implements Curve3 {
         return semiAxis2;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return getPosition(); }
+    public double semiAxis1() { return getSemiAxis1(); }
+    public double semiAxis2() { return getSemiAxis2(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
