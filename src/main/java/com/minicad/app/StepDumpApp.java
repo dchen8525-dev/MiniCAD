@@ -1514,11 +1514,14 @@ public final class StepDumpApp {
                     || point instanceof StepDraughtingAnnotationOccurrence
                     || point instanceof StepAnnotationPlane) {
                 validateSummaryEntity(point, builder);
-            } else if (point instanceof StepPointSet nestedPointSet) {
+            } else if (point instanceof StepPointSet) {
+                StepPointSet nestedPointSet = (StepPointSet) point;
                 validatePointSet(nestedPointSet, builder);
-            } else if (point instanceof StepGeometricSet geometricSet) {
+            } else if (point instanceof StepGeometricSet) {
+                StepGeometricSet geometricSet = (StepGeometricSet) point;
                 validateGeometricSet(geometricSet, builder);
-            } else if (point instanceof StepGeometricCurveSet curveSet) {
+            } else if (point instanceof StepGeometricCurveSet) {
+                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) point;
                 validateGeometricCurveSet(curveSet, builder);
             } else {
                 throw new UnsupportedGeometryException(
@@ -1532,33 +1535,47 @@ public final class StepDumpApp {
     private static int validateGeometricSet(StepGeometricSet geometricSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity element : geometricSet.elements()) {
-            if (element instanceof StepCartesianPoint cartesianPoint) {
+            if (element instanceof StepCartesianPoint) {
+                StepCartesianPoint cartesianPoint = (StepCartesianPoint) element;
                 builder.buildPoint(cartesianPoint.id());
-            } else if (element instanceof StepGeometricReplica replica && "POINT_REPLICA".equals(replica.entityName())) {
+            } else if (element instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) element;
                 builder.buildPointReference(replica.id());
-            } else if (element instanceof StepVertexPoint vertexPoint) {
+            } else if (element instanceof StepVertexPoint) {
+                StepVertexPoint vertexPoint = (StepVertexPoint) element;
                 builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepLine line) {
+            } else if (element instanceof StepLine) {
+                StepLine line = (StepLine) element;
                 builder.buildLine(line.id());
-            } else if (element instanceof StepCircle circle) {
+            } else if (element instanceof StepCircle) {
+                StepCircle circle = (StepCircle) element;
                 builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse ellipse) {
+            } else if (element instanceof StepEllipse) {
+                StepEllipse ellipse = (StepEllipse) element;
                 builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline polyline) {
+            } else if (element instanceof StepPolyline) {
+                StepPolyline polyline = (StepPolyline) element;
                 builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve edgeCurve) {
+            } else if (element instanceof StepEdgeCurve) {
+                StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
                 builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge subedge) {
+            } else if (element instanceof StepSubedge) {
+                StepSubedge subedge = (StepSubedge) element;
                 builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge orientedEdge) {
+            } else if (element instanceof StepOrientedEdge) {
+                StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
                 builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet edgeSet) {
+            } else if (element instanceof StepConnectedEdgeSet) {
+                StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
                 validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop edgeLoop) {
+            } else if (element instanceof StepEdgeLoop) {
+                StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
                 validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop vertexLoop) {
+            } else if (element instanceof StepVertexLoop) {
+                StepVertexLoop vertexLoop = (StepVertexLoop) element;
                 builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepWireShell wireShell) {
+            } else if (element instanceof StepWireShell) {
+                StepWireShell wireShell = (StepWireShell) element;
                 validateWireShell(wireShell, builder);
             } else if (element instanceof StepOpenShell
                     || element instanceof StepSurfacedOpenShell
