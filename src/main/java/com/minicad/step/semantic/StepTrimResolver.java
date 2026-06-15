@@ -202,43 +202,54 @@ final class StepTrimResolver {
     }
 
     double parameterOnCurve2(Curve2 curve, Point2 point) {
-            switch (curve) {
-      case Line2 __:
-        return line.parameterOf(point);
-      case BSplineCurve2 __:
-        return parameterOnBSpline2(bspline, point);
-      case RationalBSplineCurve2 __:
-        return parameterOnRationalBSpline2(rational, point);
-      case Polyline2 __:
-        return parameterOnPolyline2(polyline, point);
-      case TrimmedCurve2 __:
-        return parameterOnCurve2(trimmed.basisCurve(), point);
-      default:
-        throw new IllegalArgumentException("Unknown value type: " + curve);
-    }
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
+            return line.parameterOf(point);
+        } else if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 bspline = (BSplineCurve2) curve;
+            return parameterOnBSpline2(bspline, point);
+        } else if (curve instanceof RationalBSplineCurve2) {
+            RationalBSplineCurve2 rational = (RationalBSplineCurve2) curve;
+            return parameterOnRationalBSpline2(rational, point);
+        } else if (curve instanceof Polyline2) {
+            Polyline2 polyline = (Polyline2) curve;
+            return parameterOnPolyline2(polyline, point);
+        } else if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
+            return parameterOnCurve2(trimmed.basisCurve(), point);
+        } else {
+            throw new IllegalArgumentException("Unknown value type: " + curve);
+        }
     }
 
     Point2 evaluateCurve2AtParameter(Curve2 curve, double param) {
-            switch (curve) {
-      case Line2 __:
-        return line.pointAt(param);
-      case Circle2 __:
-        return circle.pointAt(param);
-      case Ellipse2 __:
-        return ellipse.pointAt(param);
-      case Polyline2 __:
-        return evaluatePolyline2AtParameter(polyline, param);
-      case TrimmedCurve2 __:
-        return evaluateCurve2AtParameter(trimmed.basisCurve(), param);
-      case BSplineCurve2 __:
-        return bspline.pointAt(param);
-      case RationalBSplineCurve2 __:
-        return rational.pointAt(param);
-      case CompositeCurve2 __:
-        return evaluateComposite2AtParameter(composite, param);
-      default:
-        throw new IllegalArgumentException();
-    }
+        if (curve instanceof Line2) {
+            Line2 line = (Line2) curve;
+            return line.pointAt(param);
+        } else if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
+            return circle.pointAt(param);
+        } else if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
+            return ellipse.pointAt(param);
+        } else if (curve instanceof Polyline2) {
+            Polyline2 polyline = (Polyline2) curve;
+            return evaluatePolyline2AtParameter(polyline, param);
+        } else if (curve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
+            return evaluateCurve2AtParameter(trimmed.basisCurve(), param);
+        } else if (curve instanceof BSplineCurve2) {
+            BSplineCurve2 bspline = (BSplineCurve2) curve;
+            return bspline.pointAt(param);
+        } else if (curve instanceof RationalBSplineCurve2) {
+            RationalBSplineCurve2 rational = (RationalBSplineCurve2) curve;
+            return rational.pointAt(param);
+        } else if (curve instanceof CompositeCurve2) {
+            CompositeCurve2 composite = (CompositeCurve2) curve;
+            return evaluateComposite2AtParameter(composite, param);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     Point2 snapTrimPoint2(Point2 point, Curve2 basisCurve) {
@@ -298,7 +309,11 @@ final class StepTrimResolver {
     }
 
     private static StepValue unwrapTyped(StepValue value) {
-        return value instanceof StepValue.TypedValue typed ? typed.value() : value;
+        if (value instanceof StepValue.TypedValue) {
+            StepValue.TypedValue typed = (StepValue.TypedValue) value;
+            return typed.value();
+        }
+        return value;
     }
 
     private double parameterOnBSpline2(BSplineCurve2 bspline, Point2 point) {

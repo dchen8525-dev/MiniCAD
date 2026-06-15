@@ -618,21 +618,24 @@ public final class StepDumpApp {
         json.append('"');
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            switch (c) {
-                case '"' -> json.append("\\\"");
-                case '\\' -> json.append("\\\\");
-                case '\b' -> json.append("\\b");
-                case '\f' -> json.append("\\f");
-                case '\n' -> json.append("\\n");
-                case '\r' -> json.append("\\r");
-                case '\t' -> json.append("\\t");
-                default -> {
-                    if (c < 0x20) {
-                        json.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        json.append(c);
-                    }
-                }
+            if (c == '"') {
+                json.append("\\\"");
+            } else if (c == '\\') {
+                json.append("\\\\");
+            } else if (c == '\b') {
+                json.append("\\b");
+            } else if (c == '\f') {
+                json.append("\\f");
+            } else if (c == '\n') {
+                json.append("\\n");
+            } else if (c == '\r') {
+                json.append("\\r");
+            } else if (c == '\t') {
+                json.append("\\t");
+            } else if (c < 0x20) {
+                json.append(String.format("\\u%04x", (int) c));
+            } else {
+                json.append(c);
             }
         }
         json.append('"');

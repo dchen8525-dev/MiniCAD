@@ -314,9 +314,10 @@ public final class PreviewUvMapper {
         }
         if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation)) {
+            if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator)) {
                 return null;
             }
+            com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
             ParametricSurfaceMapper base = mapperForSurface(replica.parent(), builder);
             if (base == null) {
                 return null;
@@ -937,9 +938,10 @@ public final class PreviewUvMapper {
         boolean promoteSingleOuter = stepFace.bounds().size() == 1
                 && stepFace.bounds().stream().noneMatch(com.minicad.step.model.topology.StepFaceBound::outer);
         for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-            if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop)) {
+            if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop)) {
                 return List.of();
             }
+            com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
             List<UvPoint> loopPoints = new ArrayList<>();
             boolean firstEdge = true;
             for (com.minicad.step.model.topology.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -1992,7 +1994,8 @@ public final class PreviewUvMapper {
         for (List<StepEntity> row : surface.controlPoints()) {
             List<CartesianPoint> pointRow = new ArrayList<>(row.size());
             for (StepEntity pt : row) {
-                if (pt instanceof com.minicad.step.model.geometry.StepCartesianPoint cartesianPoint) {
+                if (pt instanceof com.minicad.step.model.geometry.StepCartesianPoint) {
+                    com.minicad.step.model.geometry.StepCartesianPoint cartesianPoint = (com.minicad.step.model.geometry.StepCartesianPoint) pt;
                     pointRow.add(builder.buildPoint(cartesianPoint.id()));
                 } else {
                     throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
@@ -2188,7 +2191,6 @@ public final class PreviewUvMapper {
             throw new com.minicad.common.UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
         }
         EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-        }
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
@@ -2252,7 +2254,8 @@ public final class PreviewUvMapper {
             StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
                 return builder.buildTrimmedCurve(trimmedCurve.id());
             }
-            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve compositeCurve) {
+            if (item instanceof com.minicad.step.model.geometry.StepCompositeCurve) {
+                com.minicad.step.model.geometry.StepCompositeCurve compositeCurve = (com.minicad.step.model.geometry.StepCompositeCurve) item;
                 return builder.buildCompositeCurve(compositeCurve.id());
             }
             return null;

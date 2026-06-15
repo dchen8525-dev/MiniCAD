@@ -24,32 +24,36 @@ final class StepProfileBuilder {
     /**
      * Immutable pair of outer and inner 2D profile loops.
      */
-public final class ProfileLoops {
+    public final class ProfileLoops {
+        private final List<Point2> outer;
+        private final List<List<Point2>> inner;
 
-    public ProfileLoops() {
-        this.outer = List.copyOf(outer);
-        this.inner = inner.stream().map(List::copyOf).collect(Collectors.toList());
+        public ProfileLoops(List<Point2> outer, List<List<Point2>> inner) {
+            this.outer = List.copyOf(outer);
+            this.inner = inner.stream().map(List::copyOf).collect(Collectors.toList());
+        }
+
+        public List<Point2> outer() { return outer; }
+        public List<List<Point2>> inner() { return inner; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProfileLoops that = (ProfileLoops) o;
+            return outer.equals(that.outer) && inner.equals(that.inner);
+        }
+
+        @Override
+        public int hashCode() {
+            return outer.hashCode() + 31 * inner.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "ProfileLoops{outer=" + outer + ", inner=" + inner + "}";
+        }
     }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProfileLoops that = (ProfileLoops) o;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
-
-    @Override
-    public String toString() {
-        return "ProfileLoops{" + " + "}";
-    }
-}
 
     private final StepCadGeometryOps geometryOps;
     private final Function<StepEntity, Curve2> buildCurve2;

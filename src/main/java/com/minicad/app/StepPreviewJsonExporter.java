@@ -14965,60 +14965,58 @@ public final class StepPreviewJsonExporter {
             return representationLink.usedRepresentation();
         }
         if (candidate instanceof StepAttributeAssertion
-                    && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinitionId) {
-                StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepActionPropertyRepresentation
-                    && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepContactRatioRepresentation
-                    && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
-                    && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepKinematicPropertyMechanismRepresentation
-                    && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepKinematicPropertyRepresentationRelation
-                    && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinitionId) {
-                StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepKinematicPropertyTopologyRepresentation
-                    && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepResourcePropertyRepresentation
-                    && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-                StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepForwardChainingRulePremise
-                    && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinitionId) {
-                StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepBackChainingRuleBody
-                    && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinitionId) {
-                StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
-                return representationLink.usedRepresentation();
-            }
-            if (candidate instanceof StepPlacedDatumTargetFeature
-                    && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinitionId) {
-                StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
-                return representationLink.usedRepresentation();
-            }
+                && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinitionId) {
+            StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepActionPropertyRepresentation
+                && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepContactRatioRepresentation
+                && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
+                && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepKinematicPropertyMechanismRepresentation
+                && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepKinematicPropertyRepresentationRelation
+                && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinitionId) {
+            StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepKinematicPropertyTopologyRepresentation
+                && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepResourcePropertyRepresentation
+                && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepForwardChainingRulePremise
+                && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinitionId) {
+            StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepBackChainingRuleBody
+                && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinitionId) {
+            StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
+            return representationLink.usedRepresentation();
+        }
+        if (candidate instanceof StepPlacedDatumTargetFeature
+                && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinitionId) {
+            StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
             return representationLink.usedRepresentation();
         }
         return null;
@@ -15033,9 +15031,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepGroupRelationship)) {
-            StepGroupRelationship relationship = (StepGroupRelationship) candidate;
                 continue;
             }
+            StepGroupRelationship relationship = (StepGroupRelationship) candidate;
             if (relationship.relatingGroup().id() == group.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedGroup(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -15054,9 +15052,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepGeneralPropertyRelationship)) {
-            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
                 continue;
             }
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
             if (relationship.relatingGeneralProperty().id() == generalProperty.id()) {
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
@@ -15091,9 +15089,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepDocumentRelationship)) {
-            StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
                 continue;
             }
+            StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
             if (relationship.relatingDocument().id() == document.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedDocument(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -15216,9 +15214,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepOrganizationRelationship)) {
-            StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
                 continue;
             }
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
             if (relationship.relatingOrganization().id() == organization.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedOrganization(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -15237,9 +15235,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepEffectivityRelationship)) {
-            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                 continue;
             }
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
             if (relationship.relatingEffectivity().id() == effectivity.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedEffectivity(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -15258,9 +15256,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepProductCategoryRelationship)) {
-            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
                 continue;
             }
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
             if (relationship.category().id() == category.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.subCategory(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -15284,9 +15282,9 @@ public final class StepPreviewJsonExporter {
             changed = false;
             for (StepEntity candidate : resolved.values()) {
                 if (!(candidate instanceof StepEffectivityRelationship)) {
-            StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                     continue;
                 }
+                StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                 String relatingName = relationship.relatingEffectivity().name();
                 String relatedName = relationship.relatedEffectivity().name();
                 if (linkedEffectivityNames.contains(relatingName) && linkedEffectivityNames.add(relatedName)) {
@@ -15323,9 +15321,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepExternalSourceRelationship)) {
-            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                 continue;
             }
+            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
             if (relationship.relatingSource().id() == source.id()) {
                 appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
             }
@@ -15349,9 +15347,9 @@ public final class StepPreviewJsonExporter {
             changed = false;
             for (StepEntity candidate : resolved.values()) {
                 if (!(candidate instanceof StepExternalSourceRelationship)) {
-            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                     continue;
                 }
+                StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                 int relatingId = relationship.relatingSource().id();
                 int relatedId = relationship.relatedSource().id();
                 if (linkedSourceIds.contains(relatingId) && linkedSourceIds.add(relatedId)) {
@@ -15363,8 +15361,9 @@ public final class StepPreviewJsonExporter {
             }
         } while (changed);
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepExternallyDefinedItem item
-                    && linkedSourceIds.contains(item.source().id())) {
+            if (candidate instanceof StepExternallyDefinedItem
+                    && linkedSourceIds.contains(((StepExternallyDefinedItem) candidate).source().id())) {
+                StepExternallyDefinedItem item = (StepExternallyDefinedItem) candidate;
                 appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
             }
         }
@@ -15586,9 +15585,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepShapeAspectRelationship)) {
-            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) candidate;
                 continue;
             }
+            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) candidate;
             if (relationship.relatingShapeAspect().id() == shapeAspect.id()) {
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
@@ -15844,19 +15843,18 @@ public final class StepPreviewJsonExporter {
             } else if (candidate instanceof StepPlacedDatumTargetFeature
                     && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinition.id()) {
                 StepPlacedDatumTargetFeature datumTargetFeature = (StepPlacedDatumTargetFeature) candidate;
-                        && datumTargetFeature.definition().id() == propertyDefinition.id()) {
-                    targets.add(datumTargetFeature.usedRepresentation());
-                } else if (candidate instanceof StepPropertyDefinitionRelationship) {
-            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
-                    if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
-                    }
-                    if (relationship.relatedPropertyDefinition().id() == propertyDefinition.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting));
-                    }
+                targets.add(datumTargetFeature.usedRepresentation());
+            } else if (candidate instanceof StepPropertyDefinitionRelationship) {
+                StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
+                if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
+                    targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
+                }
+                if (relationship.relatedPropertyDefinition().id() == propertyDefinition.id()) {
+                    targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting));
                 }
             }
-        } else if (entity instanceof StepDescriptiveRepresentationItem) {
+        }
+    } else if (entity instanceof StepDescriptiveRepresentationItem) {
             StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) entity;
             targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
         } else if (entity instanceof StepValueRepresentationItem) {
@@ -16383,14 +16381,17 @@ public final class StepPreviewJsonExporter {
         } else if (entity instanceof StepApplicationContext) {
             StepApplicationContext applicationContext = (StepApplicationContext) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepApplicationProtocolDefinition protocolDefinition
-                        && protocolDefinition.application().id() == applicationContext.id()) {
+                if (candidate instanceof StepApplicationProtocolDefinition
+                        && ((StepApplicationProtocolDefinition) candidate).application().id() == applicationContext.id()) {
+                    StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) candidate;
                     targets.addAll(collectSemanticTargets(protocolDefinition, resolved, visiting));
-                } else if (candidate instanceof StepProductContext productContext
-                        && productContext.frameOfReference().id() == applicationContext.id()) {
+                } else if (candidate instanceof StepProductContext
+                        && ((StepProductContext) candidate).frameOfReference().id() == applicationContext.id()) {
+                    StepProductContext productContext = (StepProductContext) candidate;
                     targets.addAll(collectSemanticTargets(productContext, resolved, visiting));
-                } else if (candidate instanceof StepProductDefinitionContext productDefinitionContext
-                        && productDefinitionContext.frameOfReference().id() == applicationContext.id()) {
+                } else if (candidate instanceof StepProductDefinitionContext
+                        && ((StepProductDefinitionContext) candidate).frameOfReference().id() == applicationContext.id()) {
+                    StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) candidate;
                     targets.addAll(collectSemanticTargets(productDefinitionContext, resolved, visiting));
                 }
             }
@@ -16401,8 +16402,9 @@ public final class StepPreviewJsonExporter {
             StepProductContext productContext = (StepProductContext) entity;
             targets.addAll(collectSemanticTargets(productContext.frameOfReference(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepProduct product
-                        && product.frameOfReference().stream().anyMatch(context -> context.id() == productContext.id())) {
+                if (candidate instanceof StepProduct
+                        && ((StepProduct) candidate).frameOfReference().stream().anyMatch(context -> context.id() == productContext.id())) {
+                    StepProduct product = (StepProduct) candidate;
                     targets.addAll(collectSemanticTargets(product, resolved, visiting));
                 }
             }
@@ -16410,8 +16412,9 @@ public final class StepPreviewJsonExporter {
             StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) entity;
             targets.addAll(collectSemanticTargets(productDefinitionContext.frameOfReference(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepProductDefinition productDefinition
-                        && productDefinition.frameOfReference().id() == productDefinitionContext.id()) {
+                if (candidate instanceof StepProductDefinition
+                        && ((StepProductDefinition) candidate).frameOfReference().id() == productDefinitionContext.id()) {
+                    StepProductDefinition productDefinition = (StepProductDefinition) candidate;
                     targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
                 }
             }
@@ -16420,7 +16423,7 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectTargetsReferencingEntity(generalProperty.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepGeneralPropertyRelationship) {
-            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
+                    StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
                     if (relationship.relatingGeneralProperty().id() == generalProperty.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting));
                     }
@@ -16433,14 +16436,16 @@ public final class StepPreviewJsonExporter {
             StepDocument document = (StepDocument) entity;
             targets.addAll(collectTargetsReferencingEntity(document.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepDocumentReference reference
-                        && reference.assignedDocument().id() == document.id()) {
+                if (candidate instanceof StepDocumentReference
+                        && ((StepDocumentReference) candidate).assignedDocument().id() == document.id()) {
+                    StepDocumentReference reference = (StepDocumentReference) candidate;
                     targets.addAll(collectSemanticTargets(reference, resolved, visiting));
-                } else if (candidate instanceof StepAppliedDocumentReference reference
-                        && reference.assignedDocument().id() == document.id()) {
+                } else if (candidate instanceof StepAppliedDocumentReference
+                        && ((StepAppliedDocumentReference) candidate).assignedDocument().id() == document.id()) {
+                    StepAppliedDocumentReference reference = (StepAppliedDocumentReference) candidate;
                     targets.addAll(collectSemanticTargets(reference, resolved, visiting));
                 } else if (candidate instanceof StepDocumentRelationship) {
-            StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
+                    StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
                     if (relationship.relatingDocument().id() == document.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting));
                     }
@@ -16487,14 +16492,15 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectTargetsReferencingEntity(organization.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedOrganizationAssignment
-                    && ((StepAppliedOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
-                StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) candidate;
+                        && ((StepAppliedOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
+                    StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepOrganizationAssignment assignment
-                        && assignment.assignedOrganization().id() == organization.id()) {
+                } else if (candidate instanceof StepOrganizationAssignment
+                        && ((StepOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
+                    StepOrganizationAssignment assignment = (StepOrganizationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting));
                 } else if (candidate instanceof StepOrganizationRelationship) {
-            StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
+                    StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
                     if (relationship.relatingOrganization().id() == organization.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting));
                     }
@@ -16508,15 +16514,16 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectTargetsReferencingEntity(productCategory.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductCategoryRelationship) {
-            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
+                    StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
                     if (relationship.category().id() == productCategory.id()) {
                         targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting));
                     }
                     if (relationship.subCategory().id() == productCategory.id()) {
                         targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting));
                     }
-                } else if (candidate instanceof StepProductRelatedProductCategory relatedCategory
-                        && relatedCategory.id() == productCategory.id()) {
+                } else if (candidate instanceof StepProductRelatedProductCategory
+                        && ((StepProductRelatedProductCategory) candidate).id() == productCategory.id()) {
+                    StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) candidate;
                     targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting));
                 }
             }
@@ -16527,14 +16534,16 @@ public final class StepPreviewJsonExporter {
             StepProduct product = (StepProduct) entity;
             targets.addAll(collectTargetsReferencingEntity(product.id(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepProductDefinitionFormation formation
-                        && formation.ofProduct().id() == product.id()) {
+                if (candidate instanceof StepProductDefinitionFormation
+                        && ((StepProductDefinitionFormation) candidate).ofProduct().id() == product.id()) {
+                    StepProductDefinitionFormation formation = (StepProductDefinitionFormation) candidate;
                     targets.addAll(collectSemanticTargets(formation, resolved, visiting));
-                } else if (candidate instanceof StepProductRelatedProductCategory relatedCategory
-                        && relatedCategory.products().stream().anyMatch(related -> related.id() == product.id())) {
+                } else if (candidate instanceof StepProductRelatedProductCategory
+                        && ((StepProductRelatedProductCategory) candidate).products().stream().anyMatch(related -> related.id() == product.id())) {
+                    StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) candidate;
                     targets.addAll(collectSemanticTargets(relatedCategory, resolved, visiting));
                 } else if (candidate instanceof StepProductRelationship) {
-            StepProductRelationship relationship = (StepProductRelationship) candidate;
+                    StepProductRelationship relationship = (StepProductRelationship) candidate;
                     if (relationship.relatingProduct().id() == product.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting));
                     }
@@ -16548,11 +16557,12 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectTargetsReferencingEntity(formation.id(), resolved, visiting));
             targets.addAll(collectSemanticTargets(formation.ofProduct(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepProductDefinition productDefinition
-                        && productDefinition.formation().id() == formation.id()) {
+                if (candidate instanceof StepProductDefinition
+                        && ((StepProductDefinition) candidate).formation().id() == formation.id()) {
+                    StepProductDefinition productDefinition = (StepProductDefinition) candidate;
                     targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
                 } else if (candidate instanceof StepProductDefinitionFormationRelationship) {
-            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
+                    StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
                     if (relationship.relatingFormation().id() == formation.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting));
                     }
@@ -16581,14 +16591,17 @@ public final class StepPreviewJsonExporter {
         } else if (entity instanceof StepCalendarDate) {
             StepCalendarDate calendarDate = (StepCalendarDate) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepDateAssignment assignment
-                        && assignment.assignedDate().id() == calendarDate.id()) {
+                if (candidate instanceof StepDateAssignment
+                        && ((StepDateAssignment) candidate).assignedDate().id() == calendarDate.id()) {
+                    StepDateAssignment assignment = (StepDateAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-                } else if (candidate instanceof StepAppliedDateAssignment assignment
-                        && assignment.assignedDate().id() == calendarDate.id()) {
+                } else if (candidate instanceof StepAppliedDateAssignment
+                        && ((StepAppliedDateAssignment) candidate).assignedDate().id() == calendarDate.id()) {
+                    StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepDateAndTime dateAndTime
-                        && dateAndTime.dateComponent().id() == calendarDate.id()) {
+                } else if (candidate instanceof StepDateAndTime
+                        && ((StepDateAndTime) candidate).dateComponent().id() == calendarDate.id()) {
+                    StepDateAndTime dateAndTime = (StepDateAndTime) candidate;
                     targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
                 }
             }
@@ -16597,14 +16610,17 @@ public final class StepPreviewJsonExporter {
             targets.addAll(collectSemanticTargets(dateAndTime.dateComponent(), resolved, visiting));
             targets.addAll(collectSemanticTargets(dateAndTime.timeComponent(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepDateTimeAssignment assignment
-                        && assignment.assignedDateAndTime().id() == dateAndTime.id()) {
+                if (candidate instanceof StepDateTimeAssignment
+                        && ((StepDateTimeAssignment) candidate).assignedDateAndTime().id() == dateAndTime.id()) {
+                    StepDateTimeAssignment assignment = (StepDateTimeAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-                } else if (candidate instanceof StepAppliedDateTimeAssignment assignment
-                        && assignment.assignedDateAndTime().id() == dateAndTime.id()) {
+                } else if (candidate instanceof StepAppliedDateTimeAssignment
+                        && ((StepAppliedDateTimeAssignment) candidate).assignedDateAndTime().id() == dateAndTime.id()) {
+                    StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepApprovalDateTime approvalDateTime
-                        && approvalDateTime.dateTime().id() == dateAndTime.id()) {
+                } else if (candidate instanceof StepApprovalDateTime
+                        && ((StepApprovalDateTime) candidate).dateTime().id() == dateAndTime.id()) {
+                    StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) candidate;
                     targets.addAll(collectSemanticTargets(approvalDateTime, resolved, visiting));
                 }
             }
@@ -16612,16 +16628,18 @@ public final class StepPreviewJsonExporter {
             StepLocalTime localTime = (StepLocalTime) entity;
             targets.addAll(collectSemanticTargets(localTime.zone(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepDateAndTime dateAndTime
-                        && dateAndTime.timeComponent().id() == localTime.id()) {
+                if (candidate instanceof StepDateAndTime
+                        && ((StepDateAndTime) candidate).timeComponent().id() == localTime.id()) {
+                    StepDateAndTime dateAndTime = (StepDateAndTime) candidate;
                     targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
                 }
             }
         } else if (entity instanceof StepCoordinatedUniversalTimeOffset) {
             StepCoordinatedUniversalTimeOffset zone = (StepCoordinatedUniversalTimeOffset) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepLocalTime localTime
-                        && localTime.zone().id() == zone.id()) {
+                if (candidate instanceof StepLocalTime
+                        && ((StepLocalTime) candidate).zone().id() == zone.id()) {
+                    StepLocalTime localTime = (StepLocalTime) candidate;
                     targets.addAll(collectSemanticTargets(localTime, resolved, visiting));
                 }
             }
@@ -16634,8 +16652,9 @@ public final class StepPreviewJsonExporter {
         } else if (entity instanceof StepPerson) {
             StepPerson person = (StepPerson) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepPersonAndOrganization personAndOrganization
-                        && personAndOrganization.person().id() == person.id()) {
+                if (candidate instanceof StepPersonAndOrganization
+                        && ((StepPersonAndOrganization) candidate).person().id() == person.id()) {
+                    StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) candidate;
                     targets.addAll(collectSemanticTargets(personAndOrganization, resolved, visiting));
                 }
             }
@@ -16678,72 +16697,86 @@ public final class StepPreviewJsonExporter {
         } else if (entity instanceof StepApproval) {
             StepApproval approval = (StepApproval) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedApprovalAssignment assignment
-                        && assignment.assignedApproval().id() == approval.id()) {
+                if (candidate instanceof StepAppliedApprovalAssignment
+                        && ((StepAppliedApprovalAssignment) candidate).assignedApproval().id() == approval.id()) {
+                    StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepApprovalAssignment assignment
-                        && assignment.assignedApproval().id() == approval.id()) {
+                } else if (candidate instanceof StepApprovalAssignment
+                        && ((StepApprovalAssignment) candidate).assignedApproval().id() == approval.id()) {
+                    StepApprovalAssignment assignment = (StepApprovalAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting));
-                } else if (candidate instanceof StepApprovalPersonOrganization personOrganization
-                        && personOrganization.authorizedApproval().id() == approval.id()) {
+                } else if (candidate instanceof StepApprovalPersonOrganization
+                        && ((StepApprovalPersonOrganization) candidate).authorizedApproval().id() == approval.id()) {
+                    StepApprovalPersonOrganization personOrganization = (StepApprovalPersonOrganization) candidate;
                     targets.addAll(collectSemanticTargets(personOrganization.personOrganization(), resolved, visiting));
-                } else if (candidate instanceof StepApprovalDateTime approvalDateTime
-                        && approvalDateTime.datedApproval().id() == approval.id()) {
+                } else if (candidate instanceof StepApprovalDateTime
+                        && ((StepApprovalDateTime) candidate).datedApproval().id() == approval.id()) {
+                    StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) candidate;
                     targets.addAll(collectSemanticTargets(approvalDateTime.dateTime(), resolved, visiting));
                 }
             }
         } else if (entity instanceof StepSecurityClassification) {
             StepSecurityClassification classification = (StepSecurityClassification) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedSecurityClassificationAssignment assignment
-                        && assignment.assignedSecurityClassification().id() == classification.id()) {
+                if (candidate instanceof StepAppliedSecurityClassificationAssignment
+                        && ((StepAppliedSecurityClassificationAssignment) candidate).assignedSecurityClassification().id() == classification.id()) {
+                    StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepSecurityClassificationAssignment assignment
-                        && assignment.assignedSecurityClassification().id() == classification.id()) {
+                } else if (candidate instanceof StepSecurityClassificationAssignment
+                        && ((StepSecurityClassificationAssignment) candidate).assignedSecurityClassification().id() == classification.id()) {
+                    StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting));
                 }
             }
         } else if (entity instanceof StepContract) {
             StepContract contract = (StepContract) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedContractAssignment assignment
-                        && assignment.assignedContract().id() == contract.id()) {
+                if (candidate instanceof StepAppliedContractAssignment
+                        && ((StepAppliedContractAssignment) candidate).assignedContract().id() == contract.id()) {
+                    StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepContractAssignment assignment
-                        && assignment.assignedContract().id() == contract.id()) {
+                } else if (candidate instanceof StepContractAssignment
+                        && ((StepContractAssignment) candidate).assignedContract().id() == contract.id()) {
+                    StepContractAssignment assignment = (StepContractAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting));
                 }
             }
         } else if (entity instanceof StepCertification) {
             StepCertification certification = (StepCertification) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedCertificationAssignment assignment
-                        && assignment.assignedCertification().id() == certification.id()) {
+                if (candidate instanceof StepAppliedCertificationAssignment
+                        && ((StepAppliedCertificationAssignment) candidate).assignedCertification().id() == certification.id()) {
+                    StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepCertificationAssignment assignment
-                        && assignment.assignedCertification().id() == certification.id()) {
+                } else if (candidate instanceof StepCertificationAssignment
+                        && ((StepCertificationAssignment) candidate).assignedCertification().id() == certification.id()) {
+                    StepCertificationAssignment assignment = (StepCertificationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting));
                 }
             }
         } else if (entity instanceof StepPersonAndOrganization) {
             StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedPersonAndOrganizationAssignment assignment
-                        && assignment.assignedPersonAndOrganization().id() == personAndOrganization.id()) {
+                if (candidate instanceof StepAppliedPersonAndOrganizationAssignment
+                        && ((StepAppliedPersonAndOrganizationAssignment) candidate).assignedPersonAndOrganization().id() == personAndOrganization.id()) {
+                    StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepPersonAndOrganizationAssignment assignment
-                        && assignment.assignedPersonAndOrganization().id() == personAndOrganization.id()) {
+                } else if (candidate instanceof StepPersonAndOrganizationAssignment
+                        && ((StepPersonAndOrganizationAssignment) candidate).assignedPersonAndOrganization().id() == personAndOrganization.id()) {
+                    StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting));
                 }
             }
         } else if (entity instanceof StepLanguage) {
             StepLanguage language = (StepLanguage) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepAppliedLanguageAssignment assignment
-                        && assignment.assignedLanguage().id() == language.id()) {
+                if (candidate instanceof StepAppliedLanguageAssignment
+                        && ((StepAppliedLanguageAssignment) candidate).assignedLanguage().id() == language.id()) {
+                    StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-                } else if (candidate instanceof StepLanguageAssignment assignment
-                        && assignment.assignedLanguage().id() == language.id()) {
+                } else if (candidate instanceof StepLanguageAssignment
+                        && ((StepLanguageAssignment) candidate).assignedLanguage().id() == language.id()) {
+                    StepLanguageAssignment assignment = (StepLanguageAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting));
                 }
             }
@@ -16753,14 +16786,16 @@ public final class StepPreviewJsonExporter {
         } else if (entity instanceof StepExternalSource) {
             StepExternalSource source = (StepExternalSource) entity;
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepExternallyDefinedItem item
-                        && item.source().id() == source.id()) {
+                if (candidate instanceof StepExternallyDefinedItem
+                        && ((StepExternallyDefinedItem) candidate).source().id() == source.id()) {
+                    StepExternallyDefinedItem item = (StepExternallyDefinedItem) candidate;
                     targets.addAll(collectSemanticTargets(item, resolved, visiting));
-                } else if (candidate instanceof StepAppliedExternalIdentificationAssignment assignment
-                        && assignment.source().id() == source.id()) {
+                } else if (candidate instanceof StepAppliedExternalIdentificationAssignment
+                        && ((StepAppliedExternalIdentificationAssignment) candidate).source().id() == source.id()) {
+                    StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) candidate;
                     targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
                 } else if (candidate instanceof StepExternalSourceRelationship) {
-            StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
+                    StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                     if (relationship.relatingSource().id() == source.id()) {
                         targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting));
                     }
@@ -17333,17 +17368,21 @@ public final class StepPreviewJsonExporter {
             StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
             targets.addAll(collectSemanticTargets(productDefinitionShape.definition(), resolved, visiting));
             for (StepEntity candidate : resolved.values()) {
-                if (candidate instanceof StepShapeDefinitionRepresentation link
-                        && link.definition().id() == productDefinitionShape.id()) {
+                if (candidate instanceof StepShapeDefinitionRepresentation
+                        && ((StepShapeDefinitionRepresentation) candidate).definition().id() == productDefinitionShape.id()) {
+                    StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) candidate;
                     targets.add(link.usedRepresentation());
-                } else if (candidate instanceof StepContextDependentShapeRepresentation contextDependent
-                        && contextDependent.representedProductRelation().id() == productDefinitionShape.id()) {
+                } else if (candidate instanceof StepContextDependentShapeRepresentation
+                        && ((StepContextDependentShapeRepresentation) candidate).representedProductRelation().id() == productDefinitionShape.id()) {
+                    StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) candidate;
                     targets.addAll(collectSemanticTargets(contextDependent, resolved, visiting));
-                } else if (candidate instanceof StepShapeAspect shapeAspect
-                        && shapeAspect.ofShape().id() == productDefinitionShape.id()) {
+                } else if (candidate instanceof StepShapeAspect
+                        && ((StepShapeAspect) candidate).ofShape().id() == productDefinitionShape.id()) {
+                    StepShapeAspect shapeAspect = (StepShapeAspect) candidate;
                     targets.addAll(collectSemanticTargets(shapeAspect, resolved, visiting));
-                } else if (candidate instanceof StepShapeAspectOccurrence occurrence
-                        && occurrence.ofShape().id() == productDefinitionShape.id()) {
+                } else if (candidate instanceof StepShapeAspectOccurrence
+                        && ((StepShapeAspectOccurrence) candidate).ofShape().id() == productDefinitionShape.id()) {
+                    StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) candidate;
                     targets.addAll(collectSemanticTargets(occurrence, resolved, visiting));
                 }
             }
@@ -17419,8 +17458,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPropertyDefinition propertyDefinition
-                    && propertyDefinition.definition().id() == referencedId) {
+            if (candidate instanceof StepPropertyDefinition
+                    && ((StepPropertyDefinition) candidate).definition().id() == referencedId) {
+                StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) candidate;
                 targets.addAll(collectSemanticTargets(propertyDefinition, resolved, visiting));
             }
         }
@@ -17449,12 +17489,14 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepRepresentation representation
-                    && representation.context() != null
-                    && representation.context().id() == contextId) {
+            if (candidate instanceof StepRepresentation
+                    && ((StepRepresentation) candidate).context() != null
+                    && ((StepRepresentation) candidate).context().id() == contextId) {
+                StepRepresentation representation = (StepRepresentation) candidate;
                 targets.add(representation);
-            } else if (candidate instanceof StepPropertyDefinition propertyDefinition
-                    && propertyDefinition.definition().id() == contextId) {
+            } else if (candidate instanceof StepPropertyDefinition
+                    && ((StepPropertyDefinition) candidate).definition().id() == contextId) {
+                StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) candidate;
                 targets.addAll(collectSemanticTargets(propertyDefinition, resolved, visiting));
             }
         }
@@ -17468,12 +17510,14 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepGlobalUnitAssignedContext context
-                    && context.units().stream().anyMatch(unit -> unit.id() == unitId)) {
+            if (candidate instanceof StepGlobalUnitAssignedContext
+                    && ((StepGlobalUnitAssignedContext) candidate).units().stream().anyMatch(unit -> unit.id() == unitId)) {
+                StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
-            } else if (candidate instanceof StepGeometricRepresentationContext context
-                    && context.globalUnitAssignedContext() != null
-                    && context.globalUnitAssignedContext().units().stream().anyMatch(unit -> unit.id() == unitId)) {
+            } else if (candidate instanceof StepGeometricRepresentationContext
+                    && ((StepGeometricRepresentationContext) candidate).globalUnitAssignedContext() != null
+                    && ((StepGeometricRepresentationContext) candidate).globalUnitAssignedContext().units().stream().anyMatch(unit -> unit.id() == unitId)) {
+                StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
             }
         }
@@ -17487,13 +17531,15 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepGlobalUncertaintyAssignedContext context
-                    && context.uncertainties().stream().anyMatch(uncertainty -> uncertainty.id() == uncertaintyId)) {
+            if (candidate instanceof StepGlobalUncertaintyAssignedContext
+                    && ((StepGlobalUncertaintyAssignedContext) candidate).uncertainties().stream().anyMatch(uncertainty -> uncertainty.id() == uncertaintyId)) {
+                StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
-            } else if (candidate instanceof StepGeometricRepresentationContext context
-                    && context.globalUncertaintyAssignedContext() != null
-                    && context.globalUncertaintyAssignedContext().uncertainties().stream()
-                    .anyMatch(uncertainty -> uncertainty.id() == uncertaintyId)) {
+            } else if (candidate instanceof StepGeometricRepresentationContext
+                    && ((StepGeometricRepresentationContext) candidate).globalUncertaintyAssignedContext() != null
+                    && ((StepGeometricRepresentationContext) candidate).globalUncertaintyAssignedContext().uncertainties().stream()
+                            .anyMatch(uncertainty -> uncertainty.id() == uncertaintyId)) {
+                StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
             }
         }
@@ -17507,9 +17553,10 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepGeometricRepresentationContext context
-                    && context.globalUnitAssignedContext() != null
-                    && context.globalUnitAssignedContext().id() == contextId) {
+            if (candidate instanceof StepGeometricRepresentationContext
+                    && ((StepGeometricRepresentationContext) candidate).globalUnitAssignedContext() != null
+                    && ((StepGeometricRepresentationContext) candidate).globalUnitAssignedContext().id() == contextId) {
+                StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
             }
         }
@@ -17523,9 +17570,10 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepGeometricRepresentationContext context
-                    && context.globalUncertaintyAssignedContext() != null
-                    && context.globalUncertaintyAssignedContext().id() == contextId) {
+            if (candidate instanceof StepGeometricRepresentationContext
+                    && ((StepGeometricRepresentationContext) candidate).globalUncertaintyAssignedContext() != null
+                    && ((StepGeometricRepresentationContext) candidate).globalUncertaintyAssignedContext().id() == contextId) {
+                StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) candidate;
                 targets.addAll(collectSemanticTargets(context, resolved, visiting));
             }
         }
@@ -17538,8 +17586,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepRepresentationRelationshipWithTransformation relationship
-                    && relationship.transformationOperator().id() == transformationId) {
+            if (candidate instanceof StepRepresentationRelationshipWithTransformation
+                    && ((StepRepresentationRelationshipWithTransformation) candidate).transformationOperator().id() == transformationId) {
+                StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) candidate;
                 targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
             }
         }
@@ -17568,23 +17617,29 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepFillAreaStyleColour fillAreaStyleColour
-                    && fillAreaStyleColour.colour().id() == colourId) {
+            if (candidate instanceof StepFillAreaStyleColour
+                    && ((StepFillAreaStyleColour) candidate).colour().id() == colourId) {
+                StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) candidate;
                 targets.addAll(collectSemanticTargets(fillAreaStyleColour, resolved, visiting));
-            } else if (candidate instanceof StepCurveStyle curveStyle
-                    && curveStyle.colour().id() == colourId) {
+            } else if (candidate instanceof StepCurveStyle
+                    && ((StepCurveStyle) candidate).colour().id() == colourId) {
+                StepCurveStyle curveStyle = (StepCurveStyle) candidate;
                 targets.addAll(collectSemanticTargets(curveStyle, resolved, visiting));
-            } else if (candidate instanceof StepPointStyle pointStyle
-                    && pointStyle.colour().id() == colourId) {
+            } else if (candidate instanceof StepPointStyle
+                    && ((StepPointStyle) candidate).colour().id() == colourId) {
+                StepPointStyle pointStyle = (StepPointStyle) candidate;
                 targets.addAll(collectSemanticTargets(pointStyle, resolved, visiting));
-            } else if (candidate instanceof StepTextStyleForDefinedFont textStyle
-                    && textStyle.textColour().id() == colourId) {
+            } else if (candidate instanceof StepTextStyleForDefinedFont
+                    && ((StepTextStyleForDefinedFont) candidate).textColour().id() == colourId) {
+                StepTextStyleForDefinedFont textStyle = (StepTextStyleForDefinedFont) candidate;
                 targets.addAll(collectSemanticTargets(textStyle, resolved, visiting));
-            } else if (candidate instanceof StepSymbolColour symbolColour
-                    && symbolColour.colour().id() == colourId) {
+            } else if (candidate instanceof StepSymbolColour
+                    && ((StepSymbolColour) candidate).colour().id() == colourId) {
+                StepSymbolColour symbolColour = (StepSymbolColour) candidate;
                 targets.addAll(collectSemanticTargets(symbolColour, resolved, visiting));
-            } else if (candidate instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular style
-                    && style.specularColour().id() == colourId) {
+            } else if (candidate instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+                    && ((StepSurfaceStyleReflectanceAmbientDiffuseSpecular) candidate).specularColour().id() == colourId) {
+                StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) candidate;
                 targets.addAll(collectSemanticTargets(style, resolved, visiting));
             }
         }
@@ -17630,8 +17685,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepAppliedDateAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepAppliedDateAssignment
+                    && ((StepAppliedDateAssignment) candidate).role().id() == roleId) {
+                StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
@@ -17645,8 +17701,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepApproval approval
-                    && approval.status().id() == statusId) {
+            if (candidate instanceof StepApproval
+                    && ((StepApproval) candidate).status().id() == statusId) {
+                StepApproval approval = (StepApproval) candidate;
                 targets.addAll(collectSemanticTargets(approval, resolved, visiting));
             }
         }
@@ -17660,8 +17717,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepSecurityClassification classification
-                    && classification.securityLevel().id() == levelId) {
+            if (candidate instanceof StepSecurityClassification
+                    && ((StepSecurityClassification) candidate).securityLevel().id() == levelId) {
+                StepSecurityClassification classification = (StepSecurityClassification) candidate;
                 targets.addAll(collectSemanticTargets(classification, resolved, visiting));
             }
         }
@@ -17675,8 +17733,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepContract contract
-                    && contract.kind().id() == kindId) {
+            if (candidate instanceof StepContract
+                    && ((StepContract) candidate).kind().id() == kindId) {
+                StepContract contract = (StepContract) candidate;
                 targets.addAll(collectSemanticTargets(contract, resolved, visiting));
             }
         }
@@ -17690,8 +17749,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepCertification certification
-                    && certification.kind().id() == kindId) {
+            if (candidate instanceof StepCertification
+                    && ((StepCertification) candidate).kind().id() == kindId) {
+                StepCertification certification = (StepCertification) candidate;
                 targets.addAll(collectSemanticTargets(certification, resolved, visiting));
             }
         }
@@ -17705,8 +17765,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepApprovalPersonOrganization assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepApprovalPersonOrganization
+                    && ((StepApprovalPersonOrganization) candidate).role().id() == roleId) {
+                StepApprovalPersonOrganization assignment = (StepApprovalPersonOrganization) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
             }
         }
@@ -17720,11 +17781,13 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepOrganizationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepOrganizationAssignment
+                    && ((StepOrganizationAssignment) candidate).role().id() == roleId) {
+                StepOrganizationAssignment assignment = (StepOrganizationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-            } else if (candidate instanceof StepAppliedOrganizationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepAppliedOrganizationAssignment
+                    && ((StepAppliedOrganizationAssignment) candidate).role().id() == roleId) {
+                StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
@@ -17738,11 +17801,13 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPersonAndOrganizationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepPersonAndOrganizationAssignment
+                    && ((StepPersonAndOrganizationAssignment) candidate).role().id() == roleId) {
+                StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-            } else if (candidate instanceof StepAppliedPersonAndOrganizationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepAppliedPersonAndOrganizationAssignment
+                    && ((StepAppliedPersonAndOrganizationAssignment) candidate).role().id() == roleId) {
+                StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
@@ -17756,11 +17821,13 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepClassificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepClassificationAssignment
+                    && ((StepClassificationAssignment) candidate).role().id() == roleId) {
+                StepClassificationAssignment assignment = (StepClassificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-            } else if (candidate instanceof StepAppliedClassificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepAppliedClassificationAssignment
+                    && ((StepAppliedClassificationAssignment) candidate).role().id() == roleId) {
+                StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
@@ -17774,17 +17841,21 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepIdentificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepIdentificationAssignment
+                    && ((StepIdentificationAssignment) candidate).role().id() == roleId) {
+                StepIdentificationAssignment assignment = (StepIdentificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-            } else if (candidate instanceof StepAppliedIdentificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepAppliedIdentificationAssignment
+                    && ((StepAppliedIdentificationAssignment) candidate).role().id() == roleId) {
+                StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
-            } else if (candidate instanceof StepExternalIdentificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepExternalIdentificationAssignment
+                    && ((StepExternalIdentificationAssignment) candidate).role().id() == roleId) {
+                StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
-            } else if (candidate instanceof StepAppliedExternalIdentificationAssignment assignment
-                    && assignment.role().id() == roleId) {
+            } else if (candidate instanceof StepAppliedExternalIdentificationAssignment
+                    && ((StepAppliedExternalIdentificationAssignment) candidate).role().id() == roleId) {
+                StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
@@ -17798,8 +17869,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepDocument document
-                    && document.kind().id() == kindId) {
+            if (candidate instanceof StepDocument
+                    && ((StepDocument) candidate).kind().id() == kindId) {
+                StepDocument document = (StepDocument) candidate;
                 targets.addAll(collectSemanticTargets(document, resolved, visiting));
             }
         }
@@ -17813,8 +17885,9 @@ public final class StepPreviewJsonExporter {
     ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepAppliedDateTimeAssignment assignment
-                    && assignment.role().id() == roleId) {
+            if (candidate instanceof StepAppliedDateTimeAssignment
+                    && ((StepAppliedDateTimeAssignment) candidate).role().id() == roleId) {
+                StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) candidate;
                 targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
             }
         }
