@@ -1928,50 +1928,62 @@ public final class StepDumpApp {
             builder.buildBSplineCurve(splineCurve.id());
             return 1;
         }
-        if (entity instanceof StepRationalBSplineCurve splineCurve) {
+        if (entity instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve splineCurve = (StepRationalBSplineCurve) entity;
             builder.buildRationalBSplineCurve(splineCurve.id());
             return 1;
         }
-        if (entity instanceof StepTrimmedCurve trimmedCurve) {
+        if (entity instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) entity;
             builder.buildTrimmedCurve(trimmedCurve.id());
             return 1;
         }
-        if (entity instanceof StepSurfaceCurve surfaceCurve) {
+        if (entity instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) entity;
             builder.buildSurfaceCurve(surfaceCurve.id());
             return 1;
         }
-        if (entity instanceof StepSeamCurve seamCurve) {
+        if (entity instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) entity;
             builder.buildSeamCurve(seamCurve.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurve compositeCurve) {
+        if (entity instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
             builder.buildCompositeCurve(compositeCurve.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurveOnSurface compositeCurveOnSurface) {
+        if (entity instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
             builder.buildCompositeCurve(compositeCurveOnSurface.id());
             return 1;
         }
-        if (entity instanceof StepCompositeCurveSegment segment) {
+        if (entity instanceof StepCompositeCurveSegment) {
+            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) entity;
             return validateSummaryEntity(segment.parentCurve(), builder);
         }
-        if (entity instanceof StepOffsetCurve2D offsetCurve2D) {
+        if (entity instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) entity;
             builder.buildOffsetCurve2(offsetCurve2D.id());
             return 1;
         }
-        if (entity instanceof StepOffsetCurve3D offsetCurve3D) {
+        if (entity instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) entity;
             builder.buildOffsetCurve3(offsetCurve3D.id());
             return 1;
         }
-        if (entity instanceof StepOrientedCurve orientedCurve) {
+        if (entity instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) entity;
             builder.buildCurveReference3(orientedCurve.id());
             return validateSummaryEntity(orientedCurve.curveElement(), builder);
         }
-        if (entity instanceof StepPcurve pcurve) {
+        if (entity instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) entity;
             builder.buildPcurve2(pcurve.id());
             return 1;
         }
-        if (entity instanceof StepDegeneratePcurve degeneratePcurve) {
+        if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve degeneratePcurve = (StepDegeneratePcurve) entity;
             builder.buildPcurve2(degeneratePcurve.id());
             return validateSummaryEntity(degeneratePcurve.basisSurface(), builder)
                     + validateSummaryEntity(degeneratePcurve.referenceToCurve(), builder);
