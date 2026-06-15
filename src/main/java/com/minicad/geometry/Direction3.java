@@ -36,6 +36,25 @@ public final class Direction3 {
         return z;
     }
 
+    // Record-style accessors
+    public double x() { return getX(); }
+    public double y() { return getY(); }
+    public double z() { return getZ(); }
+
+    /**
+     * Creates a direction from a vector, normalizing it to unit length.
+     *
+     * @param vector the source vector
+     * @return unit direction
+     */
+    public static Direction3 from(Vector3 vector) {
+        double length = Math.sqrt(vector.x() * vector.x() + vector.y() * vector.y() + vector.z() * vector.z());
+        if (length < Epsilon.get()) {
+            throw new GeometryException("cannot create direction from zero-length vector");
+        }
+        return new Direction3(vector.x() / length, vector.y() / length, vector.z() / length);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

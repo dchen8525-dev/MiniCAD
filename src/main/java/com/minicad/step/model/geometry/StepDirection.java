@@ -41,6 +41,9 @@ public final class StepDirection implements StepEntity {
         return directionRatios;
     }
 
+    // Record-style accessor
+    public List<Double> directionRatios() { return getDirectionRatios(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

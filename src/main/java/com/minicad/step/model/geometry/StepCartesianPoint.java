@@ -41,6 +41,9 @@ public final class StepCartesianPoint implements StepEntity {
         return coordinates;
     }
 
+    // Record-style accessor
+    public List<Double> coordinates() { return getCoordinates(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

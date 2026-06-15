@@ -25,6 +25,9 @@ public final class Vertex {
         return point;
     }
 
+    // Record-style accessor
+    public CartesianPoint point() { return getPoint(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
