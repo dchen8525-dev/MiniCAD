@@ -55,6 +55,13 @@ public final class StepBooleanResult implements StepEntity {
         return secondOperand;
     }
 
+    // Record-style accessors for compatibility
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public String operator() { return getOperator(); }
+    public StepEntity firstOperand() { return getFirstOperand(); }
+    public StepEntity secondOperand() { return getSecondOperand(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

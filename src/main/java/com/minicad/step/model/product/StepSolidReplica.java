@@ -49,6 +49,12 @@ public final class StepSolidReplica implements StepEntity {
         return transformation;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity parentSolid() { return getParentSolid(); }
+    public StepCartesianTransformationOperator transformation() { return getTransformation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

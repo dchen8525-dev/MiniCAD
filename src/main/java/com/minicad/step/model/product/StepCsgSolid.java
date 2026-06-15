@@ -39,6 +39,11 @@ public final class StepCsgSolid implements StepEntity {
         return treeRootExpression;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity treeRootExpression() { return getTreeRootExpression(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

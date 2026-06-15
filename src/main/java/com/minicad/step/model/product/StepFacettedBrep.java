@@ -43,6 +43,11 @@ public final class StepFacettedBrep implements StepEntity {
         return outer;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepEntity outer() { return getOuter(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
