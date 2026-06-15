@@ -1249,15 +1249,20 @@ public final class StepDumpApp {
     private static Set<Integer> collectShellFaceIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepOpenShell openShell) {
+            if (entity instanceof StepOpenShell) {
+                StepOpenShell openShell = (StepOpenShell) entity;
                 openShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepSurfacedOpenShell surfacedOpenShell) {
+            } else if (entity instanceof StepSurfacedOpenShell) {
+                StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
                 surfacedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedOpenShell orientedOpenShell) {
+            } else if (entity instanceof StepOrientedOpenShell) {
+                StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
                 orientedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepClosedShell closedShell) {
+            } else if (entity instanceof StepClosedShell) {
+                StepClosedShell closedShell = (StepClosedShell) entity;
                 closedShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedClosedShell orientedClosedShell) {
+            } else if (entity instanceof StepOrientedClosedShell) {
+                StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
                 orientedClosedShell.faces().forEach(face -> ids.add(face.id()));
             }
         }
@@ -1267,7 +1272,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectLoopOrientedEdgeIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof com.minicad.step.model.topology.StepEdgeLoop edgeLoop) {
+            if (entity instanceof com.minicad.step.model.topology.StepEdgeLoop) {
+                com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) entity;
                 edgeLoop.edges().forEach(edge -> ids.add(edge.id()));
             }
         }
@@ -1277,7 +1283,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectOrientedEdgeElementIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepOrientedEdge orientedEdge) {
+            if (entity instanceof StepOrientedEdge) {
+                StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
                 ids.add(orientedEdge.edgeElement().id());
             }
         }
@@ -1287,7 +1294,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectFaceBoundLoopIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof StepFaceBound faceBound) {
+            if (entity instanceof StepFaceBound) {
+                StepFaceBound faceBound = (StepFaceBound) entity;
                 ids.add(faceBound.loop().id());
             }
         }
@@ -1309,13 +1317,16 @@ public final class StepDumpApp {
     private static int validateConnectedEdgeSet(StepConnectedEdgeSet edgeSet, StepCadBuilder builder) {
         int count = 0;
         for (StepEntity edge : edgeSet.edges()) {
-            if (edge instanceof StepEdgeCurve edgeCurve) {
+            if (edge instanceof StepEdgeCurve) {
+                StepEdgeCurve edgeCurve = (StepEdgeCurve) edge;
                 builder.buildEdge(edgeCurve.id());
                 count++;
-            } else if (edge instanceof StepSubedge subedge) {
+            } else if (edge instanceof StepSubedge) {
+                StepSubedge subedge = (StepSubedge) edge;
                 builder.buildEdge(subedge.id());
                 count++;
-            } else if (edge instanceof StepOrientedEdge orientedEdge) {
+            } else if (edge instanceof StepOrientedEdge) {
+                StepOrientedEdge orientedEdge = (StepOrientedEdge) edge;
                 builder.buildOrientedEdge(orientedEdge.id());
                 count++;
             } else {
