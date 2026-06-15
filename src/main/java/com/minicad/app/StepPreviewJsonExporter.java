@@ -14966,47 +14966,58 @@ public final class StepPreviewJsonExporter {
         if (candidate instanceof StepAttributeAssertion
                     && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinitionId) {
                 StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepActionPropertyRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepContactRatioRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyDefinitionRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyMechanismRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyRepresentationRelation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyTopologyRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepResourcePropertyRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepForwardChainingRulePremise representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepBackChainingRuleBody representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepPlacedDatumTargetFeature representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepActionPropertyRepresentation
+                    && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepContactRatioRepresentation
+                    && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
+                    && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepKinematicPropertyMechanismRepresentation
+                    && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepKinematicPropertyRepresentationRelation
+                    && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinitionId) {
+                StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepKinematicPropertyTopologyRepresentation
+                    && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepResourcePropertyRepresentation
+                    && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
+                StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepForwardChainingRulePremise
+                    && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinitionId) {
+                StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepBackChainingRuleBody
+                    && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinitionId) {
+                StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
+                return representationLink.usedRepresentation();
+            }
+            if (candidate instanceof StepPlacedDatumTargetFeature
+                    && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinitionId) {
+                StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
+                return representationLink.usedRepresentation();
+            }
             return representationLink.usedRepresentation();
         }
         return null;
