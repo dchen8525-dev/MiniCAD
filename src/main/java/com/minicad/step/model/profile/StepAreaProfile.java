@@ -32,6 +32,9 @@ public final class StepAreaProfile implements StepEntity {
         return profileDef;
     }
 
+    // Record-style accessor
+    public StepEntity profileDef() { return profileDef; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

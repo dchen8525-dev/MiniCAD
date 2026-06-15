@@ -75,6 +75,12 @@ public final class StepRectangleHollowProfileDef implements StepEntity {
         return innerRadius;
     }
 
+    // Record-style accessors
+    public double xDim() { return xDim; }
+    public double yDim() { return yDim; }
+    public double wallThickness() { return wallThickness; }
+    public double innerRadius() { return innerRadius; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

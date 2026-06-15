@@ -67,6 +67,12 @@ public final class StepRevolvedAreaSolidTapered implements StepEntity {
         return taperAngle;
     }
 
+    // Record-style accessors
+    public StepEntity sweptArea() { return sweptArea; }
+    public StepAxis1Placement axis() { return axis; }
+    public double angle() { return angle; }
+    public double taperAngle() { return taperAngle; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

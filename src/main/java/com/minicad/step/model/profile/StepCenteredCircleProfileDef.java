@@ -59,6 +59,10 @@ public final class StepCenteredCircleProfileDef implements StepEntity {
         return centerOffset;
     }
 
+    // Record-style accessors
+    public double radius() { return radius; }
+    public double centerOffset() { return centerOffset; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

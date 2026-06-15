@@ -57,6 +57,11 @@ public final class StepSweptDiskSolid implements StepEntity {
         return innerRadius;
     }
 
+    // Record-style accessors
+    public StepEntity sweptCurve() { return sweptCurve; }
+    public double radius() { return radius; }
+    public Double innerRadius() { return innerRadius; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

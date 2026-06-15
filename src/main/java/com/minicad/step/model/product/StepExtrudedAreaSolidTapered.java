@@ -67,6 +67,12 @@ public final class StepExtrudedAreaSolidTapered implements StepEntity {
         return taperAngle;
     }
 
+    // Record-style accessors
+    public StepEntity sweptArea() { return sweptArea; }
+    public StepDirection direction() { return direction; }
+    public double depth() { return depth; }
+    public double taperAngle() { return taperAngle; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

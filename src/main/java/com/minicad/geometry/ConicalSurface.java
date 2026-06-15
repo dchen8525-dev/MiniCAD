@@ -41,6 +41,11 @@ public final class ConicalSurface implements SurfaceGeometry {
         return semiAngle;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return position; }
+    public double radius() { return radius; }
+    public double semiAngle() { return semiAngle; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

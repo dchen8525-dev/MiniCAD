@@ -47,6 +47,11 @@ public final class Hyperbola3 implements Curve3 {
         return semiAxisB;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return position; }
+    public double semiAxisA() { return semiAxisA; }
+    public double semiAxisB() { return semiAxisB; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

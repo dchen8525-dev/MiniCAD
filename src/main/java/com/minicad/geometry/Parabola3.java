@@ -39,6 +39,10 @@ public final class Parabola3 implements Curve3 {
         return focalDistance;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return position; }
+    public double focalLength() { return focalDistance; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

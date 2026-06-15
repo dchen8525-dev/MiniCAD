@@ -73,6 +73,12 @@ public final class StepSurfaceCurveSweptAreaSolid implements StepEntity {
         return endPoint;
     }
 
+    // Record-style accessors
+    public StepEntity sweptArea() { return sweptArea; }
+    public StepEntity trajectory() { return trajectory; }
+    public double startPoint() { return startPoint; }
+    public double endPoint() { return endPoint; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -59,6 +59,10 @@ public final class StepCentreLineArcProfileDef implements StepEntity {
         return angle;
     }
 
+    // Record-style accessors
+    public double radius() { return radius; }
+    public double angle() { return angle; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

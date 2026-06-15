@@ -5299,7 +5299,8 @@ public final class StepCadBuilder {
      * Reverses a composite curve by reversing segment order and reversing each segment.
      */
     private CompositeCurve3 reverseCompositeCurve(CompositeCurve3 original) {
-        List<Curve3> reversedSegments = new java.util.ArrayList<>(original.segments().reversed());
+        List<Curve3> reversedSegments = new java.util.ArrayList<>(original.segments());
+        java.util.Collections.reverse(reversedSegments);
         for (int i = 0; i < reversedSegments.size(); i++) {
             reversedSegments.set(i, reverseCurve3(reversedSegments.get(i)));
         }
@@ -5317,7 +5318,8 @@ public final class StepCadBuilder {
         }
         if (curve instanceof Polyline3) {
             Polyline3 polyline = (Polyline3) curve;
-            List<CartesianPoint> reversedPoints = new java.util.ArrayList<>(polyline.points().reversed());
+            List<CartesianPoint> reversedPoints = new java.util.ArrayList<>(polyline.points());
+            java.util.Collections.reverse(reversedPoints);
             return new Polyline3(reversedPoints);
         }
         if (curve instanceof CompositeCurve3) {

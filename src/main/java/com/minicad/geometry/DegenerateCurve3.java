@@ -27,6 +27,9 @@ public final class DegenerateCurve3 implements Curve3 {
         return point;
     }
 
+    // Record-style accessor
+    public CartesianPoint point() { return point; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

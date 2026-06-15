@@ -47,6 +47,11 @@ public final class Clothoid3 implements Curve3 {
         return curvature;
     }
 
+    // Record-style accessors
+    public Axis2Placement3D position() { return position; }
+    public double xAxisIntercept() { return xAxisIntercept; }
+    public double curvature() { return curvature; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

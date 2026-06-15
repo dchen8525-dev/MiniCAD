@@ -61,6 +61,13 @@ public final class RationalBSplineCurve3 implements Curve3 {
         return knots;
     }
 
+    // Record-style accessors
+    public int degree() { return degree; }
+    public List<CartesianPoint> controlPoints() { return controlPoints; }
+    public List<Double> weights() { return weights; }
+    public List<Integer> knotMultiplicities() { return knotMultiplicities; }
+    public List<Double> knots() { return knots; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
