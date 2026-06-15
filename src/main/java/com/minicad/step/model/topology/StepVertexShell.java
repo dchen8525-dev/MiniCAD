@@ -39,6 +39,11 @@ public final class StepVertexShell implements StepEntity {
         return extent;
     }
 
+    // Record-style accessor
+    public StepVertexLoop extent() {
+        return extent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

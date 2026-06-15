@@ -91,4 +91,26 @@ public final class SurfaceCurve3 implements Curve3 {
     public String toString() {
         return "SurfaceCurve3{" + "curve3d=" + curve3d + "parametricCurves=" + parametricCurves + "}";
     }
+
+    @Override
+    public CartesianPoint pointAt(double parameter) {
+        return curve3d.pointAt(parameter);
+    }
+
+    @Override
+    public boolean contains(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return curve3d.contains(point);
+    }
+
+    @Override
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return curve3d.closestPointTo(point);
+    }
+
+    @Override
+    public java.util.List<CartesianPoint> sample(int segments) {
+        return curve3d.sample(segments);
+    }
 }

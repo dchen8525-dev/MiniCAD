@@ -39,6 +39,19 @@ public final class StepSymbolRepresentationMap implements StepEntity {
         return mappedRepresentation;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessors
+    public StepEntity mappedOrigin() {
+        return mappedOrigin;
+    }
+
+    public StepRepresentation mappedRepresentation() {
+        return mappedRepresentation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

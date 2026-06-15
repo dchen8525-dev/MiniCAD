@@ -2343,9 +2343,9 @@ public final class StepPreviewJsonExporter {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
         for (StepEntity entity : resolved.values()) {
             if (!(entity instanceof StepRepresentationRelationshipWithTransformation)) {
-            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
                 continue;
             }
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
             if (!relationship.rep1().shapeRepresentation()
                     || !relationship.rep2().shapeRepresentation()
                     || relationship.rep2().id() != representation.id()) {
@@ -2946,7 +2946,8 @@ public final class StepPreviewJsonExporter {
                             basisDirectionForNormal(normal),
                             0.0,
                             null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null
+                            null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null
                     ),
                     null
             );
@@ -2985,7 +2986,8 @@ public final class StepPreviewJsonExporter {
                             List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
                             paraboloid.focalLength(),
                             null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null
+                            null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null
                     ),
                     null
             );
@@ -3024,7 +3026,8 @@ public final class StepPreviewJsonExporter {
                             List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
                             hyperboloid.radius(),
                             null, hyperboloid.semiAxis(), 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null
+                            null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null
                     ),
                     null
             );
@@ -3063,7 +3066,8 @@ public final class StepPreviewJsonExporter {
                             null,
                             0.0,
                             null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null
+                            null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null
                     ),
                     null
             );
@@ -3102,7 +3106,8 @@ public final class StepPreviewJsonExporter {
                             null,
                             0.0,
                             null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null
+                            null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null
                     ),
                     null
             );
@@ -3281,8 +3286,9 @@ public final class StepPreviewJsonExporter {
                         axis,
                         basisDir,
                         scalarA,
-                        scalarB, scalarC, 0.0, 0.0, 0.0, 0.0,
-                        uDegree, vDegree, null, null, null, null, null
+                        Double.valueOf(scalarB), Double.valueOf(scalarC), 0.0, 0.0, 0.0, 0.0,
+                        uDegree, vDegree, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3375,12 +3381,8 @@ public final class StepPreviewJsonExporter {
                         angles.get(0),
                         angles.get(angles.size() - 1) - angles.get(0),
                         null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3465,12 +3467,8 @@ public final class StepPreviewJsonExporter {
                         angles.get(0),
                         angles.get(angles.size() - 1) - angles.get(0),
                         null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3565,12 +3563,8 @@ public final class StepPreviewJsonExporter {
                         uValues.get(0),
                         uValues.get(uValues.size() - 1) - uValues.get(0),
                         null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3665,12 +3659,8 @@ public final class StepPreviewJsonExporter {
                         uValues.get(0),
                         uValues.get(uValues.size() - 1) - uValues.get(0),
                         null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3919,7 +3909,8 @@ public final class StepPreviewJsonExporter {
                 new FaceSurfacePayload(
                         "ruled_surface", null, null, null, 0.0, null, null,
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -3964,7 +3955,8 @@ public final class StepPreviewJsonExporter {
                 new FaceSurfacePayload(
                         "constant_radius_surface", null, null, null, surface.radius(), null, null,
                         0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null, null
+                        null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, null, null, null
                 ),
                 null
         );
@@ -4474,12 +4466,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minV(),
                     uvBounds.maxV(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepCylindricalSurface) {
@@ -4498,12 +4486,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepConicalSurface) {
@@ -4522,12 +4506,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepSphericalSurface) {
@@ -4546,12 +4526,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepToroidalSurface) {
@@ -4570,12 +4546,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepDegenerateToroidalSurface) {
@@ -4594,18 +4566,14 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepSurfaceOfLinearExtrusion) {
             StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surfaceGeometry;
             SurfaceOfLinearExtrusion3 surface = builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-            Direction3 axis = surface.extrusionVector().normalize();
+            Direction3 axis = surface.extrusionVector().normalize().asDirection();
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "surface_of_linear_extrusion",
                     null,
@@ -4619,12 +4587,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepSurfaceOfRevolution) {
@@ -4643,12 +4607,8 @@ public final class StepPreviewJsonExporter {
                     uvBounds.minU(),
                     uvBounds.uSpan(),
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepRationalBSplineSurface) {
@@ -4677,7 +4637,8 @@ public final class StepPreviewJsonExporter {
                     surface.uMultiplicities(),
                     surface.vMultiplicities(),
                     surface.uKnots(),
-                    surface.vKnots()
+                    surface.vKnots(),
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepBSplineSurfaceWithKnots
@@ -4709,7 +4670,8 @@ public final class StepPreviewJsonExporter {
                     surface.uMultiplicities(),
                     surface.vMultiplicities(),
                     surface.uKnots(),
-                    surface.vKnots()
+                    surface.vKnots(),
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         return null;
@@ -4799,7 +4761,7 @@ public final class StepPreviewJsonExporter {
         Vector3 reference = Math.abs(axis.x()) < 0.9
                 ? new Vector3(1.0, 0.0, 0.0)
                 : new Vector3(0.0, 1.0, 0.0);
-        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize();
+        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize().asDirection();
         return List.of(xDirection.x(), xDirection.y(), xDirection.z());
     }
 
@@ -4817,12 +4779,9 @@ public final class StepPreviewJsonExporter {
                 : orientedEdge.edgeElement().start();
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
         StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity>     pcurves = null;
-    switch (associatedSource) {
-        default:
-            pcurves = List.of();
-            break;
-    };
+        List<StepEntity> pcurves = null;
+        // Default to empty list for unsupported source types
+        pcurves = List.of();
         if (pcurves.isEmpty()) {
             if (shouldFallbackToProjectedEdge(edgeGeometry)) {
                 List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
@@ -7534,9 +7493,9 @@ public final class StepPreviewJsonExporter {
         } catch (TopologyException ex) {
             StepEntity entity = resolved.get(edgeId);
             if (!(entity instanceof StepEdgeCurve)) {
-            StepEdgeCurve edge = (StepEdgeCurve) entity;
                 throw ex;
             }
+            StepEdgeCurve edge = (StepEdgeCurve) entity;
             CartesianPoint start = pointFromStep(edge.start().point());
             CartesianPoint end = pointFromStep(edge.end().point());
             StepEntity edgeGeometry = edge.edgeGeometry();
@@ -7620,6 +7579,7 @@ public final class StepPreviewJsonExporter {
         return new EdgePayload(
                 edgeId,
                 toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
+                null,
                 null
         );
     }
@@ -7628,7 +7588,7 @@ public final class StepPreviewJsonExporter {
         List<CartesianPoint> points = polyline.points().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
                 .collect(Collectors.toList());
-        return new EdgePayload(polyline.id(), toPointPayloads(points), null);
+        return new EdgePayload(polyline.id(), toPointPayloads(points), null, null);
     }
 
     private static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
@@ -7639,7 +7599,7 @@ public final class StepPreviewJsonExporter {
         if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
             closed.add(closed.get(0));
         }
-        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null);
+        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null, null);
     }
 
     static EdgePayload sampledCurveEdgePayload(StepEntity item, StepCadBuilder builder) {
@@ -7647,7 +7607,7 @@ public final class StepPreviewJsonExporter {
         if (points == null || points.size() < 2) {
             return null;
         }
-        return new EdgePayload(item.id(), toPointPayloads(points), sampledCurvePayload(item, builder));
+        return new EdgePayload(item.id(), toPointPayloads(points), sampledCurvePayload(item, builder), null);
     }
 
     private static EdgeCurvePayload sampledCurvePayload(StepEntity item, StepCadBuilder builder) {
@@ -9956,7 +9916,8 @@ public final class StepPreviewJsonExporter {
         return new EdgePayload(
                 mappedPayloadId(mappedItemId, edge.stepId(), 1),
                 points,
-                transformMappedCurve(edge.curve(), matrix, sourceType, sourceStepId)
+                transformMappedCurve(edge.curve(), matrix, sourceType, sourceStepId),
+                edge.color()
         );
     }
 
@@ -10654,8 +10615,11 @@ public final class StepPreviewJsonExporter {
                 || item instanceof StepAnnotationPlane) {
             return pointFromAnnotationOccurrence(item, builder);
         }
-        if (builder != null && item instanceof StepGeometricReplica && "POINT_REPLICA".equals(replica.entityName())) {
-            return pointFromReplica(replica, builder);
+        if (builder != null && item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            if ("POINT_REPLICA".equals(replica.entityName())) {
+                return pointFromReplica(replica, builder);
+            }
         }
         return null;
     }
@@ -14457,9 +14421,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepProductDefinitionFormationRelationship)) {
-            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
                 continue;
             }
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
             if (relationship.relatingFormation().id() == formation.id()) {
                 appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedFormation(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
             }
@@ -14477,16 +14441,20 @@ public final class StepPreviewJsonExporter {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
+            if (!(candidate instanceof StepProductDefinitionRelationship
+                    || candidate instanceof StepNextAssemblyUsageOccurrence)) {
+                continue;
+            }
             if (candidate instanceof StepProductDefinitionRelationship) {
-            StepProductDefinitionRelationship relationship = (StepProductDefinitionRelationship) candidate;
+                StepProductDefinitionRelationship relationship = (StepProductDefinitionRelationship) candidate;
                 if (relationship.relatingProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatedProductDefinition(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
                 if (relationship.relatedProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, relationship.relatingProductDefinition(), relationshipTypeName(relationship), relationship.id(), resolved, instanceIdsByTargetId);
                 }
-            } else if (candidate instanceof StepNextAssemblyUsageOccurrence) {
-            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) candidate;
+            } else {
+                StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) candidate;
                 if (occurrence.relatingProductDefinition().id() == productDefinition.id()
                         || occurrence.relatedProductDefinition().id() == productDefinition.id()) {
                     appendDefinitionRelationshipTargets(targetsByUsageId, usageId, occurrence, relationshipTypeName(occurrence), occurrence.id(), resolved, instanceIdsByTargetId);
@@ -14710,9 +14678,9 @@ public final class StepPreviewJsonExporter {
     ) {
         for (StepEntity candidate : resolved.values()) {
             if (!(candidate instanceof StepPropertyDefinitionRelationship)) {
-            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
                 continue;
             }
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
             if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
                 appendDefinitionRelationshipTargets(
                         targetsByUsageId,
@@ -17920,9 +17888,9 @@ public final class StepPreviewJsonExporter {
         int warnCount = 0;
         for (StepEntity entity : resolved.values()) {
             if (!(entity instanceof StepMeasureRepresentationItem)) {
-            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) entity;
                 continue;
             }
+            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) entity;
             String propertyId = StepValidationMatcher.matchPropertyId(item.name(), item.measureType());
             Double actual = actualValidationValue(propertyId, summary, context);
             if (actual == null) {

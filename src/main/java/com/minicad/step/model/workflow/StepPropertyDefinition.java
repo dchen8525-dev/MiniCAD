@@ -47,6 +47,11 @@ public final class StepPropertyDefinition implements StepEntity {
         return definition;
     }
 
+    // Record-style accessor
+    public StepEntity definition() {
+        return definition;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

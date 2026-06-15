@@ -47,6 +47,12 @@ public final class StepConversionBasedUnit implements StepEntity {
         return conversionFactor;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String unitKind() { return unitKind; }
+    public StepMeasureWithUnit conversionFactor() { return conversionFactor; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

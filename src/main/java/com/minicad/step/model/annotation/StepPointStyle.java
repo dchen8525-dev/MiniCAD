@@ -55,6 +55,15 @@ public final class StepPointStyle implements StepEntity {
         return colour;
     }
 
+    // Record-style accessors
+    public StepEntity marker() {
+        return marker;
+    }
+
+    public StepEntity colour() {
+        return colour;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

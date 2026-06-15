@@ -32,6 +32,15 @@ public final class StepPreDefinedSurfaceStyle implements StepEntity {
         return identifier;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String identifier() {
+        return identifier;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

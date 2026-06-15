@@ -32,6 +32,10 @@ public final class StepHeaderEntry {
         return parameters;
     }
 
+    // Record-style accessors
+    public String name() { return name; }
+    public List<StepValue> parameters() { return parameters; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

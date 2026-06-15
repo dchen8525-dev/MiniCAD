@@ -39,6 +39,15 @@ public final class StepClassificationAssignment implements StepEntity {
         return role;
     }
 
+    // Record-style accessors
+    public StepGroup assignedClass() {
+        return assignedClass;
+    }
+
+    public StepClassificationRole role() {
+        return role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

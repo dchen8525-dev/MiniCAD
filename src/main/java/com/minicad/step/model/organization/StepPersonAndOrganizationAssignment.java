@@ -31,11 +31,24 @@ public final class StepPersonAndOrganizationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepPersonAndOrganization getAssignedPersonAndOrganization() {
         return assignedPersonAndOrganization;
     }
 
     public StepPersonAndOrganizationRole getRole() {
+        return role;
+    }
+
+    // Record-style accessors
+    public StepPersonAndOrganization assignedPersonAndOrganization() {
+        return assignedPersonAndOrganization;
+    }
+
+    public StepPersonAndOrganizationRole role() {
         return role;
     }
 

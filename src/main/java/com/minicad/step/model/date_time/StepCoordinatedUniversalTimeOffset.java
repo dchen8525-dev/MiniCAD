@@ -47,6 +47,13 @@ public final class StepCoordinatedUniversalTimeOffset implements StepEntity {
         return sense;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public int hourOffset() { return hourOffset; }
+    public Integer minuteOffset() { return minuteOffset; }
+    public String sense() { return sense; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

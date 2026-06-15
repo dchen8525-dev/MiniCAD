@@ -73,6 +73,11 @@ public final class StepBSplineCurve implements StepEntity {
         return selfIntersect;
     }
 
+    // Record-style accessor
+    public List<StepCartesianPoint> controlPoints() {
+        return controlPoints;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

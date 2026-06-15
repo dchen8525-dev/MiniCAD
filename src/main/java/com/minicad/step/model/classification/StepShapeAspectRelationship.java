@@ -63,6 +63,19 @@ public final class StepShapeAspectRelationship implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public StepEntity relatingShapeAspect() {
+        return relatingShapeAspect;
+    }
+
+    public StepEntity relatedShapeAspect() {
+        return relatedShapeAspect;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

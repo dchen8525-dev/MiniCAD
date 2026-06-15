@@ -31,6 +31,10 @@ public final class StepRepresentationContext implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getContextIdentifier() {
         return contextIdentifier;
     }

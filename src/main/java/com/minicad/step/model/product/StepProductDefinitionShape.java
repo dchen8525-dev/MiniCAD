@@ -47,6 +47,12 @@ public final class StepProductDefinitionShape implements StepEntity {
         return definition;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String description() { return description; }
+    public StepEntity definition() { return definition; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

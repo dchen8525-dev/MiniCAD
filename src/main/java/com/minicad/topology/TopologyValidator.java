@@ -266,12 +266,7 @@ public final class TopologyValidator {
      *
      * @param issues validation issues
      */
-    /**
-     * Topology validation result.
-     *
-     * @param issues validation issues
-     */
-public final class ValidationResult {
+public static final class ValidationResult {
     private final List<MiniCadIssue> issues;
 
     public ValidationResult(List<MiniCadIssue> issues) {
@@ -279,6 +274,11 @@ public final class ValidationResult {
     }
 
     public List<MiniCadIssue> getIssues() {
+        return issues;
+    }
+
+    // Record-style accessor
+    public List<MiniCadIssue> issues() {
         return issues;
     }
 

@@ -32,6 +32,25 @@ public final class EdgeLoop implements Loop {
     // Record-style accessor
     public List<OrientedEdge> edges() { return getEdges(); }
 
+    /**
+     * Returns the vertices of this loop in traversal order.
+     *
+     * @return list of vertices
+     */
+    public List<Vertex> vertices() {
+        if (edges == null || edges.isEmpty()) {
+            return java.util.List.of();
+        }
+        java.util.List<Vertex> result = new java.util.ArrayList<>();
+        for (OrientedEdge oe : edges) {
+            Vertex start = oe.startVertex();
+            if (start != null) {
+                result.add(start);
+            }
+        }
+        return java.util.List.copyOf(result);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,5 +67,20 @@ public final class EdgeLoop implements Loop {
     @Override
     public String toString() {
         return "EdgeLoop{" + "edges=" + edges + "}";
+    }
+
+    @Override
+    public BoundingBox3 boundingBox() {
+        if (edges == null || edges.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        BoundingBox3 box = BoundingBox3.empty();
+        for (OrientedEdge oe : edges) {
+            Edge edge = oe.edge();
+            if (edge != null && edge.curve() != null) {
+                box = box.union(edge.curve().boundingBox());
+            }
+        }
+        return box;
     }
 }

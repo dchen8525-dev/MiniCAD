@@ -31,6 +31,11 @@ public final class StepApprovalStatus implements StepEntity {
         return name;
     }
 
+    // Record-style accessor
+    public String status() {
+        return name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

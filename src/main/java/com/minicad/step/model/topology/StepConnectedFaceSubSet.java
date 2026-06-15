@@ -47,7 +47,17 @@ public final class StepConnectedFaceSubSet implements StepEntity {
         return faces;
     }
 
+    // Record-style accessor
+    public List<StepFaceEntity> faces() {
+        return faces;
+    }
+
     public StepEntity getParentFaceSet() {
+        return parentFaceSet;
+    }
+
+    // Record-style accessor
+    public StepEntity parentFaceSet() {
         return parentFaceSet;
     }
 

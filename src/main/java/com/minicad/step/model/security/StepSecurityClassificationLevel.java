@@ -31,6 +31,11 @@ public final class StepSecurityClassificationLevel implements StepEntity {
         return name;
     }
 
+    // Record-style accessor
+    public String securityLevel() {
+        return name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -41,11 +41,29 @@ public final class StepAppliedIdentificationAssignment implements StepEntity {
         return assignedId;
     }
 
+    public String getName() {
+        return assignedId != null ? assignedId : "";
+    }
+
+    // Record-style accessor - name from assignedId
+    public String name() {
+        return assignedId;
+    }
+
     public StepIdentificationRole getRole() {
         return role;
     }
 
     public List<StepEntity> getItems() {
+        return items;
+    }
+
+    // Record-style accessors
+    public StepIdentificationRole role() {
+        return role;
+    }
+
+    public List<StepEntity> items() {
         return items;
     }
 

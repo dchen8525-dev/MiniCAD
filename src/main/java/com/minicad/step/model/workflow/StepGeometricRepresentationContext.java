@@ -65,6 +65,10 @@ public final class StepGeometricRepresentationContext implements StepEntity {
         return globalUncertaintyAssignedContext;
     }
 
+    // Record-style accessors
+    public StepGlobalUnitAssignedContext globalUnitAssignedContext() { return getGlobalUnitAssignedContext(); }
+    public StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext() { return getGlobalUncertaintyAssignedContext(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

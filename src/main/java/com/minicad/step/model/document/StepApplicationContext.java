@@ -31,6 +31,15 @@ public final class StepApplicationContext implements StepEntity {
         return application;
     }
 
+    public String getName() {
+        return application != null ? application : "";
+    }
+
+    // Record-style accessor - name from application
+    public String name() {
+        return application;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

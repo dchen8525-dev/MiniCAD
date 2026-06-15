@@ -31,6 +31,11 @@ public final class StepNamedUnit implements StepEntity {
         return unitKind;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return getName(); }
+    public String unitKind() { return unitKind; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

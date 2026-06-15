@@ -105,6 +105,19 @@ public final class CompiledStepDocument {
         return builder;
     }
 
+    // Record-style accessors
+    public String stepText() { return stepText; }
+    public StepFile stepFile() { return stepFile; }
+    public Map<Integer, StepEntity> resolved() { return resolved; }
+    public StepCadBuilder builder() { return builder; }
+
+    /**
+     * Creates a CompiledStepDocument from components.
+     */
+    public static CompiledStepDocument of(String stepText, StepFile stepFile, Map<Integer, StepEntity> resolved) {
+        return new CompiledStepDocument(stepText, stepFile, resolved, null);
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CompiledStepDocument)) return false;

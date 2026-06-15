@@ -63,6 +63,19 @@ public final class StepGroupRelationship implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public StepGroup relatingGroup() {
+        return relatingGroup;
+    }
+
+    public StepGroup relatedGroup() {
+        return relatedGroup;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

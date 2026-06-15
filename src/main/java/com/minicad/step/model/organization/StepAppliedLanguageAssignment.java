@@ -41,6 +41,19 @@ public final class StepAppliedLanguageAssignment implements StepEntity {
         return items;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessors
+    public StepLanguage assignedLanguage() {
+        return assignedLanguage;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -49,8 +49,18 @@ public final class StepAnnotationCurveOccurrence implements StepEntity {
         return item;
     }
 
-    // Record-style accessor
-    public StepEntity item() { return getItem(); }
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public List<StepPresentationStyleAssignment> styles() {
+        return styles;
+    }
+
+    public StepEntity item() {
+        return item;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -27,7 +27,16 @@ public final class StepSurfaceStyleFillArea implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepFillAreaStyle getFillStyle() {
+        return fillStyle;
+    }
+
+    // Record-style accessor
+    public StepFillAreaStyle fillStyle() {
         return fillStyle;
     }
 

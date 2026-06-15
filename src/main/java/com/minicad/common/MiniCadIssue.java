@@ -1,5 +1,7 @@
 package com.minicad.common;
 
+import java.util.Objects;
+
 /**
  * Structured diagnostic produced during parsing, resolution, geometry building,
  * validation, preview, or export.

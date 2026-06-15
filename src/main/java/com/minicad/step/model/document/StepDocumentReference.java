@@ -31,12 +31,21 @@ public final class StepDocumentReference implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return source != null ? source : "";
+    }
+
     public StepDocument getAssignedDocument() {
         return assignedDocument;
     }
 
     public String getSource() {
         return source;
+    }
+
+    // Record-style accessor
+    public StepDocument assignedDocument() {
+        return assignedDocument;
     }
 
     @Override

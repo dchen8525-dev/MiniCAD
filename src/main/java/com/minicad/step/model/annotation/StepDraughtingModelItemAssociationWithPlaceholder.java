@@ -73,6 +73,31 @@ public final class StepDraughtingModelItemAssociationWithPlaceholder implements 
         return annotationPlaceholder;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
+    public StepAnnotationPlaceholderOccurrence annotationPlaceholder() {
+        return annotationPlaceholder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

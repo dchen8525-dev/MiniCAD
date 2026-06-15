@@ -58,6 +58,15 @@ public final class OrientedEdge {
         return orientation ? edge.end() : edge.start();
     }
 
+    /**
+     * Returns both vertices as a list: [start, end].
+     *
+     * @return list of vertices
+     */
+    public java.util.List<Vertex> vertices() {
+        return java.util.List.of(startVertex(), endVertex());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

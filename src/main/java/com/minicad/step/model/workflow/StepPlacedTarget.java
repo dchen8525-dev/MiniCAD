@@ -63,6 +63,19 @@ public final class StepPlacedTarget implements StepEntity {
         return identifiedItem;
     }
 
+    // Record-style accessors
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

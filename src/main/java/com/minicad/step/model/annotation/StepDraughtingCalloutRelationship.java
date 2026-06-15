@@ -55,6 +55,15 @@ public final class StepDraughtingCalloutRelationship implements StepEntity {
         return relatedCallout;
     }
 
+    // Record-style accessors
+    public StepDraughtingCallout relatingCallout() {
+        return relatingCallout;
+    }
+
+    public StepDraughtingCallout relatedCallout() {
+        return relatedCallout;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

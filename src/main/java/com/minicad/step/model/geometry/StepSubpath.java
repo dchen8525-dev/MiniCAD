@@ -47,7 +47,17 @@ public final class StepSubpath implements StepEntity {
         return edges;
     }
 
+    // Record-style accessor
+    public List<StepOrientedEdge> edges() {
+        return edges;
+    }
+
     public StepEntity getParentPath() {
+        return parentPath;
+    }
+
+    // Record-style accessor
+    public StepEntity parentPath() {
         return parentPath;
     }
 

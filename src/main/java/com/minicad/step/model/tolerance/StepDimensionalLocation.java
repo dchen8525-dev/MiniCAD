@@ -49,6 +49,11 @@ public final class StepDimensionalLocation implements StepEntity {
         return relatedShape;
     }
 
+    // Record-style accessor
+    public StepEntity relatedShape() {
+        return relatedShape;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

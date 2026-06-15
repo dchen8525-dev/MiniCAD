@@ -63,6 +63,15 @@ public final class StepProductDefinitionFormationRelationship implements StepEnt
         return relatedFormation;
     }
 
+    // Record-style accessors
+    public StepProductDefinitionFormation relatingFormation() {
+        return relatingFormation;
+    }
+
+    public StepProductDefinitionFormation relatedFormation() {
+        return relatedFormation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

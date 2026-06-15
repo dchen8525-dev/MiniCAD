@@ -43,6 +43,10 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements 
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public double getAmbientReflectance() {
         return ambientReflectance;
     }
@@ -60,6 +64,27 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements 
     }
 
     public StepEntity getSpecularColour() {
+        return specularColour;
+    }
+
+    // Record-style accessors
+    public double ambientReflectance() {
+        return ambientReflectance;
+    }
+
+    public double diffuseReflectance() {
+        return diffuseReflectance;
+    }
+
+    public double specularReflectance() {
+        return specularReflectance;
+    }
+
+    public double specularExponent() {
+        return specularExponent;
+    }
+
+    public StepEntity specularColour() {
         return specularColour;
     }
 

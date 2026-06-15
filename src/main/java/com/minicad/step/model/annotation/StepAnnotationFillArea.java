@@ -41,6 +41,11 @@ public final class StepAnnotationFillArea implements StepEntity {
         return boundaries;
     }
 
+    // Record-style accessor
+    public List<StepEntity> boundaries() {
+        return boundaries;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

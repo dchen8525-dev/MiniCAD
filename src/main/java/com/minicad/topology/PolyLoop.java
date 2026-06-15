@@ -48,4 +48,16 @@ public final class PolyLoop implements Loop {
     public String toString() {
         return "PolyLoop{" + "points=" + points + "}";
     }
+
+    @Override
+    public BoundingBox3 boundingBox() {
+        if (points == null || points.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        BoundingBox3 box = BoundingBox3.empty();
+        for (CartesianPoint p : points) {
+            box = box.union(p);
+        }
+        return box;
+    }
 }

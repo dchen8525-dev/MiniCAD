@@ -39,6 +39,15 @@ public final class StepNameAttribute implements StepEntity {
         return namedItem;
     }
 
+    public String getName() {
+        return attributeValue != null ? attributeValue : "";
+    }
+
+    // Record-style accessor
+    public StepEntity namedItem() {
+        return namedItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -39,6 +39,11 @@ public final class StepFillAreaStyleColour implements StepEntity {
         return colour;
     }
 
+    // Record-style accessor
+    public StepEntity colour() {
+        return colour;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -39,6 +39,12 @@ public final class StepContextDependentShapeRepresentation implements StepEntity
         return representedProductRelation;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public StepEntity representationRelationship() { return representationRelationship; }
+    public StepEntity representedProductRelation() { return representedProductRelation; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

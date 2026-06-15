@@ -1,5 +1,6 @@
 package com.minicad.geometry;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 import java.util.Objects;
@@ -46,5 +47,35 @@ public final class DegenerateCurve3 implements Curve3 {
     @Override
     public String toString() {
         return "DegenerateCurve3{" + "point=" + point + "}";
+    }
+
+    @Override
+    public CartesianPoint pointAt(double parameter) {
+        // A degenerate curve is always the same point
+        return point;
+    }
+
+    @Override
+    public boolean contains(CartesianPoint testPoint) {
+        Preconditions.requireNonNull(testPoint, "testPoint");
+        if (point == null) {
+            return false;
+        }
+        return testPoint.distanceTo(point) < Epsilon.get();
+    }
+
+    @Override
+    public CartesianPoint closestPointTo(CartesianPoint testPoint) {
+        Preconditions.requireNonNull(testPoint, "testPoint");
+        // A degenerate curve always returns its single point
+        return point;
+    }
+
+    @Override
+    public java.util.List<CartesianPoint> sample(int segments) {
+        if (point == null) {
+            return java.util.List.of();
+        }
+        return java.util.List.of(point);
     }
 }

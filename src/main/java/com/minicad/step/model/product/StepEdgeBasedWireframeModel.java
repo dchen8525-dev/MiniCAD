@@ -43,6 +43,11 @@ public final class StepEdgeBasedWireframeModel implements StepEntity {
         return boundaries;
     }
 
+    // Record-style accessor
+    public List<StepConnectedEdgeSet> boundaries() {
+        return boundaries;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

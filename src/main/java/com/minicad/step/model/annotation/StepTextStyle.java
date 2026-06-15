@@ -39,6 +39,11 @@ public final class StepTextStyle implements StepEntity {
         return characterAppearance;
     }
 
+    // Record-style accessor
+    public StepEntity characterAppearance() {
+        return characterAppearance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

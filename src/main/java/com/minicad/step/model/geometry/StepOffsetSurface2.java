@@ -58,8 +58,11 @@ public final class StepOffsetSurface2 implements StepEntity {
     }
 
     // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public StepEntity basisSurface() { return getBasisSurface(); }
     public double distance() { return getDistance(); }
+    public boolean sameSense() { return isSameSense(); }
 
     @Override
     public boolean equals(Object o) {

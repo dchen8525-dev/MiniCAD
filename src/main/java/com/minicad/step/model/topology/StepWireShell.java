@@ -41,6 +41,11 @@ public final class StepWireShell implements StepEntity {
         return loops;
     }
 
+    // Record-style accessor
+    public List<StepLoop> loops() {
+        return loops;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

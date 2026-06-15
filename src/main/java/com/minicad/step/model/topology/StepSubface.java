@@ -41,6 +41,11 @@ public final class StepSubface implements StepEntity {
         return faceElement;
     }
 
+    // Record-style accessor
+    public StepEntity faceElement() {
+        return faceElement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

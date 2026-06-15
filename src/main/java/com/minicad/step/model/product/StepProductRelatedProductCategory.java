@@ -49,6 +49,19 @@ public final class StepProductRelatedProductCategory implements StepEntity {
         return products;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public List<StepProduct> products() {
+        return products;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

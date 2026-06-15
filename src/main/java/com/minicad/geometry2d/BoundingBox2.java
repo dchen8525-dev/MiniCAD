@@ -42,6 +42,62 @@ public final class BoundingBox2 {
         return maxY;
     }
 
+    // Record-style accessors
+    public double minX() { return minX; }
+    public double minY() { return minY; }
+    public double maxX() { return maxX; }
+    public double maxY() { return maxY; }
+
+    /**
+     * Returns an empty bounding box (all coordinates are 0).
+     *
+     * @return empty bounding box
+     */
+    public static BoundingBox2 empty() {
+        return new BoundingBox2(0, 0, 0, 0);
+    }
+
+    /**
+     * Returns a new bounding box that includes the given point.
+     *
+     * @param point point to include
+     * @return expanded bounding box
+     */
+    public BoundingBox2 union(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        return new BoundingBox2(
+            Math.min(minX, point.x()),
+            Math.min(minY, point.y()),
+            Math.max(maxX, point.x()),
+            Math.max(maxY, point.y())
+        );
+    }
+
+    /**
+     * Returns a new bounding box that is the union of this and another.
+     *
+     * @param other other bounding box
+     * @return combined bounding box
+     */
+    public BoundingBox2 union(BoundingBox2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new BoundingBox2(
+            Math.min(minX, other.minX),
+            Math.min(minY, other.minY),
+            Math.max(maxX, other.maxX),
+            Math.max(maxY, other.maxY)
+        );
+    }
+
+    /**
+     * Checks if this bounding box is empty (has zero area).
+     *
+     * @return true if empty
+     */
+    public boolean isEmpty() {
+        return minX == maxX && minY == maxY;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

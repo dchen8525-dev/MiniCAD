@@ -53,7 +53,20 @@ public final class StepAnnotationFillAreaOccurrence implements StepEntity {
         return item;
     }
 
-    public StepEntity getFillStyleTarget() {
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public List<StepPresentationStyleAssignment> styles() {
+        return styles;
+    }
+
+    public StepAnnotationFillArea item() {
+        return item;
+    }
+
+    public StepEntity fillStyleTarget() {
         return fillStyleTarget;
     }
 

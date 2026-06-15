@@ -41,6 +41,11 @@ public final class StepShellBasedSurfaceModel implements StepEntity {
         return shells;
     }
 
+    // Record-style accessor
+    public List<StepEntity> shells() {
+        return shells;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

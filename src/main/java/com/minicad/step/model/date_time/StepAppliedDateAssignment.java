@@ -57,6 +57,23 @@ public final class StepAppliedDateAssignment implements StepEntity {
         return items;
     }
 
+    public String getName() {
+        return entityName != null ? entityName : "";
+    }
+
+    // Record-style accessors
+    public StepCalendarDate assignedDate() {
+        return assignedDate;
+    }
+
+    public StepDateRole role() {
+        return role;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -31,6 +31,15 @@ public final class StepSurfaceStyleReflectanceAmbient implements StepEntity {
         return ambientReflectance;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessor
+    public double ambientReflectance() {
+        return ambientReflectance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

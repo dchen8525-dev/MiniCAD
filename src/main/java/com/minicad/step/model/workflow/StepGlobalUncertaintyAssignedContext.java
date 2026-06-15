@@ -31,9 +31,16 @@ public final class StepGlobalUncertaintyAssignedContext implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public List<StepUncertaintyMeasureWithUnit> getUncertainties() {
         return uncertainties;
     }
+
+    // Record-style accessors
+    public List<StepUncertaintyMeasureWithUnit> uncertainties() { return getUncertainties(); }
 
     @Override
     public boolean equals(Object o) {

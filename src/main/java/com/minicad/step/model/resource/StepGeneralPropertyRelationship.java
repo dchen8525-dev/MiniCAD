@@ -55,6 +55,15 @@ public final class StepGeneralPropertyRelationship implements StepEntity {
         return relatedGeneralProperty;
     }
 
+    // Record-style accessors
+    public StepGeneralProperty relatingGeneralProperty() {
+        return relatingGeneralProperty;
+    }
+
+    public StepGeneralProperty relatedGeneralProperty() {
+        return relatedGeneralProperty;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

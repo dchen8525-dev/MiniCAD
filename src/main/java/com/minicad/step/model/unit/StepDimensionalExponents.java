@@ -33,6 +33,10 @@ public final class StepDimensionalExponents implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public double getLengthExponent() {
         return lengthExponent;
     }

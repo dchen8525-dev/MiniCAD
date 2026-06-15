@@ -53,6 +53,23 @@ public final class StepMeasureRepresentationItem implements StepEntity {
         return unit;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String measureType() {
+        return measureType;
+    }
+
+    public double value() {
+        return value;
+    }
+
+    public StepEntity unit() {
+        return unit;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

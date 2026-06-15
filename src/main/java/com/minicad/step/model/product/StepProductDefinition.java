@@ -55,6 +55,18 @@ public final class StepProductDefinition implements StepEntity {
         return frameOfReference;
     }
 
+    public String getName() {
+        return identifier;
+    }
+
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return getName(); }
+    public String identifier() { return identifier; }
+    public String description() { return description; }
+    public StepProductDefinitionFormation formation() { return formation; }
+    public StepProductDefinitionContext frameOfReference() { return frameOfReference; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -31,6 +31,19 @@ public final class StepCertificationAssignment implements StepEntity {
         return assignedCertification;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessor - no name field, return empty string
+    public String name() {
+        return "";
+    }
+
+    public StepCertification assignedCertification() {
+        return assignedCertification;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

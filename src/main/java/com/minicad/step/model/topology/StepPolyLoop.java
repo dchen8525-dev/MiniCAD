@@ -42,6 +42,11 @@ public final class StepPolyLoop implements StepLoop {
         return polygon;
     }
 
+    // Record-style accessor
+    public List<StepCartesianPoint> polygon() {
+        return polygon;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

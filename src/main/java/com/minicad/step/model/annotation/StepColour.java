@@ -23,6 +23,10 @@ public final class StepColour implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

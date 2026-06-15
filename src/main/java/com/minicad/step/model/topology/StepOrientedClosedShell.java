@@ -53,6 +53,18 @@ public final class StepOrientedClosedShell implements StepEntity {
         return orientation;
     }
 
+    // Record-style accessor - derives faces from the underlying closed shell
+    public List<StepFaceEntity> faces() {
+        if (closedShellElement instanceof StepClosedShell) {
+            return ((StepClosedShell) closedShellElement).faces();
+        }
+        return Collections.emptyList();
+    }
+
+    public StepEntity closedShellElement() {
+        return closedShellElement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

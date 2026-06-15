@@ -27,7 +27,16 @@ public final class StepSecurityClassificationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepSecurityClassification getAssignedSecurityClassification() {
+        return assignedSecurityClassification;
+    }
+
+    // Record-style accessor
+    public StepSecurityClassification assignedSecurityClassification() {
         return assignedSecurityClassification;
     }
 

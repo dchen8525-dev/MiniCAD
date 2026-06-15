@@ -49,6 +49,15 @@ public final class StepAppliedContractAssignment implements StepEntity {
         return items;
     }
 
+    // Record-style accessors
+    public StepContract assignedContract() {
+        return assignedContract;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -38,6 +38,19 @@ public final class StepPlanarBox implements StepEntity {
         return height;
     }
 
+    // Record-style accessors
+    public StepEntity placement() {
+        return placement;
+    }
+
+    public double width() {
+        return width;
+    }
+
+    public double height() {
+        return height;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -31,6 +31,19 @@ public final class StepContractType implements StepEntity {
         return description;
     }
 
+    public String getName() {
+        return description != null ? description : "";
+    }
+
+    // Record-style accessor - name from description
+    public String name() {
+        return description;
+    }
+
+    public String kind() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

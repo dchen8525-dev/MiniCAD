@@ -57,6 +57,14 @@ public final class StepAppliedDateTimeAssignment implements StepEntity {
         return items;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public String entityName() { return entityName; }
+    public StepDateAndTime assignedDateAndTime() { return assignedDateAndTime; }
+    public StepDateTimeRole role() { return role; }
+    public List<StepEntity> items() { return items; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

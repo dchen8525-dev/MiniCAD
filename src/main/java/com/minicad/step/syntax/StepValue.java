@@ -22,6 +22,9 @@ public interface StepValue {
             return id;
         }
 
+        // Record-style accessor
+        public int id() { return getId(); }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -61,6 +64,10 @@ public interface StepValue {
             return raw;
         }
 
+        // Record-style accessors
+        public double value() { return getValue(); }
+        public String raw() { return getRaw(); }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -94,6 +101,9 @@ public interface StepValue {
             return value;
         }
 
+        // Record-style accessor
+        public String value() { return getValue(); }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -126,6 +136,9 @@ public interface StepValue {
         public String getValue() {
             return value;
         }
+
+        // Record-style accessor
+        public String value() { return getValue(); }
 
         @Override
         public boolean equals(Object o) {
@@ -165,6 +178,10 @@ public interface StepValue {
         public StepValue getValue() {
             return value;
         }
+
+        // Record-style accessors
+        public String typeName() { return getTypeName(); }
+        public StepValue value() { return getValue(); }
 
         @Override
         public boolean equals(Object o) {
@@ -251,6 +268,9 @@ public interface StepValue {
         public List<StepValue> getElements() {
             return elements;
         }
+
+        // Record-style accessor
+        public List<StepValue> elements() { return getElements(); }
 
         @Override
         public boolean equals(Object o) {

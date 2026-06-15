@@ -47,6 +47,12 @@ public final class StepProductDefinitionFormation implements StepEntity {
         return ofProduct;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String description() { return description; }
+    public StepProduct ofProduct() { return ofProduct; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

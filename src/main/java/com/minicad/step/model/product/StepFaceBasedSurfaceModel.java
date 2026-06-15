@@ -41,6 +41,11 @@ public final class StepFaceBasedSurfaceModel implements StepEntity {
         return faceSets;
     }
 
+    // Record-style accessor
+    public List<StepEntity> faceSets() {
+        return faceSets;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -61,6 +61,61 @@ public final class RationalBSplineCurve2 implements Curve2 {
         return knots;
     }
 
+    // Record-style accessors
+    public int degree() { return getDegree(); }
+    public List<Point2> controlPoints() { return getControlPoints(); }
+    public List<Double> weights() { return getWeights(); }
+    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
+    public List<Double> knots() { return getKnots(); }
+
+    @Override
+    public Point2 pointAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        // Simple approximation using control points for now
+        if (controlPoints == null || controlPoints.isEmpty()) {
+            return new Point2(0, 0);
+        }
+        // Linear interpolation between control points as fallback
+        double start = knots == null || knots.isEmpty() ? 0.0 : knots.get(0);
+        double end = knots == null || knots.isEmpty() ? 1.0 : knots.get(knots.size() - 1);
+        double t = (parameter - start) / (end - start);
+        t = Math.max(0.0, Math.min(1.0, t));
+        int n = controlPoints.size();
+        if (n == 1) {
+            return controlPoints.get(0);
+        }
+        int i = (int) (t * (n - 1));
+        i = Math.max(0, Math.min(i, n - 2));
+        double localT = t * (n - 1) - i;
+        Point2 p0 = controlPoints.get(i);
+        Point2 p1 = controlPoints.get(i + 1);
+        return new Point2(p0.x() + localT * (p1.x() - p0.x()), p0.y() + localT * (p1.y() - p0.y()));
+    }
+
+    /**
+     * Returns the start parameter of the curve (first knot value).
+     *
+     * @return start parameter
+     */
+    public double startParameter() {
+        if (knots == null || knots.isEmpty()) {
+            return 0.0;
+        }
+        return knots.get(0);
+    }
+
+    /**
+     * Returns the end parameter of the curve (last knot value).
+     *
+     * @return end parameter
+     */
+    public double endParameter() {
+        if (knots == null || knots.isEmpty()) {
+            return 1.0;
+        }
+        return knots.get(knots.size() - 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -77,5 +132,33 @@ public final class RationalBSplineCurve2 implements Curve2 {
     @Override
     public String toString() {
         return "RationalBSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "}";
+    }
+
+    @Override
+    public boolean contains(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        // Check if point is close to any sampled point
+        List<Point2> samples = sample(64);
+        for (Point2 sample : samples) {
+            if (point.distanceTo(sample) < Epsilon.get()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<Point2> sample(int segments) {
+        List<Point2> points = new ArrayList<>();
+        if (controlPoints == null || controlPoints.isEmpty()) {
+            return List.copyOf(points);
+        }
+        double start = startParameter();
+        double end = endParameter();
+        for (int i = 0; i <= segments; i++) {
+            double t = start + (end - start) * i / segments;
+            points.add(pointAt(t));
+        }
+        return List.copyOf(points);
     }
 }

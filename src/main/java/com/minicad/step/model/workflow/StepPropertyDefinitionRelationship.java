@@ -63,6 +63,19 @@ public final class StepPropertyDefinitionRelationship implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public StepPropertyDefinition relatingPropertyDefinition() {
+        return relatingPropertyDefinition;
+    }
+
+    public StepPropertyDefinition relatedPropertyDefinition() {
+        return relatedPropertyDefinition;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

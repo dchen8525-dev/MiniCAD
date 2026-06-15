@@ -65,6 +65,14 @@ public final class BoundingBox3 {
         return maxZ;
     }
 
+    // Record-style accessors
+    public double minX() { return minX; }
+    public double minY() { return minY; }
+    public double minZ() { return minZ; }
+    public double maxX() { return maxX; }
+    public double maxY() { return maxY; }
+    public double maxZ() { return maxZ; }
+
     /**
      * Returns an empty bounding box (all coordinates are 0).
      *
@@ -123,6 +131,36 @@ public final class BoundingBox3 {
      */
     public BoundingBox3 union(CartesianPoint point) {
         return expand(point);
+    }
+
+    /**
+     * Returns a new bounding box that is the union of this and another.
+     *
+     * @param other other bounding box
+     * @return combined bounding box
+     */
+    public BoundingBox3 union(BoundingBox3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new BoundingBox3(
+            Math.min(minX, other.minX),
+            Math.min(minY, other.minY),
+            Math.min(minZ, other.minZ),
+            Math.max(maxX, other.maxX),
+            Math.max(maxY, other.maxY),
+            Math.max(maxZ, other.maxZ)
+        );
+    }
+
+    /**
+     * Checks if this bounding box contains another bounding box.
+     *
+     * @param other other bounding box to check
+     * @return true if this box fully contains the other box
+     */
+    public boolean contains(BoundingBox3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return minX <= other.minX && minY <= other.minY && minZ <= other.minZ
+            && maxX >= other.maxX && maxY >= other.maxY && maxZ >= other.maxZ;
     }
 
     @Override

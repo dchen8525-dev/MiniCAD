@@ -41,6 +41,11 @@ public final class StepGeometricSurfaceSet implements StepEntity {
         return elements;
     }
 
+    // Record-style accessor
+    public List<StepEntity> elements() {
+        return elements;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

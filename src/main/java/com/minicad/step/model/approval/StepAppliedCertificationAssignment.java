@@ -37,6 +37,10 @@ public final class StepAppliedCertificationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return entityName != null ? entityName : "";
+    }
+
     public String getEntityName() {
         return entityName;
     }
@@ -46,6 +50,15 @@ public final class StepAppliedCertificationAssignment implements StepEntity {
     }
 
     public List<StepEntity> getItems() {
+        return items;
+    }
+
+    // Record-style accessors
+    public StepCertification assignedCertification() {
+        return assignedCertification;
+    }
+
+    public List<StepEntity> items() {
         return items;
     }
 

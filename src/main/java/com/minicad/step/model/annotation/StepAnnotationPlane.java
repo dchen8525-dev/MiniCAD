@@ -59,6 +59,19 @@ public final class StepAnnotationPlane implements StepEntity {
         return elements;
     }
 
+    // Record-style accessor
+    public List<StepEntity> elements() {
+        return elements;
+    }
+
+    public List<StepPresentationStyleAssignment> styles() {
+        return styles;
+    }
+
+    public StepPlane item() {
+        return item;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

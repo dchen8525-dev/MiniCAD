@@ -38,6 +38,19 @@ public final class StepCurveStyleRendering implements StepEntity {
         return colour;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public double transparency() {
+        return transparency;
+    }
+
+    public StepEntity colour() {
+        return colour;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

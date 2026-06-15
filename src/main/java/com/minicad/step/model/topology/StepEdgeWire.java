@@ -43,6 +43,11 @@ public final class StepEdgeWire implements StepEntity {
         return edges;
     }
 
+    // Record-style accessor
+    public List<StepEntity> edges() {
+        return edges;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

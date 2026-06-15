@@ -22,6 +22,53 @@ public final class StepFileName {
     private final String originatingSystem;
     private final String authorization;
 
+    /**
+     * Creates a StepFileName from a StepHeaderEntry.
+     * FILE_NAME(name, timeStamp, author, organization, preprocessorVersion, originatingSystem, authorization)
+     */
+    public static StepFileName from(StepHeaderEntry entry) {
+        if (entry == null) {
+            return null;
+        }
+        List<StepValue> params = entry.parameters();
+        if (params == null || params.isEmpty()) {
+            return new StepFileName(null, null, null, null, null, null, null);
+        }
+        String name = getString(params, 0);
+        String timeStamp = getString(params, 1);
+        List<String> author = getStringList(params, 2);
+        List<String> organization = getStringList(params, 3);
+        String preprocessorVersion = getString(params, 4);
+        String originatingSystem = getString(params, 5);
+        String authorization = getString(params, 6);
+        return new StepFileName(name, timeStamp, author, organization, preprocessorVersion, originatingSystem, authorization);
+    }
+
+    private static String getString(List<StepValue> params, int index) {
+        if (index >= params.size()) return null;
+        StepValue v = params.get(index);
+        if (v instanceof StepValue.StringValue) return ((StepValue.StringValue) v).value();
+        if (v instanceof StepValue.OmittedValue) return null;
+        return null;
+    }
+
+    private static List<String> getStringList(List<StepValue> params, int index) {
+        if (index >= params.size()) return null;
+        StepValue v = params.get(index);
+        if (v instanceof StepValue.ListValue) {
+            StepValue.ListValue lv = (StepValue.ListValue) v;
+            List<String> result = new java.util.ArrayList<>();
+            for (StepValue elem : lv.elements()) {
+                if (elem instanceof StepValue.StringValue) {
+                    result.add(((StepValue.StringValue) elem).value());
+                }
+            }
+            return result.isEmpty() ? null : result;
+        }
+        if (v instanceof StepValue.OmittedValue) return null;
+        return null;
+    }
+
     public StepFileName(String name, String timeStamp, List<String> author, List<String> organization, String preprocessorVersion, String originatingSystem, String authorization) {
         this.name = name;
         this.timeStamp = timeStamp;
@@ -59,6 +106,15 @@ public final class StepFileName {
     public String getAuthorization() {
         return authorization;
     }
+
+    // Record-style accessors
+    public String name() { return name; }
+    public String timeStamp() { return timeStamp; }
+    public List<String> author() { return author; }
+    public List<String> organization() { return organization; }
+    public String preprocessorVersion() { return preprocessorVersion; }
+    public String originatingSystem() { return originatingSystem; }
+    public String authorization() { return authorization; }
 
     @Override
     public boolean equals(Object o) {

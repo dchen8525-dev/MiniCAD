@@ -33,11 +33,24 @@ public final class StepApprovalDateTime implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepDateAndTime getDateTime() {
         return dateTime;
     }
 
     public StepApproval getDatedApproval() {
+        return datedApproval;
+    }
+
+    // Record-style accessors
+    public StepDateAndTime dateTime() {
+        return dateTime;
+    }
+
+    public StepApproval datedApproval() {
         return datedApproval;
     }
 

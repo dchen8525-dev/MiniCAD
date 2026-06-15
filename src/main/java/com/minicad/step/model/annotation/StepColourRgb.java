@@ -55,6 +55,23 @@ public final class StepColourRgb implements StepEntity {
         return blue;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public double red() {
+        return red;
+    }
+
+    public double green() {
+        return green;
+    }
+
+    public double blue() {
+        return blue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

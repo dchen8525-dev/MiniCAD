@@ -1,5 +1,6 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
@@ -29,6 +30,11 @@ public final class DegenerateCurve2 implements Curve2 {
         return point;
     }
 
+    // Record-style accessor
+    public Point2 point() {
+        return point;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,5 +51,28 @@ public final class DegenerateCurve2 implements Curve2 {
     @Override
     public String toString() {
         return "DegenerateCurve2{" + "point=" + point + "}";
+    }
+
+    @Override
+    public Point2 pointAt(double parameter) {
+        // A degenerate curve is always the same point
+        return point;
+    }
+
+    @Override
+    public boolean contains(Point2 testPoint) {
+        Preconditions.requireNonNull(testPoint, "testPoint");
+        if (point == null) {
+            return false;
+        }
+        return testPoint.distanceTo(point) < Epsilon.get();
+    }
+
+    @Override
+    public List<Point2> sample(int segments) {
+        if (point == null) {
+            return List.of();
+        }
+        return List.of(point);
     }
 }

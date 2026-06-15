@@ -46,6 +46,38 @@ public final class Point2 {
         return new Point2(x + vector.x(), y + vector.y());
     }
 
+    /**
+     * Subtracts a vector from this point.
+     *
+     * @param vector the vector to subtract
+     * @return new point
+     */
+    public Point2 subtract(Vector2 vector) {
+        return new Point2(x - vector.x(), y - vector.y());
+    }
+
+    /**
+     * Subtracts another point from this point, yielding a vector.
+     *
+     * @param other the other point
+     * @return vector from this point to the other
+     */
+    public Vector2 subtract(Point2 other) {
+        return new Vector2(x - other.x, y - other.y);
+    }
+
+    /**
+     * Returns the distance between this point and another point.
+     *
+     * @param other the other point
+     * @return distance
+     */
+    public double distanceTo(Point2 other) {
+        double dx = x - other.x;
+        double dy = y - other.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

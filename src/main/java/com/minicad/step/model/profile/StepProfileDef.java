@@ -49,6 +49,10 @@ public final class StepProfileDef implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return profileName != null ? profileName : "";
+    }
+
     public String getProfileType() {
         return profileType;
     }
@@ -74,8 +78,14 @@ public final class StepProfileDef implements StepEntity {
     }
 
     // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public StepEntity position() { return getPosition(); }
     public String entityName() { return getEntityName(); }
+    public String profileType() { return getProfileType(); }
+    public String profileName() { return getProfileName(); }
+    public List<StepEntity> curves() { return getCurves(); }
+    public List<Double> parameters() { return getParameters(); }
 
     @Override
     public boolean equals(Object o) {

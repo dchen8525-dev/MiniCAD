@@ -129,4 +129,21 @@ public final class Transformation3 {
     public String toString() {
         return "Transformation3{" + "m00=" + m00 + "m01=" + m01 + "m02=" + m02 + "m03=" + m03 + "m10=" + m10 + "m11=" + m11 + "m12=" + m12 + "m13=" + m13 + "m20=" + m20 + "m21=" + m21 + "m22=" + m22 + "m23=" + m23 + "m30=" + m30 + "m31=" + m31 + "m32=" + m32 + "m33=" + m33 + "}";
     }
+
+    /**
+     * Transforms a CartesianPoint using this transformation matrix.
+     *
+     * @param point the point to transform
+     * @return transformed point
+     */
+    public CartesianPoint transform(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        double x = point.x();
+        double y = point.y();
+        double z = point.z();
+        double newX = m00 * x + m01 * y + m02 * z + m03;
+        double newY = m10 * x + m11 * y + m12 * z + m13;
+        double newZ = m20 * x + m21 * y + m22 * z + m23;
+        return new CartesianPoint(newX, newY, newZ);
+    }
 }

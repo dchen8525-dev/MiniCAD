@@ -55,6 +55,15 @@ public final class StepGeometricItemSpecificUsage implements StepEntity {
         return identifiedItem;
     }
 
+    // Record-style accessors
+    public StepEntity usage() {
+        return usage;
+    }
+
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

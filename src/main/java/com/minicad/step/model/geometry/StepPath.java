@@ -43,6 +43,11 @@ public final class StepPath implements StepEntity {
         return edges;
     }
 
+    // Record-style accessor
+    public List<StepOrientedEdge> edges() {
+        return edges;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

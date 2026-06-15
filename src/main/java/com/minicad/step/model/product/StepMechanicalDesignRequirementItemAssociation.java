@@ -73,6 +73,23 @@ public final class StepMechanicalDesignRequirementItemAssociation implements Ste
         return requirement;
     }
 
+    // Record-style accessors
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
+    public StepEntity requirement() {
+        return requirement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

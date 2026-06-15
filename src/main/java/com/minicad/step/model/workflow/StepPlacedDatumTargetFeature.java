@@ -39,6 +39,24 @@ public final class StepPlacedDatumTargetFeature implements StepEntity {
         return usedRepresentation;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessors
+    public StepPropertyDefinition definition() {
+        return definition;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
+    // Record-style accessor - no name field, return empty string
+    public String name() {
+        return "";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -33,6 +33,15 @@ public final class StepGlobalUnitAssignedContext implements StepEntity {
         return units;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessor
+    public List<StepEntity> units() {
+        return units;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

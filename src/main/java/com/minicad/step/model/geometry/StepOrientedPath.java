@@ -59,6 +59,19 @@ public final class StepOrientedPath implements StepEntity {
         return edges;
     }
 
+    // Record-style accessors
+    public List<StepOrientedEdge> edges() {
+        return edges;
+    }
+
+    public boolean orientation() {
+        return orientation;
+    }
+
+    public StepEntity pathElement() {
+        return pathElement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

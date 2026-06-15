@@ -39,6 +39,13 @@ public final class StepIdentificationAssignment implements StepEntity {
         return role;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public String assignedId() { return assignedId; }
+    public StepIdentificationRole role() { return role; }
+    public String identifiedItem() { return assignedId; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -49,6 +49,15 @@ public final class StepUserDefinedTerminatorSymbol implements StepEntity {
         return mappingTarget;
     }
 
+    // Record-style accessors
+    public StepRepresentationMap mappingSource() {
+        return mappingSource;
+    }
+
+    public StepEntity mappingTarget() {
+        return mappingTarget;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

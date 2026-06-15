@@ -12,6 +12,14 @@ import java.util.List;
 public interface Curve2 {
 
     /**
+     * Returns the point on the curve at the given parameter value.
+     *
+     * @param parameter parameter value (interpretation depends on curve type)
+     * @return point on the curve
+     */
+    Point2 pointAt(double parameter);
+
+    /**
      * Returns whether a point lies on the curve within epsilon.
      *
      * @param point queried point

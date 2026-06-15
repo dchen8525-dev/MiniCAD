@@ -39,6 +39,19 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuse implements StepEnti
         return diffuseReflectance;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessors
+    public double ambientReflectance() {
+        return ambientReflectance;
+    }
+
+    public double diffuseReflectance() {
+        return diffuseReflectance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -47,6 +47,11 @@ public final class StepCertification implements StepEntity {
         return kind;
     }
 
+    // Record-style accessor
+    public StepCertificationType kind() {
+        return kind;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

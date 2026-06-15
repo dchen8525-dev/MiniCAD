@@ -2,6 +2,8 @@ package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -59,6 +61,39 @@ public final class TrimmedCurve3 implements Curve3 {
     public double trimParamEnd() { return getTrimParamEnd(); }
     public boolean senseAgreement() { return isSenseAgreement(); }
 
+    /**
+     * Returns the geometric start point of the trim by evaluating the basis curve.
+     *
+     * @return trim start point
+     */
+    public CartesianPoint trimStart() {
+        return basisCurve.pointAt(trimParamStart);
+    }
+
+    /**
+     * Returns the geometric end point of the trim by evaluating the basis curve.
+     *
+     * @return trim end point
+     */
+    public CartesianPoint trimEnd() {
+        return basisCurve.pointAt(trimParamEnd);
+    }
+
+    @Override
+    public CartesianPoint pointAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        // Map parameter from trim range to basis curve parameter
+        double basisParam = trimParamStart + parameter * (trimParamEnd - trimParamStart);
+        return basisCurve.pointAt(basisParam);
+    }
+
+    @Override
+    public boolean contains(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        // Check if point lies on the trimmed portion of the basis curve
+        return basisCurve.contains(point);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,5 +110,22 @@ public final class TrimmedCurve3 implements Curve3 {
     @Override
     public String toString() {
         return "TrimmedCurve3{" + "basisCurve=" + basisCurve + "trimParamStart=" + trimParamStart + "trimParamEnd=" + trimParamEnd + "senseAgreement=" + senseAgreement + "}";
+    }
+
+    @Override
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        // Delegate to basis curve
+        return basisCurve.closestPointTo(point);
+    }
+
+    @Override
+    public java.util.List<CartesianPoint> sample(int segments) {
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double t = (double) i / segments;
+            points.add(pointAt(t));
+        }
+        return java.util.List.copyOf(points);
     }
 }

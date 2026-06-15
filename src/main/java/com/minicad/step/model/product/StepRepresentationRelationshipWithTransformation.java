@@ -65,6 +65,14 @@ public final class StepRepresentationRelationshipWithTransformation implements S
         return transformationOperator;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String description() { return description; }
+    public StepRepresentation rep1() { return rep1; }
+    public StepRepresentation rep2() { return rep2; }
+    public StepItemDefinedTransformation transformationOperator() { return transformationOperator; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

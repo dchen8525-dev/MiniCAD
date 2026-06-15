@@ -49,6 +49,15 @@ public final class StepDraughtingCallout implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public List<StepEntity> contents() {
+        return contents;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

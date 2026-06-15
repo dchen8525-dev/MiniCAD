@@ -43,6 +43,11 @@ public final class StepOpenShell implements StepEntity {
         return faces;
     }
 
+    // Record-style accessor
+    public List<StepFaceEntity> faces() {
+        return faces;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

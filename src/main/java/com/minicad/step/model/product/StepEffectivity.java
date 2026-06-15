@@ -31,6 +31,15 @@ public final class StepEffectivity implements StepEntity {
         return effectivityId;
     }
 
+    public String getName() {
+        return effectivityId != null ? effectivityId : "";
+    }
+
+    // Record-style accessor - name from effectivityId
+    public String name() {
+        return effectivityId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

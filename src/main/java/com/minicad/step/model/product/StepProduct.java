@@ -57,6 +57,13 @@ public final class StepProduct implements StepEntity {
         return frameOfReference;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String identifier() { return identifier; }
+    public String description() { return description; }
+    public List<StepProductContext> frameOfReference() { return frameOfReference; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

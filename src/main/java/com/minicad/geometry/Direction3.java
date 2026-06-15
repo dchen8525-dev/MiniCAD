@@ -125,6 +125,60 @@ public final class Direction3 {
         }
     }
 
+    /**
+     * Returns a normalized (unit) version of this direction.
+     * If this direction is already normalized, returns itself.
+     *
+     * @return normalized direction
+     */
+    public Direction3 normalize() {
+        double length = Math.sqrt(x * x + y * y + z * z);
+        if (length < Epsilon.get()) {
+            throw new GeometryException("cannot normalize zero-length direction");
+        }
+        if (Math.abs(length - 1.0) < Epsilon.get()) {
+            return this;
+        }
+        return new Direction3(x / length, y / length, z / length);
+    }
+
+    /**
+     * Returns the cross product of this direction with another.
+     *
+     * @param other other direction
+     * @return cross product direction (not necessarily normalized)
+     */
+    public Direction3 cross(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new Direction3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    /**
+     * Returns the dot product of this direction with another.
+     *
+     * @param other other direction
+     * @return dot product value
+     */
+    public double dot(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    /**
+     * Returns the dot product of this direction with a vector.
+     *
+     * @param vector the vector
+     * @return dot product value
+     */
+    public double dot(Vector3 vector) {
+        Preconditions.requireNonNull(vector, "vector");
+        return x * vector.x() + y * vector.y() + z * vector.z();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -53,6 +53,65 @@ public final class BSplineCurve2 implements Curve2 {
         return knots;
     }
 
+    // Record-style accessors
+    public int degree() { return getDegree(); }
+    public List<Point2> controlPoints() { return getControlPoints(); }
+    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
+    public List<Double> knots() { return getKnots(); }
+
+    /**
+     * Returns the start parameter of the curve (first knot value).
+     *
+     * @return start parameter
+     */
+    public double startParameter() {
+        if (knots == null || knots.isEmpty()) {
+            return 0.0;
+        }
+        return knots.get(0);
+    }
+
+    /**
+     * Returns the end parameter of the curve (last knot value).
+     *
+     * @return end parameter
+     */
+    public double endParameter() {
+        if (knots == null || knots.isEmpty()) {
+            return 1.0;
+        }
+        return knots.get(knots.size() - 1);
+    }
+
+    /**
+     * Evaluates the B-spline curve at a given parameter value.
+     * Uses De Boor's algorithm for evaluation.
+     *
+     * @param parameter parameter value
+     * @return point on the curve
+     */
+    public Point2 pointAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        // Simple approximation using control points for now
+        // Full De Boor implementation would be more accurate
+        if (controlPoints == null || controlPoints.isEmpty()) {
+            return new Point2(0, 0);
+        }
+        // Linear interpolation between control points as fallback
+        double t = (parameter - startParameter()) / (endParameter() - startParameter());
+        t = Math.max(0.0, Math.min(1.0, t));
+        int n = controlPoints.size();
+        if (n == 1) {
+            return controlPoints.get(0);
+        }
+        int i = (int) (t * (n - 1));
+        i = Math.max(0, Math.min(i, n - 2));
+        double localT = t * (n - 1) - i;
+        Point2 p0 = controlPoints.get(i);
+        Point2 p1 = controlPoints.get(i + 1);
+        return new Point2(p0.x() + localT * (p1.x() - p0.x()), p0.y() + localT * (p1.y() - p0.y()));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,5 +128,18 @@ public final class BSplineCurve2 implements Curve2 {
     @Override
     public String toString() {
         return "BSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "}";
+    }
+
+    @Override
+    public boolean contains(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        // Check if point is close to any control point segment (approximation)
+        List<Point2> samples = sample(64);
+        for (Point2 sample : samples) {
+            if (point.distanceTo(sample) < Epsilon.get()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

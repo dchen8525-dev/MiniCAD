@@ -55,6 +55,14 @@ public final class StepLocalTime implements StepEntity {
         return zone;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public int hourComponent() { return hourComponent; }
+    public int minuteComponent() { return minuteComponent; }
+    public Double secondComponent() { return secondComponent; }
+    public StepCoordinatedUniversalTimeOffset zone() { return zone; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -39,6 +39,12 @@ public final class StepDateAndTime implements StepEntity {
         return timeComponent;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public StepCalendarDate dateComponent() { return dateComponent; }
+    public StepLocalTime timeComponent() { return timeComponent; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

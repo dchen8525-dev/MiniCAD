@@ -57,6 +57,7 @@ import com.minicad.step.model.geometry.StepDirection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 final class StepCadGeometryOps {
@@ -82,7 +83,7 @@ final class StepCadGeometryOps {
             Point2 point = sampled.get(index);
             Vector2 tangent = tangentAt(sampled, index);
             Vector2 normal = new Vector2(-tangent.y(), tangent.x());
-            Direction2 direction = normal.isZero() ? new Direction2(0.0, 1.0) : normal.normalize();
+            Direction2 direction = normal.isZero() ? new Direction2(0.0, 1.0) : Direction2.from(normal.normalize());
             offsetPoints.add(point.add(direction.asVector().scale(distance)));
         }
         return new Polyline2(offsetPoints);
@@ -636,6 +637,58 @@ final class StepCadGeometryOps {
             return "COMPOSITE_CURVE";
         }
         return curve.getClass().getSimpleName();
+    }
+
+    static String surfaceTypeName(SurfaceGeometry surface) {
+        if (surface instanceof Plane) {
+            return "PLANE";
+        }
+        if (surface instanceof CylindricalSurface) {
+            return "CYLINDRICAL_SURFACE";
+        }
+        if (surface instanceof ConicalSurface) {
+            return "CONICAL_SURFACE";
+        }
+        if (surface instanceof SphericalSurface) {
+            return "SPHERICAL_SURFACE";
+        }
+        if (surface instanceof ToroidalSurface) {
+            return "TOROIDAL_SURFACE";
+        }
+        if (surface instanceof BSplineSurface3) {
+            return "B_SPLINE_SURFACE";
+        }
+        if (surface instanceof RationalBSplineSurface3) {
+            return "RATIONAL_B_SPLINE_SURFACE";
+        }
+        if (surface instanceof SurfaceOfLinearExtrusion3) {
+            return "SURFACE_OF_LINEAR_EXTRUSION";
+        }
+        if (surface instanceof SurfaceOfRevolution3) {
+            return "SURFACE_OF_REVOLUTION";
+        }
+        if (surface instanceof RuledSurface3) {
+            return "RULED_SURFACE";
+        }
+        if (surface instanceof OffsetSurface3) {
+            return "OFFSET_SURFACE";
+        }
+        if (surface instanceof SurfaceOfConstantRadius3) {
+            return "SURFACE_OF_CONSTANT_RADIUS";
+        }
+        if (surface instanceof ParaboloidSurface) {
+            return "PARABOLOID_SURFACE";
+        }
+        if (surface instanceof HyperboloidSurface) {
+            return "HYPERBOLOID_SURFACE";
+        }
+        if (surface instanceof SurfaceOfTranslation3) {
+            return "SURFACE_OF_TRANSLATION";
+        }
+        if (surface instanceof SurfaceOfProjection3) {
+            return "SURFACE_OF_PROJECTION";
+        }
+        return surface.getClass().getSimpleName();
     }
 
     private List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {

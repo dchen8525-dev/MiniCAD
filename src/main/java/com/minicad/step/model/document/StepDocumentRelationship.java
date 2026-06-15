@@ -55,6 +55,15 @@ public final class StepDocumentRelationship implements StepEntity {
         return relatedDocument;
     }
 
+    // Record-style accessors
+    public StepDocument relatingDocument() {
+        return relatingDocument;
+    }
+
+    public StepDocument relatedDocument() {
+        return relatedDocument;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

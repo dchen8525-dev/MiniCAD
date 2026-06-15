@@ -55,6 +55,15 @@ public final class StepOrganizationRelationship implements StepEntity {
         return relatedOrganization;
     }
 
+    // Record-style accessors
+    public StepOrganization relatingOrganization() {
+        return relatingOrganization;
+    }
+
+    public StepOrganization relatedOrganization() {
+        return relatedOrganization;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

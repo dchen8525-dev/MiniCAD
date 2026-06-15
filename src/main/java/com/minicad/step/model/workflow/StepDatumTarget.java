@@ -49,6 +49,11 @@ public final class StepDatumTarget implements StepEntity {
         return targetShape;
     }
 
+    // Record-style accessor
+    public StepEntity targetShape() {
+        return targetShape;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

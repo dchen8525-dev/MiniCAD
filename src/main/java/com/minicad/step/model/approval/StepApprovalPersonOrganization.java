@@ -49,6 +49,19 @@ public final class StepApprovalPersonOrganization implements StepEntity {
         return role;
     }
 
+    // Record-style accessors
+    public StepPersonAndOrganization personOrganization() {
+        return personOrganization;
+    }
+
+    public StepApproval authorizedApproval() {
+        return authorizedApproval;
+    }
+
+    public StepApprovalRole role() {
+        return role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

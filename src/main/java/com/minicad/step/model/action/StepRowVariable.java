@@ -42,6 +42,14 @@ public final class StepRowVariable implements StepEntity {
         return usedRepresentation;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessors
+    public StepPropertyDefinition definition() { return getDefinition(); }
+    public StepRepresentation usedRepresentation() { return getUsedRepresentation(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

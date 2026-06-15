@@ -49,6 +49,15 @@ public final class StepAppliedSecurityClassificationAssignment implements StepEn
         return items;
     }
 
+    // Record-style accessors
+    public StepSecurityClassification assignedSecurityClassification() {
+        return assignedSecurityClassification;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

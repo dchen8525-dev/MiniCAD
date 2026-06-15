@@ -64,8 +64,11 @@ public final class StepOffsetCurve3D implements StepEntity {
     }
 
     // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public StepEntity basisCurve() { return getBasisCurve(); }
     public double distance() { return getDistance(); }
+    public boolean selfIntersect() { return isSelfIntersect(); }
     public StepDirection refDirection() { return getRefDirection(); }
 
     @Override

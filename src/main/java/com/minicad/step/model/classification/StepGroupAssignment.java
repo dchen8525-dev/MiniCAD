@@ -27,7 +27,16 @@ public final class StepGroupAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepGroup getAssignedGroup() {
+        return assignedGroup;
+    }
+
+    // Record-style accessor
+    public StepGroup assignedGroup() {
         return assignedGroup;
     }
 

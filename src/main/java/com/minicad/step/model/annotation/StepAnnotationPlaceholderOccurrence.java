@@ -65,6 +65,27 @@ public final class StepAnnotationPlaceholderOccurrence implements StepEntity {
         return lineSpacing;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public List<StepPresentationStyleAssignment> styles() {
+        return styles;
+    }
+
+    public StepEntity item() {
+        return item;
+    }
+
+    public String role() {
+        return role;
+    }
+
+    public double lineSpacing() {
+        return lineSpacing;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

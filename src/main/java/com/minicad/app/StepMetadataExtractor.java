@@ -111,13 +111,13 @@ public final class StepMetadataExtractor {
                     // Font styling for curves - no color data
                 }
                 if (!(style instanceof StepSurfaceStyleUsage)) {
-            StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) style;
                     continue;
                 }
+                StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) style;
                 StepSurfaceSideStyle sideStyle = usage.style();
                 for (StepEntity sideComponent : sideStyle.styles()) {
                     if (sideComponent instanceof StepSurfaceStyleFillArea) {
-            StepSurfaceStyleFillArea surfaceFill = (StepSurfaceStyleFillArea) sideComponent;
+                        StepSurfaceStyleFillArea surfaceFill = (StepSurfaceStyleFillArea) sideComponent;
                         StepFillAreaStyle fillStyle = surfaceFill.fillStyle();
                         for (StepFillAreaStyleColour fillColour : fillStyle.styles()) {
                             int[] rgb = colourToRgb(fillColour.colour());
@@ -235,7 +235,8 @@ public final class StepMetadataExtractor {
      * @param specularExponent glossiness exponent (higher = shinier)
      * @param specularColor specular color tint, or null for white
      */
-public final class DisplayMetadata {
+public static final class DisplayMetadata {
+    public static final DisplayMetadata EMPTY = new DisplayMetadata(null, List.of(), 0.0, null);
     private final int[] rgb;
     private final List<String> layers;
     private final double transparency;
@@ -263,6 +264,12 @@ public final class DisplayMetadata {
     public PbrMetadata getPbr() {
         return pbr;
     }
+
+    // Record-style accessors
+    public int[] rgb() { return rgb; }
+    public List<String> layers() { return layers; }
+    public double transparency() { return transparency; }
+    public PbrMetadata pbr() { return pbr; }
 
     @Override
     public boolean equals(Object o) {

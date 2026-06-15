@@ -41,6 +41,23 @@ public final class StepAppliedGroupAssignment implements StepEntity {
         return items;
     }
 
+    public String getName() {
+        return assignedGroup != null ? assignedGroup.getName() : "";
+    }
+
+    // Record-style accessors
+    public String name() {
+        return getName();
+    }
+
+    public StepGroup assignedGroup() {
+        return assignedGroup;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

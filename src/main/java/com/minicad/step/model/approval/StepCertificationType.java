@@ -31,6 +31,15 @@ public final class StepCertificationType implements StepEntity {
         return description;
     }
 
+    public String getName() {
+        return description != null ? description : "";
+    }
+
+    // Record-style accessor
+    public String kind() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -31,11 +31,24 @@ public final class StepDateAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepCalendarDate getAssignedDate() {
         return assignedDate;
     }
 
     public StepDateRole getRole() {
+        return role;
+    }
+
+    // Record-style accessors
+    public StepCalendarDate assignedDate() {
+        return assignedDate;
+    }
+
+    public StepDateRole role() {
         return role;
     }
 

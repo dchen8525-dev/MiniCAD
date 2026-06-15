@@ -32,6 +32,15 @@ public final class StepPlanarExtent implements StepEntity {
         return height;
     }
 
+    // Record-style accessors
+    public double width() {
+        return width;
+    }
+
+    public double height() {
+        return height;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

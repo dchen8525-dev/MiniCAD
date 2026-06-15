@@ -55,6 +55,11 @@ public final class StepConversionBasedUnitWithOffset implements StepEntity {
         return conversionOffset;
     }
 
+    // Record-style accessor
+    public StepMeasureWithUnit conversionFactor() {
+        return conversionFactor;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

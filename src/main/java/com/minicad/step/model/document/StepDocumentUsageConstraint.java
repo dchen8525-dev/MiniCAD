@@ -47,6 +47,27 @@ public final class StepDocumentUsageConstraint implements StepEntity {
         return subjectElementValue;
     }
 
+    public String getName() {
+        return subjectElement != null ? subjectElement : "";
+    }
+
+    // Record-style accessors
+    public String name() {
+        return getName();
+    }
+
+    public StepDocument source() {
+        return source;
+    }
+
+    public String subjectElement() {
+        return subjectElement;
+    }
+
+    public String subjectElementValue() {
+        return subjectElementValue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

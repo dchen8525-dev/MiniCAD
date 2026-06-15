@@ -20,17 +20,27 @@ import java.util.Objects;
  */
 public final class StepBoxDomain implements StepEntity {
     private final int id;
+    private final String name;
     private final StepCartesianPoint corner;
     private final List<Double> dimensions;
 
-    public StepBoxDomain(int id, StepCartesianPoint corner, List<Double> dimensions) {
+    public StepBoxDomain(int id, String name, StepCartesianPoint corner, List<Double> dimensions) {
         this.id = id;
+        this.name = name != null ? name : "";
         this.corner = corner;
         this.dimensions = dimensions == null ? null : java.util.List.copyOf(dimensions);
     }
 
+    public StepBoxDomain(int id, StepCartesianPoint corner, List<Double> dimensions) {
+        this(id, "", corner, dimensions);
+    }
+
     public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public StepCartesianPoint getCorner() {
@@ -43,6 +53,7 @@ public final class StepBoxDomain implements StepEntity {
 
     // Record-style accessors
     public int id() { return getId(); }
+    public String name() { return getName(); }
     public StepCartesianPoint corner() { return getCorner(); }
     public List<Double> dimensions() { return getDimensions(); }
 
@@ -51,16 +62,16 @@ public final class StepBoxDomain implements StepEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StepBoxDomain that = (StepBoxDomain) o;
-        return id == that.id && Objects.equals(corner, that.corner) && Objects.equals(dimensions, that.dimensions);
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(corner, that.corner) && Objects.equals(dimensions, that.dimensions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, corner, dimensions);
+        return Objects.hash(id, name, corner, dimensions);
     }
 
     @Override
     public String toString() {
-        return "StepBoxDomain{" + "id=" + id + "corner=" + corner + "dimensions=" + dimensions + "}";
+        return "StepBoxDomain{" + "id=" + id + "name=" + name + "corner=" + corner + "dimensions=" + dimensions + "}";
     }
 }

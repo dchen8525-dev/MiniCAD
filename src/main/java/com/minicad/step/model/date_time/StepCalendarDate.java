@@ -47,6 +47,10 @@ public final class StepCalendarDate implements StepEntity {
         return monthComponent;
     }
 
+    public String getName() {
+        return "";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

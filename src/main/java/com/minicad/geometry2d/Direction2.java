@@ -62,6 +62,32 @@ public final class Direction2 {
         return new Vector2(x, y);
     }
 
+    /**
+     * Returns the perpendicular direction (rotated 90 degrees counter-clockwise).
+     *
+     * @return perpendicular direction
+     */
+    public Direction2 perpendicular() {
+        return new Direction2(-y, x);
+    }
+
+    /**
+     * Returns a normalized (unit) version of this direction.
+     * If this direction is already normalized, returns itself.
+     *
+     * @return normalized direction
+     */
+    public Direction2 normalize() {
+        double length = Math.sqrt(x * x + y * y);
+        if (length < Epsilon.get()) {
+            throw new GeometryException("cannot normalize zero-length direction");
+        }
+        if (Math.abs(length - 1.0) < Epsilon.get()) {
+            return this;
+        }
+        return new Direction2(x / length, y / length);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

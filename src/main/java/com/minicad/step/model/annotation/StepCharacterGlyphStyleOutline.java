@@ -31,6 +31,19 @@ public final class StepCharacterGlyphStyleOutline implements StepEntity {
         return outlineStyle;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessor - no name field, return empty string
+    public String name() {
+        return "";
+    }
+
+    public StepCurveStyle outlineStyle() {
+        return outlineStyle;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

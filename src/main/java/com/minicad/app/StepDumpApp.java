@@ -406,8 +406,8 @@ public final class StepDumpApp {
         lines.add("Syntax Summary");
         lines.add("  entityCount: " + file.entities().size());
         if (!file.entities().isEmpty()) {
-            lines.add("  firstId: #" + file.entities().getFirst().id());
-            lines.add("  lastId: #" + file.entities().getLast().id());
+            lines.add("  firstId: #" + file.entities().get(0).id());
+            lines.add("  lastId: #" + file.entities().get(file.entities().size() - 1).id());
         }
     }
 
@@ -3159,7 +3159,7 @@ public final class StepDumpApp {
     }
 
     private static void validatePolyline(StepPolyline polyline, StepCadBuilder builder) {
-        if (!polyline.points().isEmpty() && polyline.points().getFirst().coordinates().size() == 2) {
+        if (!polyline.points().isEmpty() && polyline.points().get(0).coordinates().size() == 2) {
             builder.buildPolyline2(polyline.id());
         } else {
             builder.buildPolyline(polyline.id());

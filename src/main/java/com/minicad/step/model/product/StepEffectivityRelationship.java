@@ -55,6 +55,15 @@ public final class StepEffectivityRelationship implements StepEntity {
         return relatedEffectivity;
     }
 
+    // Record-style accessors
+    public StepEffectivity relatingEffectivity() {
+        return relatingEffectivity;
+    }
+
+    public StepEffectivity relatedEffectivity() {
+        return relatedEffectivity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

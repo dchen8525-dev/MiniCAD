@@ -63,6 +63,19 @@ public final class StepAnnotationOccurrenceRelationship implements StepEntity {
         return relatedAnnotationOccurrence;
     }
 
+    // Record-style accessors
+    public String entityName() {
+        return entityName;
+    }
+
+    public StepEntity relatingAnnotationOccurrence() {
+        return relatingAnnotationOccurrence;
+    }
+
+    public StepEntity relatedAnnotationOccurrence() {
+        return relatedAnnotationOccurrence;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

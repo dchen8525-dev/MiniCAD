@@ -31,11 +31,20 @@ public final class StepDescriptionAttribute implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getAttributeValue() {
         return attributeValue;
     }
 
     public StepEntity getDescribedItem() {
+        return describedItem;
+    }
+
+    // Record-style accessor
+    public StepEntity describedItem() {
         return describedItem;
     }
 

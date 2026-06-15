@@ -55,6 +55,23 @@ public final class StepExternalSourceRelationship implements StepEntity {
         return relatedSource;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepExternalSource relatingSource() {
+        return relatingSource;
+    }
+
+    public StepExternalSource relatedSource() {
+        return relatedSource;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

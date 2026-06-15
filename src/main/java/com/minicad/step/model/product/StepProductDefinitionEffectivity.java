@@ -35,6 +35,10 @@ public final class StepProductDefinitionEffectivity implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getEffectivityId() {
         return effectivityId;
     }
@@ -44,6 +48,19 @@ public final class StepProductDefinitionEffectivity implements StepEntity {
     }
 
     public StepProductDefinition getProductDefinition() {
+        return productDefinition;
+    }
+
+    // Record-style accessors
+    public String effectivityId() {
+        return effectivityId;
+    }
+
+    public String usage() {
+        return usage;
+    }
+
+    public StepProductDefinition productDefinition() {
         return productDefinition;
     }
 

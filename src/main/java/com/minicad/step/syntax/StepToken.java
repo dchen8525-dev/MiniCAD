@@ -1,5 +1,7 @@
 package com.minicad.step.syntax;
 
+import java.util.Objects;
+
 /**
  * Single token produced by the minimal STEP tokenizer.
  *
@@ -34,6 +36,19 @@ public final class StepToken {
     }
 
     public int getPosition() {
+        return position;
+    }
+
+    // Record-style accessors
+    public StepTokenType type() {
+        return type;
+    }
+
+    public String text() {
+        return text;
+    }
+
+    public int position() {
         return position;
     }
 

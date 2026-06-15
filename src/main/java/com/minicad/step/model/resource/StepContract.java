@@ -47,6 +47,11 @@ public final class StepContract implements StepEntity {
         return kind;
     }
 
+    // Record-style accessor
+    public StepContractType kind() {
+        return kind;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

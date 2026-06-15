@@ -55,6 +55,11 @@ public final class StepDocument implements StepEntity {
         return kind;
     }
 
+    // Record-style accessor
+    public StepDocumentType kind() {
+        return kind;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

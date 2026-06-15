@@ -49,6 +49,11 @@ public final class StepPresentationLayerAssignment implements StepEntity {
         return assignedItems;
     }
 
+    // Record-style accessor
+    public List<StepEntity> assignedItems() {
+        return assignedItems;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

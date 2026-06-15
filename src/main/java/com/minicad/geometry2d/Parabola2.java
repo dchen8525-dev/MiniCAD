@@ -47,6 +47,24 @@ public final class Parabola2 implements Curve2 {
         return focalDistance;
     }
 
+    // Record-style accessors
+    public Point2 vertex() { return getVertex(); }
+    public Direction2 axisDirection() { return getAxisDirection(); }
+    public double focalDistance() { return getFocalDistance(); }
+
+    @Override
+    public Point2 pointAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        // Parabola parametric equation: y = (x^2) / (4 * focalDistance)
+        // In local coordinates: x = parameter, y = parameter^2 / (4 * focalDistance)
+        double xLocal = parameter;
+        double yLocal = (parameter * parameter) / (4 * focalDistance);
+        Vector2 axis = axisDirection.asVector();
+        Direction2 perpDir = axisDirection.perpendicular();
+        Vector2 perp = perpDir.asVector();
+        return vertex.add(axis.scale(yLocal)).add(perp.scale(xLocal));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -63,5 +81,30 @@ public final class Parabola2 implements Curve2 {
     @Override
     public String toString() {
         return "Parabola2{" + "vertex=" + vertex + "axisDirection=" + axisDirection + "focalDistance=" + focalDistance + "}";
+    }
+
+    @Override
+    public boolean contains(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        // Transform point to local coordinates
+        Vector2 toPoint = point.subtract(vertex);
+        Vector2 axis = axisDirection.asVector();
+        Vector2 perp = axisDirection.perpendicular().asVector();
+        double yLocal = toPoint.dot(axis); // Along axis (away from vertex)
+        double xLocal = toPoint.dot(perp);  // Perpendicular to axis
+        // Check parabola equation: y = x^2 / (4 * focalDistance)
+        double expectedY = (xLocal * xLocal) / (4 * focalDistance);
+        return Math.abs(yLocal - expectedY) < Epsilon.get();
+    }
+
+    @Override
+    public List<Point2> sample(int segments) {
+        List<Point2> points = new ArrayList<>();
+        // Sample a range of parameter values
+        for (int i = -segments; i <= segments; i++) {
+            double t = 0.5 * i; // Scale to get meaningful range
+            points.add(pointAt(t));
+        }
+        return List.copyOf(points);
     }
 }

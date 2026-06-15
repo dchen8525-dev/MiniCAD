@@ -24,6 +24,11 @@ final class PreviewPayload {
     private final List<InstancePayload> instances;
 
     public PreviewPayload(PreviewStats stats, BoundsPayload bounds, ValidationPayload validation, ProductMetadataExtractor.ProductMetadata product, UnitExtractor.UnitInfo units, List<PmiPayload> pmi, List<MiniCadIssue> issues, List<UnsupportedBooleanPayload> unsupportedBooleans, List<UnsupportedFacePayload> unsupportedFaces, List<EdgePayload> edges, List<FacePayload> faces, List<RepresentationPayload> representations, List<InstancePayload> instances) {
+        this.stats = stats;
+        this.bounds = bounds;
+        this.validation = validation;
+        this.product = product;
+        this.units = units;
         this.pmi = PreviewPayloadCopies.copy(pmi);
         this.issues = PreviewPayloadCopies.copy(issues);
         this.unsupportedBooleans = PreviewPayloadCopies.copy(unsupportedBooleans);
@@ -74,6 +79,21 @@ final class PreviewPayload {
         return instances;
     }
 
+    // Record-style accessors
+    public PreviewStats stats() { return stats; }
+    public BoundsPayload bounds() { return bounds; }
+    public ValidationPayload validation() { return validation; }
+    public ProductMetadataExtractor.ProductMetadata product() { return product; }
+    public UnitExtractor.UnitInfo units() { return units; }
+    public List<PmiPayload> pmi() { return pmi; }
+    public List<MiniCadIssue> issues() { return issues; }
+    public List<UnsupportedBooleanPayload> unsupportedBooleans() { return unsupportedBooleans; }
+    public List<UnsupportedFacePayload> unsupportedFaces() { return unsupportedFaces; }
+    public List<EdgePayload> edges() { return edges; }
+    public List<FacePayload> faces() { return faces; }
+    public List<RepresentationPayload> representations() { return representations; }
+    public List<InstancePayload> instances() { return instances; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PreviewPayload)) return false;
@@ -101,6 +121,8 @@ final class AssemblyData {
         this.representations = PreviewPayloadCopies.copy(representations);
         this.instances = PreviewPayloadCopies.copy(instances);
         this.unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
+        this.summary = summary;
+        this.bounds = bounds;
     }
 
     public List<RepresentationPayload> getRepresentations() {
@@ -118,6 +140,13 @@ final class AssemblyData {
     public BoundsPayload getBounds() {
         return bounds;
     }
+
+    // Record-style accessors
+    public List<RepresentationPayload> representations() { return representations; }
+    public List<InstancePayload> instances() { return instances; }
+    public List<UnsupportedFacePayload> unsupportedFaces() { return unsupportedFaces; }
+    public GeometrySummary summary() { return summary; }
+    public BoundsPayload bounds() { return bounds; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -150,6 +179,10 @@ final class AssemblyMetrics {
     public BoundsPayload getBounds() {
         return bounds;
     }
+
+    // Record-style accessors
+    public GeometrySummary summary() { return summary; }
+    public BoundsPayload bounds() { return bounds; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -188,6 +221,11 @@ final class GeometryCollection {
         return unsupportedFaces;
     }
 
+    // Record-style accessors
+    public List<EdgePayload> edges() { return edges; }
+    public List<FacePayload> faces() { return faces; }
+    public List<UnsupportedFacePayload> unsupportedFaces() { return unsupportedFaces; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GeometryCollection)) return false;
@@ -209,6 +247,7 @@ final class RepresentationBuildResult {
     private final List<UnsupportedFacePayload> unsupportedFaces;
 
     public RepresentationBuildResult(RepresentationPayload payload, List<UnsupportedFacePayload> unsupportedFaces) {
+        this.payload = payload;
         this.unsupportedFaces = PreviewPayloadCopies.copy(unsupportedFaces);
     }
 
@@ -218,6 +257,10 @@ final class RepresentationBuildResult {
     public List<UnsupportedFacePayload> getUnsupportedFaces() {
         return unsupportedFaces;
     }
+
+    // Record-style accessors
+    public RepresentationPayload payload() { return payload; }
+    public List<UnsupportedFacePayload> unsupportedFaces() { return unsupportedFaces; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -276,6 +319,15 @@ final class PreviewStats {
         return unsupportedBooleanCount;
     }
 
+    // Record-style accessors
+    public int entityCount() { return entityCount; }
+    public int solidCount() { return solidCount; }
+    public int shellCount() { return shellCount; }
+    public int faceCount() { return faceCount; }
+    public int edgeCount() { return edgeCount; }
+    public int unsupportedFaceCount() { return unsupportedFaceCount; }
+    public int unsupportedBooleanCount() { return unsupportedBooleanCount; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PreviewStats)) return false;
@@ -307,6 +359,10 @@ final class BoundsPayload {
     public PointPayload getMax() {
         return max;
     }
+
+    // Record-style accessors
+    public PointPayload min() { return min; }
+    public PointPayload max() { return max; }
 
     @Override
     public boolean equals(Object o) {
@@ -373,6 +429,16 @@ final class ValidationPayload {
         return report;
     }
 
+    // Record-style accessors
+    public int representationCount() { return representationCount; }
+    public int instanceCount() { return instanceCount; }
+    public int renderedFaceCount() { return renderedFaceCount; }
+    public int renderedEdgeCount() { return renderedEdgeCount; }
+    public double approxSurfaceArea() { return approxSurfaceArea; }
+    public double approxEdgeLength() { return approxEdgeLength; }
+    public PointPayload center() { return center; }
+    public ValidationReportPayload report() { return report; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ValidationPayload)) return false;
@@ -396,6 +462,9 @@ final class ValidationReportPayload {
     private final List<ValidationCheckPayload> checks;
 
     public ValidationReportPayload(String status, int okCount, int warnCount, List<ValidationCheckPayload> checks) {
+        this.status = status;
+        this.okCount = okCount;
+        this.warnCount = warnCount;
         this.checks = PreviewPayloadCopies.copy(checks);
     }
 
@@ -411,6 +480,12 @@ final class ValidationReportPayload {
     public List<ValidationCheckPayload> getChecks() {
         return checks;
     }
+
+    // Record-style accessors
+    public String status() { return status; }
+    public int okCount() { return okCount; }
+    public int warnCount() { return warnCount; }
+    public List<ValidationCheckPayload> checks() { return checks; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -474,6 +549,16 @@ final class ValidationCheckPayload {
         return matches;
     }
 
+    // Record-style accessors
+    public String propertyId() { return propertyId; }
+    public String name() { return name; }
+    public String measureType() { return measureType; }
+    public double expected() { return expected; }
+    public double actual() { return actual; }
+    public double delta() { return delta; }
+    public String status() { return status; }
+    public boolean matches() { return matches; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ValidationCheckPayload)) return false;
@@ -526,6 +611,31 @@ final class ValidationContext {
         return sizeZ;
     }
 
+    // Record-style accessors
+    public int representationCount() {
+        return representationCount;
+    }
+
+    public int instanceCount() {
+        return instanceCount;
+    }
+
+    public PointPayload center() {
+        return center;
+    }
+
+    public double sizeX() {
+        return sizeX;
+    }
+
+    public double sizeY() {
+        return sizeY;
+    }
+
+    public double sizeZ() {
+        return sizeZ;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ValidationContext)) return false;
@@ -551,6 +661,9 @@ final class PmiPayload {
     private final List<PmiTargetPayload> targets;
 
     public PmiPayload(String name, String text, PointPayload position, List<PointPayload> leader, List<Integer> targetIds, List<PmiTargetPayload> targets) {
+        this.name = name;
+        this.text = text;
+        this.position = position;
         this.leader = PreviewPayloadCopies.copy(leader);
         this.targetIds = PreviewPayloadCopies.copy(targetIds);
         this.targets = PreviewPayloadCopies.copy(targets);
@@ -574,6 +687,14 @@ final class PmiPayload {
     public List<PmiTargetPayload> getTargets() {
         return targets;
     }
+
+    // Record-style accessors
+    public String name() { return name; }
+    public String text() { return text; }
+    public PointPayload position() { return position; }
+    public List<PointPayload> leader() { return leader; }
+    public List<Integer> targetIds() { return targetIds; }
+    public List<PmiTargetPayload> targets() { return targets; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -604,7 +725,16 @@ final class PmiTargetPayload {
     private final Integer viaDefinitionId;
 
     public PmiTargetPayload(int id, String type, String name, List<String> instanceIds, String viaRelationshipType, Integer viaRelationshipId, String viaUsageType, Integer viaUsageId, String viaDefinitionType, Integer viaDefinitionId) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
         this.instanceIds = PreviewPayloadCopies.copy(instanceIds);
+        this.viaRelationshipType = viaRelationshipType;
+        this.viaRelationshipId = viaRelationshipId;
+        this.viaUsageType = viaUsageType;
+        this.viaUsageId = viaUsageId;
+        this.viaDefinitionType = viaDefinitionType;
+        this.viaDefinitionId = viaDefinitionId;
     }
 
     public int getId() {
@@ -638,6 +768,18 @@ final class PmiTargetPayload {
         return viaDefinitionId;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String type() { return type; }
+    public String name() { return name; }
+    public List<String> instanceIds() { return instanceIds; }
+    public String viaRelationshipType() { return viaRelationshipType; }
+    public Integer viaRelationshipId() { return viaRelationshipId; }
+    public String viaUsageType() { return viaUsageType; }
+    public Integer viaUsageId() { return viaUsageId; }
+    public String viaDefinitionType() { return viaDefinitionType; }
+    public Integer viaDefinitionId() { return viaDefinitionId; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PmiTargetPayload)) return false;
@@ -663,7 +805,10 @@ final class RepresentationPayload {
     private final List<FacePayload> faces;
 
     public RepresentationPayload(int id, String name, List<String> layers, ColorPayload color, List<EdgePayload> edges, List<FacePayload> faces) {
+        this.id = id;
+        this.name = name;
         this.layers = PreviewPayloadCopies.copy(layers);
+        this.color = color;
         this.edges = PreviewPayloadCopies.copy(edges);
         this.faces = PreviewPayloadCopies.copy(faces);
     }
@@ -686,6 +831,14 @@ final class RepresentationPayload {
     public List<FacePayload> getFaces() {
         return faces;
     }
+
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public List<String> layers() { return layers; }
+    public ColorPayload color() { return color; }
+    public List<EdgePayload> edges() { return edges; }
+    public List<FacePayload> faces() { return faces; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -717,9 +870,17 @@ final class InstancePayload {
     private final int depth;
 
     public InstancePayload(String id, String parentId, int productDefinitionId, Integer occurrenceId, Integer representationId, List<Integer> representationIds, String label, String description, double[] localMatrix, double[] worldMatrix, int depth) {
+        this.id = id;
+        this.parentId = parentId;
+        this.productDefinitionId = productDefinitionId;
+        this.occurrenceId = occurrenceId;
+        this.representationId = representationId;
         this.representationIds = PreviewPayloadCopies.copy(representationIds);
+        this.label = label;
+        this.description = description;
         this.localMatrix = PreviewPayloadCopies.copy(localMatrix);
         this.worldMatrix = PreviewPayloadCopies.copy(worldMatrix);
+        this.depth = depth;
     }
 
     public String getId() {
@@ -756,6 +917,19 @@ final class InstancePayload {
         return depth;
     }
 
+    // Record-style accessors
+    public String id() { return id; }
+    public String parentId() { return parentId; }
+    public int productDefinitionId() { return productDefinitionId; }
+    public Integer occurrenceId() { return occurrenceId; }
+    public Integer representationId() { return representationId; }
+    public List<Integer> representationIds() { return representationIds; }
+    public String label() { return label; }
+    public String description() { return description; }
+    public double[] localMatrix() { return localMatrix; }
+    public double[] worldMatrix() { return worldMatrix; }
+    public int depth() { return depth; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof InstancePayload)) return false;
@@ -788,6 +962,11 @@ final class BinaryPreviewPayload {
     private final List<InstancePayload> instances;
 
     public BinaryPreviewPayload(PreviewStats stats, BoundsPayload bounds, ValidationPayload validation, ProductMetadataExtractor.ProductMetadata product, UnitExtractor.UnitInfo units, List<PmiPayload> pmi, List<MiniCadIssue> issues, List<UnsupportedBooleanPayload> unsupportedBooleans, List<UnsupportedFacePayload> unsupportedFaces, List<BinaryEdgePayload> edges, List<BinaryFacePayload> faces, List<BinaryRepresentationPayload> representations, List<InstancePayload> instances) {
+        this.stats = stats;
+        this.bounds = bounds;
+        this.validation = validation;
+        this.product = product;
+        this.units = units;
         this.pmi = PreviewPayloadCopies.copy(pmi);
         this.issues = PreviewPayloadCopies.copy(issues);
         this.unsupportedBooleans = PreviewPayloadCopies.copy(unsupportedBooleans);
@@ -838,6 +1017,21 @@ final class BinaryPreviewPayload {
         return instances;
     }
 
+    // Record-style accessors
+    public PreviewStats stats() { return stats; }
+    public BoundsPayload bounds() { return bounds; }
+    public ValidationPayload validation() { return validation; }
+    public ProductMetadataExtractor.ProductMetadata product() { return product; }
+    public UnitExtractor.UnitInfo units() { return units; }
+    public List<PmiPayload> pmi() { return pmi; }
+    public List<MiniCadIssue> issues() { return issues; }
+    public List<UnsupportedBooleanPayload> unsupportedBooleans() { return unsupportedBooleans; }
+    public List<UnsupportedFacePayload> unsupportedFaces() { return unsupportedFaces; }
+    public List<BinaryEdgePayload> edges() { return edges; }
+    public List<BinaryFacePayload> faces() { return faces; }
+    public List<BinaryRepresentationPayload> representations() { return representations; }
+    public List<InstancePayload> instances() { return instances; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BinaryPreviewPayload)) return false;
@@ -863,7 +1057,10 @@ final class BinaryRepresentationPayload {
     private final List<BinaryFacePayload> faces;
 
     public BinaryRepresentationPayload(int id, String name, List<String> layers, ColorPayload color, List<BinaryEdgePayload> edges, List<BinaryFacePayload> faces) {
+        this.id = id;
+        this.name = name;
         this.layers = PreviewPayloadCopies.copy(layers);
+        this.color = color;
         this.edges = PreviewPayloadCopies.copy(edges);
         this.faces = PreviewPayloadCopies.copy(faces);
     }
@@ -886,6 +1083,14 @@ final class BinaryRepresentationPayload {
     public List<BinaryFacePayload> getFaces() {
         return faces;
     }
+
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public List<String> layers() { return layers; }
+    public ColorPayload color() { return color; }
+    public List<BinaryEdgePayload> edges() { return edges; }
+    public List<BinaryFacePayload> faces() { return faces; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -934,6 +1139,13 @@ final class BinaryEdgePayload {
         return color;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public int pointOffset() { return pointOffset; }
+    public int pointCount() { return pointCount; }
+    public EdgeCurvePayload curve() { return curve; }
+    public ColorPayload color() { return color; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -969,9 +1181,19 @@ final class BinaryFacePayload {
     private final int triangleCount;
 
     public BinaryFacePayload(int stepId, String name, String surfaceType, PointPayload origin, VectorPayload normal, boolean sameSense, ColorPayload color, List<String> layers, FaceSurfacePayload surface, List<ParametricLoopPayload> uvLoops, List<BinaryLoopPayload> loops, int triangleOffset, int triangleCount) {
+        this.stepId = stepId;
+        this.name = name;
+        this.surfaceType = surfaceType;
+        this.origin = origin;
+        this.normal = normal;
+        this.sameSense = sameSense;
+        this.color = color;
         this.layers = PreviewPayloadCopies.copy(layers);
+        this.surface = surface;
         this.uvLoops = PreviewPayloadCopies.copy(uvLoops);
         this.loops = PreviewPayloadCopies.copy(loops);
+        this.triangleOffset = triangleOffset;
+        this.triangleCount = triangleCount;
     }
 
     public int getStepId() {
@@ -1014,6 +1236,21 @@ final class BinaryFacePayload {
         return triangleCount;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public String name() { return name; }
+    public String surfaceType() { return surfaceType; }
+    public PointPayload origin() { return origin; }
+    public VectorPayload normal() { return normal; }
+    public boolean sameSense() { return sameSense; }
+    public ColorPayload color() { return color; }
+    public List<String> layers() { return layers; }
+    public FaceSurfacePayload surface() { return surface; }
+    public List<ParametricLoopPayload> uvLoops() { return uvLoops; }
+    public List<BinaryLoopPayload> loops() { return loops; }
+    public int triangleOffset() { return triangleOffset; }
+    public int triangleCount() { return triangleCount; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BinaryFacePayload)) return false;
@@ -1051,6 +1288,11 @@ final class BinaryLoopPayload {
         return pointCount;
     }
 
+    // Record-style accessors
+    public boolean outer() { return outer; }
+    public int pointOffset() { return pointOffset; }
+    public int pointCount() { return pointCount; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -1085,6 +1327,10 @@ final class PointRange {
     public int getCount() {
         return count;
     }
+
+    // Record-style accessors
+    public int offset() { return offset; }
+    public int count() { return count; }
 
     @Override
     public boolean equals(Object o) {
@@ -1121,6 +1367,10 @@ final class UvPoint {
         return v;
     }
 
+    // Record-style accessors
+    public double u() { return u; }
+    public double v() { return v; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -1142,31 +1392,40 @@ final class UvPoint {
 
 final class ParametricLoopPayload {
     private final boolean outer;
+    private final List<UvPoint> points;
 
-    public ParametricLoopPayload(boolean outer) {
+    public ParametricLoopPayload(boolean outer, List<UvPoint> points) {
+        this.outer = outer;
         this.points = PreviewPayloadCopies.copy(points);
     }
 
     public boolean getOuter() {
         return outer;
     }
+    public List<UvPoint> getPoints() {
+        return points;
+    }
+
+    // Record-style accessors
+    public boolean outer() { return outer; }
+    public List<UvPoint> points() { return points; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ParametricLoopPayload that = (ParametricLoopPayload) o;
-        return outer == that.outer;
+        return outer == that.outer && java.util.Objects.equals(points, that.points);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(Boolean.hashCode(outer));
+        return java.util.Objects.hash(Boolean.hashCode(outer), points);
     }
 
     @Override
     public String toString() {
-        return "ParametricLoopPayload{outer=" + outer + "}";
+        return "ParametricLoopPayload{outer=" + outer + ", points=" + points + "}";
     }
 }
 
@@ -1196,6 +1455,14 @@ final class UvBounds {
         return maxV;
     }
 
+    // Record-style accessors
+    public double minU() { return minU; }
+    public double minV() { return minV; }
+    public double maxU() { return maxU; }
+    public double maxV() { return maxV; }
+    public double uSpan() { return maxU - minU; }
+    public double vSpan() { return maxV - minV; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -1217,15 +1484,22 @@ final class UvBounds {
 
 final class EdgePayload {
     private final int stepId;
+    private final List<PointPayload> points;
     private final EdgeCurvePayload curve;
     private final ColorPayload color;
 
-    public EdgePayload(int stepId, EdgeCurvePayload curve, ColorPayload color) {
+    public EdgePayload(int stepId, List<PointPayload> points, EdgeCurvePayload curve, ColorPayload color) {
+        this.stepId = stepId;
         this.points = PreviewPayloadCopies.copy(points);
+        this.curve = curve;
+        this.color = color;
     }
 
     public int getStepId() {
         return stepId;
+    }
+    public List<PointPayload> getPoints() {
+        return points;
     }
     public EdgeCurvePayload getCurve() {
         return curve;
@@ -1234,22 +1508,28 @@ final class EdgePayload {
         return color;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public List<PointPayload> points() { return points; }
+    public EdgeCurvePayload curve() { return curve; }
+    public ColorPayload color() { return color; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EdgePayload that = (EdgePayload) o;
-        return stepId == that.stepId && java.util.Objects.equals(curve, that.curve) && java.util.Objects.equals(color, that.color);
+        return stepId == that.stepId && java.util.Objects.equals(points, that.points) && java.util.Objects.equals(curve, that.curve) && java.util.Objects.equals(color, that.color);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(stepId, curve, color);
+        return java.util.Objects.hash(stepId, points, curve, color);
     }
 
     @Override
     public String toString() {
-        return "EdgePayload{stepId=" + stepId + ", curve=" + curve + ", color=" + color + "}";
+        return "EdgePayload{stepId=" + stepId + ", points=" + points + ", curve=" + curve + ", color=" + color + "}";
     }
 }
 
@@ -1279,12 +1559,29 @@ final class EdgeCurvePayload {
     private final double sweepAngle;
 
     public EdgeCurvePayload(int stepId, String type, String basisType, Integer basisStepId, List<Double> center, List<Double> axis, List<Double> xDirection, Double radius, Double semiAxis1, Double semiAxis2, Boolean orientation, Boolean senseAgreement, Double offsetDistance, Boolean selfIntersect, List<Double> refDirection, Double transformScale, String masterRepresentation, List<String> associatedSurfaceTypes, List<Integer> associatedSurfaceStepIds, String sourceType, Integer sourceStepId, double startAngle, double sweepAngle) {
+        this.stepId = stepId;
+        this.type = type;
+        this.basisType = basisType;
+        this.basisStepId = basisStepId;
         this.center = PreviewPayloadCopies.copy(center);
         this.axis = PreviewPayloadCopies.copy(axis);
         this.xDirection = PreviewPayloadCopies.copy(xDirection);
+        this.radius = radius;
+        this.semiAxis1 = semiAxis1;
+        this.semiAxis2 = semiAxis2;
+        this.orientation = orientation;
+        this.senseAgreement = senseAgreement;
+        this.offsetDistance = offsetDistance;
+        this.selfIntersect = selfIntersect;
         this.refDirection = PreviewPayloadCopies.copy(refDirection);
+        this.transformScale = transformScale;
+        this.masterRepresentation = masterRepresentation;
         this.associatedSurfaceTypes = PreviewPayloadCopies.copy(associatedSurfaceTypes);
         this.associatedSurfaceStepIds = PreviewPayloadCopies.copy(associatedSurfaceStepIds);
+        this.sourceType = sourceType;
+        this.sourceStepId = sourceStepId;
+        this.startAngle = startAngle;
+        this.sweepAngle = sweepAngle;
     }
 
     public int getStepId() {
@@ -1357,6 +1654,31 @@ final class EdgeCurvePayload {
         return sweepAngle;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public String type() { return type; }
+    public String basisType() { return basisType; }
+    public Integer basisStepId() { return basisStepId; }
+    public List<Double> center() { return center; }
+    public List<Double> axis() { return axis; }
+    public List<Double> xDirection() { return xDirection; }
+    public Double radius() { return radius; }
+    public Double semiAxis1() { return semiAxis1; }
+    public Double semiAxis2() { return semiAxis2; }
+    public Boolean orientation() { return orientation; }
+    public Boolean senseAgreement() { return senseAgreement; }
+    public Double offsetDistance() { return offsetDistance; }
+    public Boolean selfIntersect() { return selfIntersect; }
+    public List<Double> refDirection() { return refDirection; }
+    public Double transformScale() { return transformScale; }
+    public String masterRepresentation() { return masterRepresentation; }
+    public List<String> associatedSurfaceTypes() { return associatedSurfaceTypes; }
+    public List<Integer> associatedSurfaceStepIds() { return associatedSurfaceStepIds; }
+    public String sourceType() { return sourceType; }
+    public Integer sourceStepId() { return sourceStepId; }
+    public double startAngle() { return startAngle; }
+    public double sweepAngle() { return sweepAngle; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EdgeCurvePayload)) return false;
@@ -1406,14 +1728,41 @@ final class FaceSurfacePayload {
     private final Double transformScale;
 
     public FaceSurfacePayload(String type, List<Double> center, List<Double> axis, List<Double> xDirection, double radius, Double minorRadius, Double semiAngle, double lowerHeight, double upperHeight, double startAngle, double sweepAngle, Integer uDegree, Integer vDegree, List<List<List<Double>>> controlPoints, List<Integer> uMultiplicities, List<Integer> vMultiplicities, List<Double> uKnots, List<Double> vKnots, String sourceType, Integer sourceStepId, String basisType, Integer basisStepId, Boolean orientation, Double offsetDistance, Double trimU1, Double trimU2, Double trimV1, Double trimV2, Boolean implicitOuter, Double transformScale) {
+        this.type = type;
         this.center = PreviewPayloadCopies.copy(center);
         this.axis = PreviewPayloadCopies.copy(axis);
         this.xDirection = PreviewPayloadCopies.copy(xDirection);
+        this.radius = radius;
+        this.minorRadius = minorRadius;
+        this.semiAngle = semiAngle;
+        this.lowerHeight = lowerHeight;
+        this.upperHeight = upperHeight;
+        this.startAngle = startAngle;
+        this.sweepAngle = sweepAngle;
+        this.uDegree = uDegree;
+        this.vDegree = vDegree;
         this.controlPoints = PreviewPayloadCopies.copyControlPoints(controlPoints);
         this.uMultiplicities = PreviewPayloadCopies.copy(uMultiplicities);
         this.vMultiplicities = PreviewPayloadCopies.copy(vMultiplicities);
         this.uKnots = PreviewPayloadCopies.copy(uKnots);
         this.vKnots = PreviewPayloadCopies.copy(vKnots);
+        this.sourceType = sourceType;
+        this.sourceStepId = sourceStepId;
+        this.basisType = basisType;
+        this.basisStepId = basisStepId;
+        this.orientation = orientation;
+        this.offsetDistance = offsetDistance;
+        this.trimU1 = trimU1;
+        this.trimU2 = trimU2;
+        this.trimV1 = trimV1;
+        this.trimV2 = trimV2;
+        this.implicitOuter = implicitOuter;
+        this.transformScale = transformScale;
+    }
+
+    // Convenience constructor for basic surface types with 17 parameters
+    public FaceSurfacePayload(String type, List<Double> center, List<Double> axis, List<Double> xDirection, double radius, Double minorRadius, Double semiAngle, double lowerHeight, double upperHeight, double startAngle, double sweepAngle, Integer uDegree, Integer vDegree, List<List<List<Double>>> controlPoints, List<Integer> uMultiplicities, List<Integer> vMultiplicities, List<Double> uKnots) {
+        this(type, center, axis, xDirection, radius, minorRadius, semiAngle, lowerHeight, upperHeight, startAngle, sweepAngle, uDegree, vDegree, controlPoints, uMultiplicities, vMultiplicities, uKnots, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     public String getType() {
@@ -1507,6 +1856,38 @@ final class FaceSurfacePayload {
         return transformScale;
     }
 
+    // Record-style accessors
+    public String type() { return type; }
+    public List<Double> center() { return center; }
+    public List<Double> axis() { return axis; }
+    public List<Double> xDirection() { return xDirection; }
+    public double radius() { return radius; }
+    public Double minorRadius() { return minorRadius; }
+    public Double semiAngle() { return semiAngle; }
+    public double lowerHeight() { return lowerHeight; }
+    public double upperHeight() { return upperHeight; }
+    public double startAngle() { return startAngle; }
+    public double sweepAngle() { return sweepAngle; }
+    public Integer uDegree() { return uDegree; }
+    public Integer vDegree() { return vDegree; }
+    public List<List<List<Double>>> controlPoints() { return controlPoints; }
+    public List<Integer> uMultiplicities() { return uMultiplicities; }
+    public List<Integer> vMultiplicities() { return vMultiplicities; }
+    public List<Double> uKnots() { return uKnots; }
+    public List<Double> vKnots() { return vKnots; }
+    public String sourceType() { return sourceType; }
+    public Integer sourceStepId() { return sourceStepId; }
+    public String basisType() { return basisType; }
+    public Integer basisStepId() { return basisStepId; }
+    public Boolean orientation() { return orientation; }
+    public Double offsetDistance() { return offsetDistance; }
+    public Double trimU1() { return trimU1; }
+    public Double trimU2() { return trimU2; }
+    public Double trimV1() { return trimV1; }
+    public Double trimV2() { return trimV2; }
+    public Boolean implicitOuter() { return implicitOuter; }
+    public Double transformScale() { return transformScale; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FaceSurfacePayload)) return false;
@@ -1540,9 +1921,19 @@ final class FacePayload {
     private final List<ParametricLoopPayload> uvLoops;
 
     public FacePayload(int stepId, String name, String surfaceType, PointPayload origin, VectorPayload normal, boolean sameSense, ColorPayload color, double transparency, PbrPayload pbr, List<String> layers, List<LoopPayload> loops, List<PointPayload> triangles, FaceSurfacePayload surface, List<ParametricLoopPayload> uvLoops) {
+        this.stepId = stepId;
+        this.name = name;
+        this.surfaceType = surfaceType;
+        this.origin = origin;
+        this.normal = normal;
+        this.sameSense = sameSense;
+        this.color = color;
+        this.transparency = transparency;
+        this.pbr = pbr;
         this.layers = PreviewPayloadCopies.copy(layers);
         this.loops = PreviewPayloadCopies.copy(loops);
         this.triangles = PreviewPayloadCopies.copy(triangles);
+        this.surface = surface;
         this.uvLoops = PreviewPayloadCopies.copy(uvLoops);
     }
 
@@ -1589,6 +1980,22 @@ final class FacePayload {
         return uvLoops;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public String name() { return name; }
+    public String surfaceType() { return surfaceType; }
+    public PointPayload origin() { return origin; }
+    public VectorPayload normal() { return normal; }
+    public boolean sameSense() { return sameSense; }
+    public ColorPayload color() { return color; }
+    public double transparency() { return transparency; }
+    public PbrPayload pbr() { return pbr; }
+    public List<String> layers() { return layers; }
+    public List<LoopPayload> loops() { return loops; }
+    public List<PointPayload> triangles() { return triangles; }
+    public FaceSurfacePayload surface() { return surface; }
+    public List<ParametricLoopPayload> uvLoops() { return uvLoops; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FacePayload)) return false;
@@ -1630,6 +2037,12 @@ final class UnsupportedFacePayload {
     public String getReason() {
         return reason;
     }
+
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public String name() { return name; }
+    public String surfaceType() { return surfaceType; }
+    public String reason() { return reason; }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -1673,6 +2086,12 @@ final class UnsupportedBooleanPayload {
         return reason;
     }
 
+    // Record-style accessors
+    public int stepId() { return stepId; }
+    public String name() { return name; }
+    public String type() { return type; }
+    public String reason() { return reason; }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UnsupportedBooleanPayload)) return false;
@@ -1704,6 +2123,10 @@ final class PreviewFaceResult {
     public UnsupportedFacePayload getUnsupportedFace() {
         return unsupportedFace;
     }
+
+    // Record-style accessors
+    public FacePayload face() { return face; }
+    public UnsupportedFacePayload unsupportedFace() { return unsupportedFace; }
 
     @Override
     public boolean equals(Object o) {
@@ -1856,31 +2279,40 @@ final class SurfacePatch {
 
 final class LoopPayload {
     private final boolean outer;
+    private final List<PointPayload> points;
 
-    public LoopPayload(boolean outer) {
+    public LoopPayload(boolean outer, List<PointPayload> points) {
+        this.outer = outer;
         this.points = PreviewPayloadCopies.copy(points);
     }
 
     public boolean getOuter() {
         return outer;
     }
+    public List<PointPayload> getPoints() {
+        return points;
+    }
+
+    // Record-style accessors
+    public boolean outer() { return outer; }
+    public List<PointPayload> points() { return points; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LoopPayload that = (LoopPayload) o;
-        return outer == that.outer;
+        return outer == that.outer && java.util.Objects.equals(points, that.points);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(Boolean.hashCode(outer));
+        return java.util.Objects.hash(Boolean.hashCode(outer), points);
     }
 
     @Override
     public String toString() {
-        return "LoopPayload{outer=" + outer + "}";
+        return "LoopPayload{outer=" + outer + ", points=" + points + "}";
     }
 }
 
@@ -1904,6 +2336,11 @@ final class PointPayload {
     public double getZ() {
         return z;
     }
+
+    // Record-style accessors
+    public double x() { return x; }
+    public double y() { return y; }
+    public double z() { return z; }
 
     @Override
     public boolean equals(Object o) {
@@ -1945,6 +2382,11 @@ final class VectorPayload {
         return z;
     }
 
+    // Record-style accessors
+    public double x() { return x; }
+    public double y() { return y; }
+    public double z() { return z; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -1985,6 +2427,11 @@ final class ColorPayload {
         return blue;
     }
 
+    // Record-style accessors
+    public int red() { return red; }
+    public int green() { return green; }
+    public int blue() { return blue; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -2011,6 +2458,9 @@ final class PbrPayload {
     private final int[] specularColor;
 
     public PbrPayload(double diffuse, double specular, Double specularExponent, int[] specularColor) {
+        this.diffuse = diffuse;
+        this.specular = specular;
+        this.specularExponent = specularExponent;
         this.specularColor = PreviewPayloadCopies.copy(specularColor);
     }
 
@@ -2026,6 +2476,12 @@ final class PbrPayload {
     public int[] getSpecularColor() {
         return specularColor;
     }
+
+    // Record-style accessors
+    public double diffuse() { return diffuse; }
+    public double specular() { return specular; }
+    public Double specularExponent() { return specularExponent; }
+    public int[] specularColor() { return specularColor; }
 
     @Override
     public boolean equals(Object o) {
@@ -2072,6 +2528,12 @@ final class GeometrySummary {
         return approxEdgeLength;
     }
 
+    // Record-style accessors
+    public int faceCount() { return faceCount; }
+    public int edgeCount() { return edgeCount; }
+    public double approxSurfaceArea() { return approxSurfaceArea; }
+    public double approxEdgeLength() { return approxEdgeLength; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -2093,8 +2555,11 @@ final class GeometrySummary {
 
 final class RepresentationMeshes {
     private final String name;
+    private final List<FaceNode> faces;
+    private final List<EdgeNode> edges;
 
-    public RepresentationMeshes(String name) {
+    public RepresentationMeshes(String name, List<FaceNode> faces, List<EdgeNode> edges) {
+        this.name = name;
         this.faces = PreviewPayloadCopies.copy(faces);
         this.edges = PreviewPayloadCopies.copy(edges);
     }
@@ -2102,23 +2567,34 @@ final class RepresentationMeshes {
     public String getName() {
         return name;
     }
+    public List<FaceNode> getFaces() {
+        return faces;
+    }
+    public List<EdgeNode> getEdges() {
+        return edges;
+    }
+
+    // Record-style accessors
+    public String name() { return name; }
+    public List<FaceNode> faces() { return faces; }
+    public List<EdgeNode> edges() { return edges; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RepresentationMeshes that = (RepresentationMeshes) o;
-        return java.util.Objects.equals(name, that.name);
+        return java.util.Objects.equals(name, that.name) && java.util.Objects.equals(faces, that.faces) && java.util.Objects.equals(edges, that.edges);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(name);
+        return java.util.Objects.hash(name, faces, edges);
     }
 
     @Override
     public String toString() {
-        return "RepresentationMeshes{name=" + name + "}";
+        return "RepresentationMeshes{name=" + name + ", faces=" + faces + ", edges=" + edges + "}";
     }
 }
 
@@ -2142,6 +2618,11 @@ final class FaceNode {
     public String getName() {
         return name;
     }
+
+    // Record-style accessors
+    public FacePayload face() { return face; }
+    public int meshIndex() { return meshIndex; }
+    public String name() { return name; }
 
     @Override
     public boolean equals(Object o) {
@@ -2183,6 +2664,11 @@ final class EdgeNode {
         return name;
     }
 
+    // Record-style accessors
+    public EdgePayload edge() { return edge; }
+    public int meshIndex() { return meshIndex; }
+    public String name() { return name; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -2210,6 +2696,7 @@ final class FloatArrayData {
 
     public FloatArrayData(float[] values, int count, float[] min, float[] max) {
         this.values = PreviewPayloadCopies.copy(values);
+        this.count = count;
         this.min = PreviewPayloadCopies.copy(min);
         this.max = PreviewPayloadCopies.copy(max);
     }
@@ -2226,6 +2713,12 @@ final class FloatArrayData {
     public float[] getMax() {
         return max;
     }
+
+    // Record-style accessors
+    public float[] values() { return values; }
+    public int count() { return count; }
+    public float[] min() { return min; }
+    public float[] max() { return max; }
 
     @Override
     public boolean equals(Object o) {
@@ -2252,6 +2745,7 @@ final class IntArrayData {
 
     public IntArrayData(int[] values, int count) {
         this.values = PreviewPayloadCopies.copy(values);
+        this.count = count;
     }
 
     public int[] getValues() {
@@ -2260,6 +2754,10 @@ final class IntArrayData {
     public int getCount() {
         return count;
     }
+
+    // Record-style accessors
+    public int[] values() { return values; }
+    public int count() { return count; }
 
     @Override
     public boolean equals(Object o) {
@@ -2300,6 +2798,11 @@ final class IndexedTriangleMesh {
     public IntArrayData getIndices() {
         return indices;
     }
+
+    // Record-style accessors
+    public FloatArrayData positions() { return positions; }
+    public FloatArrayData normals() { return normals; }
+    public IntArrayData indices() { return indices; }
 
     @Override
     public boolean equals(Object o) {

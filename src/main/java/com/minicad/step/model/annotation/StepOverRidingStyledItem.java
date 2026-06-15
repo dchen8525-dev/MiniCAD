@@ -57,6 +57,13 @@ public final class StepOverRidingStyledItem implements StepEntity {
         return overRiddenStyle;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public List<StepPresentationStyleAssignment> styles() { return styles; }
+    public StepEntity item() { return item; }
+    public StepStyledItem overRiddenStyle() { return overRiddenStyle; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -46,4 +46,15 @@ public final class VertexLoop implements Loop {
     public String toString() {
         return "VertexLoop{" + "vertex=" + vertex + "}";
     }
+
+    @Override
+    public BoundingBox3 boundingBox() {
+        if (vertex == null || vertex.point() == null) {
+            return BoundingBox3.empty();
+        }
+        return new BoundingBox3(
+            vertex.point().x(), vertex.point().y(), vertex.point().z(),
+            vertex.point().x(), vertex.point().y(), vertex.point().z()
+        );
+    }
 }

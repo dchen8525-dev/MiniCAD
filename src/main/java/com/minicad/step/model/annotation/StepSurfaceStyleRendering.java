@@ -44,6 +44,27 @@ public final class StepSurfaceStyleRendering implements StepEntity {
         return specularReflection;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public StepEntity surfaceStyle() {
+        return surfaceStyle;
+    }
+
+    public double transparency() {
+        return transparency;
+    }
+
+    public double diffuseReflection() {
+        return diffuseReflection;
+    }
+
+    public double specularReflection() {
+        return specularReflection;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

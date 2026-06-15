@@ -57,6 +57,23 @@ public final class StepProductContext implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String disciplineType() {
+        return disciplineType;
+    }
+
+    public StepApplicationContext frameOfReference() {
+        return frameOfReference;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

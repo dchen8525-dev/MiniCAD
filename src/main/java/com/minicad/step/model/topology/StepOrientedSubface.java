@@ -49,6 +49,15 @@ public final class StepOrientedSubface implements StepEntity {
         return orientation;
     }
 
+    // Record-style accessors
+    public StepEntity faceElement() {
+        return faceElement;
+    }
+
+    public boolean orientation() {
+        return orientation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

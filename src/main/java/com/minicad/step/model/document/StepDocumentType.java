@@ -31,6 +31,15 @@ public final class StepDocumentType implements StepEntity {
         return productDataType;
     }
 
+    public String getName() {
+        return productDataType != null ? productDataType : "";
+    }
+
+    // Record-style accessor
+    public String kind() {
+        return productDataType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

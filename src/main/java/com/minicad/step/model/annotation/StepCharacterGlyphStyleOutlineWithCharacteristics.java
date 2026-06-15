@@ -31,11 +31,24 @@ public final class StepCharacterGlyphStyleOutlineWithCharacteristics implements 
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepCurveStyle getOutlineStyle() {
         return outlineStyle;
     }
 
     public StepFillAreaStyle getCharacteristics() {
+        return characteristics;
+    }
+
+    // Record-style accessors
+    public StepCurveStyle outlineStyle() {
+        return outlineStyle;
+    }
+
+    public StepFillAreaStyle characteristics() {
         return characteristics;
     }
 

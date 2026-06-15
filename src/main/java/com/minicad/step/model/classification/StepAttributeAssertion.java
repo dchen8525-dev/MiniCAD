@@ -42,6 +42,15 @@ public final class StepAttributeAssertion implements StepEntity {
         return usedRepresentation;
     }
 
+    // Record-style accessors
+    public StepPropertyDefinition definition() {
+        return definition;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

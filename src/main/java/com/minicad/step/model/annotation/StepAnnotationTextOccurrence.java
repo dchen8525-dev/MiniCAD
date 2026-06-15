@@ -47,6 +47,15 @@ public final class StepAnnotationTextOccurrence implements StepEntity {
         return position;
     }
 
+    // Record-style accessors
+    public String text() {
+        return text;
+    }
+
+    public StepEntity position() {
+        return position;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

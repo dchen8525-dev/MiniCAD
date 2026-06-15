@@ -47,6 +47,14 @@ public final class StepSiUnit implements StepEntity {
         return unitName;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public String name() { return getName(); }
+    public String unitKind() { return unitKind; }
+    public String prefix() { return prefix; }
+    public String unitName() { return unitName; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

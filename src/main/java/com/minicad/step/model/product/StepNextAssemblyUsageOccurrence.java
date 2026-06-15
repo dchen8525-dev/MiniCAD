@@ -71,6 +71,15 @@ public final class StepNextAssemblyUsageOccurrence implements StepEntity {
         return referenceDesignator;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String identifier() { return identifier; }
+    public String name() { return name; }
+    public String description() { return description; }
+    public StepProductDefinition relatingProductDefinition() { return relatingProductDefinition; }
+    public StepProductDefinition relatedProductDefinition() { return relatedProductDefinition; }
+    public String referenceDesignator() { return referenceDesignator; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

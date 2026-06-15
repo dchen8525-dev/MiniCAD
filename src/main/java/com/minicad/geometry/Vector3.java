@@ -1,6 +1,7 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 import java.util.Objects;
 
@@ -106,6 +107,16 @@ public final class Vector3 {
      */
     public Vector3 negate() {
         return new Vector3(-x, -y, -z);
+    }
+
+    /**
+     * Returns the reverse (negated) of this vector.
+     * Alias for negate().
+     *
+     * @return reversed vector
+     */
+    public Vector3 reverse() {
+        return negate();
     }
 
     /**

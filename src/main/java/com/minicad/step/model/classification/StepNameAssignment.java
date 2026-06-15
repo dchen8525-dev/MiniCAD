@@ -31,6 +31,15 @@ public final class StepNameAssignment implements StepEntity {
         return assignedName;
     }
 
+    public String getName() {
+        return assignedName != null ? assignedName : "";
+    }
+
+    // Record-style accessor
+    public String namedItem() {
+        return assignedName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

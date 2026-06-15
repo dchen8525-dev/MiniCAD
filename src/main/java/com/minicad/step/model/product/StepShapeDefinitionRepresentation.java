@@ -41,6 +41,12 @@ public final class StepShapeDefinitionRepresentation implements StepEntity {
         return usedRepresentation;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public StepProductDefinitionShape definition() { return definition; }
+    public StepRepresentation usedRepresentation() { return usedRepresentation; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

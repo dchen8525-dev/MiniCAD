@@ -49,6 +49,10 @@ public final class StepPerson implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return identifier != null ? identifier : "";
+    }
+
     public String getIdentifier() {
         return identifier;
     }

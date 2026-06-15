@@ -75,6 +75,31 @@ public final class StepChainBasedGeometricItemSpecificUsage implements StepEntit
         return identifiedItem;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepEntity usage() {
+        return usage;
+    }
+
+    public List<StepRepresentation> nodes() {
+        return nodes;
+    }
+
+    public List<StepRepresentationRelationship> undirectedLinks() {
+        return undirectedLinks;
+    }
+
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

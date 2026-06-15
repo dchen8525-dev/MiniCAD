@@ -33,6 +33,11 @@ public final class StepFillAreaWithOutline implements StepEntity {
         return outlines;
     }
 
+    // Record-style accessor
+    public List<StepEntity> outlines() {
+        return outlines;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

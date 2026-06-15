@@ -41,6 +41,11 @@ public final class StepPointSet implements StepEntity {
         return points;
     }
 
+    // Record-style accessor
+    public List<StepEntity> points() {
+        return points;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

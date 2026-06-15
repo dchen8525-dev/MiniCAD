@@ -65,6 +65,27 @@ public final class StepItemIdentifiedRepresentationUsage implements StepEntity {
         return identifiedItem;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
+    public StepRepresentation usedRepresentation() {
+        return usedRepresentation;
+    }
+
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

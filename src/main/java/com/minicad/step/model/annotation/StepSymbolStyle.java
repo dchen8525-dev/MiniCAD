@@ -39,6 +39,11 @@ public final class StepSymbolStyle implements StepEntity {
         return styleOfSymbol;
     }
 
+    // Record-style accessor
+    public StepEntity styleOfSymbol() {
+        return styleOfSymbol;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

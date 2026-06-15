@@ -57,6 +57,19 @@ public final class StepGeometricToleranceWithDefinedAreaUnit implements StepEnti
         return areaUnit;
     }
 
+    // Record-style accessors
+    public StepEntity tolerancedFeature() {
+        return tolerancedFeature;
+    }
+
+    public String toleranceType() {
+        return toleranceType;
+    }
+
+    public Double magnitude() {
+        return magnitude;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

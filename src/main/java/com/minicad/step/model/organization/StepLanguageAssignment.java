@@ -27,7 +27,16 @@ public final class StepLanguageAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepLanguage getAssignedLanguage() {
+        return assignedLanguage;
+    }
+
+    // Record-style accessor
+    public StepLanguage assignedLanguage() {
         return assignedLanguage;
     }
 

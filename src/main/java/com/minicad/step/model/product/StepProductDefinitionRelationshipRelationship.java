@@ -71,6 +71,15 @@ public final class StepProductDefinitionRelationshipRelationship implements Step
         return entityName;
     }
 
+    // Record-style accessors
+    public StepProductDefinitionRelationship relating() {
+        return relating;
+    }
+
+    public StepProductDefinitionRelationship related() {
+        return related;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

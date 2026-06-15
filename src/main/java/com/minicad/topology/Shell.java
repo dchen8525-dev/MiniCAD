@@ -39,6 +39,24 @@ public final class Shell {
     public List<Face> faces() { return getFaces(); }
     public boolean closed() { return isClosed(); }
 
+    /**
+     * Returns the bounding box of this shell.
+     *
+     * @return bounding box enclosing all faces
+     */
+    public BoundingBox3 boundingBox() {
+        if (faces == null || faces.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        BoundingBox3 box = BoundingBox3.empty();
+        for (Face face : faces) {
+            if (face != null && face.surface() != null) {
+                box = box.union(face.surface().boundingBox());
+            }
+        }
+        return box;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

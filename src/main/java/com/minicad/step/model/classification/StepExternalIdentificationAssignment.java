@@ -35,6 +35,10 @@ public final class StepExternalIdentificationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return assignedId != null ? assignedId : "";
+    }
+
     public String getAssignedId() {
         return assignedId;
     }
@@ -44,6 +48,15 @@ public final class StepExternalIdentificationAssignment implements StepEntity {
     }
 
     public StepExternalSource getSource() {
+        return source;
+    }
+
+    // Record-style accessors
+    public StepIdentificationRole role() {
+        return role;
+    }
+
+    public StepExternalSource source() {
         return source;
     }
 

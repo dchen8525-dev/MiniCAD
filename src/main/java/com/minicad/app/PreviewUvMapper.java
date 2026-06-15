@@ -1120,7 +1120,7 @@ public final class PreviewUvMapper {
         Vector3 reference = Math.abs(axis.x()) < 0.9
                 ? new Vector3(1.0, 0.0, 0.0)
                 : new Vector3(0.0, 1.0, 0.0);
-        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize();
+        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize().asDirection();
         return List.of(xDirection.x(), xDirection.y(), xDirection.z());
     }
 
@@ -1140,12 +1140,7 @@ public final class PreviewUvMapper {
                 : orientedEdge.edgeElement().start();
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
         StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity>     pcurves = null;
-    switch (associatedSource) {
-        default:
-            pcurves = List.of();
-            break;
-    };
+        List<StepEntity> pcurves = List.of();  // Default: no pcurves
         if (pcurves.isEmpty()) {
             if (shouldFallbackToProjectedEdge(edgeGeometry)) {
                 List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);

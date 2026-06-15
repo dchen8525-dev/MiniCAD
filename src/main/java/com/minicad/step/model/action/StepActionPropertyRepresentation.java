@@ -34,6 +34,10 @@ public final class StepActionPropertyRepresentation implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepPropertyDefinition getDefinition() {
         return definition;
     }
@@ -41,6 +45,10 @@ public final class StepActionPropertyRepresentation implements StepEntity {
     public StepRepresentation getUsedRepresentation() {
         return usedRepresentation;
     }
+
+    // Record-style accessors
+    public StepPropertyDefinition definition() { return getDefinition(); }
+    public StepRepresentation usedRepresentation() { return getUsedRepresentation(); }
 
     @Override
     public boolean equals(Object o) {

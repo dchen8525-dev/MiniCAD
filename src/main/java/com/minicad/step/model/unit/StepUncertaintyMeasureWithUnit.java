@@ -55,6 +55,10 @@ public final class StepUncertaintyMeasureWithUnit implements StepEntity {
         return description;
     }
 
+    // Record-style accessors
+    public double valueComponent() { return getValueComponent(); }
+    public StepEntity unitComponent() { return getUnitComponent(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

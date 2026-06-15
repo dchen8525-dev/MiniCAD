@@ -41,6 +41,15 @@ public final class StepAppliedNameAssignment implements StepEntity {
         return items;
     }
 
+    // Record-style accessors
+    public String namedItem() {
+        return assignedName;
+    }
+
+    public List<StepEntity> items() {
+        return items;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

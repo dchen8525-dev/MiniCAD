@@ -37,6 +37,11 @@ public final class StepVertexLoop implements StepLoop {
         return loopVertex;
     }
 
+    // Record-style accessor
+    public StepVertexPoint loopVertex() {
+        return loopVertex;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

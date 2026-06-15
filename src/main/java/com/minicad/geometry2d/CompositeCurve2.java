@@ -1,7 +1,9 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +28,9 @@ public final class CompositeCurve2 implements Curve2 {
         return segments;
     }
 
+    // Record-style accessors
+    public List<Curve2> segments() { return getSegments(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -42,5 +47,46 @@ public final class CompositeCurve2 implements Curve2 {
     @Override
     public String toString() {
         return "CompositeCurve2{" + "segments=" + segments + "}";
+    }
+
+    @Override
+    public Point2 pointAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        if (segments == null || segments.isEmpty()) {
+            return new Point2(0, 0);
+        }
+        // Map parameter to segment
+        int n = segments.size();
+        double segmentParam = parameter * n;
+        int segmentIndex = (int) segmentParam;
+        segmentIndex = Math.max(0, Math.min(segmentIndex, n - 1));
+        double localParam = segmentParam - segmentIndex;
+        return segments.get(segmentIndex).pointAt(localParam);
+    }
+
+    @Override
+    public boolean contains(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        if (segments == null || segments.isEmpty()) {
+            return false;
+        }
+        for (Curve2 segment : segments) {
+            if (segment.contains(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<Point2> sample(int segments) {
+        List<Point2> points = new ArrayList<>();
+        if (this.segments == null || this.segments.isEmpty()) {
+            return List.copyOf(points);
+        }
+        for (Curve2 seg : this.segments) {
+            points.addAll(seg.sample(segments / this.segments.size() + 1));
+        }
+        return List.copyOf(points);
     }
 }

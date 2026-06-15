@@ -34,11 +34,24 @@ public final class StepKinematicPropertyTopologyRepresentation implements StepEn
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepPropertyDefinition getDefinition() {
         return definition;
     }
 
     public StepRepresentation getUsedRepresentation() {
+        return usedRepresentation;
+    }
+
+    // Record-style accessors
+    public StepPropertyDefinition definition() {
+        return definition;
+    }
+
+    public StepRepresentation usedRepresentation() {
         return usedRepresentation;
     }
 

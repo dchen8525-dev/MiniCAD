@@ -51,6 +51,15 @@ public final class StepGeometricTolerance implements StepEntity {
         return toleratedShape;
     }
 
+    // Record-style accessors
+    public StepEntity toleratedShape() {
+        return toleratedShape;
+    }
+
+    public double magnitude() {
+        return magnitude;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

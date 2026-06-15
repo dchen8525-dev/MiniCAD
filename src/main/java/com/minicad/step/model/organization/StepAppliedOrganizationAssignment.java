@@ -41,6 +41,10 @@ public final class StepAppliedOrganizationAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return entityName != null ? entityName : "";
+    }
+
     public String getEntityName() {
         return entityName;
     }
@@ -54,6 +58,19 @@ public final class StepAppliedOrganizationAssignment implements StepEntity {
     }
 
     public List<StepEntity> getItems() {
+        return items;
+    }
+
+    // Record-style accessors
+    public StepOrganization assignedOrganization() {
+        return assignedOrganization;
+    }
+
+    public StepOrganizationRole role() {
+        return role;
+    }
+
+    public List<StepEntity> items() {
         return items;
     }
 

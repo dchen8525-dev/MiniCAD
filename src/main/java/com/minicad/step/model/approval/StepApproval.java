@@ -39,6 +39,23 @@ public final class StepApproval implements StepEntity {
         return level;
     }
 
+    public String getName() {
+        return level != null ? level : "";
+    }
+
+    // Record-style accessors
+    public String name() {
+        return getName();
+    }
+
+    public StepApprovalStatus status() {
+        return status;
+    }
+
+    public String level() {
+        return level;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

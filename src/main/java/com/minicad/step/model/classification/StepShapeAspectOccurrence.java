@@ -73,6 +73,31 @@ public final class StepShapeAspectOccurrence implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepProductDefinitionShape ofShape() {
+        return ofShape;
+    }
+
+    public String productDefinitional() {
+        return productDefinitional;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

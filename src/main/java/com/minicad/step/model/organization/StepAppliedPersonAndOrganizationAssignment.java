@@ -41,6 +41,10 @@ public final class StepAppliedPersonAndOrganizationAssignment implements StepEnt
         return id;
     }
 
+    public String getName() {
+        return entityName != null ? entityName : "";
+    }
+
     public String getEntityName() {
         return entityName;
     }
@@ -54,6 +58,19 @@ public final class StepAppliedPersonAndOrganizationAssignment implements StepEnt
     }
 
     public List<StepEntity> getItems() {
+        return items;
+    }
+
+    // Record-style accessors
+    public StepPersonAndOrganization assignedPersonAndOrganization() {
+        return assignedPersonAndOrganization;
+    }
+
+    public StepPersonAndOrganizationRole role() {
+        return role;
+    }
+
+    public List<StepEntity> items() {
         return items;
     }
 

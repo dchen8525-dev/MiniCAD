@@ -345,7 +345,7 @@ final class StepShellBuilder {
         double width = planarBox.width();
         double height = planarBox.height();
         Vector3 xVec = xDir.asVector().scale(width);
-        Vector3 yVec = normal.cross(xDir).scale(height);
+        Vector3 yVec = normal.cross(xDir).asVector().scale(height);
         CartesianPoint p1 = corner;
         CartesianPoint p2 = new CartesianPoint(p1.x() + xVec.x(), p1.y() + xVec.y(), p1.z() + xVec.z());
         CartesianPoint p3 = new CartesianPoint(p2.x() + yVec.x(), p2.y() + yVec.y(), p2.z() + yVec.z());

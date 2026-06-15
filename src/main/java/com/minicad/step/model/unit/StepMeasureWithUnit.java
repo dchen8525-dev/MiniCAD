@@ -39,6 +39,12 @@ public final class StepMeasureWithUnit implements StepEntity {
         return unitComponent;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String getName() { return ""; }
+    public double valueComponent() { return valueComponent; }
+    public StepEntity unitComponent() { return unitComponent; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -47,6 +47,11 @@ public final class StepTypedMeasureWithUnit implements StepEntity {
         return unitComponent;
     }
 
+    // Record-style accessor
+    public StepEntity unitComponent() {
+        return unitComponent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -37,6 +37,10 @@ public final class StepAppliedApprovalAssignment implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return entityName;
+    }
+
     public String getEntityName() {
         return entityName;
     }
@@ -46,6 +50,15 @@ public final class StepAppliedApprovalAssignment implements StepEntity {
     }
 
     public List<StepEntity> getItems() {
+        return items;
+    }
+
+    // Record-style accessors
+    public StepApproval assignedApproval() {
+        return assignedApproval;
+    }
+
+    public List<StepEntity> items() {
         return items;
     }
 

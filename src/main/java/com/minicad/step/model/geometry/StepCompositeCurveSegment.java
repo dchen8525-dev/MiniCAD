@@ -20,19 +20,29 @@ import java.util.Objects;
  */
 public final class StepCompositeCurveSegment implements StepEntity {
     private final int id;
+    private final String name;
     private final String transition;
     private final boolean sameSense;
     private final StepEntity parentCurve;
 
-    public StepCompositeCurveSegment(int id, String transition, boolean sameSense, StepEntity parentCurve) {
+    public StepCompositeCurveSegment(int id, String name, String transition, boolean sameSense, StepEntity parentCurve) {
         this.id = id;
+        this.name = name != null ? name : "";
         this.transition = transition;
         this.sameSense = sameSense;
         this.parentCurve = parentCurve;
     }
 
+    public StepCompositeCurveSegment(int id, String transition, boolean sameSense, StepEntity parentCurve) {
+        this(id, "", transition, sameSense, parentCurve);
+    }
+
     public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getTransition() {
@@ -49,6 +59,7 @@ public final class StepCompositeCurveSegment implements StepEntity {
 
     // Record-style accessors
     public int id() { return getId(); }
+    public String name() { return getName(); }
     public String transition() { return getTransition(); }
     public boolean sameSense() { return isSameSense(); }
     public StepEntity parentCurve() { return getParentCurve(); }
@@ -58,16 +69,16 @@ public final class StepCompositeCurveSegment implements StepEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StepCompositeCurveSegment that = (StepCompositeCurveSegment) o;
-        return id == that.id && Objects.equals(transition, that.transition) && sameSense == that.sameSense && Objects.equals(parentCurve, that.parentCurve);
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transition, that.transition) && sameSense == that.sameSense && Objects.equals(parentCurve, that.parentCurve);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, transition, sameSense, parentCurve);
+        return Objects.hash(id, name, transition, sameSense, parentCurve);
     }
 
     @Override
     public String toString() {
-        return "StepCompositeCurveSegment{" + "id=" + id + "transition=" + transition + "sameSense=" + sameSense + "parentCurve=" + parentCurve + "}";
+        return "StepCompositeCurveSegment{" + "id=" + id + "name=" + name + "transition=" + transition + "sameSense=" + sameSense + "parentCurve=" + parentCurve + "}";
     }
 }

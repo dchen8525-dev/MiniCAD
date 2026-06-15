@@ -39,6 +39,10 @@ public final class StepApplicationProtocolDefinition implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public String getStatus() {
         return status;
     }
@@ -52,6 +56,23 @@ public final class StepApplicationProtocolDefinition implements StepEntity {
     }
 
     public StepApplicationContext getApplication() {
+        return application;
+    }
+
+    // Record-style accessors
+    public String status() {
+        return status;
+    }
+
+    public String schemaName() {
+        return schemaName;
+    }
+
+    public int year() {
+        return year;
+    }
+
+    public StepApplicationContext application() {
         return application;
     }
 

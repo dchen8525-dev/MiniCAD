@@ -37,6 +37,10 @@ public final class StepExternallyDefinedItem implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return entityName != null ? entityName : "";
+    }
+
     public String getItemId() {
         return itemId;
     }
@@ -47,6 +51,11 @@ public final class StepExternallyDefinedItem implements StepEntity {
 
     public String getEntityName() {
         return entityName;
+    }
+
+    // Record-style accessors
+    public StepExternalSource source() {
+        return source;
     }
 
     @Override

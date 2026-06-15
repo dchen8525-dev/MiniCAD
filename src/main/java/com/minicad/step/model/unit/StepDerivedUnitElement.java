@@ -31,12 +31,21 @@ public final class StepDerivedUnitElement implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepEntity getUnit() {
         return unit;
     }
 
     public double getExponent() {
         return exponent;
+    }
+
+    // Record-style accessor
+    public StepEntity unit() {
+        return unit;
     }
 
     @Override

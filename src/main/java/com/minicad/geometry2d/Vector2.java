@@ -1,6 +1,7 @@
 package com.minicad.geometry2d;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 import java.util.Objects;
 
@@ -55,6 +56,66 @@ public final class Vector2 {
      */
     public Vector2 add(Vector2 other) {
         return new Vector2(x + other.x, y + other.y);
+    }
+
+    /**
+     * Returns true if this vector is approximately zero.
+     *
+     * @return true if zero
+     */
+    public boolean isZero() {
+        return Math.abs(x) < Epsilon.get() && Math.abs(y) < Epsilon.get();
+    }
+
+    /**
+     * Returns the norm (magnitude) of this vector.
+     *
+     * @return norm
+     */
+    public double norm() {
+        return Math.sqrt(x * x + y * y);
+    }
+
+    /**
+     * Returns the squared norm (magnitude squared) of this vector.
+     *
+     * @return squared norm
+     */
+    public double normSquared() {
+        return x * x + y * y;
+    }
+
+    /**
+     * Returns a normalized (unit) version of this vector.
+     *
+     * @return normalized vector
+     */
+    public Vector2 normalize() {
+        double n = norm();
+        if (n < Epsilon.get()) {
+            throw new GeometryException("cannot normalize zero-length vector");
+        }
+        return new Vector2(x / n, y / n);
+    }
+
+    /**
+     * Returns the dot product of this vector with another.
+     *
+     * @param other the other vector
+     * @return dot product
+     */
+    public double dot(Vector2 other) {
+        return x * other.x + y * other.y;
+    }
+
+    /**
+     * Subtracts another vector from this one.
+     *
+     * @param other the other vector
+     * @return difference vector
+     */
+    public Vector2 subtract(Vector2 other) {
+        return new Vector2(x - other.x, y - other.y);
     }
 
     @Override

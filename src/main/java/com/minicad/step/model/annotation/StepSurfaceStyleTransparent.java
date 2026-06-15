@@ -27,7 +27,16 @@ public final class StepSurfaceStyleTransparent implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public double getTransparency() {
+        return transparency;
+    }
+
+    // Record-style accessor
+    public double transparency() {
         return transparency;
     }
 

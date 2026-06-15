@@ -31,6 +31,15 @@ public final class StepTextStyleForDefinedFont implements StepEntity {
         return textColour;
     }
 
+    public String getName() {
+        return "";
+    }
+
+    // Record-style accessor
+    public StepEntity textColour() {
+        return textColour;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

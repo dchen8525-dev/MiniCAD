@@ -75,6 +75,41 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage implements St
         return identifiedItem;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepEntity definition() {
+        return definition;
+    }
+
+    public List<StepRepresentation> nodes() {
+        return nodes;
+    }
+
+    public List<StepRepresentationRelationship> undirectedLinks() {
+        return undirectedLinks;
+    }
+
+    public StepEntity identifiedItem() {
+        return identifiedItem;
+    }
+
+    /**
+     * Returns the leaf representation from the chain (last node).
+     */
+    public StepRepresentation leaf() {
+        if (nodes == null || nodes.isEmpty()) {
+            return null;
+        }
+        return nodes.get(nodes.size() - 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

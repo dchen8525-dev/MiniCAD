@@ -83,6 +83,23 @@ public final class StepGeometricMeasurement implements StepEntity {
         return passFailStatus;
     }
 
+    // Record-style accessors
+    public StepEntity measurementGeometry() {
+        return measurementGeometry;
+    }
+
+    public String geometricType() {
+        return geometricType;
+    }
+
+    public double measuredValue() {
+        return measuredValue;
+    }
+
+    public List<StepEntity> measurementPoints() {
+        return measurementPoints;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -55,6 +55,13 @@ public final class StepShapeRepresentationRelationship implements StepEntity {
         return rep2;
     }
 
+    // Record-style accessors
+    public int id() { return id; }
+    public String name() { return name; }
+    public String description() { return description; }
+    public StepRepresentation rep1() { return rep1; }
+    public StepRepresentation rep2() { return rep2; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -47,6 +47,15 @@ public final class StepTextStyleWithMirror implements StepEntity {
         return mirrorPlacement;
     }
 
+    // Record-style accessors
+    public StepEntity characterAppearance() {
+        return characterAppearance;
+    }
+
+    public StepEntity mirrorPlacement() {
+        return mirrorPlacement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

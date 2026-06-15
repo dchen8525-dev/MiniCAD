@@ -55,6 +55,15 @@ public final class StepProductCategoryRelationship implements StepEntity {
         return subCategory;
     }
 
+    // Record-style accessors
+    public StepProductCategory category() {
+        return category;
+    }
+
+    public StepProductCategory subCategory() {
+        return subCategory;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

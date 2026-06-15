@@ -31,6 +31,11 @@ public final class StepApprovalAssignment implements StepEntity {
         return assignedApproval;
     }
 
+    // Record-style accessor
+    public StepApproval assignedApproval() {
+        return assignedApproval;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

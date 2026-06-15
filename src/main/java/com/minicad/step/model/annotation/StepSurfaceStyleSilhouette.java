@@ -27,7 +27,16 @@ public final class StepSurfaceStyleSilhouette implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepCurveStyle getStyle() {
+        return style;
+    }
+
+    // Record-style accessor
+    public StepCurveStyle style() {
         return style;
     }
 

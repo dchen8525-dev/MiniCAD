@@ -41,6 +41,11 @@ public final class StepToleranceZone implements StepEntity {
         return form;
     }
 
+    // Record-style accessor
+    public StepEntity form() {
+        return form;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

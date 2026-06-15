@@ -52,6 +52,23 @@ public final class Face {
     public List<FaceBound> bounds() { return getBounds(); }
     public boolean sameSense() { return isSameSense(); }
 
+    /**
+     * Returns the outer boundary of this face, if present.
+     *
+     * @return outer boundary or null if not defined
+     */
+    public FaceBound outerBound() {
+        if (bounds == null || bounds.isEmpty()) {
+            return null;
+        }
+        for (FaceBound bound : bounds) {
+            if (bound.orientation()) {
+                return bound;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

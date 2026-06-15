@@ -39,6 +39,15 @@ public final class StepDateTimeAssignment implements StepEntity {
         return role;
     }
 
+    // Record-style accessors
+    public StepDateAndTime assignedDateAndTime() {
+        return assignedDateAndTime;
+    }
+
+    public StepDateTimeRole role() {
+        return role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

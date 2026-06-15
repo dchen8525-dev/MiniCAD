@@ -27,7 +27,16 @@ public final class StepCharacterGlyphStyleStroke implements StepEntity {
         return id;
     }
 
+    public String getName() {
+        return "";
+    }
+
     public StepCurveStyle getStrokeStyle() {
+        return strokeStyle;
+    }
+
+    // Record-style accessor
+    public StepCurveStyle strokeStyle() {
         return strokeStyle;
     }
 
