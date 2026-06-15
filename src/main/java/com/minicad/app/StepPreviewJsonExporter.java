@@ -14959,8 +14959,9 @@ public final class StepPreviewJsonExporter {
     }
 
     private static StepRepresentation propertyRepresentationLinkRepresentation(StepEntity candidate, int propertyDefinitionId) {
-        if (candidate instanceof StepPropertyDefinitionRepresentation representationLink
-                && representationLink.definition().id() == propertyDefinitionId) {
+        if (candidate instanceof StepPropertyDefinitionRepresentation
+                && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
+            StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
             return representationLink.usedRepresentation();
         }
         if (candidate instanceof StepAttributeAssertion
@@ -15143,8 +15144,9 @@ public final class StepPreviewJsonExporter {
                         personOrganization.role(),
                         instanceIdsByTargetId
                 );
-            } else if (candidate instanceof StepApprovalDateTime approvalDateTime
-                    && approvalDateTime.datedApproval().id() == approval.id()) {
+            } else if (candidate instanceof StepApprovalDateTime
+                    && ((StepApprovalDateTime) candidate).datedApproval().id() == approval.id()) {
+                StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) candidate;
                 appendExistingRepresentationDefinitionTargets(
                         targetsByUsageId,
                         identifiedItem,
