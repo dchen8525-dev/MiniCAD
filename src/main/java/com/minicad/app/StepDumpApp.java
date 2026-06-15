@@ -1647,27 +1647,38 @@ public final class StepDumpApp {
         } else if (surface instanceof StepSphericalSurface) {
             StepSphericalSurface sphericalSurface = (StepSphericalSurface) surface;
             builder.buildSphericalSurface(sphericalSurface.id());
-        } else if (surface instanceof StepToroidalSurface toroidalSurface) {
+        } else if (surface instanceof StepToroidalSurface) {
+            StepToroidalSurface toroidalSurface = (StepToroidalSurface) surface;
             builder.buildToroidalSurface(toroidalSurface.id());
-        } else if (surface instanceof StepDegenerateToroidalSurface degenerateToroidalSurface) {
+        } else if (surface instanceof StepDegenerateToroidalSurface) {
+            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) surface;
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-        } else if (surface instanceof StepSurfaceOfLinearExtrusion extrusionSurface) {
+        } else if (surface instanceof StepSurfaceOfLinearExtrusion) {
+            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surface;
             builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-        } else if (surface instanceof StepSurfaceOfRevolution revolutionSurface) {
+        } else if (surface instanceof StepSurfaceOfRevolution) {
+            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surface;
             builder.buildSurfaceOfRevolution(revolutionSurface.id());
-        } else if (surface instanceof StepBSplineSurfaceWithKnots splineSurface) {
+        } else if (surface instanceof StepBSplineSurfaceWithKnots) {
+            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) surface;
             builder.buildBSplineSurface(splineSurface.id());
-        } else if (surface instanceof StepRationalBSplineSurface rationalSplineSurface) {
+        } else if (surface instanceof StepRationalBSplineSurface) {
+            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) surface;
             builder.buildRationalBSplineSurface(rationalSplineSurface.id());
-        } else if (surface instanceof StepRectangularTrimmedSurface trimmedSurface) {
+        } else if (surface instanceof StepRectangularTrimmedSurface) {
+            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
             builder.buildRectangularTrimmedSurface(trimmedSurface.id());
-        } else if (surface instanceof StepCurveBoundedSurface boundedSurface) {
+        } else if (surface instanceof StepCurveBoundedSurface) {
+            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) surface;
             builder.buildCurveBoundedSurface(boundedSurface.id());
-        } else if (surface instanceof StepOrientedSurface orientedSurface) {
+        } else if (surface instanceof StepOrientedSurface) {
+            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
             builder.buildOrientedSurface(orientedSurface.id());
-        } else if (surface instanceof StepOffsetSurface offsetSurface) {
+        } else if (surface instanceof StepOffsetSurface) {
+            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
             builder.buildOffsetSurface(offsetSurface.id());
-        } else if (surface instanceof StepGeometricReplica replica && "SURFACE_REPLICA".equals(replica.entityName())) {
+        } else if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
+            StepGeometricReplica replica = (StepGeometricReplica) surface;
             builder.buildSurfaceReplica(replica.id());
         } else {
             throw new UnsupportedGeometryException(
