@@ -47,6 +47,12 @@ public final class StepVector implements StepEntity {
         return magnitude;
     }
 
+    // Record-style accessors
+    public int id() { return getId(); }
+    public String name() { return getName(); }
+    public StepDirection orientation() { return getOrientation(); }
+    public double magnitude() { return getMagnitude(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
