@@ -366,6 +366,7 @@ class StepMeshExporterTest {
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
         + "#92=SURFACE_REPLICA('SR0',#14,#91);"
+        ));
 
         assertTrue(obj.contains("f "));
         assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.4);
@@ -493,7 +494,8 @@ class StepMeshExporterTest {
         + "#62=ADVANCED_FACE('F0',(#61),#26,.T.);\n"
         + "#63=OPEN_SHELL('OS',(#62));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;";
+        + "END-ISO-10303-21;"
+        );
 
         assertTrue(obj.contains("f "));
         assertEquals(7.0 * Math.PI / 4.0, planarAreaFromObj(obj), 0.35);
@@ -539,8 +541,7 @@ class StepMeshExporterTest {
         + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
     }
 
     private static String surfaceOfRevolutionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
@@ -585,8 +586,7 @@ class StepMeshExporterTest {
         + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
     }
 
     private static String surfaceOfLinearExtrusionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
