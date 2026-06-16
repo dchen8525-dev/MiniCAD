@@ -60,8 +60,7 @@ class StepPreviewJsonExporterTest {
         + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         byte[] direct = StepPreviewJsonExporter.exportGlb(compiled.stepText());
         byte[] compiledBinary = StepPreviewJsonExporter.exportGlb(compiled);
@@ -110,8 +109,7 @@ class StepPreviewJsonExporterTest {
         + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         assertTrue(binary.length > 16);
         assertEquals('g', binary[0]);
@@ -183,6 +181,7 @@ class StepPreviewJsonExporterTest {
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
         + "ENDSEC;"
+        );
         PreviewSerializers.validateGlb(binary);
 
         byte[] badLength = binary.clone();
@@ -306,7 +305,7 @@ class StepPreviewJsonExporterTest {
         + "#4=CARTESIAN_POINT('P3',(3.0,1.0,0.0));\n"
         + "#10=(BEZIER_CURVE() B_SPLINE_CURVE(3,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BZ0'));\n"
         + "#11=GEOMETRIC_CURVE_SET('GCS0',(#10));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -330,7 +329,7 @@ class StepPreviewJsonExporterTest {
         + "#9=VERTEX_POINT('V1',#2);\n"
         + "#10=EDGE_CURVE('E0',#8,#9,#7,.T.);\n"
         + "#11=CONNECTED_EDGE_SET('CES',(#10));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -354,7 +353,7 @@ class StepPreviewJsonExporterTest {
         + "#10=CURVE_REPLICA('CR',#8,#9);\n"
         + "#12=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#13=SHAPE_REPRESENTATION('R0',(#10),#12);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -411,7 +410,7 @@ class StepPreviewJsonExporterTest {
         + "#16=PCURVE('PC0',#5,#15);\n"
         + "#17=SURFACE_CURVE('SC0',#9,(#16),.PCURVE_S1.);\n"
         + "#18=GEOMETRIC_CURVE_SET('GCS0',(#17));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -461,7 +460,7 @@ class StepPreviewJsonExporterTest {
         + "#33=PCURVE('PC1',#8,#32);\n"
         + "#34=SEAM_CURVE('SEAM0',#13,(#33,#26),.PCURVE_S1.);\n"
         + "#35=GEOMETRIC_CURVE_SET('GCS0',(#34));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -507,7 +506,7 @@ class StepPreviewJsonExporterTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PCW0'));\n"
         + "#20=GEOMETRIC_CURVE_SET('GCS0',(#19));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -563,7 +562,7 @@ class StepPreviewJsonExporterTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PCW0'));\n"
         + "#37=GEOMETRIC_CURVE_SET('GCS0',(#36));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -608,7 +607,7 @@ class StepPreviewJsonExporterTest {
         + "#17=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#5),#16);\n"
         + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#19=SHAPE_REPRESENTATION('ANN',(#17),#18);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -651,7 +650,7 @@ class StepPreviewJsonExporterTest {
         + "#17=ANNOTATION_TEXT_CHARACTER('ATC0',#12,#15);\n"
         + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#19=SHAPE_REPRESENTATION('ANN',(#16,#17),#18);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -691,7 +690,7 @@ class StepPreviewJsonExporterTest {
         + "#18=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#5),#16);\n"
         + "#19=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#20=SHAPE_REPRESENTATION('ANN',(#17,#18),#19);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -741,7 +740,7 @@ class StepPreviewJsonExporterTest {
         + "    REPRESENTATION_ITEM('DAO0'));\n"
         + "#18=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "#19=SHAPE_REPRESENTATION('ANN',(#17),#18);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -773,7 +772,7 @@ class StepPreviewJsonExporterTest {
         + "#10=DRAUGHTING_CALLOUT('CALLOUT_B',(#8));\n"
         + "#11=PLACED_TARGET('PT','target',#4,#3,#9);\n"
         + "#12=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#9,#10);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String occurrenceStep = 
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
@@ -800,8 +799,7 @@ class StepPreviewJsonExporterTest {
         + "#22=ANNOTATION_OCCURRENCE_RELATIONSHIP('REL','links symbol to terminator',#21,#20);\n"
         + "#23=ANNOTATION_TEXT_OCCURRENCE('NOTE','occurrence-links',#15);\n"
         + "#24=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#4,#3,#23,#22);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         String calloutBinary = metadataFromBinary(StepPreviewJsonExporter.exportBinary(calloutStep));
         String calloutGlb = metadataFromGlb(StepPreviewJsonExporter.exportGlb(calloutStep));
@@ -857,7 +855,7 @@ class StepPreviewJsonExporterTest {
         + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE_B','dim',#16);\n"
         + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_A','',#4,#3,#24,#22);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_B','',#4,#3,#25,#23);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -915,7 +913,7 @@ class StepPreviewJsonExporterTest {
         + "#40=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#41=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
         + "#42=CARTESIAN_POINT('P2',(2.0,0.0,0.0));\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -972,7 +970,7 @@ class StepPreviewJsonExporterTest {
         + "#15=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#7,#11);\n"
         + "#16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);\n"
         + "#17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1020,7 +1018,7 @@ class StepPreviewJsonExporterTest {
         + "#12=ITEM_IDENTIFIED_REPRESENTATION_USAGE('USAGE','generic',#7,#3,#11);\n"
         + "#13=PLACED_TARGET('PT','target',#7,#4,#11);\n"
         + "#14=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CBIIRU','chain',#7,(#4,#5),(#6),#11);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1103,6 +1101,7 @@ class StepPreviewJsonExporterTest {
         + "#32=DRAUGHTING_MODEL_ITEM_ASSOCIATION('DMA','',#6,#2,#19);\n"
         + "#33=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#6,#2,#24,#6);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1213,7 +1212,7 @@ class StepPreviewJsonExporterTest {
         + "#17=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#1);\n"
         + "#18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);\n"
         + "#19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1263,7 +1262,7 @@ class StepPreviewJsonExporterTest {
         + "#34=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#30,#19,#23,#23);\n"
         + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#31,#19,#24,#24);\n"
         + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#32,#19,#24,#24);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1303,7 +1302,7 @@ class StepPreviewJsonExporterTest {
         + "#15=REPRESENTATION_RELATIONSHIP('RR','chain',#13,#14);\n"
         + "#16=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#11,#10);\n"
         + "#17=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#11,(#13,#14),(#15),#10);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1340,7 +1339,7 @@ class StepPreviewJsonExporterTest {
         + "#19=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#20=ANNOTATION_TEXT_OCCURRENCE('NOTE','semantic',#19);\n"
         + "#21=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','semantic link',#12,#14,#20,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1391,7 +1390,7 @@ class StepPreviewJsonExporterTest {
         + "#25=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#23);\n"
         + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#16,#24,#7);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#13,#18,#25,#12);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1492,6 +1491,7 @@ class StepPreviewJsonExporterTest {
         + "#71=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#30,#12,#62,#10);\n"
         + "#72=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#33,#12,#63,#10);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1607,6 +1607,7 @@ class StepPreviewJsonExporterTest {
         + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#17,#26,#38,#8);\n"
         + "#43=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#20,#27,#39,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1713,6 +1714,7 @@ class StepPreviewJsonExporterTest {
         + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#12,#54,#10);\n"
         + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#12,#55,#10);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1806,7 +1808,7 @@ class StepPreviewJsonExporterTest {
         + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#17,#10,#32,#8);\n"
         + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#20,#10,#33,#8);\n"
         + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#34,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -1941,6 +1943,7 @@ class StepPreviewJsonExporterTest {
         + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#42,#10,#64,#8);\n"
         + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#45,#10,#65,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2140,7 +2143,7 @@ class StepPreviewJsonExporterTest {
         + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPLIED_GROUP','',#14);\n"
         + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#15,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2206,6 +2209,7 @@ class StepPreviewJsonExporterTest {
         + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#20,#11,#34,#8);\n"
         + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#11,#35,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2350,6 +2354,7 @@ class StepPreviewJsonExporterTest {
         + "#84=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#45,#10,#71,#8);\n"
         + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#47,#10,#72,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2562,7 +2567,7 @@ class StepPreviewJsonExporterTest {
         + "#11=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#12=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_REP','',#11);\n"
         + "#13=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#12,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2615,7 +2620,7 @@ class StepPreviewJsonExporterTest {
         + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#33,#8);\n"
         + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#26,#10,#34,#8);\n"
         + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#27,#10,#35,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2695,7 +2700,7 @@ class StepPreviewJsonExporterTest {
         + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);\n"
         + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);\n"
         + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SDR','',#26,#25,#39,#11);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2749,7 +2754,7 @@ class StepPreviewJsonExporterTest {
         + "#33=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE_OCC','occ',#33);\n"
         + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#34,#13);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2804,7 +2809,7 @@ class StepPreviewJsonExporterTest {
         + "#30=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_PDS','',#30);\n"
         + "#32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#7,#10,#31,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -2946,6 +2951,7 @@ class StepPreviewJsonExporterTest {
         + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#23,#11,#65,#9);\n"
         + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#28,#11,#67,#9);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3164,6 +3170,7 @@ class StepPreviewJsonExporterTest {
         + "#106=PMI_REQUIREMENT_ITEM_ASSOCIATION('A17','',#28,#10,#87,#8);\n"
         + "#107=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#108,#10,#88,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3414,6 +3421,7 @@ class StepPreviewJsonExporterTest {
         + "#166=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#46,#10,#143,#8);\n"
         + "#167=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#47,#10,#144,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -3783,6 +3791,7 @@ class StepPreviewJsonExporterTest {
         + "#85=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#76,#8);\n"
         + "#86=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#32,#10,#77,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4006,6 +4015,7 @@ class StepPreviewJsonExporterTest {
         + "#69=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#28,#10,#62,#8);\n"
         + "#70=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#63,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4204,6 +4214,7 @@ class StepPreviewJsonExporterTest {
         + "#76=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#70,#8);\n"
         + "#77=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#39,#10,#71,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4344,7 +4355,7 @@ class StepPreviewJsonExporterTest {
         + "#27=ANNOTATION_TEXT_OCCURRENCE('NOTE_APPROVAL_DATE','',#25);\n"
         + "#28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#18,#10,#26,#8);\n"
         + "#29=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#27,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4466,6 +4477,7 @@ class StepPreviewJsonExporterTest {
         + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#28,#14,#54,#8);\n"
         + "#63=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#31,#10,#55,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -4787,6 +4799,7 @@ class StepPreviewJsonExporterTest {
         + "#271=PMI_REQUIREMENT_ITEM_ASSOCIATION('A35','',#216,#10,#260,#8);\n"
         + "#272=PMI_REQUIREMENT_ITEM_ASSOCIATION('A36','',#217,#10,#261,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5004,6 +5017,7 @@ class StepPreviewJsonExporterTest {
         + "#48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#30,#10,#42,#8);\n"
         + "#49=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#31,#10,#43,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5077,7 +5091,7 @@ class StepPreviewJsonExporterTest {
         + "#16=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#17=ANNOTATION_TEXT_OCCURRENCE('NOTE_MEASURE','',#16);\n"
         + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#13,#10,#17,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5196,6 +5210,7 @@ class StepPreviewJsonExporterTest {
         + "#93=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#53,#10,#81,#8);\n"
         + "#94=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#56,#10,#82,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5431,6 +5446,7 @@ class StepPreviewJsonExporterTest {
         + "#74=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#64,#8);\n"
         + "#75=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#36,#10,#65,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5574,7 +5590,7 @@ class StepPreviewJsonExporterTest {
         + "#31=ANNOTATION_TEXT_OCCURRENCE('NOTE_CURVE_GENERIC','',#29);\n"
         + "#32=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#22,#10,#30,#8);\n"
         + "#33=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#23,#10,#31,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5673,7 +5689,7 @@ class StepPreviewJsonExporterTest {
         + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE_SHAPE_OCC','',#24);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#10,#10,#25,#8);\n"
         + "#28=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#26,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5792,6 +5808,7 @@ class StepPreviewJsonExporterTest {
         + "#53=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#31,#10,#48,#8);\n"
         + "#54=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#34,#10,#49,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -5965,6 +5982,7 @@ class StepPreviewJsonExporterTest {
         + "#81=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#43,#10,#73,#8);\n"
         + "#82=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#47,#10,#74,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6098,6 +6116,7 @@ class StepPreviewJsonExporterTest {
         + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#18,#10,#35,#8);\n"
         + "#38=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#19,#10,#35,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6226,6 +6245,7 @@ class StepPreviewJsonExporterTest {
         + "#213=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#45,#10,#200,#8);\n"
         + "#214=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#46,#10,#200,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6382,6 +6402,7 @@ class StepPreviewJsonExporterTest {
         + "#88=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#48,#10,#81,#8);\n"
         + "#89=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#51,#10,#82,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6521,6 +6542,7 @@ class StepPreviewJsonExporterTest {
         + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#40,#10,#70,#8);\n"
         + "#81=CARTESIAN_TRANSFORMATION_OPERATOR_3D('CTR0',#16,#15,#13,1.0,#16);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -6735,6 +6757,7 @@ class StepPreviewJsonExporterTest {
         + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A24','',#56,#10,#113,#8);\n"
         + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A25','',#57,#10,#113,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7036,6 +7059,7 @@ class StepPreviewJsonExporterTest {
         + "#179=PMI_REQUIREMENT_ITEM_ASSOCIATION('A20','',#142,#10,#61,#8);\n"
         + "#180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A21','',#143,#10,#61,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7196,6 +7220,7 @@ class StepPreviewJsonExporterTest {
         + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#37,#10,#33,#8);\n"
         + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#38,#10,#34,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7391,6 +7416,7 @@ class StepPreviewJsonExporterTest {
         + "#154=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#41,#10,#130,#8);\n"
         + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#42,#10,#131,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7533,6 +7559,7 @@ class StepPreviewJsonExporterTest {
         + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A11','',#22,#10,#83,#8);\n"
         + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A12','',#50,#10,#84,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7697,6 +7724,7 @@ class StepPreviewJsonExporterTest {
         + "#61=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#21,#10,#53,#8);\n"
         + "#62=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#25,#10,#54,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7772,7 +7800,7 @@ class StepPreviewJsonExporterTest {
         + "#40=PMI_REQUIREMENT_ITEM_ASSOCIATION('A0','',#21,#10,#33,#8);\n"
         + "#41=PMI_REQUIREMENT_ITEM_ASSOCIATION('A1','',#22,#10,#34,#8);\n"
         + "#42=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#23,#10,#35,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7857,6 +7885,7 @@ class StepPreviewJsonExporterTest {
         + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#16,#10,#50,#8);\n"
         + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#17,#10,#51,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -7972,6 +8001,7 @@ class StepPreviewJsonExporterTest {
         + "#64=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#31,#10,#50,#8);\n"
         + "#65=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#33,#10,#51,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8103,6 +8133,7 @@ class StepPreviewJsonExporterTest {
         + "#66=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#31,#10,#54,#8);\n"
         + "#67=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#32,#10,#55,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8207,7 +8238,7 @@ class StepPreviewJsonExporterTest {
         + "#19=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#10,#15,#16,#10);\n"
         + "#20=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#11,#15,#16,#11);\n"
         + "#21=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#13,#15,#16,#13);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8321,6 +8352,7 @@ class StepPreviewJsonExporterTest {
         + "#46=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#35,#36,#28);\n"
         + "#47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A10','',#33,#35,#36,#33);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8496,6 +8528,7 @@ class StepPreviewJsonExporterTest {
         + "#79=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#10,#71,#72,#10);\n"
         + "#80=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#12,#71,#72,#12);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8627,6 +8660,7 @@ class StepPreviewJsonExporterTest {
         + "#155=PMI_REQUIREMENT_ITEM_ASSOCIATION('A15','',#57,#10,#101,#8);\n"
         + "#156=PMI_REQUIREMENT_ITEM_ASSOCIATION('A16','',#58,#10,#101,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8744,7 +8778,7 @@ class StepPreviewJsonExporterTest {
         + "#100=PMI_REQUIREMENT_ITEM_ASSOCIATION('A2','',#24,#10,#86,#8);\n"
         + "#101=PMI_REQUIREMENT_ITEM_ASSOCIATION('A3','',#26,#10,#87,#8);\n"
         + "#102=PMI_REQUIREMENT_ITEM_ASSOCIATION('A4','',#27,#10,#88,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8837,6 +8871,7 @@ class StepPreviewJsonExporterTest {
         + "#138=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#27,#10,#101,#8);\n"
         + "#139=PMI_REQUIREMENT_ITEM_ASSOCIATION('A9','',#28,#10,#101,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -8959,6 +8994,7 @@ class StepPreviewJsonExporterTest {
         + "#180=PMI_REQUIREMENT_ITEM_ASSOCIATION('A22','',#53,#10,#157,#8);\n"
         + "#181=PMI_REQUIREMENT_ITEM_ASSOCIATION('A23','',#54,#10,#157,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9101,6 +9137,7 @@ class StepPreviewJsonExporterTest {
         + "#158=PMI_REQUIREMENT_ITEM_ASSOCIATION('A18','',#57,#10,#120,#8);\n"
         + "#159=PMI_REQUIREMENT_ITEM_ASSOCIATION('A19','',#58,#10,#120,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9225,7 +9262,7 @@ class StepPreviewJsonExporterTest {
         + "#35=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_OCC','',#12,#23,#32,#13);\n"
         + "#36=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PD','',#9,#24,#33,#11);\n"
         + "#37=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDS','',#11,#25,#34,#11);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9307,7 +9344,7 @@ class StepPreviewJsonExporterTest {
         + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE','links',#25);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9443,6 +9480,7 @@ class StepPreviewJsonExporterTest {
         + "#44=PMI_REQUIREMENT_ITEM_ASSOCIATION('A5','',#23,#16,#37,#7);\n"
         + "#45=PMI_REQUIREMENT_ITEM_ASSOCIATION('A6','',#24,#17,#38,#7);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9516,7 +9554,7 @@ class StepPreviewJsonExporterTest {
         + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE','datum',#14);\n"
         + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#10,#12,#15,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9565,7 +9603,7 @@ class StepPreviewJsonExporterTest {
         + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE_RULE_DATUM','',#25);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9642,7 +9680,7 @@ class StepPreviewJsonExporterTest {
         + "#13=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#14=ANNOTATION_TEXT_OCCURRENCE('NOTE','prop',#13);\n"
         + "#15=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#14,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9690,7 +9728,7 @@ class StepPreviewJsonExporterTest {
         + "#25=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#26=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct property links',#25);\n"
         + "#27=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC','',#9,#11,#26,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9781,7 +9819,7 @@ class StepPreviewJsonExporterTest {
         + "#28=ANNOTATION_TEXT_OCCURRENCE('NOTE_ASSERT','direct assert',#26);\n"
         + "#29=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_PDR','',#13,#11,#27,#8);\n"
         + "#30=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_ASSERT','',#14,#12,#28,#8);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -9937,6 +9975,7 @@ class StepPreviewJsonExporterTest {
         + "#113=PMI_REQUIREMENT_ITEM_ASSOCIATION('A13','',#35,#10,#93,#8);\n"
         + "#114=PMI_REQUIREMENT_ITEM_ASSOCIATION('A14','',#36,#10,#94,#8);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10072,6 +10111,7 @@ class StepPreviewJsonExporterTest {
         + "#47=PMI_REQUIREMENT_ITEM_ASSOCIATION('A7','',#11,#14,#34,#7);\n"
         + "#48=PMI_REQUIREMENT_ITEM_ASSOCIATION('A8','',#12,#14,#35,#7);\n"
         + "ENDSEC;"
+        );
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10145,7 +10185,7 @@ class StepPreviewJsonExporterTest {
         + "#24=ANNOTATION_TEXT_OCCURRENCE('NOTE_SA','',#22);\n"
         + "#25=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_GP','',#8,#17,#23,#7);\n"
         + "#26=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_SA','',#12,#18,#24,#7);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10189,7 +10229,7 @@ class StepPreviewJsonExporterTest {
         + "#14=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#15=ANNOTATION_TEXT_OCCURRENCE('NOTE_REQ','',#14);\n"
         + "#16=PMI_REQUIREMENT_ITEM_ASSOCIATION('ASSOC_REQ','',#8,#12,#15,#9);\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         String binaryMetadata = metadataFromBinary(StepPreviewJsonExporter.exportBinary(step));
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
@@ -10608,6 +10648,7 @@ class StepPreviewJsonExporterTest {
         + "#50=ADVANCED_FACE('F0',(#49),%s,.T.);\n"
         + "#51=OPEN_SHELL('OS',(#50));\n"
         + "ENDSEC;"
+        );
     }
 
     private static void assertMetadataContains(String metadata, String... fragments) {
@@ -10654,8 +10695,7 @@ class StepPreviewJsonExporterTest {
         + "#4=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
         + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#3))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         assertTrue(json.contains("\"units\":{\"lengthUnit\":\"INCH\",\"scaleToMeters\":0.0254"), json);
         assertTrue(json.contains("\"code\":\"units.coordinates_not_normalized\""), json);
@@ -10697,8 +10737,7 @@ class StepPreviewJsonExporterTest {
         + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#26));\n"
         + "#28=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-1','OCC','component usage',#8,#9,'R1');\n"
         + "#29=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#27,#28);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         JSONObject payload = JSONObject.parseObject(json);
         JSONObject units = payload.getJSONObject("units");

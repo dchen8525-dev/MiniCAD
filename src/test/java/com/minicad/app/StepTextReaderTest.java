@@ -18,7 +18,7 @@ class StepTextReaderTest {
         String expected = 
         "DATA;\n"
         + "#1=EXAMPLE('UTF-8 name');\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         Files.writeString(file, expected, StandardCharsets.UTF_8);
 
         String text = StepTextReader.read(file);
@@ -33,7 +33,7 @@ class StepTextReaderTest {
         String expected = 
         "DATA;\n"
         + "#1=EXAMPLE('齿轮');\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         Files.write(file, expected.getBytes(Charset.forName("GB18030")));
 
         String text = StepTextReader.read(file);
@@ -52,7 +52,7 @@ class StepTextReaderTest {
         String expected = 
         "DATA;\n"
         + "#1=EXAMPLE('café');\n"
-        + "ENDSEC;"
+        + "ENDSEC;";
         Files.write(file, expected.getBytes(StandardCharsets.ISO_8859_1));
 
         String text = StepTextReader.read(file);
