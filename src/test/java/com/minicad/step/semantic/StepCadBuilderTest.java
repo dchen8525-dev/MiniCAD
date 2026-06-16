@@ -3801,9 +3801,7 @@ class StepCadBuilderTest {
         + "#3=VECTOR('V1',#2,1.0);\n"
         + "#4=LINE('L1',#1,#3);\n"
         + "#5=ORIENTED_CURVE('OC1',#4,.F.);\n"
-        + "ENDSEC;"
-
-        );
+        + "ENDSEC;";
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(com.minicad.step.syntax.StepParser.parse(step));
 
