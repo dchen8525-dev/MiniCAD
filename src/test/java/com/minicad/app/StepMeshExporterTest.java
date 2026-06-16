@@ -338,7 +338,6 @@ class StepMeshExporterTest {
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
         + "#92=SURFACE_REPLICA('SR0',#13,#91);"
-                "#92"
         ));
 
         assertTrue(obj.contains("f "));
@@ -378,6 +377,7 @@ class StepMeshExporterTest {
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
         + "#92=SURFACE_REPLICA('SR0',#14,#91);"
+        ));
 
         assertTrue(obj.contains("f "));
         assertEquals(4.0, planarAreaFromObj(obj), 0.1);
@@ -432,7 +432,8 @@ class StepMeshExporterTest {
         + "#72=ADVANCED_FACE('F0',(#71),#32,.T.);\n"
         + "#73=OPEN_SHELL('OS',(#72));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;";
+        + "END-ISO-10303-21;"
+        );
 
         assertTrue(obj.contains("f "));
         assertEquals(4.0, planarAreaFromObj(obj), 0.15);
