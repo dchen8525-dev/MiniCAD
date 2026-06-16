@@ -132,7 +132,8 @@ class StepCadBuilderTest {
         + "#90=OPEN_SHELL('OS',(#80));\n"
         + "#91=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#91);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(50);
         Face face = builder.buildFace(80);
@@ -191,7 +192,8 @@ class StepCadBuilderTest {
         + "#92=ORIENTED_OPEN_SHELL('OOS',#90,.F.);\n"
         + "#93=ORIENTED_CLOSED_SHELL('OCS',#91,.F.);\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#93);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell openShell = builder.buildShell(92);
         Shell closedShell = builder.buildShell(93);
@@ -244,7 +246,8 @@ class StepCadBuilderTest {
         + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
         + "#80=FACE_SURFACE('F0',(#71),#13,.T.);\n"
         + "#90=SURFACED_OPEN_SHELL('SOS',(#80));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(90);
 
@@ -297,7 +300,8 @@ class StepCadBuilderTest {
         + "#93=AXIS2_PLACEMENT_3D('SOLID_POS',#90,#91,#92);\n"
         + "#94=DIRECTION('LOCAL_EXTRUDE',(0.0,0.0,1.0));\n"
         + "#95=(EXTRUDED_FACE_SOLID('EXF',#80,#93,#94,5.0) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('EXF_ITEM'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(95);
 
@@ -355,7 +359,8 @@ class StepCadBuilderTest {
         + "#93=AXIS2_PLACEMENT_3D('SOLID_POS',#90,#91,#92);\n"
         + "#94=DIRECTION('LOCAL_EXTRUDE',(0.0,0.0,-1.0));\n"
         + "#95=(EXTRUDED_FACE_SOLID('EXF',#80,#93,#94,5.0) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('EXF_ITEM'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(95);
 
@@ -458,7 +463,8 @@ class StepCadBuilderTest {
         + "#93=DIRECTION('AXIS_DIR',(0.0,1.0,0.0));\n"
         + "#94=AXIS1_PLACEMENT('REV_AXIS',#92,#93);\n"
         + "#95=(REVOLVED_FACE_SOLID('RVF',#80,#91,#94,1.57079632679) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('RVF_ITEM'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(95);
 
@@ -535,7 +541,8 @@ class StepCadBuilderTest {
         + "#20=VERTEX_POINT('V0',#2);\n"
         + "#21=VERTEX_POINT('V1',#3);\n"
         + "#30=EDGE_CURVE('E0',#20,#21,#13,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(30);
 
@@ -558,7 +565,8 @@ class StepCadBuilderTest {
         + "#8=VERTEX_POINT('V0',#6);\n"
         + "#9=VERTEX_POINT('V1',#7);\n"
         + "#10=EDGE_CURVE('E0',#8,#9,#5,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(10);
 
@@ -654,7 +662,8 @@ class StepCadBuilderTest {
         + "#12=(QUASI_UNIFORM_CURVE() B_SPLINE_CURVE(2,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('quc'));\n"
         + "#13=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() B_SPLINE_CURVE(1,(#1,#2,#3,#4),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbc'));\n"
         + "#20=(BEZIER_CURVE() B_SPLINE_CURVE(3,(#5,#6,#7,#8),.UNSPECIFIED.,.F.,.F.) BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bz2'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Curve3 bezier = builder.buildCurveReference3(10);
         Curve3 uniform = builder.buildCurveReference3(11);
@@ -681,7 +690,8 @@ class StepCadBuilderTest {
         + "#11=(UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('us'));\n"
         + "#12=(QUASI_UNIFORM_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('qus'));\n"
         + "#13=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() B_SPLINE_SURFACE(1,1,((#1,#2),(#3,#4)),.UNSPECIFIED.,.F.,.F.,.F.) BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbs'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertInstanceOf(BSplineSurface3.class, builder.buildBezierSurface(10));
         assertInstanceOf(BSplineSurface3.class, builder.buildUniformSurface(11));
@@ -725,7 +735,8 @@ class StepCadBuilderTest {
         + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
         + "#5=DEGENERATE_CONIC('DC0',#4);\n"
         + "#6=GEOMETRIC_CURVE_SET('WIRE',(#5));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Curve3 curve = builder.buildCurveReference3(5);
 
@@ -819,7 +830,8 @@ class StepCadBuilderTest {
         + "#22=VERTEX_POINT('V2',#3);\n"
         + "#30=EDGE_CURVE('E0',#20,#21,#11,.T.);\n"
         + "#31=EDGE_CURVE('E1',#20,#22,#12,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge leaderEdge = builder.buildEdge(30);
         Edge dimensionEdge = builder.buildEdge(31);
@@ -863,7 +875,8 @@ class StepCadBuilderTest {
         + "#21=VERTEX_POINT('V1',#2);\n"
         + "#22=EDGE_CURVE('E0',#20,#21,#7,.T.);\n"
         + "#23=EDGE_CURVE('E1',#20,#21,#19,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge projectionEdge = builder.buildEdge(22);
         Edge terminatorEdge = builder.buildEdge(23);
@@ -962,7 +975,8 @@ class StepCadBuilderTest {
         + "#60=EDGE_LOOP('LOOP0',(#50,#51,#52,#53));\n"
         + "#61=FACE_OUTER_BOUND('FOB',#60,.T.);\n"
         + "#62=FACE_SURFACE('F0',(#61),#25,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(62);
 
@@ -989,7 +1003,8 @@ class StepCadBuilderTest {
         + "#9=VERTEX_POINT('V0',#1);\n"
         + "#10=VERTEX_POINT('V1',#2);\n"
         + "#11=EDGE_CURVE('E0',#9,#10,#8,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(11);
 
@@ -1020,7 +1035,8 @@ class StepCadBuilderTest {
         + "#12=CARTESIAN_POINT('P2',(11.0,0.0,0.0));\n"
         + "#13=VERTEX_POINT('V1',#12);\n"
         + "#14=EDGE_CURVE('E0',#11,#13,#10,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(14);
 
@@ -1051,7 +1067,8 @@ class StepCadBuilderTest {
         + "#13=CARTESIAN_POINT('P2',(11.0,0.0,0.0));\n"
         + "#14=VERTEX_POINT('V1',#13);\n"
         + "#15=EDGE_CURVE('E0',#12,#14,#11,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(15);
 
@@ -1115,7 +1132,8 @@ class StepCadBuilderTest {
         + "#59=FACE_OUTER_BOUND('FOB',#58,.T.);\n"
         + "#60=ADVANCED_FACE('FEX',(#59),#13,.T.);\n"
         + "#61=ADVANCED_FACE('FREV',(#59),#14,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face extrusion = builder.buildFace(60);
         Face revolution = builder.buildFace(61);
@@ -1218,7 +1236,8 @@ class StepCadBuilderTest {
         + "#80=EDGE_LOOP('LOOP',(#70,#71,#72,#73));\n"
         + "#81=FACE_OUTER_BOUND('FOB',#80,.T.);\n"
         + "#82=FACE_SURFACE('FS0',(#81),#21,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(82);
 
@@ -1405,7 +1424,8 @@ class StepCadBuilderTest {
         + "#23=POLY_LOOP('L0',(#20,#21,#22));\n"
         + "#61=FACE_OUTER_BOUND('B0',#23,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#13,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(70);
 
@@ -1454,7 +1474,8 @@ class StepCadBuilderTest {
         + "#80=FACE_SURFACE('FS0',(#71),#13,.T.);\n"
         + "#81=ORIENTED_FACE('OF0',#80,.F.);\n"
         + "#90=OPEN_SHELL('OS',(#81));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(80);
         Face orientedFace = builder.buildFace(81);
@@ -1478,7 +1499,8 @@ class StepCadBuilderTest {
         + "#11=VERTEX_LOOP('VL0',#10);\n"
         + "#12=FACE_OUTER_BOUND('B0',#11,.T.);\n"
         + "#13=FACE_SURFACE('FS0',(#12),#5,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(13);
 
@@ -1500,7 +1522,8 @@ class StepCadBuilderTest {
         + "#8=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "#9=FACE_OUTER_BOUND('B0',#8,.T.);\n"
         + "#10=FACE_SURFACE('FS0',(#9),#7,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(10);
 
@@ -1562,7 +1585,8 @@ class StepCadBuilderTest {
         + "#7=AXIS2_PLACEMENT_2D('AX2',#5,#6);\n"
         + "#8=RECTANGLE_PROFILE_DEF(.AREA.,'R',#7,4.0,2.0);\n"
         + "#9=EXTRUDED_AREA_SOLID('EX',#8,#4,#2,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(9);
 
@@ -1588,7 +1612,8 @@ class StepCadBuilderTest {
         + "#11=DIRECTION('DY',(0.0,1.0,0.0));\n"
         + "#12=CARTESIAN_TRANSFORMATION_OPERATOR_3D('X',#3,#11,#10,1.0,#2);\n"
         + "#13=SOLID_REPLICA('SR',#9,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(13);
 
@@ -1611,7 +1636,8 @@ class StepCadBuilderTest {
         + "#9=AXIS2_PLACEMENT_2D('AX2',#7,#8);\n"
         + "#10=RECTANGLE_PROFILE_DEF(.AREA.,'R',#9,2.0,4.0);\n"
         + "#11=REVOLVED_AREA_SOLID('RV',#10,#5,#6,1.57079632679);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -1635,7 +1661,8 @@ class StepCadBuilderTest {
         + "#9=AXIS2_PLACEMENT_2D('AX2',#7,#8);\n"
         + "#10=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#9,2.0,0.5);\n"
         + "#11=REVOLVED_AREA_SOLID('RVH',#10,#5,#6,0.19634954084936207);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -1663,7 +1690,8 @@ class StepCadBuilderTest {
         + "#13=EXTRUDED_AREA_SOLID('EX1',#9,#4,#2,5.0);\n"
         + "#14=EXTRUDED_AREA_SOLID('EX2',#10,#4,#2,5.0);\n"
         + "#15=EXTRUDED_AREA_SOLID('EX3',#11,#4,#2,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid circle = builder.buildSolid(12);
         Solid ellipse = builder.buildSolid(13);
@@ -1697,7 +1725,8 @@ class StepCadBuilderTest {
         + "#14=POLYLINE('INNER',(#9,#10,#11,#12,#9));\n"
         + "#15=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#13,(#14));\n"
         + "#16=EXTRUDED_AREA_SOLID('EXV',#15,#4,#2,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(16);
 
@@ -1728,7 +1757,8 @@ class StepCadBuilderTest {
         + "#16=POLYLINE('INNER',(#11,#12,#13,#14,#11));\n"
         + "#17=ARBITRARY_PROFILE_DEF_WITH_VOIDS(.AREA.,'APV',#15,(#16));\n"
         + "#18=REVOLVED_AREA_SOLID('RVV',#17,#5,#6,1.57079632679);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(18);
 
@@ -1746,7 +1776,8 @@ class StepCadBuilderTest {
         + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
         + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
         + "#5=BLOCK('BLK',#4,10.0,20.0,30.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(5);
 
@@ -1768,7 +1799,8 @@ class StepCadBuilderTest {
         + "#8=RIGHT_CIRCULAR_CYLINDER('CY',#7,5.0,2.0);\n"
         + "#9=TORUS('TO',#7,5.0,1.0);\n"
         + "#10=RIGHT_ANGULAR_WEDGE('WG',#4,4.0,3.0,2.0,2.5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid sphere = builder.buildSolid(5);
         Solid ellipsoid = builder.buildSolid(6);
@@ -1797,7 +1829,8 @@ class StepCadBuilderTest {
         + "#8=PLANE('PLANE',#7);\n"
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(10);
 
@@ -1824,7 +1857,8 @@ class StepCadBuilderTest {
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
         + "#11=CSG_SOLID('CSG0',#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -1850,7 +1884,8 @@ class StepCadBuilderTest {
         + "#8=PLANE('PLANE',#7);\n"
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(10);
 
@@ -1877,7 +1912,8 @@ class StepCadBuilderTest {
         + "#9=BOX_DOMAIN(#1,5.0,20.0,30.0);\n"
         + "#10=BOXED_HALF_SPACE('BHS',#8,.T.,#9);\n"
         + "#11=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#10) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -1905,7 +1941,8 @@ class StepCadBuilderTest {
         + "#9=BOX_DOMAIN(#1,5.0,20.0,30.0);\n"
         + "#10=BOXED_HALF_SPACE('BHS',#8,.T.,#9);\n"
         + "#11=(BOOLEAN_RESULT(.INTERSECTION.,#5,#10) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -1933,7 +1970,8 @@ class StepCadBuilderTest {
         + "#9=BOX_DOMAIN(#1,5.0,20.0,30.0);\n"
         + "#10=BOXED_HALF_SPACE('BHS',#8,.T.,#9);\n"
         + "#11=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#10) BOOLEAN_RESULT(.DIFFERENCE.,#5,#10) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(11);
 
@@ -2009,7 +2047,8 @@ class StepCadBuilderTest {
         + "#60=EDGE_LOOP('L0',(#50,#51,#52,#53));\n"
         + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#14,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(70);
 
@@ -2059,7 +2098,8 @@ class StepCadBuilderTest {
         + "#60=EDGE_LOOP('L0',(#50,#51,#52,#53));\n"
         + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#11,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(70);
 
@@ -2083,7 +2123,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
         SphericalSurface surface = assertInstanceOf(SphericalSurface.class, face.surface());
@@ -2107,7 +2148,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
         ConicalSurface surface = assertInstanceOf(ConicalSurface.class, face.surface());
@@ -2132,7 +2174,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
         ToroidalSurface surface = assertInstanceOf(ToroidalSurface.class, face.surface());
@@ -2159,7 +2202,8 @@ class StepCadBuilderTest {
         + "#12=POLY_LOOP('L0',(#9,#10,#11));\n"
         + "#13=FACE_OUTER_BOUND('B0',#12,.T.);\n"
         + "#14=ADVANCED_FACE('F0',(#13),#8,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(14);
         OffsetSurface3 surface = assertInstanceOf(OffsetSurface3.class, face.surface());
@@ -2187,7 +2231,8 @@ class StepCadBuilderTest {
         + "#13=POLY_LOOP('L0',(#10,#11,#12));\n"
         + "#14=FACE_OUTER_BOUND('B0',#13,.T.);\n"
         + "#15=ADVANCED_FACE('F0',(#14),#9,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(15);
         OffsetSurface3 surface = assertInstanceOf(OffsetSurface3.class, face.surface());
@@ -2213,7 +2258,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
         OffsetSurface3 surface = assertInstanceOf(OffsetSurface3.class, face.surface());
@@ -2241,7 +2287,8 @@ class StepCadBuilderTest {
         + "#13=POLY_LOOP('L0',(#10,#11,#12));\n"
         + "#14=FACE_OUTER_BOUND('B0',#13,.T.);\n"
         + "#15=ADVANCED_FACE('F0',(#14),#9,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(15);
         CylindricalSurface surface = assertInstanceOf(CylindricalSurface.class, face.surface());
@@ -2536,7 +2583,8 @@ class StepCadBuilderTest {
         + "#80=(B_SPLINE_SURFACE(1,1,((#1,#3),(#2,#4)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
         + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.));\n"
         + "#81=ADVANCED_FACE('BS_PATCH',(#71),#80,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(81);
 
@@ -2562,7 +2610,8 @@ class StepCadBuilderTest {
         + "     B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.)\n"
         + "     RATIONAL_B_SPLINE_SURFACE(((1.0,1.0),(1.0,0.5))));\n"
         + "#41=ADVANCED_FACE('RBS_PATCH',(#31),#40,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(41);
 
@@ -2585,7 +2634,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#6,#7,#8));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#5,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
 
@@ -2608,7 +2658,8 @@ class StepCadBuilderTest {
         + "#10=POLY_LOOP('L0',(#6,#7,#8));\n"
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#5,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(12);
 
@@ -2631,7 +2682,8 @@ class StepCadBuilderTest {
         + "#9=POLY_LOOP('L0',(#6,#7,#8));\n"
         + "#10=FACE_OUTER_BOUND('B0',#9,.T.);\n"
         + "#11=ADVANCED_FACE('F0',(#10),#5,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Face face = builder.buildFace(11);
 
@@ -2830,7 +2882,8 @@ class StepCadBuilderTest {
         + "#110=(BOOLEAN_RESULT(.UNION.,#100,#9)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('BOOL'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(110);
         // Union produces a solid with merged faces from both operands
@@ -2875,7 +2928,8 @@ class StepCadBuilderTest {
         + "    SOLID_MODEL()\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('solid'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid cone = builder.buildSolid(6);
         // Cone should have base face + lateral triangular faces
@@ -3051,7 +3105,8 @@ class StepCadBuilderTest {
         + "    CURVE()\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('ipc'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Curve3 curve = builder.buildCurveReference3(5);
         assertInstanceOf(Polyline3.class, curve);
@@ -3072,7 +3127,8 @@ class StepCadBuilderTest {
         + "    CURVE()\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('ipc'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Curve3 curve = builder.buildCurveReference3(5);
         assertInstanceOf(Polyline3.class, curve);
@@ -3128,7 +3184,8 @@ class StepCadBuilderTest {
         + "    SOLID_MODEL()\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('ext'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(10);
         assertTrue(solid.outerShell().faces().size() >= 6);
@@ -3151,7 +3208,8 @@ class StepCadBuilderTest {
         + "#11=ADVANCED_FACE('AF',(#10),#8,.T.);\n"
         + "#12=OPEN_SHELL('OS',(#11));\n"
         + "#13=SHELL_BASED_SURFACE_MODEL('SSM',(#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(13);
         assertNotNull(shell);
@@ -3167,7 +3225,8 @@ class StepCadBuilderTest {
         + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
         + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
         + "#5=PLANAR_BOX('PB',#4,2.0,3.0,1.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(5);
         assertNotNull(shell);
@@ -3180,7 +3239,8 @@ class StepCadBuilderTest {
         StepCadBuilder builder = builder(
         "DATA;\n"
         + "#1=PLANAR_EXTENT('PE',4.0,5.0,1.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(1);
         assertNotNull(shell);
@@ -3204,7 +3264,8 @@ class StepCadBuilderTest {
         + "#10=ADVANCED_FACE('AF',(#9),#7,.T.);\n"
         + "#11=CONNECTED_FACE_SET('CFS',(#10));\n"
         + "#12=CONNECTED_FACE_SUB_SET('CFSS',(#10),#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(12);
         assertNotNull(shell);
@@ -3221,7 +3282,8 @@ class StepCadBuilderTest {
         + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
         + "#5=PLANE('PL',#4);\n"
         + "#6=SURFACE_PATCH('SP',#5,$,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Shell shell = builder.buildShell(6);
         assertNotNull(shell);
@@ -3317,7 +3379,8 @@ class StepCadBuilderTest {
         + "#10=ADVANCED_FACE('AF',(#9),#7,.T.);\n"
         + "#11=CLOSED_SHELL('CS',(#10));\n"
         + "#12=MANIFOLD_SOLID_BREP('MSB',#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(12);
         assertNotNull(solid);
@@ -3371,7 +3434,8 @@ class StepCadBuilderTest {
         + "#6=VECTOR('V',#5,1.0);\n"
         + "#7=LINE('L0',#1,#6);\n"
         + "#8=EDGE_CURVE('E0',#3,#4,#7,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Edge edge = builder.buildEdge(8);
         assertNotNull(edge);
@@ -3814,7 +3878,8 @@ class StepCadBuilderTest {
         + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
         + "#5=BLOCK('B',#4,2.0,3.0,4.0);\n"
         + "#6=CSG_SOLID('CS',#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         Solid solid = builder.buildSolid(6);
         assertNotNull(solid);
