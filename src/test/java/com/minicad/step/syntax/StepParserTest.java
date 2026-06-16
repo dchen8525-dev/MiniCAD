@@ -183,11 +183,10 @@ class StepParserTest {
 
     @Test
     void shouldPreserveOriginalNumberLiteral() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=EXAMPLE(1.25E-3);\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
 
         StepValue.NumberValue number = assertInstanceOf(
                 StepValue.NumberValue.class,
