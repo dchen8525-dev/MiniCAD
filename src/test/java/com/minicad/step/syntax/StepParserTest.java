@@ -28,8 +28,7 @@ class StepParserTest {
         + "#10=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#11=DIRECTION('D0',(0.0,0.0,1.0));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
 
         StepFile file = StepParser.parse(step);
 
@@ -52,8 +51,7 @@ class StepParserTest {
         + "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
 
         StepFile file = StepParser.parse(step);
         StepFileName fileName = file.fileName().orElseThrow();
@@ -77,8 +75,7 @@ class StepParserTest {
         "DATA;\n"
         + "#20=EDGE_CURVE('E0',#30,#31,#40,.T.);\n"
         + "#40=LINE('L0',#50,#60);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepFile file = StepParser.parse(step);
         StepEntityInstance edgeCurve = file.entities().get(0);
@@ -93,8 +90,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=EXAMPLE('A''B',$,*,.T.,LENGTH_MEASURE(1.0),(1.0,#2,'X'));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance entity = StepParser.parse(step).entities().get(0);
 
@@ -114,8 +110,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=EXAMPLE(AP242_SELECT(#2,'name',.T.));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance entity = StepParser.parse(step).entities().get(0);
 
@@ -136,8 +131,7 @@ class StepParserTest {
         + "    /* typed select */ AP242_SELECT(/* ref */ #2, /* name */ 'selected', /* flag */ .T.),\n"
         + "    /* list */ (1.0, /* omitted */ $, /* not provided */ *)\n"
         + ");\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance entity = StepParser.parse(step).entities().get(0);
 
@@ -157,8 +151,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=EXAMPLE('A''B','\\S\\D','\\P\\A\\S\\|','\\X\\E9','\\X2\\4F60597D\\X0\\','\\X2\\65E5672C\\X0\\','\\X4\\0001F600\\X0\\');\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance entity = StepParser.parse(step).entities().get(0);
 
@@ -176,15 +169,13 @@ class StepParserTest {
         StepParseException invalidHex = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE('\\X\\ZZ');\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(invalidHex.getMessage().startsWith("malformed \\X\\ string escape at position "));
 
         StepParseException unterminatedLong = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE('\\X2\\4F60');\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(unterminatedLong.getMessage().startsWith("malformed long string escape at position "));
     }
 
@@ -193,8 +184,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=EXAMPLE(1.25E-3);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepValue.NumberValue number = assertInstanceOf(
                 StepValue.NumberValue.class,
@@ -209,22 +199,19 @@ class StepParserTest {
         StepParseException hugeExponent = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE(1E9999);\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertEquals("non-finite number '1E9999' at position 17", hugeExponent.getMessage());
 
         StepParseException nan = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE(NaN);\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertEquals("invalid number 'NaN' at position 17", nan.getMessage());
 
         StepParseException infinity = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE(Infinity);\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertEquals("invalid number 'Infinity' at position 17", infinity.getMessage());
     }
 
@@ -233,15 +220,13 @@ class StepParserTest {
         StepParseException zero = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#0=EXAMPLE();\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(zero.getMessage().startsWith("entity id '#0' must be positive at position "));
 
         StepParseException negative = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#-1=EXAMPLE();\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(negative.getMessage().startsWith("entity id '#-1' must be positive at position "));
 
         StepParseException explicitPlus = assertThrows(StepParseException.class, () -> StepParser.parse(
@@ -289,8 +274,7 @@ class StepParserTest {
         + "#1=EXAMPLE('contains ENDSEC; in data');\n"
         + "#2=EXAMPLE('still parsing');\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
 
         StepFile file = StepParser.parse(step);
 
@@ -311,8 +295,7 @@ class StepParserTest {
         + "DATA;\n"
         + "#1=EXAMPLE('payload');\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
 
         StepFile file = StepParser.parse(step);
 
@@ -328,8 +311,7 @@ class StepParserTest {
         + "SOMEDATA;\n"
         + "#1=EXAMPLE('payload');\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        ));
+        + "END-ISO-10303-21;";
         assertEquals("missing DATA section", noData.getMessage());
 
         String valid = 
@@ -337,8 +319,7 @@ class StepParserTest {
         + "DATA;\n"
         + "#1=EXAMPLE('SOMEENDSEC; text');\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;";
 
         StepFile file = StepParser.parse(valid);
 
@@ -351,8 +332,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0))\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
@@ -373,8 +353,7 @@ class StepParserTest {
         StepParseException inData = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(inData.getMessage().startsWith("unterminated string at position "));
 
         StepParseException beforeData = assertThrows(StepParseException.class, () -> StepParser.parse(
@@ -382,8 +361,7 @@ class StepParserTest {
         + "'unterminated\n"
         + "DATA;\n"
         + "#1=EXAMPLE();\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(beforeData.getMessage().startsWith("unterminated string at position "));
     }
 
@@ -394,8 +372,7 @@ class StepParserTest {
         + "/* unterminated\n"
         + "DATA;\n"
         + "#1=EXAMPLE();\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;";
         assertTrue(beforeData.getMessage().startsWith("unterminated comment at position "));
 
         StepParseException inData = assertThrows(StepParseException.class, () -> StepParser.parse(
@@ -412,8 +389,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0];\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
@@ -425,8 +401,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance instance = StepParser.parse(step).entities().get(0);
 
@@ -441,8 +416,7 @@ class StepParserTest {
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3)\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         assertEquals("unterminated complex entity opened at position 9", exception.getMessage());
     }
@@ -455,8 +429,7 @@ class StepParserTest {
         + "ENDSEC;\n"
         + "DATA;\n"
         + "#2=B();\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         assertEquals("multiple DATA sections are not supported", exception.getMessage());
     }
@@ -468,8 +441,7 @@ class StepParserTest {
         + "#1=A();\n"
         + "#2=B();\n"
         + "#1=C();\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         assertTrue(exception.getMessage().startsWith("duplicate entity id #1 at position "));
         assertTrue(exception.getMessage().contains("; first declared at position "));
@@ -480,8 +452,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=(geometric_representation_context(3) representation_context('ID','MODEL'));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepEntityInstance instance = StepParser.parse(step).entities().get(0);
 
@@ -496,8 +467,7 @@ class StepParserTest {
         "DATA;\n"
         + "#1=A();\n"
         + "#2=B(#1);\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepFile file = StepParser.parse(step);
 
@@ -510,8 +480,7 @@ class StepParserTest {
         String step = 
         "DATA;\n"
         + "#1=A();\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;";
 
         StepFile file = StepParser.parse(step);
 
