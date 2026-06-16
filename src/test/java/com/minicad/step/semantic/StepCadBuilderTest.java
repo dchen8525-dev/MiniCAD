@@ -3050,9 +3050,7 @@ class StepCadBuilderTest {
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
         + "ENDSEC;"
-
         );
-
 
         // Verify the profile was resolved - check that entity 4 is in the map
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
@@ -3065,7 +3063,7 @@ class StepCadBuilderTest {
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
         + "ENDSEC;"
-        );
+        ));
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepRectangleHollowProfileDef.class, entity);
         StepRectangleHollowProfileDef profile = (StepRectangleHollowProfileDef) entity;
