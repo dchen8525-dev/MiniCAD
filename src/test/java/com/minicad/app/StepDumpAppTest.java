@@ -60,7 +60,8 @@ class StepDumpAppTest {
         + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
         + "#90=CLOSED_SHELL('CS',(#80));\n"
         + "#100=MANIFOLD_SOLID_BREP('S0',#90);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "Syntax Summary",
@@ -116,7 +117,8 @@ class StepDumpAppTest {
         + "#82=MANIFOLD_SOLID_BREP('S0',#81);\n"
         + "#83=OPEN_SHELL('OS0',(#80));\n"
         + "#84=SHELL_BASED_SURFACE_MODEL('SBSM',(#83));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MANIFOLD_SOLID_BREP #82:",
@@ -174,7 +176,8 @@ class StepDumpAppTest {
         + "#90=VERTEX_SHELL('VS0',#89);\n"
         + "#91=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#88,#90));\n"
         + "#94=OPEN_SHELL('OS0',(#80));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "FACE_BASED_SURFACE_MODEL #83:",
@@ -215,7 +218,8 @@ class StepDumpAppTest {
         + "#22=EDGE_LOOP('EL0',(#19,#20,#21));\n"
         + "#23=POLY_LOOP('PL0',(#1,#2,#3));\n"
         + "#24=WIRE_SHELL('WS0',(#22,#23));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EDGE_LOOP #22: built=true, unsupportedFaces=0",
@@ -233,7 +237,8 @@ class StepDumpAppTest {
         + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
         + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
         + "#5=PARABOLA('PAR0',#4,2.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "Semantic Summary",
@@ -281,7 +286,8 @@ class StepDumpAppTest {
         + "#71=FACE_OUTER_BOUND('FOB',#70,.T.);\n"
         + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
         + "#81=ORIENTED_FACE('OF0',#80,.F.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ADVANCED_FACE #80: built=true, unsupportedFaces=0",
@@ -309,7 +315,8 @@ class StepDumpAppTest {
         + "#50=EDGE_CURVE('E0',#30,#31,#20,.T.);\n"
         + "#51=EDGE_CURVE('E1',#30,#32,#21,.T.);\n"
         + "#61=ORIENTED_EDGE('OE1',$,$,#51,.F.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EDGE_CURVE #50: built=true, unsupportedFaces=0",
@@ -350,7 +357,8 @@ class StepDumpAppTest {
         + "#51=OPEN_PATH('OP',(#30));\n"
         + "#52=SUBPATH('SP',(#31),#50);\n"
         + "#53=ORIENTED_PATH('OPTH',#50,.F.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EDGE_LOOP #40: built=true, unsupportedFaces=0",
@@ -386,7 +394,8 @@ class StepDumpAppTest {
         + "#15=OPEN_PATH('OP0',(#13,#14));\n"
         + "#16=ORIENTED_PATH('OP1',#15,.F.);\n"
         + "#17=ORIENTED_PATH('OP2',#16,.F.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_PATH #15: built=true, unsupportedFaces=0",
@@ -504,7 +513,8 @@ class StepDumpAppTest {
         + "#80=ADVANCED_FACE('F0',(#71),#13,.T.);\n"
         + "#81=OPEN_SHELL('OS0',(#80));\n"
         + "#82=(FACE_BASED_SURFACE_MODEL('FBSM',(#81)) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('fbsm-item'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #81: faces=1, unsupportedFaces=0",
@@ -528,7 +538,8 @@ class StepDumpAppTest {
         + "#10=POINT_SET('PS0',(#1,#2));\n"
         + "#11=POLYLINE('PL0',(#1,#2,#3));\n"
         + "#12=GEOMETRIC_SET('GS0',(#1,#6,#9,#11));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #10: builtMembers=2, unsupportedFaces=0",
@@ -554,7 +565,8 @@ class StepDumpAppTest {
         + "#11=POLYLINE('PL0',(#1,#2,#3));\n"
         + "#12=GEOMETRIC_SET('GS0',(#1,#6,#9,#10));\n"
         + "#13=GEOMETRIC_CURVE_SET('GCS0',(#1,#6,#11));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #10:",
@@ -580,7 +592,8 @@ class StepDumpAppTest {
         + "#11=POLYLINE('PL0',(#1,#2,#3));\n"
         + "#12=GEOMETRIC_SET('GS0',(#1,#6,#9,#10));\n"
         + "#13=GEOMETRIC_CURVE_SET('GCS0',(#1,#6,#11));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #10:",
@@ -625,7 +638,8 @@ class StepDumpAppTest {
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "#18=GEOMETRIC_CURVE_SET('LEADER',(#1,#2));\n"
         + "#19=DRAUGHTING_CALLOUT('CALLOUT',(#16,#18));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_PLACEHOLDER_OCCURRENCE #9:",
@@ -673,7 +687,8 @@ class StepDumpAppTest {
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "#18=GEOMETRIC_CURVE_SET('LEADER',(#1,#2));\n"
         + "#19=DRAUGHTING_CALLOUT('CALLOUT',(#16,#18));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_PLACEHOLDER_OCCURRENCE #9:",
@@ -698,7 +713,8 @@ class StepDumpAppTest {
         + "#7=POINT_REPLICA('PR0',#1,#6);\n"
         + "#8=POINT_SET('PS0',(#1,#7));\n"
         + "#9=GEOMETRIC_SET('GS0',(#7,#1));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -721,7 +737,8 @@ class StepDumpAppTest {
         + "#8=VECTOR('VX',#2,1.0);\n"
         + "#9=LINE('L0',#1,#8);\n"
         + "#10=GEOMETRIC_CURVE_SET('GCS0',(#7,#9));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -738,7 +755,8 @@ class StepDumpAppTest {
         + "#3=POINT_SET('PS0',(#2));\n"
         + "#4=GEOMETRIC_CURVE_SET('GCS0',(#2));\n"
         + "#5=GEOMETRIC_SET('GS0',(#3,#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #3: builtMembers=1, unsupportedFaces=0",
@@ -771,7 +789,8 @@ class StepDumpAppTest {
         + "#18=POLY_LOOP('PL0',(#6,#7,#8));\n"
         + "#19=GEOMETRIC_CURVE_SET('GCS0',(#14,#17,#18));\n"
         + "#20=GEOMETRIC_SET('GS0',(#5,#14,#17,#18,#19));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CYLINDRICAL_SURFACE #5: builtItems=1, unsupportedFaces=0",
@@ -800,7 +819,8 @@ class StepDumpAppTest {
         + "#14=WIRE_SHELL('WS0',(#13,#12));\n"
         + "#15=GEOMETRIC_CURVE_SET('GCS0',(#11,#13));\n"
         + "#16=GEOMETRIC_SET('GS0',(#11,#13,#12,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CONNECTED_EDGE_SET #11: builtEdges=2, unsupportedFaces=0",
@@ -836,7 +856,8 @@ class StepDumpAppTest {
         + "    REPRESENTATION_ITEM('EBWM'));\n"
         + "#17=SHELL_BASED_WIREFRAME_MODEL('SBWM',(#15,#14));\n"
         + "#18=GEOMETRIC_CURVE_SET('GCS0',(#11,#12,#13,#15,#16,#17));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CONNECTED_EDGE_SET #11: builtEdges=2, unsupportedFaces=0",
@@ -870,7 +891,8 @@ class StepDumpAppTest {
         + "    REPRESENTATION_ITEM('FBM'));\n"
         + "#14=BLOCK('BLK',#7,1.0,1.0,1.0);\n"
         + "#15=GEOMETRIC_SET('GS0',(#12,#13,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #12: faces=1, unsupportedFaces=0",
@@ -894,7 +916,8 @@ class StepDumpAppTest {
         + "#8=GEOMETRIC_SET('INNER_GS',(#6,#7));\n"
         + "#9=GEOMETRIC_CURVE_SET('OUTER_GCS',(#6,#8,#7));\n"
         + "#10=GEOMETRIC_SET('OUTER_GS',(#8,#9));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #6: builtMembers=1, unsupportedFaces=0",
@@ -923,7 +946,8 @@ class StepDumpAppTest {
         + "#12=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T1',#2,#3,#1,1.0,#4);\n"
         + "#13=MAPPED_ITEM(#11,#12);\n"
         + "#14=SHAPE_REPRESENTATION('TOP',(#13),#9);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -953,7 +977,8 @@ class StepDumpAppTest {
         + "#13=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#2,#3,#1,1.0,#4);\n"
         + "#14=MAPPED_ITEM(#12,#13);\n"
         + "#15=SHAPE_REPRESENTATION('TOP',(#14),#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "STYLED_ITEM #8: builtItems=1, unsupportedFaces=0",
@@ -985,7 +1010,8 @@ class StepDumpAppTest {
         + "#13=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T3',#2,#3,#1,1.0,#4);\n"
         + "#14=MAPPED_ITEM(#12,#13);\n"
         + "#15=SHAPE_REPRESENTATION('TOP',(#14),#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "STYLED_ITEM #8:",
@@ -1021,7 +1047,8 @@ class StepDumpAppTest {
         + "#18=(REPRESENTATION_RELATIONSHIP('RRT','xform',#11,#12)\n"
         + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#17));\n"
         + "#19=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','shape',#11,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "REPRESENTATION_RELATIONSHIP #13: builtItems=2, unsupportedFaces=0",
@@ -1056,7 +1083,8 @@ class StepDumpAppTest {
         + "#18=(REPRESENTATION_RELATIONSHIP('RRT','xform',#11,#12)\n"
         + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#17));\n"
         + "#19=SHAPE_REPRESENTATION_RELATIONSHIP('SRR','shape',#11,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "REPRESENTATION_RELATIONSHIP #13:",
@@ -1182,7 +1210,8 @@ class StepDumpAppTest {
         + "#24=DRAUGHTING_CALLOUT('CALLOUT_A',(#22,#23));\n"
         + "#25=DRAUGHTING_CALLOUT('CALLOUT_B',(#22,#23));\n"
         + "#26=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#24,#25);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_OCCURRENCE_RELATIONSHIP #19:",
@@ -1222,7 +1251,8 @@ class StepDumpAppTest {
         + "#24=DRAUGHTING_CALLOUT('CALLOUT_A',(#22,#23));\n"
         + "#25=DRAUGHTING_CALLOUT('CALLOUT_B',(#22,#23));\n"
         + "#26=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#24,#25);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_OCCURRENCE_RELATIONSHIP #19:",
@@ -1255,7 +1285,8 @@ class StepDumpAppTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('APLANE'));\n"
         + "#13=PLANE('PL0',#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -1281,7 +1312,8 @@ class StepDumpAppTest {
         + "    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#8),#7));\n"
         + "#10=GEOMETRIC_CURVE_SET('LEADER',(#7,#1));\n"
         + "#11=DRAUGHTING_CALLOUT('CALLOUT',(#9,#10));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -1315,7 +1347,8 @@ class StepDumpAppTest {
         + "#17=TERMINATOR_SYMBOL('TS0',(#11),#10,#16);\n"
         + "#18=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#11),#10);\n"
         + "#19=ANNOTATION_OCCURRENCE_RELATIONSHIP('REL','links symbol to terminator',#18,#17);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL_OCCURRENCE #18: builtItems=1, unsupportedFaces=0",
@@ -1349,7 +1382,8 @@ class StepDumpAppTest {
         + "#18=TERMINATOR_SYMBOL('TS0',(#11),#10,#17);\n"
         + "#19=ANNOTATION_OCCURRENCE_ASSOCIATIVITY('AOA','assoc',#12,#18);\n"
         + "#20=DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY('DCTPCA','assoc',#18,#17);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_OCCURRENCE_ASSOCIATIVITY #19: builtItems=3, unsupportedFaces=0",
@@ -1378,7 +1412,8 @@ class StepDumpAppTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PC0'));\n"
         + "#10=TERMINATOR_SYMBOL('TS0',(#3),#5,#9);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_PLACEHOLDER_OCCURRENCE #4: builtItems=1, unsupportedFaces=0",
@@ -1413,7 +1448,8 @@ class StepDumpAppTest {
         + "#13=DRAUGHTING_CALLOUT('PS_CALLOUT',(#3,#4));\n"
         + "#14=DRAUGHTING_CALLOUT('PH_CALLOUT',(#3,#7));\n"
         + "#15=DRAUGHTING_CALLOUT('AP_CALLOUT',(#3,#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #4: builtMembers=1, unsupportedFaces=0",
@@ -1441,7 +1477,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('PH_GCS',(#4),#3)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PH_GCS'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #2: builtMembers=1, unsupportedFaces=0",
@@ -1496,7 +1533,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('PC0',(#22),#21)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('PC0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_CURVE_OCCURRENCE #23: builtItems=1, unsupportedFaces=0",
@@ -1530,7 +1568,8 @@ class StepDumpAppTest {
         + "#18=(ANNOTATION_FILL_AREA('FA0',(#15,#17))\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_FILL_AREA #18: builtItems=3, unsupportedFaces=0");
@@ -1573,7 +1612,8 @@ class StepDumpAppTest {
         + "#23=(ANNOTATION_FILL_AREA('FA0',(#16,#19))\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_CURVE_OCCURRENCE #21: builtItems=2, unsupportedFaces=0",
@@ -1607,7 +1647,8 @@ class StepDumpAppTest {
         + "#13=DRAUGHTING_CALLOUT('PS_CALLOUT',(#3,#4));\n"
         + "#14=DRAUGHTING_CALLOUT('PH_CALLOUT',(#3,#7));\n"
         + "#15=DRAUGHTING_CALLOUT('AP_CALLOUT',(#3,#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #4:",
@@ -1645,7 +1686,8 @@ class StepDumpAppTest {
         + "#13=DRAUGHTING_CALLOUT('PS_CALLOUT',(#3,#4));\n"
         + "#14=DRAUGHTING_CALLOUT('PH_CALLOUT',(#3,#7));\n"
         + "#15=DRAUGHTING_CALLOUT('AP_CALLOUT',(#3,#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #4:",
@@ -1666,7 +1708,8 @@ class StepDumpAppTest {
         + "#3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
         + "#4=GEOMETRIC_SET('GS',(#2));\n"
         + "#5=DRAUGHTING_CALLOUT('GS_CALLOUT',(#3,#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRIC_SET #4: builtMembers=1, unsupportedFaces=0",
@@ -1683,7 +1726,8 @@ class StepDumpAppTest {
         + "#3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
         + "#4=GEOMETRIC_SET('GS',(#2));\n"
         + "#5=DRAUGHTING_CALLOUT('GS_CALLOUT',(#3,#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRIC_SET #4:",
@@ -1701,7 +1745,8 @@ class StepDumpAppTest {
         + "#3=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
         + "#4=GEOMETRIC_SET('GS',(#2));\n"
         + "#5=DRAUGHTING_CALLOUT('GS_CALLOUT',(#3,#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRIC_SET #4:",
@@ -1731,7 +1776,8 @@ class StepDumpAppTest {
         + "#16=DRAUGHTING_CALLOUT('PATH_CALLOUT',(#15,#11));\n"
         + "#17=DRAUGHTING_CALLOUT('EDGESET_CALLOUT',(#15,#12));\n"
         + "#18=DRAUGHTING_CALLOUT('WIRE_CALLOUT',(#15,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PATH #11: built=true, unsupportedFaces=0",
@@ -1766,7 +1812,8 @@ class StepDumpAppTest {
         + "#17=POINT_REPLICA('PR0',#1,#16);\n"
         + "#18=ANNOTATION_TEXT_OCCURRENCE('NOTE','direct',#1);\n"
         + "#19=DRAUGHTING_CALLOUT('DIRECT_CALLOUT',(#18,#1,#5,#17,#11,#12,#13,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #17: builtItems=2, unsupportedFaces=0",
@@ -1792,7 +1839,8 @@ class StepDumpAppTest {
         + "#12=CURVE_REPLICA('CR0',#8,#11);\n"
         + "#13=ANNOTATION_TEXT_OCCURRENCE('NOTE','advanced',#1);\n"
         + "#14=DRAUGHTING_CALLOUT('ADV_CALLOUT',(#13,#8,#9,#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "TRIMMED_CURVE #8: builtItems=1, unsupportedFaces=0",
@@ -1824,7 +1872,8 @@ class StepDumpAppTest {
         + "#16=DRAUGHTING_CALLOUT('PATH_CALLOUT',(#15,#11));\n"
         + "#17=DRAUGHTING_CALLOUT('EDGESET_CALLOUT',(#15,#12));\n"
         + "#18=DRAUGHTING_CALLOUT('WIRE_CALLOUT',(#15,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PATH #11:",
@@ -1867,7 +1916,8 @@ class StepDumpAppTest {
         + "#25=DRAUGHTING_CALLOUT('VS_CALLOUT',(#22,#19));\n"
         + "#26=DRAUGHTING_CALLOUT('EBWM_CALLOUT',(#22,#16));\n"
         + "#27=DRAUGHTING_CALLOUT('SBWM_CALLOUT',(#22,#21));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POLY_LOOP #17: built=true, unsupportedFaces=0",
@@ -2013,7 +2063,8 @@ class StepDumpAppTest {
         + "#84=ANNOTATION_TEXT_OCCURRENCE('NOTE','solid-callout',#1);\n"
         + "#85=DRAUGHTING_CALLOUT('MSB_CALLOUT',(#84,#82));\n"
         + "#86=DRAUGHTING_CALLOUT('BWV_CALLOUT',(#84,#83));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MANIFOLD_SOLID_BREP #82: shellFaces=1",
@@ -2056,7 +2107,8 @@ class StepDumpAppTest {
         + "#34=DRAUGHTING_CALLOUT('BCR_CALLOUT',(#30,#12));\n"
         + "#35=DRAUGHTING_CALLOUT('EX_CALLOUT',(#30,#25));\n"
         + "#36=DRAUGHTING_CALLOUT('SR_CALLOUT',(#30,#29));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BLOCK #5: shellFaces=6, unsupportedFaces=0",
@@ -2097,7 +2149,8 @@ class StepDumpAppTest {
         + "#16=DRAUGHTING_CALLOUT('PATH_CALLOUT',(#15,#11));\n"
         + "#17=DRAUGHTING_CALLOUT('EDGESET_CALLOUT',(#15,#12));\n"
         + "#18=DRAUGHTING_CALLOUT('WIRE_CALLOUT',(#15,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PATH #11:",
@@ -2138,7 +2191,8 @@ class StepDumpAppTest {
         + "#21=DRAUGHTING_CALLOUT('TEXT_CALLOUT',(#19,#15));\n"
         + "#22=DRAUGHTING_CALLOUT('TEXT_CHAR_CALLOUT',(#19,#16));\n"
         + "#23=DRAUGHTING_CALLOUT('FILL_CALLOUT',(#19,#17));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL #12: builtItems=2, unsupportedFaces=0",
@@ -2175,7 +2229,8 @@ class StepDumpAppTest {
         + "#17=(ANNOTATION_FILL_AREA('FA0',(#4))\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL #12:",
@@ -2208,7 +2263,8 @@ class StepDumpAppTest {
         + "#17=(ANNOTATION_FILL_AREA('FA0',(#4))\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FA0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL #12:",
@@ -2243,7 +2299,8 @@ class StepDumpAppTest {
         + "#16=ANNOTATION_TEXT_OCCURRENCE('NOTE','note',#15);\n"
         + "#17=DRAUGHTING_CALLOUT('SUB_CALLOUT',(#16,#13));\n"
         + "#18=DRAUGHTING_CALLOUT('DAO_CALLOUT',(#16,#14));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SUBFIGURE_OCCURRENCE #13: builtItems=2, unsupportedFaces=0",
@@ -2268,7 +2325,8 @@ class StepDumpAppTest {
         + "    DRAUGHTING_ANNOTATION_OCCURRENCE('AP0',(#3),#1));\n"
         + "#6=ANNOTATION_SYMBOL_OCCURRENCE('ASO0',(#3),#4);\n"
         + "#7=ANNOTATION_SUBFIGURE_OCCURRENCE('SUB0',(#3),#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_PLACEHOLDER_OCCURRENCE #4: builtItems=1, unsupportedFaces=0",
@@ -2299,7 +2357,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('DAO0',(#12),#11)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('DAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SUBFIGURE_OCCURRENCE #13:",
@@ -2328,7 +2387,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('DAO0',(#12),#11)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('DAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SUBFIGURE_OCCURRENCE #13:",
@@ -2364,7 +2424,8 @@ class StepDumpAppTest {
         + "#22=DATUM_TARGET_CALLOUT('DTC',(#2,#14));\n"
         + "#23=GEOMETRICAL_TOLERANCE_CALLOUT('GTC',(#2,#14));\n"
         + "#24=ROUGHNESS_CALLOUT('RC',(#2,#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "LEADER_DIRECTED_CALLOUT #15: builtItems=2, unsupportedFaces=0",
@@ -2408,7 +2469,8 @@ class StepDumpAppTest {
         + "#22=DATUM_TARGET_CALLOUT('DTC',(#2,#14));\n"
         + "#23=GEOMETRICAL_TOLERANCE_CALLOUT('GTC',(#2,#14));\n"
         + "#24=ROUGHNESS_CALLOUT('RC',(#2,#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "LEADER_DIRECTED_CALLOUT #15:",
@@ -2442,7 +2504,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('AP',(#10),#5)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #8: builtMembers=1, unsupportedFaces=0",
@@ -2470,7 +2533,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('AP',(#11),#5)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #8: builtMembers=1, unsupportedFaces=0",
@@ -2505,7 +2569,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('FAO0',(#14),#13)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -2528,7 +2593,8 @@ class StepDumpAppTest {
         + "#8=ANNOTATION_TEXT_OCCURRENCE('NOTE','note',#7);\n"
         + "#9=GEOMETRIC_CURVE_SET('LEADER',(#7,#1));\n"
         + "#10=DRAUGHTING_CALLOUT('CALLOUT',(#8,#9));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #7: builtItems=2, unsupportedFaces=0",
@@ -2558,7 +2624,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('FAO0',(#6),#10)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_TEXT_OCCURRENCE #7: builtItems=1, unsupportedFaces=0",
@@ -2588,7 +2655,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('AP',(#11),#10)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #3: builtMembers=1, unsupportedFaces=0",
@@ -2618,7 +2686,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('FAO0',(#3),#6)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "VERTEX_POINT #2: builtItems=1, unsupportedFaces=0",
@@ -2636,7 +2705,8 @@ class StepDumpAppTest {
         + "#3=ANNOTATION_TEXT_OCCURRENCE('NOTE','vertex',#2);\n"
         + "#4=GEOMETRIC_CURVE_SET('LEADER',(#1));\n"
         + "#5=DRAUGHTING_CALLOUT('CALLOUT',(#3,#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "VERTEX_POINT #2: builtItems=1, unsupportedFaces=0",
@@ -2665,7 +2735,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('FAO0',(#5),#9)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('FAO0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "VERTEX_SHELL #4: builtVertices=1, unsupportedFaces=0",
@@ -2694,7 +2765,8 @@ class StepDumpAppTest {
         + "    REPRESENTATION_ITEM('FAO0'));\n"
         + "#8=(ANNOTATION_POINT_OCCURRENCE('AP_NESTED',(#2),#7)\n"
         + "    DRAUGHTING_ANNOTATION_OCCURRENCE('AP_NESTED',(#2),#7));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_POINT_OCCURRENCE #3: builtItems=1, unsupportedFaces=0",
@@ -2746,7 +2818,8 @@ class StepDumpAppTest {
         + "    STYLED_ITEM('AP',(#20),#28)\n"
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL #9: builtItems=1, unsupportedFaces=0",
@@ -2779,7 +2852,8 @@ class StepDumpAppTest {
         + "    GEOMETRIC_REPRESENTATION_ITEM()\n"
         + "    REPRESENTATION_ITEM('AP'));\n"
         + "#10=POINT_SET('PS0',(#3,#9));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_POINT_OCCURRENCE #3: builtItems=1, unsupportedFaces=0",
@@ -2798,7 +2872,8 @@ class StepDumpAppTest {
         + "#3=POINT_SET('PS0',(#2));\n"
         + "#4=GEOMETRIC_SET('GS0',(#2));\n"
         + "#5=GEOMETRIC_CURVE_SET('GCS0',(#2));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_SET #3: builtMembers=1, unsupportedFaces=0",
@@ -2820,7 +2895,8 @@ class StepDumpAppTest {
         + "#7=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#4,#6,2.0,#5);\n"
         + "#8=POINT_REPLICA('PR0',#2,#7);\n"
         + "#9=POINT_SET('PS0',(#8));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT_REPLICA #8: builtItems=2, unsupportedFaces=0",
@@ -2860,7 +2936,8 @@ class StepDumpAppTest {
         + "#26=TEXT_STYLE_WITH_MIRROR('TS3',#22,#5);\n"
         + "#27=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS4',#22,(BOX_HEIGHT(1.2)));\n"
         + "#28=SYMBOL_COLOUR(#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "REPRESENTATION_MAP #6: builtItems=0, unsupportedFaces=0",
@@ -2920,7 +2997,8 @@ class StepDumpAppTest {
         + "#26=TEXT_STYLE_WITH_MIRROR('TS3',#22,#5);\n"
         + "#27=TEXT_STYLE_WITH_BOX_CHARACTERISTICS('TS4',#22,(BOX_HEIGHT(1.2)));\n"
         + "#28=SYMBOL_COLOUR(#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "USER_DEFINED_CURVE_FONT #7:",
@@ -2967,7 +3045,8 @@ class StepDumpAppTest {
         + "#14=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('position');\n"
         + "#15=PRE_DEFINED_TERMINATOR_SYMBOL('filled_arrow');\n"
         + "#16=PRE_DEFINED_SURFACE_SIDE_STYLE('both');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_SOURCE #1: builtItems=1, unsupportedFaces=0",
@@ -3009,7 +3088,8 @@ class StepDumpAppTest {
         + "#14=PRE_DEFINED_GEOMETRICAL_TOLERANCE_SYMBOL('position');\n"
         + "#15=PRE_DEFINED_TERMINATOR_SYMBOL('filled_arrow');\n"
         + "#16=PRE_DEFINED_SURFACE_SIDE_STYLE('both');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNALLY_DEFINED_ITEM #2:",
@@ -3063,7 +3143,8 @@ class StepDumpAppTest {
         + "#32=DESCRIPTION_ATTRIBUTE('attribute description',#4);\n"
         + "#33=NAME_ATTRIBUTE('attribute name',#4);\n"
         + "#34=ID_ATTRIBUTE('attribute-id',#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_SOURCE_RELATIONSHIP #12: builtItems=2, unsupportedFaces=0",
@@ -3119,7 +3200,8 @@ class StepDumpAppTest {
         + "#35=SECURITY_CLASSIFICATION('SEC-1','internal use',#34);\n"
         + "#36=SECURITY_CLASSIFICATION_ASSIGNMENT(#35);\n"
         + "#37=APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT(#35,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP_ASSIGNMENT #12: builtItems=1, unsupportedFaces=0",
@@ -3183,7 +3265,8 @@ class StepDumpAppTest {
         + "#41=PRODUCT_DEFINITION_RELATIONSHIP('PDR2','peer','peer relationship',#39,#36);\n"
         + "#42=PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP('PDRR','links','links pdrs',#40,#41);\n"
         + "#43=PRODUCT_DEFINITION_FORMATION_RELATIONSHIP('PDFR','versions','links formations',#34,#35);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON_AND_ORGANIZATION_ASSIGNMENT #14: builtItems=3, unsupportedFaces=0",
@@ -3217,7 +3300,8 @@ class StepDumpAppTest {
         + "#15=APPLIED_DATE_AND_TIME_ASSIGNMENT(#13,#14,(#4));\n"
         + "#16=APPLIED_DATE_TIME_ASSIGNMENT(#13,#14,(#4));\n"
         + "#17=CC_DESIGN_DATE_AND_TIME_ASSIGNMENT(#13,#14,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPLIED_DATE_AND_TIME_ASSIGNMENT #15: builtItems=5, unsupportedFaces=0",
@@ -3242,7 +3326,8 @@ class StepDumpAppTest {
         + "#15=APPLIED_DATE_AND_TIME_ASSIGNMENT(#13,#14,(#4));\n"
         + "#16=APPLIED_DATE_TIME_ASSIGNMENT(#13,#14,(#4));\n"
         + "#17=CC_DESIGN_DATE_AND_TIME_ASSIGNMENT(#13,#14,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPLIED_DATE_AND_TIME_ASSIGNMENT #15:",
@@ -3271,7 +3356,8 @@ class StepDumpAppTest {
         + "#14=PROPERTY_DEFINITION('prop-a','property a',#12);\n"
         + "#15=PROPERTY_DEFINITION('prop-b','property b',#13);\n"
         + "#16=PROPERTY_DEFINITION_RELATIONSHIP('PDRP','property relation',#14,#15);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP_RELATIONSHIP #3: builtItems=2, unsupportedFaces=0",
@@ -3300,7 +3386,8 @@ class StepDumpAppTest {
         + "#14=PROPERTY_DEFINITION('prop-a','property a',#12);\n"
         + "#15=PROPERTY_DEFINITION('prop-b','property b',#13);\n"
         + "#16=PROPERTY_DEFINITION_RELATIONSHIP('PDRP','property relation',#14,#15);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP_RELATIONSHIP #3:",
@@ -3325,7 +3412,8 @@ class StepDumpAppTest {
         + "#10=EFFECTIVITY('E-2');\n"
         + "#11=EFFECTIVITY('E-3');\n"
         + "#12=EFFECTIVITY_RELATIONSHIP('effectivity rel','range chain',#10,#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_SOURCE_RELATIONSHIP #3: builtItems=2, unsupportedFaces=0",
@@ -3351,7 +3439,8 @@ class StepDumpAppTest {
         + "#10=EFFECTIVITY('E-2');\n"
         + "#11=EFFECTIVITY('E-3');\n"
         + "#12=EFFECTIVITY_RELATIONSHIP('effectivity rel','range chain',#10,#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_SOURCE_RELATIONSHIP #3:",
@@ -3376,7 +3465,8 @@ class StepDumpAppTest {
         + "#9=DOCUMENT_TYPE('spec');\n"
         + "#10=DOCUMENT('DOC-1','datasheet','supplier document',#9);\n"
         + "#11=DOCUMENT_USAGE_CONSTRAINT(#10,'scope','assembly only');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_IDENTIFICATION_ASSIGNMENT #7: builtItems=2, unsupportedFaces=0",
@@ -3402,7 +3492,8 @@ class StepDumpAppTest {
         + "#9=DOCUMENT_TYPE('spec');\n"
         + "#10=DOCUMENT('DOC-1','datasheet','supplier document',#9);\n"
         + "#11=DOCUMENT_USAGE_CONSTRAINT(#10,'scope','assembly only');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNAL_IDENTIFICATION_ASSIGNMENT #7:",
@@ -3427,7 +3518,8 @@ class StepDumpAppTest {
         + "#9=DESCRIPTION_ATTRIBUTE('attribute description',#4);\n"
         + "#10=NAME_ATTRIBUTE('attribute name',#4);\n"
         + "#11=ID_ATTRIBUTE('attribute-id',#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "LANGUAGE_ASSIGNMENT #6: builtItems=1, unsupportedFaces=0",
@@ -3454,7 +3546,8 @@ class StepDumpAppTest {
         + "#9=DESCRIPTION_ATTRIBUTE('attribute description',#4);\n"
         + "#10=NAME_ATTRIBUTE('attribute name',#4);\n"
         + "#11=ID_ATTRIBUTE('attribute-id',#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "LANGUAGE_ASSIGNMENT #6:",
@@ -3482,7 +3575,8 @@ class StepDumpAppTest {
         + "#10=APPLIED_IDENTIFICATION_ASSIGNMENT('ERP-42',#8,(#3));\n"
         + "#11=NAME_ASSIGNMENT('display name');\n"
         + "#12=APPLIED_NAME_ASSIGNMENT('display name',(#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ASSIGNMENT #6: builtItems=2, unsupportedFaces=0",
@@ -3511,7 +3605,8 @@ class StepDumpAppTest {
         + "#10=APPLIED_IDENTIFICATION_ASSIGNMENT('ERP-42',#8,(#3));\n"
         + "#11=NAME_ASSIGNMENT('display name');\n"
         + "#12=APPLIED_NAME_ASSIGNMENT('display name',(#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ASSIGNMENT #6:",
@@ -3539,7 +3634,8 @@ class StepDumpAppTest {
         + "#9=EXTERNAL_SOURCE('erp');\n"
         + "#10=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#9);\n"
         + "#11=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#9,(#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ROLE #5: builtItems=1, unsupportedFaces=0",
@@ -3568,7 +3664,8 @@ class StepDumpAppTest {
         + "#9=EXTERNAL_SOURCE('erp');\n"
         + "#10=EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#9);\n"
         + "#11=APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT('EXT-42',#8,#9,(#3));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ASSIGNMENT #6:",
@@ -3590,7 +3687,8 @@ class StepDumpAppTest {
         + "#6=DESCRIPTION_ATTRIBUTE('attribute description',#3);\n"
         + "#7=NAME_ATTRIBUTE('attribute name',#3);\n"
         + "#8=ID_ATTRIBUTE('attribute-id',#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "NAME_ASSIGNMENT #4: builtItems=1, unsupportedFaces=0",
@@ -3613,7 +3711,8 @@ class StepDumpAppTest {
         + "#6=DESCRIPTION_ATTRIBUTE('attribute description',#3);\n"
         + "#7=NAME_ATTRIBUTE('attribute name',#3);\n"
         + "#8=ID_ATTRIBUTE('attribute-id',#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "NAME_ASSIGNMENT #4:",
@@ -3637,7 +3736,8 @@ class StepDumpAppTest {
         + "#7=EFFECTIVITY('E-2');\n"
         + "#8=EFFECTIVITY('E-3');\n"
         + "#9=EFFECTIVITY_RELATIONSHIP('effectivity rel','supersedes',#7,#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GENERAL_PROPERTY #1: builtItems=1, unsupportedFaces=0",
@@ -3665,7 +3765,8 @@ class StepDumpAppTest {
         + "#7=EFFECTIVITY('E-2');\n"
         + "#8=EFFECTIVITY('E-3');\n"
         + "#9=EFFECTIVITY_RELATIONSHIP('effectivity rel','supersedes',#7,#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GENERAL_PROPERTY #1:",
@@ -3688,7 +3789,8 @@ class StepDumpAppTest {
         + "#2=CLASS('class group','classified grouping');\n"
         + "#3=CLASS_SYSTEM('class system','classification root');\n"
         + "#4=GROUP_RELATIONSHIP('group rel','relates groups',#2,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP #1: builtItems=1, unsupportedFaces=0",
@@ -3706,7 +3808,8 @@ class StepDumpAppTest {
         + "#2=CLASS('class group','classified grouping');\n"
         + "#3=CLASS_SYSTEM('class system','classification root');\n"
         + "#4=GROUP_RELATIONSHIP('group rel','relates groups',#2,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP #1:",
@@ -3725,7 +3828,8 @@ class StepDumpAppTest {
         + "#3=PRODUCT('ASM','assembly','',(#2));\n"
         + "#4=PRODUCT('PRT','part','machined part',(#2));\n"
         + "#5=PRODUCT_RELATIONSHIP('PR','contains','assembly contains part',#3,#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT #3: builtItems=1, unsupportedFaces=0",
@@ -3743,7 +3847,8 @@ class StepDumpAppTest {
         + "#3=PRODUCT('ASM','assembly','',(#2));\n"
         + "#4=PRODUCT('PRT','part','machined part',(#2));\n"
         + "#5=PRODUCT_RELATIONSHIP('PR','contains','assembly contains part',#3,#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT #3:",
@@ -3783,7 +3888,8 @@ class StepDumpAppTest {
         + "#25=CERTIFICATION('CERT-1','compliance',#24);\n"
         + "#26=CERTIFICATION_ASSIGNMENT(#25);\n"
         + "#27=APPLIED_CERTIFICATION_ASSIGNMENT(#25,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP_ASSIGNMENT #6: builtItems=1, unsupportedFaces=0",
@@ -3832,7 +3938,8 @@ class StepDumpAppTest {
         + "#25=CERTIFICATION('CERT-1','compliance',#24);\n"
         + "#26=CERTIFICATION_ASSIGNMENT(#25);\n"
         + "#27=APPLIED_CERTIFICATION_ASSIGNMENT(#25,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GROUP_ASSIGNMENT #6:",
@@ -3874,7 +3981,8 @@ class StepDumpAppTest {
         + "#18=DATE_TIME_ROLE('created');\n"
         + "#19=DATE_TIME_ASSIGNMENT(#17,#18);\n"
         + "#20=APPLIED_DATE_TIME_ASSIGNMENT(#17,#18,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON_AND_ORGANIZATION_ASSIGNMENT #9: builtItems=3, unsupportedFaces=0",
@@ -3910,7 +4018,8 @@ class StepDumpAppTest {
         + "#18=DATE_TIME_ROLE('created');\n"
         + "#19=DATE_TIME_ASSIGNMENT(#17,#18);\n"
         + "#20=APPLIED_DATE_TIME_ASSIGNMENT(#17,#18,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON_AND_ORGANIZATION_ASSIGNMENT #9:",
@@ -3942,7 +4051,8 @@ class StepDumpAppTest {
         + "#14=LOCAL_TIME(9,15,$,#13);\n"
         + "#15=DATE_AND_TIME(#12,#14);\n"
         + "#16=APPROVAL_DATE_TIME(#15,#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_RELATIONSHIP #4: builtItems=4, unsupportedFaces=0",
@@ -3972,7 +4082,8 @@ class StepDumpAppTest {
         + "#14=LOCAL_TIME(9,15,$,#13);\n"
         + "#15=DATE_AND_TIME(#12,#14);\n"
         + "#16=APPROVAL_DATE_TIME(#15,#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_RELATIONSHIP #4:",
@@ -3997,7 +4108,8 @@ class StepDumpAppTest {
         + "#10=APPROVAL(#9,'design');\n"
         + "#11=APPROVAL_ASSIGNMENT(#10);\n"
         + "#12=APPLIED_APPROVAL_ASSIGNMENT(#10,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_REFERENCE #7: builtItems=2, unsupportedFaces=0",
@@ -4024,7 +4136,8 @@ class StepDumpAppTest {
         + "#10=APPROVAL(#9,'design');\n"
         + "#11=APPROVAL_ASSIGNMENT(#10);\n"
         + "#12=APPLIED_APPROVAL_ASSIGNMENT(#10,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_REFERENCE #7:",
@@ -4049,7 +4162,8 @@ class StepDumpAppTest {
         + "#9=DATE_AND_TIME(#6,#8);\n"
         + "#10=DATE_ROLE('released');\n"
         + "#11=DATE_TIME_ROLE('created');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON #1: builtItems=1, unsupportedFaces=0",
@@ -4081,7 +4195,8 @@ class StepDumpAppTest {
         + "#9=DATE_AND_TIME(#6,#8);\n"
         + "#10=DATE_ROLE('released');\n"
         + "#11=DATE_TIME_ROLE('created');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON #1:",
@@ -4115,7 +4230,8 @@ class StepDumpAppTest {
         + "#11=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#12=EXTERNAL_SOURCE('erp');\n"
         + "#13=EXTERNAL_SOURCE_RELATIONSHIP('source rel','catalog to erp',#11,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ORGANIZATION #5: builtItems=1, unsupportedFaces=0",
@@ -4147,7 +4263,8 @@ class StepDumpAppTest {
         + "#11=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#12=EXTERNAL_SOURCE('erp');\n"
         + "#13=EXTERNAL_SOURCE_RELATIONSHIP('source rel','catalog to erp',#11,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ORGANIZATION #5:",
@@ -4173,7 +4290,8 @@ class StepDumpAppTest {
         + "#5=CONTRACT_TYPE('supply');\n"
         + "#6=CERTIFICATION_TYPE('iso');\n"
         + "#7=SECURITY_CLASSIFICATION_LEVEL('internal');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ROLE #1: builtItems=1, unsupportedFaces=0",
@@ -4197,7 +4315,8 @@ class StepDumpAppTest {
         + "#5=CONTRACT_TYPE('supply');\n"
         + "#6=CERTIFICATION_TYPE('iso');\n"
         + "#7=SECURITY_CLASSIFICATION_LEVEL('internal');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASSIFICATION_ROLE #1:",
@@ -4219,7 +4338,8 @@ class StepDumpAppTest {
         + "#3=EFFECTIVITY('E-2');\n"
         + "#4=PRODUCT_CATEGORY('hardware','hardware parts');\n"
         + "#5=GENERAL_PROPERTY('gp-1','material','material property');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_TYPE #1: builtItems=1, unsupportedFaces=0",
@@ -4239,7 +4359,8 @@ class StepDumpAppTest {
         + "#3=EFFECTIVITY('E-2');\n"
         + "#4=PRODUCT_CATEGORY('hardware','hardware parts');\n"
         + "#5=GENERAL_PROPERTY('gp-1','material','material property');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_TYPE #1:",
@@ -4264,7 +4385,8 @@ class StepDumpAppTest {
         + "#8=CERTIFICATION('CERT-1','compliance',#7);\n"
         + "#9=SECURITY_CLASSIFICATION_LEVEL('internal');\n"
         + "#10=SECURITY_CLASSIFICATION('SEC-1','internal use',#9);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT #2: builtItems=2, unsupportedFaces=0",
@@ -4289,7 +4411,8 @@ class StepDumpAppTest {
         + "#8=CERTIFICATION('CERT-1','compliance',#7);\n"
         + "#9=SECURITY_CLASSIFICATION_LEVEL('internal');\n"
         + "#10=SECURITY_CLASSIFICATION('SEC-1','internal use',#9);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT #2:",
@@ -4307,7 +4430,8 @@ class StepDumpAppTest {
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
         + "#3=DOCUMENT_USAGE_CONSTRAINT(#2,'scope','assembly only');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_TYPE #1: builtItems=1, unsupportedFaces=0",
@@ -4323,7 +4447,8 @@ class StepDumpAppTest {
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
         + "#3=DOCUMENT_USAGE_CONSTRAINT(#2,'scope','assembly only');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DOCUMENT_TYPE #1:",
@@ -4348,7 +4473,8 @@ class StepDumpAppTest {
         + "#10=LOCAL_TIME(9,15,$,#9);\n"
         + "#11=DATE_AND_TIME(#8,#10);\n"
         + "#12=APPROVAL_DATE_TIME(#11,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPROVAL_ROLE #4: builtItems=1, unsupportedFaces=0",
@@ -4375,7 +4501,8 @@ class StepDumpAppTest {
         + "#10=LOCAL_TIME(9,15,$,#9);\n"
         + "#11=DATE_AND_TIME(#8,#10);\n"
         + "#12=APPROVAL_DATE_TIME(#11,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPROVAL_ROLE #4:",
@@ -4397,7 +4524,8 @@ class StepDumpAppTest {
         + "#5=ORGANIZATION_ROLE('supplier');\n"
         + "#6=ORGANIZATION('org-2','Vendor','supply');\n"
         + "#7=ORGANIZATION_RELATIONSHIP('org rel','supplier link',#2,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON #1: builtItems=1, unsupportedFaces=0",
@@ -4421,7 +4549,8 @@ class StepDumpAppTest {
         + "#5=ORGANIZATION_ROLE('supplier');\n"
         + "#6=ORGANIZATION('org-2','Vendor','supply');\n"
         + "#7=ORGANIZATION_RELATIONSHIP('org rel','supplier link',#2,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PERSON #1:",
@@ -4444,7 +4573,8 @@ class StepDumpAppTest {
         + "#4=PRODUCT_DEFINITION_FORMATION('v1','first release',#3);\n"
         + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
         + "#6=PRODUCT_DEFINITION('def','part definition',#4,#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPLICATION_CONTEXT #1: builtItems=1, unsupportedFaces=0",
@@ -4466,7 +4596,8 @@ class StepDumpAppTest {
         + "#4=PRODUCT_DEFINITION_FORMATION('v1','first release',#3);\n"
         + "#5=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
         + "#6=PRODUCT_DEFINITION('def','part definition',#4,#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPLICATION_CONTEXT #1:",
@@ -4496,7 +4627,8 @@ class StepDumpAppTest {
         + "#12=REPRESENTATION_RELATIONSHIP('RR','rep rel',#10,#10);\n"
         + "#13=NEXT_ASSEMBLY_USAGE_OCCURRENCE('NAUO','next usage','',#6,#6);\n"
         + "#14=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#12,#13);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT_DEFINITION_SHAPE #7: builtItems=2, unsupportedFaces=0",
@@ -4523,7 +4655,8 @@ class StepDumpAppTest {
         + "#12=REPRESENTATION_RELATIONSHIP('RR','rep rel',#10,#10);\n"
         + "#13=NEXT_ASSEMBLY_USAGE_OCCURRENCE('NAUO','next usage','',#6,#6);\n"
         + "#14=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#12,#13);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT_DEFINITION_SHAPE #7:",
@@ -4551,7 +4684,8 @@ class StepDumpAppTest {
         + "#13=REPRESENTATION_RELATIONSHIP('RR','rep rel',#11,#12);\n"
         + "#14=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','generic',#7,#11,#6);\n"
         + "#15=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','chain',#7,(#11,#12),(#13),#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ITEM_IDENTIFIED_REPRESENTATION_USAGE #14: builtItems=5, unsupportedFaces=0",
@@ -4578,7 +4712,8 @@ class StepDumpAppTest {
         + "#13=REPRESENTATION_RELATIONSHIP('RR','rep rel',#11,#12);\n"
         + "#14=ITEM_IDENTIFIED_REPRESENTATION_USAGE('IU','generic',#7,#11,#6);\n"
         + "#15=CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE('CIU','chain',#7,(#11,#12),(#13),#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ITEM_IDENTIFIED_REPRESENTATION_USAGE #14:",
@@ -4610,7 +4745,8 @@ class StepDumpAppTest {
         + "#18=DRAUGHTING_CALLOUT('CALLOUT',(#16,#17));\n"
         + "#19=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#18,#11);\n"
         + "#20=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#18,(#12,#13),(#14),#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRIC_ITEM_SPECIFIC_USAGE #19: builtItems=2, unsupportedFaces=0",
@@ -4642,7 +4778,8 @@ class StepDumpAppTest {
         + "#18=DRAUGHTING_CALLOUT('CALLOUT',(#16,#17));\n"
         + "#19=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#18,#11);\n"
         + "#20=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#18,(#12,#13),(#14),#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRIC_ITEM_SPECIFIC_USAGE #19:",
@@ -4674,7 +4811,8 @@ class StepDumpAppTest {
         + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#16,#11,#8,#8);\n"
         + "#19=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDR','',#17,#11,#8,#8);\n"
         + "#20=PLACED_TARGET('PT','',#18,#12,#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DRAUGHTING_MODEL_ITEM_ASSOCIATION #17: builtItems=6, unsupportedFaces=0",
@@ -4708,7 +4846,8 @@ class StepDumpAppTest {
         + "#18=PMI_REQUIREMENT_ITEM_ASSOCIATION('PMI','',#16,#11,#8,#8);\n"
         + "#19=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDR','',#17,#11,#8,#8);\n"
         + "#20=PLACED_TARGET('PT','',#18,#12,#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DRAUGHTING_MODEL_ITEM_ASSOCIATION #17:",
@@ -4738,7 +4877,8 @@ class StepDumpAppTest {
         + "#14=PMI_REQUIREMENT_ITEM_ASSOCIATION('PRIA','req',#7,#3,#10,#7);\n"
         + "#15=MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION('MDRIA','mdreq',#7,#3,#10,#7);\n"
         + "#16=PLACED_TARGET('PT','target',#7,#3,#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "VERTEX_LOOP #10: built=true, unsupportedFaces=0",
@@ -4766,7 +4906,8 @@ class StepDumpAppTest {
         + "#9=DRAUGHTING_CALLOUT('CALLOUT',(#6,#7));\n"
         + "#10=ANNOTATION_PLACEHOLDER_OCCURRENCE('PH',(),#8,.TITLE.,1.0);\n"
         + "#11=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#9,#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER #11: builtItems=5, unsupportedFaces=0");
@@ -4794,7 +4935,8 @@ class StepDumpAppTest {
         + "#15=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#7,#11);\n"
         + "#16=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#10,(#12,#13),(#14),#11);\n"
         + "#17=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','assocph',#4,#3,#7,#9);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_POINT_OCCURRENCE #7: builtItems=1, unsupportedFaces=0",
@@ -4847,7 +4989,8 @@ class StepDumpAppTest {
         + "#33=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#24,#2);\n"
         + "#34=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGIU','',#14,(#3,#4),(#5),#2);\n"
         + "#35=DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER('DMIAP','',#6,#2,#19,#26);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_SYMBOL #14: builtItems=1, unsupportedFaces=0",
@@ -4889,7 +5032,8 @@ class StepDumpAppTest {
         + "#17=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#1);\n"
         + "#18=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU','',#17,#10);\n"
         + "#19=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#17,(#14,#15),(#16),#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_PATH #10: built=true, unsupportedFaces=0",
@@ -4931,7 +5075,8 @@ class StepDumpAppTest {
         + "#29=CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE('CGU','',#23,(#19,#20),(#21),#17);\n"
         + "#30=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SOLID','',#22,#24);\n"
         + "#31=GEOMETRIC_ITEM_SPECIFIC_USAGE('GIU_SET','',#22,#27);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #16: faces=1, unsupportedFaces=0",
@@ -4965,7 +5110,8 @@ class StepDumpAppTest {
         + "#11=REPRESENTATION('REP_A',(),#10);\n"
         + "#12=PLACED_DATUM_TARGET_FEATURE(#9,#11);\n"
         + "#13=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PLACED_DATUM_TARGET_FEATURE #12: builtItems=0, unsupportedFaces=0",
@@ -5003,7 +5149,8 @@ class StepDumpAppTest {
         + "#24=DOCUMENT_TYPE('specification');\n"
         + "#25=DOCUMENT('DOC-1','Spec','primary spec',#24);\n"
         + "#26=CC_DESIGN_SPECIFICATION_REFERENCE(#25,'internal',(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT #9: builtItems=4, unsupportedFaces=0",
@@ -5039,7 +5186,8 @@ class StepDumpAppTest {
         + "#17=DOCUMENT_TYPE('specification');\n"
         + "#18=DOCUMENT('DOC-1','Spec','primary spec',#17);\n"
         + "#19=CC_DESIGN_SPECIFICATION_REFERENCE(#18,'internal',(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_APPROVAL #7: builtItems=3, unsupportedFaces=0",
@@ -5074,7 +5222,8 @@ class StepDumpAppTest {
         + "#17=DOCUMENT_TYPE('specification');\n"
         + "#18=DOCUMENT('DOC-1','Spec','primary spec',#17);\n"
         + "#19=CC_DESIGN_SPECIFICATION_REFERENCE(#18,'internal',(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_APPROVAL #7:",
@@ -5101,7 +5250,8 @@ class StepDumpAppTest {
         + "#9=CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT(#7,#8,(#4));\n"
         + "#10=ORGANIZATION_ROLE('supplier');\n"
         + "#11=CC_DESIGN_ORGANIZATION_ASSIGNMENT(#6,#10,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT #9: builtItems=4, unsupportedFaces=0",
@@ -5125,7 +5275,8 @@ class StepDumpAppTest {
         + "#9=CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT(#7,#8,(#4));\n"
         + "#10=ORGANIZATION_ROLE('supplier');\n"
         + "#11=CC_DESIGN_ORGANIZATION_ASSIGNMENT(#6,#10,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_PERSON_AND_ORGANIZATION_ASSIGNMENT #9:",
@@ -5149,7 +5300,8 @@ class StepDumpAppTest {
         + "#10=DATE_AND_TIME(#5,#9);\n"
         + "#11=DATE_TIME_ROLE('created');\n"
         + "#12=CC_DESIGN_DATE_AND_TIME_ASSIGNMENT(#10,#11,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_DATE_ASSIGNMENT #7: builtItems=3, unsupportedFaces=0",
@@ -5173,7 +5325,8 @@ class StepDumpAppTest {
         + "#10=DATE_AND_TIME(#5,#9);\n"
         + "#11=DATE_TIME_ROLE('created');\n"
         + "#12=CC_DESIGN_DATE_AND_TIME_ASSIGNMENT(#10,#11,(#4));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CC_DESIGN_DATE_ASSIGNMENT #7:",
@@ -5195,7 +5348,8 @@ class StepDumpAppTest {
         + "#8=CLASS('fixture','classification');\n"
         + "#9=ASSEMBLY_COMPONENT_USAGE('acu','assembly usage','',#6,#6);\n"
         + "#10=PROMISSORY_USAGE_OCCURRENCE('puo','promised usage','',#6,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CLASS_SYSTEM #7: builtItems=1, unsupportedFaces=0",
@@ -5220,7 +5374,8 @@ class StepDumpAppTest {
         + "#8=CLASS('fixture','classification');\n"
         + "#9=ASSEMBLY_COMPONENT_USAGE('acu','assembly usage','',#6,#6);\n"
         + "#10=PROMISSORY_USAGE_OCCURRENCE('puo','promised usage','',#6,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MECHANICAL_CONTEXT #2:",
@@ -5242,7 +5397,8 @@ class StepDumpAppTest {
         + "#4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);\n"
         + "#5=DESIGN_CONTEXT('design',#1,'design');\n"
         + "#6=PRODUCT_DEFINITION('def','part def',#4,#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MECHANICAL_CONTEXT #2: builtItems=1, unsupportedFaces=0",
@@ -5260,7 +5416,8 @@ class StepDumpAppTest {
         + "#4=PRODUCT_DEFINITION_FORMATION('v1','first',#3);\n"
         + "#5=DESIGN_CONTEXT('design',#1,'design');\n"
         + "#6=PRODUCT_DEFINITION('def','part def',#4,#5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MECHANICAL_CONTEXT #2:",
@@ -5278,7 +5435,8 @@ class StepDumpAppTest {
         + "#4=LANGUAGE_ASSIGNMENT('LANG',(#1),#2);\n"
         + "#5=MESSAGE_CONTENTS_ASSIGNMENT('MSG',(#1),#2);\n"
         + "#6=MACHINING_TOOL_DIRECTION_REPRESENTATION('MTDR',(#1),#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ANALYSIS_MODEL #3: builtItems=1, unsupportedFaces=0",
@@ -5303,7 +5461,8 @@ class StepDumpAppTest {
         + "#8=MACHINING_TOOL_BODY_REPRESENTATION('MTBR',(#1),#2);\n"
         + "#9=MACHINING_TOOL_DIMENSION_REPRESENTATION('MTDR2',(#1),#2);\n"
         + "#10=MACHINING_TOOLPATH_SPEED_PROFILE_REPRESENTATION('MTSPR',(#1),#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "FOUNDED_KINEMATIC_PATH #3: builtItems=1, unsupportedFaces=0",
@@ -5328,7 +5487,8 @@ class StepDumpAppTest {
         + "#4=HARDNESS_REPRESENTATION('HR',(#1),#2);\n"
         + "#5=DEFAULT_TOLERANCE_TABLE('DTT',(#1),#2);\n"
         + "#6=OTHER_LIST_TABLE_REPRESENTATION('OLTR',(#1),#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "FREEFORM_MILLING_TOLERANCE_REPRESENTATION #3: builtItems=1, unsupportedFaces=0",
@@ -5349,7 +5509,8 @@ class StepDumpAppTest {
         + "#4=CHARACTERIZED_ITEM_WITHIN_REPRESENTATION('CIWR',(#1),#2);\n"
         + "#5=CHARACTERIZED_CHAIN_BASED_ITEM_WITHIN_REPRESENTATION('CCBIWR',(#1),#2);\n"
         + "#6=EVALUATED_CHARACTERISTIC_OF_PRODUCT_AS_INDIVIDUAL_TEST_RESULT('ECPITR',(#1),#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CHARACTERIZED_REPRESENTATION #3: builtItems=1, unsupportedFaces=0",
@@ -5371,7 +5532,8 @@ class StepDumpAppTest {
         + "#6=MANIFOLD_SURFACE_SHAPE_REPRESENTATION('MSSR',(#1),#2);\n"
         + "#7=SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION('SBSMSR',(#1),#2);\n"
         + "#8=SURFACE_MODEL_SHAPE_REPRESENTATION('SMSR',(#1),#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "GEOMETRICALLY_BOUNDED_SURFACE_SHAPE_REPRESENTATION #3: builtItems=1, unsupportedFaces=0",
@@ -5395,7 +5557,8 @@ class StepDumpAppTest {
         + "#6=TOPOLOGY_TO_GEOMETRY_MODEL_ASSOCIATION('TGMA','topo geom',#3,#4);\n"
         + "#7=KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP('KFRR','frame link',#3,#4);\n"
         + "#8=COAXIAL_ASSEMBLY_CONSTRAINT('CAC','coaxial',#3,#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DEFINITIONAL_REPRESENTATION_RELATIONSHIP #5: builtItems=2, unsupportedFaces=0",
@@ -5418,7 +5581,8 @@ class StepDumpAppTest {
         + "#6=REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT('RRSC','samectx',#3,#4);\n"
         + "#7=KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP('KFBRR','framebg',#3,#4);\n"
         + "#8=MECHANISM_STATE_REPRESENTATION_RELATIONSHIP('MSRR','state',#3,#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SHAPE_REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION #5: builtItems=2, unsupportedFaces=0",
@@ -5455,7 +5619,8 @@ class StepDumpAppTest {
         + "#21=PROPERTY_DEFINITION_RELATIONSHIP('PDRP','property relation',#19,#20);\n"
         + "#22=ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE('ACUS','usage substitute','alternate usage',#10,#11);\n"
         + "#23=PRODUCT_DEFINITION_SUBSTITUTE('PDS','definition substitute','alternate definition',#10,#11);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT_DEFINITION_RELATIONSHIP #10: builtItems=4, unsupportedFaces=0",
@@ -5508,7 +5673,8 @@ class StepDumpAppTest {
         + "#29=LOCAL_TIME(9,15,$,#28);\n"
         + "#30=DATE_AND_TIME(#27,#29);\n"
         + "#31=APPROVAL_DATE_TIME(#30,#21);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PROPERTY_DEFINITION_RELATIONSHIP #9: builtItems=2, unsupportedFaces=0",
@@ -5561,7 +5727,8 @@ class StepDumpAppTest {
         + "#32=PRODUCT_DEFINITION_EFFECTIVITY('PDE-1','serial usage',#9);\n"
         + "#33=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#34=ANNOTATION_TEXT_OCCURRENCE('NOTE','',#33);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PRODUCT_DEFINITION_SHAPE #11:",
@@ -5607,7 +5774,8 @@ class StepDumpAppTest {
         + "#39=DIMENSIONAL_LOCATION('DL','location',#8,#10);\n"
         + "#45=SHAPE_ASPECT_DERIVING_RELATIONSHIP('SADR','derive',#22,#8);\n"
         + "#54=SHAPE_FEATURE_FIT_RELATIONSHIP('SFFR','fit',#11,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SHAPE_ASPECT_RELATIONSHIP #37: builtItems=4, unsupportedFaces=0",
@@ -5643,7 +5811,8 @@ class StepDumpAppTest {
         + "#46=DIMENSIONAL_LOCATION_WITH_DATUM_FEATURE('DLWDF','datum location',#19,#8);\n"
         + "#47=DIMENSIONAL_LOCATION_WITH_PATH('DLWP','path location',#8,#28);\n"
         + "#49=SHAPE_FEATURE_DEFINITION_ELEMENT_RELATIONSHIP('SFDERR','definition element',#8,#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ASSEMBLY_SHAPE_CONSTRAINT_ITEM_RELATIONSHIP #37: builtItems=4, unsupportedFaces=0",
@@ -5671,7 +5840,8 @@ class StepDumpAppTest {
         + "#10=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#4,#3);\n"
         + "#11=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#4,#3);\n"
         + "#12=RESOURCE_PROPERTY_REPRESENTATION(#4,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PROPERTY_DEFINITION_REPRESENTATION #5: builtItems=2, unsupportedFaces=0",
@@ -5696,7 +5866,8 @@ class StepDumpAppTest {
         + "#5=PROPERTY_DEFINITION_REPRESENTATION(#4,#3);\n"
         + "#6=ACTION_PROPERTY_REPRESENTATION(#4,#3);\n"
         + "#7=CONTACT_RATIO_REPRESENTATION(#4,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PROPERTY_DEFINITION_REPRESENTATION #5: builtItems=2, unsupportedFaces=0",
@@ -5716,7 +5887,8 @@ class StepDumpAppTest {
         + "#5=PROPERTY_DEFINITION_REPRESENTATION(#4,#3);\n"
         + "#6=ACTION_PROPERTY_REPRESENTATION(#4,#3);\n"
         + "#7=CONTACT_RATIO_REPRESENTATION(#4,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PROPERTY_DEFINITION_REPRESENTATION #5:",
@@ -5739,7 +5911,8 @@ class StepDumpAppTest {
         + "#10=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#4,#3);\n"
         + "#11=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#4,#3);\n"
         + "#12=RESOURCE_PROPERTY_REPRESENTATION(#4,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION #8: builtItems=2, unsupportedFaces=0",
@@ -5764,7 +5937,8 @@ class StepDumpAppTest {
         + "#10=KINEMATIC_PROPERTY_REPRESENTATION_RELATION(#4,#3);\n"
         + "#11=KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION(#4,#3);\n"
         + "#12=RESOURCE_PROPERTY_REPRESENTATION(#4,#3);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION #8:",
@@ -5811,7 +5985,8 @@ class StepDumpAppTest {
         + "#24=PROPERTY_DEFINITION('PD_UNC','',#19);\n"
         + "#25=PROPERTY_DEFINITION('PD_UNIT','',#20);\n"
         + "#26=PROPERTY_DEFINITION('PD_CTX','',#21);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PROPERTY_DEFINITION #22:",
@@ -5838,7 +6013,8 @@ class StepDumpAppTest {
         + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#1,#3,#4))\n"
         + "    GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#7))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SI_UNIT #1: builtItems=1, unsupportedFaces=0",
@@ -5867,7 +6043,8 @@ class StepDumpAppTest {
         + "    GLOBAL_UNIT_ASSIGNED_CONTEXT((#1,#3,#4))\n"
         + "    GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#7))\n"
         + "    REPRESENTATION_CONTEXT('ID','MODEL'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SI_UNIT #1:",
@@ -5921,7 +6098,8 @@ class StepDumpAppTest {
         + "#36=LINEAR_STIFFNESS_MEASURE_WITH_UNIT(LINEAR_STIFFNESS_MEASURE(1000.0),#16);\n"
         + "#37=ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT(ROTATIONAL_STIFFNESS_MEASURE(250.0),#17);\n"
         + "#38=LINEAR_MOMENT_MEASURE_WITH_UNIT(LINEAR_MOMENT_MEASURE(6.0),#18);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MASS_DENSITY_MEASURE_WITH_UNIT #21: builtItems=0, unsupportedFaces=0",
@@ -5985,7 +6163,8 @@ class StepDumpAppTest {
         + "#36=LINEAR_STIFFNESS_MEASURE_WITH_UNIT(LINEAR_STIFFNESS_MEASURE(1000.0),#16);\n"
         + "#37=ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT(ROTATIONAL_STIFFNESS_MEASURE(250.0),#17);\n"
         + "#38=LINEAR_MOMENT_MEASURE_WITH_UNIT(LINEAR_MOMENT_MEASURE(6.0),#18);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "MASS_DENSITY_MEASURE_WITH_UNIT #21:",
@@ -6024,7 +6203,8 @@ class StepDumpAppTest {
         + "    CONVERSION_BASED_UNIT('DEG_C',#7)\n"
         + "    NAMED_UNIT(*)\n"
         + "    THERMODYNAMIC_TEMPERATURE_UNIT());\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DERIVED_UNIT_ELEMENT #3: builtItems=1, unsupportedFaces=0",
@@ -6050,7 +6230,8 @@ class StepDumpAppTest {
         + "    CONVERSION_BASED_UNIT('DEG_C',#7)\n"
         + "    NAMED_UNIT(*)\n"
         + "    THERMODYNAMIC_TEMPERATURE_UNIT());\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DERIVED_UNIT_ELEMENT #3:",
@@ -6069,7 +6250,8 @@ class StepDumpAppTest {
         + "#2=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
         + "#3=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));\n"
         + "#4=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "REPRESENTATION_ITEM #1: builtItems=1, unsupportedFaces=0",
@@ -6087,7 +6269,8 @@ class StepDumpAppTest {
         + "#2=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
         + "#3=(TOPOLOGICAL_REPRESENTATION_ITEM('TOPO_ITEM_ONLY'));\n"
         + "#4=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "REPRESENTATION_ITEM #1:",
@@ -6105,7 +6288,8 @@ class StepDumpAppTest {
         + "#2=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#3=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));\n"
         + "#4=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#1);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DESCRIPTIVE_REPRESENTATION_ITEM #2: builtItems=1, unsupportedFaces=0",
@@ -6122,7 +6306,8 @@ class StepDumpAppTest {
         + "#2=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#3=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));\n"
         + "#4=MEASURE_REPRESENTATION_ITEM('thickness',LENGTH_MEASURE(2.5),#1);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DESCRIPTIVE_REPRESENTATION_ITEM #2:",
@@ -6143,7 +6328,8 @@ class StepDumpAppTest {
         + "#6=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('V'));\n"
         + "#7=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('E'));\n"
         + "#8=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('F'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT #1: builtItems=1, unsupportedFaces=0",
@@ -6169,7 +6355,8 @@ class StepDumpAppTest {
         + "#6=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('V'));\n"
         + "#7=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('E'));\n"
         + "#8=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('F'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "POINT #1:",
@@ -6203,7 +6390,8 @@ class StepDumpAppTest {
         + "#13=POLYLINE('PL0',(#1,#16));\n"
         + "#14=PLANE('PLN',#6);\n"
         + "#15=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#2,#1,1.0,#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CARTESIAN_POINT #1: builtItems=1, unsupportedFaces=0",
@@ -6244,7 +6432,8 @@ class StepDumpAppTest {
         + "#13=POLYLINE('PL0',(#1,#16));\n"
         + "#14=PLANE('PLN',#6);\n"
         + "#15=CARTESIAN_TRANSFORMATION_OPERATOR_3D('T0',#3,#2,#1,1.0,#2);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CARTESIAN_POINT #1:",
@@ -6299,7 +6488,8 @@ class StepDumpAppTest {
         + "#28=OFFSET_CURVE_2D('OC2',#23,0.25,.F.);\n"
         + "#29=DIRECTION('DY',(0.0,1.0,0.0));\n"
         + "#30=OFFSET_CURVE_3D('OC3',#8,0.5,.F.,#29);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ORIENTED_CURVE #9: builtItems=1, unsupportedFaces=0",
@@ -6336,7 +6526,8 @@ class StepDumpAppTest {
         + "#13=CARTESIAN_POINT('P2',(1.0,2.0));\n"
         + "#14=DIRECTION('D2',(1.0,0.0));\n"
         + "#15=CARTESIAN_TRANSFORMATION_OPERATOR_2D('T2',$,#14,#13,$);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CARTESIAN_TRANSFORMATION_OPERATOR_3D #9: builtItems=1, unsupportedFaces=0",
@@ -6363,7 +6554,8 @@ class StepDumpAppTest {
         + "#10=RECTANGLE_PROFILE_DEF(.AREA.,'R',#8,4.0,2.0);\n"
         + "#11=EXTRUDED_AREA_SOLID('EX',#9,#4,#2,5.0);\n"
         + "#12=REVOLVED_AREA_SOLID('RV',#10,#4,#5,1.57079632679);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTRUDED_AREA_SOLID #11:",
@@ -6383,7 +6575,8 @@ class StepDumpAppTest {
         + "#6=BLOCK('BLK',#4,10.0,20.0,30.0);\n"
         + "#7=SPHERE('SPH',#4,5.0);\n"
         + "#8=RIGHT_CIRCULAR_CYLINDER('CYL',#5,12.0,3.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BLOCK #6:",
@@ -6404,7 +6597,8 @@ class StepDumpAppTest {
         + "#6=ELLIPSOID('EL',#4,3.0,2.0,1.0);\n"
         + "#7=TORUS('TO',#5,5.0,1.0);\n"
         + "#8=RIGHT_ANGULAR_WEDGE('WG',#4,4.0,3.0,2.0,2.5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ELLIPSOID #6:",
@@ -6425,7 +6619,8 @@ class StepDumpAppTest {
         + "#6=BOX_DOMAIN(#1,10.0,20.0,30.0);\n"
         + "#7=HALF_SPACE_SOLID('HS',#5,.T.);\n"
         + "#8=BOXED_HALF_SPACE('BHS',#5,.F.,#6);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BOX_DOMAIN #6: builtItems=1, unsupportedFaces=0",
@@ -6445,7 +6640,8 @@ class StepDumpAppTest {
         + "#5=ROUNDED_RECTANGLE_PROFILE_DEF(.AREA.,'rounded rectangle',#3,8.0,4.0,0.5);\n"
         + "#6=CENTERED_RECTANGLE_PROFILE_DEF(.AREA.,'centered rectangle',#3,3.0,7.0);\n"
         + "#7=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'hollow circle',#3,6.0,0.5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ELLIPSE_PROFILE_DEF #4: builtItems=1, unsupportedFaces=0",
@@ -6472,7 +6668,8 @@ class StepDumpAppTest {
         + "#11=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#8);\n"
         + "#12=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#8);\n"
         + "#13=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#8);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CIRCLE_PROFILE_DEF #9: builtItems=1, unsupportedFaces=0",
@@ -6504,7 +6701,8 @@ class StepDumpAppTest {
         + "#15=DEGENERATE_PCURVE('DPC0',#8,#13);\n"
         + "#16=SURFACE_CURVE('SC0',#6,(#14),.CURVE_3D.);\n"
         + "#17=SEAM_CURVE('SM0',#6,(#14,#15),.CURVE_3D.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PCURVE #14: builtItems=1, unsupportedFaces=0",
@@ -6525,7 +6723,8 @@ class StepDumpAppTest {
         + "#5=PARABOLA('P0',#4,2.0);\n"
         + "#6=HYPERBOLA('H0',#4,4.0,2.0);\n"
         + "#7=DEGENERATE_CONIC('DC0',#4);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PARABOLA #5: builtItems=1, unsupportedFaces=0",
@@ -6547,7 +6746,8 @@ class StepDumpAppTest {
         + "#7=TOROIDAL_SURFACE('TO0',#4,5.0,1.0);\n"
         + "#8=SPHERICAL_SURFACE('SPH0',#4,2.0);\n"
         + "#9=DEGENERATE_TOROIDAL_SURFACE('DTS0',#4,5.0,1.0,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CYLINDRICAL_SURFACE #5: builtItems=1, unsupportedFaces=0",
@@ -6591,7 +6791,8 @@ class StepDumpAppTest {
         + "#29=ARBITRARY_CLOSED_PROFILE_DEF(.AREA.,'ACP',#25);\n"
         + "#30=ARBITRARY_PROFILE_DEF(.AREA.,'AP',#25);\n"
         + "#31=ARBITRARY_OPEN_PROFILE_DEF(.CURVE.,'AOP',#26);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "RATIONAL_B_SPLINE_CURVE #8: builtItems=1, unsupportedFaces=0",
@@ -6698,7 +6899,8 @@ class StepDumpAppTest {
         + "#14=PLANE('PL0',#4);\n"
         + "#15=HALF_SPACE_SOLID('HS',#14,.T.);\n"
         + "#16=BOXED_HALF_SPACE('BHS',#14,.F.,#13);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "PARABOLA #5: builtItems=1, unsupportedFaces=0",
@@ -6747,7 +6949,8 @@ class StepDumpAppTest {
         + "#25=PRODUCT_RELATED_PRODUCT_CATEGORY('CAT','category',(#24));\n"
         + "#26=COLOUR_SPECIFICATION('generic-colour');\n"
         + "#27=DRAUGHTING_PRE_DEFINED_TEXT_FONT('ISO');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DEGENERATE_PCURVE #11: builtItems=2, unsupportedFaces=0",
@@ -6775,7 +6978,8 @@ class StepDumpAppTest {
         + "#4=LINE('L0',#1,#3);\n"
         + "#5=COMPOSITE_CURVE_SEGMENT(.CONTINUOUS.,.T.,#4);\n"
         + "#6=FEATURE_DEFINITION('FD0','feature');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "COMPOSITE_CURVE_SEGMENT #5: builtItems=1, unsupportedFaces=0",
@@ -6798,7 +7002,8 @@ class StepDumpAppTest {
         + "#9=COUNTERBORE_HOLE_DEFINITION('CBHD','counterbore');\n"
         + "#10=SPOTFACE_HOLE_DEFINITION('SHD','spotface hole');\n"
         + "#11=TURNED_KNURL('TK','turned knurl');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CHARACTERIZED_OBJECT #1: builtItems=1, unsupportedFaces=0",
@@ -6835,7 +7040,8 @@ class StepDumpAppTest {
         + "#51=COUNTERBORE_HOLE_DEFINITION('CBHD','counterbore definition');\n"
         + "#52=COUNTERDRILL_HOLE_DEFINITION('CDHD','counterdrill definition');\n"
         + "#53=COUNTERSINK_HOLE_DEFINITION('CSHD','countersink definition');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BASIC_ROUND_HOLE_OCCURRENCE #9: builtItems=3, unsupportedFaces=0",
@@ -6862,7 +7068,8 @@ class StepDumpAppTest {
         + "#23=GEOMETRIC_TOLERANCE_WITH_MODIFIERS('GTWM','tolerance modifiers',#7,.T.);\n"
         + "#28=PATH_FEATURE_COMPONENT('PFC','path feature',#7,.T.);\n"
         + "#36=TOLERANCE_ZONE_DEFINITION('TZD','tolerance zone',#7,.T.);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "APPLIED_AREA #8: builtItems=2, unsupportedFaces=0",
@@ -6887,7 +7094,8 @@ class StepDumpAppTest {
         + "#6=EXTERNALLY_DEFINED_DIMENSION_DEFINITION('dimension-1',#1);\n"
         + "#7=EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM('picture-1',#1);\n"
         + "#8=EXTERNALLY_DEFINED_STYLE('style-1',#1);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTERNALLY_DEFINED_CLASS #2: builtItems=1, unsupportedFaces=0",
@@ -6919,7 +7127,8 @@ class StepDumpAppTest {
         + "#42=PLANE('PL0',#5);\n"
         + "#50=ADVANCED_FACE('F0',(#41),#42,.T.);\n"
         + "#60=OPEN_SHELL('OS',(#50));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #60: faces=0, unsupportedFaces=1",
@@ -6946,7 +7155,8 @@ class StepDumpAppTest {
         + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#13,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "CYLINDRICAL_SURFACE #13: builtItems=1, unsupportedFaces=0",
@@ -6998,7 +7208,8 @@ class StepDumpAppTest {
         + "#61=FACE_OUTER_BOUND('B0',#60,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#11,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SURFACE_OF_REVOLUTION #10: builtItems=2, unsupportedFaces=0",
@@ -7023,7 +7234,8 @@ class StepDumpAppTest {
         + "#10=FACE_OUTER_BOUND('B0',#9,.T.);\n"
         + "#11=ADVANCED_FACE('F0',(#10),#5,.T.);\n"
         + "#12=OPEN_SHELL('OS',(#11));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "TOROIDAL_SURFACE #5: builtItems=1, unsupportedFaces=0",
@@ -7048,7 +7260,8 @@ class StepDumpAppTest {
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#5,.T.);\n"
         + "#13=OPEN_SHELL('OS',(#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "DEGENERATE_TOROIDAL_SURFACE #5: builtItems=1, unsupportedFaces=0",
@@ -7073,7 +7286,8 @@ class StepDumpAppTest {
         + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
         + "#12=ADVANCED_FACE('F0',(#11),#5,.T.);\n"
         + "#13=OPEN_SHELL('OS',(#12));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "SPHERICAL_SURFACE #5: builtItems=1, unsupportedFaces=0",
@@ -7124,7 +7338,8 @@ class StepDumpAppTest {
         + "#81=FACE_OUTER_BOUND('FOB',#80,.T.);\n"
         + "#82=ADVANCED_FACE('F0',(#81),#15,.T.);\n"
         + "#83=OPEN_SHELL('OS',(#82));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #83: faces=0, unsupportedFaces=1",
@@ -7180,7 +7395,8 @@ class StepDumpAppTest {
         + "#81=FACE_OUTER_BOUND('FOB',#80,.T.);\n"
         + "#82=ADVANCED_FACE('F0',(#81),#19,.T.);\n"
         + "#83=OPEN_SHELL('OS',(#82));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #83: faces=0, unsupportedFaces=1",
@@ -7223,7 +7439,8 @@ class StepDumpAppTest {
         + "#61=FACE_OUTER_BOUND('FOB',#60,.T.);\n"
         + "#70=ADVANCED_FACE('F0',(#61),#13,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #80: faces=0, unsupportedFaces=1",
@@ -7248,7 +7465,8 @@ class StepDumpAppTest {
         + "#9=FACE_OUTER_BOUND('B0',#8,.T.);\n"
         + "#10=FACE_SURFACE('FS0',(#9),#7,.T.);\n"
         + "#11=OPEN_SHELL('OS',(#10));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "OPEN_SHELL #11: faces=1, unsupportedFaces=0");
@@ -7278,7 +7496,8 @@ class StepDumpAppTest {
         + "#17=FACETED_BREP('FB0',#15);\n"
         + "#18=FACETED_BREP('FB1',#16);\n"
         + "#19=(BOOLEAN_RESULT(.UNION.,#17,#18) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BOOLEAN_RESULT #19: faces=0, unsupportedFaces=1",
@@ -7301,7 +7520,8 @@ class StepDumpAppTest {
         + "#7=AXIS2_PLACEMENT_2D('AX2',#5,#6);\n"
         + "#8=RECTANGLE_PROFILE_DEF(.AREA.,'R',#7,4.0,2.0);\n"
         + "#9=EXTRUDED_AREA_SOLID('EX',#8,#4,#2,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "EXTRUDED_AREA_SOLID #9: shellFaces=6, unsupportedFaces=0");
     }
@@ -7352,7 +7572,8 @@ class StepDumpAppTest {
         + "#93=AXIS2_PLACEMENT_3D('SOLID_POS',#90,#91,#92);\n"
         + "#94=DIRECTION('LOCAL_EXTRUDE',(0.0,0.0,1.0));\n"
         + "#95=EXTRUDED_FACE_SOLID('EXF',#80,#93,#94,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "EXTRUDED_FACE_SOLID #95: shellFaces=6, unsupportedFaces=0");
     }
@@ -7403,7 +7624,8 @@ class StepDumpAppTest {
         + "#93=DIRECTION('AXIS_DIR',(0.0,1.0,0.0));\n"
         + "#94=AXIS1_PLACEMENT('REV_AXIS',#92,#93);\n"
         + "#95=REVOLVED_FACE_SOLID('RVF',#80,#91,#94,1.57079632679);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "REVOLVED_FACE_SOLID #95: shellFaces=34, unsupportedFaces=0");
     }
@@ -7424,7 +7646,8 @@ class StepDumpAppTest {
         + "#9=AXIS2_PLACEMENT_2D('AX2',#7,#8);\n"
         + "#10=RECTANGLE_PROFILE_DEF(.AREA.,'R',#9,2.0,4.0);\n"
         + "#11=REVOLVED_AREA_SOLID('RV',#10,#5,#6,1.57079632679);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "REVOLVED_AREA_SOLID #11: shellFaces=34, unsupportedFaces=0");
     }
@@ -7445,7 +7668,8 @@ class StepDumpAppTest {
         + "#9=CIRCULAR_HOLLOW_PROFILE_DEF(.AREA.,'CH',#7,3.0,0.5);\n"
         + "#10=EXTRUDED_AREA_SOLID('EX0',#8,#4,#2,5.0);\n"
         + "#11=EXTRUDED_AREA_SOLID('EX1',#9,#4,#2,5.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTRUDED_AREA_SOLID #10: shellFaces=74, unsupportedFaces=0",
@@ -7470,7 +7694,8 @@ class StepDumpAppTest {
         + "#11=DIRECTION('DY',(0.0,1.0,0.0));\n"
         + "#12=CARTESIAN_TRANSFORMATION_OPERATOR_3D('X',#3,#11,#10,1.0,#2);\n"
         + "#13=SOLID_REPLICA('SR',#9,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "SOLID_REPLICA #13: shellFaces=6, unsupportedFaces=0");
     }
@@ -7493,7 +7718,8 @@ class StepDumpAppTest {
         + "#11=DIRECTION('DY',(0.0,1.0,0.0));\n"
         + "#12=CARTESIAN_TRANSFORMATION_OPERATOR_3D('X',#3,#11,#10,1.0,#2);\n"
         + "#13=SOLID_REPLICA('SR',#9,#12);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "SOLID_REPLICA #13:");
     }
@@ -7514,7 +7740,8 @@ class StepDumpAppTest {
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
         + "#11=CSG_SOLID('CSG0',#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "CSG_SOLID #11:");
     }
@@ -7535,7 +7762,8 @@ class StepDumpAppTest {
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
         + "#11=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BOOLEAN_RESULT #10:",
@@ -7566,7 +7794,8 @@ class StepDumpAppTest {
         + "#17=FACETED_BREP('FB0',#15);\n"
         + "#18=FACETED_BREP('FB1',#16);\n"
         + "#19=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#17,#18) BOOLEAN_RESULT(.DIFFERENCE.,#17,#18) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BOOLEAN_CLIPPING_RESULT #19: faces=0, unsupportedFaces=1",
@@ -7591,7 +7820,8 @@ class StepDumpAppTest {
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL0'));\n"
         + "#11=CSG_SOLID('CSG0',#10);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BLOCK #5: shellFaces=6, unsupportedFaces=0",
@@ -7612,7 +7842,8 @@ class StepDumpAppTest {
         + "#6=BLOCK('BLK',#4,10.0,20.0,30.0);\n"
         + "#7=SPHERE('SP',#4,2.0);\n"
         + "#8=RIGHT_CIRCULAR_CYLINDER('CY',#5,5.0,2.0);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "BLOCK #6: shellFaces=6, unsupportedFaces=0",
@@ -7633,7 +7864,8 @@ class StepDumpAppTest {
         + "#6=ELLIPSOID('EL',#4,3.0,2.0,1.0);\n"
         + "#7=TORUS('TO',#5,5.0,1.0);\n"
         + "#8=RIGHT_ANGULAR_WEDGE('WG',#4,4.0,3.0,2.0,2.5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "ELLIPSOID #6: shellFaces=528, unsupportedFaces=0",
@@ -7656,7 +7888,8 @@ class StepDumpAppTest {
         + "#8=PLANE('PLANE',#7);\n"
         + "#9=HALF_SPACE_SOLID('HS',#8,.T.);\n"
         + "#10=(BOOLEAN_CLIPPING_RESULT(.DIFFERENCE.,#5,#9) BOOLEAN_RESULT(.DIFFERENCE.,#5,#9) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BCR0'));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file, "BOOLEAN_CLIPPING_RESULT #10: faces=6, unsupportedFaces=0");
     }
@@ -7683,7 +7916,8 @@ class StepDumpAppTest {
         + "#15=RIGHT_CIRCULAR_CYLINDER('CY',#14,5.0,2.0);\n"
         + "#16=TORUS('TO',#14,5.0,1.0);\n"
         + "#17=RIGHT_ANGULAR_WEDGE('WG',#4,4.0,3.0,2.0,2.5);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         assertDumpContains(file,
                 "EXTRUDED_AREA_SOLID #10: shellFaces=74, unsupportedFaces=0",
@@ -7758,7 +7992,8 @@ class StepDumpAppTest {
         Files.writeString(bad, 
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         DumpRunResult result = runDumpRaw("--json", bad.toString());
 
@@ -7811,7 +8046,8 @@ class StepDumpAppTest {
         Files.writeString(file, 
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         DumpRunResult result = runDumpRaw(file.toString());
 
@@ -7828,7 +8064,8 @@ class StepDumpAppTest {
         Files.writeString(file, 
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         DumpRunResult result = runDumpRaw("--debug", file.toString());
 
@@ -7844,7 +8081,8 @@ class StepDumpAppTest {
         Files.writeString(file, 
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
 
         ProcessResult result = runMainProcess(file.toString());
 
@@ -7878,7 +8116,8 @@ class StepDumpAppTest {
         Files.writeString(file, 
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
         return file;
     }
 
