@@ -169,7 +169,8 @@ class StepParserTest {
         StepParseException invalidHex = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
         + "#1=EXAMPLE('\\X\\ZZ');\n"
-        + "ENDSEC;";
+        + "ENDSEC;"
+        );
         assertTrue(invalidHex.getMessage().startsWith("malformed \\X\\ string escape at position "));
 
         StepParseException unterminatedLong = assertThrows(StepParseException.class, () -> StepParser.parse(
