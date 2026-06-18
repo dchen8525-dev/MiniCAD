@@ -3073,10 +3073,7 @@ public final class MiscRegistry {
           "BREAKDOWN_ELEMENT_REALIZATION",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "BREAKDOWN_ELEMENT_REALIZATION"));
-      registry.put(
-          "BREAKDOWN_ELEMENT_USAGE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BREAKDOWN_ELEMENT_USAGE"));
+      // BREAKDOWN_ELEMENT_USAGE already registered via registerProductDefinitionRelationshipAliases at line 872
       registry.put(
           "CHANGE_ELEMENT",
           (resolver, instance) ->
@@ -3754,10 +3751,7 @@ public final class MiscRegistry {
           "BACKGROUND_COLOUR",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BACKGROUND_COLOUR"));
-      registry.put(
-          "BARRING_HOLE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "BARRING_HOLE"));
+      // BARRING_HOLE already registered via registerCharacterizedObjectAliases at line 1100
       registry.put(
           "BEZIER_VOLUME",
           (resolver, instance) ->
@@ -4064,10 +4058,7 @@ public final class MiscRegistry {
           (resolver, instance) ->
               resolver.resolveGenericRelationship(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
       // APPLIED_AREA already registered via registerShapeAspectAliases at line 1235
-      registry.put(
-          "BREAKDOWN_OF",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BREAKDOWN_OF"));
+      // BREAKDOWN_OF already registered via registerProductDefinitionRelationshipAliases at line 873
       registry.put(
           "CAMERA_MODEL_D3_MULTI_CLIPPING",
           (resolver, instance) ->
@@ -5699,10 +5690,7 @@ public final class MiscRegistry {
           "BASIC_SPARSE_MATRIX",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BASIC_SPARSE_MATRIX"));
-      registry.put(
-          "BEAD",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BEAD"));
+      // BEAD already registered via registerCharacterizedObjectAliases at line 1102
       // BEAD_END already registered via registerShapeAspectAliases at line 1236
       registry.put(
           "BINARY_ASSEMBLY_CONSTRAINT",
@@ -5742,10 +5730,7 @@ public final class MiscRegistry {
           "BOSS",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BOSS"));
-      registry.put(
-          "BOSS_TOP",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BOSS_TOP"));
+      // BOSS_TOP already registered via registerShapeAspectAliases at line 1237
       registry.put(
           "BOUND_PARAMETER_ENVIRONMENT",
           (resolver, instance) ->
@@ -5892,10 +5877,7 @@ public final class MiscRegistry {
           "COMPONENT_PATH_SHAPE_ASPECT",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "COMPONENT_PATH_SHAPE_ASPECT"));
-      registry.put(
-          "COMPONENT_TERMINAL",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "COMPONENT_TERMINAL"));
+      // COMPONENT_TERMINAL already registered via registerShapeAspectAliases at line 1239
       registry.put(
           "COMPOSITE_ASSEMBLY_TABLE",
           (resolver, instance) ->
