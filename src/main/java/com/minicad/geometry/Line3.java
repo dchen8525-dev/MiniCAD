@@ -104,6 +104,18 @@ public final class Line3 implements Curve3 {
     }
 
     /**
+     * Returns the curve parameter corresponding to the given point.
+     * For Line3, this returns the actual parameter value (not normalized to [0,1]).
+     *
+     * @param point a point on or near the curve
+     * @return parameter value where pointAt(t) is closest to the given point
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        return parameterOfClosestPoint(point);
+    }
+
+    /**
      * Returns the start parameter for a bounded segment.
      * Default is 0 for an unbounded line.
      *
@@ -136,6 +148,17 @@ public final class Line3 implements Curve3 {
         return Math.abs(t1 - t0) * parameterScale;
     }
 
+    /**
+     * Returns the length for one unit of parameter.
+     * For Line3, this returns the parameterScale value.
+     *
+     * @return parameterScale (length per parameter unit)
+     */
+    @Override
+    public double length() {
+        return parameterScale;
+    }
+
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
@@ -162,9 +185,14 @@ public final class Line3 implements Curve3 {
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        // Sample a finite range of the infinite line (from -10 to 10)
+        // Sample a finite range of the infinite line
+        // Use a parameter range that scales inversely with parameterScale
+        // to maintain consistent world-space sampling distance
+        double sampleRange = 10.0; // World-space distance
+        double paramRange = sampleRange / Math.max(parameterScale, 1.0e-12);
+        double paramStep = 2.0 * paramRange / segments;
         for (int i = 0; i <= segments; i++) {
-            double t = -10.0 + 20.0 * i / segments;
+            double t = -paramRange + paramStep * i;
             points.add(pointAt(t));
         }
         return java.util.List.copyOf(points);

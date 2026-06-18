@@ -58,7 +58,8 @@ public final class StepBenchmarkApp {
         BuildSummary buildSummary = benchmarkBuild(resolved);
         long buildElapsedNanos = System.nanoTime() - buildStartedAt;
 
-        CompiledStepDocument compiled = CompiledStepDocument.of(stepText, stepFile, resolved);
+        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        CompiledStepDocument compiled = new CompiledStepDocument(stepText, stepFile, resolved, builder);
 
         long previewExportStartedAt = System.nanoTime();
         String previewJson = StepPreviewJsonExporter.export(compiled);

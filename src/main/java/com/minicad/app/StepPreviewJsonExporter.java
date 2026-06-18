@@ -644,7 +644,8 @@ public final class StepPreviewJsonExporter {
         long resolveStartedAt = System.nanoTime();
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
         log.info("stage={} elapsedMs={}, resolvedCount={}", resolveStageName, elapsedMillis(resolveStartedAt), resolved.size());
-        return CompiledStepDocument.of(stepText, stepFile, resolved);
+        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+        return new CompiledStepDocument(stepText, stepFile, resolved, builder);
     }
 
     private static PreviewPayload buildPayload(
