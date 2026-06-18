@@ -112,6 +112,24 @@ public final class Ellipse2 implements Curve2 {
     }
 
     /**
+     * Samples an arc of the ellipse from startAngle to endAngle.
+     *
+     * @param segments number of segments
+     * @param startAngle start angle in radians
+     * @param endAngle end angle in radians
+     * @return list of sampled points
+     */
+    public List<Point2> sample(int segments, double startAngle, double endAngle) {
+        List<Point2> points = new ArrayList<>();
+        double delta = endAngle - startAngle;
+        for (int i = 0; i <= segments; i++) {
+            double angle = startAngle + delta * i / segments;
+            points.add(pointAt(angle));
+        }
+        return List.copyOf(points);
+    }
+
+    /**
      * Returns the parametric angle corresponding to a point on the ellipse.
      *
      * @param point a point on or near the ellipse

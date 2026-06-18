@@ -97,6 +97,24 @@ public final class Circle2 implements Curve2 {
     }
 
     /**
+     * Samples an arc of the circle from startAngle to endAngle.
+     *
+     * @param segments number of segments
+     * @param startAngle start angle in radians
+     * @param endAngle end angle in radians
+     * @return list of sampled points
+     */
+    public List<Point2> sample(int segments, double startAngle, double endAngle) {
+        List<Point2> points = new ArrayList<>();
+        double delta = endAngle - startAngle;
+        for (int i = 0; i <= segments; i++) {
+            double angle = startAngle + delta * i / segments;
+            points.add(pointAt(angle));
+        }
+        return List.copyOf(points);
+    }
+
+    /**
      * Returns the angle corresponding to a point on the circle.
      *
      * @param point a point on or near the circle

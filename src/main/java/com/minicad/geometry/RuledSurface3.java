@@ -39,6 +39,81 @@ public final class RuledSurface3 implements SurfaceGeometry {
     public Curve3 directrix1() { return getDirectrix1(); }
     public Curve3 directrix2() { return getDirectrix2(); }
 
+    /**
+     * Returns a point on the ruled surface at given parametric coordinates.
+     *
+     * @param u parameter along directrix curves (0 to 1)
+     * @param v parameter between curves (0 to 1, 0 = directrix1, 1 = directrix2)
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        CartesianPoint p1 = directrix1.pointAt(u);
+        CartesianPoint p2 = directrix2.pointAt(u);
+        // Interpolate between p1 and p2
+        return new CartesianPoint(
+            p1.x() + v * (p2.x() - p1.x()),
+            p1.y() + v * (p2.y() - p1.y()),
+            p1.z() + v * (p2.z() - p1.z())
+        );
+    }
+
+    /**
+     * Returns the normal vector at a parametric position.
+     *
+     * @param u parameter along directrix curves
+     * @param v parameter between curves
+     * @return normal vector (approximate for general ruled surfaces)
+     */
+    public Vector3 normalAt(double u, double v) {
+        // Approximate normal by computing tangent vectors
+        // Tangent along u direction (along directrix)
+        CartesianPoint pU0 = pointAt(Math.max(0, u - 0.01), v);
+        CartesianPoint pU1 = pointAt(Math.min(1, u + 0.01), v);
+        Vector3 tangentU = pU1.subtract(pU0);
+
+        // Tangent along v direction (between directrices)
+        CartesianPoint pV0 = pointAt(u, Math.max(0, v - 0.01));
+        CartesianPoint pV1 = pointAt(u, Math.min(1, v + 0.01));
+        Vector3 tangentV = pV1.subtract(pV0);
+
+        // Normal is cross product of tangents
+        return tangentU.cross(tangentV).normalize();
+    }
+
+    /**
+     * Returns the bounding box of the ruled surface.
+     *
+     * @return bounding box
+     */
+    public BoundingBox3 boundingBox() {
+        BoundingBox3 box1 = directrix1.boundingBox();
+        BoundingBox3 box2 = directrix2.boundingBox();
+        return box1.union(box2);
+    }
+
+    /**
+     * Samples the ruled surface on a grid.
+     *
+     * @param uSegments number of segments along u direction
+     * @param vSegments number of segments along v direction
+     * @return list of sampled point rows
+     */
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
+        for (int i = 0; i <= uSegments; i++) {
+            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
+            double u = (double) i / uSegments;
+            for (int j = 0; j <= vSegments; j++) {
+                double v = (double) j / vSegments;
+                row.add(pointAt(u, v));
+            }
+            grid.add(java.util.List.copyOf(row));
+        }
+        return java.util.List.copyOf(grid);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
