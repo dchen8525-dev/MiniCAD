@@ -30,6 +30,13 @@ public final class Polyline2 implements Curve2 {
     // Record-style accessors
     public List<Point2> points() { return getPoints(); }
 
+    // Convenience methods
+    public int pointCount() { return points == null ? 0 : points.size(); }
+    public int segmentCount() { return points == null || points.size() < 2 ? 0 : points.size() - 1; }
+    public Point2 startPoint() { return points == null || points.isEmpty() ? null : points.get(0); }
+    public Point2 endPoint() { return points == null || points.isEmpty() ? null : points.get(points.size() - 1); }
+    public List<Point2> sample() { return sample(0); } // Returns all points
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

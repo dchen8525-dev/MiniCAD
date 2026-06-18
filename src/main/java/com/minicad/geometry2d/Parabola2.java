@@ -35,6 +35,18 @@ public final class Parabola2 implements Curve2 {
         this.focalDistance = focalDistance;
     }
 
+    /**
+     * Creates a parabola with default axis direction (Y-axis).
+     *
+     * @param vertex parabola vertex
+     * @param focalDistance distance from vertex to focus
+     * @return parabola at the given vertex with default axis direction
+     */
+    public static Parabola2 at(Point2 vertex, double focalDistance) {
+        Preconditions.requireNonNull(vertex, "vertex");
+        return new Parabola2(vertex, Direction2.yAxis(), focalDistance);
+    }
+
     public Point2 getVertex() {
         return vertex;
     }
@@ -106,5 +118,138 @@ public final class Parabola2 implements Curve2 {
             points.add(pointAt(t));
         }
         return List.copyOf(points);
+    }
+
+    /**
+     * Samples a portion of the parabola with given parameter bounds.
+     *
+     * @param segments number of segments
+     * @param startParam start parameter
+     * @param endParam end parameter
+     * @return sampled points
+     */
+    public List<Point2> sample(int segments, double startParam, double endParam) {
+        Preconditions.requireFinite(startParam, "startParam");
+        Preconditions.requireFinite(endParam, "endParam");
+        List<Point2> points = new ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double t = startParam + (endParam - startParam) * i / segments;
+            points.add(pointAt(t));
+        }
+        return List.copyOf(points);
+    }
+
+    /**
+     * Returns the normal vector at a parametric position.
+     *
+     * @param t parametric value
+     * @return normal vector
+     */
+    public Vector2 normalAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        // Tangent derivative: dx/dt = 1, dy/dt = 2t / (4*f) = t / (2*f)
+        // Normal is perpendicular to tangent
+        double dx = 1.0;
+        double dy = t / (2 * focalDistance);
+        // Perpendicular to tangent
+        Vector2 tangentLocal = new Vector2(dx, dy);
+        Vector2 normalLocal = tangentLocal.perpendicular().normalize();
+        // Transform to global coordinates
+        Vector2 axis = axisDirection.asVector();
+        Vector2 perp = axisDirection.perpendicular().asVector();
+        return new Vector2(
+            normalLocal.x() * perp.x() + normalLocal.y() * axis.x(),
+            normalLocal.x() * perp.y() + normalLocal.y() * axis.y()
+        );
+    }
+
+    /**
+     * Returns the normal vector at a segment index.
+     *
+     * @param segment segment index
+     * @return normal vector
+     */
+    public Vector2 normalAt(int segment) {
+        // Map segment index to parameter
+        double t = 0.5 * segment;
+        return normalAt(t);
+    }
+
+    /**
+     * Returns the curvature at a parametric position.
+     *
+     * @param t parametric value
+     * @return curvature
+     */
+    public double curvatureAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        // Curvature formula for parabola: k = |2 * focalDistance| / ( (1 + (t/(2*f))^2 )^(3/2) )
+        double derivative = t / (2 * focalDistance);
+        double denominator = Math.pow(1 + derivative * derivative, 1.5);
+        return (2 * focalDistance) / denominator;
+    }
+
+    /**
+     * Returns the curvature at a segment index.
+     *
+     * @param segment segment index
+     * @return curvature
+     */
+    public double curvatureAt(int segment) {
+        double t = 0.5 * segment;
+        return curvatureAt(t);
+    }
+
+    /**
+     * Returns the focus point.
+     *
+     * @return focus point
+     */
+    public Point2 focus() {
+        Vector2 axis = axisDirection.asVector();
+        return vertex.add(axis.scale(focalDistance));
+    }
+
+    /**
+     * Returns the directrix line (line at distance -focalDistance from vertex).
+     *
+     * @return directrix line
+     */
+    public Line2 directrix() {
+        Vector2 axis = axisDirection.asVector();
+        Point2 directrixPoint = vertex.subtract(axis.scale(focalDistance));
+        Direction2 perp = axisDirection.perpendicular();
+        return new Line2(directrixPoint, perp);
+    }
+
+    /**
+     * Returns the focal length (same as focalDistance).
+     *
+     * @return focal length
+     */
+    public double focalLength() {
+        return focalDistance;
+    }
+
+    /**
+     * Returns the direction perpendicular to the axis (y-direction).
+     *
+     * @return y-direction
+     */
+    public Direction2 yDirection() {
+        return axisDirection.perpendicular();
+    }
+
+    /**
+     * Creates a new parabola at a given vertex with a given focal distance.
+     *
+     * @param newVertex new vertex point
+     * @param newFocalDistance new focal distance
+     * @return new parabola with same axis direction
+     */
+    public Parabola2 withVertex(Point2 newVertex, double newFocalDistance) {
+        Preconditions.requireNonNull(newVertex, "newVertex");
+        Preconditions.requireFinite(newFocalDistance, "newFocalDistance");
+        return new Parabola2(newVertex, axisDirection, newFocalDistance);
     }
 }

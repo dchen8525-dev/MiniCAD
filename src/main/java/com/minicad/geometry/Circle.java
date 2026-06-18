@@ -109,6 +109,15 @@ public final class Circle implements Curve3 {
     }
 
     /**
+     * Returns the circumference of the circle.
+     *
+     * @return circumference (2 * PI * radius)
+     */
+    public double circumference() {
+        return 2 * Math.PI * radius;
+    }
+
+    /**
      * Returns the angle corresponding to a point on the circle.
      *
      * @param point a point on or near the circle

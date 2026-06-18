@@ -30,6 +30,9 @@ public final class CompositeCurve3 implements Curve3 {
     // Record-style accessor
     public List<Curve3> segments() { return getSegments(); }
 
+    // Convenience method
+    public int segmentCount() { return segments.size(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

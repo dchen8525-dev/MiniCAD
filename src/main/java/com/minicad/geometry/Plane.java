@@ -62,6 +62,19 @@ public final class Plane implements SurfaceGeometry {
     }
 
     /**
+     * Projects a point onto this plane.
+     * Returns the closest point on the plane to the given point.
+     *
+     * @param point the point to project
+     * @return closest point on the plane
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        double signedDist = signedDistanceTo(point);
+        return point.subtractVector(normal.asVector().scale(signedDist));
+    }
+
+    /**
      * Checks if a point lies on this plane (within epsilon tolerance).
      *
      * @param point point to check

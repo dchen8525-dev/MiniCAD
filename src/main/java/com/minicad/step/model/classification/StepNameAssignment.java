@@ -40,6 +40,10 @@ public final class StepNameAssignment implements StepEntity {
         return assignedName;
     }
 
+    public String assignedName() {
+        return assignedName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

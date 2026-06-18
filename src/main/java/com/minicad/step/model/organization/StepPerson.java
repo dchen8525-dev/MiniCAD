@@ -77,6 +77,19 @@ public final class StepPerson implements StepEntity {
         return suffixTitles;
     }
 
+    // Record-style accessors
+    public List<String> middleNames() {
+        return middleNames;
+    }
+
+    public List<String> prefixTitles() {
+        return prefixTitles;
+    }
+
+    public List<String> suffixTitles() {
+        return suffixTitles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

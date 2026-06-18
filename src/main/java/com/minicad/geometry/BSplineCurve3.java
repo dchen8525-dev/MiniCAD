@@ -101,6 +101,54 @@ public final class BSplineCurve3 implements Curve3 {
         return knots.get(knots.size() - 1);
     }
 
+    /**
+     * Returns the expanded knot vector (with multiplicities expanded).
+     *
+     * @return expanded knot vector
+     */
+    public List<Double> expandedKnots() {
+        if (knots == null || knotMultiplicities == null) {
+            return java.util.List.of();
+        }
+        List<Double> expanded = new ArrayList<>();
+        for (int i = 0; i < knots.size(); i++) {
+            int multiplicity = knotMultiplicities.get(i);
+            double knotValue = knots.get(i);
+            for (int j = 0; j < multiplicity; j++) {
+                expanded.add(knotValue);
+            }
+        }
+        return java.util.List.copyOf(expanded);
+    }
+
+    /**
+     * Returns the midpoint of the curve (point at middle parameter).
+     *
+     * @return midpoint
+     */
+    public CartesianPoint midpoint() {
+        double midParam = (startParameter() + endParameter()) / 2.0;
+        return pointAt(midParam);
+    }
+
+    /**
+     * Returns the number of control points.
+     *
+     * @return control point count
+     */
+    public int controlPointCount() {
+        return controlPoints == null ? 0 : controlPoints.size();
+    }
+
+    /**
+     * Returns the number of unique knots.
+     *
+     * @return knot count
+     */
+    public int knotCount() {
+        return knots == null ? 0 : knots.size();
+    }
+
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");

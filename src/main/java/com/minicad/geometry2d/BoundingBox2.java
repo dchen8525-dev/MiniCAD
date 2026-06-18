@@ -128,6 +128,17 @@ public final class BoundingBox2 {
     }
 
     /**
+     * Expands this bounding box uniformly by a delta on all sides.
+     *
+     * @param delta expansion amount (added to min and max on each side)
+     * @return expanded bounding box
+     */
+    public BoundingBox2 expand(double delta) {
+        Preconditions.requireFinite(delta, "delta");
+        return new BoundingBox2(minX - delta, minY - delta, maxX + delta, maxY + delta);
+    }
+
+    /**
      * Returns a new bounding box that includes the given point.
      *
      * @param point point to include
@@ -251,6 +262,25 @@ public final class BoundingBox2 {
         Preconditions.requireNonNull(other, "other");
         return minX <= other.maxX && maxX >= other.minX
             && minY <= other.maxY && maxY >= other.minY;
+    }
+
+    /**
+     * Scales this bounding box about its center by a factor.
+     *
+     * @param factor scaling factor
+     * @return scaled bounding box
+     */
+    public BoundingBox2 scale(double factor) {
+        Preconditions.requireFinite(factor, "factor");
+        Point2 c = center();
+        double halfW = width() / 2.0 * factor;
+        double halfH = height() / 2.0 * factor;
+        return new BoundingBox2(
+            c.x() - halfW,
+            c.y() - halfH,
+            c.x() + halfW,
+            c.y() + halfH
+        );
     }
 
     @Override

@@ -61,6 +61,9 @@ public final class TrimmedCurve2 implements Curve2 {
     public double trimParamEnd() { return getTrimParamEnd(); }
     public boolean senseAgreement() { return isSenseAgreement(); }
 
+    // Convenience alias
+    public Curve2 underlyingCurve() { return basisCurve; }
+
     /**
      * Returns the geometric start point of the trim by evaluating the basis curve.
      *
@@ -120,5 +123,30 @@ public final class TrimmedCurve2 implements Curve2 {
             points.add(pointAt(t));
         }
         return List.copyOf(points);
+    }
+
+    /**
+     * Maps a point on the trimmed curve to a parameter on the basis curve.
+     *
+     * @param point point on or near the trimmed curve
+     * @return parameter on the underlying basis curve
+     */
+    public double parameterOnUnderlyingCurve(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        // First find the parameter on the trimmed curve
+        // Then map to the basis curve parameter
+        List<Point2> samples = sample(256);
+        int closestIdx = 0;
+        double minDist = point.distanceTo(samples.get(0));
+        for (int i = 1; i < samples.size(); i++) {
+            double dist = point.distanceTo(samples.get(i));
+            if (dist < minDist) {
+                minDist = dist;
+                closestIdx = i;
+            }
+        }
+        // Convert to basis curve parameter
+        double trimmedParam = (double) closestIdx / (samples.size() - 1);
+        return trimParamStart + trimmedParam * (trimParamEnd - trimParamStart);
     }
 }

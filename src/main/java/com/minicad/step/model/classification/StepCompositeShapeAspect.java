@@ -44,6 +44,23 @@ public final class StepCompositeShapeAspect implements StepEntity {
         return productDefinitional;
     }
 
+    // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public StepEntity ofShape() {
+        return ofShape;
+    }
+
+    public boolean productDefinitional() {
+        return productDefinitional;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

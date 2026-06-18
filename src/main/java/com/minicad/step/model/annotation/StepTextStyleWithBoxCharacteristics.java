@@ -54,6 +54,10 @@ public final class StepTextStyleWithBoxCharacteristics implements StepEntity {
         return characterAppearance;
     }
 
+    public List<String> boxCharacteristics() {
+        return boxCharacteristics;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -111,4 +111,67 @@ public final class Parabola3 implements Curve3 {
         }
         return java.util.List.copyOf(points);
     }
+
+    /**
+     * Samples the parabola between two parameter values.
+     *
+     * @param segments number of segments
+     * @param tMin minimum parameter value
+     * @param tMax maximum parameter value
+     * @return sampled points
+     */
+    public java.util.List<CartesianPoint> sample(int segments, double tMin, double tMax) {
+        Preconditions.requireFinite(tMin, "tMin");
+        Preconditions.requireFinite(tMax, "tMax");
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double t = tMin + (tMax - tMin) * i / segments;
+            points.add(pointAt(t));
+        }
+        return java.util.List.copyOf(points);
+    }
+
+    /**
+     * Returns the curvature at a parametric position.
+     *
+     * @param t parametric value
+     * @return curvature
+     */
+    public double curvatureAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        // Curvature formula for parabola: k = |2 * focalDistance| / ( (1 + (t/(2*f))^2 )^(3/2) )
+        double derivative = t / (2 * focalDistance);
+        double denominator = Math.pow(1 + derivative * derivative, 1.5);
+        return (2 * focalDistance) / denominator;
+    }
+
+    /**
+     * Returns the curvature at a segment index.
+     *
+     * @param segment segment index
+     * @return curvature
+     */
+    public double curvatureAt(int segment) {
+        double t = 0.5 * segment;
+        return curvatureAt(t);
+    }
+
+    /**
+     * Returns the focus point.
+     *
+     * @return focus point
+     */
+    public CartesianPoint focus() {
+        Vector3 axis = position.yDirection().asVector();
+        return position.location().add(axis.scale(focalDistance));
+    }
+
+    /**
+     * Returns the vertex point (same as position.location()).
+     *
+     * @return vertex point
+     */
+    public CartesianPoint vertex() {
+        return position.location();
+    }
 }

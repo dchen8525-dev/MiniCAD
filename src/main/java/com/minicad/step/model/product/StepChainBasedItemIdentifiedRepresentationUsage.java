@@ -110,6 +110,16 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage implements St
         return nodes.get(nodes.size() - 1);
     }
 
+    /**
+     * Returns the root representation from the chain (first node).
+     */
+    public StepRepresentation root() {
+        if (nodes == null || nodes.isEmpty()) {
+            return null;
+        }
+        return nodes.get(0);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

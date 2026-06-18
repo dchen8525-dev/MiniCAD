@@ -30,6 +30,26 @@ public final class Axis2Placement3D {
         this.refDirection = refDirection;
     }
 
+    /**
+     * Creates a placement at the given point with default axes.
+     *
+     * @param point origin point
+     * @return placement at the point with default axis (Z) and refDirection (X)
+     */
+    public static Axis2Placement3D at(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return new Axis2Placement3D(point, Direction3.zAxis(), Direction3.xAxis());
+    }
+
+    /**
+     * Creates a default placement at the origin.
+     *
+     * @return placement at origin with default axis (Z) and refDirection (X)
+     */
+    public static Axis2Placement3D origin() {
+        return at(CartesianPoint.origin());
+    }
+
     public CartesianPoint getLocation() {
         return location;
     }
@@ -46,6 +66,17 @@ public final class Axis2Placement3D {
     public CartesianPoint location() { return getLocation(); }
     public Direction3 axis() { return getAxis(); }
     public Direction3 refDirection() { return getRefDirection(); }
+
+    /**
+     * Returns a new placement with the given point as the location.
+     *
+     * @param point the new origin point
+     * @return new placement at the given point
+     */
+    public Axis2Placement3D withOrigin(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return new Axis2Placement3D(point, axis, refDirection);
+    }
 
     /**
      * Returns the local X direction (refDirection normalized).
@@ -92,6 +123,21 @@ public final class Axis2Placement3D {
                 .add(yDirection().asVector().scale(localPoint.y()))
                 .add(axis.asVector().scale(localPoint.z()));
         return location.add(offset);
+    }
+
+    /**
+     * Transforms a world point to local coordinates.
+     *
+     * @param worldPoint world point
+     * @return local point
+     */
+    public CartesianPoint transformToLocal(CartesianPoint worldPoint) {
+        Preconditions.requireNonNull(worldPoint, "worldPoint");
+        Vector3 offset = worldPoint.subtract(location);
+        double xLocal = offset.dot(xDirection().asVector());
+        double yLocal = offset.dot(yDirection().asVector());
+        double zLocal = offset.dot(axis.asVector());
+        return new CartesianPoint(xLocal, yLocal, zLocal);
     }
 
     @Override

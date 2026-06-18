@@ -8110,9 +8110,12 @@ class StepDumpAppTest {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
 
-        int exitCode = StepDumpApp.run(args, sink(stdout), sink(stderr));
-
-        return new DumpRunResult(exitCode, stdout.toString(), stderr.toString());
+        try {
+            int exitCode = StepDumpApp.run(args, sink(stdout), sink(stderr));
+            return new DumpRunResult(exitCode, stdout.toString(), stderr.toString());
+        } catch (java.io.IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private static Path writePointFile(String prefix) throws IOException {
@@ -8203,6 +8206,11 @@ class StepDumpAppTest {
         public String getStdout() { return stdout; }
         public String getStderr() { return stderr; }
 
+        // Record-style accessors
+        public int exitCode() { return exitCode; }
+        public String stdout() { return stdout; }
+        public String stderr() { return stderr; }
+
         @Override public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof DumpRunResult)) return false;
@@ -8231,6 +8239,11 @@ class StepDumpAppTest {
         public int getExitCode() { return exitCode; }
         public String getStdout() { return stdout; }
         public String getStderr() { return stderr; }
+
+        // Record-style accessors
+        public int exitCode() { return exitCode; }
+        public String stdout() { return stdout; }
+        public String stderr() { return stderr; }
 
         @Override public boolean equals(Object o) {
             if (this == o) return true;

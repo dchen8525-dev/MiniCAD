@@ -203,4 +203,117 @@ public final class Line2 implements Curve2 {
     public double curvatureAt(int segment) {
         return curvature();
     }
+
+    /**
+     * Returns the signed distance from a point to this line.
+     * Positive distance is on the side where the normal points.
+     *
+     * @param point target point
+     * @return signed distance
+     */
+    public double signedDistanceTo(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector2 toPoint = point.subtract(origin);
+        Vector2 normal = direction.perpendicular().asVector();
+        return toPoint.dot(normal);
+    }
+
+    /**
+     * Projects a point onto this line (same as closestPoint).
+     *
+     * @param point target point
+     * @return projected point on line
+     */
+    public Point2 project(Point2 point) {
+        return closestPoint(point);
+    }
+
+    /**
+     * Returns a new line parallel to this one passing through the given point.
+     *
+     * @param point point on the new line
+     * @return parallel line
+     */
+    public Line2 parallelThrough(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        return new Line2(point, direction, parameterScale);
+    }
+
+    /**
+     * Returns true if this line is parallel to another line.
+     *
+     * @param other other line
+     * @return true if parallel
+     */
+    public boolean isParallelTo(Line2 other) {
+        Preconditions.requireNonNull(other, "other");
+        // Two directions are parallel if their cross product is near zero
+        double cross = direction.cross(other.direction.asVector());
+        return Math.abs(cross) < Epsilon.get();
+    }
+
+    /**
+     * Returns a new line perpendicular to this one passing through the given point.
+     *
+     * @param point point on the new line
+     * @return perpendicular line
+     */
+    public Line2 perpendicularThrough(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        return new Line2(point, direction.perpendicular(), parameterScale);
+    }
+
+    /**
+     * Returns the intersection point with another line (if they intersect).
+     *
+     * @param other other line
+     * @return intersection point, or null if parallel
+     */
+    public Point2 intersect(Line2 other) {
+        Preconditions.requireNonNull(other, "other");
+        if (isParallelTo(other)) {
+            return null; // Lines are parallel, no intersection
+        }
+        // Solve for intersection using parametric form
+        Vector2 d1 = direction.asVector();
+        Vector2 d2 = other.direction.asVector();
+        Vector2 toOther = other.origin.subtract(origin);
+        double cross = d1.cross(d2);
+        double t1 = toOther.cross(d2) / cross;
+        return pointAt(t1);
+    }
+
+    /**
+     * Returns true if this line is coincident with another line (same line).
+     *
+     * @param other other line
+     * @return true if coincident
+     */
+    public boolean isCoincidentWith(Line2 other) {
+        Preconditions.requireNonNull(other, "other");
+        if (!isParallelTo(other)) {
+            return false;
+        }
+        // Check if the other origin lies on this line
+        return contains(other.origin);
+    }
+
+    /**
+     * Samples a segment of the line with given parameter bounds.
+     *
+     * @param segments number of segments
+     * @param startParam start parameter
+     * @param endParam end parameter
+     * @return sampled points
+     */
+    public List<Point2> sample(int segments, double startParam, double endParam) {
+        Preconditions.requireFinite(startParam, "startParam");
+        Preconditions.requireFinite(endParam, "endParam");
+        List<Point2> points = new ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double t = startParam + (endParam - startParam) * i / segments;
+            points.add(pointAt(t));
+        }
+        return List.copyOf(points);
+    }
 }

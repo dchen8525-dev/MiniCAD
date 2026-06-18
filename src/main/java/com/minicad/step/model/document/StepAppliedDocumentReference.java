@@ -66,6 +66,10 @@ public final class StepAppliedDocumentReference implements StepEntity {
         return assignedDocument;
     }
 
+    public String source() {
+        return source;
+    }
+
     public List<StepEntity> items() {
         return items;
     }

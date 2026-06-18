@@ -127,6 +127,28 @@ public final class BoundingBox3 {
     }
 
     /**
+     * Creates a bounding box containing all points in the collection.
+     *
+     * @param points collection of points
+     * @return bounding box containing all points
+     */
+    public static BoundingBox3 of(java.util.Collection<CartesianPoint> points) {
+        Preconditions.requireNonNull(points, "points");
+        if (points.isEmpty()) {
+            return new BoundingBox3(0, 0, 0, 0, 0, 0);
+        }
+        BoundingBox3 box = null;
+        for (CartesianPoint point : points) {
+            if (box == null) {
+                box = of(point);
+            } else {
+                box = box.expand(point);
+            }
+        }
+        return box;
+    }
+
+    /**
      * Returns the center point of the bounding box.
      *
      * @return center point
@@ -155,6 +177,18 @@ public final class BoundingBox3 {
             Math.max(maxY, point.y()),
             Math.max(maxZ, point.z())
         );
+    }
+
+    /**
+     * Expands this bounding box uniformly by a delta on all sides.
+     *
+     * @param delta expansion amount (added to min and max on each side)
+     * @return expanded bounding box
+     */
+    public BoundingBox3 expand(double delta) {
+        Preconditions.requireFinite(delta, "delta");
+        return new BoundingBox3(minX - delta, minY - delta, minZ - delta,
+                                 maxX + delta, maxY + delta, maxZ + delta);
     }
 
     /**

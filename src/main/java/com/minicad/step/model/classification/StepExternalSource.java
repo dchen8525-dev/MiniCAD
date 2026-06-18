@@ -35,6 +35,11 @@ public final class StepExternalSource implements StepEntity {
         return sourceId != null ? sourceId : "";
     }
 
+    // Record-style accessor
+    public String sourceId() {
+        return sourceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

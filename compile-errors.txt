@@ -1,0 +1,1121 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.minicad:mini-cad >------------------------
+[INFO] Building mini-cad 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.5.0:enforce (enforce-build-prerequisites) @ mini-cad ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 2: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ mini-cad ---
+[INFO] Copying 9 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ mini-cad ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1388 source files with javac [debug release 11] to target\classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ mini-cad ---
+[INFO] Copying 0 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ mini-cad ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 71 source files with javac [debug release 11] to target\test-classes
+[INFO] 某些消息已经过简化; 请使用 -Xdiags:verbose 重新编译以获得完整输出
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BoundingBox2Test.java:[55,9] 对于assertEquals(double,com.minicad.geometry2d.Vector2,double), 找不到合适的方法
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.util.function.Supplier<java.lang.String>)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.String)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.lang.String)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.lang.String)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,double)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,float)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.lang.String)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.lang.String)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.lang.String)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.lang.String)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.lang.String)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.lang.String)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.lang.String)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.lang.String)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.lang.String)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.lang.String)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BoundingBox2Test.java:[119,44] 不兼容的类型: int无法转换为com.minicad.geometry2d.Point2
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Geometry2DUtilityTest.java:[159,35] 不兼容的类型: com.minicad.geometry2d.Vector2无法转换为com.minicad.geometry2d.Direction2
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Geometry2DUtilityTest.java:[176,32] 找不到符号
+  符号:   方法 reverse()
+  位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Clothoid3Test.java:[101,36] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+  需要: 没有参数
+  找到: double,double
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[121,46] 找不到符号
+  符号:   方法 inverse()
+  位置: 类型为com.minicad.geometry.Transformation3的变量 translation
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[132,43] 找不到符号
+  符号:   方法 inverse()
+  位置: 类型为com.minicad.geometry.Transformation3的变量 rotation
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[143,54] 找不到符号
+  符号:   方法 at(com.minicad.geometry.CartesianPoint)
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[144,57] 找不到符号
+  符号:   方法 from(com.minicad.geometry.Axis2Placement3D)
+  位置: 类 com.minicad.geometry.Transformation3
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[156,47] 不兼容的类型: com.minicad.geometry.Vector3无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[166,53] 不兼容的类型: com.minicad.geometry.Direction3无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[175,32] 无法将类 com.minicad.geometry.Transformation3中的方法 translation应用到给定类型;
+  需要: double,double,double
+  找到: 没有参数
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Line3Test.java:[44,41] 无法将接口 com.minicad.geometry.Curve3中的方法 length应用到给定类型;
+  需要: 没有参数
+  找到: double,double
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[605,31] 找不到符号
+  符号:   方法 degree()
+  位置: 类型为com.minicad.step.model.geometry.StepBSplineCurve的变量 spline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[778,46] 找不到符号
+  符号:   方法 orientation()
+  位置: 类型为com.minicad.step.model.topology.StepOrientedOpenShell的变量 orientedOpenShell
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[779,48] 找不到符号
+  符号:   方法 orientation()
+  位置: 类型为com.minicad.step.model.topology.StepOrientedClosedShell的变量 orientedClosedShell
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2287,38] 找不到符号
+  符号:   方法 curveWidth()
+  位置: 类型为com.minicad.step.model.annotation.StepCurveStyle的变量 curveStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2370,37] 找不到符号
+  符号:   方法 markerSize()
+  位置: 类型为com.minicad.step.model.annotation.StepPointStyle的变量 pointStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2408,37] 找不到符号
+  符号:   方法 characterSpacing()
+  位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithSpacing的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2426,39] 找不到符号
+  符号:   方法 justification()
+  位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithJustification的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2465,77] 找不到符号
+  符号:   方法 boxCharacteristics()
+  位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithBoxCharacteristics的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[3806,35] 找不到符号
+  符号:   方法 root()
+  位置: 类型为com.minicad.step.model.product.StepChainBasedItemIdentifiedRepresentationUsage的变量 chainUsage
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[4956,34] 找不到符号
+  符号:   方法 conversionOffset()
+  位置: 类型为com.minicad.step.model.unit.StepConversionBasedUnitWithOffset的变量 unit
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[5217,49] 找不到符号
+  符号:   方法 valueType()
+  位置: 类型为com.minicad.step.model.base.StepValueRepresentationItem的变量 item
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[5218,36] 找不到符号
+  符号:   方法 valueText()
+  位置: 类型为com.minicad.step.model.base.StepValueRepresentationItem的变量 item
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8191,40] 找不到符号
+  符号:   方法 identifier()
+  位置: 类型为com.minicad.step.model.product.StepProductRelationship的变量 relationship
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8333,42] 找不到符号
+  符号:   方法 middleNames()
+  位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8334,44] 找不到符号
+  符号:   方法 prefixTitles()
+  位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8335,43] 找不到符号
+  符号:   方法 suffixTitles()
+  位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8337,45] 找不到符号
+  符号:   方法 middleNames()
+  位置: 类型为com.minicad.step.model.organization.StepPerson的变量 sparsePerson
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8511,49] 找不到符号
+  符号:   方法 source()
+  位置: 类型为com.minicad.step.model.document.StepAppliedDocumentReference的变量 appliedDocument
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8513,46] 找不到符号
+  符号:   方法 description()
+  位置: 类型为com.minicad.step.model.resource.StepContractType的变量 contractType
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8518,51] 找不到符号
+  符号:   方法 description()
+  位置: 类型为com.minicad.step.model.approval.StepCertificationType的变量 certificationType
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8656,40] 找不到符号
+  符号:   方法 effectivityId()
+  位置: 类型为com.minicad.step.model.product.StepEffectivity的变量 effectivity
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8821,52] 找不到符号
+  符号:   方法 assignedName()
+  位置: 类型为com.minicad.step.model.classification.StepNameAssignment的变量 nameAssignment
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8826,56] 找不到符号
+  符号:   方法 sourceId()
+  位置: 类型为com.minicad.step.model.classification.StepExternalSource的变量 externalSource
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8838,41] 找不到符号
+  符号:   方法 town()
+  位置: 类型为com.minicad.step.model.organization.StepAddress的变量 address
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8839,48] 找不到符号
+  符号:   方法 electronicMailAddress()
+  位置: 类型为com.minicad.step.model.organization.StepAddress的变量 address
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8848,54] 找不到符号
+  符号:   方法 assignedId()
+  位置: 类型为com.minicad.step.model.classification.StepExternalIdentificationAssignment的变量 externalIdentification
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8946,40] 找不到符号
+  符号:   方法 ofShape()
+  位置: 类型为com.minicad.step.model.classification.StepCompositeShapeAspect的变量 compositeAspect
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BoundingBoxTest.java:[89,44] 不兼容的类型: int无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BoundingBoxTest.java:[334,9] 对于assertEquals(double,com.minicad.geometry.Vector3,double), 找不到合适的方法
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.util.function.Supplier<java.lang.String>)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.String)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Character)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.lang.String)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.lang.String)不适用
+      (参数不匹配; 从double转换到char可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,double)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.lang.String)不适用
+      (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,float)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Float)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.lang.String)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.lang.String)不适用
+      (参数不匹配; 从double转换到float可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Long)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.lang.String)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.lang.String)不适用
+      (参数不匹配; 从double转换到long可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Integer)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.lang.String)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.lang.String)不适用
+      (参数不匹配; 从double转换到int可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Byte)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.lang.String)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.lang.String)不适用
+      (参数不匹配; 从double转换到byte可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.util.function.Supplier<java.lang.String>)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.lang.String)不适用
+      (参数不匹配; double无法转换为java.lang.Short)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.lang.String)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+    方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.lang.String)不适用
+      (参数不匹配; 从double转换到short可能会有损失)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[35,40] 无法将类 com.minicad.geometry2d.Polyline2中的方法 sample应用到给定类型;
+  需要: int
+  找到: 没有参数
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[180,33] 找不到符号
+  符号:   方法 segmentCount()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[191,48] 找不到符号
+  符号:   方法 startPoint()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[192,50] 找不到符号
+  符号:   方法 endPoint()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[203,33] 找不到符号
+  符号:   方法 pointCount()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[237,30] 找不到符号
+  符号:   方法 startPoint()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[237,53] 找不到符号
+  符号:   方法 endPoint()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[239,33] 找不到符号
+  符号:   方法 segmentCount()
+  位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[69,40] 找不到符号
+  符号:   方法 closestPointTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[86,33] 找不到符号
+  符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[90,33] 找不到符号
+  符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[94,33] 找不到符号
+  符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[104,44] 不兼容的类型: java.util.List<com.minicad.geometry.CartesianPoint>无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[115,40] 不兼容的类型: 不存在类型变量E的实例, 以使java.util.List<E>与com.minicad.geometry.CartesianPoint一致
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[186,38] 找不到符号
+  符号:   方法 closestPointTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.ConicalSurface的变量 cone
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[201,31] 找不到符号
+  符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+  位置: 类型为com.minicad.geometry.ConicalSurface的变量 cone
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/app/StepCapabilityReportAppTest.java:[67,30] 找不到符号
+  符号:   方法 parsed()
+  位置: 类型为com.minicad.app.StepCapabilityRegistry.Capability的变量 capability
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[85,63] 对于sampleBranch(int,double,double,boolean), 找不到合适的方法
+    方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int)不适用
+      (实际参数列表和形式参数列表长度不同)
+    方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int,double,double,boolean)不适用
+      (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[89,62] 对于sampleBranch(int,double,double,boolean), 找不到合适的方法
+    方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int)不适用
+      (实际参数列表和形式参数列表长度不同)
+    方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int,double,double,boolean)不适用
+      (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[132,37] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+  需要: 没有参数
+  找到: double,double
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BSplineCurve3Test.java:[131,35] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+  需要: 没有参数
+  找到: int
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[44,31] 找不到符号
+  符号:   方法 rotate(double)
+  位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[52,31] 找不到符号
+  符号:   方法 rotate(double)
+  位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[60,31] 找不到符号
+  符号:   方法 rotate(double)
+  位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[78,46] 无法将类 com.minicad.geometry2d.Line2中的方法 sample应用到给定类型;
+  需要: int
+  找到: int,int,int
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[155,32] 找不到符号
+  符号:   方法 signedDistanceTo(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[159,32] 找不到符号
+  符号:   方法 signedDistanceTo(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[170,32] 找不到符号
+  符号:   方法 project(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[182,30] 找不到符号
+  符号:   方法 parallelThrough(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[184,28] 找不到符号
+  符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 parallel
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[196,35] 找不到符号
+  符号:   方法 perpendicularThrough(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[209,36] 找不到符号
+  符号:   方法 intersect(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[222,36] 找不到符号
+  符号:   方法 intersect(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[233,36] 找不到符号
+  符号:   方法 intersect(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[242,25] 找不到符号
+  符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[245,26] 找不到符号
+  符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[253,25] 找不到符号
+  符号:   方法 isCoincidentWith(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[256,26] 找不到符号
+  符号:   方法 isCoincidentWith(com.minicad.geometry2d.Line2)
+  位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[40,51] 找不到符号
+  符号:   方法 origin()
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[49,54] 找不到符号
+  符号:   方法 at(com.minicad.geometry.CartesianPoint)
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[57,51] 找不到符号
+  符号:   方法 origin()
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[67,54] 找不到符号
+  符号:   方法 at(com.minicad.geometry.CartesianPoint)
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[77,54] 找不到符号
+  符号:   方法 at(com.minicad.geometry.CartesianPoint)
+  位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Ellipse3Test.java:[89,57] 对于sample(int,int,double), 找不到合适的方法
+    方法 com.minicad.geometry.Ellipse3.sample(int)不适用
+      (实际参数列表和形式参数列表长度不同)
+    方法 com.minicad.geometry.Ellipse3.sample(int,double)不适用
+      (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Ellipse3Test.java:[236,35] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+  需要: 没有参数
+  找到: int,double
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[131,35] 无法将接口 com.minicad.geometry2d.Curve2中的方法 boundingBox应用到给定类型;
+  需要: 没有参数
+  找到: int
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[146,40] 找不到符号
+  符号:   方法 expandedKnots()
+  位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[241,32] 找不到符号
+  符号:   方法 controlPointCount()
+  位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[255,32] 找不到符号
+  符号:   方法 knotCount()
+  位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[46,34] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[47,34] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[48,34] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[164,41] 找不到符号
+  符号:   方法 underlyingCurve()
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[191,33] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[192,32] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[193,33] 找不到符号
+  符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+  位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Parabola2Test.java:[72,50] 无法将类 com.minicad.geometry2d.Parabola2中的方法 sample应用到给定类型;
+  需要: int
+  找到: int,double,double
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Parabola2Test.java:[96,30] 找不到符号
+  符号:   方法 normalAt(int)
+  位置: 类型为com.minicad.geometry2d.Parabola2的变量 parabola
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  27.772 s
+[INFO] Finished at: 2026-06-18T19:54:33+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project mini-cad: Compilation failure: Compilation failure: 
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BoundingBox2Test.java:[55,9] 对于assertEquals(double,com.minicad.geometry2d.Vector2,double), 找不到合适的方法
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.util.function.Supplier<java.lang.String>)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.String)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,double)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry2d.Vector2无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,float)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BoundingBox2Test.java:[119,44] 不兼容的类型: int无法转换为com.minicad.geometry2d.Point2
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Geometry2DUtilityTest.java:[159,35] 不兼容的类型: com.minicad.geometry2d.Vector2无法转换为com.minicad.geometry2d.Direction2
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Geometry2DUtilityTest.java:[176,32] 找不到符号
+[ERROR]   符号:   方法 reverse()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Clothoid3Test.java:[101,36] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: double,double
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[121,46] 找不到符号
+[ERROR]   符号:   方法 inverse()
+[ERROR]   位置: 类型为com.minicad.geometry.Transformation3的变量 translation
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[132,43] 找不到符号
+[ERROR]   符号:   方法 inverse()
+[ERROR]   位置: 类型为com.minicad.geometry.Transformation3的变量 rotation
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[143,54] 找不到符号
+[ERROR]   符号:   方法 at(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[144,57] 找不到符号
+[ERROR]   符号:   方法 from(com.minicad.geometry.Axis2Placement3D)
+[ERROR]   位置: 类 com.minicad.geometry.Transformation3
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[156,47] 不兼容的类型: com.minicad.geometry.Vector3无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[166,53] 不兼容的类型: com.minicad.geometry.Direction3无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Transformation3Test.java:[175,32] 无法将类 com.minicad.geometry.Transformation3中的方法 translation应用到给定类型;
+[ERROR]   需要: double,double,double
+[ERROR]   找到: 没有参数
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Line3Test.java:[44,41] 无法将接口 com.minicad.geometry.Curve3中的方法 length应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: double,double
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[605,31] 找不到符号
+[ERROR]   符号:   方法 degree()
+[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepBSplineCurve的变量 spline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[778,46] 找不到符号
+[ERROR]   符号:   方法 orientation()
+[ERROR]   位置: 类型为com.minicad.step.model.topology.StepOrientedOpenShell的变量 orientedOpenShell
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[779,48] 找不到符号
+[ERROR]   符号:   方法 orientation()
+[ERROR]   位置: 类型为com.minicad.step.model.topology.StepOrientedClosedShell的变量 orientedClosedShell
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2287,38] 找不到符号
+[ERROR]   符号:   方法 curveWidth()
+[ERROR]   位置: 类型为com.minicad.step.model.annotation.StepCurveStyle的变量 curveStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2370,37] 找不到符号
+[ERROR]   符号:   方法 markerSize()
+[ERROR]   位置: 类型为com.minicad.step.model.annotation.StepPointStyle的变量 pointStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2408,37] 找不到符号
+[ERROR]   符号:   方法 characterSpacing()
+[ERROR]   位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithSpacing的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2426,39] 找不到符号
+[ERROR]   符号:   方法 justification()
+[ERROR]   位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithJustification的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[2465,77] 找不到符号
+[ERROR]   符号:   方法 boxCharacteristics()
+[ERROR]   位置: 类型为com.minicad.step.model.annotation.StepTextStyleWithBoxCharacteristics的变量 textStyle
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[3806,35] 找不到符号
+[ERROR]   符号:   方法 root()
+[ERROR]   位置: 类型为com.minicad.step.model.product.StepChainBasedItemIdentifiedRepresentationUsage的变量 chainUsage
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[4956,34] 找不到符号
+[ERROR]   符号:   方法 conversionOffset()
+[ERROR]   位置: 类型为com.minicad.step.model.unit.StepConversionBasedUnitWithOffset的变量 unit
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[5217,49] 找不到符号
+[ERROR]   符号:   方法 valueType()
+[ERROR]   位置: 类型为com.minicad.step.model.base.StepValueRepresentationItem的变量 item
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[5218,36] 找不到符号
+[ERROR]   符号:   方法 valueText()
+[ERROR]   位置: 类型为com.minicad.step.model.base.StepValueRepresentationItem的变量 item
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8191,40] 找不到符号
+[ERROR]   符号:   方法 identifier()
+[ERROR]   位置: 类型为com.minicad.step.model.product.StepProductRelationship的变量 relationship
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8333,42] 找不到符号
+[ERROR]   符号:   方法 middleNames()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8334,44] 找不到符号
+[ERROR]   符号:   方法 prefixTitles()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8335,43] 找不到符号
+[ERROR]   符号:   方法 suffixTitles()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepPerson的变量 person
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8337,45] 找不到符号
+[ERROR]   符号:   方法 middleNames()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepPerson的变量 sparsePerson
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8511,49] 找不到符号
+[ERROR]   符号:   方法 source()
+[ERROR]   位置: 类型为com.minicad.step.model.document.StepAppliedDocumentReference的变量 appliedDocument
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8513,46] 找不到符号
+[ERROR]   符号:   方法 description()
+[ERROR]   位置: 类型为com.minicad.step.model.resource.StepContractType的变量 contractType
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8518,51] 找不到符号
+[ERROR]   符号:   方法 description()
+[ERROR]   位置: 类型为com.minicad.step.model.approval.StepCertificationType的变量 certificationType
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8656,40] 找不到符号
+[ERROR]   符号:   方法 effectivityId()
+[ERROR]   位置: 类型为com.minicad.step.model.product.StepEffectivity的变量 effectivity
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8821,52] 找不到符号
+[ERROR]   符号:   方法 assignedName()
+[ERROR]   位置: 类型为com.minicad.step.model.classification.StepNameAssignment的变量 nameAssignment
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8826,56] 找不到符号
+[ERROR]   符号:   方法 sourceId()
+[ERROR]   位置: 类型为com.minicad.step.model.classification.StepExternalSource的变量 externalSource
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8838,41] 找不到符号
+[ERROR]   符号:   方法 town()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepAddress的变量 address
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8839,48] 找不到符号
+[ERROR]   符号:   方法 electronicMailAddress()
+[ERROR]   位置: 类型为com.minicad.step.model.organization.StepAddress的变量 address
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8848,54] 找不到符号
+[ERROR]   符号:   方法 assignedId()
+[ERROR]   位置: 类型为com.minicad.step.model.classification.StepExternalIdentificationAssignment的变量 externalIdentification
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/step/semantic/StepEntityResolverTest.java:[8946,40] 找不到符号
+[ERROR]   符号:   方法 ofShape()
+[ERROR]   位置: 类型为com.minicad.step.model.classification.StepCompositeShapeAspect的变量 compositeAspect
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BoundingBoxTest.java:[89,44] 不兼容的类型: int无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BoundingBoxTest.java:[334,9] 对于assertEquals(double,com.minicad.geometry.Vector3,double), 找不到合适的方法
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.util.function.Supplier<java.lang.String>)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Object,java.lang.Object,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.String)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,java.lang.Character,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Character,char,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Character)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,java.lang.Character,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(char,char,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到char可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,double)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,java.lang.Double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Double,double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,java.lang.Double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为java.lang.Double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(double,double,java.lang.String)不适用
+[ERROR]       (参数不匹配; com.minicad.geometry.Vector3无法转换为double)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,float)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,java.lang.Float,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Float,float,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Float)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,java.lang.Float,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(float,float,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到float可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,java.lang.Long,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Long,long,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Long)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,java.lang.Long,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(long,long,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到long可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,java.lang.Integer,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Integer,int,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Integer)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,java.lang.Integer,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(int,int,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到int可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,java.lang.Byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Byte,byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Byte)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,java.lang.Byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(byte,byte,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到byte可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.util.function.Supplier<java.lang.String>)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,java.lang.Short,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(java.lang.Short,short,java.lang.String)不适用
+[ERROR]       (参数不匹配; double无法转换为java.lang.Short)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,java.lang.Short,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR]     方法 org.junit.jupiter.api.Assertions.assertEquals(short,short,java.lang.String)不适用
+[ERROR]       (参数不匹配; 从double转换到short可能会有损失)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[35,40] 无法将类 com.minicad.geometry2d.Polyline2中的方法 sample应用到给定类型;
+[ERROR]   需要: int
+[ERROR]   找到: 没有参数
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[180,33] 找不到符号
+[ERROR]   符号:   方法 segmentCount()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[191,48] 找不到符号
+[ERROR]   符号:   方法 startPoint()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[192,50] 找不到符号
+[ERROR]   符号:   方法 endPoint()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[203,33] 找不到符号
+[ERROR]   符号:   方法 pointCount()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[237,30] 找不到符号
+[ERROR]   符号:   方法 startPoint()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[237,53] 找不到符号
+[ERROR]   符号:   方法 endPoint()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Polyline2Test.java:[239,33] 找不到符号
+[ERROR]   符号:   方法 segmentCount()
+[ERROR]   位置: 类型为com.minicad.geometry2d.Polyline2的变量 polyline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[69,40] 找不到符号
+[ERROR]   符号:   方法 closestPointTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[86,33] 找不到符号
+[ERROR]   符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[90,33] 找不到符号
+[ERROR]   符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[94,33] 找不到符号
+[ERROR]   符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.SphericalSurface的变量 sphere
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[104,44] 不兼容的类型: java.util.List<com.minicad.geometry.CartesianPoint>无法转换为com.minicad.geometry.CartesianPoint
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[115,40] 不兼容的类型: 不存在类型变量E的实例, 以使java.util.List<E>与com.minicad.geometry.CartesianPoint一致
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[186,38] 找不到符号
+[ERROR]   符号:   方法 closestPointTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.ConicalSurface的变量 cone
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/SurfaceUtilityTest.java:[201,31] 找不到符号
+[ERROR]   符号:   方法 distanceTo(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类型为com.minicad.geometry.ConicalSurface的变量 cone
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/app/StepCapabilityReportAppTest.java:[67,30] 找不到符号
+[ERROR]   符号:   方法 parsed()
+[ERROR]   位置: 类型为com.minicad.app.StepCapabilityRegistry.Capability的变量 capability
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[85,63] 对于sampleBranch(int,double,double,boolean), 找不到合适的方法
+[ERROR]     方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR]     方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int,double,double,boolean)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[89,62] 对于sampleBranch(int,double,double,boolean), 找不到合适的方法
+[ERROR]     方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR]     方法 com.minicad.geometry.Hyperbola3.sampleBranch(int,int,double,double,boolean)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Hyperbola3Test.java:[132,37] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: double,double
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/BSplineCurve3Test.java:[131,35] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: int
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[44,31] 找不到符号
+[ERROR]   符号:   方法 rotate(double)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[52,31] 找不到符号
+[ERROR]   符号:   方法 rotate(double)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Direction2UtilityTest.java:[60,31] 找不到符号
+[ERROR]   符号:   方法 rotate(double)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Direction2的变量 x
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[78,46] 无法将类 com.minicad.geometry2d.Line2中的方法 sample应用到给定类型;
+[ERROR]   需要: int
+[ERROR]   找到: int,int,int
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[155,32] 找不到符号
+[ERROR]   符号:   方法 signedDistanceTo(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[159,32] 找不到符号
+[ERROR]   符号:   方法 signedDistanceTo(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[170,32] 找不到符号
+[ERROR]   符号:   方法 project(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[182,30] 找不到符号
+[ERROR]   符号:   方法 parallelThrough(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[184,28] 找不到符号
+[ERROR]   符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 parallel
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[196,35] 找不到符号
+[ERROR]   符号:   方法 perpendicularThrough(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[209,36] 找不到符号
+[ERROR]   符号:   方法 intersect(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[222,36] 找不到符号
+[ERROR]   符号:   方法 intersect(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[233,36] 找不到符号
+[ERROR]   符号:   方法 intersect(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[242,25] 找不到符号
+[ERROR]   符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[245,26] 找不到符号
+[ERROR]   符号:   方法 isParallelTo(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[253,25] 找不到符号
+[ERROR]   符号:   方法 isCoincidentWith(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Line2Test.java:[256,26] 找不到符号
+[ERROR]   符号:   方法 isCoincidentWith(com.minicad.geometry2d.Line2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Line2的变量 line1
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[40,51] 找不到符号
+[ERROR]   符号:   方法 origin()
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[49,54] 找不到符号
+[ERROR]   符号:   方法 at(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[57,51] 找不到符号
+[ERROR]   符号:   方法 origin()
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[67,54] 找不到符号
+[ERROR]   符号:   方法 at(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Axis2Placement3DTest.java:[77,54] 找不到符号
+[ERROR]   符号:   方法 at(com.minicad.geometry.CartesianPoint)
+[ERROR]   位置: 类 com.minicad.geometry.Axis2Placement3D
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Ellipse3Test.java:[89,57] 对于sample(int,int,double), 找不到合适的方法
+[ERROR]     方法 com.minicad.geometry.Ellipse3.sample(int)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR]     方法 com.minicad.geometry.Ellipse3.sample(int,double)不适用
+[ERROR]       (实际参数列表和形式参数列表长度不同)
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry/Ellipse3Test.java:[236,35] 无法将接口 com.minicad.geometry.Curve3中的方法 boundingBox应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: int,double
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[131,35] 无法将接口 com.minicad.geometry2d.Curve2中的方法 boundingBox应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到: int
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[146,40] 找不到符号
+[ERROR]   符号:   方法 expandedKnots()
+[ERROR]   位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[241,32] 找不到符号
+[ERROR]   符号:   方法 controlPointCount()
+[ERROR]   位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/BSplineCurve2Test.java:[255,32] 找不到符号
+[ERROR]   符号:   方法 knotCount()
+[ERROR]   位置: 类型为com.minicad.geometry2d.BSplineCurve2的变量 bspline
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[46,34] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[47,34] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[48,34] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[164,41] 找不到符号
+[ERROR]   符号:   方法 underlyingCurve()
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 trimmed
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[191,33] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[192,32] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/TrimmedCurve2Test.java:[193,33] 找不到符号
+[ERROR]   符号:   方法 parameterOnUnderlyingCurve(com.minicad.geometry2d.Point2)
+[ERROR]   位置: 类型为com.minicad.geometry2d.TrimmedCurve2的变量 outer
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Parabola2Test.java:[72,50] 无法将类 com.minicad.geometry2d.Parabola2中的方法 sample应用到给定类型;
+[ERROR]   需要: int
+[ERROR]   找到: int,double,double
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /D:/work/MiniCAD/src/test/java/com/minicad/geometry2d/Parabola2Test.java:[96,30] 找不到符号
+[ERROR]   符号:   方法 normalAt(int)
+[ERROR]   位置: 类型为com.minicad.geometry2d.Parabola2的变量 parabola
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

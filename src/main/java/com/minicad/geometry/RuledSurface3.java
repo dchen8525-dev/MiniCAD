@@ -114,6 +114,42 @@ public final class RuledSurface3 implements SurfaceGeometry {
         return java.util.List.copyOf(grid);
     }
 
+    /**
+     * Finds the closest point on this surface to a given point.
+     *
+     * @param point the point to find closest point to
+     * @return closest point on the surface
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        // Sample grid and find closest point
+        java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(32, 32);
+        CartesianPoint closest = grid.get(0).get(0);
+        double minDist = point.distanceTo(closest);
+        for (java.util.List<CartesianPoint> row : grid) {
+            for (CartesianPoint p : row) {
+                double dist = point.distanceTo(p);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = p;
+                }
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Computes the distance from a point to this surface.
+     *
+     * @param point the point to measure distance from
+     * @return distance to the surface
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint closest = closestPointTo(point);
+        return point.distanceTo(closest);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

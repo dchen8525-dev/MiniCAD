@@ -128,7 +128,7 @@ class BSplineCurve3Test {
 
         BSplineCurve3 bspline = new BSplineCurve3(1, controlPoints, multiplicities, knots);
 
-        BoundingBox3 box = bspline.boundingBox(16);
+        BoundingBox3 box = bspline.boundingBox();
         assertNotNull(box);
     }
 

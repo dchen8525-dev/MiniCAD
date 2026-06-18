@@ -44,6 +44,10 @@ public final class StepContractType implements StepEntity {
         return description;
     }
 
+    public String description() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -61,6 +61,58 @@ public final class SphericalSurface implements SurfaceGeometry {
         return origin.add(radial).add(axial);
     }
 
+    /**
+     * Samples the spherical surface on a grid.
+     *
+     * @param uSegments number of segments around the axis
+     * @param vSegments number of segments from pole to pole
+     * @return list of sampled point rows
+     */
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
+        for (int i = 0; i <= uSegments; i++) {
+            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
+            double u = 2 * Math.PI * i / uSegments;
+            for (int j = 0; j <= vSegments; j++) {
+                double v = Math.PI * j / vSegments - Math.PI / 2;
+                row.add(pointAt(u, v));
+            }
+            grid.add(java.util.List.copyOf(row));
+        }
+        return java.util.List.copyOf(grid);
+    }
+
+    /**
+     * Finds the closest point on this surface to a given point.
+     *
+     * @param point the point to find closest point to
+     * @return closest point on the surface
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint center = position.location();
+        Vector3 toPoint = point.subtract(center);
+        double dist = toPoint.norm();
+        if (dist < Epsilon.get()) {
+            return pointAt(0, 0); // Point at center, return any point on sphere
+        }
+        Direction3 radial = Direction3.from(toPoint);
+        return center.add(radial.asVector().scale(radius));
+    }
+
+    /**
+     * Computes the distance from a point to this surface.
+     *
+     * @param point the point to measure distance from
+     * @return distance to the surface
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint center = position.location();
+        double dist = point.distanceTo(center);
+        return Math.abs(dist - radius);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

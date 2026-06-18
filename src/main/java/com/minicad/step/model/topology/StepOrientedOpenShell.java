@@ -68,6 +68,10 @@ public final class StepOrientedOpenShell implements StepEntity {
         return openShellElement;
     }
 
+    public boolean orientation() {
+        return isOrientation();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

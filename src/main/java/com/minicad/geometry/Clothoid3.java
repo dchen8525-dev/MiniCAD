@@ -52,6 +52,10 @@ public final class Clothoid3 implements Curve3 {
     public double xAxisIntercept() { return xAxisIntercept; }
     public double curvature() { return curvature; }
 
+    // Alias methods for convenience
+    public double intercept() { return xAxisIntercept; }
+    public double curvatureRate() { return curvature; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

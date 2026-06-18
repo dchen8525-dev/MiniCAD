@@ -74,6 +74,7 @@ public final class StepBSplineCurve implements StepEntity {
     }
 
     // Record-style accessor
+    public int degree() { return getDegree(); }
     public List<StepCartesianPoint> controlPoints() {
         return controlPoints;
     }

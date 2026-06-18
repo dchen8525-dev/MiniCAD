@@ -71,20 +71,40 @@ public final class MiniCadIssue {
         return severity;
     }
 
+    public Severity getSeverity() {
+        return severity();
+    }
+
     public String code() {
         return code;
+    }
+
+    public String getCode() {
+        return code();
     }
 
     public Integer entityId() {
         return entityId;
     }
 
+    public Integer getEntityId() {
+        return entityId();
+    }
+
     public String entityType() {
         return entityType;
     }
 
+    public String getEntityType() {
+        return entityType();
+    }
+
     public String message() {
         return message;
+    }
+
+    public String getMessage() {
+        return message();
     }
 
     @Override

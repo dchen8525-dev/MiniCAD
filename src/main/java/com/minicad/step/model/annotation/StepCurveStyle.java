@@ -60,6 +60,10 @@ public final class StepCurveStyle implements StepEntity {
         return curveFont;
     }
 
+    public double curveWidth() {
+        return curveWidth;
+    }
+
     public StepEntity colour() {
         return colour;
     }

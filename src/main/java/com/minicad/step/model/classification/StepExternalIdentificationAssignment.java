@@ -52,6 +52,10 @@ public final class StepExternalIdentificationAssignment implements StepEntity {
     }
 
     // Record-style accessors
+    public String assignedId() {
+        return assignedId;
+    }
+
     public StepIdentificationRole role() {
         return role;
     }

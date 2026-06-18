@@ -65,6 +65,10 @@ public final class StepOrientedClosedShell implements StepEntity {
         return closedShellElement;
     }
 
+    public boolean orientation() {
+        return isOrientation();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -40,6 +40,10 @@ public final class StepEffectivity implements StepEntity {
         return effectivityId;
     }
 
+    public String effectivityId() {
+        return effectivityId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

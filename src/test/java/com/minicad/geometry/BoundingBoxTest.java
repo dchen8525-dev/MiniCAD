@@ -331,7 +331,7 @@ class BoundingBoxTest {
     void boundingBox3Diagonal() {
         BoundingBox3 box = BoundingBox3.of(new CartesianPoint(0, 0, 0), new CartesianPoint(3, 4, 12));
         // Diagonal = sqrt(3^2 + 4^2 + 12^2) = sqrt(9 + 16 + 144) = sqrt(169) = 13
-        assertEquals(13.0, box.diagonal(), 1e-10);
+        assertEquals(13.0, box.diagonal().norm(), 1e-10);
     }
 
     @Test

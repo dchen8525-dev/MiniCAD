@@ -60,6 +60,10 @@ public final class StepPointStyle implements StepEntity {
         return marker;
     }
 
+    public double markerSize() {
+        return markerSize;
+    }
+
     public StepEntity colour() {
         return colour;
     }

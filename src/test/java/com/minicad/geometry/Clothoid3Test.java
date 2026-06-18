@@ -98,7 +98,7 @@ class Clothoid3Test {
         );
         Clothoid3 clothoid = new Clothoid3(position, 1.0, 1.0);
 
-        BoundingBox3 box = clothoid.boundingBox(0.0, 0.5);
+        BoundingBox3 box = clothoid.boundingBox();
         // Just verify the box is valid
         assertTrue(box.maxX() >= box.minX());
     }

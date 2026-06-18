@@ -209,6 +209,48 @@ public final class Vector2 {
         return new Vector2(x - other.x, y - other.y);
     }
 
+    /**
+     * Projects this vector onto another vector.
+     *
+     * @param other the target vector to project onto
+     * @return projection of this vector onto other
+     */
+    public Vector2 projectOnto(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double otherNormSq = other.normSquared();
+        if (otherNormSq < Epsilon.get()) {
+            return new Vector2(0, 0);
+        }
+        double scale = dot(other) / otherNormSq;
+        return other.scale(scale);
+    }
+
+    /**
+     * Reflects this vector about a normal direction.
+     *
+     * @param normal the normal direction to reflect about
+     * @return reflected vector
+     */
+    public Vector2 reflect(Vector2 normal) {
+        Preconditions.requireNonNull(normal, "normal");
+        // Reflection formula: v' = v - 2 * (v.dot(n)) * n
+        double dotN = dot(normal);
+        return subtract(normal.scale(2 * dotN));
+    }
+
+    /**
+     * Rotates this vector by an angle (counter-clockwise).
+     *
+     * @param angle rotation angle in radians
+     * @return rotated vector
+     */
+    public Vector2 rotate(double angle) {
+        Preconditions.requireFinite(angle, "angle");
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new Vector2(x * cos - y * sin, x * sin + y * cos);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

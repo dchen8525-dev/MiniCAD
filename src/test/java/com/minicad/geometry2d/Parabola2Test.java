@@ -127,7 +127,7 @@ class Parabola2Test {
         Direction2 axisDir = new Direction2(0, 1);
         Parabola2 parabola = new Parabola2(vertex, axisDir, 2.0);
 
-        BoundingBox2 box = parabola.boundingBox(0.0, 1.0);
+        BoundingBox2 box = parabola.boundingBox();
         assertEquals(-4.0, box.minX(), 1e-10);
         assertEquals(0.0, box.maxX(), 1e-10);
     }

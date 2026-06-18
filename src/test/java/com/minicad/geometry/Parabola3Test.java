@@ -129,7 +129,7 @@ class Parabola3Test {
         );
         Parabola3 parabola = new Parabola3(position, 2.0);
 
-        BoundingBox3 box = parabola.boundingBox(0.0, 1.0);
+        BoundingBox3 box = parabola.boundingBox();
         assertEquals(0.0, box.minX(), 1e-10);
         assertEquals(4.0, box.maxX(), 1e-10);
     }

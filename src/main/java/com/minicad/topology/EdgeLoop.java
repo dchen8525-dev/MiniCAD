@@ -33,6 +33,15 @@ public final class EdgeLoop implements Loop {
     public List<OrientedEdge> edges() { return getEdges(); }
 
     /**
+     * Returns the number of edges in this loop.
+     *
+     * @return edge count
+     */
+    public int edgeCount() {
+        return edges == null ? 0 : edges.size();
+    }
+
+    /**
      * Returns the vertices of this loop in traversal order.
      *
      * @return list of vertices

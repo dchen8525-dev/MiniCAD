@@ -102,6 +102,21 @@ public final class Direction2 {
     }
 
     /**
+     * Returns the signed angle from this direction to another direction.
+     * Positive angle means counter-clockwise rotation.
+     *
+     * @param other other direction
+     * @return signed angle in radians
+     */
+    public double signedAngleTo(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        // Use atan2(cross, dot) to get signed angle
+        double crossVal = x * other.y - y * other.x;
+        double dotVal = x * other.x + y * other.y;
+        return Math.atan2(crossVal, dotVal);
+    }
+
+    /**
      * Returns the angle between this direction and a vector.
      *
      * @param other other vector
@@ -157,6 +172,28 @@ public final class Direction2 {
      */
     public Direction2 negate() {
         return new Direction2(-x, -y);
+    }
+
+    /**
+     * Returns the reversed direction (same as negate).
+     *
+     * @return reversed direction
+     */
+    public Direction2 reverse() {
+        return negate();
+    }
+
+    /**
+     * Rotates this direction by an angle (counter-clockwise).
+     *
+     * @param angle rotation angle in radians
+     * @return rotated direction
+     */
+    public Direction2 rotate(double angle) {
+        Preconditions.requireFinite(angle, "angle");
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+        return new Direction2(x * cos - y * sin, x * sin + y * cos);
     }
 
     /**

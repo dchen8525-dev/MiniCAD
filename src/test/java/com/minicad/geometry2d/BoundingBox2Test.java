@@ -52,7 +52,7 @@ class BoundingBox2Test {
     @Test
     void boundingBoxDiagonal() {
         BoundingBox2 box = new BoundingBox2(0, 0, 3, 4);
-        assertEquals(5.0, box.diagonal(), 0.001);
+        assertEquals(5.0, box.diagonal().norm(), 0.001);
     }
 
     @Test

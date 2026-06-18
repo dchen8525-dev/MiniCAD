@@ -92,6 +92,18 @@ public final class Line3 implements Curve3 {
     }
 
     /**
+     * Returns the parameter value corresponding to the closest point on this line.
+     *
+     * @param point the point to find parameter for
+     * @return parameter value t where pointAt(t) is closest to the given point
+     */
+    public double parameterOfClosestPoint(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        Vector3 toPoint = point.subtract(origin);
+        return toPoint.dot(direction.asVector()) / parameterScale;
+    }
+
+    /**
      * Returns the start parameter for a bounded segment.
      * Default is 0 for an unbounded line.
      *
@@ -109,6 +121,19 @@ public final class Line3 implements Curve3 {
      */
     public double endParameter() {
         return Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Returns the length of a line segment between two parameter values.
+     *
+     * @param t0 start parameter
+     * @param t1 end parameter
+     * @return length of segment
+     */
+    public double length(double t0, double t1) {
+        Preconditions.requireFinite(t0, "t0");
+        Preconditions.requireFinite(t1, "t1");
+        return Math.abs(t1 - t0) * parameterScale;
     }
 
     @Override

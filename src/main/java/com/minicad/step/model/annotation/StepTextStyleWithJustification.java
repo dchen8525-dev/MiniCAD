@@ -52,6 +52,10 @@ public final class StepTextStyleWithJustification implements StepEntity {
         return characterAppearance;
     }
 
+    public String justification() {
+        return justification;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -31,6 +31,39 @@ public final class CompositeCurve2 implements Curve2 {
     // Record-style accessors
     public List<Curve2> segments() { return getSegments(); }
 
+    /**
+     * Returns the number of segments in this composite curve.
+     *
+     * @return segment count
+     */
+    public int segmentCount() {
+        return segments == null ? 0 : segments.size();
+    }
+
+    /**
+     * Returns the parameter value corresponding to a point on this curve.
+     *
+     * @param point the point to find parameter for
+     * @return parameter value (approximate)
+     */
+    public double parameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        if (segments == null || segments.isEmpty()) {
+            return 0.0;
+        }
+        // Find which segment contains the point and return parameter
+        double accumulatedLength = 0.0;
+        for (int i = 0; i < segments.size(); i++) {
+            Curve2 seg = segments.get(i);
+            // Approximate: assume uniform parameter distribution
+            accumulatedLength += 1.0 / segments.size();
+            if (seg.contains(point)) {
+                return accumulatedLength;
+            }
+        }
+        return 1.0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

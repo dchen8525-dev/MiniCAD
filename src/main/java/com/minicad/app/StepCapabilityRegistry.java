@@ -134,9 +134,37 @@ public static final class Capability {
     }
 
     // Record-style accessors
-    public String entity() { return entity; }
-    public String level() { return level; }
-    public String limitations() { return limitations; }
+    public String entity() {
+        return entity;
+    }
+
+    public String level() {
+        return level;
+    }
+
+    public boolean parsed() {
+        return parsed;
+    }
+
+    public boolean resolved() {
+        return resolved;
+    }
+
+    public boolean built() {
+        return built;
+    }
+
+    public boolean exported() {
+        return exported;
+    }
+
+    public boolean tested() {
+        return tested;
+    }
+
+    public String limitations() {
+        return limitations;
+    }
 
     @Override
     public boolean equals(Object o) {

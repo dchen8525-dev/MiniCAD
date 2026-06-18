@@ -82,11 +82,11 @@ class Hyperbola3Test {
         );
         Hyperbola3 hyperbola = new Hyperbola3(position, 4.0, 2.0);
 
-        java.util.List<CartesianPoint> rightBranch = hyperbola.sampleBranch(4, 1.0, 2.0, true);
+        java.util.List<CartesianPoint> rightBranch = hyperbola.sampleBranch(1, 4, 1.0, 2.0, true);
         assertEquals(5, rightBranch.size());
         assertTrue(rightBranch.get(0).x() > 0);
 
-        java.util.List<CartesianPoint> leftBranch = hyperbola.sampleBranch(4, 1.0, 2.0, false);
+        java.util.List<CartesianPoint> leftBranch = hyperbola.sampleBranch(-1, 4, 1.0, 2.0, false);
         assertEquals(5, leftBranch.size());
         assertTrue(leftBranch.get(0).x() < 0);
     }
@@ -129,7 +129,7 @@ class Hyperbola3Test {
         );
         Hyperbola3 hyperbola = new Hyperbola3(position, 4.0, 2.0);
 
-        BoundingBox3 box = hyperbola.boundingBox(1.0, 1.5);
+        BoundingBox3 box = hyperbola.boundingBox();
         assertTrue(box.maxX() <= 6.1);
     }
 

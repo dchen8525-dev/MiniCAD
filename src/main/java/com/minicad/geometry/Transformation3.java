@@ -283,4 +283,102 @@ public final class Transformation3 {
         double newZ = m20 * x + m21 * y + m22 * z + m23;
         return new CartesianPoint(newX, newY, newZ);
     }
+
+    /**
+     * Transforms a Vector3 using this transformation matrix.
+     * Vector transformation does not include translation component.
+     *
+     * @param vector the vector to transform
+     * @return transformed vector
+     */
+    public Vector3 transform(Vector3 vector) {
+        Preconditions.requireNonNull(vector, "vector");
+        double x = vector.x();
+        double y = vector.y();
+        double z = vector.z();
+        double newX = m00 * x + m01 * y + m02 * z;
+        double newY = m10 * x + m11 * y + m12 * z;
+        double newZ = m20 * x + m21 * y + m22 * z;
+        return new Vector3(newX, newY, newZ);
+    }
+
+    /**
+     * Transforms a Direction3 using this transformation matrix.
+     * Direction transformation does not include translation component.
+     *
+     * @param direction the direction to transform
+     * @return transformed direction
+     */
+    public Direction3 transform(Direction3 direction) {
+        Preconditions.requireNonNull(direction, "direction");
+        double x = direction.x();
+        double y = direction.y();
+        double z = direction.z();
+        double newX = m00 * x + m01 * y + m02 * z;
+        double newY = m10 * x + m11 * y + m12 * z;
+        double newZ = m20 * x + m21 * y + m22 * z;
+        return new Direction3(newX, newY, newZ);
+    }
+
+    /**
+     * Returns the inverse transformation.
+     *
+     * @return inverse transformation
+     */
+    public Transformation3 inverse() {
+        // For a 4x4 transformation matrix, compute the inverse
+        // Assuming this is a rigid transformation (rotation + translation)
+        // Inverse rotation is transpose, inverse translation is -translation
+        return new Transformation3(
+            m00, m10, m20, -(m00 * m03 + m10 * m13 + m20 * m23),
+            m01, m11, m21, -(m01 * m03 + m11 * m13 + m21 * m23),
+            m02, m12, m22, -(m02 * m03 + m12 * m13 + m22 * m23),
+            m30, m31, m32, m33
+        );
+    }
+
+    /**
+     * Creates a transformation from an Axis2Placement3D.
+     *
+     * @param placement the axis placement
+     * @return transformation representing the placement
+     */
+    public static Transformation3 from(Axis2Placement3D placement) {
+        Preconditions.requireNonNull(placement, "placement");
+        Vector3 xDir = placement.xDirection().asVector();
+        Vector3 yDir = placement.yDirection().asVector();
+        Vector3 zDir = placement.axis().asVector();
+        CartesianPoint origin = placement.location();
+        return new Transformation3(
+            xDir.x(), yDir.x(), zDir.x(), origin.x(),
+            xDir.y(), yDir.y(), zDir.y(), origin.y(),
+            xDir.z(), yDir.z(), zDir.z(), origin.z(),
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Returns the translation vector component of this transformation.
+     *
+     * @return translation vector
+     */
+    public Vector3 translation() {
+        return new Vector3(m03, m13, m23);
+    }
+
+    /**
+     * Returns a new transformation with the given point as the translation component.
+     *
+     * @param point the new translation point
+     * @return transformation with updated translation
+     */
+    public Transformation3 at(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return new Transformation3(
+            m00, m01, m02, point.x(),
+            m10, m11, m12, point.y(),
+            m20, m21, m22, point.z(),
+            m30, m31, m32, m33
+        );
+    }
 }

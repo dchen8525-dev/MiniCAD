@@ -156,7 +156,7 @@ class Geometry2DUtilityTest {
     @Test
     void vector2Normalize() {
         Vector2 v = new Vector2(3, 4);
-        Direction2 d = v.normalize();
+        Direction2 d = Direction2.from(v.normalize());
         assertEquals(0.6, d.x(), 1e-10);  // 3/5
         assertEquals(0.8, d.y(), 1e-10);  // 4/5
     }

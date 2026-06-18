@@ -120,6 +120,107 @@ public final class Ellipse3 implements Curve3 {
     }
 
     /**
+     * Samples a portion of the ellipse.
+     *
+     * @param segments number of segments
+     * @param arcFraction fraction of the ellipse to sample (0 to 1)
+     * @return sampled points
+     */
+    public java.util.List<CartesianPoint> sample(int segments, double arcFraction) {
+        Preconditions.requireFinite(arcFraction, "arcFraction");
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double angle = 2 * Math.PI * arcFraction * i / segments;
+            points.add(pointAt(angle));
+        }
+        return java.util.List.copyOf(points);
+    }
+
+    /**
+     * Samples a portion of the ellipse between two angle values.
+     *
+     * @param segments number of segments
+     * @param angleStart start angle (in radians)
+     * @param angleEnd end angle (in radians)
+     * @return sampled points
+     */
+    public java.util.List<CartesianPoint> sample(int segments, double angleStart, double angleEnd) {
+        Preconditions.requireFinite(angleStart, "angleStart");
+        Preconditions.requireFinite(angleEnd, "angleEnd");
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            double angle = angleStart + (angleEnd - angleStart) * i / segments;
+            points.add(pointAt(angle));
+        }
+        return java.util.List.copyOf(points);
+    }
+
+    /**
+     * Returns the normal vector in the plane at a parametric angle.
+     *
+     * @param t parametric angle in radians
+     * @return normal vector in the ellipse plane (perpendicular to tangent)
+     */
+    public Vector3 normalInPlaneAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        // Tangent direction in local coordinates
+        double sinT = Math.sin(t);
+        double cosT = Math.cos(t);
+        double tx = -semiAxis1 * sinT;
+        double ty = semiAxis2 * cosT;
+        // Normal in plane is perpendicular to tangent (rotate 90 degrees)
+        double nx = -ty;
+        double ny = tx;
+        // Transform to world coordinates
+        Vector3 normalLocal = new Vector3(nx, ny, 0).normalize();
+        return position.transformDirectionToWorld(Direction3.from(normalLocal)).asVector();
+    }
+
+    /**
+     * Returns the curvature at a parametric angle.
+     *
+     * @param t parametric angle in radians
+     * @return curvature
+     */
+    public double curvatureAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        // Ellipse curvature formula: (ab) / ((a sin(t))^2 + (b cos(t))^2)^(3/2)
+        double sinT = Math.sin(t);
+        double cosT = Math.cos(t);
+        double numerator = semiAxis1 * semiAxis2;
+        double denominator = Math.pow(
+            Math.pow(semiAxis1 * sinT, 2) + Math.pow(semiAxis2 * cosT, 2),
+            1.5
+        );
+        return numerator / denominator;
+    }
+
+    /**
+     * Returns the binormal vector at a parametric angle.
+     * For an ellipse in a plane, this is the plane normal.
+     *
+     * @param t parametric angle in radians
+     * @return binormal vector (plane normal)
+     */
+    public Vector3 binormalAt(double t) {
+        Preconditions.requireFinite(t, "t");
+        return position.axis().asVector();
+    }
+
+    /**
+     * Returns the perimeter (circumference) of the ellipse.
+     * Uses Ramanujan's approximation.
+     *
+     * @return approximate perimeter
+     */
+    public double perimeter() {
+        double a = semiAxis1;
+        double b = semiAxis2;
+        // Ramanujan's approximation: PI * (3(a+b) - sqrt((3a+b)(a+3b)))
+        return Math.PI * (3.0 * (a + b) - Math.sqrt((3.0 * a + b) * (a + 3.0 * b)));
+    }
+
+    /**
      * Returns the parametric angle corresponding to a point on the ellipse.
      *
      * @param point a point on or near the ellipse

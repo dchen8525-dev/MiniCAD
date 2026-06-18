@@ -47,6 +47,15 @@ public final class StepValueRepresentationItem implements StepEntity {
         return valueText;
     }
 
+    // Record-style accessors
+    public String valueType() {
+        return valueType;
+    }
+
+    public String valueText() {
+        return valueText;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -123,6 +123,10 @@ public final class StepAddress implements StepEntity {
         return telexNumber;
     }
 
+    // Record-style accessors
+    public String town() { return getTown(); }
+    public String electronicMailAddress() { return getElectronicMailAddress(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

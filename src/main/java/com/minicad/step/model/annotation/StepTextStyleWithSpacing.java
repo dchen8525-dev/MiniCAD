@@ -52,6 +52,10 @@ public final class StepTextStyleWithSpacing implements StepEntity {
         return characterAppearance;
     }
 
+    public double characterSpacing() {
+        return characterSpacing;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
