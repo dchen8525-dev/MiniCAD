@@ -174,6 +174,9 @@ public final class BoundingBox3 {
      */
     public BoundingBox3 expand(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
+        if (isEmpty()) {
+            return BoundingBox3.of(point);
+        }
         return new BoundingBox3(
             Math.min(minX, point.x()),
             Math.min(minY, point.y()),
