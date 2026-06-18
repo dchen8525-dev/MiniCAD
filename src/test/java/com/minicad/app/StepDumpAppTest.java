@@ -457,7 +457,8 @@ class StepDumpAppTest {
         + "#93=POLYLINE('PL0',(#1,#2,#3));\n"
         + "#95=GEOMETRIC_CURVE_SET('GCS',(#32,#93,#1));\n"
         + "#94=OPEN_SHELL('OS0',(#80));\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        );
 
         assertDumpContains(file,
                 "CONNECTED_EDGE_SET #85: builtEdges=2, unsupportedFaces=0",
@@ -1154,7 +1155,8 @@ class StepDumpAppTest {
         + "#41=DRAUGHTING_CALLOUT('CALLOUT_B',(#30,#39));\n"
         + "#42=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#40,#41);\n"
         + "#43=ANNOTATION_OCCURRENCE_RELATIONSHIP('AOR','link',#22,#37);\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        );
 
         assertDumpContains(file,
                 "ANNOTATION_CURVE_OCCURRENCE #23: builtItems=1, unsupportedFaces=0",
@@ -1998,7 +2000,8 @@ class StepDumpAppTest {
         + "#102=DRAUGHTING_CALLOUT('CFSS_CALLOUT',(#92,#89));\n"
         + "#103=DRAUGHTING_CALLOUT('FBSM_CALLOUT',(#92,#90));\n"
         + "#104=DRAUGHTING_CALLOUT('SBSM_CALLOUT',(#92,#91));\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        );
 
         assertDumpContains(file,
                 "ADVANCED_FACE #80: builtItems=1, unsupportedFaces=0",
@@ -6867,7 +6870,8 @@ class StepDumpAppTest {
         + "#60=FACE_OUTER_BOUND('BS-B0',#59,.T.);\n"
         + "#61=ADVANCED_FACE('BS-F0',(#60),#55,.T.);\n"
         + "#90=OPEN_SHELL('OS',(#17,#27,#39,#49,#61));\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        );
 
         assertDumpContains(file,
                 "OFFSET_SURFACE #11:",
@@ -8185,62 +8189,60 @@ class StepDumpAppTest {
     }
 
     private static final class DumpRunResult {
-    private final int exitCode;
-    private final String stdout;
-    private final String stderr;
+        private final int exitCode;
+        private final String stdout;
+        private final String stderr;
 
-    public DumpRunResult(int exitCode, String stdout, String stderr) {
-        this.exitCode = exitCode;
-        this.stdout = stdout;
-        this.stderr = stderr;
-    }
+        public DumpRunResult(int exitCode, String stdout, String stderr) {
+            this.exitCode = exitCode;
+            this.stdout = stdout;
+            this.stderr = stderr;
+        }
 
-    public int getExitCode() { return exitCode; }
-    public String getStdout() { return stdout; }
-    public String getStderr() { return stderr; }
+        public int getExitCode() { return exitCode; }
+        public String getStdout() { return stdout; }
+        public String getStderr() { return stderr; }
 
-    @Override public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DumpRunResult)) return false;
-        DumpRunResult that = (DumpRunResult) o;
-        return exitCode == that.exitCode
-            && java.util.Objects.equals(stdout, that.stdout)
-            && java.util.Objects.equals(stderr, that.stderr);
-    }
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof DumpRunResult)) return false;
+            DumpRunResult that = (DumpRunResult) o;
+            return exitCode == that.exitCode
+                && java.util.Objects.equals(stdout, that.stdout)
+                && java.util.Objects.equals(stderr, that.stderr);
+        }
 
-    @Override public int hashCode() { return java.util.Objects.hash(exitCode, stdout, stderr); }
+        @Override public int hashCode() { return java.util.Objects.hash(exitCode, stdout, stderr); }
 
-    @Override public String toString() { return "DumpRunResult{" + "exitCode=" + exitCode + ", stdout=" + stdout + ", stderr=" + stderr + "}"; }
-}
+        @Override public String toString() { return "DumpRunResult{" + "exitCode=" + exitCode + ", stdout=" + stdout + ", stderr=" + stderr + "}"; }
     }
 
     private static final class ProcessResult {
-    private final int exitCode;
-    private final String stdout;
-    private final String stderr;
+        private final int exitCode;
+        private final String stdout;
+        private final String stderr;
 
-    public ProcessResult(int exitCode, String stdout, String stderr) {
-        this.exitCode = exitCode;
-        this.stdout = stdout;
-        this.stderr = stderr;
-    }
+        public ProcessResult(int exitCode, String stdout, String stderr) {
+            this.exitCode = exitCode;
+            this.stdout = stdout;
+            this.stderr = stderr;
+        }
 
-    public int getExitCode() { return exitCode; }
-    public String getStdout() { return stdout; }
-    public String getStderr() { return stderr; }
+        public int getExitCode() { return exitCode; }
+        public String getStdout() { return stdout; }
+        public String getStderr() { return stderr; }
 
-    @Override public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProcessResult)) return false;
-        ProcessResult that = (ProcessResult) o;
-        return exitCode == that.exitCode
-            && java.util.Objects.equals(stdout, that.stdout)
-            && java.util.Objects.equals(stderr, that.stderr);
-    }
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ProcessResult)) return false;
+            ProcessResult that = (ProcessResult) o;
+            return exitCode == that.exitCode
+                && java.util.Objects.equals(stdout, that.stdout)
+                && java.util.Objects.equals(stderr, that.stderr);
+        }
 
-    @Override public int hashCode() { return java.util.Objects.hash(exitCode, stdout, stderr); }
+        @Override public int hashCode() { return java.util.Objects.hash(exitCode, stdout, stderr); }
 
-    @Override public String toString() { return "ProcessResult{" + "exitCode=" + exitCode + ", stdout=" + stdout + ", stderr=" + stderr + "}"; }
-}
+        @Override public String toString() { return "ProcessResult{" + "exitCode=" + exitCode + ", stdout=" + stdout + ", stderr=" + stderr + "}"; }
     }
 }

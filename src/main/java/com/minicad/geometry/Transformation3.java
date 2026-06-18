@@ -48,6 +48,143 @@ public final class Transformation3 {
         this.m33 = m33;
     }
 
+    /**
+     * Returns an identity transformation (no transformation applied).
+     *
+     * @return identity transformation
+     */
+    public static Transformation3 identity() {
+        return new Transformation3(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Creates a translation transformation.
+     *
+     * @param tx translation along X axis
+     * @param ty translation along Y axis
+     * @param tz translation along Z axis
+     * @return translation transformation
+     */
+    public static Transformation3 translation(double tx, double ty, double tz) {
+        return new Transformation3(
+            1, 0, 0, tx,
+            0, 1, 0, ty,
+            0, 0, 1, tz,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Creates a uniform scale transformation.
+     *
+     * @param s scale factor for all axes
+     * @return scale transformation
+     */
+    public static Transformation3 scale(double s) {
+        return scale(s, s, s);
+    }
+
+    /**
+     * Creates a non-uniform scale transformation.
+     *
+     * @param sx scale factor for X axis
+     * @param sy scale factor for Y axis
+     * @param sz scale factor for Z axis
+     * @return scale transformation
+     */
+    public static Transformation3 scale(double sx, double sy, double sz) {
+        return new Transformation3(
+            sx, 0, 0, 0,
+            0, sy, 0, 0,
+            0, 0, sz, 0,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Creates a rotation around the X axis.
+     *
+     * @param angle rotation angle in radians
+     * @return rotation transformation
+     */
+    public static Transformation3 rotationX(double angle) {
+        double c = Math.cos(angle);
+        double s = Math.sin(angle);
+        return new Transformation3(
+            1, 0, 0, 0,
+            0, c, -s, 0,
+            0, s, c, 0,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Creates a rotation around the Y axis.
+     *
+     * @param angle rotation angle in radians
+     * @return rotation transformation
+     */
+    public static Transformation3 rotationY(double angle) {
+        double c = Math.cos(angle);
+        double s = Math.sin(angle);
+        return new Transformation3(
+            c, 0, s, 0,
+            0, 1, 0, 0,
+            -s, 0, c, 0,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Creates a rotation around the Z axis.
+     *
+     * @param angle rotation angle in radians
+     * @return rotation transformation
+     */
+    public static Transformation3 rotationZ(double angle) {
+        double c = Math.cos(angle);
+        double s = Math.sin(angle);
+        return new Transformation3(
+            c, -s, 0, 0,
+            s, c, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
+    }
+
+    /**
+     * Composes (multiplies) this transformation with another.
+     *
+     * @param other other transformation
+     * @return composed transformation
+     */
+    public Transformation3 compose(Transformation3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new Transformation3(
+            m00 * other.m00 + m01 * other.m10 + m02 * other.m20 + m03 * other.m30,
+            m00 * other.m01 + m01 * other.m11 + m02 * other.m21 + m03 * other.m31,
+            m00 * other.m02 + m01 * other.m12 + m02 * other.m22 + m03 * other.m32,
+            m00 * other.m03 + m01 * other.m13 + m02 * other.m23 + m03 * other.m33,
+            m10 * other.m00 + m11 * other.m10 + m12 * other.m20 + m13 * other.m30,
+            m10 * other.m01 + m11 * other.m11 + m12 * other.m21 + m13 * other.m31,
+            m10 * other.m02 + m11 * other.m12 + m12 * other.m22 + m13 * other.m32,
+            m10 * other.m03 + m11 * other.m13 + m12 * other.m23 + m13 * other.m33,
+            m20 * other.m00 + m21 * other.m10 + m22 * other.m20 + m23 * other.m30,
+            m20 * other.m01 + m21 * other.m11 + m22 * other.m21 + m23 * other.m31,
+            m20 * other.m02 + m21 * other.m12 + m22 * other.m22 + m23 * other.m32,
+            m20 * other.m03 + m21 * other.m13 + m22 * other.m23 + m23 * other.m33,
+            m30 * other.m00 + m31 * other.m10 + m32 * other.m20 + m33 * other.m30,
+            m30 * other.m01 + m31 * other.m11 + m32 * other.m21 + m33 * other.m31,
+            m30 * other.m02 + m31 * other.m12 + m32 * other.m22 + m33 * other.m32,
+            m30 * other.m03 + m31 * other.m13 + m32 * other.m23 + m33 * other.m33
+        );
+    }
+
     public double getM00() {
         return m00;
     }

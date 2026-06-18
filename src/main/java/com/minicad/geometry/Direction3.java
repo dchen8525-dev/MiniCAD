@@ -179,6 +179,60 @@ public final class Direction3 {
         return x * vector.x() + y * vector.y() + z * vector.z();
     }
 
+    /**
+     * Returns the angle between this direction and another in radians.
+     *
+     * @param other other direction
+     * @return angle in radians (0 to PI)
+     */
+    public double angleBetween(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        double dotVal = dot(other);
+        // Clamp to [-1, 1] to avoid NaN from acos
+        dotVal = Math.max(-1.0, Math.min(1.0, dotVal));
+        return Math.acos(dotVal);
+    }
+
+    /**
+     * Rotates this direction around an axis by a given angle.
+     *
+     * @param axis rotation axis direction
+     * @param angle rotation angle in radians
+     * @return rotated direction
+     */
+    public Direction3 rotateAround(Direction3 axis, double angle) {
+        Preconditions.requireNonNull(axis, "axis");
+        // Rodrigues' rotation formula
+        double cosA = Math.cos(angle);
+        double sinA = Math.sin(angle);
+        Direction3 k = axis.normalize();
+        // v_rot = v*cos(angle) + (k x v)*sin(angle) + k*(k.v)*(1-cos(angle))
+        Direction3 cross = k.cross(this);
+        double dotKV = k.dot(this);
+        return new Direction3(
+            x * cosA + cross.x * sinA + k.x * dotKV * (1 - cosA),
+            y * cosA + cross.y * sinA + k.y * dotKV * (1 - cosA),
+            z * cosA + cross.z * sinA + k.z * dotKV * (1 - cosA)
+        ).normalize();
+    }
+
+    /**
+     * Returns the signed angle between this direction and another, measured around a reference axis.
+     *
+     * @param other other direction
+     * @param referenceAxis axis defining the sign (positive = counterclockwise around axis)
+     * @return signed angle in radians (-PI to PI)
+     */
+    public double signedAngleBetween(Direction3 other, Direction3 referenceAxis) {
+        Preconditions.requireNonNull(other, "other");
+        Preconditions.requireNonNull(referenceAxis, "referenceAxis");
+        double unsignedAngle = angleBetween(other);
+        Direction3 cross = this.cross(other);
+        // If cross product points in same direction as reference axis, angle is positive
+        double sign = cross.dot(referenceAxis) >= 0 ? 1.0 : -1.0;
+        return sign * unsignedAngle;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

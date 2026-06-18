@@ -362,14 +362,14 @@ class StepViewerAppSecurityTest {
 
     public Server getServer() { return server; }
     public int getPort() { return port; }
-}
-        URI uri(String path) {
-            return URI.create("http://127.0.0.1:" + port + path);
-        }
 
-        @Override
-        public void close() throws Exception {
-            server.stop();
-        }
+    URI uri(String path) {
+        return URI.create("http://127.0.0.1:" + port + path);
     }
+
+    @Override
+    public void close() throws Exception {
+        server.stop();
+    }
+}
 }

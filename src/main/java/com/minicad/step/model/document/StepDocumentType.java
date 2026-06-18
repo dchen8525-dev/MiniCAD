@@ -40,6 +40,10 @@ public final class StepDocumentType implements StepEntity {
         return productDataType;
     }
 
+    public String productDataType() {
+        return productDataType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

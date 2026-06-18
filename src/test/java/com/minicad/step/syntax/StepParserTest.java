@@ -322,13 +322,12 @@ class StepParserTest {
         ));
         assertEquals("missing DATA section", noData.getMessage());
 
-        String valid = 
+        String valid =
         "ISO-10303-21;\n"
         + "DATA;\n"
         + "#1=EXAMPLE('SOMEENDSEC; text');\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        ));
+        + "END-ISO-10303-21;\n";
 
         StepFile file = StepParser.parse(valid);
 
@@ -352,7 +351,8 @@ class StepParserTest {
     void shouldRejectMissingDataEndsec() {
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
         "DATA;\n"
-        + "#1=EXAMPLE();"
+        + "#1=EXAMPLE();\n"
+        ));
 
         assertEquals("missing ENDSEC for DATA section", exception.getMessage());
     }
@@ -398,11 +398,10 @@ class StepParserTest {
 
     @Test
     void shouldRejectIllegalStepSyntax() {
-        String step = 
+        String step =
         "DATA;\n"
-        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0];\n"
-        + "ENDSEC;"
-        ));
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0)];\n"
+        + "ENDSEC;\n";
 
         StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(step));
 
@@ -411,11 +410,10 @@ class StepParserTest {
 
     @Test
     void shouldParseComplexEntityInstance() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;\n";
 
         StepEntityInstance instance = StepParser.parse(step).entities().get(0);
 
@@ -466,11 +464,10 @@ class StepParserTest {
 
     @Test
     void shouldCacheNormalizedDefinitionNamesForCaseInsensitiveQueries() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(geometric_representation_context(3) representation_context('ID','MODEL'));\n"
-        + "ENDSEC;"
-        ));
+        + "ENDSEC;\n";
 
         StepEntityInstance instance = StepParser.parse(step).entities().get(0);
 

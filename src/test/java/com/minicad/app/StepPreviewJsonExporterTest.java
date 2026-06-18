@@ -10635,8 +10635,7 @@ class StepPreviewJsonExporterTest {
         + "#49=FACE_OUTER_BOUND('B0',#48,.T.);\n"
         + "#50=ADVANCED_FACE('F0',(#49),%s,.T.);\n"
         + "#51=OPEN_SHELL('OS',(#50));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n";
     }
 
     private static void assertMetadataContains(String metadata, String... fragments) {

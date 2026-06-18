@@ -163,6 +163,18 @@ public final class BoundingBox3 {
             && maxX >= other.maxX && maxY >= other.maxY && maxZ >= other.maxZ;
     }
 
+    /**
+     * Checks if this bounding box contains a point.
+     *
+     * @param point point to check
+     * @return true if the point is inside or on the boundary of this box
+     */
+    public boolean containsPoint(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return minX <= point.x() && minY <= point.y() && minZ <= point.z()
+            && maxX >= point.x() && maxY >= point.y() && maxZ >= point.z();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

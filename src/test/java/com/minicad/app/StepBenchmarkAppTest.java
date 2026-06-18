@@ -10,7 +10,7 @@ class StepBenchmarkAppTest {
 
     @Test
     void shouldBenchmarkMinimalStepPipeline() {
-        StepBenchmarkApp.BenchmarkResult result = StepBenchmarkApp.benchmark("inline", 
+        StepBenchmarkApp.BenchmarkResult result = StepBenchmarkApp.benchmark("inline",
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -18,7 +18,8 @@ class StepBenchmarkAppTest {
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;";
+        + "END-ISO-10303-21;\n"
+        );
 
         assertTrue(result.entityCount() >= 2);
         assertTrue(result.resolvedCount() >= 2);
@@ -31,10 +32,11 @@ class StepBenchmarkAppTest {
 
     @Test
     void shouldFormatBenchmarkResults() {
-        StepBenchmarkApp.BenchmarkResult result = StepBenchmarkApp.benchmark("inline", 
+        StepBenchmarkApp.BenchmarkResult result = StepBenchmarkApp.benchmark("inline",
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        );
 
         String output = StepBenchmarkApp.formatResults(List.of(result));
 

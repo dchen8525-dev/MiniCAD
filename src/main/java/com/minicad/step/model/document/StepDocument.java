@@ -60,6 +60,10 @@ public final class StepDocument implements StepEntity {
         return kind;
     }
 
+    public String description() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

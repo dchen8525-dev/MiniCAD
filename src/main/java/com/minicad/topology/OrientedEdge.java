@@ -84,4 +84,33 @@ public final class OrientedEdge {
     public String toString() {
         return "OrientedEdge{" + "edge=" + edge + "orientation=" + orientation + "}";
     }
+
+    /**
+     * Returns the length of this oriented edge.
+     *
+     * @return length of the underlying edge
+     */
+    public double length() {
+        return edge != null ? edge.length() : 0.0;
+    }
+
+    /**
+     * Returns the closest point on this oriented edge to a given point.
+     *
+     * @param point the target point
+     * @return closest point on the edge
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        return edge != null ? edge.closestPointTo(point) : null;
+    }
+
+    /**
+     * Returns the distance from this oriented edge to a given point.
+     *
+     * @param point the target point
+     * @return distance to the closest point
+     */
+    public double distanceTo(CartesianPoint point) {
+        return edge != null ? edge.distanceTo(point) : Double.MAX_VALUE;
+    }
 }

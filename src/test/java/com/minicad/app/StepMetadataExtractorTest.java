@@ -33,7 +33,8 @@ class StepMetadataExtractorTest {
         + "#26=PRESENTATION_STYLE_ASSIGNMENT((#25));\n"
         + "#27=STYLED_ITEM('FACE_STYLE',(#26),#8);\n"
         + "#28=PRESENTATION_LAYER_ASSIGNMENT('Inspection','Layer for QA',(#8));\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        ));
 
         StepMetadataExtractor extractor = StepMetadataExtractor.fromResolved(resolved);
 

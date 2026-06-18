@@ -31,6 +31,15 @@ public final class PolyLoop implements Loop {
     // Record-style accessor
     public List<CartesianPoint> points() { return getPoints(); }
 
+    /**
+     * Returns the number of vertices in this polygon loop.
+     *
+     * @return vertex count
+     */
+    public int vertexCount() {
+        return points == null ? 0 : points.size();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

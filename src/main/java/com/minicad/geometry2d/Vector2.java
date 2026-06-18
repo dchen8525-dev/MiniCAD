@@ -109,6 +109,97 @@ public final class Vector2 {
     }
 
     /**
+     * Returns the dot product of this vector with a direction.
+     *
+     * @param other other direction
+     * @return dot product value
+     */
+    public double dot(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.x() + y * other.y();
+    }
+
+    /**
+     * Returns the cross product of this vector with another vector (2D scalar cross product).
+     *
+     * @param other other vector
+     * @return cross product scalar (z-component of 3D cross product)
+     */
+    public double cross(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.y - y * other.x;
+    }
+
+    /**
+     * Returns the cross product of this vector with a direction (2D scalar cross product).
+     *
+     * @param other other direction
+     * @return cross product scalar
+     */
+    public double cross(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.y() - y * other.x();
+    }
+
+    /**
+     * Returns the angle between this vector and another vector.
+     *
+     * @param other other vector
+     * @return angle in radians
+     */
+    public double angleBetween(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double dotVal = dot(other);
+        double lenProduct = Math.sqrt(normSquared()) * Math.sqrt(other.normSquared());
+        if (lenProduct < Epsilon.get()) {
+            return 0.0;
+        }
+        return Math.acos(Math.max(-1.0, Math.min(1.0, dotVal / lenProduct)));
+    }
+
+    /**
+     * Returns the angle between this vector and a direction.
+     *
+     * @param other other direction
+     * @return angle in radians
+     */
+    public double angleBetween(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double len = Math.sqrt(normSquared());
+        if (len < Epsilon.get()) {
+            return 0.0;
+        }
+        return Math.acos(Math.max(-1.0, Math.min(1.0, dot(other) / len)));
+    }
+
+    /**
+     * Returns a perpendicular vector (rotated 90 degrees counter-clockwise).
+     *
+     * @return perpendicular vector
+     */
+    public Vector2 perpendicular() {
+        return new Vector2(-y, x);
+    }
+
+    /**
+     * Returns the negated vector.
+     *
+     * @return negated vector
+     */
+    public Vector2 negate() {
+        return new Vector2(-x, -y);
+    }
+
+    /**
+     * Returns the reversed vector (same as negate).
+     *
+     * @return reversed vector
+     */
+    public Vector2 reverse() {
+        return negate();
+    }
+
+    /**
      * Subtracts another vector from this one.
      *
      * @param other the other vector

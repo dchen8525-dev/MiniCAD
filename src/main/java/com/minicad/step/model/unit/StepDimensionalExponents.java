@@ -65,6 +65,15 @@ public final class StepDimensionalExponents implements StepEntity {
         return luminousIntensityExponent;
     }
 
+    // Record-style accessors
+    public double lengthExponent() { return getLengthExponent(); }
+    public double massExponent() { return getMassExponent(); }
+    public double timeExponent() { return getTimeExponent(); }
+    public double electricCurrentExponent() { return getElectricCurrentExponent(); }
+    public double thermodynamicTemperatureExponent() { return getThermodynamicTemperatureExponent(); }
+    public double amountOfSubstanceExponent() { return getAmountOfSubstanceExponent(); }
+    public double luminousIntensityExponent() { return getLuminousIntensityExponent(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

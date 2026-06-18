@@ -3085,8 +3085,9 @@ class StepCadBuilderTest {
         + "#4=(CENTERED_CIRCLE_PROFILE_DEF(.AREA.,'CC',#3,2.0,1.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepCenteredCircleProfileDef.class, entity);
         StepCenteredCircleProfileDef profile = (StepCenteredCircleProfileDef) entity;
@@ -3106,8 +3107,9 @@ class StepCadBuilderTest {
         + "#4=(I_SHAPE_PROFILE_DEF(.AREA.,'IBEAM',#3,100.0,200.0,10.0,10.0,5.0,0.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepProfileDef.class, entity);
         StepProfileDef profile = (StepProfileDef) entity;
@@ -3126,8 +3128,9 @@ class StepCadBuilderTest {
         + "#4=(L_SHAPE_PROFILE_DEF(.AREA.,'ANGLE',#3,50.0,50.0,5.0,5.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepProfileDef.class, entity);
         StepProfileDef profile = (StepProfileDef) entity;
@@ -3146,8 +3149,9 @@ class StepCadBuilderTest {
         + "#4=(U_SHAPE_PROFILE_DEF(.AREA.,'CHANNEL',#3,50.0,100.0,5.0,10.0,5.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepProfileDef.class, entity);
         StepProfileDef profile = (StepProfileDef) entity;
@@ -3166,8 +3170,9 @@ class StepCadBuilderTest {
         + "#4=(T_SHAPE_PROFILE_DEF(.AREA.,'TEE',#3,100.0,50.0,10.0,10.0,5.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepProfileDef.class, entity);
         StepProfileDef profile = (StepProfileDef) entity;
@@ -3186,8 +3191,9 @@ class StepCadBuilderTest {
         + "#4=(Z_SHAPE_PROFILE_DEF(.AREA.,'ZBEAM',#3,50.0,100.0,5.0,10.0,5.0)\n"
         + "    PROFILE_DEFINITION()\n"
         + "    PRODUCT_DEFINITION_SHAPE('',$,$));\n"
-        + "ENDSEC;"
-        );
+        + "ENDSEC;\n"
+        ));
+
         StepEntity entity = resolved.get(4);
         assertInstanceOf(StepProfileDef.class, entity);
         StepProfileDef profile = (StepProfileDef) entity;

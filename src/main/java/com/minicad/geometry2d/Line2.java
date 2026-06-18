@@ -153,4 +153,54 @@ public final class Line2 implements Curve2 {
         }
         return List.copyOf(points);
     }
+
+    /**
+     * Returns the normal vector at a parameter (perpendicular to line direction).
+     * For a line, the normal is constant at all points.
+     *
+     * @param parameter parametric value (ignored for line)
+     * @return normal vector
+     */
+    public Vector2 normalAt(double parameter) {
+        return direction.perpendicular().asVector();
+    }
+
+    /**
+     * Returns the normal vector at a segment index.
+     *
+     * @param segment segment index (ignored for line)
+     * @return normal vector
+     */
+    public Vector2 normalAt(int segment) {
+        return normalAt(0.0);
+    }
+
+    /**
+     * Returns the curvature of the line (always 0 for a line).
+     *
+     * @return curvature (0)
+     */
+    public double curvature() {
+        return 0.0;
+    }
+
+    /**
+     * Returns the curvature at a parameter (always 0 for a line).
+     *
+     * @param parameter parametric value (ignored for line)
+     * @return curvature (0)
+     */
+    public double curvatureAt(double parameter) {
+        return curvature();
+    }
+
+    /**
+     * Returns the curvature at a segment index (always 0 for a line).
+     *
+     * @param segment segment index (ignored for line)
+     * @return curvature (0)
+     */
+    public double curvatureAt(int segment) {
+        return curvature();
+    }
 }

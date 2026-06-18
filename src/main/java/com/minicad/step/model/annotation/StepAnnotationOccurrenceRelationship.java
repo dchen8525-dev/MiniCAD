@@ -68,6 +68,14 @@ public final class StepAnnotationOccurrenceRelationship implements StepEntity {
         return entityName;
     }
 
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
     public StepEntity relatingAnnotationOccurrence() {
         return relatingAnnotationOccurrence;
     }

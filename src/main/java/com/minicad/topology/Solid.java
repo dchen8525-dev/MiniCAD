@@ -62,4 +62,154 @@ public final class Solid {
     public String toString() {
         return "Solid{" + "outerShell=" + outerShell + "voidShells=" + voidShells + "}";
     }
+
+    /**
+     * Returns the bounding box of this solid.
+     *
+     * @return bounding box of outer shell
+     */
+    public BoundingBox3 boundingBox() {
+        return outerShell != null ? outerShell.boundingBox() : BoundingBox3.empty();
+    }
+
+    /**
+     * Returns the number of faces in this solid.
+     *
+     * @return total face count
+     */
+    public int faceCount() {
+        return outerShell != null ? outerShell.faceCount() : 0;
+    }
+
+    /**
+     * Returns the number of shells in this solid.
+     *
+     * @return shell count (outer + void shells)
+     */
+    public int shellCount() {
+        int count = outerShell != null ? 1 : 0;
+        if (voidShells != null) {
+            count += voidShells.size();
+        }
+        return count;
+    }
+
+    /**
+     * Returns the total surface area of this solid.
+     *
+     * @return total surface area
+     */
+    public double surfaceArea() {
+        return outerShell != null ? outerShell.surfaceArea() : 0.0;
+    }
+
+    /**
+     * Returns the approximate volume of this solid (bounding box volume).
+     *
+     * @return approximate volume
+     */
+    public double approximateVolume() {
+        BoundingBox3 box = boundingBox();
+        if (box.isEmpty()) {
+            return 0.0;
+        }
+        double dx = box.maxX() - box.minX();
+        double dy = box.maxY() - box.minY();
+        double dz = box.maxZ() - box.minZ();
+        return dx * dy * dz;
+    }
+
+    /**
+     * Returns the centroid of this solid.
+     *
+     * @return centroid point
+     */
+    public CartesianPoint centroid() {
+        return outerShell != null ? outerShell.centroid() : null;
+    }
+
+    /**
+     * Returns the closest point on this solid to a given point.
+     *
+     * @param point the target point
+     * @return closest point
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        return outerShell != null ? outerShell.closestPointTo(point) : null;
+    }
+
+    /**
+     * Returns the distance from this solid to a given point.
+     *
+     * @param point the target point
+     * @return minimum distance
+     */
+    public double distanceTo(CartesianPoint point) {
+        return outerShell != null ? outerShell.distanceTo(point) : Double.MAX_VALUE;
+    }
+
+    /**
+     * Checks if a point is approximately within this solid.
+     *
+     * @param point the point to check
+     * @return true if within bounding box
+     */
+    public boolean containsApproximate(CartesianPoint point) {
+        return outerShell != null && outerShell.containsApproximate(point);
+    }
+
+    /**
+     * Returns all shells of this solid.
+     *
+     * @return list of all shells
+     */
+    public java.util.List<Shell> allShells() {
+        java.util.List<Shell> result = new java.util.ArrayList<>();
+        if (outerShell != null) {
+            result.add(outerShell);
+        }
+        if (voidShells != null) {
+            result.addAll(voidShells);
+        }
+        return result;
+    }
+
+    /**
+     * Returns all faces of this solid.
+     *
+     * @return list of all faces
+     */
+    public java.util.List<Face> allFaces() {
+        java.util.List<Face> result = new java.util.ArrayList<>();
+        for (Shell shell : allShells()) {
+            if (shell != null && shell.faces() != null) {
+                result.addAll(shell.faces());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns all edges of this solid.
+     *
+     * @return list of all edges
+     */
+    public java.util.List<Edge> allEdges() {
+        java.util.List<Edge> result = new java.util.ArrayList<>();
+        for (Face face : allFaces()) {
+            if (face != null) {
+                for (com.minicad.topology.FaceBound bound : face.bounds()) {
+                    if (bound != null && bound.loop() instanceof com.minicad.topology.EdgeLoop) {
+                        com.minicad.topology.EdgeLoop loop = (com.minicad.topology.EdgeLoop) bound.loop();
+                        for (com.minicad.topology.OrientedEdge oe : loop.edges()) {
+                            if (oe != null && oe.edge() != null) {
+                                result.add(oe.edge());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

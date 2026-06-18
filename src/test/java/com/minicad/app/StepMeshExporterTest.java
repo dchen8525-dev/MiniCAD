@@ -334,10 +334,10 @@ class StepMeshExporterTest {
     @Test
     void shouldExportSurfaceReplicaCylindricalFace() {
         String obj = StepMeshExporter.exportObj(cylindricalFaceStep(
-                
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
-        + "#92=SURFACE_REPLICA('SR0',#13,#91);"
+        + "#92=SURFACE_REPLICA('SR0',#13,#91);",
+        "#13"
         ));
 
         assertTrue(obj.contains("f "));
@@ -365,7 +365,8 @@ class StepMeshExporterTest {
         String obj = StepMeshExporter.exportObj(surfaceOfRevolutionFaceStep(
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
-        + "#92=SURFACE_REPLICA('SR0',#14,#91);"
+        + "#92=SURFACE_REPLICA('SR0',#14,#91);",
+        "#14"
         ));
 
         assertTrue(obj.contains("f "));
@@ -377,7 +378,8 @@ class StepMeshExporterTest {
         String obj = StepMeshExporter.exportObj(surfaceOfLinearExtrusionFaceStep(
         "#90=CARTESIAN_POINT('T0',(0.0,0.0,5.0));\n"
         + "#91=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#90,1.0,$);\n"
-        + "#92=SURFACE_REPLICA('SR0',#14,#91);"
+        + "#92=SURFACE_REPLICA('SR0',#14,#91);",
+        "#14"
         ));
 
         assertTrue(obj.contains("f "));
@@ -627,8 +629,7 @@ class StepMeshExporterTest {
         + "#60=ADVANCED_FACE('F0',(#51),%s,.T.);\n"
         + "#70=OPEN_SHELL('OS',(#60));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;"
-        );
+        + "END-ISO-10303-21;\n";
     }
 
     private static double planarAreaFromObj(String obj) {

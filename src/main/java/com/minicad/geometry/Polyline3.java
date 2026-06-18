@@ -134,6 +134,96 @@ public final class Polyline3 implements Curve3 {
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
+        if (points == null || points.isEmpty()) {
+            return java.util.List.of();
+        }
+        if (segments <= 0) {
+            return points;
+        }
+        // Interpolate along each segment
+        java.util.List<CartesianPoint> result = new java.util.ArrayList<>();
+        int n = points.size() - 1;
+        for (int i = 0; i < n; i++) {
+            CartesianPoint p0 = points.get(i);
+            CartesianPoint p1 = points.get(i + 1);
+            for (int j = 0; j < segments; j++) {
+                double t = j / (double) segments;
+                result.add(new CartesianPoint(
+                    p0.x() + t * (p1.x() - p0.x()),
+                    p0.y() + t * (p1.y() - p0.y()),
+                    p0.z() + t * (p1.z() - p0.z())
+                ));
+            }
+        }
+        result.add(points.get(points.size() - 1)); // Add last point
+        return java.util.List.copyOf(result);
+    }
+
+    /**
+     * Returns all vertices of the polyline.
+     *
+     * @return list of points
+     */
+    public java.util.List<CartesianPoint> sample() {
         return points == null ? java.util.List.of() : points;
+    }
+
+    /**
+     * Returns the first point of the polyline.
+     *
+     * @return first point, or null if empty
+     */
+    public CartesianPoint first() {
+        return points == null || points.isEmpty() ? null : points.get(0);
+    }
+
+    /**
+     * Returns the last point of the polyline.
+     *
+     * @return last point, or null if empty
+     */
+    public CartesianPoint last() {
+        return points == null || points.isEmpty() ? null : points.get(points.size() - 1);
+    }
+
+    /**
+     * Returns the number of points in the polyline.
+     *
+     * @return point count
+     */
+    public int pointCount() {
+        return points == null ? 0 : points.size();
+    }
+
+    /**
+     * Returns the total length of the polyline.
+     *
+     * @return total length
+     */
+    public double length() {
+        if (points == null || points.size() < 2) {
+            return 0.0;
+        }
+        double totalLength = 0.0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            totalLength += points.get(i).distanceTo(points.get(i + 1));
+        }
+        return totalLength;
+    }
+
+    /**
+     * Returns the bounding box of the polyline.
+     *
+     * @return bounding box
+     */
+    public BoundingBox3 boundingBox() {
+        if (points == null || points.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        BoundingBox3 box = BoundingBox3.empty();
+        for (CartesianPoint p : points) {
+            box = box.union(p);
+        }
+        return box;
     }
 }

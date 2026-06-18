@@ -54,6 +54,24 @@ public final class Direction2 {
     }
 
     /**
+     * Returns the X-axis direction (1, 0).
+     *
+     * @return X-axis direction
+     */
+    public static Direction2 xAxis() {
+        return new Direction2(1, 0);
+    }
+
+    /**
+     * Returns the Y-axis direction (0, 1).
+     *
+     * @return Y-axis direction
+     */
+    public static Direction2 yAxis() {
+        return new Direction2(0, 1);
+    }
+
+    /**
      * Returns this direction as a vector.
      *
      * @return vector representation
@@ -69,6 +87,76 @@ public final class Direction2 {
      */
     public Direction2 perpendicular() {
         return new Direction2(-y, x);
+    }
+
+    /**
+     * Returns the angle between this direction and another direction.
+     *
+     * @param other other direction
+     * @return angle in radians
+     */
+    public double angleBetween(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double dotVal = x * other.x + y * other.y;
+        return Math.acos(Math.max(-1.0, Math.min(1.0, dotVal)));
+    }
+
+    /**
+     * Returns the angle between this direction and a vector.
+     *
+     * @param other other vector
+     * @return angle in radians
+     */
+    public double angleBetween(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        double otherLen = Math.sqrt(other.x() * other.x() + other.y() * other.y());
+        if (otherLen < Epsilon.get()) {
+            return 0.0;
+        }
+        double dotVal = (x * other.x() + y * other.y()) / otherLen;
+        return Math.acos(Math.max(-1.0, Math.min(1.0, dotVal)));
+    }
+
+    /**
+     * Returns the dot product of this direction with a vector.
+     *
+     * @param other other vector
+     * @return dot product value
+     */
+    public double dot(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.x() + y * other.y();
+    }
+
+    /**
+     * Returns the dot product of this direction with another direction.
+     *
+     * @param other other direction
+     * @return dot product value
+     */
+    public double dot(Direction2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.x + y * other.y;
+    }
+
+    /**
+     * Returns the cross product (scalar) with a vector.
+     *
+     * @param other other vector
+     * @return cross product scalar
+     */
+    public double cross(Vector2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return x * other.y() - y * other.x();
+    }
+
+    /**
+     * Returns the negated direction.
+     *
+     * @return negated direction
+     */
+    public Direction2 negate() {
+        return new Direction2(-x, -y);
     }
 
     /**

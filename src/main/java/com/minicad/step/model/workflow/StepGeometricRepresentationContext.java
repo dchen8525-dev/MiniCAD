@@ -70,6 +70,9 @@ public final class StepGeometricRepresentationContext implements StepEntity {
     }
 
     // Record-style accessors
+    public int coordinateSpaceDimension() { return getCoordinateSpaceDimension(); }
+    public String contextIdentifier() { return getContextIdentifier(); }
+    public String contextType() { return getContextType(); }
     public StepGlobalUnitAssignedContext globalUnitAssignedContext() { return getGlobalUnitAssignedContext(); }
     public StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext() { return getGlobalUncertaintyAssignedContext(); }
 

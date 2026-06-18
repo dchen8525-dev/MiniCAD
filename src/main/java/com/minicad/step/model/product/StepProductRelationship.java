@@ -72,6 +72,14 @@ public final class StepProductRelationship implements StepEntity {
     }
 
     // Record-style accessors
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
     public StepProduct relatingProduct() {
         return relatingProduct;
     }

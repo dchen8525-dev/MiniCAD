@@ -30,6 +30,16 @@ public final class Line3 implements Curve3 {
         this.parameterScale = parameterScale;
     }
 
+    /**
+     * Creates a line with default parameter scale of 1.0.
+     *
+     * @param origin line origin
+     * @param direction line direction
+     */
+    public Line3(CartesianPoint origin, Direction3 direction) {
+        this(origin, direction, 1.0);
+    }
+
     public CartesianPoint getOrigin() {
         return origin;
     }

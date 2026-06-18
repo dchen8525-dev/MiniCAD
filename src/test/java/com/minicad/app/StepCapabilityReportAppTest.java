@@ -54,10 +54,10 @@ class StepCapabilityReportAppTest {
 
     @Test
     void loadsDeclarativeCapabilityRegistry() throws Exception {
-        String registry = 
+        String registry =
         "# comment\n"
         + "entity\tlevel\tparsed\tresolved\tbuilt\texported\ttested\tlimitations\n"
-        + "CARTESIAN_POINT\tL4\ttrue\ttrue\ttrue\ttrue\ttrue\tcommon path"
+        + "CARTESIAN_POINT\tL4\ttrue\ttrue\ttrue\ttrue\ttrue\tcommon path\n";
 
         Map<String, StepCapabilityRegistry.Capability> capabilities = StepCapabilityRegistry.load(
                 new ByteArrayInputStream(registry.getBytes(StandardCharsets.UTF_8)));
@@ -79,7 +79,8 @@ class StepCapabilityReportAppTest {
         + "  ENTITY custom_entity\n"
         + "    ABSTRACT SUPERTYPE;\n"
         + "  END_ENTITY;\n"
-        + "END_SCHEMA;"
+        + "END_SCHEMA;\n"
+        );
 
         assertEquals(
                 java.util.Set.of("CARTESIAN_POINT", "CUSTOM_ENTITY"),
@@ -89,11 +90,12 @@ class StepCapabilityReportAppTest {
     @Test
     void scansCuratedEntityLists() throws Exception {
         Path schema = tempDir.resolve("ap214-curated-entities.lst");
-        Files.writeString(schema, 
+        Files.writeString(schema,
         "# Curated entity list\n"
         + "cartesian_point\n"
         + "ADVANCED_FACE # inline note\n"
-        + "// ignored comment"
+        + "// ignored comment\n"
+        );
 
         assertEquals(
                 java.util.Set.of("ADVANCED_FACE", "CARTESIAN_POINT"),
@@ -109,7 +111,8 @@ class StepCapabilityReportAppTest {
         + "  END_ENTITY;\n"
         + "  ENTITY schema_only_entity;\n"
         + "  END_ENTITY;\n"
-        + "END_SCHEMA;"
+        + "END_SCHEMA;\n"
+        );
         StepCapabilityReportApp.CapabilityReport report = StepCapabilityReportApp.scan(Path.of("."));
 
         StepCapabilityReportApp.SchemaCoverageReport schemaReport =

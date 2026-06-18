@@ -97,7 +97,8 @@ class StepAssemblyGraphBuilderTest {
         + "#31=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-2','second part','',#8,#9);\n"
         + "#32=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#28,#30);\n"
         + "#33=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#29,#31);\n"
-        + "ENDSEC;";
+        + "ENDSEC;\n"
+        ));
 
         AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);
 

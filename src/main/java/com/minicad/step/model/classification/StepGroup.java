@@ -47,6 +47,9 @@ public final class StepGroup implements StepEntity {
         return entityName;
     }
 
+    // Record-style accessors
+    public String description() { return getDescription(); }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
