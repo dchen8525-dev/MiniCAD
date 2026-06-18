@@ -146,15 +146,30 @@ public final class Direction3 {
      * Returns the cross product of this direction with another.
      *
      * @param other other direction
-     * @return cross product direction (not necessarily normalized)
+     * @return cross product vector
      */
-    public Direction3 cross(Direction3 other) {
+    public Vector3 cross(Direction3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new Vector3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    /**
+     * Returns the cross product as a normalized direction.
+     *
+     * @param other other direction
+     * @return cross product direction (normalized)
+     */
+    public Direction3 crossDirection(Direction3 other) {
         Preconditions.requireNonNull(other, "other");
         return new Direction3(
             y * other.z - z * other.y,
             z * other.x - x * other.z,
             x * other.y - y * other.x
-        );
+        ).normalize();
     }
 
     /**
@@ -207,12 +222,12 @@ public final class Direction3 {
         double sinA = Math.sin(angle);
         Direction3 k = axis.normalize();
         // v_rot = v*cos(angle) + (k x v)*sin(angle) + k*(k.v)*(1-cos(angle))
-        Direction3 cross = k.cross(this);
+        Vector3 cross = k.cross(this);
         double dotKV = k.dot(this);
         return new Direction3(
-            x * cosA + cross.x * sinA + k.x * dotKV * (1 - cosA),
-            y * cosA + cross.y * sinA + k.y * dotKV * (1 - cosA),
-            z * cosA + cross.z * sinA + k.z * dotKV * (1 - cosA)
+            x * cosA + cross.x() * sinA + k.x * dotKV * (1 - cosA),
+            y * cosA + cross.y() * sinA + k.y * dotKV * (1 - cosA),
+            z * cosA + cross.z() * sinA + k.z * dotKV * (1 - cosA)
         ).normalize();
     }
 
@@ -227,9 +242,9 @@ public final class Direction3 {
         Preconditions.requireNonNull(other, "other");
         Preconditions.requireNonNull(referenceAxis, "referenceAxis");
         double unsignedAngle = angleBetween(other);
-        Direction3 cross = this.cross(other);
+        Vector3 cross = this.cross(other);
         // If cross product points in same direction as reference axis, angle is positive
-        double sign = cross.dot(referenceAxis) >= 0 ? 1.0 : -1.0;
+        double sign = cross.dot(referenceAxis.asVector()) >= 0 ? 1.0 : -1.0;
         return sign * unsignedAngle;
     }
 

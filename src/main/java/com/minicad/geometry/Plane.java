@@ -121,7 +121,8 @@ public final class Plane implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         // For a plane, we need two perpendicular directions
         Direction3 xDir = normal.perpendicular();
-        Direction3 yDir = normal.cross(xDir);
+        Vector3 yDirVec = normal.cross(xDir);
+        Direction3 yDir = Direction3.from(yDirVec);
         return origin.add(xDir.asVector().scale(u)).add(yDir.asVector().scale(v));
     }
 
