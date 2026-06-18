@@ -504,7 +504,7 @@ class StepMeshExporterTest {
     }
 
     private static String cylindricalFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return 
+        return String.format(
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -543,11 +543,12 @@ class StepMeshExporterTest {
         + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;";
+        + "END-ISO-10303-21;",
+        surfaceDeclarations, faceGeometryRef);
     }
 
     private static String surfaceOfRevolutionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return 
+        return String.format(
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -588,11 +589,12 @@ class StepMeshExporterTest {
         + "#70=ADVANCED_FACE('F0',(#61),%s,.T.);\n"
         + "#80=OPEN_SHELL('OS',(#70));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;";
+        + "END-ISO-10303-21;",
+        surfaceDeclarations, faceGeometryRef);
     }
 
     private static String surfaceOfLinearExtrusionFaceStep(String surfaceDeclarations, String faceGeometryRef) {
-        return 
+        return String.format(
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -629,7 +631,8 @@ class StepMeshExporterTest {
         + "#60=ADVANCED_FACE('F0',(#51),%s,.T.);\n"
         + "#70=OPEN_SHELL('OS',(#60));\n"
         + "ENDSEC;\n"
-        + "END-ISO-10303-21;\n";
+        + "END-ISO-10303-21;\n",
+        surfaceDeclarations, faceGeometryRef);
     }
 
     private static double planarAreaFromObj(String obj) {

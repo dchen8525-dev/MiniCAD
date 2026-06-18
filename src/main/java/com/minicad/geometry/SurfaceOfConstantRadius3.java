@@ -50,6 +50,22 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
     }
 
     @Override
+    public BoundingBox3 boundingBox() {
+        // Expand the swept surface's bounding box by the radius
+        BoundingBox3 sweptBox = sweptSurface.boundingBox();
+        if (sweptBox.isEmpty()) {
+            return BoundingBox3.empty();
+        }
+        return sweptBox.expand(radius);
+    }
+
+    @Override
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        // Delegate to the swept surface's sample grid
+        return sweptSurface.sampleGrid(uSegments, vSegments);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(sweptSurface, radius);
     }
@@ -77,25 +93,6 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
             return grid.get(0).get(0);
         }
         return sweptSurface.boundingBox().center();
-    }
-
-    @Override
-    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        return sweptSurface.sampleGrid(uSegments, vSegments);
-    }
-
-    @Override
-    public BoundingBox3 boundingBox() {
-        BoundingBox3 baseBox = sweptSurface.boundingBox();
-        // Expand by radius in all directions
-        return new BoundingBox3(
-            baseBox.minX() - radius,
-            baseBox.minY() - radius,
-            baseBox.minZ() - radius,
-            baseBox.maxX() + radius,
-            baseBox.maxY() + radius,
-            baseBox.maxZ() + radius
-        );
     }
 
     /**

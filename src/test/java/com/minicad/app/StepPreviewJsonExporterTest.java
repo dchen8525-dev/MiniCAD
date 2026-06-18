@@ -10597,7 +10597,7 @@ class StepPreviewJsonExporterTest {
             String p11,
             String p01
     ) {
-        return 
+        return String.format(
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('B0',(1.0,0.0,0.0));\n"
@@ -10635,7 +10635,8 @@ class StepPreviewJsonExporterTest {
         + "#49=FACE_OUTER_BOUND('B0',#48,.T.);\n"
         + "#50=ADVANCED_FACE('F0',(#49),%s,.T.);\n"
         + "#51=OPEN_SHELL('OS',(#50));\n"
-        + "ENDSEC;\n";
+        + "ENDSEC;\n",
+        surfaceDeclarations, p00, p10, p11, p01, faceGeometryRef);
     }
 
     private static void assertMetadataContains(String metadata, String... fragments) {

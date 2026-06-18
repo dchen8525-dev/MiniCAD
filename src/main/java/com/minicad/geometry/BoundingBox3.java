@@ -1,6 +1,7 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 import java.util.Objects;
 
@@ -336,6 +337,9 @@ public final class BoundingBox3 {
      * @return list of corner points in order: min, then all combinations
      */
     public java.util.List<CartesianPoint> corners() {
+        if (isEmpty()) {
+            return java.util.List.of();
+        }
         java.util.List<CartesianPoint> cornerList = new java.util.ArrayList<>();
         cornerList.add(new CartesianPoint(minX, minY, minZ));
         cornerList.add(new CartesianPoint(maxX, minY, minZ));
@@ -387,9 +391,13 @@ public final class BoundingBox3 {
      *
      * @param point the target point
      * @return closest point on box boundary
+     * @throws GeometryException if the box is empty
      */
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
+        if (isEmpty()) {
+            throw new GeometryException("Cannot find closest point to empty bounding box");
+        }
         double closestX = Math.max(minX, Math.min(maxX, point.x()));
         double closestY = Math.max(minY, Math.min(maxY, point.y()));
         double closestZ = Math.max(minZ, Math.min(maxZ, point.z()));
