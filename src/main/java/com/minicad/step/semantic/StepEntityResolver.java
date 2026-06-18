@@ -13156,9 +13156,12 @@ public final class StepEntityResolver {
   StepEntity resolveGenericAssignment(
       StepEntityInstance instance, String entityName) {
     StepEntityDefinition definition = definition(instance, entityName);
-    // Support both 2-parameter (name, ref) and 3-parameter (name, items, context) forms
-    requireParameterCountIn(instance, definition, 2, 3);
-    if (definition.parameters().size() == 2) {
+    // Support 0-parameter (parent entity in complex instance), 2-parameter, and 3-parameter forms
+    requireParameterCountIn(instance, definition, 0, 2, 3);
+    if (definition.parameters().size() == 0) {
+      // Parent entity in complex instance, no parameters
+      return new StepGenericEntity(instance.id(), "", entityName);
+    } else if (definition.parameters().size() == 2) {
       return new StepGenericEntity(
           instance.id(),
           stringValue(instance, definition, 0),

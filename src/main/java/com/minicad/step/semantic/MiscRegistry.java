@@ -4069,10 +4069,7 @@ public final class MiscRegistry {
           "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
           (resolver, instance) ->
               resolver.resolveGenericRelationship(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
-      registry.put(
-          "APPLIED_AREA",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "APPLIED_AREA"));
+      // APPLIED_AREA already registered via registerShapeAspectAliases at line 1235
       registry.put(
           "BREAKDOWN_OF",
           (resolver, instance) ->
@@ -5289,10 +5286,7 @@ public final class MiscRegistry {
           "SIMPLIFIED_SPOTFACE_HOLE_DEFINITION",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "SIMPLIFIED_SPOTFACE_HOLE_DEFINITION"));
-      registry.put(
-          "SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION"));
+      // SINGLE_AREA_CSG_2D_SHAPE_REPRESENTATION already registered at line 65
       registry.put(
           "SINGLE_BOUNDARY_CSG_2D_SHAPE_REPRESENTATION",
           (resolver, instance) ->
