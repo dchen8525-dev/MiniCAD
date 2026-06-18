@@ -220,7 +220,8 @@ class Ellipse2Test {
         Ellipse2 ellipse = new Ellipse2(center, xDir, 4.0, 2.0);
 
         // c = sqrt(a^2 - b^2) = sqrt(16 - 4) = sqrt(12) ~ 3.46
-        Point2[] foci = ellipse.foci();
+        java.util.List<Point2> fociList = ellipse.foci();
+        Point2[] foci = fociList.toArray(new Point2[0]);
         assertEquals(2, foci.length);
 
         double c = Math.sqrt(12);
@@ -234,7 +235,8 @@ class Ellipse2Test {
         Direction2 xDir = new Direction2(1, 0);
         Ellipse2 circle = new Ellipse2(center, xDir, 5.0, 5.0);
 
-        Point2[] foci = circle.foci();
+        java.util.List<Point2> fociList = circle.foci();
+        Point2[] foci = fociList.toArray(new Point2[0]);
         assertEquals(center, foci[0]);
         assertEquals(center, foci[1]);
     }

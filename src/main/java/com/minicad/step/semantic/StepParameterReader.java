@@ -226,6 +226,10 @@ public final class StepParameterReader {
       return value;
     }
 
+    // Record-style accessors
+    public String typeName() { return getTypeName(); }
+    public StepValue value() { return getValue(); }
+
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;

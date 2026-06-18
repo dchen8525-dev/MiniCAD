@@ -196,6 +196,75 @@ public final class Polyline3 implements Curve3 {
     }
 
     /**
+     * Returns the number of line segments in the polyline.
+     *
+     * @return segment count (points.size() - 1, or 0 if empty)
+     */
+    public int segmentCount() {
+        return points == null || points.size() < 2 ? 0 : points.size() - 1;
+    }
+
+    /**
+     * Returns the start point (first point) of the polyline.
+     *
+     * @return start point, or null if empty
+     */
+    public CartesianPoint startPoint() {
+        return first();
+    }
+
+    /**
+     * Returns the end point (last point) of the polyline.
+     *
+     * @return end point, or null if empty
+     */
+    public CartesianPoint endPoint() {
+        return last();
+    }
+
+    /**
+     * Returns the midpoint of the polyline at half the total length.
+     *
+     * @return midpoint
+     */
+    public CartesianPoint midpoint() {
+        if (points == null || points.isEmpty()) {
+            return CartesianPoint.origin();
+        }
+        double halfLength = length() / 2.0;
+        return pointAtLength(halfLength);
+    }
+
+    /**
+     * Returns the point at a given length along the polyline.
+     *
+     * @param targetLength length along the polyline
+     * @return point at that length
+     */
+    private CartesianPoint pointAtLength(double targetLength) {
+        if (points == null || points.size() < 2) {
+            return points == null || points.isEmpty() ? CartesianPoint.origin() : points.get(0);
+        }
+        double accumulated = 0.0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            CartesianPoint p0 = points.get(i);
+            CartesianPoint p1 = points.get(i + 1);
+            double segmentLength = p0.distanceTo(p1);
+            if (accumulated + segmentLength >= targetLength) {
+                double remaining = targetLength - accumulated;
+                double t = remaining / segmentLength;
+                return new CartesianPoint(
+                    p0.x() + t * (p1.x() - p0.x()),
+                    p0.y() + t * (p1.y() - p0.y()),
+                    p0.z() + t * (p1.z() - p0.z())
+                );
+            }
+            accumulated += segmentLength;
+        }
+        return points.get(points.size() - 1);
+    }
+
+    /**
      * Returns the total length of the polyline.
      *
      * @return total length

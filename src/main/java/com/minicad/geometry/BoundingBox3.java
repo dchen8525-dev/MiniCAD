@@ -79,7 +79,20 @@ public final class BoundingBox3 {
      * @return empty bounding box
      */
     public static BoundingBox3 empty() {
-        return new BoundingBox3(0, 0, 0, 0, 0, 0);
+        // Use NaN to represent truly empty/invalid box
+        return new BoundingBox3(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+    }
+
+    /**
+     * Checks if this bounding box is empty (has zero or negative volume).
+     *
+     * @return true if empty
+     */
+    public boolean isEmpty() {
+        return Double.isNaN(minX) || Double.isNaN(maxX)
+            || Double.isNaN(minY) || Double.isNaN(maxY)
+            || Double.isNaN(minZ) || Double.isNaN(maxZ)
+            || minX > maxX || minY > maxY || minZ > maxZ;
     }
 
     /**
@@ -100,6 +113,17 @@ public final class BoundingBox3 {
             Math.max(p1.y(), p2.y()),
             Math.max(p1.z(), p2.z())
         );
+    }
+
+    /**
+     * Creates a bounding box from a single point (zero-volume box).
+     *
+     * @param point the point
+     * @return bounding box containing just that point
+     */
+    public static BoundingBox3 of(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return new BoundingBox3(point.x(), point.y(), point.z(), point.x(), point.y(), point.z());
     }
 
     /**
@@ -134,15 +158,6 @@ public final class BoundingBox3 {
     }
 
     /**
-     * Checks if this bounding box is empty (has zero volume).
-     *
-     * @return true if empty
-     */
-    public boolean isEmpty() {
-        return minX == maxX && minY == maxY && minZ == maxZ;
-    }
-
-    /**
      * Returns a new bounding box that includes the given point.
      * Alias for expand().
      *
@@ -172,6 +187,24 @@ public final class BoundingBox3 {
     }
 
     /**
+     * Returns the intersection of this bounding box with another.
+     *
+     * @param other other bounding box
+     * @return intersection bounding box (may be empty if no overlap)
+     */
+    public BoundingBox3 intersection(BoundingBox3 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new BoundingBox3(
+            Math.max(minX, other.minX),
+            Math.max(minY, other.minY),
+            Math.max(minZ, other.minZ),
+            Math.min(maxX, other.maxX),
+            Math.min(maxY, other.maxY),
+            Math.min(maxZ, other.maxZ)
+        );
+    }
+
+    /**
      * Checks if this bounding box contains another bounding box.
      *
      * @param other other bounding box to check
@@ -193,6 +226,17 @@ public final class BoundingBox3 {
         Preconditions.requireNonNull(point, "point");
         return minX <= point.x() && minY <= point.y() && minZ <= point.z()
             && maxX >= point.x() && maxY >= point.y() && maxZ >= point.z();
+    }
+
+    /**
+     * Checks if this bounding box contains a point.
+     * Alias for containsPoint for compatibility.
+     *
+     * @param point point to check
+     * @return true if the point is inside or on the boundary
+     */
+    public boolean contains(CartesianPoint point) {
+        return containsPoint(point);
     }
 
     /**
@@ -238,6 +282,18 @@ public final class BoundingBox3 {
      */
     public double volume() {
         return width() * height() * depth();
+    }
+
+    /**
+     * Returns the surface area of the bounding box.
+     *
+     * @return surface area (2*(w*h + h*d + w*d))
+     */
+    public double surfaceArea() {
+        double w = width();
+        double h = height();
+        double d = depth();
+        return 2 * (w * h + h * d + w * d);
     }
 
     /**

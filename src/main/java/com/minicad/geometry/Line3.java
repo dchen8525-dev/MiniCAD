@@ -118,4 +118,19 @@ public final class Line3 implements Curve3 {
         CartesianPoint closest = closestPointTo(point);
         return point.distanceTo(closest) < Epsilon.get();
     }
+
+    /**
+     * Returns the bounding box of a line segment from t0 to t1.
+     *
+     * @param t0 start parameter
+     * @param t1 end parameter
+     * @return bounding box of the segment
+     */
+    public BoundingBox3 boundingBox(double t0, double t1) {
+        Preconditions.requireFinite(t0, "t0");
+        Preconditions.requireFinite(t1, "t1");
+        CartesianPoint p0 = pointAt(t0);
+        CartesianPoint p1 = pointAt(t1);
+        return BoundingBox3.of(p0, p1);
+    }
 }

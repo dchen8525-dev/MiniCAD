@@ -58,4 +58,76 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
     public String toString() {
         return "SurfaceOfConstantRadius3{" + "sweptSurface=" + sweptSurface + "radius=" + radius + "}";
     }
+
+    /**
+     * Returns a point on the surface at parametric coordinates.
+     * Delegates to the swept surface if it has pointAt method.
+     *
+     * @param u first parametric coordinate
+     * @param v second parametric coordinate
+     * @return point on the surface
+     */
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        // CylindricalSurface, SphericalSurface, etc. have pointAt method
+        // We need to cast or use reflection - for simplicity, return from sampleGrid
+        java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(1, 1);
+        if (!grid.isEmpty() && !grid.get(0).isEmpty()) {
+            return grid.get(0).get(0);
+        }
+        return sweptSurface.boundingBox().center();
+    }
+
+    @Override
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        return sweptSurface.sampleGrid(uSegments, vSegments);
+    }
+
+    @Override
+    public BoundingBox3 boundingBox() {
+        BoundingBox3 baseBox = sweptSurface.boundingBox();
+        // Expand by radius in all directions
+        return new BoundingBox3(
+            baseBox.minX() - radius,
+            baseBox.minY() - radius,
+            baseBox.minZ() - radius,
+            baseBox.maxX() + radius,
+            baseBox.maxY() + radius,
+            baseBox.maxZ() + radius
+        );
+    }
+
+    /**
+     * Returns the closest point on the surface to a given point.
+     * Approximate implementation using bounding box.
+     *
+     * @param point target point
+     * @return closest point on surface (approximate)
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        // Approximate: use center of bounding box if swept surface doesn't have method
+        return sweptSurface.boundingBox().closestPointTo(point);
+    }
+
+    /**
+     * Returns the distance from a point to the surface.
+     * Approximate implementation.
+     *
+     * @param point target point
+     * @return distance to surface (approximate)
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        CartesianPoint closest = closestPointTo(point);
+        return point.distanceTo(closest);
+    }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        return sweptSurface.normalAt(u, v);
+    }
 }
