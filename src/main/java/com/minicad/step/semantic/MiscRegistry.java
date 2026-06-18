@@ -3007,10 +3007,7 @@ public final class MiscRegistry {
           "STATE_TYPE_ROLE",
           (resolver, instance) ->
               resolver.resolveGenericType(instance, "STATE_TYPE_ROLE"));
-      registry.put(
-          "SUPPLIED_PART_RELATIONSHIP",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "SUPPLIED_PART_RELATIONSHIP"));
+      // SUPPLIED_PART_RELATIONSHIP already registered via registerProductDefinitionRelationshipAliases at line 876
       registry.put(
           "TIME_INTERVAL_ASSIGNMENT",
           (resolver, instance) ->
@@ -3061,10 +3058,7 @@ public final class MiscRegistry {
           "ASSEMBLY_BOND_DEFINITION",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "ASSEMBLY_BOND_DEFINITION"));
-      registry.put(
-          "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE"));
+      // ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE already registered via registerProductDefinitionRelationshipRelationshipAliases at line 887
       registry.put(
           "ASSEMBLY_GROUP_COMPONENT_DEFINITION_PLACEMENT_LINK",
           (resolver, instance) ->
@@ -3102,34 +3096,19 @@ public final class MiscRegistry {
           "CONNECTIVITY_DEFINITION",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "CONNECTIVITY_DEFINITION"));
-      registry.put(
-          "CONTACT_FEATURE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "CONTACT_FEATURE_DEFINITION"));
+      // CONTACT_FEATURE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1107
       registry.put(
           "COORDINATES_LIST",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "COORDINATES_LIST"));
-      registry.put(
-          "COUNTERBORE_HOLE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "COUNTERBORE_HOLE_DEFINITION"));
-      registry.put(
-          "COUNTERBORE_HOLE_OCCURRENCE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "COUNTERBORE_HOLE_OCCURRENCE"));
+      // COUNTERBORE_HOLE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1108
+      // COUNTERBORE_HOLE_OCCURRENCE already registered via registerShapeAspectOccurrenceAliases at line 1267
       registry.put(
           "COUNTERBORE_HOLE_OCCURRENCE_IN_ASSEMBLY",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "COUNTERBORE_HOLE_OCCURRENCE_IN_ASSEMBLY"));
-      registry.put(
-          "COUNTERDRILL_HOLE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "COUNTERDRILL_HOLE_DEFINITION"));
-      registry.put(
-          "COUNTERDRILL_HOLE_OCCURRENCE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "COUNTERDRILL_HOLE_OCCURRENCE"));
+      // COUNTERDRILL_HOLE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1109
+      // COUNTERDRILL_HOLE_OCCURRENCE already registered via registerShapeAspectOccurrenceAliases at line 1268
       registry.put(
           "COUNTERDRILL_HOLE_OCCURRENCE_IN_ASSEMBLY",
           (resolver, instance) ->
@@ -3138,10 +3117,7 @@ public final class MiscRegistry {
           "COUNTERSINK_HOLE_DEFINITION",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "COUNTERSINK_HOLE_DEFINITION"));
-      registry.put(
-          "COUNTERSINK_HOLE_OCCURRENCE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "COUNTERSINK_HOLE_OCCURRENCE"));
+      // COUNTERSINK_HOLE_OCCURRENCE already registered via registerShapeAspectOccurrenceAliases at line 1269
       registry.put(
           "COUNTERSINK_HOLE_OCCURRENCE_IN_ASSEMBLY",
           (resolver, instance) ->
@@ -3423,10 +3399,7 @@ public final class MiscRegistry {
           "PRODUCT_DEFINITION_SPECIFIED_OCCURRENCE",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "PRODUCT_DEFINITION_SPECIFIED_OCCURRENCE"));
-      registry.put(
-          "PRODUCT_DEFINITION_SUBSTITUTE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "PRODUCT_DEFINITION_SUBSTITUTE"));
+      // PRODUCT_DEFINITION_SUBSTITUTE already registered via registerProductDefinitionRelationshipRelationshipAliases at line 888
       registry.put(
           "PRODUCT_GROUP_ATTRIBUTE_SET",
           (resolver, instance) ->
@@ -3772,10 +3745,7 @@ public final class MiscRegistry {
           "CIRCULAR_CLOSED_PROFILE",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "CIRCULAR_CLOSED_PROFILE"));
-      registry.put(
-          "CIRCULAR_PATTERN",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "CIRCULAR_PATTERN"));
+      // CIRCULAR_PATTERN already registered via registerCharacterizedObjectAliases at line 1104
       registry.put(
           "CLOSED_PATH_PROFILE",
           (resolver, instance) ->
@@ -3784,10 +3754,7 @@ public final class MiscRegistry {
           "COMPONENT_FEATURE_JOINT",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "COMPONENT_FEATURE_JOINT"));
-      registry.put(
-          "COMPOSITE_HOLE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "COMPOSITE_HOLE"));
+      // COMPOSITE_HOLE already registered via registerCharacterizedObjectAliases at line 1106
       registry.put(
           "CONICAL_STEPPED_HOLE_TRANSITION",
           (resolver, instance) ->
@@ -3868,14 +3835,8 @@ public final class MiscRegistry {
           "ERRONEOUS_MANIFOLD_SOLID_BREP",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "ERRONEOUS_MANIFOLD_SOLID_BREP"));
-      registry.put(
-          "EXPLICIT_COMPOSITE_HOLE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "EXPLICIT_COMPOSITE_HOLE"));
-      registry.put(
-          "EXPLICIT_ROUND_HOLE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "EXPLICIT_ROUND_HOLE"));
+      // EXPLICIT_COMPOSITE_HOLE already registered via registerCharacterizedObjectAliases at line 1111
+      // EXPLICIT_ROUND_HOLE already registered via registerCharacterizedObjectAliases at line 1112
       registry.put(
           "EXTERNALLY_DEFINED_COLOUR",
           (resolver, instance) ->
@@ -4111,10 +4072,7 @@ public final class MiscRegistry {
           "COMPLEX_AREA",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "COMPLEX_AREA"));
-      registry.put(
-          "COMPOUND_FEATURE",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "COMPOUND_FEATURE"));
+      // COMPOUND_FEATURE already registered via registerCharacterizedObjectAliases at line 1105
       registry.put(
           "CONCEPT_FEATURE_OPERATOR",
           (resolver, instance) ->
@@ -4123,10 +4081,7 @@ public final class MiscRegistry {
           "CONDITIONAL_CONCEPT_FEATURE",
           (resolver, instance) ->
               resolver.resolveGenericRelationship(instance, "CONDITIONAL_CONCEPT_FEATURE"));
-      registry.put(
-          "CONTACTING_FEATURE",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "CONTACTING_FEATURE"));
+      // CONTACTING_FEATURE already registered via registerShapeAspectAliases at line 1241
       registry.put(
           "CONTACT_FEATURE",
           (resolver, instance) ->
@@ -5726,10 +5681,7 @@ public final class MiscRegistry {
           "BOOLEAN_VARIABLE",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BOOLEAN_VARIABLE"));
-      registry.put(
-          "BOSS",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BOSS"));
+      // BOSS already registered via registerCharacterizedObjectAliases at line 1103
       // BOSS_TOP already registered via registerShapeAspectAliases at line 1237
       registry.put(
           "BOUND_PARAMETER_ENVIRONMENT",
@@ -5914,10 +5866,7 @@ public final class MiscRegistry {
           "CONSTANT_FUNCTION",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "CONSTANT_FUNCTION"));
-      registry.put(
-          "CONSTITUENT_SHAPE_ASPECT",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "CONSTITUENT_SHAPE_ASPECT"));
+      // CONSTITUENT_SHAPE_ASPECT already registered via registerShapeAspectAliases at line 1240
       registry.put(
           "CONTAINING_MESSAGE",
           (resolver, instance) ->
