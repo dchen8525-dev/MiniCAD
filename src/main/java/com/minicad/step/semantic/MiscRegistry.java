@@ -3313,10 +3313,7 @@ public final class MiscRegistry {
           "EXTERNALLY_LISTED_DATA",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "EXTERNALLY_LISTED_DATA"));
-      registry.put(
-          "FEATURE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "FEATURE_DEFINITION"));
+      // FEATURE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1114
       registry.put(
           "FEATURE_DEFINITION_WITH_CONNECTION_AREA",
           (resolver, instance) ->
@@ -4043,10 +4040,7 @@ public final class MiscRegistry {
           "BOOLEAN_REPRESENTATION_ITEM",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BOOLEAN_REPRESENTATION_ITEM"));
-      registry.put(
-          "BREAKDOWN_CONTEXT",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BREAKDOWN_CONTEXT"));
+      // BREAKDOWN_CONTEXT already registered via registerProductDefinitionRelationshipAliases at line 871
       registry.put(
           "BYTES_REPRESENTATION_ITEM",
           (resolver, instance) ->
@@ -5709,10 +5703,7 @@ public final class MiscRegistry {
           "BEAD",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "BEAD"));
-      registry.put(
-          "BEAD_END",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BEAD_END"));
+      // BEAD_END already registered via registerShapeAspectAliases at line 1236
       registry.put(
           "BINARY_ASSEMBLY_CONSTRAINT",
           (resolver, instance) ->
