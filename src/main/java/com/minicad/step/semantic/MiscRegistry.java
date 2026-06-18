@@ -3113,10 +3113,7 @@ public final class MiscRegistry {
           "COUNTERDRILL_HOLE_OCCURRENCE_IN_ASSEMBLY",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "COUNTERDRILL_HOLE_OCCURRENCE_IN_ASSEMBLY"));
-      registry.put(
-          "COUNTERSINK_HOLE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "COUNTERSINK_HOLE_DEFINITION"));
+      // COUNTERSINK_HOLE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1110
       // COUNTERSINK_HOLE_OCCURRENCE already registered via registerShapeAspectOccurrenceAliases at line 1269
       registry.put(
           "COUNTERSINK_HOLE_OCCURRENCE_IN_ASSEMBLY",
@@ -3274,10 +3271,7 @@ public final class MiscRegistry {
           "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "EXTERNALLY_CONDITIONED_DATA_QUALITY_INSPECTION_INSTANCE_REPORT_ITEM"));
-      registry.put(
-          "EXTERNALLY_DEFINED_FEATURE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "EXTERNALLY_DEFINED_FEATURE_DEFINITION"));
+      // EXTERNALLY_DEFINED_FEATURE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1113
       registry.put(
           "EXTERNALLY_DEFINED_ITEM_WITH_MULTIPLE_REFERENCES",
           (resolver, instance) ->
@@ -3287,10 +3281,7 @@ public final class MiscRegistry {
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "EXTERNALLY_LISTED_DATA"));
       // FEATURE_DEFINITION already registered via registerCharacterizedObjectAliases at line 1114
-      registry.put(
-          "FEATURE_DEFINITION_WITH_CONNECTION_AREA",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "FEATURE_DEFINITION_WITH_CONNECTION_AREA"));
+      // FEATURE_DEFINITION_WITH_CONNECTION_AREA already registered via registerCharacterizedObjectAliases at line 1115
       registry.put(
           "FIXED_INSTANCE_ATTRIBUTE_SET",
           (resolver, instance) ->
@@ -4362,10 +4353,7 @@ public final class MiscRegistry {
           "CURVE_WITH_SMALL_CURVATURE_RADIUS",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "CURVE_WITH_SMALL_CURVATURE_RADIUS"));
-      registry.put(
-          "DEFAULT_MODEL_GEOMETRIC_VIEW",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "DEFAULT_MODEL_GEOMETRIC_VIEW"));
+      // DEFAULT_MODEL_GEOMETRIC_VIEW already registered via registerShapeAspectAliases at line 1244
       registry.put(
           "DIFFERENT_CURVE_LENGTH",
           (resolver, instance) ->
