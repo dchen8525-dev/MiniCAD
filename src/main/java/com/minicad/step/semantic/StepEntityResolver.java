@@ -13156,12 +13156,28 @@ public final class StepEntityResolver {
   StepEntity resolveGenericAssignment(
       StepEntityInstance instance, String entityName) {
     StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+    // Support both 2-parameter (name, ref) and 3-parameter (name, items, context) forms
+    requireParameterCountIn(instance, definition, 2, 3);
+    if (definition.parameters().size() == 2) {
+      return new StepGenericEntity(
+          instance.id(),
+          stringValue(instance, definition, 0),
+          resolve(referenceId(instance, definition, 1)),
+          entityName);
+    } else {
+      // 3-parameter form: name, items list, context reference
+      List<StepEntity> items =
+          entityReferenceList(
+              instance, definition, 1, entityName + " items must contain entity references");
+      StepEntity context = resolve(referenceId(instance, definition, 2));
+      return new StepRepresentation(
+          instance.id(),
+          stringValue(instance, definition, 0),
+          items,
+          context,
+          false,
+          entityName);
+    }
   }
 
   StepEntity resolveGenericRelationship(
@@ -13202,12 +13218,28 @@ public final class StepEntityResolver {
   StepEntity resolveGenericProperty(
       StepEntityInstance instance, String entityName) {
     StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+    // Support both 2-parameter (name, ref) and 3-parameter (name, items, context) forms
+    requireParameterCountIn(instance, definition, 2, 3);
+    if (definition.parameters().size() == 2) {
+      return new StepGenericEntity(
+          instance.id(),
+          stringValue(instance, definition, 0),
+          resolve(referenceId(instance, definition, 1)),
+          entityName);
+    } else {
+      // 3-parameter form: name, items list, context reference
+      List<StepEntity> items =
+          entityReferenceList(
+              instance, definition, 1, entityName + " items must contain entity references");
+      StepEntity context = resolve(referenceId(instance, definition, 2));
+      return new StepRepresentation(
+          instance.id(),
+          stringValue(instance, definition, 0),
+          items,
+          context,
+          false,
+          entityName);
+    }
   }
 
   StepEntity resolveGenericSetup(
