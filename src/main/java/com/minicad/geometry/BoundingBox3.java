@@ -153,8 +153,12 @@ public final class BoundingBox3 {
      * Returns the center point of the bounding box.
      *
      * @return center point
+     * @throws GeometryException if the box is empty
      */
     public CartesianPoint center() {
+        if (isEmpty()) {
+            throw new GeometryException("Cannot compute center of empty bounding box");
+        }
         return new CartesianPoint(
             (minX + maxX) / 2.0,
             (minY + maxY) / 2.0,
@@ -211,6 +215,13 @@ public final class BoundingBox3 {
      */
     public BoundingBox3 union(BoundingBox3 other) {
         Preconditions.requireNonNull(other, "other");
+        // Handle empty boxes
+        if (isEmpty()) {
+            return other;
+        }
+        if (other.isEmpty()) {
+            return this;
+        }
         return new BoundingBox3(
             Math.min(minX, other.minX),
             Math.min(minY, other.minY),

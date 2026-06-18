@@ -51,8 +51,11 @@ public final class Shell {
         }
         BoundingBox3 box = BoundingBox3.empty();
         for (Face face : faces) {
-            if (face != null && face.surface() != null) {
-                box = box.union(face.surface().boundingBox());
+            if (face != null) {
+                BoundingBox3 faceBox = face.boundingBox();
+                if (faceBox != null) {
+                    box = box.union(faceBox);
+                }
             }
         }
         return box;
@@ -160,11 +163,14 @@ public final class Shell {
     /**
      * Returns the centroid of this shell.
      *
-     * @return centroid point
+     * @return centroid point, or null if shell has no faces or empty bounding box
      */
     public CartesianPoint centroid() {
         BoundingBox3 box = boundingBox();
-        return box != null ? box.center() : null;
+        if (box == null || box.isEmpty()) {
+            return null;
+        }
+        return box.center();
     }
 
     /**
