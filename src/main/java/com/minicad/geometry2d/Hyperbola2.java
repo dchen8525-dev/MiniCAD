@@ -110,9 +110,11 @@ public final class Hyperbola2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
-        // Sample a range of parameter values
-        for (int i = -segments; i <= segments; i++) {
-            double t = 0.5 * i; // Scale to get meaningful range
+        // Sample a range of parameter values for the right branch (positive x)
+        double paramRange = segments * 0.5; // Range scales with segments
+        double paramStep = paramRange / segments;
+        for (int i = 0; i <= segments; i++) {
+            double t = paramStep * i; // t >= 0 for right branch
             points.add(pointAt(t));
         }
         return List.copyOf(points);

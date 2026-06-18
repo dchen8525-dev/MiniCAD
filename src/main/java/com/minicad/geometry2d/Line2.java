@@ -143,12 +143,14 @@ public final class Line2 implements Curve2 {
 
     @Override
     public List<Point2> sample(int segments) {
-        // For an infinite line, sample a default segment
         List<Point2> points = new ArrayList<>();
-        double start = startParameter();
-        double end = Math.min(endParameter(), 100.0); // Limit for sampling
+        // Sample a finite range of the infinite line
+        // Use a parameter range that scales inversely with parameterScale
+        double sampleRange = 10.0; // World-space distance
+        double paramRange = sampleRange / Math.max(parameterScale, 1.0e-12);
+        double paramStep = 2.0 * paramRange / segments;
         for (int i = 0; i <= segments; i++) {
-            double t = start + (end - start) * i / segments;
+            double t = -paramRange + paramStep * i;
             points.add(pointAt(t));
         }
         return List.copyOf(points);
@@ -202,6 +204,29 @@ public final class Line2 implements Curve2 {
      */
     public double curvatureAt(int segment) {
         return curvature();
+    }
+
+    /**
+     * Returns the length for one unit of parameter.
+     * For Line2, this returns the parameterScale value.
+     *
+     * @return parameterScale (length per parameter unit)
+     */
+    @Override
+    public double length() {
+        return parameterScale;
+    }
+
+    /**
+     * Returns the tangent vector at a parameter value.
+     * For Line2, tangent is constant (the direction vector).
+     *
+     * @param parameter parameter value (ignored for line)
+     * @return direction vector as tangent
+     */
+    @Override
+    public Vector2 tangentAt(double parameter) {
+        return direction.asVector();
     }
 
     /**

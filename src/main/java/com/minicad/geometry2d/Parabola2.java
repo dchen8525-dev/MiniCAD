@@ -112,9 +112,11 @@ public final class Parabola2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
-        // Sample a range of parameter values
-        for (int i = -segments; i <= segments; i++) {
-            double t = 0.5 * i; // Scale to get meaningful range
+        // Sample a range of parameter values symmetrically around vertex
+        double paramRange = segments * 0.5; // Range scales with segments
+        double paramStep = 2.0 * paramRange / segments;
+        for (int i = 0; i <= segments; i++) {
+            double t = -paramRange + paramStep * i;
             points.add(pointAt(t));
         }
         return List.copyOf(points);
