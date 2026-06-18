@@ -31,7 +31,7 @@ public final class CompositeCurve3 implements Curve3 {
     public List<Curve3> segments() { return getSegments(); }
 
     // Convenience method
-    public int segmentCount() { return segments.size(); }
+    public int segmentCount() { return segments == null ? 0 : segments.size(); }
 
     @Override
     public boolean equals(Object o) {

@@ -158,4 +158,15 @@ public final class Line3 implements Curve3 {
         CartesianPoint p1 = pointAt(t1);
         return BoundingBox3.of(p0, p1);
     }
+
+    @Override
+    public java.util.List<CartesianPoint> sample(int segments) {
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        // Sample a finite range of the infinite line (from -10 to 10)
+        for (int i = 0; i <= segments; i++) {
+            double t = -10.0 + 20.0 * i / segments;
+            points.add(pointAt(t));
+        }
+        return java.util.List.copyOf(points);
+    }
 }
