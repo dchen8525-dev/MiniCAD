@@ -8764,7 +8764,7 @@ public final class StepEntityResolver {
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT_WITH_OFFSET");
     requireParameterCount(instance, definition, 1);
-    StepConversionBasedUnit base = resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT_WITH_OFFSET");
+    StepConversionBasedUnit base = resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT");
     return new StepConversionBasedUnitWithOffset(
         instance.id(),
         base.name(),
