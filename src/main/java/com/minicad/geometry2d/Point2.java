@@ -78,6 +78,29 @@ public final class Point2 {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * Returns the midpoint between this point and another point.
+     *
+     * @param other the other point
+     * @return midpoint
+     */
+    public Point2 midpoint(Point2 other) {
+        Preconditions.requireNonNull(other, "other");
+        return new Point2((x + other.x) / 2.0, (y + other.y) / 2.0);
+    }
+
+    /**
+     * Interpolates between this point and another point.
+     *
+     * @param other the other point
+     * @param t interpolation parameter (0 = this point, 1 = other point)
+     * @return interpolated point
+     */
+    public Point2 interpolate(Point2 other, double t) {
+        Preconditions.requireNonNull(other, "other");
+        return new Point2(x + t * (other.x - x), y + t * (other.y - y));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

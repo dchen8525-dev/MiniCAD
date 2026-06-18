@@ -83,6 +83,26 @@ public final class BoundingBox3 {
     }
 
     /**
+     * Creates a bounding box from two points.
+     *
+     * @param p1 first point
+     * @param p2 second point
+     * @return bounding box containing both points
+     */
+    public static BoundingBox3 of(CartesianPoint p1, CartesianPoint p2) {
+        Preconditions.requireNonNull(p1, "p1");
+        Preconditions.requireNonNull(p2, "p2");
+        return new BoundingBox3(
+            Math.min(p1.x(), p2.x()),
+            Math.min(p1.y(), p2.y()),
+            Math.min(p1.z(), p2.z()),
+            Math.max(p1.x(), p2.x()),
+            Math.max(p1.y(), p2.y()),
+            Math.max(p1.z(), p2.z())
+        );
+    }
+
+    /**
      * Returns the center point of the bounding box.
      *
      * @return center point
@@ -173,6 +193,117 @@ public final class BoundingBox3 {
         Preconditions.requireNonNull(point, "point");
         return minX <= point.x() && minY <= point.y() && minZ <= point.z()
             && maxX >= point.x() && maxY >= point.y() && maxZ >= point.z();
+    }
+
+    /**
+     * Returns the diagonal vector from min corner to max corner.
+     *
+     * @return diagonal vector
+     */
+    public Vector3 diagonal() {
+        return new Vector3(maxX - minX, maxY - minY, maxZ - minZ);
+    }
+
+    /**
+     * Returns the width (X extent) of the bounding box.
+     *
+     * @return width
+     */
+    public double width() {
+        return maxX - minX;
+    }
+
+    /**
+     * Returns the height (Y extent) of the bounding box.
+     *
+     * @return height
+     */
+    public double height() {
+        return maxY - minY;
+    }
+
+    /**
+     * Returns the depth (Z extent) of the bounding box.
+     *
+     * @return depth
+     */
+    public double depth() {
+        return maxZ - minZ;
+    }
+
+    /**
+     * Returns the volume of the bounding box.
+     *
+     * @return volume (width * height * depth)
+     */
+    public double volume() {
+        return width() * height() * depth();
+    }
+
+    /**
+     * Returns the eight corners of the bounding box.
+     *
+     * @return list of corner points in order: min, then all combinations
+     */
+    public java.util.List<CartesianPoint> corners() {
+        java.util.List<CartesianPoint> cornerList = new java.util.ArrayList<>();
+        cornerList.add(new CartesianPoint(minX, minY, minZ));
+        cornerList.add(new CartesianPoint(maxX, minY, minZ));
+        cornerList.add(new CartesianPoint(minX, maxY, minZ));
+        cornerList.add(new CartesianPoint(maxX, maxY, minZ));
+        cornerList.add(new CartesianPoint(minX, minY, maxZ));
+        cornerList.add(new CartesianPoint(maxX, minY, maxZ));
+        cornerList.add(new CartesianPoint(minX, maxY, maxZ));
+        cornerList.add(new CartesianPoint(maxX, maxY, maxZ));
+        return java.util.List.copyOf(cornerList);
+    }
+
+    /**
+     * Returns a point inside the box at parametric coordinates.
+     *
+     * @param u parametric coordinate in X (0 to 1)
+     * @param v parametric coordinate in Y (0 to 1)
+     * @param w parametric coordinate in Z (0 to 1)
+     * @return point inside the box
+     */
+    public CartesianPoint pointAt(double u, double v, double w) {
+        return new CartesianPoint(
+            minX + u * (maxX - minX),
+            minY + v * (maxY - minY),
+            minZ + w * (maxZ - minZ)
+        );
+    }
+
+    /**
+     * Returns the distance from the box to a point (0 if point is inside).
+     *
+     * @param point the point
+     * @return distance (0 if inside)
+     */
+    public double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        if (containsPoint(point)) {
+            return 0.0;
+        }
+        // Find closest point on box
+        double closestX = Math.max(minX, Math.min(maxX, point.x()));
+        double closestY = Math.max(minY, Math.min(maxY, point.y()));
+        double closestZ = Math.max(minZ, Math.min(maxZ, point.z()));
+        return point.distanceTo(new CartesianPoint(closestX, closestY, closestZ));
+    }
+
+    /**
+     * Returns the closest point on the box boundary to a given point.
+     *
+     * @param point the target point
+     * @return closest point on box boundary
+     */
+    public CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        double closestX = Math.max(minX, Math.min(maxX, point.x()));
+        double closestY = Math.max(minY, Math.min(maxY, point.y()));
+        double closestZ = Math.max(minZ, Math.min(maxZ, point.z()));
+        return new CartesianPoint(closestX, closestY, closestZ);
     }
 
     @Override
