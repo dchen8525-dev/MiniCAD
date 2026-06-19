@@ -3866,10 +3866,7 @@ public final class MiscRegistry {
           "HOLE_BOTTOM",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "HOLE_BOTTOM"));
-      registry.put(
-          "HOLE_IN_PANEL",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "HOLE_IN_PANEL"));
+      // HOLE_IN_PANEL already registered via registerCharacterizedObjectAliases at line 1121
       registry.put(
           "HOMOKINETIC_PAIR",
           (resolver, instance) ->
@@ -3954,10 +3951,7 @@ public final class MiscRegistry {
           "ORIENTED_JOINT",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "ORIENTED_JOINT"));
-      registry.put(
-          "OUTSIDE_PROFILE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "OUTSIDE_PROFILE"));
+      // OUTSIDE_PROFILE already registered via registerCharacterizedObjectAliases at line 1126
 
 // Phase 4 final: Additional entities to reach 85%
       registry.put(
@@ -4255,10 +4249,7 @@ public final class MiscRegistry {
           "TEE_PROFILE",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "TEE_PROFILE"));
-      registry.put(
-          "TERMINAL_FEATURE",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "TERMINAL_FEATURE"));
+      // TERMINAL_FEATURE already registered via registerShapeAspectAliases at line 1258
       registry.put(
           "TRANSFORMATION_WITH_DERIVED_ANGLE",
           (resolver, instance) ->
@@ -4508,10 +4499,7 @@ public final class MiscRegistry {
           "SYSTEM_BREAKDOWN_CONTEXT",
           (resolver, instance) ->
               resolver.resolveGenericRelationship(instance, "SYSTEM_BREAKDOWN_CONTEXT"));
-      registry.put(
-          "TOLERANCE_ZONE_DEFINITION",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "TOLERANCE_ZONE_DEFINITION"));
+      // TOLERANCE_ZONE_DEFINITION already registered via registerShapeAspectAliases at line 1260
       registry.put(
           "TOLERANCE_ZONE_WITH_DATUM",
           (resolver, instance) ->
@@ -8366,8 +8354,8 @@ public final class MiscRegistry {
       registry.put("TOLERANCE_MODIFIER", StepEntityResolver::resolveToleranceModifier);
   
       // FEA types
-      registry.put("FEA_MATERIAL_PROPERTY_REPRESENTATION", StepEntityResolver::resolveFeaMaterialPropertyRepresentation);
-      registry.put("VOLUME_3D_ELEMENT_REPRESENTATION", StepEntityResolver::resolveVolume3dElementRepresentation);
+      // FEA_MATERIAL_PROPERTY_REPRESENTATION already registered at line 6474
+      // VOLUME_3D_ELEMENT_REPRESENTATION already registered at line 6469
   
       // PMI/Annotation types
       registry.put("PRESENTATION_LAYER_ASSIGNMENT", StepEntityResolver::resolvePresentationLayerAssignment);
