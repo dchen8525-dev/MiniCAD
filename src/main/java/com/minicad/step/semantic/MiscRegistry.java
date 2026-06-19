@@ -2791,10 +2791,7 @@ public final class MiscRegistry {
           "LOCATION_ROLE",
           (resolver, instance) ->
               resolver.resolveGenericRole(instance, "LOCATION_ROLE"));
-      registry.put(
-          "MATED_PART_RELATIONSHIP",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "MATED_PART_RELATIONSHIP"));
+      // MATED_PART_RELATIONSHIP already registered via registerShapeAspectAliases at line 1249
       registry.put(
           "MESSAGE_RELATIONSHIP",
           (resolver, instance) ->
@@ -3836,10 +3833,7 @@ public final class MiscRegistry {
           "EXTERNALLY_DEFINED_STYLE",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "EXTERNALLY_DEFINED_STYLE"));
-      registry.put(
-          "FEATURE_PATTERN",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "FEATURE_PATTERN"));
+      // FEATURE_PATTERN already registered via registerCharacterizedObjectAliases at line 1117
       registry.put(
           "FILL_AREA_STYLE_TILES",
           (resolver, instance) ->
@@ -4097,14 +4091,8 @@ public final class MiscRegistry {
           "EXTERNAL_CLASS_LIBRARY",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "EXTERNAL_CLASS_LIBRARY"));
-      registry.put(
-          "FEATURE_IN_PANEL",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "FEATURE_IN_PANEL"));
-      registry.put(
-          "GENERAL_FEATURE",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "GENERAL_FEATURE"));
+      // FEATURE_IN_PANEL already registered via registerCharacterizedObjectAliases at line 1116
+      // GENERAL_FEATURE already registered via registerCharacterizedObjectAliases at line 1120
       registry.put(
           "INCLUSION_PRODUCT_CONCEPT_FEATURE",
           (resolver, instance) ->
@@ -4157,14 +4145,8 @@ public final class MiscRegistry {
           "PATH_AREA_WITH_PARAMETERS",
           (resolver, instance) ->
               resolver.resolveGenericAssignment(instance, "PATH_AREA_WITH_PARAMETERS"));
-      registry.put(
-          "PATH_FEATURE_COMPONENT",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "PATH_FEATURE_COMPONENT"));
-      registry.put(
-          "PHYSICAL_COMPONENT_FEATURE",
-          (resolver, instance) ->
-              resolver.resolveGenericRelationship(instance, "PHYSICAL_COMPONENT_FEATURE"));
+      // PATH_FEATURE_COMPONENT already registered via registerShapeAspectAliases at line 1252
+      // PHYSICAL_COMPONENT_FEATURE already registered via registerShapeAspectAliases at line 1253
       registry.put(
           "PLACED_FEATURE",
           (resolver, instance) ->
@@ -4598,10 +4580,7 @@ public final class MiscRegistry {
           "FIXED_REFERENCE_SWEPT_SURFACE",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "FIXED_REFERENCE_SWEPT_SURFACE"));
-      registry.put(
-          "FLAT_FACE",
-          (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "FLAT_FACE"));
+      // FLAT_FACE already registered via registerCharacterizedObjectAliases at line 1118
       registry.put(
           "FREE_EDGE",
           (resolver, instance) ->
@@ -4658,10 +4637,7 @@ public final class MiscRegistry {
           "GEOMETRIC_GAP_IN_TOPOLOGY",
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "GEOMETRIC_GAP_IN_TOPOLOGY"));
-      registry.put(
-          "GEOMETRIC_TOLERANCE_WITH_MODIFIERS",
-          (resolver, instance) ->
-              resolver.resolveGenericStatus(instance, "GEOMETRIC_TOLERANCE_WITH_MODIFIERS"));
+      // GEOMETRIC_TOLERANCE_WITH_MODIFIERS already registered via registerShapeAspectAliases at line 1247
       registry.put(
           "HIERARCHICAL_INTERFACE_CONNECTION",
           (resolver, instance) ->
