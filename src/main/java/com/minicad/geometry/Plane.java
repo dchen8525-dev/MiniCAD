@@ -93,12 +93,12 @@ public final class Plane implements SurfaceGeometry {
      */
     public CartesianPoint intersect(Line3 line) {
         Preconditions.requireNonNull(line, "line");
-        Vector3 lineDir = line.direction().asVector();
+        Vector3 lineDir = line.getDirection().asVector();
         double denom = normal.dot(lineDir);
         if (Math.abs(denom) < Epsilon.get()) {
             throw new GeometryException("line is parallel to plane");
         }
-        Vector3 toLineOrigin = line.origin().subtract(origin);
+        Vector3 toLineOrigin = line.getOrigin().subtract(origin);
         double t = -normal.dot(toLineOrigin) / denom;
         return line.pointAt(t);
     }
@@ -160,8 +160,8 @@ public final class Plane implements SurfaceGeometry {
         // For infinite plane, return a reasonable approximation
         // Sample points at a finite range
         return new BoundingBox3(
-            origin.x() - 10, origin.y() - 10, origin.z() - 10,
-            origin.x() + 10, origin.y() + 10, origin.z() + 10
+            origin.getX() - 10, origin.getY() - 10, origin.getZ() - 10,
+            origin.getX() + 10, origin.getY() + 10, origin.getZ() + 10
         );
     }
 

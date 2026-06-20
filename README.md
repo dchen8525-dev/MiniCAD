@@ -30,7 +30,7 @@ MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目�
 | `com.minicad.topology` | 11 | B-Rep 拓扑类型（Vertex、Edge、Face、Shell、Solid 等） |
 | `com.minicad.step.syntax` | 5 | STEP 语法解析器（Tokenizer、Parser、AST 模型） |
 | `com.minicad.step.semantic` | 6 | STEP 语义解析器（EntityResolver、EntityFactory、CadBuilder 等） |
-| `com.minicad.step.model` | 1246 | STEP 实体模型类，分 26 个子包（见下表） |
+| `com.minicad.step.model` | 1264 | STEP 实体模型类，分 26 个子包（见下表） |
 | `com.minicad.app` | 13 | 应用入口：CLI 解析器、Web 预览器、JSON 导出器、装配图构建器等 |
 
 ### `step.model` 子包明细
@@ -73,8 +73,8 @@ MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目�
 | 覆盖口径 | Schema 实体数 | Model | Registered | Builder | Exporter | Tested | Full signal | 说明 |
 |----------|--------------:|------:|-----------:|--------:|---------:|-------:|------------:|------|
 | **AP214 Curated** | 64 | 59 | 64 | 59 | 59 | 51 | 51 | 基于仓库 AP214/automotive_design 示例抽取的 curated baseline，不是完整 AP214 schema |
-| **AP242 Ed2** | 2122 | 428 | 740 | 417 | 334 | 441 | 301 | 基于 `schemas/ap242ed2_dis2_mim_lf_v1.101.exp` 的 schema 覆盖扫描 |
-| **All scanned entities** | 1844 | 1246 | 1293 | 734 | 425 | 495 | - | 见 [doc/generated/coverage.md](doc/generated/coverage.md) |
+| **AP242 Ed2** | 2122 | 445 | 1550 | 434 | 334 | 441 | 301 | 基于 `schemas/ap242ed2_dis2_mim_lf_v1.101.exp` 的 schema 覆盖扫描 |
+| **All scanned entities** | 2651 | 1264 | 2103 | 752 | 425 | 496 | - | 见 [doc/generated/coverage.md](doc/generated/coverage.md) |
 
 覆盖等级：
 
@@ -433,7 +433,7 @@ src/main/java/com/minicad/
 ├── step/
 │   ├── syntax/       -- STEP 语法解析器 (5 个)
 │   ├── semantic/     -- STEP 语义解析器 (6 个)
-│   └── model/        -- STEP 实体模型类 (1246 个, 26 个子包)
+│   └── model/        -- STEP 实体模型类 (1264 个, 26 个子包)
 │       ├── base/         -- 基础抽象 (11)
 │       ├── geometry/     -- 几何实体 (115)
 │       ├── topology/     -- 拓扑实体 (31)
@@ -464,6 +464,77 @@ src/main/java/com/minicad/
 
 examples/             -- STEP 示例文件
 ```
+
+## 架构概览
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        STEP 文件 (.step / .stp)                     │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    语法层 (step.syntax)                              │
+│                                                                     │
+│  StepTokenizer ─────► StepParser ─────► StepFile (AST)             │
+│                                                                     │
+│  • ISO 10303-21 词法分析  • HEADER/DATA 解析  • 实体参数解析       │
+│  • 字符串转义处理         • 注释跳过         • 重复 ID 检测        │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    语义层 (step.semantic)                            │
+│                                                                     │
+│  StepEntityResolver ─────► StepCadBuilder ─────► B-Rep 模型        │
+│                                                                     │
+│  • 实体解析 (1264 种)  • 几何构建           • 拓扑构建             │
+│  • 前向引用处理        • 曲线/曲面求值      • Shell/Solid 验证     │
+│  • 参数类型检查        • 装配变换           • 三角网格导出          │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    几何层 (geometry / topology)                      │
+│                                                                     │
+│  Curve3 (13 种)         SurfaceGeometry (16 种)                    │
+│  • Line3, Circle        • Plane, Cylinder                         │
+│  • BSpline, Trimmed     • BSpline, Offset                         │
+│  • Composite, Polyline  • Torus, Sphere                           │
+│                                                                     │
+│  Topology:                                                         │
+│  • Vertex → Edge → Face → Shell → Solid                           │
+│  • TopologyValidator:闭合性、流形性、零面积检测                    │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    应用层 (app)                                      │
+│                                                                     │
+│  StepDumpApp ────────► CLI 解析输出                                 │
+│  StepViewerApp ──────► Web 预览器 (Jetty + Three.js)               │
+│  StepPreviewJsonExporter ──► GLB 导出                              │
+│  StepCapabilityReportApp ──► 覆盖报告生成                          │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 数据流
+
+1. **输入**: STEP 文本 (ISO 10303-21)
+2. **解析**: Tokenizer → Parser → AST (StepFile)
+3. **解析**: Resolver → 语义模型 (StepEntity map)
+4. **构建**: Builder → 几何/拓扑 (Curve, Surface, Topology)
+5. **导出**: Exporter → GLB (Web 预览) 或 JSON (元数据)
+
+### 扩展新实体
+
+添加新 STEP 实体支持的步骤：
+
+1. `step.model.<subpackage>`: 创建 `StepXxx` 模型类
+2. `StepEntityResolver`: 添加 `resolveXxx()` 方法
+3. `MiscRegistry`: 注册实体工厂
+4. `StepCadBuilder`: 添加 `buildXxx()` 方法（如果需要几何）
+5. 测试: 添加解析 + 解析 + 构建测试
 
 ## 构建与运行
 
@@ -543,4 +614,125 @@ mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp exec:java  # 启动
 - 逐步覆盖 STEP AP214/AP242 核心实体
 - 持续完善几何内核功能
 - 支持 STEP 文件导出能力
+
+## 故障排除
+
+### 常见问题
+
+#### 1. Java 版本错误
+
+**错误**: `UnsupportedClassVersionError` 或编译失败
+
+**解决**: MiniCAD 需要 Java 11。检查并设置正确的 JAVA_HOME：
+
+```bash
+# Windows (PowerShell)
+$env:JAVA_HOME = "C:\path\to\jdk-11"
+
+# Linux/macOS
+export JAVA_HOME=/path/to/jdk-11
+
+# 验证
+java -version  # 应显示 11.x.x
+```
+
+#### 2. Maven 依赖下载失败
+
+**错误**: `Could not resolve dependencies` 或网络超时
+
+**解决**: 检查 Maven 镜像配置（`~/.m2/settings.xml`）：
+
+```xml
+<settings>
+  <mirrors>
+    <mirror>
+      <id>aliyun</id>
+      <name>Aliyun Maven Mirror</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+</settings>
+```
+
+#### 3. 测试失败
+
+**错误**: 测试用例失败或编译错误
+
+**解决**:
+
+```bash
+# 清理并重新构建
+mvn clean test
+
+# 如果仍然失败，检查 Java 版本
+java -version  # 必须是 Java 11
+
+# 查看具体失败原因
+mvn test -X  # 调试模式
+```
+
+#### 4. Web 预览器无法启动
+
+**错误**: `Address already in use: bind 127.0.0.1:8080`
+
+**解决**: 端口被占用，使用其他端口：
+
+```bash
+# 使用 --port 参数
+mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp \
+    -Dexec.args="--port 9090"
+
+# 或设置系统属性
+mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp \
+    -Dminicad.preview.port=9090
+```
+
+#### 5. STEP 文件解析失败
+
+**错误**: `StepParseException` 或 `UnsupportedStepEntityException`
+
+**可能原因**:
+
+- **语法错误**: STEP 文件不符合 ISO 10303-21 规范
+  - 解决: 使用 FreeCAD 或其他 CAD 软件重新导出
+  
+- **不支持的实体**: 文件包含未实现的 STEP 实体类型
+  - 解决: 查看 `doc/generated/coverage.md` 确认实体支持状态
+  - 或提交 issue 请求支持
+
+- **编码问题**: 文件编码不是 UTF-8
+  - 解决: MiniCAD 支持 UTF-8、GBK、GB18030 自动检测
+  - 如果仍然失败，转换为 UTF-8：`iconv -f GBK -t UTF-8 input.step > output.step`
+
+#### 6. 大文件处理缓慢
+
+**现象**: 解析大型 STEP 文件（>10MB）时内存占用高或速度慢
+
+**解决**:
+
+```bash
+# 增加 JVM 堆内存
+mvn exec:java -Dexec.args="large-file.step" \
+    -Dexec.mainClass=com.minicad.app.StepDumpApp \
+    -Dexec.jvmArgs="-Xmx4g"
+
+# 或使用 --max-upload 调整预览限制
+mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp \
+    -Dexec.args="--max-upload 100m"
+```
+
+#### 7. engine.stp 解析输出包含 379 个退化边
+
+**现象**: `unsupportedFaces=379`, `edge must have distinct vertices`
+
+**说明**: 这是已知限制。engine.stp 包含共线顶点导致的零长度边。MiniCAD 的拓扑验证器会检测并报告这些问题，但不影响其他几何的正确构建。
+
+**影响**: 这 379 个面无法生成有效的 B-Rep，但其他 31 个 solid 仍然正确解析。
+
+### 获取帮助
+
+- **GitHub Issues**: 报告 bug 或请求功能
+- **GitHub Discussions**: 提问或讨论
+- **SECURITY.md**: 报告安全漏洞
 

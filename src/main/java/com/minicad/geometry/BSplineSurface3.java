@@ -71,6 +71,15 @@ public final class BSplineSurface3 implements SurfaceGeometry {
     public List<Double> uKnots() { return uKnots; }
     public List<Double> vKnots() { return vKnots; }
 
+    // Java Bean getters
+    public int getUDegree() { return uDegree; }
+    public int getVDegree() { return vDegree; }
+    public List<List<CartesianPoint>> getControlPoints() { return controlPoints; }
+    public List<Integer> getUMultiplicities() { return uMultiplicities; }
+    public List<Integer> getVMultiplicities() { return vMultiplicities; }
+    public List<Double> getUKnots() { return uKnots; }
+    public List<Double> getVKnots() { return vKnots; }
+
     private List<Double> uExpanded() {
         List<Double> local = uExpandedKnots;
         if (local == null) {
@@ -125,10 +134,10 @@ public final class BSplineSurface3 implements SurfaceGeometry {
                 int vj = vSpan - vDegree + j;
                 double nv = basisValue(vj, vDegree, clampedV, vExp);
                 CartesianPoint control = controlPoints.get(ui).get(vj);
-                sum = sum.add(new Vector3(control.x() * nu * nv, control.y() * nu * nv, control.z() * nu * nv));
+                sum = sum.add(new Vector3(control.getX() * nu * nv, control.getY() * nu * nv, control.getZ() * nu * nv));
             }
         }
-        return new CartesianPoint(sum.x(), sum.y(), sum.z());
+        return new CartesianPoint(sum.getX(), sum.getY(), sum.getZ());
     }
 
     public Vector3 normalAt(double u, double v) {
@@ -154,7 +163,7 @@ public final class BSplineSurface3 implements SurfaceGeometry {
                 double nv = basisValue(vj, vDegree, clampedV, vExp);
                 double dNv = derivativeBasisValue(vj, vDegree, clampedV, vExp);
                 CartesianPoint cp = controlPoints.get(ui).get(vj);
-                Vector3 cpVec = new Vector3(cp.x(), cp.y(), cp.z());
+                Vector3 cpVec = new Vector3(cp.getX(), cp.getY(), cp.getZ());
                 dSdu = dSdu.add(cpVec.scale(dNu * nv));
                 dSdv = dSdv.add(cpVec.scale(nu * dNv));
             }

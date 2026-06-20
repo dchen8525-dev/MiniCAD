@@ -45,6 +45,11 @@ public final class StepBrepWithVoids implements StepEntity {
         return outer;
     }
 
+    // Java Bean style alias for outer
+    public StepEntity isOuter() {
+        return outer;
+    }
+
     public List<StepEntity> getVoids() {
         return voids;
     }

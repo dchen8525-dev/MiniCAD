@@ -57,8 +57,8 @@ public final class ToroidalSurface implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
         double cosU = Math.cos(u);
@@ -150,7 +150,7 @@ public final class ToroidalSurface implements SurfaceGeometry {
     public Vector3 normalAt(double u, double v) {
         Vector3 x = position.xDirection().asVector();
         Vector3 y = position.yDirection().asVector();
-        Vector3 z = position.axis().asVector();
+        Vector3 z = position.getAxis().asVector();
         return x.scale(Math.cos(u) * Math.cos(v))
             .add(y.scale(Math.sin(u) * Math.cos(v)))
             .add(z.scale(Math.sin(v))).normalize();

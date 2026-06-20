@@ -35,6 +35,9 @@ final class StepProfileBuilder {
 
         public List<Point2> outer() { return outer; }
         public List<List<Point2>> inner() { return inner; }
+        public List<Point2> getOuter() { return outer; }
+        public List<List<Point2>> getInner() { return inner; }
+        public boolean isOuter() { return !outer.isEmpty(); }
 
         @Override
         public boolean equals(Object o) {
@@ -179,7 +182,7 @@ final class StepProfileBuilder {
         int startIndex = includeStart ? 0 : 1;
         for (int index = startIndex; index <= segments; index++) {
             double angle = startAngle + (endAngle - startAngle) * index / segments;
-            points.add(new Point2(center.x() + Math.cos(angle) * radius, center.y() + Math.sin(angle) * radius));
+            points.add(new Point2(center.getX() + Math.cos(angle) * radius, center.getY() + Math.sin(angle) * radius));
         }
     }
 
@@ -194,8 +197,8 @@ final class StepProfileBuilder {
             throw new UnsupportedGeometryException("CIRCULAR_HOLLOW_PROFILE_DEF dimensions must define a positive inner radius");
         }
         return new ProfileLoops(
-                normalizeOuterLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(outerRadius), "CIRCLE_PROFILE_DEF"))),
-                List.of(normalizeInnerLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.position(), profile.curves(), List.of(innerRadius), "CIRCLE_PROFILE_DEF"))))
+                normalizeOuterLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.getPosition(), profile.curves(), List.of(outerRadius), "CIRCLE_PROFILE_DEF"))),
+                List.of(normalizeInnerLoop(circleProfile(new StepProfileDef(profile.id(), profile.profileType(), profile.profileName(), profile.getPosition(), profile.curves(), List.of(innerRadius), "CIRCLE_PROFILE_DEF"))))
         );
     }
 
@@ -572,7 +575,7 @@ final class StepProfileBuilder {
         for (int index = 0; index < points.size() - 1; index++) {
             Point2 current = points.get(index);
             Point2 next = points.get(index + 1);
-            area += current.x() * next.y() - next.x() * current.y();
+            area += current.getX() * next.getY() - next.getX() * current.getY();
         }
         return area * 0.5;
     }

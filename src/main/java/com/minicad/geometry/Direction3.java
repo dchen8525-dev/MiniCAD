@@ -48,11 +48,11 @@ public final class Direction3 {
      * @return unit direction
      */
     public static Direction3 from(Vector3 vector) {
-        double length = Math.sqrt(vector.x() * vector.x() + vector.y() * vector.y() + vector.z() * vector.z());
+        double length = Math.sqrt(vector.getX() * vector.getX() + vector.getY() * vector.getY() + vector.getZ() * vector.getZ());
         if (length < Epsilon.get()) {
             throw new GeometryException("cannot create direction from zero-length vector");
         }
-        return new Direction3(vector.x() / length, vector.y() / length, vector.z() / length);
+        return new Direction3(vector.getX() / length, vector.getY() / length, vector.getZ() / length);
     }
 
     /**
@@ -191,7 +191,7 @@ public final class Direction3 {
      */
     public double dot(Vector3 vector) {
         Preconditions.requireNonNull(vector, "vector");
-        return x * vector.x() + y * vector.y() + z * vector.z();
+        return x * vector.getX() + y * vector.getY() + z * vector.getZ();
     }
 
     /**
@@ -225,9 +225,9 @@ public final class Direction3 {
         Vector3 cross = k.cross(this);
         double dotKV = k.dot(this);
         return new Direction3(
-            x * cosA + cross.x() * sinA + k.x * dotKV * (1 - cosA),
-            y * cosA + cross.y() * sinA + k.y * dotKV * (1 - cosA),
-            z * cosA + cross.z() * sinA + k.z * dotKV * (1 - cosA)
+            x * cosA + cross.getX() * sinA + k.x * dotKV * (1 - cosA),
+            y * cosA + cross.getY() * sinA + k.y * dotKV * (1 - cosA),
+            z * cosA + cross.getZ() * sinA + k.z * dotKV * (1 - cosA)
         ).normalize();
     }
 

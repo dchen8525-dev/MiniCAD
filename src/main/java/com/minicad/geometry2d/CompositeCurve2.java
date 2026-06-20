@@ -63,9 +63,9 @@ public final class CompositeCurve2 implements Curve2 {
                 if (seg instanceof TrimmedCurve2) {
                     TrimmedCurve2 trimmed = (TrimmedCurve2) seg;
                     double underlying = trimmed.parameterOnUnderlyingCurve(point);
-                    double span = trimmed.trimParamEnd() - trimmed.trimParamStart();
-                    local = (underlying - trimmed.trimParamStart()) / span;
-                    if (!trimmed.senseAgreement()) local = 1.0 - local;
+                    double span = trimmed.getTrimParamEnd() - trimmed.getTrimParamStart();
+                    local = (underlying - trimmed.getTrimParamStart()) / span;
+                    if (!trimmed.isSenseAgreement()) local = 1.0 - local;
                 }
                 return (i + local) / segments.size();
             }

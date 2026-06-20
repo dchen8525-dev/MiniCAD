@@ -163,8 +163,8 @@ public final class Parabola2 implements Curve2 {
         Vector2 axis = axisDirection.asVector();
         Vector2 perp = axisDirection.perpendicular().asVector();
         return new Vector2(
-            normalLocal.x() * perp.x() + normalLocal.y() * axis.x(),
-            normalLocal.x() * perp.y() + normalLocal.y() * axis.y()
+            normalLocal.getX() * perp.getX() + normalLocal.getY() * axis.getX(),
+            normalLocal.getX() * perp.getY() + normalLocal.getY() * axis.getY()
         );
     }
 

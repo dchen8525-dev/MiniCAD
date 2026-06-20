@@ -79,7 +79,7 @@ public final class Circle implements Curve3 {
         Preconditions.requireNonNull(point, "point");
         // Check if point lies on the circle within epsilon
         // Distance from center should equal radius, and point should be in the circle's plane
-        CartesianPoint center = position.location();
+        CartesianPoint center = position.getLocation();
         double dist = point.distanceTo(center);
         return Math.abs(dist - radius) < Epsilon.get();
     }
@@ -88,9 +88,9 @@ public final class Circle implements Curve3 {
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Project point onto circle plane and find closest point on circle
-        CartesianPoint center = position.location();
+        CartesianPoint center = position.getLocation();
         Vector3 toPoint = point.subtract(center);
-        Direction3 normal = position.axis();
+        Direction3 normal = position.getAxis();
         // Project onto plane
         double dotNormal = toPoint.dot(normal.asVector());
         Vector3 projected = toPoint.subtract(normal.asVector().scale(dotNormal));
@@ -137,8 +137,8 @@ public final class Circle implements Curve3 {
      */
     public double angleOf(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        CartesianPoint center = position.location();
-        Direction3 normal = position.axis();
+        CartesianPoint center = position.getLocation();
+        Direction3 normal = position.getAxis();
         Vector3 toPoint = point.subtract(center);
         // Project onto circle plane
         Vector3 xDir = position.xDirection().asVector();

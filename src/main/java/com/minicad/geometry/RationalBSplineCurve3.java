@@ -139,9 +139,9 @@ public final class RationalBSplineCurve3 implements Curve3 {
         CartesianPoint p0 = controlPoints.get(i);
         CartesianPoint p1 = controlPoints.get(i + 1);
         return new CartesianPoint(
-            p0.x() + localT * (p1.x() - p0.x()),
-            p0.y() + localT * (p1.y() - p0.y()),
-            p0.z() + localT * (p1.z() - p0.z())
+            p0.getX() + localT * (p1.getX() - p0.getX()),
+            p0.getY() + localT * (p1.getY() - p0.getY()),
+            p0.getZ() + localT * (p1.getZ() - p0.getZ())
         );
     }
 

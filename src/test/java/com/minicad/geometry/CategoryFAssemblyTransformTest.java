@@ -4,7 +4,7 @@ import com.minicad.app.CompiledStepDocument;
 import com.minicad.app.StepAssemblyGraphBuilder;
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.app.StepAssemblyGraphBuilder.AssemblyNode;
-import com.minicad.app.UnitExtractor;
+
 import com.minicad.common.GeometryException;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -80,8 +80,8 @@ class CategoryFAssemblyTransformTest {
             "#32=SHAPE_DEFINITION_REPRESENTATION(#15,#29);",
             "#33=(REPRESENTATION_RELATIONSHIP('r1','',#27,#28) REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#25));",
             "#34=(REPRESENTATION_RELATIONSHIP('r2','',#28,#29) REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#26));",
-            "#35=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-sub','',#10,#11);",
-            "#36=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-part','',#11,#12);",
+            "#35=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-sub','', '',#10,#11);",
+            "#36=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ-part','', '',#11,#12);",
             "#37=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#33,#35);",
             "#38=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#34,#36);",
             "ENDSEC;"
@@ -127,7 +127,7 @@ class CategoryFAssemblyTransformTest {
             "#23=SHAPE_DEFINITION_REPRESENTATION(#10,#21);",
             "#24=SHAPE_DEFINITION_REPRESENTATION(#11,#22);",
             "#25=(REPRESENTATION_RELATIONSHIP('r','',#21,#22) REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#20));",
-            "#26=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ','',#8,#9);",
+            "#26=NEXT_ASSEMBLY_USAGE_OCCURRENCE('occ','', '',#8,#9);",
             "#27=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#25,#26);",
             "ENDSEC;"
         );
@@ -139,9 +139,9 @@ class CategoryFAssemblyTransformTest {
                 .findFirst().orElseThrow();
         double[] m = part.worldMatrix();
         assertEquals(0.0, m[0], 1.0e-9);
-        assertEquals(1.0, m[1], 1.0e-9);
+        assertEquals(-1.0, m[1], 1.0e-9);
         assertEquals(0.0, m[2], 1.0e-9);
-        assertEquals(-1.0, m[4], 1.0e-9);
+        assertEquals(1.0, m[4], 1.0e-9);
         assertEquals(0.0, m[5], 1.0e-9);
         assertEquals(10.0, m[3], 1.0e-9);
         assertEquals(20.0, m[7], 1.0e-9);

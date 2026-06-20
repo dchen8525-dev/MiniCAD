@@ -43,6 +43,10 @@ public final class StepVector implements StepEntity {
         return orientation;
     }
 
+    public StepDirection isOrientation() {
+        return orientation;
+    }
+
     public double getMagnitude() {
         return magnitude;
     }

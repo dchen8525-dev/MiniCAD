@@ -121,9 +121,9 @@ public final class Axis2Placement3D {
      */
     public Direction3 transformDirectionToWorld(Direction3 localDir) {
         Vector3 localVec = localDir.asVector();
-        Vector3 worldVec = xDirection().asVector().scale(localVec.x())
-                .add(yDirection().asVector().scale(localVec.y()))
-                .add(axis.asVector().scale(localVec.z()));
+        Vector3 worldVec = xDirection().asVector().scale(localVec.getX())
+                .add(yDirection().asVector().scale(localVec.getY()))
+                .add(axis.asVector().scale(localVec.getZ()));
         return Direction3.from(worldVec);
     }
 
@@ -134,9 +134,9 @@ public final class Axis2Placement3D {
      * @return world point
      */
     public CartesianPoint transformToWorld(CartesianPoint localPoint) {
-        Vector3 offset = xDirection().asVector().scale(localPoint.x())
-                .add(yDirection().asVector().scale(localPoint.y()))
-                .add(axis.asVector().scale(localPoint.z()));
+        Vector3 offset = xDirection().asVector().scale(localPoint.getX())
+                .add(yDirection().asVector().scale(localPoint.getY()))
+                .add(axis.asVector().scale(localPoint.getZ()));
         return location.add(offset);
     }
 

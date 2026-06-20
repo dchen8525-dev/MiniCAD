@@ -36,6 +36,8 @@ public final class SurfaceCurve3 implements Curve3 {
 
         public SurfaceGeometry surface() { return surface; }
         public Curve2 curve2() { return curve2; }
+        public SurfaceGeometry getSurface() { return surface; }
+        public Curve2 getCurve2() { return curve2; }
 
         @Override
         public boolean equals(Object o) {
@@ -71,6 +73,15 @@ public final class SurfaceCurve3 implements Curve3 {
     }
 
     public List<ParametricCurve> parametricCurves() {
+        return parametricCurves;
+    }
+
+    // Java Bean getters
+    public Curve3 getCurve3d() {
+        return curve3d;
+    }
+
+    public List<ParametricCurve> getParametricCurves() {
         return parametricCurves;
     }
 

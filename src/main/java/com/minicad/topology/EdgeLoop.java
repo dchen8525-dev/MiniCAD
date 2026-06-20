@@ -98,14 +98,14 @@ public final class EdgeLoop implements Loop {
         }
         BoundingBox3 box = BoundingBox3.empty();
         for (OrientedEdge oe : edges) {
-            Edge edge = oe.edge();
+            Edge edge = oe.getEdge();
             if (edge != null) {
                 // Include start and end vertices
-                if (edge.start() != null) {
-                    box = box.expand(edge.start().point());
+                if (edge.getStart() != null) {
+                    box = box.expand(edge.getStart().point());
                 }
-                if (edge.end() != null) {
-                    box = box.expand(edge.end().point());
+                if (edge.getEnd() != null) {
+                    box = box.expand(edge.getEnd().point());
                 }
                 box = box.union(edge.boundingBox());
             }

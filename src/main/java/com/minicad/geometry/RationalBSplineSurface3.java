@@ -82,6 +82,16 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     public List<Double> uKnots() { return uKnots; }
     public List<Double> vKnots() { return vKnots; }
 
+    // Java Bean getters
+    public int getUDegree() { return uDegree; }
+    public int getVDegree() { return vDegree; }
+    public List<List<CartesianPoint>> getControlPoints() { return controlPoints; }
+    public List<List<Double>> getWeightsData() { return weightsData; }
+    public List<Integer> getUMultiplicities() { return uMultiplicities; }
+    public List<Integer> getVMultiplicities() { return vMultiplicities; }
+    public List<Double> getUKnots() { return uKnots; }
+    public List<Double> getVKnots() { return vKnots; }
+
     private List<Double> uExpanded() {
         List<Double> local = uExpandedKnots;
         if (local == null) {
@@ -138,9 +148,9 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
                 double weightedBasis = nu * nv * weightsData.get(ui).get(vj);
                 CartesianPoint control = controlPoints.get(ui).get(vj);
                 numerator = numerator.add(new Vector3(
-                        control.x() * weightedBasis,
-                        control.y() * weightedBasis,
-                        control.z() * weightedBasis
+                        control.getX() * weightedBasis,
+                        control.getY() * weightedBasis,
+                        control.getZ() * weightedBasis
                 ));
                 denominator += weightedBasis;
             }
@@ -149,9 +159,9 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             throw new GeometryException("rational surface denominator is zero");
         }
         return new CartesianPoint(
-                numerator.x() / denominator,
-                numerator.y() / denominator,
-                numerator.z() / denominator
+                numerator.getX() / denominator,
+                numerator.getY() / denominator,
+                numerator.getZ() / denominator
         );
     }
 
@@ -184,7 +194,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
                 double w = weightsData.get(ui).get(vj);
                 double weightedBasis = w * nu * nv;
                 CartesianPoint cp = controlPoints.get(ui).get(vj);
-                Vector3 cpVec = new Vector3(cp.x(), cp.y(), cp.z());
+                Vector3 cpVec = new Vector3(cp.getX(), cp.getY(), cp.getZ());
                 A = A.add(cpVec.scale(weightedBasis));
                 dAdu = dAdu.add(cpVec.scale(w * dNu * nv));
                 dAdv = dAdv.add(cpVec.scale(w * nu * dNv));

@@ -39,14 +39,14 @@ public final class TopologyValidator {
 
         List<MiniCadIssue> issues = new ArrayList<>();
         Map<Edge, EdgeUseSummary> edgeUses = new IdentityHashMap<>();
-        for (int faceIndex = 0; faceIndex < shell.faces().size(); faceIndex++) {
-            Face face = shell.faces().get(faceIndex);
+        for (int faceIndex = 0; faceIndex < shell.getFaces().size(); faceIndex++) {
+            Face face = shell.getFaces().get(faceIndex);
             validateFace(face, faceIndex, issues);
-            for (FaceBound bound : face.bounds()) {
-                if (bound.loop() instanceof EdgeLoop) {
-                    EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
+            for (FaceBound bound : face.getBounds()) {
+                if (bound.getLoop() instanceof EdgeLoop) {
+                    EdgeLoop edgeLoop = (EdgeLoop) bound.getLoop();
                     for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-                        edgeUses.computeIfAbsent(orientedEdge.edge(), edge -> new EdgeUseSummary())
+                        edgeUses.computeIfAbsent(orientedEdge.getEdge(), edge -> new EdgeUseSummary())
                                 .add(orientedEdge);
                     }
                 }
@@ -64,7 +64,7 @@ public final class TopologyValidator {
                         "edge " + describeEdge(edge) + " is used by " + summary.total() + " face bounds"
                 ));
             }
-            if (shell.closed() && summary.total() != 2) {
+            if (shell.isClosed() && summary.total() != 2) {
                 issues.add(MiniCadIssue.error(
                         "closed_shell.edge_use_count",
                         null,
@@ -73,7 +73,7 @@ public final class TopologyValidator {
                                 + " time(s), expected 2"
                 ));
             }
-            if (shell.closed() && summary.total() == 2
+            if (shell.isClosed() && summary.total() == 2
                     && (summary.forwardCount() != 1 || summary.reverseCount() != 1)) {
                 issues.add(MiniCadIssue.error(
                         "closed_shell.edge_orientation",
@@ -105,13 +105,13 @@ public final class TopologyValidator {
         }
 
         List<MiniCadIssue> issues = new ArrayList<>();
-        issues.addAll(validateShell(solid.outerShell()).issues());
+        issues.addAll(validateShell(solid.getOuterShell()).getIssues());
 
-        BoundingBox3 outerBox = solid.outerShell().boundingBox();
-        double outerVolumeSign = Math.signum(signedShellVolume(solid.outerShell()));
-        for (int index = 0; index < solid.voidShells().size(); index++) {
-            Shell voidShell = solid.voidShells().get(index);
-            issues.addAll(validateShell(voidShell).issues());
+        BoundingBox3 outerBox = solid.getOuterShell().boundingBox();
+        double outerVolumeSign = Math.signum(signedShellVolume(solid.getOuterShell()));
+        for (int index = 0; index < solid.getVoidShells().size(); index++) {
+            Shell voidShell = solid.getVoidShells().get(index);
+            issues.addAll(validateShell(voidShell).getIssues());
             if (!outerBox.contains(voidShell.boundingBox())) {
                 issues.add(MiniCadIssue.error(
                         "solid.void_outside_outer",
@@ -136,7 +136,7 @@ public final class TopologyValidator {
     }
 
     private static void validateFace(Face face, int faceIndex, List<MiniCadIssue> issues) {
-        if (face.surface() instanceof Plane) {
+        if (face.getSurface() instanceof Plane) {
             double area = planarOuterArea(face);
             if (area <= Epsilon.EPS) {
                 issues.add(MiniCadIssue.error(
@@ -154,39 +154,39 @@ public final class TopologyValidator {
         if (outer == null) {
             return 0.0;
         }
-        if (outer.loop() instanceof EdgeLoop) {
-            EdgeLoop edgeLoop = (EdgeLoop) outer.loop();
+        if (outer.getLoop() instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) outer.getLoop();
             return polygonArea3d(edgeLoop.vertices().stream()
                     .map(Vertex::point)
                     .collect(Collectors.toList()));
         }
-        if (outer.loop() instanceof PolyLoop) {
-            PolyLoop polyLoop = (PolyLoop) outer.loop();
-            return polygonArea3d(polyLoop.points());
+        if (outer.getLoop() instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) outer.getLoop();
+            return polygonArea3d(polyLoop.getPoints());
         }
         return 0.0;
     }
 
     private static String describeEdge(Edge edge) {
-        return "(" + describeVertex(edge.start()) + " -> " + describeVertex(edge.end()) + ")";
+        return "(" + describeVertex(edge.getStart()) + " -> " + describeVertex(edge.getEnd()) + ")";
     }
 
     private static String describeVertex(Vertex vertex) {
         return String.format(
                 "%.6f,%.6f,%.6f",
-                vertex.point().x(),
-                vertex.point().y(),
-                vertex.point().z()
+                vertex.point().getX(),
+                vertex.point().getY(),
+                vertex.point().getZ()
         );
     }
 
     private static double signedShellVolume(Shell shell) {
         double volume = 0.0;
-        for (Face face : shell.faces()) {
+        for (Face face : shell.getFaces()) {
             FaceBound outer = face.outerBound();
-            if (outer != null && outer.loop() instanceof EdgeLoop) { EdgeLoop edgeLoop = (EdgeLoop) outer.loop();
+            if (outer != null && outer.getLoop() instanceof EdgeLoop) { EdgeLoop edgeLoop = (EdgeLoop) outer.getLoop();
                 double contribution = signedLoopVolume(edgeLoop.vertices());
-                volume += face.sameSense() ? contribution : -contribution;
+                volume += face.isSameSense() ? contribution : -contribution;
             }
         }
         return volume / 6.0;
@@ -217,22 +217,22 @@ public final class TopologyValidator {
             CartesianPoint current = points.get(index);
             CartesianPoint next = points.get((index + 1) % points.size());
             CartesianPoint cross = cross(current, next);
-            x += cross.x();
-            y += cross.y();
-            z += cross.z();
+            x += cross.getX();
+            y += cross.getY();
+            z += cross.getZ();
         }
         return 0.5 * Math.sqrt(x * x + y * y + z * z);
     }
 
     private static double dot(CartesianPoint a, CartesianPoint b) {
-        return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+        return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ();
     }
 
     private static CartesianPoint cross(CartesianPoint a, CartesianPoint b) {
         return new CartesianPoint(
-                a.y() * b.z() - a.z() * b.y(),
-                a.z() * b.x() - a.x() * b.z(),
-                a.x() * b.y() - a.y() * b.x()
+                a.getY() * b.getZ() - a.getZ() * b.getY(),
+                a.getZ() * b.getX() - a.getX() * b.getZ(),
+                a.getX() * b.getY() - a.getY() * b.getX()
         );
     }
 
@@ -241,7 +241,7 @@ public final class TopologyValidator {
         private int reverseCount;
 
         private void add(OrientedEdge edge) {
-            if (edge.orientation()) {
+            if (edge.isOrientation()) {
                 forwardCount++;
             } else {
                 reverseCount++;

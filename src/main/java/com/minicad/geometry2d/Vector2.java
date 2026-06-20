@@ -116,7 +116,7 @@ public final class Vector2 {
      */
     public double dot(Direction2 other) {
         Preconditions.requireNonNull(other, "other");
-        return x * other.x() + y * other.y();
+        return x * other.getX() + y * other.getY();
     }
 
     /**
@@ -138,7 +138,7 @@ public final class Vector2 {
      */
     public double cross(Direction2 other) {
         Preconditions.requireNonNull(other, "other");
-        return x * other.y() - y * other.x();
+        return x * other.getY() - y * other.getX();
     }
 
     /**

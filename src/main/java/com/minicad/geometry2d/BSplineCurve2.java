@@ -117,7 +117,7 @@ public final class BSplineCurve2 implements Curve2 {
         double localT = t * (n - 1) - i;
         Point2 p0 = controlPoints.get(i);
         Point2 p1 = controlPoints.get(i + 1);
-        return new Point2(p0.x() + localT * (p1.x() - p0.x()), p0.y() + localT * (p1.y() - p0.y()));
+        return new Point2(p0.getX() + localT * (p1.getX() - p0.getX()), p0.getY() + localT * (p1.getY() - p0.getY()));
     }
 
     @Override

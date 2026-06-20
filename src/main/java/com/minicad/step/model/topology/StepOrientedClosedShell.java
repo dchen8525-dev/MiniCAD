@@ -57,11 +57,16 @@ public final class StepOrientedClosedShell implements StepEntity {
     public List<StepFaceEntity> faces() {
         if (closedShellElement instanceof StepOrientedClosedShell) {
             // Handle nested oriented shells
-            return ((StepOrientedClosedShell) closedShellElement).faces();
+            return ((StepOrientedClosedShell) closedShellElement).getFaces();
         } else if (closedShellElement instanceof StepClosedShell) {
-            return ((StepClosedShell) closedShellElement).faces();
+            return ((StepClosedShell) closedShellElement).getFaces();
         }
         return Collections.emptyList();
+    }
+
+    // Java Bean style accessor
+    public List<StepFaceEntity> getFaces() {
+        return faces();
     }
 
     public StepEntity closedShellElement() {

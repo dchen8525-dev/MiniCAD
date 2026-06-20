@@ -52,8 +52,8 @@ public final class SphericalSurface implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
         double cosU = Math.cos(u);
@@ -94,7 +94,7 @@ public final class SphericalSurface implements SurfaceGeometry {
      */
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        CartesianPoint center = position.location();
+        CartesianPoint center = position.getLocation();
         Vector3 toPoint = point.subtract(center);
         double dist = toPoint.norm();
         if (dist < Epsilon.get()) {
@@ -112,7 +112,7 @@ public final class SphericalSurface implements SurfaceGeometry {
      */
     public double distanceTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        CartesianPoint center = position.location();
+        CartesianPoint center = position.getLocation();
         double dist = point.distanceTo(center);
         return Math.abs(dist - radius);
     }
@@ -139,7 +139,7 @@ public final class SphericalSurface implements SurfaceGeometry {
     public Vector3 normalAt(double u, double v) {
         Vector3 x = position.xDirection().asVector();
         Vector3 y = position.yDirection().asVector();
-        Vector3 z = position.axis().asVector();
+        Vector3 z = position.getAxis().asVector();
         return x.scale(Math.sin(v) * Math.cos(u))
             .add(y.scale(Math.sin(v) * Math.sin(u)))
             .add(z.scale(Math.cos(v))).normalize();

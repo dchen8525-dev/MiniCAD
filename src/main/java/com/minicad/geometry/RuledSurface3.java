@@ -53,9 +53,9 @@ public final class RuledSurface3 implements SurfaceGeometry {
         CartesianPoint p2 = directrix2.pointAt(u);
         // Interpolate between p1 and p2
         return new CartesianPoint(
-            p1.x() + v * (p2.x() - p1.x()),
-            p1.y() + v * (p2.y() - p1.y()),
-            p1.z() + v * (p2.z() - p1.z())
+            p1.getX() + v * (p2.getX() - p1.getX()),
+            p1.getY() + v * (p2.getY() - p1.getY()),
+            p1.getZ() + v * (p2.getZ() - p1.getZ())
         );
     }
 

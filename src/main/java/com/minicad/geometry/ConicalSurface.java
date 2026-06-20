@@ -56,8 +56,8 @@ public final class ConicalSurface implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
         double r = radius + v * Math.tan(semiAngle);
@@ -75,7 +75,7 @@ public final class ConicalSurface implements SurfaceGeometry {
      */
     public Vector3 normalAt(double u) {
         Preconditions.requireFinite(u, "u");
-        Vector3 axis = position.axis().asVector();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
         double cosU = Math.cos(u);

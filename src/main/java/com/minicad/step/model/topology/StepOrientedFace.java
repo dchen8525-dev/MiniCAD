@@ -45,7 +45,7 @@ public final class StepOrientedFace implements StepFaceEntity {
     // StepFaceEntity interface implementation
     @Override
     public List<StepFaceBound> bounds() {
-        return faceElement != null ? faceElement.bounds() : List.of();
+        return faceElement != null ? faceElement.getBounds() : List.of();
     }
 
     // Record-style accessors

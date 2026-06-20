@@ -70,10 +70,10 @@ public final class BoundingBox2 {
         Preconditions.requireNonNull(p1, "p1");
         Preconditions.requireNonNull(p2, "p2");
         return new BoundingBox2(
-            Math.min(p1.x(), p2.x()),
-            Math.min(p1.y(), p2.y()),
-            Math.max(p1.x(), p2.x()),
-            Math.max(p1.y(), p2.y())
+            Math.min(p1.getX(), p2.getX()),
+            Math.min(p1.getY(), p2.getY()),
+            Math.max(p1.getX(), p2.getX()),
+            Math.max(p1.getY(), p2.getY())
         );
     }
 
@@ -93,10 +93,10 @@ public final class BoundingBox2 {
         double maxX = Double.MIN_VALUE;
         double maxY = Double.MIN_VALUE;
         for (Point2 p : points) {
-            minX = Math.min(minX, p.x());
-            minY = Math.min(minY, p.y());
-            maxX = Math.max(maxX, p.x());
-            maxY = Math.max(maxY, p.y());
+            minX = Math.min(minX, p.getX());
+            minY = Math.min(minY, p.getY());
+            maxX = Math.max(maxX, p.getX());
+            maxY = Math.max(maxY, p.getY());
         }
         return new BoundingBox2(minX, minY, maxX, maxY);
     }
@@ -150,13 +150,13 @@ public final class BoundingBox2 {
     public BoundingBox2 union(Point2 point) {
         Preconditions.requireNonNull(point, "point");
         if (isEmpty()) {
-            return new BoundingBox2(point.x(), point.y(), point.x(), point.y());
+            return new BoundingBox2(point.getX(), point.getY(), point.getX(), point.getY());
         }
         return new BoundingBox2(
-            Math.min(minX, point.x()),
-            Math.min(minY, point.y()),
-            Math.max(maxX, point.x()),
-            Math.max(maxY, point.y())
+            Math.min(minX, point.getX()),
+            Math.min(minY, point.getY()),
+            Math.max(maxX, point.getX()),
+            Math.max(maxY, point.getY())
         );
     }
 
@@ -201,8 +201,8 @@ public final class BoundingBox2 {
      */
     public boolean contains(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        return minX <= point.x() && minY <= point.y()
-            && maxX >= point.x() && maxY >= point.y();
+        return minX <= point.getX() && minY <= point.getY()
+            && maxX >= point.getX() && maxY >= point.getY();
     }
 
     /**
@@ -298,10 +298,10 @@ public final class BoundingBox2 {
         double halfW = width() / 2.0 * factor;
         double halfH = height() / 2.0 * factor;
         return new BoundingBox2(
-            c.x() - halfW,
-            c.y() - halfH,
-            c.x() + halfW,
-            c.y() + halfH
+            c.getX() - halfW,
+            c.getY() - halfH,
+            c.getX() + halfW,
+            c.getY() + halfH
         );
     }
 

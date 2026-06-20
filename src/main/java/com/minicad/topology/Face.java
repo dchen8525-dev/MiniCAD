@@ -36,7 +36,7 @@ public final class Face {
         if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
             for (FaceBound bound : bounds) {
-                for (CartesianPoint vertex : boundaryPoints(bound.loop())) {
+                for (CartesianPoint vertex : boundaryPoints(bound.getLoop())) {
                     if (plane.distanceTo(vertex) > Epsilon.IMPORT_PLANE_TOLERANCE) {
                         throw new TopologyException("all face vertices must lie on the plane");
                     }
@@ -54,7 +54,7 @@ public final class Face {
             for (Vertex vertex : ((EdgeLoop) loop).vertices()) points.add(vertex.point());
             return points;
         }
-        if (loop instanceof PolyLoop) return ((PolyLoop) loop).points();
+        if (loop instanceof PolyLoop) return ((PolyLoop) loop).getPoints();
         return List.of();
     }
 
@@ -85,7 +85,7 @@ public final class Face {
             return null;
         }
         for (FaceBound bound : bounds) {
-            if (bound.orientation()) {
+            if (bound.isOrientation()) {
                 return bound;
             }
         }
@@ -120,8 +120,8 @@ public final class Face {
         // Include all boundary edges
         if (bounds != null) {
             for (FaceBound bound : bounds) {
-                if (bound != null && bound.loop() != null) {
-                    box = box.union(bound.loop().boundingBox());
+                if (bound != null && bound.getLoop() != null) {
+                    box = box.union(bound.getLoop().boundingBox());
                 }
             }
         }
@@ -139,8 +139,8 @@ public final class Face {
         }
         int count = 0;
         for (FaceBound bound : bounds) {
-            if (bound != null && bound.loop() instanceof EdgeLoop) {
-                EdgeLoop loop = (EdgeLoop) bound.loop();
+            if (bound != null && bound.getLoop() instanceof EdgeLoop) {
+                EdgeLoop loop = (EdgeLoop) bound.getLoop();
                 if (loop.edges() != null) {
                     count += loop.edges().size();
                 }
@@ -160,8 +160,8 @@ public final class Face {
             return result;
         }
         for (FaceBound bound : bounds) {
-            if (bound != null && bound.loop() instanceof EdgeLoop) {
-                EdgeLoop loop = (EdgeLoop) bound.loop();
+            if (bound != null && bound.getLoop() instanceof EdgeLoop) {
+                EdgeLoop loop = (EdgeLoop) bound.getLoop();
                 result.addAll(loop.vertices());
             }
         }
@@ -179,8 +179,8 @@ public final class Face {
         }
         double total = 0.0;
         for (FaceBound bound : bounds) {
-            if (bound != null && bound.loop() instanceof EdgeLoop) {
-                EdgeLoop loop = (EdgeLoop) bound.loop();
+            if (bound != null && bound.getLoop() instanceof EdgeLoop) {
+                EdgeLoop loop = (EdgeLoop) bound.getLoop();
                 for (OrientedEdge oe : loop.edges()) {
                     total += oe.length();
                 }
@@ -198,15 +198,15 @@ public final class Face {
         if (surface instanceof Plane && bounds != null && !bounds.isEmpty()) {
             // Calculate area using shoelace formula for planar polygons
             FaceBound outer = outerBound();
-            if (outer != null && outer.loop() instanceof EdgeLoop) {
-                EdgeLoop loop = (EdgeLoop) outer.loop();
+            if (outer != null && outer.getLoop() instanceof EdgeLoop) {
+                EdgeLoop loop = (EdgeLoop) outer.getLoop();
                 java.util.List<Vertex> verts = loop.vertices();
                 if (verts.size() >= 3) {
                     double area = 0.0;
                     for (int i = 0; i < verts.size(); i++) {
                         Vertex v1 = verts.get(i);
                         Vertex v2 = verts.get((i + 1) % verts.size());
-                        area += v1.point().x() * v2.point().y() - v2.point().x() * v1.point().y();
+                        area += v1.point().getX() * v2.point().getY() - v2.point().getX() * v1.point().getY();
                     }
                     return Math.abs(area) / 2.0;
                 }
@@ -229,8 +229,8 @@ public final class Face {
         // For planar faces, project point onto the plane
         if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
-            CartesianPoint origin = plane.origin();
-            com.minicad.geometry.Vector3 normal = plane.normal().asVector();
+            CartesianPoint origin = plane.getOrigin();
+            com.minicad.geometry.Vector3 normal = plane.getNormal().asVector();
             // Project point onto plane
             com.minicad.geometry.Vector3 toPoint = point.subtract(origin);
             double dist = toPoint.dot(normal);
@@ -266,9 +266,9 @@ public final class Face {
         }
         double x = 0, y = 0, z = 0;
         for (Vertex v : verts) {
-            x += v.point().x();
-            y += v.point().y();
-            z += v.point().z();
+            x += v.point().getX();
+            y += v.point().getY();
+            z += v.point().getZ();
         }
         return new CartesianPoint(x / verts.size(), y / verts.size(), z / verts.size());
     }
@@ -281,7 +281,7 @@ public final class Face {
     public com.minicad.geometry.Vector3 normal() {
         if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
-            com.minicad.geometry.Direction3 dir = plane.normal();
+            com.minicad.geometry.Direction3 dir = plane.getNormal();
             return dir.asVector();
         }
         // For other surfaces, compute normal at center
@@ -333,7 +333,7 @@ public final class Face {
         }
         java.util.List<FaceBound> result = new java.util.ArrayList<>();
         for (FaceBound bound : bounds) {
-            if (bound != null && !bound.outer()) {
+            if (bound != null && !bound.isOuter()) {
                 result.add(bound);
             }
         }

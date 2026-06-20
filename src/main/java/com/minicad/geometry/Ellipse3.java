@@ -204,7 +204,7 @@ public final class Ellipse3 implements Curve3 {
      */
     public Vector3 binormalAt(double t) {
         Preconditions.requireFinite(t, "t");
-        return position.axis().asVector();
+        return position.getAxis().asVector();
     }
 
     /**
@@ -235,7 +235,7 @@ public final class Ellipse3 implements Curve3 {
      */
     public double angleOf(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        CartesianPoint center = position.location();
+        CartesianPoint center = position.getLocation();
         Vector3 toPoint = point.subtract(center);
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();

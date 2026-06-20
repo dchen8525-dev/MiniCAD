@@ -71,7 +71,7 @@ final class StepCadGeometryOps {
     Curve3 liftCurve2(Curve2 curve2) {
         List<Point2> points2 = sampleCurve2(curve2, 72);
         List<CartesianPoint> points3 = points2.stream()
-                .map(point -> new CartesianPoint(point.x(), point.y(), 0.0))
+                .map(point -> new CartesianPoint(point.getX(), point.getY(), 0.0))
                 .collect(Collectors.toList());
         return new Polyline3(points3);
     }
@@ -82,7 +82,7 @@ final class StepCadGeometryOps {
         for (int index = 0; index < sampled.size(); index++) {
             Point2 point = sampled.get(index);
             Vector2 tangent = tangentAt(sampled, index);
-            Vector2 normal = new Vector2(-tangent.y(), tangent.x());
+            Vector2 normal = new Vector2(-tangent.getY(), tangent.getX());
             Direction2 direction = normal.isZero() ? new Direction2(0.0, 1.0) : Direction2.from(normal.normalize());
             offsetPoints.add(point.add(direction.asVector().scale(distance)));
         }
@@ -146,13 +146,13 @@ final class StepCadGeometryOps {
         }
         if (curve instanceof Polyline2) {
             Polyline2 polyline = (Polyline2) curve;
-            return polyline.points();
+            return polyline.getPoints();
         }
         if (curve instanceof CompositeCurve2) {
             CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
             List<Point2> points = new ArrayList<>();
             boolean first = true;
-            for (Curve2 segment : compositeCurve.segments()) {
+            for (Curve2 segment : compositeCurve.getSegments()) {
                 List<Point2> segmentPoints = sampleCurve2(segment, segments);
                 int start = first ? 0 : 1;
                 for (int i = start; i < segmentPoints.size(); i++) {
@@ -240,17 +240,17 @@ final class StepCadGeometryOps {
         }
         if (curve instanceof SurfaceCurve3) {
             SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleCurve3(surfaceCurve.curve3d(), segments);
+            return sampleCurve3(surfaceCurve.getCurve3d(), segments);
         }
         if (curve instanceof Polyline3) {
             Polyline3 polyline = (Polyline3) curve;
-            return polyline.points();
+            return polyline.getPoints();
         }
         if (curve instanceof CompositeCurve3) {
             CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>();
             boolean first = true;
-            for (Curve3 segment : compositeCurve.segments()) {
+            for (Curve3 segment : compositeCurve.getSegments()) {
                 List<CartesianPoint> segmentPoints = sampleCurve3(segment, segments);
                 int start = first ? 0 : 1;
                 for (int i = start; i < segmentPoints.size(); i++) {
@@ -272,88 +272,88 @@ final class StepCadGeometryOps {
         if (curve instanceof Line3) {
             Line3 line = (Line3) curve;
             return new Line3(
-                    transformPoint3(line.origin(), transformation),
-                    transformDirection3(line.direction(), transformation),
-                    line.parameterScale() * Math.abs(scale));
+                    transformPoint3(line.getOrigin(), transformation),
+                    transformDirection3(line.getDirection(), transformation),
+                    line.getParameterScale() * Math.abs(scale));
         }
         if (curve instanceof Circle) {
             Circle circle = (Circle) curve;
             return new Circle(
-                    transformPlacement(circle.position(), transformation),
-                    circle.radius() * scale);
+                    transformPlacement(circle.getPosition(), transformation),
+                    circle.getRadius() * scale);
         }
         if (curve instanceof Ellipse3) {
             Ellipse3 ellipse = (Ellipse3) curve;
             return new Ellipse3(
-                    transformPlacement(ellipse.position(), transformation),
-                    ellipse.semiAxis1() * scale,
-                    ellipse.semiAxis2() * scale);
+                    transformPlacement(ellipse.getPosition(), transformation),
+                    ellipse.getSemiAxis1() * scale,
+                    ellipse.getSemiAxis2() * scale);
         }
         if (curve instanceof Polyline3) {
             Polyline3 polyline = (Polyline3) curve;
-            return new Polyline3(polyline.points().stream()
+            return new Polyline3(polyline.getPoints().stream()
                     .map(point -> transformPoint3(point, transformation))
                     .collect(Collectors.toList()));
         }
         if (curve instanceof BSplineCurve3) {
             BSplineCurve3 spline = (BSplineCurve3) curve;
             return new BSplineCurve3(
-                    spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
-                    spline.knotMultiplicities(),
-                    spline.knots());
+                    spline.getDegree(),
+                    spline.getControlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
+                    spline.getKnotMultiplicities(),
+                    spline.getKnots());
         }
         if (curve instanceof RationalBSplineCurve3) {
             RationalBSplineCurve3 spline = (RationalBSplineCurve3) curve;
             return new RationalBSplineCurve3(
-                    spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
-                    spline.weights(),
-                    spline.knotMultiplicities(),
-                    spline.knots());
+                    spline.getDegree(),
+                    spline.getControlPoints().stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()),
+                    spline.getWeights(),
+                    spline.getKnotMultiplicities(),
+                    spline.getKnots());
         }
         if (curve instanceof SurfaceCurve3) {
             SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             return new SurfaceCurve3(
-                    transformCurve3(surfaceCurve.curve3d(), transformation),
-                    surfaceCurve.parametricCurves().stream()
+                    transformCurve3(surfaceCurve.getCurve3d(), transformation),
+                    surfaceCurve.getParametricCurves().stream()
                             .map(binding -> new SurfaceCurve3.ParametricCurve(
-                                    transformSurfaceGeometry(binding.surface(), transformation),
-                                    binding.curve2()))
+                                    transformSurfaceGeometry(binding.getSurface(), transformation),
+                                    binding.getCurve2()))
                             .collect(Collectors.toList()));
         }
         if (curve instanceof TrimmedCurve3) {
             TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             return new TrimmedCurve3(
-                    transformCurve3(trimmedCurve.basisCurve(), transformation),
-                    trimmedCurve.trimParamStart(),
-                    trimmedCurve.trimParamEnd(),
-                    trimmedCurve.senseAgreement());
+                    transformCurve3(trimmedCurve.getBasisCurve(), transformation),
+                    trimmedCurve.getTrimParamStart(),
+                    trimmedCurve.getTrimParamEnd(),
+                    trimmedCurve.isSenseAgreement());
         }
         if (curve instanceof CompositeCurve3) {
             CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             return new CompositeCurve3(
-                    compositeCurve.segments().stream()
+                    compositeCurve.getSegments().stream()
                             .map(segment -> transformCurve3(segment, transformation))
                             .collect(Collectors.toList()));
         }
         if (curve instanceof Parabola3) {
             Parabola3 parabola = (Parabola3) curve;
             return new Parabola3(
-                    transformPlacement(parabola.position(), transformation),
+                    transformPlacement(parabola.getPosition(), transformation),
                     parabola.focalDistance() * scale);
         }
         if (curve instanceof Hyperbola3) {
             Hyperbola3 hyperbola = (Hyperbola3) curve;
             return new Hyperbola3(
-                    transformPlacement(hyperbola.position(), transformation),
-                    hyperbola.semiAxisA() * scale,
-                    hyperbola.semiAxisB() * scale);
+                    transformPlacement(hyperbola.getPosition(), transformation),
+                    hyperbola.getSemiAxisA() * scale,
+                    hyperbola.getSemiAxisB() * scale);
         }
         if (curve instanceof Clothoid3) {
             Clothoid3 clothoid = (Clothoid3) curve;
             return new Clothoid3(
-                    transformPlacement(clothoid.position(), transformation),
+                    transformPlacement(clothoid.getPosition(), transformation),
                     clothoid.xAxisIntercept() * scale,
                     clothoid.curvature() * scale);
         }
@@ -370,68 +370,68 @@ final class StepCadGeometryOps {
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
             return new Line2(
-                    transformPoint2(line.origin(), transformation),
-                    transformDirection2(line.direction(), transformation),
-                    line.parameterScale() * Math.abs(scale));
+                    transformPoint2(line.getOrigin(), transformation),
+                    transformDirection2(line.getDirection(), transformation),
+                    line.getParameterScale() * Math.abs(scale));
         }
         if (curve instanceof Circle2) {
             Circle2 circle = (Circle2) curve;
             return new Circle2(
                     transformPoint2(circle.center(), transformation),
                     transformDirection2(circle.xDirection(), transformation),
-                    circle.radius() * scale);
+                    circle.getRadius() * scale);
         }
         if (curve instanceof Ellipse2) {
             Ellipse2 ellipse = (Ellipse2) curve;
             return new Ellipse2(
                     transformPoint2(ellipse.center(), transformation),
                     transformDirection2(ellipse.xDirection(), transformation),
-                    ellipse.semiAxis1() * scale,
-                    ellipse.semiAxis2() * scale);
+                    ellipse.getSemiAxis1() * scale,
+                    ellipse.getSemiAxis2() * scale);
         }
         if (curve instanceof Polyline2) {
             Polyline2 polyline = (Polyline2) curve;
-            return new Polyline2(polyline.points().stream()
+            return new Polyline2(polyline.getPoints().stream()
                     .map(point -> transformPoint2(point, transformation))
                     .collect(Collectors.toList()));
         }
         if (curve instanceof BSplineCurve2) {
             BSplineCurve2 spline = (BSplineCurve2) curve;
             return new BSplineCurve2(
-                    spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
-                    spline.knotMultiplicities(),
-                    spline.knots());
+                    spline.getDegree(),
+                    spline.getControlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
+                    spline.getKnotMultiplicities(),
+                    spline.getKnots());
         }
         if (curve instanceof RationalBSplineCurve2) {
             RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
             return new RationalBSplineCurve2(
-                    spline.degree(),
-                    spline.controlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
-                    spline.weights(),
-                    spline.knotMultiplicities(),
-                    spline.knots());
+                    spline.getDegree(),
+                    spline.getControlPoints().stream().map(point -> transformPoint2(point, transformation)).collect(Collectors.toList()),
+                    spline.getWeights(),
+                    spline.getKnotMultiplicities(),
+                    spline.getKnots());
         }
         if (curve instanceof TrimmedCurve2) {
             TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
             return new TrimmedCurve2(
-                    transformCurve2(trimmedCurve.basisCurve(), transformation),
-                    trimmedCurve.trimParamStart(),
-                    trimmedCurve.trimParamEnd(),
-                    trimmedCurve.senseAgreement());
+                    transformCurve2(trimmedCurve.getBasisCurve(), transformation),
+                    trimmedCurve.getTrimParamStart(),
+                    trimmedCurve.getTrimParamEnd(),
+                    trimmedCurve.isSenseAgreement());
         }
         if (curve instanceof CompositeCurve2) {
             CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
             return new CompositeCurve2(
-                    compositeCurve.segments().stream()
+                    compositeCurve.getSegments().stream()
                             .map(segment -> transformCurve2(segment, transformation))
                             .collect(Collectors.toList()));
         }
         if (curve instanceof Parabola2) {
             Parabola2 parabola = (Parabola2) curve;
             return new Parabola2(
-                    transformPoint2(parabola.vertex(), transformation),
-                    transformDirection2(parabola.axisDirection(), transformation),
+                    transformPoint2(parabola.getVertex(), transformation),
+                    transformDirection2(parabola.getAxisDirection(), transformation),
                     parabola.focalDistance() * scale);
         }
         if (curve instanceof Hyperbola2) {
@@ -439,8 +439,8 @@ final class StepCadGeometryOps {
             return new Hyperbola2(
                     transformPoint2(hyperbola.center(), transformation),
                     transformDirection2(hyperbola.xDirection(), transformation),
-                    hyperbola.semiAxisA() * scale,
-                    hyperbola.semiAxisB() * scale);
+                    hyperbola.getSemiAxisA() * scale,
+                    hyperbola.getSemiAxisB() * scale);
         }
         throw new UnsupportedGeometryException("curve replica for " + curveTypeName(curve) + " is unsupported");
     }
@@ -454,111 +454,111 @@ final class StepCadGeometryOps {
         if (surface instanceof OffsetSurface3) {
             OffsetSurface3 offsetSurface = (OffsetSurface3) surface;
             return new OffsetSurface3(
-                    transformSurfaceGeometry(offsetSurface.basisSurface(), transformation),
-                    offsetSurface.distance() * scale);
+                    transformSurfaceGeometry(offsetSurface.getBasisSurface(), transformation),
+                    offsetSurface.getDistance() * scale);
         }
         if (surface instanceof CylindricalSurface) {
             CylindricalSurface cylindricalSurface = (CylindricalSurface) surface;
             return new CylindricalSurface(
-                    transformPlacement(cylindricalSurface.position(), transformation),
-                    cylindricalSurface.radius() * scale);
+                    transformPlacement(cylindricalSurface.getPosition(), transformation),
+                    cylindricalSurface.getRadius() * scale);
         }
         if (surface instanceof ConicalSurface) {
             ConicalSurface conicalSurface = (ConicalSurface) surface;
             return new ConicalSurface(
-                    transformPlacement(conicalSurface.position(), transformation),
-                    conicalSurface.radius() * scale,
-                    conicalSurface.semiAngle());
+                    transformPlacement(conicalSurface.getPosition(), transformation),
+                    conicalSurface.getRadius() * scale,
+                    conicalSurface.getSemiAngle());
         }
         if (surface instanceof ToroidalSurface) {
             ToroidalSurface toroidalSurface = (ToroidalSurface) surface;
             return new ToroidalSurface(
-                    transformPlacement(toroidalSurface.position(), transformation),
-                    toroidalSurface.majorRadius() * scale,
-                    toroidalSurface.minorRadius() * scale);
+                    transformPlacement(toroidalSurface.getPosition(), transformation),
+                    toroidalSurface.getMajorRadius() * scale,
+                    toroidalSurface.getMinorRadius() * scale);
         }
         if (surface instanceof SphericalSurface) {
             SphericalSurface sphericalSurface = (SphericalSurface) surface;
             return new SphericalSurface(
-                    transformPlacement(sphericalSurface.position(), transformation),
-                    sphericalSurface.radius() * scale);
+                    transformPlacement(sphericalSurface.getPosition(), transformation),
+                    sphericalSurface.getRadius() * scale);
         }
         if (surface instanceof BSplineSurface3) {
             BSplineSurface3 splineSurface = (BSplineSurface3) surface;
             return new BSplineSurface3(
-                    splineSurface.uDegree(),
-                    splineSurface.vDegree(),
-                    splineSurface.controlPoints().stream()
+                    splineSurface.getUDegree(),
+                    splineSurface.getVDegree(),
+                    splineSurface.getControlPoints().stream()
                             .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()))
                             .collect(Collectors.toList()),
-                    splineSurface.uMultiplicities(),
-                    splineSurface.vMultiplicities(),
-                    splineSurface.uKnots(),
-                    splineSurface.vKnots());
+                    splineSurface.getUMultiplicities(),
+                    splineSurface.getVMultiplicities(),
+                    splineSurface.getUKnots(),
+                    splineSurface.getVKnots());
         }
         if (surface instanceof RationalBSplineSurface3) {
             RationalBSplineSurface3 splineSurface = (RationalBSplineSurface3) surface;
             return new RationalBSplineSurface3(
-                    splineSurface.uDegree(),
-                    splineSurface.vDegree(),
-                    splineSurface.controlPoints().stream()
+                    splineSurface.getUDegree(),
+                    splineSurface.getVDegree(),
+                    splineSurface.getControlPoints().stream()
                             .map(row -> row.stream().map(point -> transformPoint3(point, transformation)).collect(Collectors.toList()))
                             .collect(Collectors.toList()),
-                    splineSurface.weightsData(),
-                    splineSurface.uMultiplicities(),
-                    splineSurface.vMultiplicities(),
-                    splineSurface.uKnots(),
-                    splineSurface.vKnots());
+                    splineSurface.getWeightsData(),
+                    splineSurface.getUMultiplicities(),
+                    splineSurface.getVMultiplicities(),
+                    splineSurface.getUKnots(),
+                    splineSurface.getVKnots());
         }
         if (surface instanceof SurfaceOfLinearExtrusion3) {
             SurfaceOfLinearExtrusion3 extrusionSurface = (SurfaceOfLinearExtrusion3) surface;
             return new SurfaceOfLinearExtrusion3(
-                    transformCurve3(extrusionSurface.sweptCurve(), transformation),
-                    transformVector3(extrusionSurface.extrusionVector(), transformation));
+                    transformCurve3(extrusionSurface.getSweptCurve(), transformation),
+                    transformVector3(extrusionSurface.getExtrusionVector(), transformation));
         }
         if (surface instanceof SurfaceOfRevolution3) {
             SurfaceOfRevolution3 revolutionSurface = (SurfaceOfRevolution3) surface;
             return new SurfaceOfRevolution3(
-                    transformCurve3(revolutionSurface.sweptCurve(), transformation),
-                    transformPoint3(revolutionSurface.axisOrigin(), transformation),
-                    transformDirection3(revolutionSurface.axisDirection(), transformation));
+                    transformCurve3(revolutionSurface.getSweptCurve(), transformation),
+                    transformPoint3(revolutionSurface.getAxisOrigin(), transformation),
+                    transformDirection3(revolutionSurface.getAxisDirection(), transformation));
         }
         if (surface instanceof RuledSurface3) {
             RuledSurface3 ruledSurface = (RuledSurface3) surface;
             return new RuledSurface3(
-                    transformCurve3(ruledSurface.directrix1(), transformation),
-                    transformCurve3(ruledSurface.directrix2(), transformation));
+                    transformCurve3(ruledSurface.getDirectrix1(), transformation),
+                    transformCurve3(ruledSurface.getDirectrix2(), transformation));
         }
         if (surface instanceof SurfaceOfConstantRadius3) {
             SurfaceOfConstantRadius3 constantRadiusSurface = (SurfaceOfConstantRadius3) surface;
             return new SurfaceOfConstantRadius3(
-                    transformSurfaceGeometry(constantRadiusSurface.sweptSurface(), transformation),
-                    constantRadiusSurface.radius() * scale);
+                    transformSurfaceGeometry(constantRadiusSurface.getSweptSurface(), transformation),
+                    constantRadiusSurface.getRadius() * scale);
         }
         if (surface instanceof ParaboloidSurface) {
             ParaboloidSurface paraboloid = (ParaboloidSurface) surface;
             return new ParaboloidSurface(
-                    transformPlacement(paraboloid.position(), transformation),
-                    paraboloid.focalLength() * scale);
+                    transformPlacement(paraboloid.getPosition(), transformation),
+                    paraboloid.getFocalLength() * scale);
         }
         if (surface instanceof HyperboloidSurface) {
             HyperboloidSurface hyperboloid = (HyperboloidSurface) surface;
             return new HyperboloidSurface(
-                    transformPlacement(hyperboloid.position(), transformation),
-                    hyperboloid.radius() * scale,
-                    hyperboloid.semiAxis() * scale);
+                    transformPlacement(hyperboloid.getPosition(), transformation),
+                    hyperboloid.getRadius() * scale,
+                    hyperboloid.getSemiAxis() * scale);
         }
         if (surface instanceof SurfaceOfTranslation3) {
             SurfaceOfTranslation3 translation = (SurfaceOfTranslation3) surface;
             return new SurfaceOfTranslation3(
-                    transformCurve3(translation.profile(), transformation),
-                    transformVector3(translation.direction(), transformation));
+                    transformCurve3(translation.getProfile(), transformation),
+                    transformVector3(translation.getDirection(), transformation));
         }
         if (surface instanceof SurfaceOfProjection3) {
             SurfaceOfProjection3 projection = (SurfaceOfProjection3) surface;
             return new SurfaceOfProjection3(
-                    transformCurve3(projection.profile(), transformation),
-                    transformVector3(projection.projectionDirection(), transformation));
+                    transformCurve3(projection.getProfile(), transformation),
+                    transformVector3(projection.getProjectionDirection(), transformation));
         }
         throw new UnsupportedGeometryException("surface replica for " + surfaceTypeName(surface) + " is unsupported");
     }
@@ -692,7 +692,7 @@ final class StepCadGeometryOps {
     }
 
     private List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {
-        List<Point2> sampled = sampleCurve2(trimmedCurve.basisCurve(), segments);
+        List<Point2> sampled = sampleCurve2(trimmedCurve.getBasisCurve(), segments);
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
@@ -704,7 +704,7 @@ final class StepCadGeometryOps {
         List<Point2> trimmed = new ArrayList<>();
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement());
+            appendClosedTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement());
         } else {
             appendOpenTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex);
         }
@@ -764,7 +764,7 @@ final class StepCadGeometryOps {
     }
 
     private List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
-        List<CartesianPoint> sampled = sampleCurve3(trimmedCurve.basisCurve(), segments);
+        List<CartesianPoint> sampled = sampleCurve3(trimmedCurve.getBasisCurve(), segments);
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }
@@ -776,7 +776,7 @@ final class StepCadGeometryOps {
         List<CartesianPoint> trimmed = new ArrayList<>();
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints3(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement());
+            appendClosedTrimmedPoints3(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement());
         } else {
             appendOpenTrimmedPoints3(trimmed, basisPoints, startIndex, endIndex);
         }
@@ -837,39 +837,39 @@ final class StepCadGeometryOps {
 
     private Plane transformPlane(Plane plane, StepCartesianTransformationOperator transformation) {
         return new Plane(
-                transformPoint3(plane.origin(), transformation),
-                transformDirection3(plane.normal(), transformation));
+                transformPoint3(plane.getOrigin(), transformation),
+                transformDirection3(plane.getNormal(), transformation));
     }
 
     Axis2Placement3D transformPlacement(Axis2Placement3D placement, StepCartesianTransformationOperator transformation) {
         return new Axis2Placement3D(
-                transformPoint3(placement.location(), transformation),
-                transformDirection3(placement.axis(), transformation),
-                transformDirection3(placement.refDirection(), transformation));
+                transformPoint3(placement.getLocation(), transformation),
+                transformDirection3(placement.getAxis(), transformation),
+                transformDirection3(placement.getRefDirection(), transformation));
     }
 
     CartesianPoint transformPoint3(CartesianPoint point, StepCartesianTransformationOperator transformation) {
         TransformBasis3 basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        Vector3 offset = basis.x().scale(point.x() * scale)
-                .add(basis.y().scale(point.y() * scale))
-                .add(basis.z().scale(point.z() * scale));
+        Vector3 offset = basis.getX().scale(point.getX() * scale)
+                .add(basis.getY().scale(point.getY() * scale))
+                .add(basis.getZ().scale(point.getZ() * scale));
         return builder.buildPoint(transformation.localOrigin().id()).add(offset);
     }
 
     Vector3 transformVector3(Vector3 vector, StepCartesianTransformationOperator transformation) {
         TransformBasis3 basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        return basis.x().scale(vector.x() * scale)
-                .add(basis.y().scale(vector.y() * scale))
-                .add(basis.z().scale(vector.z() * scale));
+        return basis.getX().scale(vector.getX() * scale)
+                .add(basis.getY().scale(vector.getY() * scale))
+                .add(basis.getZ().scale(vector.getZ() * scale));
     }
 
     Point2 transformPoint2(Point2 point, StepCartesianTransformationOperator transformation) {
         Vector2 basisX = transformAxis1_2(transformation);
         Vector2 basisY = transformAxis2OrDefault2(transformation, basisX);
         double scale = transformationScale(transformation);
-        Vector2 offset = basisX.scale(point.x() * scale).add(basisY.scale(point.y() * scale));
+        Vector2 offset = basisX.scale(point.getX() * scale).add(basisY.scale(point.getY() * scale));
         Point2 origin = origin2(transformation);
         return origin.add(offset);
     }
@@ -878,9 +878,9 @@ final class StepCadGeometryOps {
         TransformBasis3 basis = transformBasis3(transformation);
         Vector3 source = direction.asVector();
         return Direction3.from(
-                basis.x().scale(source.x())
-                        .add(basis.y().scale(source.y()))
-                        .add(basis.z().scale(source.z()))
+                basis.getX().scale(source.getX())
+                        .add(basis.getY().scale(source.getY()))
+                        .add(basis.getZ().scale(source.getZ()))
         );
     }
 
@@ -888,7 +888,7 @@ final class StepCadGeometryOps {
         Vector2 basisX = transformAxis1_2(transformation);
         Vector2 basisY = transformAxis2OrDefault2(transformation, basisX);
         Vector2 source = direction.asVector();
-        return Direction2.from(basisX.scale(source.x()).add(basisY.scale(source.y())));
+        return Direction2.from(basisX.scale(source.getX()).add(basisY.scale(source.getY())));
     }
 
     private Vector3 transformAxis1_3(StepCartesianTransformationOperator transformation) {
@@ -955,7 +955,7 @@ final class StepCadGeometryOps {
             }
             return builder.buildDirection2(direction.id()).asVector();
         }
-        return new Vector2(-axis1.y(), axis1.x());
+        return new Vector2(-axis1.getY(), axis1.getX());
     }
 
     private Point2 origin2(StepCartesianTransformationOperator transformation) {
@@ -998,6 +998,9 @@ final class StepCadGeometryOps {
         Vector3 x() { return x; }
         Vector3 y() { return y; }
         Vector3 z() { return z; }
+        Vector3 getX() { return x; }
+        Vector3 getY() { return y; }
+        Vector3 getZ() { return z; }
 
         @Override
         public boolean equals(Object o) {

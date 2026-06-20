@@ -46,11 +46,11 @@ public final class Direction2 {
      * @return unit direction
      */
     public static Direction2 from(Vector2 vector) {
-        double length = Math.sqrt(vector.x() * vector.x() + vector.y() * vector.y());
+        double length = Math.sqrt(vector.getX() * vector.getX() + vector.getY() * vector.getY());
         if (length < Epsilon.get()) {
             throw new GeometryException("cannot create direction from zero-length vector");
         }
-        return new Direction2(vector.x() / length, vector.y() / length);
+        return new Direction2(vector.getX() / length, vector.getY() / length);
     }
 
     /**
@@ -124,11 +124,11 @@ public final class Direction2 {
      */
     public double angleBetween(Vector2 other) {
         Preconditions.requireNonNull(other, "other");
-        double otherLen = Math.sqrt(other.x() * other.x() + other.y() * other.y());
+        double otherLen = Math.sqrt(other.getX() * other.getX() + other.getY() * other.getY());
         if (otherLen < Epsilon.get()) {
             return 0.0;
         }
-        double dotVal = (x * other.x() + y * other.y()) / otherLen;
+        double dotVal = (x * other.getX() + y * other.getY()) / otherLen;
         return Math.acos(Math.max(-1.0, Math.min(1.0, dotVal)));
     }
 
@@ -140,7 +140,7 @@ public final class Direction2 {
      */
     public double dot(Vector2 other) {
         Preconditions.requireNonNull(other, "other");
-        return x * other.x() + y * other.y();
+        return x * other.getX() + y * other.getY();
     }
 
     /**
@@ -162,7 +162,7 @@ public final class Direction2 {
      */
     public double cross(Vector2 other) {
         Preconditions.requireNonNull(other, "other");
-        return x * other.y() - y * other.x();
+        return x * other.getY() - y * other.getX();
     }
 
     /**

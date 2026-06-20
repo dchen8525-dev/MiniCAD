@@ -2319,8 +2319,8 @@ public final class StepEntityResolver {
               referenceId(instance, definition, 2),
               StepVertexPoint.class,
               "ORIENTED_EDGE edge_end must reference VERTEX_POINT");
-      StepVertexPoint expectedStart = orientation ? edgeElement.start() : edgeElement.end();
-      StepVertexPoint expectedEnd = orientation ? edgeElement.end() : edgeElement.start();
+      StepVertexPoint expectedStart = orientation ? edgeElement.getStart() : edgeElement.getEnd();
+      StepVertexPoint expectedEnd = orientation ? edgeElement.getEnd() : edgeElement.getStart();
       if (explicitStart.id() != expectedStart.id() || explicitEnd.id() != expectedEnd.id()) {
         throw new StepResolutionException(
             "ORIENTED_EDGE explicit edge_start/edge_end must match edge_element orientation");
@@ -2487,11 +2487,11 @@ public final class StepEntityResolver {
   }
 
   private static int orientedEdgeStartId(StepOrientedEdge edge) {
-    return edge.orientation() ? edge.edgeElement().start().id() : edge.edgeElement().end().id();
+    return edge.isOrientation() ? edge.edgeElement().getStart().id() : edge.edgeElement().getEnd().id();
   }
 
   private static int orientedEdgeEndId(StepOrientedEdge edge) {
-    return edge.orientation() ? edge.edgeElement().end().id() : edge.edgeElement().start().id();
+    return edge.isOrientation() ? edge.edgeElement().getEnd().id() : edge.edgeElement().getStart().id();
   }
 
   private static boolean isPathEntity(StepEntity entity) {
@@ -8904,8 +8904,8 @@ public final class StepEntityResolver {
     return new StepUniformCurve(
         instance.id(),
         spline.name(),
-        spline.degree(),
-        spline.controlPoints(),
+        spline.getDegree(),
+        spline.getControlPoints(),
         spline.curveForm(),
         spline.closedCurve(),
         spline.selfIntersect());
@@ -8921,8 +8921,8 @@ public final class StepEntityResolver {
     return new StepBezierCurve(
         instance.id(),
         spline.name(),
-        spline.degree(),
-        spline.controlPoints(),
+        spline.getDegree(),
+        spline.getControlPoints(),
         spline.curveForm(),
         spline.closedCurve(),
         spline.selfIntersect());
@@ -8938,8 +8938,8 @@ public final class StepEntityResolver {
     return new StepPiecewiseBezierCurve(
         instance.id(),
         spline.name(),
-        spline.degree(),
-        spline.controlPoints(),
+        spline.getDegree(),
+        spline.getControlPoints(),
         spline.curveForm(),
         spline.closedCurve(),
         spline.selfIntersect());
@@ -8955,8 +8955,8 @@ public final class StepEntityResolver {
     return new StepQuasiUniformCurve(
         instance.id(),
         spline.name(),
-        spline.degree(),
-        spline.controlPoints(),
+        spline.getDegree(),
+        spline.getControlPoints(),
         spline.curveForm(),
         spline.closedCurve(),
         spline.selfIntersect());
@@ -8978,9 +8978,9 @@ public final class StepEntityResolver {
     return new StepUniformSurface(
         instance.id(),
         surface.name(),
-        surface.uDegree(),
-        surface.vDegree(),
-        surface.controlPoints(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
         surface.surfaceForm(),
         surface.uClosed(),
         surface.vClosed(),
@@ -8997,9 +8997,9 @@ public final class StepEntityResolver {
     return new StepBezierSurface(
         instance.id(),
         surface.name(),
-        surface.uDegree(),
-        surface.vDegree(),
-        surface.controlPoints(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
         surface.surfaceForm(),
         surface.uClosed(),
         surface.vClosed(),
@@ -9016,9 +9016,9 @@ public final class StepEntityResolver {
     return new StepPiecewiseBezierSurface(
         instance.id(),
         surface.name(),
-        surface.uDegree(),
-        surface.vDegree(),
-        surface.controlPoints(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
         surface.surfaceForm(),
         surface.uClosed(),
         surface.vClosed(),
@@ -9035,9 +9035,9 @@ public final class StepEntityResolver {
     return new StepQuasiUniformSurface(
         instance.id(),
         surface.name(),
-        surface.uDegree(),
-        surface.vDegree(),
-        surface.controlPoints(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
         surface.surfaceForm(),
         surface.uClosed(),
         surface.vClosed(),
@@ -13130,6 +13130,14 @@ public final class StepEntityResolver {
       String curveForm() { return curveForm; }
       boolean closedCurve() { return closedCurve; }
       boolean selfIntersect() { return selfIntersect; }
+      
+      // Java Bean getters
+      String getName() { return name; }
+      int getDegree() { return degree; }
+      List<StepCartesianPoint> getControlPoints() { return controlPoints; }
+      String getCurveForm() { return curveForm; }
+      boolean isClosedCurve() { return closedCurve; }
+      boolean isSelfIntersect() { return selfIntersect; }
   }
 
   private static final class ResolvedBSplineSurfaceData {
@@ -13165,6 +13173,16 @@ public final class StepEntityResolver {
       boolean uClosed() { return uClosed; }
       boolean vClosed() { return vClosed; }
       boolean selfIntersect() { return selfIntersect; }
+      
+      // Java Bean getters
+      String getName() { return name; }
+      int getUDegree() { return uDegree; }
+      int getVDegree() { return vDegree; }
+      List<List<StepCartesianPoint>> getControlPoints() { return controlPoints; }
+      String getSurfaceForm() { return surfaceForm; }
+      boolean isUClosed() { return uClosed; }
+      boolean isVClosed() { return vClosed; }
+      boolean isSelfIntersect() { return selfIntersect; }
   }
 
   // Phase 2 Batch 4-10: Generic helper resolver methods for alias families

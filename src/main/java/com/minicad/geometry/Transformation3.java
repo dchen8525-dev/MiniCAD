@@ -275,9 +275,9 @@ public final class Transformation3 {
      */
     public CartesianPoint transform(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        double x = point.x();
-        double y = point.y();
-        double z = point.z();
+        double x = point.getX();
+        double y = point.getY();
+        double z = point.getZ();
         double newX = m00 * x + m01 * y + m02 * z + m03;
         double newY = m10 * x + m11 * y + m12 * z + m13;
         double newZ = m20 * x + m21 * y + m22 * z + m23;
@@ -293,9 +293,9 @@ public final class Transformation3 {
      */
     public Vector3 transform(Vector3 vector) {
         Preconditions.requireNonNull(vector, "vector");
-        double x = vector.x();
-        double y = vector.y();
-        double z = vector.z();
+        double x = vector.getX();
+        double y = vector.getY();
+        double z = vector.getZ();
         double newX = m00 * x + m01 * y + m02 * z;
         double newY = m10 * x + m11 * y + m12 * z;
         double newZ = m20 * x + m21 * y + m22 * z;
@@ -311,9 +311,9 @@ public final class Transformation3 {
      */
     public Direction3 transform(Direction3 direction) {
         Preconditions.requireNonNull(direction, "direction");
-        double x = direction.x();
-        double y = direction.y();
-        double z = direction.z();
+        double x = direction.getX();
+        double y = direction.getY();
+        double z = direction.getZ();
         double newX = m00 * x + m01 * y + m02 * z;
         double newY = m10 * x + m11 * y + m12 * z;
         double newZ = m20 * x + m21 * y + m22 * z;
@@ -347,36 +347,36 @@ public final class Transformation3 {
         Preconditions.requireNonNull(placement, "placement");
         // Build an orthonormal frame following the STEP convention:
         // z = normalize(axis), x = normalize(project(refDir onto plane normal to z)), y = z x x
-        Vector3 zDir = placement.axis().asVector();
-        double zNorm = Math.sqrt(zDir.x() * zDir.x() + zDir.y() * zDir.y() + zDir.z() * zDir.z());
+        Vector3 zDir = placement.getAxis().asVector();
+        double zNorm = Math.sqrt(zDir.getX() * zDir.getX() + zDir.getY() * zDir.getY() + zDir.getZ() * zDir.getZ());
         if (zNorm < com.minicad.common.Epsilon.get()) {
             throw new com.minicad.common.GeometryException("axis direction must be non-zero");
         }
-        Vector3 zUnit = new Vector3(zDir.x() / zNorm, zDir.y() / zNorm, zDir.z() / zNorm);
+        Vector3 zUnit = new Vector3(zDir.getX() / zNorm, zDir.getY() / zNorm, zDir.getZ() / zNorm);
         Vector3 xSeed = placement.xDirection().asVector();
         // Gram-Schmidt: project xSeed onto the plane normal to zUnit
-        double dotXZ = xSeed.x() * zUnit.x() + xSeed.y() * zUnit.y() + xSeed.z() * zUnit.z();
+        double dotXZ = xSeed.getX() * zUnit.getX() + xSeed.getY() * zUnit.getY() + xSeed.getZ() * zUnit.getZ();
         Vector3 xProj = new Vector3(
-            xSeed.x() - zUnit.x() * dotXZ,
-            xSeed.y() - zUnit.y() * dotXZ,
-            xSeed.z() - zUnit.z() * dotXZ
+            xSeed.getX() - zUnit.getX() * dotXZ,
+            xSeed.getY() - zUnit.getY() * dotXZ,
+            xSeed.getZ() - zUnit.getZ() * dotXZ
         );
-        double xNorm = Math.sqrt(xProj.x() * xProj.x() + xProj.y() * xProj.y() + xProj.z() * xProj.z());
+        double xNorm = Math.sqrt(xProj.getX() * xProj.getX() + xProj.getY() * xProj.getY() + xProj.getZ() * xProj.getZ());
         if (xNorm < com.minicad.common.Epsilon.get()) {
             throw new com.minicad.common.GeometryException("refDirection is parallel to axis");
         }
-        Vector3 xDir = new Vector3(xProj.x() / xNorm, xProj.y() / xNorm, xProj.z() / xNorm);
+        Vector3 xDir = new Vector3(xProj.getX() / xNorm, xProj.getY() / xNorm, xProj.getZ() / xNorm);
         // y = z cross x (already unit length since z and x are orthonormal)
         Vector3 yDir = new Vector3(
-            zUnit.y() * xDir.z() - zUnit.z() * xDir.y(),
-            zUnit.z() * xDir.x() - zUnit.x() * xDir.z(),
-            zUnit.x() * xDir.y() - zUnit.y() * xDir.x()
+            zUnit.getY() * xDir.getZ() - zUnit.getZ() * xDir.getY(),
+            zUnit.getZ() * xDir.getX() - zUnit.getX() * xDir.getZ(),
+            zUnit.getX() * xDir.getY() - zUnit.getY() * xDir.getX()
         );
-        CartesianPoint origin = placement.location();
+        CartesianPoint origin = placement.getLocation();
         return new Transformation3(
-            xDir.x(), yDir.x(), zUnit.x(), origin.x(),
-            xDir.y(), yDir.y(), zUnit.y(), origin.y(),
-            xDir.z(), yDir.z(), zUnit.z(), origin.z(),
+            xDir.getX(), yDir.getX(), zUnit.getX(), origin.getX(),
+            xDir.getY(), yDir.getY(), zUnit.getY(), origin.getY(),
+            xDir.getZ(), yDir.getZ(), zUnit.getZ(), origin.getZ(),
             0, 0, 0, 1
         );
     }
@@ -399,9 +399,9 @@ public final class Transformation3 {
     public Transformation3 at(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         return new Transformation3(
-            m00, m01, m02, point.x(),
-            m10, m11, m12, point.y(),
-            m20, m21, m22, point.z(),
+            m00, m01, m02, point.getX(),
+            m10, m11, m12, point.getY(),
+            m20, m21, m22, point.getZ(),
             m30, m31, m32, m33
         );
     }

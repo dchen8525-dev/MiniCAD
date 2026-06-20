@@ -43,7 +43,7 @@ public final class Point2 {
      * @return new point
      */
     public Point2 add(Vector2 vector) {
-        return new Point2(x + vector.x(), y + vector.y());
+        return new Point2(x + vector.getX(), y + vector.getY());
     }
 
     /**
@@ -53,7 +53,7 @@ public final class Point2 {
      * @return new point
      */
     public Point2 subtract(Vector2 vector) {
-        return new Point2(x - vector.x(), y - vector.y());
+        return new Point2(x - vector.getX(), y - vector.getY());
     }
 
     /**

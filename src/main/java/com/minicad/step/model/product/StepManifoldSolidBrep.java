@@ -39,6 +39,11 @@ public final class StepManifoldSolidBrep implements StepEntity {
         return outer;
     }
 
+    // Java Bean style alias for outer
+    public StepEntity isOuter() {
+        return outer;
+    }
+
     // Record-style accessors for compatibility
     public int id() { return getId(); }
     public String name() { return getName(); }

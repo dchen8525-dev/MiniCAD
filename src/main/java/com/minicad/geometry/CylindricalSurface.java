@@ -48,8 +48,8 @@ public final class CylindricalSurface implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
         double cosU = Math.cos(u);
@@ -101,8 +101,8 @@ public final class CylindricalSurface implements SurfaceGeometry {
     public BoundingBox3 boundingBox(double vMin, double vMax) {
         Preconditions.requireFinite(vMin, "vMin");
         Preconditions.requireFinite(vMax, "vMax");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
         Vector3 xDir = position.xDirection().asVector();
         Vector3 yDir = position.yDirection().asVector();
 
@@ -147,8 +147,8 @@ public final class CylindricalSurface implements SurfaceGeometry {
      */
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        CartesianPoint origin = position.location();
-        Vector3 axis = position.axis().asVector();
+        CartesianPoint origin = position.getLocation();
+        Vector3 axis = position.getAxis().asVector();
 
         // Project point onto axis
         Vector3 toPoint = point.subtract(origin);
@@ -163,7 +163,7 @@ public final class CylindricalSurface implements SurfaceGeometry {
         }
 
         // Normalize radial direction and scale to radius
-        Direction3 radialDir = new Direction3(radial.x(), radial.y(), radial.z()).normalize();
+        Direction3 radialDir = new Direction3(radial.getX(), radial.getY(), radial.getZ()).normalize();
         return origin.add(axis.scale(v)).add(radialDir.asVector().scale(radius));
     }
 

@@ -108,12 +108,12 @@ public final class BoundingBox3 {
         Preconditions.requireNonNull(p1, "p1");
         Preconditions.requireNonNull(p2, "p2");
         return new BoundingBox3(
-            Math.min(p1.x(), p2.x()),
-            Math.min(p1.y(), p2.y()),
-            Math.min(p1.z(), p2.z()),
-            Math.max(p1.x(), p2.x()),
-            Math.max(p1.y(), p2.y()),
-            Math.max(p1.z(), p2.z())
+            Math.min(p1.getX(), p2.getX()),
+            Math.min(p1.getY(), p2.getY()),
+            Math.min(p1.getZ(), p2.getZ()),
+            Math.max(p1.getX(), p2.getX()),
+            Math.max(p1.getY(), p2.getY()),
+            Math.max(p1.getZ(), p2.getZ())
         );
     }
 
@@ -125,7 +125,7 @@ public final class BoundingBox3 {
      */
     public static BoundingBox3 of(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        return new BoundingBox3(point.x(), point.y(), point.z(), point.x(), point.y(), point.z());
+        return new BoundingBox3(point.getX(), point.getY(), point.getZ(), point.getX(), point.getY(), point.getZ());
     }
 
     /**
@@ -179,12 +179,12 @@ public final class BoundingBox3 {
             return BoundingBox3.of(point);
         }
         return new BoundingBox3(
-            Math.min(minX, point.x()),
-            Math.min(minY, point.y()),
-            Math.min(minZ, point.z()),
-            Math.max(maxX, point.x()),
-            Math.max(maxY, point.y()),
-            Math.max(maxZ, point.z())
+            Math.min(minX, point.getX()),
+            Math.min(minY, point.getY()),
+            Math.min(minZ, point.getZ()),
+            Math.max(maxX, point.getX()),
+            Math.max(maxY, point.getY()),
+            Math.max(maxZ, point.getZ())
         );
     }
 
@@ -274,8 +274,8 @@ public final class BoundingBox3 {
      */
     public boolean containsPoint(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        return minX <= point.x() && minY <= point.y() && minZ <= point.z()
-            && maxX >= point.x() && maxY >= point.y() && maxZ >= point.z();
+        return minX <= point.getX() && minY <= point.getY() && minZ <= point.getZ()
+            && maxX >= point.getX() && maxY >= point.getY() && maxZ >= point.getZ();
     }
 
     /**
@@ -395,9 +395,9 @@ public final class BoundingBox3 {
             return 0.0;
         }
         // Find closest point on box
-        double closestX = Math.max(minX, Math.min(maxX, point.x()));
-        double closestY = Math.max(minY, Math.min(maxY, point.y()));
-        double closestZ = Math.max(minZ, Math.min(maxZ, point.z()));
+        double closestX = Math.max(minX, Math.min(maxX, point.getX()));
+        double closestY = Math.max(minY, Math.min(maxY, point.getY()));
+        double closestZ = Math.max(minZ, Math.min(maxZ, point.getZ()));
         return point.distanceTo(new CartesianPoint(closestX, closestY, closestZ));
     }
 
@@ -413,9 +413,9 @@ public final class BoundingBox3 {
         if (isEmpty()) {
             throw new GeometryException("Cannot find closest point to empty bounding box");
         }
-        double closestX = Math.max(minX, Math.min(maxX, point.x()));
-        double closestY = Math.max(minY, Math.min(maxY, point.y()));
-        double closestZ = Math.max(minZ, Math.min(maxZ, point.z()));
+        double closestX = Math.max(minX, Math.min(maxX, point.getX()));
+        double closestY = Math.max(minY, Math.min(maxY, point.getY()));
+        double closestZ = Math.max(minZ, Math.min(maxZ, point.getZ()));
         return new CartesianPoint(closestX, closestY, closestZ);
     }
 

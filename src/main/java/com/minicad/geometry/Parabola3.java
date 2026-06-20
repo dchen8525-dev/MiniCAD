@@ -49,6 +49,9 @@ public final class Parabola3 implements Curve3 {
     public double focalLength() { return focalDistance; }
     public double focalDistance() { return focalDistance; }
 
+    // Java Bean getters
+    public double getFocalLength() { return focalDistance; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -166,7 +169,7 @@ public final class Parabola3 implements Curve3 {
      */
     public CartesianPoint focus() {
         Vector3 axis = position.yDirection().asVector();
-        return position.location().add(axis.scale(focalDistance));
+        return position.getLocation().add(axis.scale(focalDistance));
     }
 
     /**
@@ -175,6 +178,6 @@ public final class Parabola3 implements Curve3 {
      * @return vertex point
      */
     public CartesianPoint vertex() {
-        return position.location();
+        return position.getLocation();
     }
 }

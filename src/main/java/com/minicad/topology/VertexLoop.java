@@ -53,8 +53,8 @@ public final class VertexLoop implements Loop {
             return BoundingBox3.empty();
         }
         return new BoundingBox3(
-            vertex.point().x(), vertex.point().y(), vertex.point().z(),
-            vertex.point().x(), vertex.point().y(), vertex.point().z()
+            vertex.point().getX(), vertex.point().getY(), vertex.point().getZ(),
+            vertex.point().getX(), vertex.point().getY(), vertex.point().getZ()
         );
     }
 }

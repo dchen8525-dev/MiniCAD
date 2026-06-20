@@ -45,7 +45,7 @@ public final class OrientedEdge {
      * @return start vertex
      */
     public Vertex startVertex() {
-        return orientation ? edge.start() : edge.end();
+        return orientation ? edge.getStart() : edge.getEnd();
     }
 
     /**
@@ -55,7 +55,7 @@ public final class OrientedEdge {
      * @return end vertex
      */
     public Vertex endVertex() {
-        return orientation ? edge.end() : edge.start();
+        return orientation ? edge.getEnd() : edge.getStart();
     }
 
     /**

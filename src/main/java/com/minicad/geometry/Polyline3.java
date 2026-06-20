@@ -141,9 +141,9 @@ public final class Polyline3 implements Curve3 {
             for (int j = 0; j < segments; j++) {
                 double t = j / (double) segments;
                 result.add(new CartesianPoint(
-                    p0.x() + t * (p1.x() - p0.x()),
-                    p0.y() + t * (p1.y() - p0.y()),
-                    p0.z() + t * (p1.z() - p0.z())
+                    p0.getX() + t * (p1.getX() - p0.getX()),
+                    p0.getY() + t * (p1.getY() - p0.getY()),
+                    p0.getZ() + t * (p1.getZ() - p0.getZ())
                 ));
             }
         }
@@ -246,9 +246,9 @@ public final class Polyline3 implements Curve3 {
                 double remaining = targetLength - accumulated;
                 double t = remaining / segmentLength;
                 return new CartesianPoint(
-                    p0.x() + t * (p1.x() - p0.x()),
-                    p0.y() + t * (p1.y() - p0.y()),
-                    p0.z() + t * (p1.z() - p0.z())
+                    p0.getX() + t * (p1.getX() - p0.getX()),
+                    p0.getY() + t * (p1.getY() - p0.getY()),
+                    p0.getZ() + t * (p1.getZ() - p0.getZ())
                 );
             }
             accumulated += segmentLength;

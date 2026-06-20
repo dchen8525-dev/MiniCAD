@@ -25,10 +25,10 @@ public final class Solid {
     private final List<Shell> voidShells;
 
     public Solid(Shell outerShell, List<Shell> voidShells) {
-        if (outerShell == null || !outerShell.closed()) {
+        if (outerShell == null || !outerShell.isClosed()) {
             throw new TopologyException("solid requires a closed shell");
         }
-        if (voidShells != null && voidShells.stream().anyMatch(shell -> shell == null || !shell.closed())) {
+        if (voidShells != null && voidShells.stream().anyMatch(shell -> shell == null || !shell.isClosed())) {
             throw new TopologyException("solid voids require closed shells");
         }
         this.outerShell = outerShell;
@@ -119,9 +119,9 @@ public final class Solid {
         if (box.isEmpty()) {
             return 0.0;
         }
-        double dx = box.maxX() - box.minX();
-        double dy = box.maxY() - box.minY();
-        double dz = box.maxZ() - box.minZ();
+        double dx = box.getMaxX() - box.getMinX();
+        double dy = box.getMaxY() - box.getMinY();
+        double dz = box.getMaxZ() - box.getMinZ();
         return dx * dy * dz;
     }
 
@@ -188,8 +188,8 @@ public final class Solid {
     public java.util.List<Face> allFaces() {
         java.util.List<Face> result = new java.util.ArrayList<>();
         for (Shell shell : allShells()) {
-            if (shell != null && shell.faces() != null) {
-                result.addAll(shell.faces());
+            if (shell != null && shell.getFaces() != null) {
+                result.addAll(shell.getFaces());
             }
         }
         return result;
@@ -204,12 +204,12 @@ public final class Solid {
         java.util.List<Edge> result = new java.util.ArrayList<>();
         for (Face face : allFaces()) {
             if (face != null) {
-                for (com.minicad.topology.FaceBound bound : face.bounds()) {
-                    if (bound != null && bound.loop() instanceof com.minicad.topology.EdgeLoop) {
-                        com.minicad.topology.EdgeLoop loop = (com.minicad.topology.EdgeLoop) bound.loop();
+                for (com.minicad.topology.FaceBound bound : face.getBounds()) {
+                    if (bound != null && bound.getLoop() instanceof com.minicad.topology.EdgeLoop) {
+                        com.minicad.topology.EdgeLoop loop = (com.minicad.topology.EdgeLoop) bound.getLoop();
                         for (com.minicad.topology.OrientedEdge oe : loop.edges()) {
-                            if (oe != null && oe.edge() != null) {
-                                result.add(oe.edge());
+                            if (oe != null && oe.getEdge() != null) {
+                                result.add(oe.getEdge());
                             }
                         }
                     }

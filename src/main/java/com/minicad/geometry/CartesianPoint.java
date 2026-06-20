@@ -32,6 +32,18 @@ public final class CartesianPoint {
         return z;
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
     /**
      * Returns the vector from {@code other} to this point.
      *
@@ -51,7 +63,7 @@ public final class CartesianPoint {
      */
     public CartesianPoint add(Vector3 vector) {
         Preconditions.requireNonNull(vector, "vector");
-        return new CartesianPoint(x + vector.x(), y + vector.y(), z + vector.z());
+        return new CartesianPoint(x + vector.getX(), y + vector.getY(), z + vector.getZ());
     }
 
     /**
@@ -62,7 +74,7 @@ public final class CartesianPoint {
      */
     public CartesianPoint subtractVector(Vector3 vector) {
         Preconditions.requireNonNull(vector, "vector");
-        return new CartesianPoint(x - vector.x(), y - vector.y(), z - vector.z());
+        return new CartesianPoint(x - vector.getX(), y - vector.getY(), z - vector.getZ());
     }
 
     /**
@@ -115,8 +127,8 @@ public final class CartesianPoint {
      */
     public CartesianPoint projectOnto(Line3 line) {
         Preconditions.requireNonNull(line, "line");
-        Vector3 offset = subtract(line.origin());
-        double projection = offset.dot(line.direction().asVector());
+        Vector3 offset = subtract(line.getOrigin());
+        double projection = offset.dot(line.getDirection().asVector());
         return line.pointAt(projection);
     }
 
@@ -129,8 +141,8 @@ public final class CartesianPoint {
     public CartesianPoint projectOnto(Plane plane) {
         Preconditions.requireNonNull(plane, "plane");
         double distance = plane.signedDistanceTo(this);
-        Vector3 offset = plane.normal().asVector().scale(distance);
-        return new CartesianPoint(x - offset.x(), y - offset.y(), z - offset.z());
+        Vector3 offset = plane.getNormal().asVector().scale(distance);
+        return new CartesianPoint(x - offset.getX(), y - offset.getY(), z - offset.getZ());
     }
 
     /**
@@ -209,7 +221,7 @@ public final class CartesianPoint {
     public CartesianPoint mirrorThrough(Plane plane) {
         Preconditions.requireNonNull(plane, "plane");
         double signedDistance = plane.signedDistanceTo(this);
-        Vector3 mirrorOffset = plane.normal().asVector().scale(2.0 * signedDistance);
+        Vector3 mirrorOffset = plane.getNormal().asVector().scale(2.0 * signedDistance);
         return subtractVector(mirrorOffset);
     }
 

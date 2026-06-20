@@ -18,4 +18,13 @@ public interface StepFaceEntity extends StepEntity {
      * @return immutable face-bound list
      */
     List<StepFaceBound> bounds();
+
+    /**
+     * Returns the face bounds (Java Bean style).
+     *
+     * @return immutable face-bound list
+     */
+    default List<StepFaceBound> getBounds() {
+        return bounds();
+    }
 }
