@@ -767,6 +767,7 @@ import com.minicad.step.model.misc.StepGenericEntity;
 import com.minicad.step.model.analysis.StepCalculatedGeometricRepresentationItem;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
+import com.minicad.common.StepParseException;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepValue;
 
@@ -8821,7 +8822,22 @@ public final class StepEntityResolver {
 
   StepRepresentation resolveRepresentation(
       StepEntityInstance instance, String entityName, boolean shapeRepresentation) {
-    StepEntityDefinition definition = definition(instance, entityName);
+    // Try to find the specific entity definition first, fall back to parent definitions
+    StepEntityDefinition definition = null;
+    try {
+      definition = definition(instance, entityName);
+    } catch (StepParseException e) {
+      // Try parent definitions for representation subtypes
+      if (entityName.endsWith("_REPRESENTATION") && !entityName.equals("REPRESENTATION") && !entityName.equals("SHAPE_REPRESENTATION")) {
+        try {
+          definition = definition(instance, "SHAPE_REPRESENTATION");
+        } catch (StepParseException e2) {
+          definition = definition(instance, "REPRESENTATION");
+        }
+      } else {
+        throw e;
+      }
+    }
     requireParameterCount(instance, definition, 3);
     List<StepEntity> items =
         entityReferenceList(

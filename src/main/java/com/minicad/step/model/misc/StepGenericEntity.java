@@ -81,6 +81,11 @@ public final class StepGenericEntity implements StepEntity {
         return entityName;
     }
 
+    // Alias for getEntityName for reflection-based entity name extraction
+    public String entityName() {
+        return entityName;
+    }
+
     public Object[] getAttributes() {
         return attributes;
     }

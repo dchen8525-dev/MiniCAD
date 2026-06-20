@@ -56,7 +56,10 @@ public final class StepOrientedOpenShell implements StepEntity {
 
     // Record-style accessor - derives faces from the underlying open shell
     public List<StepFaceEntity> faces() {
-        if (openShellElement instanceof StepOpenShell) {
+        if (openShellElement instanceof StepOrientedOpenShell) {
+            // Handle nested oriented shells
+            return ((StepOrientedOpenShell) openShellElement).faces();
+        } else if (openShellElement instanceof StepOpenShell) {
             return ((StepOpenShell) openShellElement).faces();
         } else if (openShellElement instanceof StepSurfacedOpenShell) {
             return ((StepSurfacedOpenShell) openShellElement).faces();

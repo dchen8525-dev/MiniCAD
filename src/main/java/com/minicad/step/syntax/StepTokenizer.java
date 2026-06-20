@@ -82,7 +82,7 @@ public final class StepTokenizer {
             if (isIdentifierStart(c)) {
                 return identifierToken();
             }
-            throw new StepParseException("unexpected character '" + c + "' at position " + index);
+            throw new StepParseException("unexpected character '" + c + "' at position " + (index - 1));
         }
     }
 
@@ -182,12 +182,14 @@ public final class StepTokenizer {
         }
         char page = Character.toUpperCase(input.charAt(index));
         index++;
-        String     charsetName = null;
-    switch (page) {
-        default:
-            charsetName = null;
-            break;
-    };
+        String charsetName;
+        switch (page) {
+            case 'A': charsetName = "ISO-8859-1"; break;
+            case 'B': charsetName = "ISO-8859-2"; break;
+            case 'C': charsetName = "ISO-8859-3"; break;
+            case 'D': charsetName = "ISO-8859-4"; break;
+            default: charsetName = null;
+        }
         if (charsetName == null || !Charset.isSupported(charsetName)) {
             throw new StepParseException("unsupported \\P\\ string escape code page '" + page
                     + "' at position " + escapeStart);

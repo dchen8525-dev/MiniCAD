@@ -160,6 +160,12 @@ public final class Line3 implements Curve3 {
     }
 
     @Override
+    public Vector3 tangentAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        return direction.asVector();
+    }
+
+    @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         // Check if point lies on the line within epsilon

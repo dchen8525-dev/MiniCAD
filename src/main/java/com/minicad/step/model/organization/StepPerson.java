@@ -50,7 +50,19 @@ public final class StepPerson implements StepEntity {
     }
 
     public String getName() {
-        return identifier != null ? identifier : "";
+        // Convention: present the person's full name from first/last name fields
+        // when available. Returns the empty string when neither is supplied;
+        // the raw STEP identifier remains available via {@link #getIdentifier()}.
+        boolean hasFirst = firstName != null && !firstName.isEmpty();
+        boolean hasLast = lastName != null && !lastName.isEmpty();
+        if (hasFirst && hasLast) {
+            return firstName + " " + lastName;
+        } else if (hasFirst) {
+            return firstName;
+        } else if (hasLast) {
+            return lastName;
+        }
+        return "";
     }
 
     public String getIdentifier() {

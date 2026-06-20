@@ -71,6 +71,10 @@ public final class StepProductDefinitionRelationshipRelationship implements Step
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     // Record-style accessors
     public StepProductDefinitionRelationship relating() {
         return relating;

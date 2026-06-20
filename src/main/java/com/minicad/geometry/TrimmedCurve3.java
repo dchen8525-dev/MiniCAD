@@ -1,6 +1,7 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,10 @@ public final class TrimmedCurve3 implements Curve3 {
     private final boolean senseAgreement;
 
     public TrimmedCurve3(Curve3 basisCurve, double trimParamStart, double trimParamEnd, boolean senseAgreement) {
+        Preconditions.requireNonNull(basisCurve, "basisCurve");
+        if (!Double.isFinite(trimParamStart) || !Double.isFinite(trimParamEnd)) {
+            throw new GeometryException("trim parameters must be finite");
+        }
         this.basisCurve = basisCurve;
         this.trimParamStart = trimParamStart;
         this.trimParamEnd = trimParamEnd;
@@ -83,8 +88,19 @@ public final class TrimmedCurve3 implements Curve3 {
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         // Map parameter from trim range to basis curve parameter
-        double basisParam = trimParamStart + parameter * (trimParamEnd - trimParamStart);
+        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
+        double basisParam = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
         return basisCurve.pointAt(basisParam);
+    }
+
+    @Override
+    public Vector3 tangentAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
+        double basisParameter = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
+        Vector3 tangent = basisCurve.tangentAt(basisParameter);
+        boolean reversed = (trimParamEnd < trimParamStart) ^ !senseAgreement;
+        return reversed ? tangent.scale(-1.0) : tangent;
     }
 
     @Override

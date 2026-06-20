@@ -20,7 +20,10 @@ public final class Polyline3 implements Curve3 {
     private final List<CartesianPoint> points;
 
     public Polyline3(List<CartesianPoint> points) {
-        this.points = points == null ? null : java.util.List.copyOf(points);
+        if (points == null || points.size() < 2) {
+            throw new IllegalArgumentException("polyline requires at least two points");
+        }
+        this.points = java.util.List.copyOf(points);
     }
 
     public List<CartesianPoint> getPoints() {
@@ -58,18 +61,7 @@ public final class Polyline3 implements Curve3 {
             return points.get(0);
         }
         // Parameter is normalized [0, 1] along the polyline
-        double t = Math.max(0.0, Math.min(1.0, parameter));
-        int n = points.size() - 1;
-        int segment = (int) (t * n);
-        segment = Math.max(0, Math.min(segment, n - 1));
-        double localT = t * n - segment;
-        CartesianPoint p0 = points.get(segment);
-        CartesianPoint p1 = points.get(segment + 1);
-        return new CartesianPoint(
-            p0.x() + localT * (p1.x() - p0.x()),
-            p0.y() + localT * (p1.y() - p0.y()),
-            p0.z() + localT * (p1.z() - p0.z())
-        );
+        return pointAtLength(Math.max(0.0, Math.min(1.0, parameter)) * length());
     }
 
     @Override

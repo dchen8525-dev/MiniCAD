@@ -111,6 +111,10 @@ public final class SurfaceCurve3 implements Curve3 {
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
-        return curve3d.sample(segments);
+        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            points.add(pointAt((double) i / segments));
+        }
+        return java.util.List.copyOf(points);
     }
 }

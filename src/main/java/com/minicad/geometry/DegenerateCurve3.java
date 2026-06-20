@@ -76,6 +76,11 @@ public final class DegenerateCurve3 implements Curve3 {
         if (point == null) {
             return java.util.List.of();
         }
-        return java.util.List.of(point);
+        return java.util.List.of(point, point);
+    }
+
+    @Override
+    public Vector3 tangentAt(double parameter) {
+        throw new GeometryException("degenerate curve has no tangent");
     }
 }

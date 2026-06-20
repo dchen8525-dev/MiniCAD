@@ -27,6 +27,11 @@ public final class Parabola3 implements Curve3 {
     private final double focalDistance;
 
     public Parabola3(Axis2Placement3D position, double focalDistance) {
+        Preconditions.requireNonNull(position, "position");
+        Preconditions.requireFinite(focalDistance, "focalDistance");
+        if (focalDistance <= Epsilon.get()) {
+            throw new GeometryException("focalDistance must be greater than epsilon");
+        }
         this.position = position;
         this.focalDistance = focalDistance;
     }
@@ -67,8 +72,8 @@ public final class Parabola3 implements Curve3 {
         Preconditions.requireFinite(parameter, "parameter");
         // Parabola parametric equation: x = t, y = t^2 / (4 * f)
         // In local coordinates: x = parameter, y = parameter^2 / (4 * focalDistance), z = 0
-        double xLocal = parameter;
-        double yLocal = (parameter * parameter) / (4 * focalDistance);
+        double xLocal = 2.0 * focalDistance * parameter;
+        double yLocal = focalDistance * parameter * parameter;
         CartesianPoint localPoint = new CartesianPoint(xLocal, yLocal, 0);
         return position.transformToWorld(localPoint);
     }
@@ -105,8 +110,8 @@ public final class Parabola3 implements Curve3 {
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         // Sample a range of parameter values
-        for (int i = -segments; i <= segments; i++) {
-            double t = 0.5 * i; // Scale to get meaningful range
+        for (int i = 0; i <= segments; i++) {
+            double t = -1.0 + 2.0 * i / segments;
             points.add(pointAt(t));
         }
         return java.util.List.copyOf(points);
@@ -140,9 +145,7 @@ public final class Parabola3 implements Curve3 {
     public double curvatureAt(double t) {
         Preconditions.requireFinite(t, "t");
         // Curvature formula for parabola: k = |2 * focalDistance| / ( (1 + (t/(2*f))^2 )^(3/2) )
-        double derivative = t / (2 * focalDistance);
-        double denominator = Math.pow(1 + derivative * derivative, 1.5);
-        return (2 * focalDistance) / denominator;
+        return 1.0 / (2.0 * focalDistance * Math.pow(1.0 + t * t, 1.5));
     }
 
     /**

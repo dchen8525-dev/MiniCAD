@@ -239,8 +239,9 @@ public final class Line2 implements Curve2 {
     public double signedDistanceTo(Point2 point) {
         Preconditions.requireNonNull(point, "point");
         Vector2 toPoint = point.subtract(origin);
-        Vector2 normal = direction.perpendicular().asVector();
-        return toPoint.dot(normal);
+        // Signed distance uses cross product: toPoint cross direction
+        // Positive when point is to the right of direction, negative when to the left
+        return toPoint.cross(direction);
     }
 
     /**

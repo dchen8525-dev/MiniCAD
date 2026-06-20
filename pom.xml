@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.13.0</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
                 </configuration>
@@ -97,7 +97,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>3.5.2</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
                 </configuration>
@@ -105,10 +105,61 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.0</version>
                 <configuration>
                     <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
+            </plugin>
+            <!-- Spotless formatter: validates Java formatting but excludes generated STEP model files -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <includes>
+                            <include>src/main/java/com/minicad/app/**/*.java</include>
+                            <include>src/main/java/com/minicad/common/**/*.java</include>
+                            <include>src/main/java/com/minicad/geometry/**/*.java</include>
+                            <include>src/main/java/com/minicad/geometry2d/**/*.java</include>
+                            <include>src/main/java/com/minicad/topology/**/*.java</include>
+                            <include>src/main/java/com/minicad/tools/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>src/main/java/com/minicad/step/model/**/*.java</exclude>
+                        </excludes>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
+            </plugin>
+            <!-- Forbidden APIs check: flags deprecated API usage.
+                 Configured to report but not fail, to allow gradual cleanup.
+                 jdk-unsafe and jdk-reflection omitted due to high noise in existing codebase. -->
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <version>3.8</version>
+                <configuration>
+                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                    <failOnViolation>false</failOnViolation>
+                    <bundledSignatures>
+                        <bundledSignature>jdk-deprecated</bundledSignature>
+                    </bundledSignatures>
+                    <suppressAnnotations>
+                        <suppressAnnotation>javax.annotation.processing.Generated</suppressAnnotation>
+                        <suppressAnnotation>lombok.Generated</suppressAnnotation>
+                    </suppressAnnotations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

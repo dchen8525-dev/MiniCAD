@@ -25,6 +25,12 @@ public final class Axis2Placement3D {
     private final Direction3 refDirection;
 
     public Axis2Placement3D(CartesianPoint location, Direction3 axis, Direction3 refDirection) {
+        Preconditions.requireNonNull(location, "location");
+        Preconditions.requireNonNull(axis, "axis");
+        Preconditions.requireNonNull(refDirection, "refDirection");
+        if (axis.asVector().cross(refDirection.asVector()).norm() <= Epsilon.get()) {
+            throw new GeometryException("axis and refDirection must not be parallel");
+        }
         this.location = location;
         this.axis = axis;
         this.refDirection = refDirection;
@@ -79,12 +85,21 @@ public final class Axis2Placement3D {
     }
 
     /**
-     * Returns the local X direction (refDirection normalized).
+     * Returns the local X direction, computed by projecting the reference
+     * direction onto the plane normal to the axis (Gram-Schmidt).
+     * This ensures an orthonormal coordinate system per the STEP standard.
      *
      * @return X direction
      */
     public Direction3 xDirection() {
-        return refDirection != null ? refDirection : Direction3.xAxis();
+        Direction3 z = axis != null ? axis : Direction3.zAxis();
+        Direction3 ref = refDirection != null ? refDirection : Direction3.xAxis();
+        double dot = ref.dot(z);
+        Vector3 projected = ref.asVector().subtract(z.asVector().scale(dot));
+        if (projected.isZero()) {
+            return ref;
+        }
+        return Direction3.from(projected);
     }
 
     /**

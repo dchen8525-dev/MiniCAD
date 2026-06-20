@@ -86,8 +86,19 @@ public final class TrimmedCurve2 implements Curve2 {
     public Point2 pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         // Map parameter from trim range to basis curve parameter
-        double basisParam = trimParamStart + parameter * (trimParamEnd - trimParamStart);
+        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
+        double basisParam = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
         return basisCurve.pointAt(basisParam);
+    }
+
+    @Override
+    public Vector2 tangentAt(double parameter) {
+        Preconditions.requireFinite(parameter, "parameter");
+        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
+        double basisParameter = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
+        Vector2 tangent = basisCurve.tangentAt(basisParameter);
+        boolean reversed = (trimParamEnd < trimParamStart) ^ !senseAgreement;
+        return reversed ? tangent.scale(-1.0) : tangent;
     }
 
     @Override
@@ -147,6 +158,12 @@ public final class TrimmedCurve2 implements Curve2 {
         }
         // Convert to basis curve parameter
         double trimmedParam = (double) closestIdx / (samples.size() - 1);
-        return trimParamStart + trimmedParam * (trimParamEnd - trimParamStart);
+        double orientedParameter = senseAgreement ? trimmedParam : 1.0 - trimmedParam;
+        double basisParameter = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
+        if (basisCurve instanceof TrimmedCurve2) {
+            TrimmedCurve2 trimmedBasis = (TrimmedCurve2) basisCurve;
+            return trimmedBasis.parameterOnUnderlyingCurve(trimmedBasis.pointAt(basisParameter));
+        }
+        return basisParameter;
     }
 }

@@ -205,6 +205,15 @@ final class StepTrimResolver {
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
             return line.parameterOf(point);
+        } else if (curve instanceof Circle2) {
+            Circle2 circle = (Circle2) curve;
+            return circle.angleOf(point);
+        } else if (curve instanceof Ellipse2) {
+            Ellipse2 ellipse = (Ellipse2) curve;
+            return ellipse.angleOf(point);
+        } else if (curve instanceof CompositeCurve2) {
+            CompositeCurve2 composite = (CompositeCurve2) curve;
+            return composite.parameterOf(point);
         } else if (curve instanceof BSplineCurve2) {
             BSplineCurve2 bspline = (BSplineCurve2) curve;
             return parameterOnBSpline2(bspline, point);

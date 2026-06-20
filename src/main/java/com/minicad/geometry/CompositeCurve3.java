@@ -20,7 +20,10 @@ public final class CompositeCurve3 implements Curve3 {
     private final List<Curve3> segments;
 
     public CompositeCurve3(List<Curve3> segments) {
-        this.segments = segments == null ? null : java.util.List.copyOf(segments);
+        if (segments == null || segments.isEmpty()) {
+            throw new IllegalArgumentException("composite curve requires at least one segment");
+        }
+        this.segments = java.util.List.copyOf(segments);
     }
 
     public List<Curve3> getSegments() {
@@ -63,7 +66,12 @@ public final class CompositeCurve3 implements Curve3 {
         int segmentIndex = (int) segmentParam;
         segmentIndex = Math.max(0, Math.min(segmentIndex, n - 1));
         double localParam = segmentParam - segmentIndex;
-        return segments.get(segmentIndex).pointAt(localParam);
+        Curve3 segment = segments.get(segmentIndex);
+        if (segment instanceof BSplineCurve3) {
+            BSplineCurve3 spline = (BSplineCurve3) segment;
+            localParam = spline.startParameter() + localParam * (spline.endParameter() - spline.startParameter());
+        }
+        return segment.pointAt(localParam);
     }
 
     @Override
@@ -100,14 +108,51 @@ public final class CompositeCurve3 implements Curve3 {
     }
 
     @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        if (segments.size() == 1 && segments.get(0) instanceof BSplineCurve3) {
+            BSplineCurve3 spline = (BSplineCurve3) segments.get(0);
+            double basisParameter = spline.parameterAt(point);
+            return (basisParameter - spline.startParameter()) / (spline.endParameter() - spline.startParameter());
+        }
+        int sampleCount = 1024;
+        int bestIndex = 0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= sampleCount; i++) {
+            double distance = point.distanceTo(pointAt((double) i / sampleCount));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return (double) bestIndex / sampleCount;
+    }
+
+    @Override
+    public Vector3 tangentAt(double parameter) {
+        int count = segments.size();
+        double scaled = Math.max(0.0, Math.min(1.0, parameter)) * count;
+        int index = Math.min((int) scaled, count - 1);
+        double local = scaled - index;
+        return segments.get(index).tangentAt(local);
+    }
+
+    @Override
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         if (this.segments == null || this.segments.isEmpty()) {
             return java.util.List.copyOf(points);
         }
-        for (Curve3 seg : this.segments) {
-            points.addAll(seg.sample(segments / this.segments.size() + 1));
+        for (int i = 0; i <= segments; i++) {
+            points.add(pointAt((double) i / segments));
         }
         return java.util.List.copyOf(points);
+    }
+
+    @Override
+    public double length() {
+        double total = 0.0;
+        for (Curve3 segment : segments) total += segment.length();
+        return total;
     }
 }

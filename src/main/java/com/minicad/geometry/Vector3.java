@@ -25,6 +25,9 @@ public final class Vector3 {
     private final double z;
 
     public Vector3(double x, double y, double z) {
+        Preconditions.requireFinite(x, "x");
+        Preconditions.requireFinite(y, "y");
+        Preconditions.requireFinite(z, "z");
         this.x = x;
         this.y = y;
         this.z = z;
@@ -166,7 +169,7 @@ public final class Vector3 {
      * @return direction
      */
     public Direction3 asDirection() {
-        return Direction3.from(this);
+        return Direction3.from(normalize());
     }
 
     /**

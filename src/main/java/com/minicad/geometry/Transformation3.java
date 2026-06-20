@@ -345,14 +345,38 @@ public final class Transformation3 {
      */
     public static Transformation3 from(Axis2Placement3D placement) {
         Preconditions.requireNonNull(placement, "placement");
-        Vector3 xDir = placement.xDirection().asVector();
-        Vector3 yDir = placement.yDirection().asVector();
+        // Build an orthonormal frame following the STEP convention:
+        // z = normalize(axis), x = normalize(project(refDir onto plane normal to z)), y = z x x
         Vector3 zDir = placement.axis().asVector();
+        double zNorm = Math.sqrt(zDir.x() * zDir.x() + zDir.y() * zDir.y() + zDir.z() * zDir.z());
+        if (zNorm < com.minicad.common.Epsilon.get()) {
+            throw new com.minicad.common.GeometryException("axis direction must be non-zero");
+        }
+        Vector3 zUnit = new Vector3(zDir.x() / zNorm, zDir.y() / zNorm, zDir.z() / zNorm);
+        Vector3 xSeed = placement.xDirection().asVector();
+        // Gram-Schmidt: project xSeed onto the plane normal to zUnit
+        double dotXZ = xSeed.x() * zUnit.x() + xSeed.y() * zUnit.y() + xSeed.z() * zUnit.z();
+        Vector3 xProj = new Vector3(
+            xSeed.x() - zUnit.x() * dotXZ,
+            xSeed.y() - zUnit.y() * dotXZ,
+            xSeed.z() - zUnit.z() * dotXZ
+        );
+        double xNorm = Math.sqrt(xProj.x() * xProj.x() + xProj.y() * xProj.y() + xProj.z() * xProj.z());
+        if (xNorm < com.minicad.common.Epsilon.get()) {
+            throw new com.minicad.common.GeometryException("refDirection is parallel to axis");
+        }
+        Vector3 xDir = new Vector3(xProj.x() / xNorm, xProj.y() / xNorm, xProj.z() / xNorm);
+        // y = z cross x (already unit length since z and x are orthonormal)
+        Vector3 yDir = new Vector3(
+            zUnit.y() * xDir.z() - zUnit.z() * xDir.y(),
+            zUnit.z() * xDir.x() - zUnit.x() * xDir.z(),
+            zUnit.x() * xDir.y() - zUnit.y() * xDir.x()
+        );
         CartesianPoint origin = placement.location();
         return new Transformation3(
-            xDir.x(), yDir.x(), zDir.x(), origin.x(),
-            xDir.y(), yDir.y(), zDir.y(), origin.y(),
-            xDir.z(), yDir.z(), zDir.z(), origin.z(),
+            xDir.x(), yDir.x(), zUnit.x(), origin.x(),
+            xDir.y(), yDir.y(), zUnit.y(), origin.y(),
+            xDir.z(), yDir.z(), zUnit.z(), origin.z(),
             0, 0, 0, 1
         );
     }

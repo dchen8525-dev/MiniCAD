@@ -30,6 +30,12 @@ public final class Clothoid3 implements Curve3 {
     private final double curvature;
 
     public Clothoid3(Axis2Placement3D position, double xAxisIntercept, double curvature) {
+        Preconditions.requireNonNull(position, "position");
+        Preconditions.requireFinite(xAxisIntercept, "xAxisIntercept");
+        Preconditions.requireFinite(curvature, "curvature");
+        if (Math.abs(curvature) <= Epsilon.get()) {
+            throw new GeometryException("curvature must not be zero");
+        }
         this.position = position;
         this.xAxisIntercept = xAxisIntercept;
         this.curvature = curvature;
@@ -83,7 +89,7 @@ public final class Clothoid3 implements Curve3 {
         // Simplified approximation for now
         double t = parameter;
         // Approximate Fresnel integrals using simple polynomial approximation
-        double xLocal = xAxisIntercept * (1 - curvature * t * t / 6);
+        double xLocal = xAxisIntercept * t;
         double yLocal = curvature * t * t * t / 6;
         CartesianPoint localPoint = new CartesianPoint(xLocal, yLocal, 0);
         return position.transformToWorld(localPoint);
@@ -121,8 +127,8 @@ public final class Clothoid3 implements Curve3 {
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         // Sample a range of parameter values
-        for (int i = -segments; i <= segments; i++) {
-            double t = 0.1 * i; // Scale to get meaningful range
+        for (int i = 0; i <= segments; i++) {
+            double t = (double) i / segments;
             points.add(pointAt(t));
         }
         return java.util.List.copyOf(points);

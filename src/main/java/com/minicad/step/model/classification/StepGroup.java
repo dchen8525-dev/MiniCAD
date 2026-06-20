@@ -47,6 +47,10 @@ public final class StepGroup implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     // Record-style accessors
     public String description() { return getDescription(); }
 

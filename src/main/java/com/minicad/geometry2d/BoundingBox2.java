@@ -54,7 +54,9 @@ public final class BoundingBox2 {
      * @return empty bounding box
      */
     public static BoundingBox2 empty() {
-        return new BoundingBox2(0, 0, 0, 0);
+        return new BoundingBox2(
+            Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
     }
 
     /**
@@ -105,6 +107,7 @@ public final class BoundingBox2 {
      * @return center point
      */
     public Point2 center() {
+        requireNonEmpty();
         return new Point2((minX + maxX) / 2.0, (minY + maxY) / 2.0);
     }
 
@@ -146,6 +149,9 @@ public final class BoundingBox2 {
      */
     public BoundingBox2 union(Point2 point) {
         Preconditions.requireNonNull(point, "point");
+        if (isEmpty()) {
+            return new BoundingBox2(point.x(), point.y(), point.x(), point.y());
+        }
         return new BoundingBox2(
             Math.min(minX, point.x()),
             Math.min(minY, point.y()),
@@ -162,6 +168,12 @@ public final class BoundingBox2 {
      */
     public BoundingBox2 union(BoundingBox2 other) {
         Preconditions.requireNonNull(other, "other");
+        if (isEmpty()) {
+            return other;
+        }
+        if (other.isEmpty()) {
+            return this;
+        }
         return new BoundingBox2(
             Math.min(minX, other.minX),
             Math.min(minY, other.minY),
@@ -176,7 +188,9 @@ public final class BoundingBox2 {
      * @return true if empty
      */
     public boolean isEmpty() {
-        return minX == maxX && minY == maxY;
+        return Double.isNaN(minX) || Double.isNaN(minY)
+            || Double.isNaN(maxX) || Double.isNaN(maxY)
+            || minX > maxX || minY > maxY;
     }
 
     /**
@@ -197,7 +211,7 @@ public final class BoundingBox2 {
      * @return width (maxX - minX)
      */
     public double width() {
-        return maxX - minX;
+        return isEmpty() ? 0.0 : maxX - minX;
     }
 
     /**
@@ -206,7 +220,7 @@ public final class BoundingBox2 {
      * @return height (maxY - minY)
      */
     public double height() {
-        return maxY - minY;
+        return isEmpty() ? 0.0 : maxY - minY;
     }
 
     /**
@@ -215,6 +229,7 @@ public final class BoundingBox2 {
      * @return minimum corner point
      */
     public Point2 minCorner() {
+        requireNonEmpty();
         return new Point2(minX, minY);
     }
 
@@ -224,7 +239,14 @@ public final class BoundingBox2 {
      * @return maximum corner point
      */
     public Point2 maxCorner() {
+        requireNonEmpty();
         return new Point2(maxX, maxY);
+    }
+
+    private void requireNonEmpty() {
+        if (isEmpty()) {
+            throw new com.minicad.common.GeometryException("Cannot access an empty bounding box");
+        }
     }
 
     /**

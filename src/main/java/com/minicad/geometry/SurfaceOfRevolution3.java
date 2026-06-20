@@ -50,25 +50,40 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
     /**
      * Returns a point on the surface of revolution at the given parametric coordinates.
      *
-     * @param u revolution angle (radians)
-     * @param v parameter along the swept curve
+     * @param u normalized parameter along the swept curve
+     * @param v revolution angle (radians)
      * @return point on the surface
      */
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        CartesianPoint curvePoint = sweptCurve.pointAt(v);
+        CartesianPoint curvePoint = sweptCurve.pointAt(u);
         Vector3 axis = axisDirection.asVector();
         Vector3 offset = curvePoint.subtract(axisOrigin);
         Vector3 axial = axis.scale(offset.dot(axis));
         Vector3 radial = offset.subtract(axial);
-        double cosU = Math.cos(u);
-        double sinU = Math.sin(u);
+        double cosU = Math.cos(v);
+        double sinU = Math.sin(v);
+        
+        // Handle degenerate case: curvePoint on rotation axis
+        if (radial.norm() < 1e-12) {
+            return axisOrigin.add(axial);
+        }
+        
         // Rotate radial component around axis using perpendicular directions
         Vector3 perp1 = radial.normalize().asVector();
         Vector3 perp2 = axis.cross(perp1).normalize().asVector();
         Vector3 rotatedRadial = perp1.scale(radial.norm() * cosU).add(perp2.scale(radial.norm() * sinU));
         return axisOrigin.add(axial).add(rotatedRadial);
+    }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        CartesianPoint point = pointAt(u, v);
+        Vector3 axis = axisDirection.asVector();
+        Vector3 offset = point.subtract(axisOrigin);
+        Vector3 radial = offset.subtract(axis.scale(offset.dot(axis)));
+        return radial.normalize();
     }
 
     @Override

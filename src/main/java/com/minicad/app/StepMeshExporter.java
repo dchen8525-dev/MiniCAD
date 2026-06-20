@@ -1464,17 +1464,30 @@ public final class StepMeshExporter {
             }
 
             Edge edge = builder.buildEdge(orientedEdge.edgeElement().id());
-            OrientedEdge built = new OrientedEdge(edge, orientedEdge.orientation());
-            List<CartesianPoint> points3d = orientSamples(built, built.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
+            List<CartesianPoint> points3d = edge.sample(DEFAULT_CURVE_SEGMENTS);
+            if (!orientedEdge.orientation()) {
+                points3d = new ArrayList<>(points3d);
+                Collections.reverse(points3d);
+            }
+            
+            // No pcurves available - project start/end and interpolate in UV space
+            // This is more robust than projecting every point, especially when intermediate
+            // 3D points don't lie exactly on the surface
+            CartesianPoint startPt = mapPointIntoFaceGeometry(points3d.get(0), faceGeometry, builder);
+            CartesianPoint endPt = mapPointIntoFaceGeometry(points3d.get(points3d.size() - 1), faceGeometry, builder);
+            UvPoint startUv = mapper.project(startPt, null);
+            UvPoint endUv = mapper.project(endPt, startUv);
+            if (startUv == null || endUv == null) {
+                return List.of();
+            }
+            
+            // Linearly interpolate in UV space
             List<UvPoint> uvPoints = new ArrayList<>();
-            UvPoint previous = null;
-            for (CartesianPoint point : points3d) {
-                UvPoint uv = mapper.project(mapPointIntoFaceGeometry(point, faceGeometry, builder), previous);
-                if (uv == null) {
-                    return List.of();
-                }
-                uvPoints.add(uv);
-                previous = uv;
+            for (int i = 0; i < points3d.size(); i++) {
+                double t = (double) i / (points3d.size() - 1);
+                double u = startUv.u() + (endUv.u() - startUv.u()) * t;
+                double v = startUv.v() + (endUv.v() - startUv.v()) * t;
+                uvPoints.add(new UvPoint(u, v));
             }
             return List.copyOf(uvPoints);
         }

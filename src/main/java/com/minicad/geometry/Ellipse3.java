@@ -169,8 +169,8 @@ public final class Ellipse3 implements Curve3 {
         double tx = -semiAxis1 * sinT;
         double ty = semiAxis2 * cosT;
         // Normal in plane is perpendicular to tangent (rotate 90 degrees)
-        double nx = -ty;
-        double ny = tx;
+        double nx = ty;
+        double ny = -tx;
         // Transform to world coordinates
         Vector3 normalLocal = new Vector3(nx, ny, 0).normalize();
         return position.transformDirectionToWorld(Direction3.from(normalLocal)).asVector();
@@ -218,6 +218,13 @@ public final class Ellipse3 implements Curve3 {
         double b = semiAxis2;
         // Ramanujan's approximation: PI * (3(a+b) - sqrt((3a+b)(a+3b)))
         return Math.PI * (3.0 * (a + b) - Math.sqrt((3.0 * a + b) * (a + 3.0 * b)));
+    }
+
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        // For ellipses, the natural parameter is the parametric angle in radians.
+        // Use angleOf which correctly computes the angle from the point.
+        return angleOf(point);
     }
 
     /**

@@ -31,10 +31,41 @@ public final class BSplineCurve3 implements Curve3 {
     private final List<Double> knots;
 
     public BSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
+        validateDefinition(degree, controlPoints, knotMultiplicities, knots);
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
         this.knots = knots == null ? null : java.util.List.copyOf(knots);
+    }
+
+    static void validateDefinition(int degree, List<CartesianPoint> controlPoints,
+                                   List<Integer> knotMultiplicities, List<Double> knots) {
+        if (degree < 1) {
+            throw new GeometryException("B-spline degree must be positive");
+        }
+        if (controlPoints == null || controlPoints.size() <= degree) {
+            throw new GeometryException("B-spline requires more control points than its degree");
+        }
+        if (knots == null || knotMultiplicities == null || knots.size() != knotMultiplicities.size()) {
+            throw new GeometryException("knot values and multiplicities must have equal size");
+        }
+        int expandedCount = 0;
+        double previous = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < knots.size(); i++) {
+            double knot = knots.get(i);
+            int multiplicity = knotMultiplicities.get(i);
+            if (!Double.isFinite(knot) || knot <= previous) {
+                throw new GeometryException("knot values must be finite and strictly increasing");
+            }
+            if (multiplicity <= 0) {
+                throw new GeometryException("knot multiplicities must be positive");
+            }
+            previous = knot;
+            expandedCount += multiplicity;
+        }
+        if (expandedCount != controlPoints.size() + degree + 1) {
+            throw new GeometryException("expanded knot count does not match control points and degree");
+        }
     }
 
     public int getDegree() {
@@ -204,11 +235,31 @@ public final class BSplineCurve3 implements Curve3 {
     }
 
     @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        int samples = 1024;
+        double start = startParameter();
+        double end = endParameter();
+        double bestParameter = start;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= samples; i++) {
+            double parameter = start + (end - start) * i / samples;
+            double distance = point.distanceTo(pointAt(parameter));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestParameter = parameter;
+            }
+        }
+        return bestParameter;
+    }
+
+    @Override
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         if (controlPoints == null || controlPoints.isEmpty()) {
             return java.util.List.copyOf(points);
         }
+        segments = Math.max(8, segments);
         double start = startParameter();
         double end = endParameter();
         for (int i = 0; i <= segments; i++) {

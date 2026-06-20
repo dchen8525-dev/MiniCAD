@@ -22,7 +22,20 @@ public final class EdgeLoop implements Loop {
     private final List<OrientedEdge> edges;
 
     public EdgeLoop(List<OrientedEdge> edges) {
-        this.edges = edges == null ? null : java.util.List.copyOf(edges);
+        if (edges == null || edges.isEmpty()) {
+            throw new TopologyException("edge loop requires at least one edge");
+        }
+        for (int i = 0; i < edges.size(); i++) {
+            OrientedEdge current = edges.get(i);
+            OrientedEdge next = edges.get((i + 1) % edges.size());
+            double gap = current.endVertex().point().distanceTo(next.startVertex().point());
+            if (gap > Epsilon.IMPORT_TOPOLOGY_TOLERANCE) {
+                throw new TopologyException("edge loop must be connected and closed between edge " + i
+                    + " and edge " + ((i + 1) % edges.size()) + "; gap " + gap
+                    + " exceeds tolerance " + Epsilon.IMPORT_TOPOLOGY_TOLERANCE);
+            }
+        }
+        this.edges = java.util.List.copyOf(edges);
     }
 
     public List<OrientedEdge> getEdges() {
@@ -94,13 +107,7 @@ public final class EdgeLoop implements Loop {
                 if (edge.end() != null) {
                     box = box.expand(edge.end().point());
                 }
-                // Also include curve's bounding box if available
-                if (edge.curve() != null) {
-                    BoundingBox3 curveBox = edge.curve().boundingBox();
-                    if (curveBox != null && !curveBox.isEmpty()) {
-                        box = box.union(curveBox);
-                    }
-                }
+                box = box.union(edge.boundingBox());
             }
         }
         return box;

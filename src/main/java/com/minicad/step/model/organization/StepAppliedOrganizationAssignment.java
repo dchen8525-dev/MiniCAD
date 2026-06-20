@@ -49,6 +49,10 @@ public final class StepAppliedOrganizationAssignment implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     public StepOrganization getAssignedOrganization() {
         return assignedOrganization;
     }

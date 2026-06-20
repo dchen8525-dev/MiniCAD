@@ -34,6 +34,15 @@ public final class RationalBSplineCurve3 implements Curve3 {
     private final List<Double> knots;
 
     public RationalBSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Double> weights, List<Integer> knotMultiplicities, List<Double> knots) {
+        BSplineCurve3.validateDefinition(degree, controlPoints, knotMultiplicities, knots);
+        if (weights == null || weights.size() != controlPoints.size()) {
+            throw new GeometryException("weight count must match control point count");
+        }
+        for (double weight : weights) {
+            if (!Double.isFinite(weight) || weight <= 0.0) {
+                throw new GeometryException("weights must be finite and positive");
+            }
+        }
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.weights = weights == null ? null : java.util.List.copyOf(weights);

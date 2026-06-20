@@ -47,6 +47,10 @@ public final class StepDataEquivalenceInspectionCriterionReportItem implements S
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

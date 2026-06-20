@@ -145,4 +145,14 @@ public final class ToroidalSurface implements SurfaceGeometry {
     public String toString() {
         return "ToroidalSurface{" + "position=" + position + "majorRadius=" + majorRadius + "minorRadius=" + minorRadius + "}";
     }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Vector3 x = position.xDirection().asVector();
+        Vector3 y = position.yDirection().asVector();
+        Vector3 z = position.axis().asVector();
+        return x.scale(Math.cos(u) * Math.cos(v))
+            .add(y.scale(Math.sin(u) * Math.cos(v)))
+            .add(z.scale(Math.sin(v))).normalize();
+    }
 }

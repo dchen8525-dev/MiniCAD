@@ -45,6 +45,10 @@ public final class StepAppliedApprovalAssignment implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     public StepApproval getAssignedApproval() {
         return assignedApproval;
     }

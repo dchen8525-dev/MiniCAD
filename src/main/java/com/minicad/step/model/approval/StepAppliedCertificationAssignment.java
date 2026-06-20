@@ -45,6 +45,10 @@ public final class StepAppliedCertificationAssignment implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     public StepCertification getAssignedCertification() {
         return assignedCertification;
     }

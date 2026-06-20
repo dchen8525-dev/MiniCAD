@@ -30,6 +30,12 @@ public final class Parabola2 implements Curve2 {
     private final double focalDistance;
 
     public Parabola2(Point2 vertex, Direction2 axisDirection, double focalDistance) {
+        Preconditions.requireNonNull(vertex, "vertex");
+        Preconditions.requireNonNull(axisDirection, "axisDirection");
+        Preconditions.requireFinite(focalDistance, "focalDistance");
+        if (focalDistance <= Epsilon.get()) {
+            throw new GeometryException("focalDistance must be greater than epsilon");
+        }
         this.vertex = vertex;
         this.axisDirection = axisDirection;
         this.focalDistance = focalDistance;
@@ -69,8 +75,8 @@ public final class Parabola2 implements Curve2 {
         Preconditions.requireFinite(parameter, "parameter");
         // Parabola parametric equation: y = (x^2) / (4 * focalDistance)
         // In local coordinates: x = parameter, y = parameter^2 / (4 * focalDistance)
-        double xLocal = parameter;
-        double yLocal = (parameter * parameter) / (4 * focalDistance);
+        double xLocal = 2.0 * focalDistance * parameter;
+        double yLocal = focalDistance * parameter * parameter;
         Vector2 axis = axisDirection.asVector();
         Direction2 perpDir = axisDirection.perpendicular();
         Vector2 perp = perpDir.asVector();
@@ -112,11 +118,8 @@ public final class Parabola2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
-        // Sample a range of parameter values symmetrically around vertex
-        double paramRange = segments * 0.5; // Range scales with segments
-        double paramStep = 2.0 * paramRange / segments;
         for (int i = 0; i <= segments; i++) {
-            double t = -paramRange + paramStep * i;
+            double t = -1.0 + 2.0 * i / segments;
             points.add(pointAt(t));
         }
         return List.copyOf(points);
@@ -151,8 +154,8 @@ public final class Parabola2 implements Curve2 {
         Preconditions.requireFinite(t, "t");
         // Tangent derivative: dx/dt = 1, dy/dt = 2t / (4*f) = t / (2*f)
         // Normal is perpendicular to tangent
-        double dx = 1.0;
-        double dy = t / (2 * focalDistance);
+        double dx = 2.0 * focalDistance;
+        double dy = 2.0 * focalDistance * t;
         // Perpendicular to tangent
         Vector2 tangentLocal = new Vector2(dx, dy);
         Vector2 normalLocal = tangentLocal.perpendicular().normalize();
@@ -186,9 +189,7 @@ public final class Parabola2 implements Curve2 {
     public double curvatureAt(double t) {
         Preconditions.requireFinite(t, "t");
         // Curvature formula for parabola: k = |2 * focalDistance| / ( (1 + (t/(2*f))^2 )^(3/2) )
-        double derivative = t / (2 * focalDistance);
-        double denominator = Math.pow(1 + derivative * derivative, 1.5);
-        return (2 * focalDistance) / denominator;
+        return 1.0 / (2.0 * focalDistance * Math.pow(1.0 + t * t, 1.5));
     }
 
     /**

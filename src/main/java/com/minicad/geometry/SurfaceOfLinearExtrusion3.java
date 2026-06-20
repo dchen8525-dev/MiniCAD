@@ -126,4 +126,10 @@ public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
     public String toString() {
         return "SurfaceOfLinearExtrusion3{" + "sweptCurve=" + sweptCurve + "extrusionVector=" + extrusionVector + "}";
     }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Vector3 tangent = sweptCurve.tangentAt(u);
+        return tangent.cross(extrusionVector).normalize();
+    }
 }

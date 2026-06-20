@@ -20,7 +20,10 @@ public final class Polyline2 implements Curve2 {
     private final List<Point2> points;
 
     public Polyline2(List<Point2> points) {
-        this.points = points == null ? null : java.util.List.copyOf(points);
+        if (points == null || points.size() < 2) {
+            throw new IllegalArgumentException("polyline requires at least two points");
+        }
+        this.points = java.util.List.copyOf(points);
     }
 
     public List<Point2> getPoints() {
@@ -64,15 +67,7 @@ public final class Polyline2 implements Curve2 {
         if (points.size() == 1) {
             return points.get(0);
         }
-        // Parameter is normalized [0, 1] along the polyline
-        double t = Math.max(0.0, Math.min(1.0, parameter));
-        int n = points.size() - 1;
-        int segment = (int) (t * n);
-        segment = Math.max(0, Math.min(segment, n - 1));
-        double localT = t * n - segment;
-        Point2 p0 = points.get(segment);
-        Point2 p1 = points.get(segment + 1);
-        return new Point2(p0.x() + localT * (p1.x() - p0.x()), p0.y() + localT * (p1.y() - p0.y()));
+        return pointAtLength(Math.max(0.0, Math.min(1.0, parameter)) * length());
     }
 
     @Override
@@ -109,7 +104,66 @@ public final class Polyline2 implements Curve2 {
     }
 
     @Override
+    public Point2 closestPointTo(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        Point2 closest = points.get(0);
+        double bestDistance = point.distanceTo(closest);
+        for (int i = 0; i < points.size() - 1; i++) {
+            Point2 start = points.get(i);
+            Vector2 segment = points.get(i + 1).subtract(start);
+            double denominator = segment.normSquared();
+            double fraction = denominator <= Epsilon.get()
+                ? 0.0
+                : point.subtract(start).dot(segment) / denominator;
+            fraction = Math.max(0.0, Math.min(1.0, fraction));
+            Point2 candidate = start.add(segment.scale(fraction));
+            double distance = point.distanceTo(candidate);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                closest = candidate;
+            }
+        }
+        return closest;
+    }
+
+    @Override
     public List<Point2> sample(int segments) {
-        return points == null ? List.of() : points;
+        if (segments <= 0) {
+            return points;
+        }
+        java.util.List<Point2> result = new java.util.ArrayList<>();
+        for (int i = 0; i <= segments; i++) {
+            result.add(pointAt((double) i / segments));
+        }
+        return List.copyOf(result);
+    }
+
+    @Override
+    public double length() {
+        double total = 0.0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            total += points.get(i).distanceTo(points.get(i + 1));
+        }
+        return total;
+    }
+
+    @Override
+    public Point2 midpoint() {
+        return pointAt(0.5);
+    }
+
+    private Point2 pointAtLength(double targetLength) {
+        double accumulated = 0.0;
+        for (int i = 0; i < points.size() - 1; i++) {
+            Point2 start = points.get(i);
+            Point2 end = points.get(i + 1);
+            double segmentLength = start.distanceTo(end);
+            if (accumulated + segmentLength >= targetLength) {
+                double fraction = segmentLength <= Epsilon.get() ? 0.0 : (targetLength - accumulated) / segmentLength;
+                return start.add(end.subtract(start).scale(fraction));
+            }
+            accumulated += segmentLength;
+        }
+        return points.get(points.size() - 1);
     }
 }

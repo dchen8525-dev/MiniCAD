@@ -233,7 +233,7 @@ class Ellipse3Test {
         Ellipse3 ellipse = new Ellipse3(position, 4.0, 2.0);
 
         // Arc from 0 to PI/2
-        BoundingBox3 box = ellipse.boundingBox();
+        BoundingBox3 box = BoundingBox3.of(ellipse.sample(64, 0.0, Math.PI / 2.0));
         assertTrue(box.minX() >= -1);
         assertTrue(box.maxX() <= 5);
         assertTrue(box.minY() >= -1);

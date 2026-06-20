@@ -30,6 +30,12 @@ public final class Hyperbola3 implements Curve3 {
     private final double semiAxisB;
 
     public Hyperbola3(Axis2Placement3D position, double semiAxisA, double semiAxisB) {
+        Preconditions.requireNonNull(position, "position");
+        Preconditions.requireFinite(semiAxisA, "semiAxisA");
+        Preconditions.requireFinite(semiAxisB, "semiAxisB");
+        if (semiAxisA <= Epsilon.get() || semiAxisB <= Epsilon.get()) {
+            throw new GeometryException("hyperbola semi-axes must be greater than epsilon");
+        }
         this.position = position;
         this.semiAxisA = semiAxisA;
         this.semiAxisB = semiAxisB;
@@ -111,12 +117,10 @@ public final class Hyperbola3 implements Curve3 {
         Preconditions.requireFinite(tMax, "tMax");
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         double sign = branch >= 0 ? 1.0 : -1.0;
-        int offset = includeEndPoints ? 0 : 1;
-        int endOffset = includeEndPoints ? 0 : -1;
-        for (int i = offset; i <= segments + endOffset; i++) {
+        for (int i = 0; i <= segments; i++) {
             double t = tMin + (tMax - tMin) * i / segments;
-            double xLocal = semiAxisA * Math.cosh(t);
-            double yLocal = sign * semiAxisB * Math.sinh(t);
+            double xLocal = sign * semiAxisA * t;
+            double yLocal = semiAxisB * Math.sqrt(Math.max(0.0, t * t - 1.0));
             CartesianPoint localPoint = new CartesianPoint(xLocal, yLocal, 0);
             points.add(position.transformToWorld(localPoint));
         }
@@ -145,10 +149,9 @@ public final class Hyperbola3 implements Curve3 {
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
         // Hyperbola parametric equation: x = a * cosh(t), y = b * sinh(t)
-        double coshT = Math.cosh(parameter);
-        double sinhT = Math.sinh(parameter);
-        double xLocal = semiAxisA * coshT;
-        double yLocal = semiAxisB * sinhT;
+        double branchParameter = Math.abs(parameter) < 1.0 ? Math.copySign(1.0, parameter == 0.0 ? 1.0 : parameter) : parameter;
+        double xLocal = semiAxisA * branchParameter;
+        double yLocal = semiAxisB * Math.sqrt(Math.max(0.0, branchParameter * branchParameter - 1.0));
         CartesianPoint localPoint = new CartesianPoint(xLocal, yLocal, 0);
         return position.transformToWorld(localPoint);
     }
@@ -185,9 +188,10 @@ public final class Hyperbola3 implements Curve3 {
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
         // Sample a range of parameter values
-        for (int i = -segments; i <= segments; i++) {
-            double t = 0.5 * i; // Scale to get meaningful range
-            points.add(pointAt(t));
+        for (int i = 0; i <= segments; i++) {
+            double magnitude = 1.0 + 0.5 * i / segments;
+            points.add(pointAt(-magnitude));
+            points.add(pointAt(magnitude));
         }
         return java.util.List.copyOf(points);
     }

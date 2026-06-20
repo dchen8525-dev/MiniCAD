@@ -4,6 +4,8 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.geometry.BoundingBox3;
+import com.minicad.geometry.CartesianPoint;
 import com.minicad.step.model.product.StepBooleanClippingResult;
 import com.minicad.common.GeometryException;
 import com.minicad.step.model.product.StepBrepWithVoids;
@@ -339,8 +341,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -373,33 +378,258 @@ public final class StepDumpApp {
     }
 
     static int run(String[] args, Consumer<String> out, Consumer<String> err) throws IOException {
-        if (args.length != 1) {
-            err.accept("Usage: StepDumpApp <step-file>");
+        boolean debug = false;
+        boolean validateOnly = false;
+        boolean jsonOutput = false;
+        List<String> files = new ArrayList<>();
+
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if ("--debug".equals(arg)) {
+                debug = true;
+            } else if ("--validate-only".equals(arg)) {
+                validateOnly = true;
+            } else if ("--json".equals(arg)) {
+                jsonOutput = true;
+            } else if (!arg.startsWith("--")) {
+                files.add(arg);
+            }
+        }
+
+        if (files.isEmpty()) {
+            err.accept("Usage: StepDumpApp [--debug] [--validate-only] [--json] <step-file>...");
             return 2;
         }
 
-        Path path = Path.of(args[0]);
+        if (jsonOutput) {
+            return runJson(files, debug, out, err);
+        }
+
+        int overallExitCode = 0;
+        for (String filePath : files) {
+            int exitCode = runSingleFile(filePath, debug, validateOnly, out, err);
+            if (exitCode != 0) {
+                overallExitCode = exitCode;
+            }
+        }
+        return overallExitCode;
+    }
+
+    private static int runSingleFile(String filePath, boolean debug, boolean validateOnly,
+                                     Consumer<String> out, Consumer<String> err) throws IOException {
+        Path path = Path.of(filePath);
         String text = StepTextReader.read(path);
 
         try {
             StepFile stepFile = StepParser.parse(text);
             Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-            StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+            StepCadBuilder builder = validateOnly ? null : StepCadBuilder.fromResolved(resolved);
 
             List<String> lines = new ArrayList<>();
             lines.add("File: " + path);
             lines.add("");
             appendSyntaxSummary(stepFile, lines);
-            lines.add("");
-            appendSemanticSummary(resolved, lines);
-            lines.add("");
-            appendBuildSummary(resolved, builder, lines);
+            if (!validateOnly) {
+                lines.add("");
+                appendSemanticSummary(resolved, lines);
+                lines.add("");
+                appendBuildSummary(resolved, builder, lines);
+            } else {
+                lines.add("");
+                lines.add("Validation Summary");
+                lines.add("  status: ok");
+                lines.add("  entityCount: " + stepFile.entities().size());
+                lines.add("  resolvedCount: " + resolved.size());
+            }
             lines.forEach(out);
             return 0;
         } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-            err.accept("STEP processing failed: " + ex.getMessage());
+            String errorMsg = "STEP processing failed for " + path + ": " + ex.getMessage();
+            err.accept(errorMsg);
+            if (debug) {
+                StringWriter sw = new StringWriter();
+                ex.printStackTrace(new PrintWriter(sw));
+                err.accept(sw.toString());
+            }
             return 1;
         }
+    }
+
+    private static int runJson(List<String> files, boolean debug, Consumer<String> out, Consumer<String> err) throws IOException {
+        List<Map<String, Object>> results = new ArrayList<>();
+        int overallExitCode = 0;
+
+        for (String filePath : files) {
+            Map<String, Object> fileResult = new LinkedHashMap<>();
+            fileResult.put("path", filePath);
+            Path path = Path.of(filePath);
+
+            try {
+                String text = StepTextReader.read(path);
+                StepFile stepFile = StepParser.parse(text);
+                Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
+                StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+                UnitExtractor.UnitInfo units = UnitExtractor.extract(resolved);
+
+                fileResult.put("status", "ok");
+                fileResult.put("exitCode", 0);
+                fileResult.put("entityCount", stepFile.entities().size());
+                fileResult.put("resolvedCount", resolved.size());
+                fileResult.put("unsupportedCount", countUnsupportedFaces(resolved, builder));
+
+                // Collect issues
+                List<Map<String, Object>> issues = new ArrayList<>();
+                if (units != null && units.scaleToMeters() != null
+                        && Math.abs(units.scaleToMeters() - 1.0) > 1.0e-12) {
+                    Map<String, Object> unitWarning = new LinkedHashMap<>();
+                    unitWarning.put("severity", "WARNING");
+                    unitWarning.put("code", "units.coordinates_not_normalized");
+                    unitWarning.put("message", "geometry coordinates are emitted in source STEP units; scaleToMeters is metadata only");
+                    issues.add(unitWarning);
+                }
+                fileResult.put("issues", issues);
+
+                // Calculate bbox
+                BoundingBox3 bbox = computeBoundingBox(resolved, builder);
+                Map<String, Object> bboxMap = new LinkedHashMap<>();
+                if (bbox != null) {
+                    bboxMap.put("min", new double[]{bbox.minX(), bbox.minY(), bbox.minZ()});
+                    bboxMap.put("max", new double[]{bbox.maxX(), bbox.maxY(), bbox.maxZ()});
+                } else {
+                    bboxMap.put("min", new double[]{0.0, 0.0, 0.0});
+                    bboxMap.put("max", new double[]{0.0, 0.0, 0.0});
+                }
+                fileResult.put("bbox", bboxMap);
+            } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
+                fileResult.put("status", "failed");
+                fileResult.put("exitCode", 1);
+                fileResult.put("error", ex.getMessage());
+                Map<String, Object> issue = new LinkedHashMap<>();
+                issue.put("severity", "ERROR");
+                issue.put("code", "step.parse");
+                issue.put("message", ex.getMessage());
+                fileResult.put("issues", List.of(issue));
+                overallExitCode = 1;
+            }
+
+            results.add(fileResult);
+        }
+
+        // Output JSON
+        out.accept(toJson(results));
+        return overallExitCode;
+    }
+
+    private static String toJson(List<Map<String, Object>> results) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < results.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append(toJsonMap(results.get(i)));
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private static String toJsonMap(Map<String, Object> map) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (i > 0) sb.append(",");
+            sb.append("\"").append(entry.getKey()).append("\":");
+            sb.append(toJsonValue(entry.getValue()));
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private static String toJsonValue(Object value) {
+        if (value == null) {
+            return "null";
+        } else if (value instanceof String) {
+            return "\"" + jsonEscape((String) value) + "\"";
+        } else if (value instanceof Number) {
+            return value.toString();
+        } else if (value instanceof Boolean) {
+            return value.toString();
+        } else if (value instanceof List) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            List<?> list = (List<?>) value;
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) sb.append(",");
+                sb.append(toJsonValue(list.get(i)));
+            }
+            sb.append("]");
+            return sb.toString();
+        } else if (value instanceof Map) {
+            return toJsonMap((Map<String, Object>) value);
+        } else if (value instanceof double[]) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            double[] arr = (double[]) value;
+            for (int i = 0; i < arr.length; i++) {
+                if (i > 0) sb.append(",");
+                sb.append(arr[i]);
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+        return "\"" + jsonEscape(value.toString()) + "\"";
+    }
+
+    private static String jsonEscape(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"': sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                case '\t': sb.append("\\t"); break;
+                default: sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static int countUnsupportedFaces(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        int unsupportedFaces = 0;
+        for (StepEntity entity : resolved.values()) {
+            if (entity instanceof StepOpenShell) {
+                StepOpenShell openShell = (StepOpenShell) entity;
+                unsupportedFaces += summarizeShell(openShell.faces(), builder).unsupportedFaces();
+            } else if (entity instanceof StepClosedShell) {
+                StepClosedShell closedShell = (StepClosedShell) entity;
+                unsupportedFaces += summarizeShell(closedShell.faces(), builder).unsupportedFaces();
+            }
+        }
+        return unsupportedFaces;
+    }
+
+    private static BoundingBox3 computeBoundingBox(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        BoundingBox3 bbox = null;
+        for (StepEntity entity : resolved.values()) {
+            if (entity instanceof StepCartesianPoint) {
+                StepCartesianPoint point = (StepCartesianPoint) entity;
+                List<Double> coords = point.coordinates();
+                if (coords != null && coords.size() >= 2) {
+                    double x = coords.get(0);
+                    double y = coords.get(1);
+                    double z = coords.size() >= 3 ? coords.get(2) : 0.0;
+                    CartesianPoint cp = new CartesianPoint(x, y, z);
+                    if (bbox == null) {
+                        bbox = BoundingBox3.of(cp);
+                    } else {
+                        bbox = bbox.expand(cp);
+                    }
+                }
+            }
+        }
+        return bbox;
     }
 
     private static void appendSyntaxSummary(StepFile file, List<String> lines) {

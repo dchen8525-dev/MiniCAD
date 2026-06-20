@@ -115,10 +115,10 @@ public interface Curve3 {
      */
     default Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        double eps = 0.001;
-        CartesianPoint p = pointAt(parameter);
-        CartesianPoint pNext = pointAt(parameter + eps);
-        Vector3 tangent = pNext.subtract(p);
+        double eps = 1.0e-6;
+        CartesianPoint before = pointAt(parameter - eps);
+        CartesianPoint after = pointAt(parameter + eps);
+        Vector3 tangent = after.subtract(before);
         double norm = tangent.norm();
         if (norm <= Epsilon.EPS) {
             return new Vector3(1, 0, 0);

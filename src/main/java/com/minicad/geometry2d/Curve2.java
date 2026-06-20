@@ -78,14 +78,8 @@ public interface Curve2 {
      */
     default Vector2 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        double eps = 0.001;
-        List<Point2> samples = sample(256);
-        if (samples.size() < 2) {
-            return new Vector2(1, 0);
-        }
-        int index = (int) (parameter * (samples.size() - 1));
-        index = Math.max(0, Math.min(index, samples.size() - 2));
-        Vector2 tangent = samples.get(index + 1).subtract(samples.get(index));
+        double eps = 1.0e-6;
+        Vector2 tangent = pointAt(parameter + eps).subtract(pointAt(parameter - eps));
         if (tangent.norm() <= Epsilon.EPS) {
             return new Vector2(1, 0);
         }

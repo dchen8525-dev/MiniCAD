@@ -518,6 +518,375 @@ class StepParserTest {
         });
     }
 
+    @Test
+    void shouldRejectUnsupportedStringEscapeZ() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE('\\Z\\');\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("unsupported string escape")
+                || exception.getMessage().contains("malformed string escape"));
+    }
+
+    @Test
+    void shouldRejectLoneBackslashAtEndOfString() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE('\\');\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().startsWith("malformed string escape at position "));
+    }
+
+    @Test
+    void shouldRejectTruncatedBackslashXAtEndOfString() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE('\\X');\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("malformed"));
+    }
+
+    @Test
+    void shouldRejectTruncatedSingleByteEscapeAtEndOfString() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE('\\S');\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().startsWith("malformed string escape at position "));
+    }
+
+    @Test
+    void shouldRejectUnsupportedCodePageEscape() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE('\\P\\Z\\S\\A');\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("unsupported \\P\\ string escape code page"));
+    }
+
+    @Test
+    void shouldAcceptNumberWithHugeNegativeExponentAsZero() {
+        StepFile file = StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(1E-9999);\n"
+            + "ENDSEC;"
+        );
+        StepValue.NumberValue number = assertInstanceOf(
+                StepValue.NumberValue.class,
+                file.entities().get(0).parameters().get(0));
+        assertEquals(0.0, number.getValue());
+    }
+
+    @Test
+    void shouldRejectLowercaseNan() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(nan);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("invalid number"));
+    }
+
+    @Test
+    void shouldRejectLowercaseInfinity() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(infinity);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("invalid number"));
+    }
+
+    @Test
+    void shouldRejectLowercaseInf() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(inf);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("invalid number"));
+    }
+
+    @Test
+    void shouldRejectEmptyComplexEntity() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=();\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("at least one definition"));
+    }
+
+    @Test
+    void shouldRejectMissingDataSectionAfterHeader() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "ISO-10303-21;\n"
+            + "HEADER;\n"
+            + "FILE_DESCRIPTION(('test'),'1');\n"
+            + "ENDSEC;\n"
+            + "END-ISO-10303-21;"
+        ));
+        assertEquals("missing DATA section", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectMissingHeaderEndsec() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "ISO-10303-21;\n"
+            + "HEADER;\n"
+            + "FILE_DESCRIPTION(('test'),'1');\n"
+            + "DATA;\n"
+            + "#1=EXAMPLE();\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("expected") || exception.getMessage().contains("missing"));
+    }
+
+    @Test
+    void shouldRejectBlankInput() {
+        StepParseException empty = assertThrows(StepParseException.class, () -> StepParser.parse(""));
+        assertTrue(empty.getMessage().contains("must not be blank"));
+
+        StepParseException nullInput = assertThrows(StepParseException.class, () -> StepParser.parse(null));
+        assertTrue(nullInput.getMessage().contains("must not be blank"));
+    }
+
+    @Test
+    void shouldRejectEntityIdZeroInComplexEntity() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#0=(A() B());\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().startsWith("entity id '#0' must be positive"));
+    }
+
+    @Test
+    void shouldAcceptEntityIdWithLeadingZeros() {
+        StepFile file = StepParser.parse(
+            "DATA;\n"
+            + "#01=EXAMPLE();\n"
+            + "ENDSEC;"
+        );
+        assertEquals(1, file.entities().get(0).id());
+    }
+
+    @Test
+    void shouldRejectDuplicateIdsWithLargeGap() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=A();\n"
+            + "#100=B();\n"
+            + "#1000=C();\n"
+            + "#1=D();\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().startsWith("duplicate entity id #1"));
+        assertTrue(exception.getMessage().contains("; first declared at position "));
+    }
+
+    @Test
+    void shouldRejectMaxLongEntityId() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#9223372036854775807=EXAMPLE();\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("exceeds supported maximum"));
+    }
+
+    @Test
+    void shouldRejectVeryLargeEntityId() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#99999999999999999999=EXAMPLE();\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("exceeds supported maximum"));
+    }
+
+    @Test
+    void shouldParseNumberZeroExponent() {
+        StepFile file = StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(5E0);\n"
+            + "ENDSEC;"
+        );
+        StepValue.NumberValue number = assertInstanceOf(
+                StepValue.NumberValue.class,
+                file.entities().get(0).parameters().get(0));
+        assertEquals(5.0, number.getValue());
+        assertEquals("5E0", number.getRaw());
+    }
+
+    @Test
+    void shouldParseNumberWithLargePositiveExponent() {
+        StepFile file = StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(1E308);\n"
+            + "ENDSEC;"
+        );
+        StepValue.NumberValue number = assertInstanceOf(
+                StepValue.NumberValue.class,
+                file.entities().get(0).parameters().get(0));
+        assertEquals(1E308, number.getValue());
+    }
+
+    @Test
+    void shouldRejectUnterminatedComplexEntityWithMultipleDefinitions() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=(A(1) B(2)\n"
+            + "ENDSEC;"
+        ));
+        assertEquals("unterminated complex entity opened at position 9", exception.getMessage());
+    }
+
+    @Test
+    void shouldParseComplexEntityWithSingleDefinition() {
+        String step =
+            "DATA;\n"
+            + "#1=(A(1));\n"
+            + "ENDSEC;";
+
+        StepEntityInstance instance = StepParser.parse(step).entities().get(0);
+        assertEquals(1, instance.definitions().size());
+        assertEquals("A", instance.definitions().get(0).name());
+    }
+
+    @Test
+    void shouldRejectEmptyEnumLiteral() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(..);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("empty enum literal")
+                || exception.getMessage().contains("unterminated enum"));
+    }
+
+    @Test
+    void shouldRejectUnterminatedEnumLiteral() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(.T);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("unterminated enum literal"));
+    }
+
+    @Test
+    void shouldRejectNonFiniteInTypedValue() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(LENGTH_MEASURE(1E9999));\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("non-finite number"));
+    }
+
+    @Test
+    void shouldRejectNonFiniteInList() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE((1.0, 1E9999, 3.0));\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("non-finite number"));
+    }
+
+    @Test
+    void shouldNotMatchDataKeywordInsideStringBeforeRealData() {
+        String step =
+            "ISO-10303-21;\n"
+            + "HEADER;\n"
+            + "FILE_DESCRIPTION(('contains DATA; keyword'),'1');\n"
+            + "ENDSEC;\n"
+            + "DATA;\n"
+            + "#1=EXAMPLE('payload');\n"
+            + "ENDSEC;\n"
+            + "END-ISO-10303-21;";
+
+        StepFile file = StepParser.parse(step);
+        assertEquals(1, file.entities().size());
+        assertEquals("EXAMPLE", file.entities().get(0).name());
+    }
+
+    @Test
+    void shouldHandleEscapedQuotesInStringsWithoutAffectingKeywordSearch() {
+        String step =
+            "ISO-10303-21;\n"
+            + "HEADER;\n"
+            + "FILE_DESCRIPTION(('it''s a test with DATA; inside'),'1');\n"
+            + "ENDSEC;\n"
+            + "DATA;\n"
+            + "#1=EXAMPLE('another''s ENDSEC; test');\n"
+            + "ENDSEC;\n"
+            + "END-ISO-10303-21;";
+
+        StepFile file = StepParser.parse(step);
+        assertEquals(1, file.headerEntries().size());
+        assertEquals(1, file.entities().size());
+        assertEquals("another's ENDSEC; test",
+                ((StepValue.StringValue) file.entities().get(0).parameters().get(0)).getValue());
+    }
+
+    @Test
+    void shouldRejectExponentWithoutDigits() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(1E);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("invalid exponent")
+                || exception.getMessage().contains("invalid number"));
+    }
+
+    @Test
+    void shouldRejectExponentWithSignButNoDigits() {
+        StepParseException exception = assertThrows(StepParseException.class, () -> StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(1E+);\n"
+            + "ENDSEC;"
+        ));
+        assertTrue(exception.getMessage().contains("invalid exponent")
+                || exception.getMessage().contains("invalid number"));
+    }
+
+    @Test
+    void shouldAcceptDecimalWithNoFractionalDigits() {
+        StepFile file = StepParser.parse(
+            "DATA;\n"
+            + "#1=EXAMPLE(1.);\n"
+            + "ENDSEC;"
+        );
+        StepValue.NumberValue number = assertInstanceOf(
+                StepValue.NumberValue.class,
+                file.entities().get(0).parameters().get(0));
+        assertEquals(1.0, number.getValue());
+        assertEquals("1.", number.getRaw());
+    }
+
+    @Test
+    void shouldParseMultipleEntitiesInOrder() {
+        String step =
+            "DATA;\n"
+            + "#1=A();\n"
+            + "#2=B();\n"
+            + "#3=C();\n"
+            + "ENDSEC;";
+
+        StepFile file = StepParser.parse(step);
+        assertEquals(3, file.entities().size());
+        assertEquals(1, file.entities().get(0).id());
+        assertEquals(2, file.entities().get(1).id());
+        assertEquals(3, file.entities().get(2).id());
+    }
     private static String stringParameter(StepEntityInstance entity, int index) {
         return assertInstanceOf(StepValue.StringValue.class, entity.parameters().get(index)).getValue();
     }

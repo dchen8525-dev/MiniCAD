@@ -7137,8 +7137,8 @@ class StepDumpAppTest {
         assertDumpContains(file,
                 "OPEN_SHELL #60: faces=0, unsupportedFaces=1",
                 "unsupportedReasons:",
-                "lie on edge curve",
-                "unsupportedReasonCodes: topology.edge_vertex_off_curve:1",
+                "edge loop must be connected and closed",
+                "unsupportedReasonCodes: topology.edge_loop_not_closed:1",
                 "unsupportedFaces=1");
     }
 

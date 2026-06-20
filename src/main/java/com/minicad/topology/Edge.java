@@ -42,6 +42,13 @@ public final class Edge {
     private final boolean sameSense;
 
     public Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
+        if (start == null || end == null || curve == null) {
+            throw new TopologyException("edge vertices and curve are required");
+        }
+        if (start.point().distanceTo(end.point()) <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE
+                && !(curve instanceof Circle) && !(curve instanceof com.minicad.geometry.Ellipse3)) {
+            throw new TopologyException("edge must have distinct vertices");
+        }
         this.start = start;
         this.end = end;
         this.curve = curve;
@@ -97,7 +104,7 @@ public final class Edge {
         if (curve == null) {
             return BoundingBox3.empty();
         }
-        BoundingBox3 box = curve.boundingBox();
+        BoundingBox3 box = BoundingBox3.of(sample(64));
         // Ensure start and end vertices are included
         if (start != null && start.point() != null) {
             box = box.expand(start.point());
@@ -117,7 +124,13 @@ public final class Edge {
         if (curve == null) {
             return 0.0;
         }
-        // Sample the curve and sum distances
+        if (start != null && end != null && start.point().equals(end.point())) {
+            if (curve instanceof Circle) {
+                return ((Circle) curve).circumference();
+            }
+            return curve.length();
+        }
+        // Sample the bounded curve segment and sum distances
         java.util.List<CartesianPoint> samples = sample(20);
         double length = 0.0;
         for (int i = 1; i < samples.size(); i++) {
@@ -200,7 +213,20 @@ public final class Edge {
             }
             return result;
         }
-        // Use curve sampling
+        if (start != null && end != null && !start.point().equals(end.point())) {
+            double startParameter = curve.parameterAt(start.point());
+            double endParameter = curve.parameterAt(end.point());
+            java.util.List<CartesianPoint> result = new java.util.ArrayList<>();
+            for (int i = 0; i <= count; i++) {
+                double fraction = (double) i / count;
+                double parameter = startParameter + (endParameter - startParameter) * fraction;
+                result.add(curve.pointAt(parameter));
+            }
+            if (!sameSense) {
+                java.util.Collections.reverse(result);
+            }
+            return java.util.List.copyOf(result);
+        }
         java.util.List<CartesianPoint> curveSamples = curve.sample(count);
         if (curveSamples.isEmpty()) {
             java.util.List<CartesianPoint> result = new java.util.ArrayList<>();

@@ -24,6 +24,11 @@ public final class Circle implements Curve3 {
     private final double radius;
 
     public Circle(Axis2Placement3D position, double radius) {
+        Preconditions.requireNonNull(position, "position");
+        Preconditions.requireFinite(radius, "radius");
+        if (radius <= Epsilon.get()) {
+            throw new GeometryException("radius must be greater than epsilon");
+        }
         this.position = position;
         this.radius = radius;
     }
@@ -115,6 +120,13 @@ public final class Circle implements Curve3 {
      */
     public double circumference() {
         return 2 * Math.PI * radius;
+    }
+
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        // For circles, the natural parameter is the angle in radians.
+        // Use angleOf which correctly computes the angle from the point.
+        return angleOf(point);
     }
 
     /**

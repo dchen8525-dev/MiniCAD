@@ -33,6 +33,10 @@ public final class StepExternallyDefinedHatchStyle implements StepEntity {
         return externalSource;
     }
 
+    public String entityName() {
+        return "EXTERNALLY_DEFINED_HATCH_STYLE";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

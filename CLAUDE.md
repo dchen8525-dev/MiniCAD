@@ -81,7 +81,7 @@ Tests mirror main package layout under `src/test/java/`. Test distribution: geom
 - Unsupported behavior must fail explicitly with clear exceptions (`UnsupportedStepEntityException`, `UnsupportedGeometryException`), not silently.
 - If a feature approaches industrial CAD kernel complexity (Boolean operations, healing, tolerance propagation), document limitations explicitly.
 - Keep classes small and explicit; avoid deep inheritance or generic frameworks.
-- Use Java 21 `record` where immutability is natural.
+- Keep source code compatible with Java 11; use explicit immutable classes instead of `record`.
 
 ## STEP Entity Coverage
 

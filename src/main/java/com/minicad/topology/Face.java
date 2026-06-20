@@ -30,9 +30,32 @@ public final class Face {
     private final boolean sameSense;
 
     public Face(SurfaceGeometry surface, List<FaceBound> bounds, boolean sameSense) {
+        if (surface == null || bounds == null || bounds.stream().noneMatch(FaceBound::outer)) {
+            throw new TopologyException("face must contain an outer bound");
+        }
+        if (surface instanceof Plane) {
+            Plane plane = (Plane) surface;
+            for (FaceBound bound : bounds) {
+                for (CartesianPoint vertex : boundaryPoints(bound.loop())) {
+                    if (plane.distanceTo(vertex) > Epsilon.IMPORT_PLANE_TOLERANCE) {
+                        throw new TopologyException("all face vertices must lie on the plane");
+                    }
+                }
+            }
+        }
         this.surface = surface;
         this.bounds = bounds == null ? null : java.util.List.copyOf(bounds);
         this.sameSense = sameSense;
+    }
+
+    private static List<CartesianPoint> boundaryPoints(Loop loop) {
+        if (loop instanceof EdgeLoop) {
+            List<CartesianPoint> points = new java.util.ArrayList<>();
+            for (Vertex vertex : ((EdgeLoop) loop).vertices()) points.add(vertex.point());
+            return points;
+        }
+        if (loop instanceof PolyLoop) return ((PolyLoop) loop).points();
+        return List.of();
     }
 
     public SurfaceGeometry getSurface() {
@@ -93,10 +116,7 @@ public final class Face {
      * @return bounding box enclosing the face
      */
     public BoundingBox3 boundingBox() {
-        if (surface == null) {
-            return BoundingBox3.empty();
-        }
-        BoundingBox3 box = surface.boundingBox();
+        BoundingBox3 box = BoundingBox3.empty();
         // Include all boundary edges
         if (bounds != null) {
             for (FaceBound bound : bounds) {
@@ -105,7 +125,7 @@ public final class Face {
                 }
             }
         }
-        return box;
+        return box.isEmpty() && surface != null ? surface.boundingBox() : box;
     }
 
     /**

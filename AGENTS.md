@@ -645,7 +645,7 @@ Problem: repo has Actions tab, but no obvious workflow in root listing. :content
 
 Fix:
 - `.github/workflows/ci.yml`
-- Java 21
+- Java 11
 - `mvn -B clean test`
 
 ## J02. Add dependency cache
@@ -664,7 +664,7 @@ Problem: pom uses Jetty 11.0.24, logback 1.5.18, fastjson2 2.0.56, JUnit 5.10.2.
 
 Fix:
 - Check for newer safe versions.
-- Keep Java 21 compatibility.
+- Keep Java 11 compatibility.
 - Run tests.
 
 ## J05. Add formatter/checkstyle
@@ -682,7 +682,7 @@ Fix:
 ## J07. Add Maven Enforcer
 
 Fix:
-- Require Java 21.
+- Require Java 11.
 - Ban duplicate dependencies.
 
 ---

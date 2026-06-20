@@ -45,6 +45,10 @@ public final class StepAppliedDateAssignment implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     public StepCalendarDate getAssignedDate() {
         return assignedDate;
     }

@@ -31,6 +31,14 @@ public final class BSplineCurve2 implements Curve2 {
     private final List<Double> knots;
 
     public BSplineCurve2(int degree, List<Point2> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
+        // Validate degree (must be >= 1)
+        if (degree < 1) {
+            throw new GeometryException("B-spline degree must be at least 1, got " + degree);
+        }
+        // Validate control points (must have at least degree+1 points)
+        if (controlPoints == null || controlPoints.size() < degree + 1) {
+            throw new GeometryException("B-spline requires at least " + (degree + 1) + " control points for degree " + degree + ", got " + (controlPoints == null ? 0 : controlPoints.size()));
+        }
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
@@ -184,6 +192,7 @@ public final class BSplineCurve2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
+        segments = Math.max(8, segments);
         double start = startParameter();
         double end = endParameter();
         for (int i = 0; i <= segments; i++) {

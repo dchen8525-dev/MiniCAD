@@ -275,6 +275,12 @@ public final class StepParameterReader {
       StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
       return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
     }
+    if (value instanceof StepValue.ListValue) {
+      StepValue.ListValue listValue = (StepValue.ListValue) value;
+      return "(" + listValue.elements().stream()
+          .map(StepParameterReader::literalText)
+          .collect(java.util.stream.Collectors.joining(",")) + ")";
+    }
     throw new IllegalArgumentException();
   }
 

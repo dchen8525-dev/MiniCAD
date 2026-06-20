@@ -48,6 +48,10 @@ public final class StepBinaryGenericExpression implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

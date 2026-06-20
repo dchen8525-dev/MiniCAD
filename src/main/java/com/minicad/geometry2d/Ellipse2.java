@@ -261,8 +261,8 @@ public final class Ellipse2 implements Curve2 {
         double c = Math.sqrt(a * a - b * b);  // distance from center to focus
         Direction2 majorDir = (semiAxis1 >= semiAxis2) ? xDirection : xDirection.perpendicular();
         return List.of(
-            center.add(majorDir.asVector().scale(c)),
-            center.subtract(majorDir.asVector().scale(c))
+            center.subtract(majorDir.asVector().scale(c)),
+            center.add(majorDir.asVector().scale(c))
         );
     }
 

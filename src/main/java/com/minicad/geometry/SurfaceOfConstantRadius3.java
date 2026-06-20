@@ -25,6 +25,11 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
     private final double radius;
 
     public SurfaceOfConstantRadius3(SurfaceGeometry sweptSurface, double radius) {
+        Preconditions.requireNonNull(sweptSurface, "sweptSurface");
+        Preconditions.requireFinite(radius, "radius");
+        if (radius <= Epsilon.get()) {
+            throw new com.minicad.common.GeometryException("radius must be greater than epsilon");
+        }
         this.sweptSurface = sweptSurface;
         this.radius = radius;
     }
@@ -61,8 +66,18 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
 
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        // Delegate to the swept surface's sample grid
-        return sweptSurface.sampleGrid(uSegments, vSegments);
+        java.util.List<java.util.List<CartesianPoint>> result = new java.util.ArrayList<>();
+        java.util.List<java.util.List<CartesianPoint>> base = sweptSurface.sampleGrid(uSegments, vSegments);
+        for (int i = 0; i < base.size(); i++) {
+            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
+            for (int j = 0; j < base.get(i).size(); j++) {
+                double u = 2.0 * Math.PI * i / Math.max(1, uSegments);
+                double v = (double) j / Math.max(1, vSegments);
+                row.add(base.get(i).get(j).add(sweptSurface.normalAt(u, v).scale(radius)));
+            }
+            result.add(java.util.List.copyOf(row));
+        }
+        return java.util.List.copyOf(result);
     }
 
     @Override
@@ -86,13 +101,12 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        // CylindricalSurface, SphericalSurface, etc. have pointAt method
-        // We need to cast or use reflection - for simplicity, return from sampleGrid
-        java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(1, 1);
-        if (!grid.isEmpty() && !grid.get(0).isEmpty()) {
-            return grid.get(0).get(0);
-        }
-        return sweptSurface.boundingBox().center();
+        CartesianPoint base;
+        if (sweptSurface instanceof CylindricalSurface) base = ((CylindricalSurface) sweptSurface).pointAt(u, v);
+        else if (sweptSurface instanceof SphericalSurface) base = ((SphericalSurface) sweptSurface).pointAt(u, v);
+        else if (sweptSurface instanceof Plane) base = ((Plane) sweptSurface).pointAt(u, v);
+        else throw new com.minicad.common.GeometryException("unsupported constant-radius base surface");
+        return base.add(sweptSurface.normalAt(u, v).scale(radius));
     }
 
     /**
@@ -104,8 +118,14 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
      */
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Approximate: use center of bounding box if swept surface doesn't have method
-        return sweptSurface.boundingBox().closestPointTo(point);
+        CartesianPoint base;
+        if (sweptSurface instanceof CylindricalSurface) base = ((CylindricalSurface) sweptSurface).closestPointTo(point);
+        else if (sweptSurface instanceof SphericalSurface) base = ((SphericalSurface) sweptSurface).closestPointTo(point);
+        else if (sweptSurface instanceof Plane) base = ((Plane) sweptSurface).closestPointTo(point);
+        else base = sweptSurface.boundingBox().closestPointTo(point);
+        Vector3 direction = point.subtract(base);
+        if (direction.norm() <= Epsilon.get()) return base;
+        return base.add(direction.normalize().scale(radius));
     }
 
     /**

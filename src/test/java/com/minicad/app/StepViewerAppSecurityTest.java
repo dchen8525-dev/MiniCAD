@@ -298,6 +298,184 @@ class StepViewerAppSecurityTest {
         }
     }
 
+    @Test
+    void readBoundedAcceptsExactLimit() throws Exception {
+        ByteArrayInputStream input = new ByteArrayInputStream("abcde".getBytes(StandardCharsets.UTF_8));
+        byte[] result = StepViewerApp.readBounded(input, 5);
+        assertEquals("abcde", new String(result, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void readBoundedAcceptsEmptyStreamWithZeroLimit() throws Exception {
+        ByteArrayInputStream input = new ByteArrayInputStream(new byte[0]);
+        byte[] result = StepViewerApp.readBounded(input, 0);
+        assertEquals(0, result.length);
+    }
+
+    @Test
+    void readBoundedRejectsNonEmptyStreamWithZeroLimit() {
+        ByteArrayInputStream input = new ByteArrayInputStream("a".getBytes(StandardCharsets.UTF_8));
+        assertThrows(StepViewerApp.PayloadTooLargeException.class, () -> StepViewerApp.readBounded(input, 0));
+    }
+
+    @Test
+    void resolveExamplePathDefaultsToMinimalSquareForNullAndBlank() {
+        assertTrue(StepViewerApp.resolveExamplePath(null).endsWith(Path.of("examples", "minimal-square.step")));
+        assertTrue(StepViewerApp.resolveExamplePath("").endsWith(Path.of("examples", "minimal-square.step")));
+        assertTrue(StepViewerApp.resolveExamplePath("   ").endsWith(Path.of("examples", "minimal-square.step")));
+    }
+
+    @Test
+    void resolveExamplePathRejectsSpecialCharacters() {
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test/file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test\\file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test!file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test@file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test#file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test$file"));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("test%file"));
+    }
+
+    @Test
+    void cleanPreviewCacheHandlesNonExistentDirectory() throws Exception {
+        StepViewerApp.cleanPreviewCache(Path.of("nonexistent"), 1024);
+    }
+
+    @Test
+    void cleanPreviewCacheHandlesNegativeMaxBytes() throws Exception {
+        StepViewerApp.cleanPreviewCache(tempDir, -1);
+    }
+
+    @Test
+    void cleanPreviewCacheKeepsAllFilesWhenWithinLimit() throws Exception {
+        Path file1 = tempDir.resolve("file1.glb");
+        Path file2 = tempDir.resolve("file2.glb");
+        Files.write(file1, new byte[10]);
+        Files.write(file2, new byte[10]);
+        StepViewerApp.cleanPreviewCache(tempDir, 100);
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.exists(file2));
+    }
+
+    @Test
+    void writeCacheAtomicallyCreatesFileWithCorrectContent() throws Exception {
+        Path targetFile = tempDir.resolve("test.glb");
+        byte[] content = "test content".getBytes(StandardCharsets.UTF_8);
+        StepViewerApp.writeCacheAtomically(targetFile, content);
+        assertTrue(Files.exists(targetFile));
+        assertEquals("test content", Files.readString(targetFile, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void writeCacheAtomicallyOverwritesExistingFile() throws Exception {
+        Path targetFile = tempDir.resolve("test.glb");
+        Files.write(targetFile, "old".getBytes(StandardCharsets.UTF_8));
+        byte[] newContent = "new content".getBytes(StandardCharsets.UTF_8);
+        StepViewerApp.writeCacheAtomically(targetFile, newContent);
+        assertTrue(java.util.Arrays.equals(newContent, Files.readAllBytes(targetFile)));
+    }
+
+    @Test
+    void parseConfigUsesDefaultHost() {
+        StepViewerApp.ViewerConfig config = StepViewerApp.parseConfig(new String[]{});
+        assertEquals("127.0.0.1", config.host());
+    }
+
+    @Test
+    void parseConfigRejectsInvalidPort() {
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[]{"--port=0"}));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[]{"--port=65536"}));
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[]{"--port=abc"}));
+    }
+
+    @Test
+    void parseConfigRejectsBlankHost() {
+        assertThrows(IllegalArgumentException.class, () -> StepViewerApp.parseConfig(new String[]{"--host="}));
+    }
+
+    @Test
+    void viewerConfigRejectsInvalidParameters() {
+        assertThrows(IllegalArgumentException.class, () ->
+            new StepViewerApp.ViewerConfig(8080, "", 1024, 1024, tempDir, true, false));
+        assertThrows(IllegalArgumentException.class, () ->
+            new StepViewerApp.ViewerConfig(8080, null, 1024, 1024, tempDir, true, false));
+        assertThrows(IllegalArgumentException.class, () ->
+            new StepViewerApp.ViewerConfig(8080, "127.0.0.1", -1, 1024, tempDir, true, false));
+        assertThrows(IllegalArgumentException.class, () ->
+            new StepViewerApp.ViewerConfig(8080, "127.0.0.1", 1024, -1, tempDir, true, false));
+        assertThrows(IllegalArgumentException.class, () ->
+            new StepViewerApp.ViewerConfig(8080, "127.0.0.1", 1024, 1024, null, true, false));
+    }
+
+    @Test
+    void previewEndpointRejectsGetRequests() throws Exception {
+        try (RunningViewer viewer = startViewer(1024 * 1024)) {
+            HttpResponse<String> response = get(viewer.uri("/api/preview"));
+            assertEquals(405, response.statusCode());
+            assertTrue(response.body().contains("use POST"));
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
+    void configEndpointRejectsPostRequests() throws Exception {
+        try (RunningViewer viewer = startViewer(1024 * 1024)) {
+            HttpRequest request = HttpRequest.newBuilder(viewer.uri("/api/config"))
+                    .header("Content-Type", "text/plain")
+                    .POST(HttpRequest.BodyPublishers.ofString("test"))
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(405, response.statusCode());
+            assertTrue(response.body().contains("use GET"));
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
+    void exampleEndpointRejectsPostRequests() throws Exception {
+        try (RunningViewer viewer = startViewer(1024 * 1024)) {
+            HttpRequest request = HttpRequest.newBuilder(viewer.uri("/api/example?name=minimal-square"))
+                    .header("Content-Type", "text/plain")
+                    .POST(HttpRequest.BodyPublishers.ofString("test"))
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(405, response.statusCode());
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
+    void staticEndpointRejectsPostRequests() throws Exception {
+        try (RunningViewer viewer = startViewer(1024 * 1024)) {
+            HttpRequest request = HttpRequest.newBuilder(viewer.uri("/"))
+                    .header("Content-Type", "text/plain")
+                    .POST(HttpRequest.BodyPublishers.ofString("test"))
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(405, response.statusCode());
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
+    void previewRejectsBlankBody() throws Exception {
+        try (RunningViewer viewer = startViewer(1024 * 1024)) {
+            HttpResponse<String> response = postText(viewer.uri("/api/preview"), "   ");
+            assertEquals(400, response.statusCode());
+            assertTrue(response.body().contains("must contain STEP text"));
+            assertSecurityHeaders(response);
+        }
+    }
+
+    @Test
+    void cachePathUsesSha256Hash() throws Exception {
+        String stepText = "test step content";
+        Path cachePath = StepViewerApp.previewCachePath(stepText, tempDir);
+        assertTrue(cachePath.getFileName().toString().endsWith(".glb"));
+        assertTrue(cachePath.getFileName().toString().matches("[a-f0-9]{64}\\.glb"));
+    }
+
     private RunningViewer startViewer(long maxUploadBytes) throws Exception {
         StepViewerApp.ViewerConfig config = new StepViewerApp.ViewerConfig(
                 0,

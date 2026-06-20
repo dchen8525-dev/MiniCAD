@@ -45,6 +45,10 @@ public final class StepAppliedDocumentReference implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     public StepDocument getAssignedDocument() {
         return assignedDocument;
     }

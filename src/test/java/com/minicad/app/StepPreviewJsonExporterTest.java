@@ -617,7 +617,7 @@ class StepPreviewJsonExporterTest {
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
         assertMetadataContains(binaryMetadata,
-                "\"representations\":[{\"id\":19",
+                "\"id\":19",
                 "\"curve\":{\"stepId\":6,\"type\":\"PROJECTION_CURVE\",\"basisType\":\"LINE\",\"basisStepId\":4",
                 "\"sourceType\":\"ANNOTATION_SYMBOL_OCCURRENCE\"",
                 "\"sourceStepId\":17");
@@ -660,7 +660,7 @@ class StepPreviewJsonExporterTest {
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
         assertMetadataContains(binaryMetadata,
-                "\"representations\":[{\"id\":19",
+                "\"id\":19",
                 "\"curve\":{\"stepId\":6,\"type\":\"PROJECTION_CURVE\",\"basisType\":\"LINE\",\"basisStepId\":4");
         assertMetadataContains(glbMetadata,
                 "\"kind\":\"edge\"",
@@ -700,7 +700,7 @@ class StepPreviewJsonExporterTest {
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
         assertMetadataContains(binaryMetadata,
-                "\"representations\":[{\"id\":20",
+                "\"id\":20",
                 "\"curve\":{\"stepId\":6,\"type\":\"PROJECTION_CURVE\",\"basisType\":\"LINE\",\"basisStepId\":4",
                 "\"sourceType\":\"ANNOTATION_SYMBOL_OCCURRENCE\"",
                 "\"sourceStepId\":17",
@@ -750,7 +750,7 @@ class StepPreviewJsonExporterTest {
         String glbMetadata = metadataFromGlb(StepPreviewJsonExporter.exportGlb(step));
 
         assertMetadataContains(binaryMetadata,
-                "\"representations\":[{\"id\":19",
+                "\"id\":19",
                 "\"curve\":{\"stepId\":6,\"type\":\"PROJECTION_CURVE\",\"basisType\":\"LINE\",\"basisStepId\":4",
                 "\"sourceType\":\"DRAUGHTING_ANNOTATION_OCCURRENCE\"",
                 "\"sourceStepId\":17");

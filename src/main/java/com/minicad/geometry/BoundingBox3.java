@@ -80,8 +80,9 @@ public final class BoundingBox3 {
      * @return empty bounding box
      */
     public static BoundingBox3 empty() {
-        // Use NaN to represent truly empty/invalid box
-        return new BoundingBox3(Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+        return new BoundingBox3(
+            Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
     }
 
     /**
@@ -136,7 +137,7 @@ public final class BoundingBox3 {
     public static BoundingBox3 of(java.util.Collection<CartesianPoint> points) {
         Preconditions.requireNonNull(points, "points");
         if (points.isEmpty()) {
-            return new BoundingBox3(0, 0, 0, 0, 0, 0);
+            return empty();
         }
         BoundingBox3 box = null;
         for (CartesianPoint point : points) {
@@ -303,7 +304,7 @@ public final class BoundingBox3 {
      * @return width
      */
     public double width() {
-        return maxX - minX;
+        return isEmpty() ? 0.0 : maxX - minX;
     }
 
     /**
@@ -312,7 +313,7 @@ public final class BoundingBox3 {
      * @return height
      */
     public double height() {
-        return maxY - minY;
+        return isEmpty() ? 0.0 : maxY - minY;
     }
 
     /**
@@ -321,7 +322,7 @@ public final class BoundingBox3 {
      * @return depth
      */
     public double depth() {
-        return maxZ - minZ;
+        return isEmpty() ? 0.0 : maxZ - minZ;
     }
 
     /**

@@ -53,6 +53,10 @@ public final class StepExternallyDefinedItem implements StepEntity {
         return entityName;
     }
 
+    public String entityName() {
+        return entityName;
+    }
+
     // Record-style accessors
     public StepExternalSource source() {
         return source;

@@ -1,6 +1,6 @@
 ﻿# MiniCAD
 
-实验性的 Java CAD 内核与 STEP 文件解析器，使用 Java 21 实现。
+实验性的 Java CAD 内核与 STEP 文件解析器，使用 Java 11 实现。
 
 ## 项目定位
 
@@ -487,7 +487,7 @@ mvn exec:java -Dexec.mainClass=com.minicad.app.StepViewerApp exec:java  # 启动
 
 ## 技术栈
 
-- Java 21
+- Java 11
 - Maven
 - JUnit 5
 - Jetty 11 (嵌入式 Web 服务器)

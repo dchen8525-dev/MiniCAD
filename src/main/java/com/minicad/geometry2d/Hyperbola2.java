@@ -33,6 +33,13 @@ public final class Hyperbola2 implements Curve2 {
     private final double semiAxisB;
 
     public Hyperbola2(Point2 center, Direction2 xDirection, double semiAxisA, double semiAxisB) {
+        Preconditions.requireNonNull(center, "center");
+        Preconditions.requireNonNull(xDirection, "xDirection");
+        Preconditions.requireFinite(semiAxisA, "semiAxisA");
+        Preconditions.requireFinite(semiAxisB, "semiAxisB");
+        if (semiAxisA <= Epsilon.get() || semiAxisB <= Epsilon.get()) {
+            throw new GeometryException("hyperbola semi-axes must be greater than epsilon");
+        }
         this.center = center;
         this.xDirection = xDirection;
         this.semiAxisA = semiAxisA;
@@ -110,11 +117,10 @@ public final class Hyperbola2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
-        // Sample a range of parameter values for the right branch (positive x)
-        double paramRange = segments * 0.5; // Range scales with segments
-        double paramStep = paramRange / segments;
+        // Use a fixed parameter range for the right branch
+        // The range [0, 4] gives a good representative portion of the hyperbola
         for (int i = 0; i <= segments; i++) {
-            double t = paramStep * i; // t >= 0 for right branch
+            double t = 4.0 * i / segments;
             points.add(pointAt(t));
         }
         return List.copyOf(points);
@@ -128,10 +134,12 @@ public final class Hyperbola2 implements Curve2 {
      * @return point on the branch
      */
     public Point2 pointAt(int branch, boolean onBranch) {
-        // This is a convenience method for test compatibility
-        // Default to right branch (positive x)
-        double t = (branch == 0) ? 1.0 : -1.0;
-        return pointAt(t);
+        Point2 point = pointAt(branch);
+        if (onBranch) {
+            return point;
+        }
+        Vector2 offset = point.subtract(center);
+        return center.subtract(offset);
     }
 
     /**
@@ -208,7 +216,7 @@ public final class Hyperbola2 implements Curve2 {
         double b = semiAxisB;
         // Curvature for hyperbola parametric: (ab) / (a^2 sinh^2 + b^2 cosh^2)^(3/2)
         double denom = Math.pow(a * a * sinhT * sinhT + b * b * coshT * coshT, 1.5);
-        return -(a * b) / denom;  // Negative curvature for hyperbola
+        return (a * b) / denom;
     }
 
     /**

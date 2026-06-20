@@ -22,6 +22,10 @@ public final class SphericalSurface implements SurfaceGeometry {
     private final double radius;
 
     public SphericalSurface(Axis2Placement3D position, double radius) {
+        Preconditions.requireNonNull(position, "position");
+        if (radius <= Epsilon.get()) {
+            throw new GeometryException("sphere radius must be greater than epsilon");
+        }
         this.position = position;
         this.radius = radius;
     }
@@ -129,5 +133,15 @@ public final class SphericalSurface implements SurfaceGeometry {
     @Override
     public String toString() {
         return "SphericalSurface{" + "position=" + position + "radius=" + radius + "}";
+    }
+
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Vector3 x = position.xDirection().asVector();
+        Vector3 y = position.yDirection().asVector();
+        Vector3 z = position.axis().asVector();
+        return x.scale(Math.sin(v) * Math.cos(u))
+            .add(y.scale(Math.sin(v) * Math.sin(u)))
+            .add(z.scale(Math.cos(v))).normalize();
     }
 }

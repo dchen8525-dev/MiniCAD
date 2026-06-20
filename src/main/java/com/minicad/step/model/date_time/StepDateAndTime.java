@@ -41,7 +41,37 @@ public final class StepDateAndTime implements StepEntity {
 
     // Record-style accessors
     public int id() { return id; }
-    public String getName() { return ""; }
+    public String getName() {
+        if (dateComponent == null && timeComponent == null) {
+            return "";
+        }
+        String datePart = dateComponent != null ? dateComponent.getName() : "";
+        String timePart = timeComponent != null ? formatTime(timeComponent) : "";
+        if (datePart.isEmpty()) {
+            return timePart;
+        }
+        if (timePart.isEmpty()) {
+            return datePart;
+        }
+        return datePart + " " + timePart;
+    }
+    private static String formatTime(StepLocalTime time) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%02d:%02d", time.getHourComponent(), time.getMinuteComponent()));
+        if (time.getSecondComponent() != null) {
+            double seconds = time.getSecondComponent();
+            if (seconds == Math.floor(seconds)) {
+                sb.append(String.format(":%02d", (int) seconds));
+            } else {
+                sb.append(String.format(":%s", trimTrailingZeros(seconds)));
+            }
+        }
+        return sb.toString();
+    }
+    private static String trimTrailingZeros(double value) {
+        String s = Double.toString(value);
+        return s;
+    }
     public StepCalendarDate dateComponent() { return dateComponent; }
     public StepLocalTime timeComponent() { return timeComponent; }
 

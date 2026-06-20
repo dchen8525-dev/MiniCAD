@@ -48,7 +48,7 @@ public final class StepCalendarDate implements StepEntity {
     }
 
     public String getName() {
-        return "";
+        return String.format("%04d-%02d-%02d", yearComponent, monthComponent, dayComponent);
     }
 
     @Override

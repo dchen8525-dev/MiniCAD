@@ -25,6 +25,12 @@ public final class Solid {
     private final List<Shell> voidShells;
 
     public Solid(Shell outerShell, List<Shell> voidShells) {
+        if (outerShell == null || !outerShell.closed()) {
+            throw new TopologyException("solid requires a closed shell");
+        }
+        if (voidShells != null && voidShells.stream().anyMatch(shell -> shell == null || !shell.closed())) {
+            throw new TopologyException("solid voids require closed shells");
+        }
         this.outerShell = outerShell;
         this.voidShells = voidShells == null ? null : java.util.List.copyOf(voidShells);
     }

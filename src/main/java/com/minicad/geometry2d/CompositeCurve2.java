@@ -21,7 +21,10 @@ public final class CompositeCurve2 implements Curve2 {
     private final List<Curve2> segments;
 
     public CompositeCurve2(List<Curve2> segments) {
-        this.segments = segments == null ? null : java.util.List.copyOf(segments);
+        if (segments == null || segments.isEmpty()) {
+            throw new IllegalArgumentException("composite curve requires at least one segment");
+        }
+        this.segments = java.util.List.copyOf(segments);
     }
 
     public List<Curve2> getSegments() {
@@ -55,10 +58,16 @@ public final class CompositeCurve2 implements Curve2 {
         double accumulatedLength = 0.0;
         for (int i = 0; i < segments.size(); i++) {
             Curve2 seg = segments.get(i);
-            // Approximate: assume uniform parameter distribution
-            accumulatedLength += 1.0 / segments.size();
             if (seg.contains(point)) {
-                return accumulatedLength;
+                double local = 0.0;
+                if (seg instanceof TrimmedCurve2) {
+                    TrimmedCurve2 trimmed = (TrimmedCurve2) seg;
+                    double underlying = trimmed.parameterOnUnderlyingCurve(point);
+                    double span = trimmed.trimParamEnd() - trimmed.trimParamStart();
+                    local = (underlying - trimmed.trimParamStart()) / span;
+                    if (!trimmed.senseAgreement()) local = 1.0 - local;
+                }
+                return (i + local) / segments.size();
             }
         }
         return 1.0;
@@ -121,5 +130,12 @@ public final class CompositeCurve2 implements Curve2 {
             points.addAll(seg.sample(segments / this.segments.size() + 1));
         }
         return List.copyOf(points);
+    }
+
+    @Override
+    public double length() {
+        double total = 0.0;
+        for (Curve2 segment : segments) total += segment.length();
+        return total;
     }
 }

@@ -47,6 +47,11 @@ public final class StepCharacterizedObject implements StepEntity {
         return entityName;
     }
 
+    // Alias for getEntityName for reflection-based entity name extraction
+    public String entityName() {
+        return entityName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
