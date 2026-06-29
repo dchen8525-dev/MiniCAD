@@ -698,8 +698,8 @@ public final class StepPreviewJsonExporter {
 
         PreviewStats stats = new PreviewStats(
                 stepFile.entities().size(),
-                countSolidEntities(resolved),
-                countShells(resolved),
+                PreviewStatisticsHelper.countSolidEntities(resolved),
+                PreviewStatisticsHelper.countShells(resolved),
                 faceCount,
                 edgeCount,
                 unsupportedFaces.size(),
@@ -715,13 +715,13 @@ public final class StepPreviewJsonExporter {
                         stats.unsupportedBooleanCount());
         if (!unsupportedFaces.isEmpty()) {
             log.debug("stage={} bySurfaceType={}, byReason={}", "unsupported_faces_summary",
-                    summarizeUnsupportedFacesBySurfaceType(unsupportedFaces),
-                            summarizeUnsupportedFacesByReason(unsupportedFaces));
+                    PreviewStatisticsHelper.summarizeUnsupportedFacesBySurfaceType(unsupportedFaces),
+                            PreviewStatisticsHelper.summarizeUnsupportedFacesByReason(unsupportedFaces));
         }
         if (!unsupportedBooleans.isEmpty()) {
             log.debug("stage={} byType={}, byReason={}", "unsupported_booleans_summary",
-                    summarizeUnsupportedBooleansByType(unsupportedBooleans),
-                    summarizeUnsupportedBooleansByReason(unsupportedBooleans));
+                    PreviewStatisticsHelper.summarizeUnsupportedBooleansByType(unsupportedBooleans),
+                    PreviewStatisticsHelper.summarizeUnsupportedBooleansByReason(unsupportedBooleans));
         }
 
         return new PreviewPayload(
@@ -2614,121 +2614,6 @@ public final class StepPreviewJsonExporter {
         return new PbrPayload(metadata.diffuse(), metadata.specular(), metadata.specularExponent(), metadata.specularColor());
     }
 
-    private static int countEntities(Map<Integer, StepEntity> resolved, Class<? extends StepEntity> type) {
-        int count = 0;
-        for (StepEntity entity : resolved.values()) {
-            if (type.isInstance(entity)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private static int countSolidEntities(Map<Integer, StepEntity> resolved) {
-        int count = 0;
-        for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepManifoldSolidBrep
-                    || entity instanceof StepBrepWithVoids
-                    || entity instanceof StepSweptAreaSolid
-                    || entity instanceof StepSolidReplica
-                    || entity instanceof StepCsgSolid
-                    || entity instanceof StepCsgPrimitive
-                    || entity instanceof StepBooleanClippingResult
-                    || entity instanceof StepBooleanResult
-                    || entity instanceof StepSweptDiskSolid
-                    || entity instanceof StepExtrudedAreaSolidTapered
-                    || entity instanceof StepRevolvedAreaSolidTapered
-                    || entity instanceof StepSurfaceCurveSweptAreaSolid
-                    || entity instanceof StepPolygonalBoundedHalfSpace
-                    || entity instanceof StepComplexClippingResult
-                    || entity instanceof StepHalfSpaceSolid
-                    || entity instanceof StepCsgVolume
-                    || entity instanceof StepBlockVolume) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private static String summarizeUnsupportedFacesBySurfaceType(List<UnsupportedFacePayload> unsupportedFaces) {
-        Map<String, Long> counts = unsupportedFaces.stream()
-                .collect(Collectors.groupingBy(
-                        face -> face.surfaceType() == null ? "UNKNOWN" : face.surfaceType(),
-                        LinkedHashMap::new,
-                        Collectors.counting()
-                ));
-        return counts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
-                .map(entry -> entry.getKey() + ":" + entry.getValue())
-                .collect(Collectors.joining("|"));
-    }
-
-    private static String summarizeUnsupportedFacesByReason(List<UnsupportedFacePayload> unsupportedFaces) {
-        Map<String, Long> counts = unsupportedFaces.stream()
-                .collect(Collectors.groupingBy(
-                        face -> face.reason() == null ? "unknown" : face.reason(),
-                        LinkedHashMap::new,
-                        Collectors.counting()
-                ));
-        return counts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
-                .map(entry -> entry.getKey() + ":" + entry.getValue())
-                .collect(Collectors.joining("|"));
-    }
-
-    private static String summarizeUnsupportedBooleansByType(List<UnsupportedBooleanPayload> unsupportedBooleans) {
-        Map<String, Long> counts = unsupportedBooleans.stream()
-                .collect(Collectors.groupingBy(
-                        UnsupportedBooleanPayload::type,
-                        LinkedHashMap::new,
-                        Collectors.counting()
-                ));
-        return counts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
-                .map(entry -> entry.getKey() + ":" + entry.getValue())
-                .collect(Collectors.joining("|"));
-    }
-
-    private static String summarizeUnsupportedBooleansByReason(List<UnsupportedBooleanPayload> unsupportedBooleans) {
-        Map<String, Long> counts = unsupportedBooleans.stream()
-                .collect(Collectors.groupingBy(
-                        item -> item.reason() == null ? "unknown" : item.reason(),
-                        LinkedHashMap::new,
-                        Collectors.counting()
-                ));
-        return counts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
-                .map(entry -> entry.getKey() + ":" + entry.getValue())
-                .collect(Collectors.joining("|"));
-    }
-
-    private static String summarizeLoopPointCounts(List<ParametricLoopPayload> loops) {
-        return loops.stream()
-                .map(loop -> (loop.outer() ? "outer" : "inner") + ":" + loop.points().size())
-                .collect(Collectors.joining("|"));
-    }
-
-    private static String formatUvBounds(UvBounds bounds) {
-        return String.format(
-                "(minU=%.6f,minV=%.6f,maxU=%.6f,maxV=%.6f,uSpan=%.6f,vSpan=%.6f)",
-                bounds.minU(),
-                bounds.minV(),
-                bounds.maxU(),
-                bounds.maxV(),
-                bounds.uSpan(),
-                bounds.vSpan()
-        );
-    }
-
-    private static int countShells(Map<Integer, StepEntity> resolved) {
-        int count = 0;
-        for (StepEntity entity : resolved.values()) {
-            if (ShellHelper.isShellLikeEntity(entity)) {
-                count++;
-            }
-        }
-        return count;
-    }
 
     private static int countUnsupportedFaces(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
         long startedAt = System.nanoTime();
@@ -3986,11 +3871,11 @@ public final class StepPreviewJsonExporter {
                     stepFace.id(), surfaceTypeName(geometry), loops.size(),
                             loops.stream().filter(ParametricLoopPayload::outer).count(),
                             loops.stream().filter(loop -> !loop.outer()).count(),
-                            formatUvBounds(uvBounds),
+                            PreviewStatisticsHelper.formatUvBounds(uvBounds),
                             sampleCount,
                             baseUSegments,
                             baseVSegments,
-                            summarizeLoopPointCounts(loops));
+                            PreviewStatisticsHelper.summarizeLoopPointCounts(loops));
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "parametric triangulation produced no cells"));
         }
 
