@@ -2130,7 +2130,7 @@ public final class StepPreviewJsonExporter {
                 }
                 if (builder != null) {
                     double[] matrix = matrixForTransformationOperator(transformation, builder);
-                    if (inverseUniformScaleTransform(matrix) == null) {
+                    if (MathUtilityHelper.inverseUniformScaleTransform(matrix) == null) {
                         return "SURFACE_REPLICA non-uniform scale preview is unsupported";
                     }
                 }
@@ -3998,10 +3998,10 @@ public final class StepPreviewJsonExporter {
             double v = point.v();
             if (previous != null) {
                 if (uPeriod != null) {
-                    u = unwrapPeriodic(u, previous.u(), uPeriod);
+                    u = MathUtilityHelper.unwrapPeriodic(u, previous.u(), uPeriod);
                 }
                 if (vPeriod != null) {
-                    v = unwrapPeriodic(v, previous.v(), vPeriod);
+                    v = MathUtilityHelper.unwrapPeriodic(v, previous.v(), vPeriod);
                 }
             }
             UvPoint normalizedPoint = new UvPoint(u, v);
@@ -4014,10 +4014,10 @@ public final class StepPreviewJsonExporter {
             double u = last.u();
             double v = last.v();
             if (uPeriod != null) {
-                u = unwrapPeriodic(u, first.u(), uPeriod);
+                u = MathUtilityHelper.unwrapPeriodic(u, first.u(), uPeriod);
             }
             if (vPeriod != null) {
-                v = unwrapPeriodic(v, first.v(), vPeriod);
+                v = MathUtilityHelper.unwrapPeriodic(v, first.v(), vPeriod);
             }
             normalized.set(normalized.size() - 1, new UvPoint(u, v));
         }
@@ -4898,7 +4898,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
@@ -4924,7 +4924,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
@@ -4950,7 +4950,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.sphericalV(surface.position(), point, surface.radius()));
                 }
 
@@ -4978,8 +4978,8 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
@@ -5012,8 +5012,8 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
@@ -5085,24 +5085,24 @@ public final class StepPreviewJsonExporter {
                 return null;
             }
             double[] matrix = matrixForTransformationOperator(transformation, builder);
-            double[] inverse = inverseUniformScaleTransform(matrix);
+            double[] inverse = MathUtilityHelper.inverseUniformScaleTransform(matrix);
             if (inverse == null) {
                 return null;
             }
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return base.project(transformCartesian(point, inverse), previous);
+                    return base.project(MathUtilityHelper.transformCartesian(point, inverse), previous);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return transformCartesian(base.pointAt(u, v), matrix);
+                    return MathUtilityHelper.transformCartesian(base.pointAt(u, v), matrix);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    VectorPayload transformed = transform(
+                    VectorPayload transformed = MathUtilityHelper.transform(
                             new VectorPayload(base.normalAt(u, v).x(), base.normalAt(u, v).y(), base.normalAt(u, v).z()),
                             matrix
                     );
@@ -5153,7 +5153,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface, point));
                 }
 
@@ -5179,7 +5179,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
@@ -5205,7 +5205,7 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
                     return new UvPoint(u, SurfaceGeometryHelper.sphericalV(placement, point, sphericalSurface.radius()));
                 }
 
@@ -5235,8 +5235,8 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(placement, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalU(placement, point), previousU, Math.PI * 2.0);
+                    double v = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
@@ -5269,8 +5269,8 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = MathUtilityHelper.unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
@@ -5391,43 +5391,7 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    static double[] inverseUniformScaleTransform(double[] matrix) {
-        double sx = Math.sqrt(matrix[0] * matrix[0] + matrix[4] * matrix[4] + matrix[8] * matrix[8]);
-        double sy = Math.sqrt(matrix[1] * matrix[1] + matrix[5] * matrix[5] + matrix[9] * matrix[9]);
-        double sz = Math.sqrt(matrix[2] * matrix[2] + matrix[6] * matrix[6] + matrix[10] * matrix[10]);
-        if (sx <= 1.0e-12 || sy <= 1.0e-12 || sz <= 1.0e-12) {
-            return null;
-        }
-        double maxScale = Math.max(sx, Math.max(sy, sz));
-        double tolerance = maxScale * 1.0e-6;
-        if (Math.abs(sx - sy) > tolerance || Math.abs(sx - sz) > tolerance || Math.abs(sy - sz) > tolerance) {
-            return null;
-        }
-        double n01 = ((matrix[0] / sx) * (matrix[1] / sy)) + ((matrix[4] / sx) * (matrix[5] / sy)) + ((matrix[8] / sx) * (matrix[9] / sy));
-        double n02 = ((matrix[0] / sx) * (matrix[2] / sz)) + ((matrix[4] / sx) * (matrix[6] / sz)) + ((matrix[8] / sx) * (matrix[10] / sz));
-        double n12 = ((matrix[1] / sy) * (matrix[2] / sz)) + ((matrix[5] / sy) * (matrix[6] / sz)) + ((matrix[9] / sy) * (matrix[10] / sz));
-        if (Math.abs(n01) > 1.0e-6 || Math.abs(n02) > 1.0e-6 || Math.abs(n12) > 1.0e-6) {
-            return null;
-        }
-        double scale = (sx + sy + sz) / 3.0;
-        double scaleSquared = scale * scale;
-        if (scaleSquared <= 1.0e-18) {
-            return null;
-        }
-        double tx = matrix[3];
-        double ty = matrix[7];
-        double tz = matrix[11];
-        return new double[]{
-                matrix[0] / scaleSquared, matrix[4] / scaleSquared, matrix[8] / scaleSquared,
-                -((matrix[0] * tx) + (matrix[4] * ty) + (matrix[8] * tz)) / scaleSquared,
-                matrix[1] / scaleSquared, matrix[5] / scaleSquared, matrix[9] / scaleSquared,
-                -((matrix[1] * tx) + (matrix[5] * ty) + (matrix[9] * tz)) / scaleSquared,
-                matrix[2] / scaleSquared, matrix[6] / scaleSquared, matrix[10] / scaleSquared,
-                -((matrix[2] * tx) + (matrix[6] * ty) + (matrix[10] * tz)) / scaleSquared,
-                0.0, 0.0, 0.0, 1.0
-        };
-    }
-
+    
     private static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
         double uStart = surface.uStart();
         double uEnd = surface.uEnd();
@@ -5435,8 +5399,8 @@ public final class StepPreviewJsonExporter {
         double vEnd = surface.vEnd();
         boolean hasPrevious = previous != null;
 
-        double bestU = hasPrevious ? clamp(previous.u(), uStart, uEnd) : uStart;
-        double bestV = hasPrevious ? clamp(previous.v(), vStart, vEnd) : vStart;
+        double bestU = hasPrevious ? MathUtilityHelper.clamp(previous.u(), uStart, uEnd) : uStart;
+        double bestV = hasPrevious ? MathUtilityHelper.clamp(previous.v(), vStart, vEnd) : vStart;
         double bestDistance = surface.pointAt(bestU, bestV).distanceTo(point);
 
         int uSamples = hasPrevious ? 4 : 12;
@@ -5491,10 +5455,7 @@ public final class StepPreviewJsonExporter {
         return new UvPoint(bestU, bestV);
     }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
+    
     private static ParametricSurfaceMapper extrusionMapper(
             StepSurfaceOfLinearExtrusion extrusionSurface,
             StepCadBuilder builder
@@ -5548,7 +5509,7 @@ public final class StepPreviewJsonExporter {
             @Override
             public UvPoint project(CartesianPoint point, UvPoint previous) {
                 Vector3 offset = point.subtract(axisOrigin);
-                double v = unwrapPeriodic(
+                double v = MathUtilityHelper.unwrapPeriodic(
                         Math.atan2(offset.dot(tangentialReference.asVector()), offset.dot(radialReference.asVector())),
                         previous == null ? null : previous.v(),
                         Math.PI * 2.0
@@ -5997,19 +5958,7 @@ public final class StepPreviewJsonExporter {
         return normal.norm() <= Epsilon.EPS ? new Vector3(0.0, 0.0, 1.0) : normal;
     }
 
-    private static double unwrapPeriodic(double value, Double previous, double period) {
-        if (previous == null) {
-            return value;
-        }
-        while (value - previous > period * 0.5) {
-            value -= period;
-        }
-        while (value - previous < -period * 0.5) {
-            value += period;
-        }
-        return value;
-    }
-
+    
     private static SurfacePatch buildFourSidedPatch(EdgeLoop outerLoop) {
         if (outerLoop.edges().size() != 4) {
             return null;
@@ -6439,8 +6388,8 @@ public final class StepPreviewJsonExporter {
         double vEnd = surface.vEnd();
         boolean hasPrevious = previous != null;
 
-        double bestU = hasPrevious ? clamp(previous.u(), uStart, uEnd) : uStart;
-        double bestV = hasPrevious ? clamp(previous.v(), vStart, vEnd) : vStart;
+        double bestU = hasPrevious ? MathUtilityHelper.clamp(previous.u(), uStart, uEnd) : uStart;
+        double bestV = hasPrevious ? MathUtilityHelper.clamp(previous.v(), vStart, vEnd) : vStart;
         double bestDistance = surface.pointAt(bestU, bestV).distanceTo(point);
 
         int uSamples = hasPrevious ? 4 : 12;
@@ -6470,8 +6419,8 @@ public final class StepPreviewJsonExporter {
             double stepV = (vEnd - vStart) / Math.pow(4.0, iteration + 2);
             for (int du = -1; du <= 1; du++) {
                 for (int dv = -1; dv <= 1; dv++) {
-                    double u = clamp(bestU + du * stepU, uStart, uEnd);
-                    double v = clamp(bestV + dv * stepV, vStart, vEnd);
+                    double u = MathUtilityHelper.clamp(bestU + du * stepU, uStart, uEnd);
+                    double v = MathUtilityHelper.clamp(bestV + dv * stepV, vStart, vEnd);
                     double distance = surface.pointAt(u, v).distanceTo(point);
                     if (distance < bestDistance) {
                         bestDistance = distance;
@@ -7456,7 +7405,7 @@ public final class StepPreviewJsonExporter {
                 continue;
             }
             for (CartesianPoint point : sampled) {
-                points.add(transformCartesian(point, matrix));
+                points.add(MathUtilityHelper.transformCartesian(point, matrix));
             }
         }
         return points.isEmpty() ? null : List.copyOf(points);
@@ -7732,7 +7681,7 @@ public final class StepPreviewJsonExporter {
         else if (entityName.equals("PARABOLA")) return sampleParabolaPoints(curve, matrix);
         else if (entityName.equals("HYPERBOLA")) return sampleHyperbolaPoints(curve, matrix);
         else if (entityName.equals("DEGENERATE_CONIC")) {
-            CartesianPoint point = transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
+            CartesianPoint point = MathUtilityHelper.transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
             return List.of(point, point);
         } else return null;
     }
@@ -7758,7 +7707,7 @@ public final class StepPreviewJsonExporter {
         for (int i = 0; i <= segments; i++) {
             double angle = 2.0 * Math.PI * i / segments;
             CartesianPoint local = new CartesianPoint(rx * Math.cos(angle), ry * Math.sin(angle), 0.0);
-            points.add(transformCartesian(local, matrix));
+            points.add(MathUtilityHelper.transformCartesian(local, matrix));
         }
         return List.copyOf(points);
     }
@@ -7777,7 +7726,7 @@ public final class StepPreviewJsonExporter {
         for (int index = 0; index <= segments; index++) {
             double t = -yExtent + (2.0 * yExtent * index) / segments;
             double x = (t * t) / (4.0 * focalDistance);
-            points.add(transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
+            points.add(MathUtilityHelper.transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
         }
         return List.copyOf(points);
     }
@@ -7801,7 +7750,7 @@ public final class StepPreviewJsonExporter {
             double t = -extent + (2.0 * extent * index) / segments;
             double x = semiAxis * Math.cosh(t);
             double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
+            points.add(MathUtilityHelper.transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
         }
         return List.copyOf(points);
     }
@@ -8655,13 +8604,13 @@ public final class StepPreviewJsonExporter {
                 for (FacePayload face : representation.faces()) {
                     for (LoopPayload loop : face.loops()) {
                         for (PointPayload point : loop.points()) {
-                            bounds.include(transform(point, instance.worldMatrix()));
+                            bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
                         }
                     }
                 }
                 for (EdgePayload edge : representation.edges()) {
                     for (PointPayload point : edge.points()) {
-                        bounds.include(transform(point, instance.worldMatrix()));
+                        bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
                     }
                 }
             }
@@ -8775,13 +8724,13 @@ public final class StepPreviewJsonExporter {
         for (FacePayload face : representation.faces()) {
             for (LoopPayload loop : face.loops()) {
                 for (PointPayload point : loop.points()) {
-                    bounds.include(transform(point, matrix));
+                    bounds.include(MathUtilityHelper.transform(point, matrix));
                 }
             }
         }
         for (EdgePayload edge : representation.edges()) {
             for (PointPayload point : edge.points()) {
-                bounds.include(transform(point, matrix));
+                bounds.include(MathUtilityHelper.transform(point, matrix));
             }
         }
     }
@@ -8824,7 +8773,7 @@ public final class StepPreviewJsonExporter {
         double total = 0.0;
         for (EdgePayload edge : edges) {
             for (int i = 0; i + 1 < edge.points().size(); i++) {
-                total += distance(transform(edge.points().get(i), matrix), transform(edge.points().get(i + 1), matrix));
+                total += distance(MathUtilityHelper.transform(edge.points().get(i), matrix), MathUtilityHelper.transform(edge.points().get(i + 1), matrix));
             }
         }
         return total;
@@ -8853,9 +8802,9 @@ public final class StepPreviewJsonExporter {
     private static double triangleArea(List<PointPayload> triangles, double[] matrix) {
         double total = 0.0;
         for (int i = 0; i + 2 < triangles.size(); i += 3) {
-            PointPayload a = transform(triangles.get(i), matrix);
-            PointPayload b = transform(triangles.get(i + 1), matrix);
-            PointPayload c = transform(triangles.get(i + 2), matrix);
+            PointPayload a = MathUtilityHelper.transform(triangles.get(i), matrix);
+            PointPayload b = MathUtilityHelper.transform(triangles.get(i + 1), matrix);
+            PointPayload c = MathUtilityHelper.transform(triangles.get(i + 2), matrix);
             double abx = b.x() - a.x();
             double aby = b.y() - a.y();
             double abz = b.z() - a.z();
@@ -8933,8 +8882,8 @@ public final class StepPreviewJsonExporter {
         double areaVectorY = 0.0;
         double areaVectorZ = 0.0;
         for (int i = 0; i < points.size(); i++) {
-            PointPayload current = transform(points.get(i), matrix);
-            PointPayload next = transform(points.get((i + 1) % points.size()), matrix);
+            PointPayload current = MathUtilityHelper.transform(points.get(i), matrix);
+            PointPayload next = MathUtilityHelper.transform(points.get((i + 1) % points.size()), matrix);
             areaVectorX += current.y() * next.z() - current.z() * next.y();
             areaVectorY += current.z() * next.x() - current.x() * next.z();
             areaVectorZ += current.x() * next.y() - current.y() * next.x();
@@ -9015,7 +8964,7 @@ public final class StepPreviewJsonExporter {
             Integer sourceStepId
     ) {
         List<PointPayload> points = edge.points().stream()
-                .map(point -> transform(point, matrix))
+                .map(point -> MathUtilityHelper.transform(point, matrix))
                 .collect(Collectors.toList());
         return new EdgePayload(
                 mappedPayloadId(mappedItemId, edge.stepId(), 1),
@@ -9036,16 +8985,16 @@ public final class StepPreviewJsonExporter {
         }
         List<Double> center = curve.center() == null
                 ? null
-                : PreviewSerializers.pointList(transform(new PointPayload(curve.center().get(0), curve.center().get(1), curve.center().get(2)), matrix));
+                : PreviewSerializers.pointList(MathUtilityHelper.transform(new PointPayload(curve.center().get(0), curve.center().get(1), curve.center().get(2)), matrix));
         List<Double> axis = curve.axis() == null
                 ? null
-                : PreviewSerializers.vectorList(transform(new VectorPayload(curve.axis().get(0), curve.axis().get(1), curve.axis().get(2)), matrix));
+                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.axis().get(0), curve.axis().get(1), curve.axis().get(2)), matrix));
         List<Double> xDirection = curve.xDirection() == null
                 ? null
-                : PreviewSerializers.vectorList(transform(new VectorPayload(curve.xDirection().get(0), curve.xDirection().get(1), curve.xDirection().get(2)), matrix));
+                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.xDirection().get(0), curve.xDirection().get(1), curve.xDirection().get(2)), matrix));
         List<Double> refDirection = curve.refDirection() == null
                 ? null
-                : PreviewSerializers.vectorList(transform(new VectorPayload(curve.refDirection().get(0), curve.refDirection().get(1), curve.refDirection().get(2)), matrix));
+                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.refDirection().get(0), curve.refDirection().get(1), curve.refDirection().get(2)), matrix));
         return new EdgeCurvePayload(
                 curve.stepId(),
                 curve.type(),
@@ -9082,11 +9031,11 @@ public final class StepPreviewJsonExporter {
         List<LoopPayload> loops = face.loops().stream()
                 .map(loop -> new LoopPayload(
                         loop.outer(),
-                        loop.points().stream().map(point -> transform(point, matrix)).collect(Collectors.toList())
+                        loop.points().stream().map(point -> MathUtilityHelper.transform(point, matrix)).collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
         List<PointPayload> triangles = face.triangles().stream()
-                .map(point -> transform(point, matrix))
+                .map(point -> MathUtilityHelper.transform(point, matrix))
                 .collect(Collectors.toList());
         int[] rgb = metadata.rgb() != null ? metadata.rgb() : null;
         ColorPayload color = rgb == null ? face.color() : PayloadConversionHelper.toColorPayload(rgb);
@@ -9097,8 +9046,8 @@ public final class StepPreviewJsonExporter {
                 mappedPayloadId(mappedItemId, face.stepId(), 2),
                 face.name(),
                 face.surfaceType(),
-                transform(face.origin(), matrix),
-                transform(face.normal(), matrix),
+                MathUtilityHelper.transform(face.origin(), matrix),
+                MathUtilityHelper.transform(face.normal(), matrix),
                 face.sameSense(),
                 color,
                 transparency,
@@ -17066,39 +17015,8 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    private static PointPayload transform(PointPayload point, double[] matrix) {
-        double x = point.x();
-        double y = point.y();
-        double z = point.z();
-        return new PointPayload(
-                matrix[0] * x + matrix[1] * y + matrix[2] * z + matrix[3],
-                matrix[4] * x + matrix[5] * y + matrix[6] * z + matrix[7],
-                matrix[8] * x + matrix[9] * y + matrix[10] * z + matrix[11]
-        );
-    }
-
-    private static CartesianPoint transformCartesian(CartesianPoint point, double[] matrix) {
-        double x = point.x();
-        double y = point.y();
-        double z = point.z();
-        return new CartesianPoint(
-                matrix[0] * x + matrix[1] * y + matrix[2] * z + matrix[3],
-                matrix[4] * x + matrix[5] * y + matrix[6] * z + matrix[7],
-                matrix[8] * x + matrix[9] * y + matrix[10] * z + matrix[11]
-        );
-    }
-
-    private static VectorPayload transform(VectorPayload vector, double[] matrix) {
-        double x = matrix[0] * vector.x() + matrix[1] * vector.y() + matrix[2] * vector.z();
-        double y = matrix[4] * vector.x() + matrix[5] * vector.y() + matrix[6] * vector.z();
-        double z = matrix[8] * vector.x() + matrix[9] * vector.y() + matrix[10] * vector.z();
-        double length = Math.sqrt(x * x + y * y + z * z);
-        if (length <= Epsilon.EPS) {
-            return vector;
-        }
-        return new VectorPayload(x / length, y / length, z / length);
-    }
-
+    
+    
     private static String toJson(PreviewPayload payload) {
         return PreviewSerializers.toJson(payload);
     }

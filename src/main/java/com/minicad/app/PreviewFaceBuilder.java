@@ -260,7 +260,7 @@ public final class PreviewFaceBuilder {
                 }
                 if (builder != null) {
                     double[] matrix = StepPreviewJsonExporter.matrixForTransformationOperator(transformation, builder);
-                    if (StepPreviewJsonExporter.inverseUniformScaleTransform(matrix) == null) {
+                    if (MathUtilityHelper.inverseUniformScaleTransform(matrix) == null) {
                         return "SURFACE_REPLICA non-uniform scale preview is unsupported";
                     }
                 }
