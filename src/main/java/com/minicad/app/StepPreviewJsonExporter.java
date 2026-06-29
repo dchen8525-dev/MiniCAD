@@ -3331,20 +3331,20 @@ public final class StepPreviewJsonExporter {
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (averageAxialHeight(surface, sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface, sampleOrientedEdge(upperArc))) {
+        if (SurfaceGeometryHelper.averageAxialHeight(surface, sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface, sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = sampleOrientedEdge(lowerArc);
         List<CartesianPoint> upperArcPoints = sampleOrientedEdge(upperArc);
-        double lowerHeight = averageAxialHeight(surface, lowerArcPoints);
-        double upperHeight = averageAxialHeight(surface, upperArcPoints);
+        double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface, lowerArcPoints);
+        double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface, upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
             return null;
         }
 
-        List<Double> angles = unwrapAngles(surface, lowerArcPoints);
+        List<Double> angles = SurfaceGeometryHelper.unwrapAngles(surface, lowerArcPoints);
         if (angles.size() < 2) {
             return null;
         }
@@ -3355,12 +3355,12 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = cylindricalNormal(surface, angles.get(0), sameSense);
+        Vector3 startNormal = SurfaceGeometryHelper.cylindricalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
+                toPointPayload(SurfaceGeometryHelper.surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -3417,20 +3417,20 @@ public final class StepPreviewJsonExporter {
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (averageAxialHeight(surface.position(), sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface.position(), sampleOrientedEdge(upperArc))) {
+        if (SurfaceGeometryHelper.averageAxialHeight(surface.position(), sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface.position(), sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = sampleOrientedEdge(lowerArc);
         List<CartesianPoint> upperArcPoints = sampleOrientedEdge(upperArc);
-        double lowerHeight = averageAxialHeight(surface.position(), lowerArcPoints);
-        double upperHeight = averageAxialHeight(surface.position(), upperArcPoints);
+        double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), lowerArcPoints);
+        double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
             return null;
         }
 
-        List<Double> angles = unwrapAngles(surface.position(), lowerArcPoints);
+        List<Double> angles = SurfaceGeometryHelper.unwrapAngles(surface.position(), lowerArcPoints);
         if (angles.size() < 2) {
             return null;
         }
@@ -3441,12 +3441,12 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = conicalNormal(surface, angles.get(0), sameSense);
+        Vector3 startNormal = SurfaceGeometryHelper.conicalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
+                toPointPayload(SurfaceGeometryHelper.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -3502,8 +3502,8 @@ public final class StepPreviewJsonExporter {
         List<OrientedEdge> varyingVEdges = new ArrayList<>();
         for (OrientedEdge edge : circleEdges) {
             List<CartesianPoint> points = sampleOrientedEdge(edge);
-            List<Double> uValues = unwrapToroidalU(surface, points);
-            List<Double> vValues = unwrapToroidalV(surface, points);
+            List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, points);
+            List<Double> vValues = SurfaceGeometryHelper.unwrapToroidalV(surface, points);
             double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
             double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
             if (uRange >= vRange) {
@@ -3518,15 +3518,15 @@ public final class StepPreviewJsonExporter {
 
         OrientedEdge lowerVEdge = varyingUEdges.get(0);
         OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
+        if (SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
             lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
             upperVEdge = varyingUEdges.get(0);
         }
 
         List<CartesianPoint> lowerPoints = sampleOrientedEdge(lowerVEdge);
-        List<Double> uValues = unwrapToroidalU(surface, lowerPoints);
-        double lowerV = averageToroidalV(surface, lowerPoints);
-        double upperV = averageToroidalV(surface, sampleOrientedEdge(upperVEdge));
+        List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, lowerPoints);
+        double lowerV = SurfaceGeometryHelper.averageToroidalV(surface, lowerPoints);
+        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(upperVEdge));
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
             return null;
         }
@@ -3537,12 +3537,12 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
+        Vector3 startNormal = SurfaceGeometryHelper.toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -3598,8 +3598,8 @@ public final class StepPreviewJsonExporter {
         List<OrientedEdge> varyingVEdges = new ArrayList<>();
         for (OrientedEdge edge : circleEdges) {
             List<CartesianPoint> points = sampleOrientedEdge(edge);
-            List<Double> uValues = unwrapToroidalU(surface, points);
-            List<Double> vValues = unwrapToroidalV(surface, points);
+            List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, points);
+            List<Double> vValues = SurfaceGeometryHelper.unwrapToroidalV(surface, points);
             double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
             double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
             if (uRange >= vRange) {
@@ -3614,15 +3614,15 @@ public final class StepPreviewJsonExporter {
 
         OrientedEdge lowerVEdge = varyingUEdges.get(0);
         OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
+        if (SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(upperVEdge))) {
             lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
             upperVEdge = varyingUEdges.get(0);
         }
 
         List<CartesianPoint> lowerPoints = sampleOrientedEdge(lowerVEdge);
-        List<Double> uValues = unwrapToroidalU(surface, lowerPoints);
-        double lowerV = averageToroidalV(surface, lowerPoints);
-        double upperV = averageToroidalV(surface, sampleOrientedEdge(upperVEdge));
+        List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, lowerPoints);
+        double lowerV = SurfaceGeometryHelper.averageToroidalV(surface, lowerPoints);
+        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, sampleOrientedEdge(upperVEdge));
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
             return null;
         }
@@ -3633,12 +3633,12 @@ public final class StepPreviewJsonExporter {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
+        Vector3 startNormal = SurfaceGeometryHelper.toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS",
-                toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -4191,12 +4191,12 @@ public final class StepPreviewJsonExporter {
                 continue;
             }
 
-            CartesianPoint lower0 = surfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = surfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = surfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = surfacePoint(surface, angle1, upperHeight);
+            CartesianPoint lower0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, lowerHeight);
+            CartesianPoint lower1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, lowerHeight);
+            CartesianPoint upper0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, upperHeight);
+            CartesianPoint upper1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, upperHeight);
 
-            Vector3 targetNormal = cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
+            Vector3 targetNormal = SurfaceGeometryHelper.cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
             appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
             appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
         }
@@ -4218,12 +4218,12 @@ public final class StepPreviewJsonExporter {
                 continue;
             }
 
-            CartesianPoint lower0 = conicalSurfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = conicalSurfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = conicalSurfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = conicalSurfacePoint(surface, angle1, upperHeight);
+            CartesianPoint lower0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, lowerHeight);
+            CartesianPoint lower1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, lowerHeight);
+            CartesianPoint upper0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, upperHeight);
+            CartesianPoint upper1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, upperHeight);
 
-            Vector3 targetNormal = conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
+            Vector3 targetNormal = SurfaceGeometryHelper.conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
             appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
             appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
         }
@@ -4244,11 +4244,11 @@ public final class StepPreviewJsonExporter {
             if (Math.abs(u1 - u0) <= Epsilon.EPS) {
                 continue;
             }
-            CartesianPoint p00 = toroidalSurfacePoint(surface, u0, lowerV);
-            CartesianPoint p10 = toroidalSurfacePoint(surface, u1, lowerV);
-            CartesianPoint p01 = toroidalSurfacePoint(surface, u0, upperV);
-            CartesianPoint p11 = toroidalSurfacePoint(surface, u1, upperV);
-            Vector3 targetNormal = toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
+            CartesianPoint p00 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, lowerV);
+            CartesianPoint p10 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, lowerV);
+            CartesianPoint p01 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, upperV);
+            CartesianPoint p11 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, upperV);
+            Vector3 targetNormal = SurfaceGeometryHelper.toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
             appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
             appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
         }
@@ -5557,18 +5557,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return surfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.surfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return cylindricalNormal(surface, u, true);
+                    return SurfaceGeometryHelper.cylindricalNormal(surface, u, true);
                 }
 
                 @Override
@@ -5583,18 +5583,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return conicalSurfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.conicalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return conicalNormal(surface, u, true);
+                    return SurfaceGeometryHelper.conicalNormal(surface, u, true);
                 }
 
                 @Override
@@ -5609,18 +5609,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, sphericalV(surface.position(), point, surface.radius()));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.sphericalV(surface.position(), point, surface.radius()));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return sphericalSurfacePoint(surface.position(), surface.radius(), u, v);
+                    return SurfaceGeometryHelper.sphericalSurfacePoint(surface.position(), surface.radius(), u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return sphericalNormal(surface.position(), u, v, true);
+                    return SurfaceGeometryHelper.sphericalNormal(surface.position(), u, v, true);
                 }
 
                 @Override
@@ -5637,19 +5637,19 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return SurfaceGeometryHelper.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -5671,19 +5671,19 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return SurfaceGeometryHelper.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -5812,18 +5812,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface, point));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface, point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return surfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.surfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return cylindricalNormal(surface, u, true);
+                    return SurfaceGeometryHelper.cylindricalNormal(surface, u, true);
                 }
 
                 @Override
@@ -5838,18 +5838,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return conicalSurfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.conicalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return conicalNormal(surface, u, true);
+                    return SurfaceGeometryHelper.conicalNormal(surface, u, true);
                 }
 
                 @Override
@@ -5864,18 +5864,18 @@ public final class StepPreviewJsonExporter {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, sphericalV(placement, point, sphericalSurface.radius()));
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, SurfaceGeometryHelper.sphericalV(placement, point, sphericalSurface.radius()));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return sphericalSurfacePoint(placement, sphericalSurface.radius(), u, v);
+                    return SurfaceGeometryHelper.sphericalSurfacePoint(placement, sphericalSurface.radius(), u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return sphericalNormal(placement, u, v, true);
+                    return SurfaceGeometryHelper.sphericalNormal(placement, u, v, true);
                 }
 
                 @Override
@@ -5894,19 +5894,19 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(placement, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(placement, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(placement, majorRadius, minorRadius, u, v);
+                    return SurfaceGeometryHelper.toroidalSurfacePoint(placement, majorRadius, minorRadius, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(placement, u, v, true);
+                    return SurfaceGeometryHelper.toroidalNormal(placement, u, v, true);
                 }
 
                 @Override
@@ -5928,19 +5928,19 @@ public final class StepPreviewJsonExporter {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(SurfaceGeometryHelper.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(SurfaceGeometryHelper.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return SurfaceGeometryHelper.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return SurfaceGeometryHelper.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -6774,219 +6774,6 @@ public final class StepPreviewJsonExporter {
         triangles.add(toPointPayload(c));
     }
 
-    private static List<Double> unwrapAngles(CylindricalSurface surface, List<CartesianPoint> points) {
-        return unwrapAngles(surface.position(), points);
-    }
-
-    private static List<Double> unwrapAngles(Axis2Placement3D placement, List<CartesianPoint> points) {
-        List<Double> angles = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double angle = cylindricalAngle(placement, point);
-            if (!angles.isEmpty()) {
-                double previous = angles.get(angles.size() - 1);
-                while (angle - previous > Math.PI) {
-                    angle -= Math.PI * 2.0;
-                }
-                while (angle - previous < -Math.PI) {
-                    angle += Math.PI * 2.0;
-                }
-            }
-            angles.add(angle);
-        }
-        return List.copyOf(angles);
-    }
-
-    private static double averageAxialHeight(CylindricalSurface surface, List<CartesianPoint> points) {
-        return averageAxialHeight(surface.position(), points);
-    }
-
-    private static double averageAxialHeight(Axis2Placement3D placement, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += axialHeight(placement, point);
-        }
-        return total / points.size();
-    }
-
-    private static double axialHeight(CylindricalSurface surface, CartesianPoint point) {
-        return axialHeight(surface.position(), point);
-    }
-
-    private static double axialHeight(Axis2Placement3D placement, CartesianPoint point) {
-        return point.subtract(placement.location()).dot(placement.axis().asVector());
-    }
-
-    private static double cylindricalAngle(CylindricalSurface surface, CartesianPoint point) {
-        return cylindricalAngle(surface.position(), point);
-    }
-
-    private static double cylindricalAngle(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    private static CartesianPoint surfacePoint(CylindricalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * surface.radius())
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * surface.radius()));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    private static Vector3 cylindricalNormal(CylindricalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        return sameSense ? radial : radial.scale(-1.0);
-    }
-
-    private static CartesianPoint conicalSurfacePoint(ConicalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        double radius = surface.radius() + height * Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * radius)
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * radius));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    private static Vector3 conicalNormal(ConicalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        double slope = Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        Vector3 normal = radial.subtract(placement.axis().asVector().scale(slope));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    private static double sphericalU(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    private static double sphericalV(Axis2Placement3D placement, CartesianPoint point, double radius) {
-        Vector3 offset = point.subtract(placement.location());
-        double z = offset.dot(placement.axis().asVector());
-        double normalized = radius <= 1.0e-12 ? 0.0 : z / radius;
-        normalized = Math.max(-1.0, Math.min(1.0, normalized));
-        return Math.asin(normalized);
-    }
-
-    private static CartesianPoint sphericalSurfacePoint(Axis2Placement3D placement, double radius, double u, double v) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return placement.location().add(normal.scale(radius));
-    }
-
-    private static Vector3 sphericalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    private static CartesianPoint toroidalSurfacePoint(ToroidalSurface surface, double u, double v) {
-        return toroidalSurfacePoint(surface.position(), surface.majorRadius(), surface.minorRadius(), u, v);
-    }
-
-    private static CartesianPoint toroidalSurfacePoint(
-            Axis2Placement3D placement,
-            double majorRadius,
-            double minorRadius,
-            double u,
-            double v
-    ) {
-        double radial = majorRadius + minorRadius * Math.cos(v);
-        Vector3 xy = placement.xDirection().asVector().scale(Math.cos(u) * radial)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * radial));
-        Vector3 z = placement.axis().asVector().scale(minorRadius * Math.sin(v));
-        return placement.location().add(xy.add(z));
-    }
-
-    private static Vector3 toroidalNormal(ToroidalSurface surface, double u, double v, boolean sameSense) {
-        return toroidalNormal(surface.position(), u, v, sameSense);
-    }
-
-    private static Vector3 toroidalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * Math.cos(v))
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * Math.cos(v)))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    private static List<Double> unwrapToroidalU(ToroidalSurface surface, List<CartesianPoint> points) {
-        List<Double> values = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double value = toroidalU(surface, point);
-            if (!values.isEmpty()) {
-                double previous = values.get(values.size() - 1);
-                while (value - previous > Math.PI) {
-                    value -= Math.PI * 2.0;
-                }
-                while (value - previous < -Math.PI) {
-                    value += Math.PI * 2.0;
-                }
-            }
-            values.add(value);
-        }
-        return List.copyOf(values);
-    }
-
-    private static List<Double> unwrapToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
-        List<Double> values = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double value = toroidalV(surface, point);
-            if (!values.isEmpty()) {
-                double previous = values.get(values.size() - 1);
-                while (value - previous > Math.PI) {
-                    value -= Math.PI * 2.0;
-                }
-                while (value - previous < -Math.PI) {
-                    value += Math.PI * 2.0;
-                }
-            }
-            values.add(value);
-        }
-        return List.copyOf(values);
-    }
-
-    private static double averageToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += toroidalV(surface, point);
-        }
-        return total / points.size();
-    }
-
-    private static double toroidalU(ToroidalSurface surface, CartesianPoint point) {
-        return toroidalU(surface.position(), point);
-    }
-
-    private static double toroidalU(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    private static double toroidalV(ToroidalSurface surface, CartesianPoint point) {
-        return toroidalV(surface.position(), surface.majorRadius(), point);
-    }
-
-    private static double toroidalV(Axis2Placement3D placement, double majorRadius, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        double z = offset.dot(placement.axis().asVector());
-        double rho = Math.sqrt(x * x + y * y);
-        return Math.atan2(z, rho - majorRadius);
-    }
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
