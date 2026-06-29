@@ -15,12 +15,49 @@
 [INFO] 
 [INFO] --- compiler:3.13.0:compile (default-compile) @ mini-cad ---
 [INFO] Recompiling the module because of changed source code.
-[INFO] Compiling 1422 source files with javac [debug release 11] to target\classes
+[INFO] Compiling 1423 source files with javac [debug release 11] to target\classes
 [INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: D:\work\MiniCAD\src\main\java\com\minicad\app\StepDumpApp.java使用了未经检查或不安全的操作。
 [INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[2912,50] 找不到符号
+  符号:   变量 GeometryMeasurementHelper
+  位置: 类型为com.minicad.geometry.OffsetSurface3的变量 offset
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4317,43] 找不到符号
+  符号:   变量 GeometryMeasurementHelper
+  位置: 类型为com.minicad.step.model.geometry.StepOffsetSurface的变量 offsetSurface
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6193,33] 找不到符号
+  符号:   变量 GeometryMeasurementHelper
+  位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve2D的变量 offsetCurve2D
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6197,33] 找不到符号
+  符号:   变量 GeometryMeasurementHelper
+  位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve3D的变量 offsetCurve3D
+[INFO] 4 errors 
+[INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
+[INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  11.842 s
-[INFO] Finished at: 2026-06-29T20:29:14+08:00
+[INFO] Total time:  8.827 s
+[INFO] Finished at: 2026-06-30T07:28:39+08:00
 [INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project mini-cad: Compilation failure: Compilation failure: 
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[2912,50] 找不到符号
+[ERROR]   符号:   变量 GeometryMeasurementHelper
+[ERROR]   位置: 类型为com.minicad.geometry.OffsetSurface3的变量 offset
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4317,43] 找不到符号
+[ERROR]   符号:   变量 GeometryMeasurementHelper
+[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetSurface的变量 offsetSurface
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6193,33] 找不到符号
+[ERROR]   符号:   变量 GeometryMeasurementHelper
+[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve2D的变量 offsetCurve2D
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6197,33] 找不到符号
+[ERROR]   符号:   变量 GeometryMeasurementHelper
+[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve3D的变量 offsetCurve3D
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
