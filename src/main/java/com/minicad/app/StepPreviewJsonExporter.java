@@ -2683,7 +2683,7 @@ public final class StepPreviewJsonExporter {
                 loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
                     name,
@@ -2723,7 +2723,7 @@ public final class StepPreviewJsonExporter {
                 loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
                     name,
@@ -2763,7 +2763,7 @@ public final class StepPreviewJsonExporter {
                 loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
                     name,
@@ -2803,7 +2803,7 @@ public final class StepPreviewJsonExporter {
                 loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
             return new FacePayload(
                     stepId,
                     name,
@@ -2916,7 +2916,7 @@ public final class StepPreviewJsonExporter {
         if (grid.isEmpty()) {
             throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " produced no sample grid");
         }
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
         if (triangles.isEmpty()) {
             throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " triangulation produced no cells");
         }
@@ -2967,7 +2967,7 @@ public final class StepPreviewJsonExporter {
     ) {
         java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
         if (grid.isEmpty()) return null;
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
         if (triangles.isEmpty()) return null;
         Vector3 normal = surface.normalAt(0.5, 0.5);
         if (!sameSense) normal = normal.scale(-1.0);
@@ -3067,7 +3067,7 @@ public final class StepPreviewJsonExporter {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateCylindricalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateCylindricalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3153,7 +3153,7 @@ public final class StepPreviewJsonExporter {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateConicalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateConicalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3249,7 +3249,7 @@ public final class StepPreviewJsonExporter {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3345,7 +3345,7 @@ public final class StepPreviewJsonExporter {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3406,7 +3406,7 @@ public final class StepPreviewJsonExporter {
         BSplineSurface3 surface = buildBsplineSurface(stepSurface, builder);
         int uSegments = Math.max(patch.uSegments(), 10);
         int vSegments = Math.max(patch.vSegments(), 10);
-        List<PointPayload> triangles = triangulateSurfaceGrid(
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(
                 sampleSurfaceGrid(surface, uSegments, vSegments),
                 faceSameSense(stepFace)
         );
@@ -3515,7 +3515,7 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(stepSurface.id());
-        List<PointPayload> triangles = triangulateSurfaceGrid(
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(
                 sampleSurfaceGrid(surface, 16, 16),
                 faceSameSense(stepFace)
         );
@@ -3562,7 +3562,7 @@ public final class StepPreviewJsonExporter {
         if (patch == null) {
             return null;
         }
-        List<PointPayload> triangles = triangulatePatch(patch, faceSameSense(stepFace));
+        List<PointPayload> triangles = TriangulationHelper.triangulatePatch(patch, faceSameSense(stepFace));
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3600,7 +3600,7 @@ public final class StepPreviewJsonExporter {
         }
         RuledSurface3 surface = builder.buildRuledSurface(stepSurface.id());
         java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, faceSameSense(stepFace));
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3646,7 +3646,7 @@ public final class StepPreviewJsonExporter {
         }
         SurfaceOfConstantRadius3 surface = builder.buildSurfaceOfConstantRadius(stepSurface.id());
         java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, faceSameSense(stepFace));
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3697,7 +3697,7 @@ public final class StepPreviewJsonExporter {
         }
         SurfaceGeometry surface = builder.buildSurfaceGeometry(stepSurface.id());
         java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, faceSameSense(stepFace));
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, faceSameSense(stepFace));
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3739,7 +3739,7 @@ public final class StepPreviewJsonExporter {
             return null;
         }
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -3893,129 +3893,11 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    private static List<PointPayload> triangulateCylindricalStrip(
-            CylindricalSurface surface,
-            double lowerHeight,
-            double upperHeight,
-            List<Double> angles,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < angles.size() - 1; index++) {
-            double angle0 = angles.get(index);
-            double angle1 = angles.get(index + 1);
-            if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
-                continue;
-            }
-
-            CartesianPoint lower0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, upperHeight);
-
-            Vector3 targetNormal = SurfaceGeometryHelper.cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
-            appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
-    private static List<PointPayload> triangulateConicalStrip(
-            ConicalSurface surface,
-            double lowerHeight,
-            double upperHeight,
-            List<Double> angles,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < angles.size() - 1; index++) {
-            double angle0 = angles.get(index);
-            double angle1 = angles.get(index + 1);
-            if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
-                continue;
-            }
-
-            CartesianPoint lower0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, upperHeight);
-
-            Vector3 targetNormal = SurfaceGeometryHelper.conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
-            appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
-    private static List<PointPayload> triangulateToroidalStrip(
-            ToroidalSurface surface,
-            double lowerV,
-            double upperV,
-            List<Double> uValues,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < uValues.size() - 1; index++) {
-            double u0 = uValues.get(index);
-            double u1 = uValues.get(index + 1);
-            if (Math.abs(u1 - u0) <= Epsilon.EPS) {
-                continue;
-            }
-            CartesianPoint p00 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, lowerV);
-            CartesianPoint p10 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, lowerV);
-            CartesianPoint p01 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, upperV);
-            CartesianPoint p11 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, upperV);
-            Vector3 targetNormal = SurfaceGeometryHelper.toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-            appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
-    private static List<PointPayload> triangulatePatch(SurfacePatch patch, boolean sameSense) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int u = 0; u < patch.uSegments(); u++) {
-            for (int v = 0; v < patch.vSegments(); v++) {
-                CartesianPoint p00 = patch.pointAt((double) u / patch.uSegments(), (double) v / patch.vSegments());
-                CartesianPoint p10 = patch.pointAt((double) (u + 1) / patch.uSegments(), (double) v / patch.vSegments());
-                CartesianPoint p01 = patch.pointAt((double) u / patch.uSegments(), (double) (v + 1) / patch.vSegments());
-                CartesianPoint p11 = patch.pointAt((double) (u + 1) / patch.uSegments(), (double) (v + 1) / patch.vSegments());
-                Vector3 targetNormal = patch.normalAt((u + 0.5) / patch.uSegments(), (v + 0.5) / patch.vSegments());
-                if (!sameSense) {
-                    targetNormal = targetNormal.scale(-1.0);
-                }
-                appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-                appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-            }
-        }
-        return List.copyOf(triangles);
-    }
-
-    private static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
-        List<PointPayload> triangles = new ArrayList<>();
-        if (grid.size() < 2 || grid.get(0).size() < 2) {
-            return List.of();
-        }
-        for (int u = 0; u + 1 < grid.size(); u++) {
-            for (int v = 0; v + 1 < grid.get(u).size(); v++) {
-                CartesianPoint p00 = grid.get(u).get(v);
-                CartesianPoint p10 = grid.get(u + 1).get(v);
-                CartesianPoint p01 = grid.get(u).get(v + 1);
-                CartesianPoint p11 = grid.get(u + 1).get(v + 1);
-                Vector3 targetNormal = p10.subtract(p00).cross(p01.subtract(p00));
-                if (targetNormal.norm() <= Epsilon.EPS) {
-                    continue;
-                }
-                if (!sameSense) {
-                    targetNormal = targetNormal.scale(-1.0);
-                }
-                appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-                appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-            }
-        }
-        return List.copyOf(triangles);
-    }
-
+    
+    
+    
+    
+    
     private static List<List<CartesianPoint>> sampleSurfaceGrid(BSplineSurface3 surface, int uSegments, int vSegments) {
         return surface.sampleGrid(Math.max(uSegments, 2), Math.max(vSegments, 2));
     }
@@ -4844,12 +4726,12 @@ public final class StepPreviewJsonExporter {
                 double v0 = bounds.minV() + bounds.vSpan() * vi / vSegments;
                 double v1 = bounds.minV() + bounds.vSpan() * (vi + 1) / vSegments;
                 UvPoint center = new UvPoint((u0 + u1) * 0.5, (v0 + v1) * 0.5);
-                if (!contains(outer.points(), center)) {
+                if (!TriangulationHelper.contains(outer.points(), center)) {
                     continue;
                 }
                 boolean insideHole = false;
                 for (ParametricLoopPayload hole : holes) {
-                    if (contains(hole.points(), center)) {
+                    if (TriangulationHelper.contains(hole.points(), center)) {
                         insideHole = true;
                         break;
                     }
@@ -4865,8 +4747,8 @@ public final class StepPreviewJsonExporter {
                 if (!sameSense) {
                     normal = normal.scale(-1.0);
                 }
-                appendOrientedTriangle(triangles, p00, p10, p11, normal);
-                appendOrientedTriangle(triangles, p00, p11, p01, normal);
+                TriangulationHelper.appendOrientedTriangle(triangles, p00, p10, p11, normal);
+                TriangulationHelper.appendOrientedTriangle(triangles, p00, p11, p01, normal);
             }
         }
         return List.copyOf(triangles);
@@ -4883,7 +4765,7 @@ public final class StepPreviewJsonExporter {
         int outerIndex = -1;
         double outerArea = Double.NEGATIVE_INFINITY;
         for (int index = 0; index < loops.size(); index++) {
-            double area = Math.abs(signedArea(loops.get(index).points()));
+            double area = Math.abs(TriangulationHelper.signedArea(loops.get(index).points()));
             if (area > outerArea + Epsilon.EPS) {
                 outerArea = area;
                 outerIndex = index;
@@ -4901,19 +4783,7 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(normalized);
     }
 
-    private static double signedArea(List<UvPoint> points) {
-        if (points.size() < 3) {
-            return 0.0;
-        }
-        double area = 0.0;
-        for (int index = 0; index + 1 < points.size(); index++) {
-            UvPoint current = points.get(index);
-            UvPoint next = points.get(index + 1);
-            area += current.u() * next.v() - next.u() * current.v();
-        }
-        return area * 0.5;
-    }
-
+    
     private static List<PointPayload> triangulateParametricFaceAdaptive(
             ParametricSurfaceMapper mapper,
             List<ParametricLoopPayload> loops,
@@ -4938,55 +4808,9 @@ public final class StepPreviewJsonExporter {
         return List.of();
     }
 
-    private static boolean contains(List<UvPoint> polygon, UvPoint point) {
-        if (polygon.size() < 3) {
-            return false;
-        }
-        if (isOnPolygonBoundary(polygon, point)) {
-            return true;
-        }
-        boolean inside = false;
-        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
-            UvPoint a = polygon.get(i);
-            UvPoint b = polygon.get(j);
-            boolean intersects = ((a.v() > point.v()) != (b.v() > point.v()))
-                    && (point.u() < (b.u() - a.u()) * (point.v() - a.v()) / ((b.v() - a.v()) + 1.0e-12) + a.u());
-            if (intersects) {
-                inside = !inside;
-            }
-        }
-        return inside;
-    }
-
-    private static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
-        for (int index = 0; index + 1 < polygon.size(); index++) {
-            if (isOnSegment(polygon.get(index), polygon.get(index + 1), point)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
-        double abU = b.u() - a.u();
-        double abV = b.v() - a.v();
-        double lengthSquared = abU * abU + abV * abV;
-        if (lengthSquared <= 1.0e-18) {
-            return PcurveSamplingHelper.distanceSquared(a, point) <= 1.0e-18;
-        }
-        double apU = point.u() - a.u();
-        double apV = point.v() - a.v();
-        double cross = abU * apV - abV * apU;
-        if (Math.abs(cross) > 1.0e-9) {
-            return false;
-        }
-        double dot = apU * abU + apV * abV;
-        if (dot < -1.0e-9) {
-            return false;
-        }
-        return dot <= lengthSquared + 1.0e-9;
-    }
-
+    
+    
+    
     private static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof StepRectangularTrimmedSurface) {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
@@ -6272,25 +6096,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    private static void appendOrientedTriangle(
-            List<PointPayload> triangles,
-            CartesianPoint a,
-            CartesianPoint b,
-            CartesianPoint c,
-            Vector3 targetNormal
-    ) {
-        Vector3 normal = b.subtract(a).cross(c.subtract(a));
-        if (normal.dot(targetNormal) < 0.0) {
-            triangles.add(PayloadConversionHelper.toPointPayload(a));
-            triangles.add(PayloadConversionHelper.toPointPayload(c));
-            triangles.add(PayloadConversionHelper.toPointPayload(b));
-            return;
-        }
-        triangles.add(PayloadConversionHelper.toPointPayload(a));
-        triangles.add(PayloadConversionHelper.toPointPayload(b));
-        triangles.add(PayloadConversionHelper.toPointPayload(c));
-    }
-
+    
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
