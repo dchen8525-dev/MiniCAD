@@ -1245,14 +1245,14 @@ public final class PreviewFaceBuilder {
             StepEntity shellEntity = resolved.get(shellId);
             if (shellEntity instanceof StepTessellatedFaceSet) {
             StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) shellEntity;
-                List<FacePayload> tessFaces = StepPreviewJsonExporter.buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
+                List<FacePayload> tessFaces = TessellatedFaceExporter.buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
                 faces.addAll(tessFaces);
                 log.debug("stage={} shellId={}, tessellatedFaceCount={}", "geometry_tessellated_shell", shellId, tessFaces.size());
                 continue;
             }
             if (shellEntity instanceof StepTessellatedFace) {
             StepTessellatedFace tessellatedFace = (StepTessellatedFace) shellEntity;
-                FacePayload payload = StepPreviewJsonExporter.buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
+                FacePayload payload = TessellatedFaceExporter.buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
                 if (payload != null) {
                     faces.add(payload);
                 }

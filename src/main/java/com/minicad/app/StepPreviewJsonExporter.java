@@ -910,14 +910,14 @@ public final class StepPreviewJsonExporter {
             StepEntity shellEntity = resolved.get(shellId);
             if (shellEntity instanceof StepTessellatedFaceSet) {
             StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) shellEntity;
-                List<FacePayload> tessFaces = buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
+                List<FacePayload> tessFaces = TessellatedFaceExporter.buildTessellatedFacePayloads(tessellated, metadata.forItem(shellId));
                 faces.addAll(tessFaces);
                 log.debug("stage={} shellId={}, tessellatedFaceCount={}", "geometry_tessellated_shell", shellId, tessFaces.size());
                 continue;
             }
             if (shellEntity instanceof StepTessellatedFace) {
             StepTessellatedFace tessellatedFace = (StepTessellatedFace) shellEntity;
-                FacePayload payload = buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
+                FacePayload payload = TessellatedFaceExporter.buildTessellatedFacePayload(tessellatedFace, metadata.forItem(shellId));
                 if (payload != null) {
                     faces.add(payload);
                 }
@@ -2600,14 +2600,14 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    private static ColorPayload toColorPayload(int[] rgb) {
+    static ColorPayload toColorPayload(int[] rgb) {
         if (rgb == null) {
             return null;
         }
         return new ColorPayload(rgb[0], rgb[1], rgb[2]);
     }
 
-    private static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
+    static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
         if (metadata == null) {
             return null;
         }
@@ -2752,107 +2752,6 @@ public final class StepPreviewJsonExporter {
         return unsupported;
     }
 
-    static List<FacePayload> buildTessellatedFacePayloads(
-            StepTessellatedFaceSet tessellated,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<StepCartesianPoint> coords = tessellated.coordinates();
-        List<PointPayload> points = new ArrayList<>(coords.size());
-        for (StepCartesianPoint cp : coords) {
-            double cx = cp.coordinates().get(0);
-            double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
-            double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
-            points.add(new PointPayload(cx, cy, cz));
-        }
-        List<FacePayload> faces = new ArrayList<>(tessellated.faceIndices().size());
-        for (List<Integer> faceIndex : tessellated.faceIndices()) {
-            if (faceIndex.size() < 3) continue;
-            PointPayload p1 = points.get(faceIndex.get(0) - 1);
-            PointPayload p2 = points.get(faceIndex.get(1) - 1);
-            PointPayload p3 = points.get(faceIndex.get(2) - 1);
-            VectorPayload normal = computeNormal(p1, p2, p3);
-            if (normal == null) continue;
-            List<PointPayload> triangle = List.of(p1, p2, p3);
-            FacePayload face = new FacePayload(
-                    tessellated.id(),
-                    tessellated.name(),
-                    "TESSELLATED_FACE_SET",
-                    p1,
-                    normal,
-                    true,
-                    toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    List.of(new LoopPayload(true, triangle)),
-                    triangle,
-                    null,
-                    null
-            );
-            faces.add(face);
-        }
-        return faces;
-    }
-
-    static FacePayload buildTessellatedFacePayload(
-            StepTessellatedFace tessellatedFace,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<PointPayload> allPoints = new ArrayList<>();
-        for (StepEntity triangleRef : tessellatedFace.triangles()) {
-            if (triangleRef instanceof StepTessellatedTriangle) {
-            StepTessellatedTriangle triangle = (StepTessellatedTriangle) triangleRef;
-                PointPayload p1 = pointPayloadFromVertex(triangle.vertex1());
-                PointPayload p2 = pointPayloadFromVertex(triangle.vertex2());
-                PointPayload p3 = pointPayloadFromVertex(triangle.vertex3());
-                if (p1 == null || p2 == null || p3 == null) continue;
-                VectorPayload normal = computeNormal(p1, p2, p3);
-                if (normal == null) continue;
-                List<PointPayload> tri = List.of(p1, p2, p3);
-                return new FacePayload(
-                        tessellatedFace.id(),
-                        tessellatedFace.name(),
-                        "TESSELLATED_FACE",
-                        p1,
-                        normal,
-                        true,
-                        toColorPayload(metadata.rgb()),
-                        metadata.transparency(),
-                        toPbrPayload(metadata.pbr()),
-                        metadata.layers(),
-                        List.of(new LoopPayload(true, tri)),
-                        tri,
-                        null,
-                        null
-                );
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Computes the face normal from three triangle vertices using the cross product.
-     * Returns null if the normal is degenerate (near-zero length).
-     */
-    private static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
-        double nx = (p2.y() - p1.y()) * (p3.z() - p1.z()) - (p2.z() - p1.z()) * (p3.y() - p1.y());
-        double ny = (p2.z() - p1.z()) * (p3.x() - p1.x()) - (p2.x() - p1.x()) * (p3.z() - p1.z());
-        double nz = (p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x());
-        double len = Math.sqrt(nx * nx + ny * ny + nz * nz);
-        if (len < 1.0e-9) return null;
-        return new VectorPayload(nx / len, ny / len, nz / len);
-    }
-
-    private static PointPayload pointPayloadFromVertex(StepEntity vertex) {
-        if (vertex instanceof StepCartesianPoint) {
-            StepCartesianPoint cp = (StepCartesianPoint) vertex;
-            double cx = cp.coordinates().get(0);
-            double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
-            double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
-            return new PointPayload(cx, cy, cz);
-        }
-        return null;
-    }
 
     private static List<StepFaceEntity> shellFaces(StepEntity entity) {
         if (entity instanceof StepOpenShell) {
