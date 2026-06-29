@@ -924,7 +924,7 @@ public final class StepPreviewJsonExporter {
                 log.debug("stage={} shellId={}, tessellatedFaceBuilt={}", "geometry_tessellated_face", shellId, payload != null);
                 continue;
             }
-            List<StepFaceEntity> shellFaces = shellFaces(shellEntity);
+            List<StepFaceEntity> shellFaces = ShellHelper.shellFaces(shellEntity);
             log.debug("stage={} shellId={}, shellFaceCount={}", "geometry_shell_start", shellId, shellFaces.size());
             for (StepFaceEntity stepFace : shellFaces) {
                 PreviewFaceResult previewFace = buildPreviewFaceResult(
@@ -1053,7 +1053,7 @@ public final class StepPreviewJsonExporter {
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
-        if (isShellLikeEntity(item)) {
+        if (ShellHelper.isShellLikeEntity(item)) {
             shellIds.add(item.id());
             return;
         }
@@ -2723,7 +2723,7 @@ public final class StepPreviewJsonExporter {
     private static int countShells(Map<Integer, StepEntity> resolved) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
-            if (isShellLikeEntity(entity)) {
+            if (ShellHelper.isShellLikeEntity(entity)) {
                 count++;
             }
         }
@@ -2753,60 +2753,6 @@ public final class StepPreviewJsonExporter {
     }
 
 
-    private static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell) {
-            StepOpenShell openShell = (StepOpenShell) entity;
-            return openShell.faces();
-        }
-        if (entity instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-            return surfacedOpenShell.faces();
-        }
-        if (entity instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-            return orientedOpenShell.faces();
-        }
-        if (entity instanceof StepClosedShell) {
-            StepClosedShell closedShell = (StepClosedShell) entity;
-            return closedShell.faces();
-        }
-        if (entity instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-            return orientedClosedShell.faces();
-        }
-        if (entity instanceof StepConnectedFaceSet) {
-            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
-            return connectedFaceSet.faces();
-        }
-        if (entity instanceof StepConnectedFaceSubSet) {
-            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
-            return connectedFaceSubSet.faces();
-        }
-        throw new UnsupportedGeometryException(
-                "preview export requires shell or connected face set geometry");
-    }
-
-    private static boolean isShellEntity(StepEntity entity) {
-        return entity instanceof StepOpenShell
-                || entity instanceof StepSurfacedOpenShell
-                || entity instanceof StepOrientedOpenShell
-                || entity instanceof StepClosedShell
-                || entity instanceof StepOrientedClosedShell;
-    }
-
-    private static boolean isShellLikeEntity(StepEntity entity) {
-        return isShellEntity(entity)
-                || entity instanceof StepConnectedFaceSet
-                || entity instanceof StepConnectedFaceSubSet
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepGeometricSurfaceSet
-                || entity instanceof StepPlanarBox
-                || entity instanceof StepPlanarExtent
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepSurfacePatch;
-    }
 
     static FacePayload facePayloadFromTopologyFace(
             int stepId,
