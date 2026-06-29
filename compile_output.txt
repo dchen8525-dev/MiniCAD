@@ -1,0 +1,26 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.minicad:mini-cad >------------------------
+[INFO] Building mini-cad 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.5.0:enforce (enforce-build-prerequisites) @ mini-cad ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 2: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ mini-cad ---
+[INFO] Copying 9 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ mini-cad ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 1422 source files with javac [debug release 11] to target\classes
+[INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: D:\work\MiniCAD\src\main\java\com\minicad\app\StepDumpApp.java使用了未经检查或不安全的操作。
+[INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11.842 s
+[INFO] Finished at: 2026-06-29T20:29:14+08:00
+[INFO] ------------------------------------------------------------------------
