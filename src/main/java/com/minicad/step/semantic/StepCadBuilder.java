@@ -820,7 +820,7 @@ public final class StepCadBuilder {
         return built;
     }
 
-    private Object buildCurve2(StepEntity item) {
+    Object buildCurve2(StepEntity item) {
         if (item instanceof StepLine) {
             StepLine line = (StepLine) item;
             return buildLine2(line.id());
