@@ -4095,7 +4095,7 @@ public final class StepPreviewJsonExporter {
                 loopPoints = reverseClosedLoop(loopPoints);
             }
             loopPoints = normalizePeriodicLoop(loopPoints, mapper);
-            if (!sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
+            if (!PcurveSamplingHelper.sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
                 loopPoints.add(loopPoints.get(0));
             }
             loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
@@ -4532,10 +4532,10 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof Line2) {
             Line2 line = (Line2) built;
-                UvPoint start = snapToLine(projectedStart, line);
-                UvPoint end = snapToLine(projectedEnd, line);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleLinePcurve(line, start, end);
+                UvPoint start = PcurveSamplingHelper.snapToLine(projectedStart, line);
+                UvPoint end = PcurveSamplingHelper.snapToLine(projectedEnd, line);
+                double score = PcurveSamplingHelper.distanceSquared(projectedStart, start) + PcurveSamplingHelper.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PcurveSamplingHelper.sampleLinePcurve(line, start, end);
                 if (best == null || score < bestScore) {
                     best = samples;
                     bestScore = score;
@@ -4544,9 +4544,9 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof BSplineCurve2) {
             BSplineCurve2 spline = (BSplineCurve2) built;
-                List<UvPoint> samples = sampleSplinePcurve(spline, projectedStart, projectedEnd);
+                List<UvPoint> samples = PcurveSamplingHelper.sampleSplinePcurve(spline, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
+                    double score = PcurveSamplingHelper.distanceSquared(projectedStart, samples.get(0)) + PcurveSamplingHelper.distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -4556,10 +4556,10 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof Circle2) {
             Circle2 circle = (Circle2) built;
-                UvPoint start = snapToCircle(projectedStart, circle);
-                UvPoint end = snapToCircle(projectedEnd, circle);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleCirclePcurve(circle, start, end);
+                UvPoint start = PcurveSamplingHelper.snapToCircle(projectedStart, circle);
+                UvPoint end = PcurveSamplingHelper.snapToCircle(projectedEnd, circle);
+                double score = PcurveSamplingHelper.distanceSquared(projectedStart, start) + PcurveSamplingHelper.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PcurveSamplingHelper.sampleCirclePcurve(circle, start, end);
                 if (!samples.isEmpty() && (best == null || score < bestScore)) {
                     best = samples;
                     bestScore = score;
@@ -4568,10 +4568,10 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof Ellipse2) {
             Ellipse2 ellipse = (Ellipse2) built;
-                UvPoint start = snapToEllipse(projectedStart, ellipse);
-                UvPoint end = snapToEllipse(projectedEnd, ellipse);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleEllipsePcurve(ellipse, start, end);
+                UvPoint start = PcurveSamplingHelper.snapToEllipse(projectedStart, ellipse);
+                UvPoint end = PcurveSamplingHelper.snapToEllipse(projectedEnd, ellipse);
+                double score = PcurveSamplingHelper.distanceSquared(projectedStart, start) + PcurveSamplingHelper.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PcurveSamplingHelper.sampleEllipsePcurve(ellipse, start, end);
                 if (!samples.isEmpty() && (best == null || score < bestScore)) {
                     best = samples;
                     bestScore = score;
@@ -4580,9 +4580,9 @@ public final class StepPreviewJsonExporter {
             }
             if (built instanceof TrimmedCurve2) {
             TrimmedCurve2 trimmed = (TrimmedCurve2) built;
-                List<UvPoint> samples = sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
+                List<UvPoint> samples = PcurveSamplingHelper.sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
+                    double score = PcurveSamplingHelper.distanceSquared(projectedStart, samples.get(0)) + PcurveSamplingHelper.distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -4797,194 +4797,18 @@ public final class StepPreviewJsonExporter {
         return Set.copyOf(ids);
     }
 
-    private static UvPoint snapToLine(UvPoint point, Line2 line) {
-        com.minicad.geometry2d.Point2 snapped = line.closestPoint(new com.minicad.geometry2d.Point2(point.u(), point.v()));
-        return new UvPoint(snapped.x(), snapped.y());
-    }
+    
+    
 
-    private static UvPoint snapToCircle(UvPoint point, Circle2 circle) {
-        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(circle.center());
-        double norm = offset.norm();
-        if (norm <= Epsilon.EPS) {
-            com.minicad.geometry2d.Point2 fallback = circle.pointAt(0.0);
-            return new UvPoint(fallback.x(), fallback.y());
-        }
-        com.minicad.geometry2d.Point2 snapped = circle.center().add(offset.scale(circle.radius() / norm));
-        return new UvPoint(snapped.x(), snapped.y());
-    }
+    
 
-    private static UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
-        double angle = ellipse.angleOf(ellipse.pointAt(ellipse.angleOf(snapEllipseSeed(point, ellipse))));
-        com.minicad.geometry2d.Point2 snapped = ellipse.pointAt(angle);
-        return new UvPoint(snapped.x(), snapped.y());
-    }
+    
+    
 
-    private static List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startParameter = line.parameterOf(startPoint);
-        double endParameter = line.parameterOf(endPoint);
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(endParameter - startParameter) * 6.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double parameter = startParameter + (endParameter - startParameter) * index / segments;
-            com.minicad.geometry2d.Point2 point = line.pointAt(parameter);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
 
-    private static List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint projectedStart, UvPoint projectedEnd) {
-        List<com.minicad.geometry2d.Point2> sampled = spline.sample(48);
-        if (sampled.size() < 2) {
-            return List.of();
-        }
-        int startIndex = closestPointIndex(sampled, projectedStart);
-        int endIndex = closestPointIndex(sampled, projectedEnd);
-        if (startIndex == endIndex) {
-            return List.of(projectedStart, projectedEnd);
-        }
-        List<UvPoint> points = new ArrayList<>();
-        int step = startIndex <= endIndex ? 1 : -1;
-        for (int index = startIndex; index != endIndex + step; index += step) {
-            com.minicad.geometry2d.Point2 point = sampled.get(index);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, projectedStart);
-        points.set(points.size() - 1, projectedEnd);
-        return List.copyOf(points);
-    }
 
-    private static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startAngle = circle.angleOf(startPoint);
-        double endAngle = circle.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            com.minicad.geometry2d.Point2 point = circle.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
 
-    private static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startAngle = ellipse.angleOf(startPoint);
-        double endAngle = ellipse.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            com.minicad.geometry2d.Point2 point = ellipse.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    private static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint projectedStart, UvPoint projectedEnd) {
-        UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());
-        UvPoint trimEnd = new UvPoint(trimmed.trimEnd().x(), trimmed.trimEnd().y());
-        List<UvPoint> forward = sampleCurve2(trimmed.basisCurve(), trimStart, trimEnd);
-        List<UvPoint> reverse = sampleCurve2(trimmed.basisCurve(), trimEnd, trimStart);
-        if (forward.isEmpty() && reverse.isEmpty()) {
-            return List.of();
-        }
-        List<UvPoint> preferred;
-        if (!trimmed.senseAgreement()) {
-            preferred = reverse.isEmpty() ? forward : reverse;
-        } else {
-            preferred = score(projectedStart, projectedEnd, forward) <= score(projectedStart, projectedEnd, reverse)
-                    ? forward
-                    : reverse;
-        }
-        return alignTrimmedSamples(preferred, projectedStart, projectedEnd);
-    }
-
-    private static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return sampleLinePcurve(line, start, end);
-        }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
-            return sampleCirclePcurve(circle, start, end);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
-            return sampleEllipsePcurve(ellipse, start, end);
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            return sampleSplinePcurve(spline, start, end);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
-            return sampleTrimmedPcurve(trimmed, start, end);
-        }
-        return List.of();
-    }
-
-    private static double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
-        if (samples.isEmpty()) {
-            return Double.POSITIVE_INFINITY;
-        }
-        return distanceSquared(start, samples.get(0)) + distanceSquared(end, samples.get(samples.size() - 1));
-    }
-
-    private static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
-        if (samples.isEmpty()) {
-            return samples;
-        }
-        List<UvPoint> aligned = new ArrayList<>(samples);
-        double forwardScore = distanceSquared(projectedStart, aligned.get(0)) + distanceSquared(projectedEnd, aligned.get(aligned.size() - 1));
-        double reverseScore = distanceSquared(projectedStart, aligned.get(aligned.size() - 1)) + distanceSquared(projectedEnd, aligned.get(0));
-        if (reverseScore < forwardScore) {
-            java.util.Collections.reverse(aligned);
-        }
-        aligned.set(0, projectedStart);
-        aligned.set(aligned.size() - 1, projectedEnd);
-        return List.copyOf(aligned);
-    }
-
-    private static com.minicad.geometry2d.Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
-        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(ellipse.center());
-        if (offset.norm() <= Epsilon.EPS) {
-            return ellipse.pointAt(0.0);
-        }
-        com.minicad.geometry2d.Vector2 x = ellipse.xDirection().asVector();
-        com.minicad.geometry2d.Vector2 y = new com.minicad.geometry2d.Vector2(-x.y(), x.x());
-        double nx = offset.dot(x) / ellipse.semiAxis1();
-        double ny = offset.dot(y) / ellipse.semiAxis2();
-        double norm = Math.hypot(nx, ny);
-        if (norm <= Epsilon.EPS) {
-            return ellipse.pointAt(0.0);
-        }
-        double angle = Math.atan2(ny / norm, nx / norm);
-        return ellipse.pointAt(angle);
-    }
-
+    
     private static List<LoopPayload> toParametricLoopPayloads(List<ParametricLoopPayload> loops, ParametricSurfaceMapper mapper) {
         List<LoopPayload> payloads = new ArrayList<>(loops.size());
         for (ParametricLoopPayload loop : loops) {
@@ -4997,31 +4821,7 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(payloads);
     }
 
-    private static int closestPointIndex(List<com.minicad.geometry2d.Point2> points, UvPoint target) {
-        int bestIndex = 0;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            com.minicad.geometry2d.Point2 point = points.get(index);
-            double du = point.x() - target.u();
-            double dv = point.y() - target.v();
-            double distance = du * du + dv * dv;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestIndex = index;
-            }
-        }
-        return bestIndex;
-    }
-
-    private static boolean sameUv(UvPoint left, UvPoint right) {
-        return distanceSquared(left, right) <= 1.0e-12;
-    }
-
-    private static double distanceSquared(UvPoint left, UvPoint right) {
-        double du = left.u() - right.u();
-        double dv = left.v() - right.v();
-        return du * du + dv * dv;
-    }
+    
 
     private static List<PointPayload> triangulateParametricFace(
             ParametricSurfaceMapper mapper,
@@ -5172,7 +4972,7 @@ public final class StepPreviewJsonExporter {
         double abV = b.v() - a.v();
         double lengthSquared = abU * abU + abV * abV;
         if (lengthSquared <= 1.0e-18) {
-            return distanceSquared(a, point) <= 1.0e-18;
+            return PcurveSamplingHelper.distanceSquared(a, point) <= 1.0e-18;
         }
         double apU = point.u() - a.u();
         double apV = point.v() - a.v();
