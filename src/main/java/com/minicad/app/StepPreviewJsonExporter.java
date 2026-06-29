@@ -17030,69 +17030,6 @@ public final class StepPreviewJsonExporter {
     }
 
 
-    private interface CurveEvaluator {
-        double start();
-
-        double end();
-
-        CartesianPoint pointAt(double parameter);
-
-        default Vector3 tangentAt(double parameter) {
-            double span = Math.max(end() - start(), 1.0);
-            double step = Math.max(span * 1.0e-4, 1.0e-5);
-            double t0 = Math.max(start(), parameter - step);
-            double t1 = Math.min(end(), parameter + step);
-            if (t1 - t0 <= Epsilon.EPS) {
-                t0 = Math.max(start(), parameter - step * 2.0);
-                t1 = Math.min(end(), parameter + step * 2.0);
-            }
-            return pointAt(t1).subtract(pointAt(t0));
-        }
-
-        default List<CartesianPoint> sample(int segments) {
-            List<CartesianPoint> points = new ArrayList<>(segments + 1);
-            for (int index = 0; index <= segments; index++) {
-                double parameter = start() + (end() - start()) * index / (double) segments;
-                points.add(pointAt(parameter));
-            }
-            return List.copyOf(points);
-        }
-    }
-
-    private static final class BoundsAccumulator {
-        private double minX = Double.POSITIVE_INFINITY;
-        private double minY = Double.POSITIVE_INFINITY;
-        private double minZ = Double.POSITIVE_INFINITY;
-        private double maxX = Double.NEGATIVE_INFINITY;
-        private double maxY = Double.NEGATIVE_INFINITY;
-        private double maxZ = Double.NEGATIVE_INFINITY;
-
-        void include(CartesianPoint point) {
-            include(new PointPayload(point.x(), point.y(), point.z()));
-        }
-
-        void include(PointPayload point) {
-            minX = Math.min(minX, point.x());
-            minY = Math.min(minY, point.y());
-            minZ = Math.min(minZ, point.z());
-            maxX = Math.max(maxX, point.x());
-            maxY = Math.max(maxY, point.y());
-            maxZ = Math.max(maxZ, point.z());
-        }
-
-        boolean isEmpty() {
-            return !Double.isFinite(minX);
-        }
-
-        BoundsPayload toPayload() {
-            if (!Double.isFinite(minX)) {
-                PointPayload zero = new PointPayload(0.0, 0.0, 0.0);
-                return new BoundsPayload(zero, zero);
-            }
-            return new BoundsPayload(new PointPayload(minX, minY, minZ), new PointPayload(maxX, maxY, maxZ));
-        }
-    }
-
     private static long elapsedMillis(long startedAt) {
         return (System.nanoTime() - startedAt) / 1_000_000L;
     }
