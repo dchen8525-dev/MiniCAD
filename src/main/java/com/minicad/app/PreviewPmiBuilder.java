@@ -103,7 +103,7 @@ public final class PreviewPmiBuilder {
         return new PmiPayload(
                 name == null || name.isBlank() ? "POINT_" + id : name,
                 "",
-                StepPreviewJsonExporter.toPointPayload(position),
+                PayloadConversionHelper.toPointPayload(position),
                 List.of(),
                 targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 targets
@@ -539,7 +539,7 @@ public final class PreviewPmiBuilder {
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleAnnotationFillAreaPoints(fillArea, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -554,7 +554,7 @@ public final class PreviewPmiBuilder {
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationSymbol, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -574,7 +574,7 @@ public final class PreviewPmiBuilder {
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationText, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -584,7 +584,7 @@ public final class PreviewPmiBuilder {
             List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationTextCharacter, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -669,37 +669,37 @@ public final class PreviewPmiBuilder {
         }
         if (content instanceof StepVertexLoop) {
             StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
         if (content instanceof StepPolyLoop) {
             StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+                leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
             }
             return;
         }
         if (content instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
         if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) content;
             CartesianPoint point = pointFromReplica(replica, builder);
             if (point != null) {
-                leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
             return;
         }
         if (content instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
             return;
         }
         if (content instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(StepPreviewJsonExporter.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
             return;
         }
         List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(content, builder);
@@ -707,7 +707,7 @@ public final class PreviewPmiBuilder {
             return;
         }
         for (CartesianPoint point : sampled) {
-            leader.add(StepPreviewJsonExporter.toPointPayload(point));
+            leader.add(PayloadConversionHelper.toPointPayload(point));
         }
     }
 
@@ -755,13 +755,13 @@ public final class PreviewPmiBuilder {
         }
         if (loop instanceof VertexLoop) {
             VertexLoop vertexLoop = (VertexLoop) loop;
-            leader.add(StepPreviewJsonExporter.toPointPayload(vertexLoop.vertex().point()));
+            leader.add(PayloadConversionHelper.toPointPayload(vertexLoop.vertex().point()));
             return;
         }
         if (loop instanceof PolyLoop) {
             PolyLoop polyLoop = (PolyLoop) loop;
             for (CartesianPoint point : polyLoop.points()) {
-                leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
         }
     }
@@ -777,7 +777,7 @@ public final class PreviewPmiBuilder {
             points = reversed;
         }
         for (CartesianPoint point : points) {
-            leader.add(StepPreviewJsonExporter.toPointPayload(point));
+            leader.add(PayloadConversionHelper.toPointPayload(point));
         }
     }
 
@@ -792,7 +792,7 @@ public final class PreviewPmiBuilder {
                 continue;
             }
             for (CartesianPoint point : points) {
-                leader.add(StepPreviewJsonExporter.toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
         }
     }
@@ -1664,7 +1664,7 @@ public final class PreviewPmiBuilder {
         return new PmiPayload(
                 callout.name(),
                 text.text(),
-                StepPreviewJsonExporter.toPointPayload(position),
+                PayloadConversionHelper.toPointPayload(position),
                 List.copyOf(leader),
                 targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 List.copyOf(targets)

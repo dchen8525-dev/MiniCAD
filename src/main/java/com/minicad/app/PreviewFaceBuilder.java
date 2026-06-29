@@ -333,7 +333,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -422,7 +422,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -492,7 +492,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "SPHERICAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -591,7 +591,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -649,7 +649,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "RATIONAL_B_SPLINE_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
+                PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
@@ -738,7 +738,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 StepPreviewJsonExporter.surfaceTypeName(geometry),
-                StepPreviewJsonExporter.toPointPayload(patch.pointAt(0.0, 0.0)),
+                PayloadConversionHelper.toPointPayload(patch.pointAt(0.0, 0.0)),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
@@ -917,7 +917,7 @@ public final class PreviewFaceBuilder {
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "FREE_FORM_SURFACE",
-                StepPreviewJsonExporter.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
+                PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
                 toColorPayload(metadata.rgb()),
@@ -2611,14 +2611,14 @@ public final class PreviewFaceBuilder {
     ) {
         Vector3 normal = b.subtract(a).cross(c.subtract(a));
         if (normal.dot(targetNormal) < 0.0) {
-            triangles.add(StepPreviewJsonExporter.toPointPayload(a));
-            triangles.add(StepPreviewJsonExporter.toPointPayload(c));
-            triangles.add(StepPreviewJsonExporter.toPointPayload(b));
+            triangles.add(PayloadConversionHelper.toPointPayload(a));
+            triangles.add(PayloadConversionHelper.toPointPayload(c));
+            triangles.add(PayloadConversionHelper.toPointPayload(b));
             return;
         }
-        triangles.add(StepPreviewJsonExporter.toPointPayload(a));
-        triangles.add(StepPreviewJsonExporter.toPointPayload(b));
-        triangles.add(StepPreviewJsonExporter.toPointPayload(c));
+        triangles.add(PayloadConversionHelper.toPointPayload(a));
+        triangles.add(PayloadConversionHelper.toPointPayload(b));
+        triangles.add(PayloadConversionHelper.toPointPayload(c));
     }
 
     // ─── Sample edge (delegates to PreviewCurveEvaluator) ────────────────

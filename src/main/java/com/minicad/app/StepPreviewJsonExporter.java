@@ -2302,7 +2302,7 @@ public final class StepPreviewJsonExporter {
                         representation.id(),
                         displayName,
                         representationMetadata.layers(),
-                        toColorPayload(representationMetadata.rgb()),
+                        PayloadConversionHelper.toColorPayload(representationMetadata.rgb()),
                         List.copyOf(representationEdges),
                         geometry.faces()
                 ),
@@ -2600,19 +2600,6 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static ColorPayload toColorPayload(int[] rgb) {
-        if (rgb == null) {
-            return null;
-        }
-        return new ColorPayload(rgb[0], rgb[1], rgb[2]);
-    }
-
-    static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
-        if (metadata == null) {
-            return null;
-        }
-        return new PbrPayload(metadata.diffuse(), metadata.specular(), metadata.specularExponent(), metadata.specularColor());
-    }
 
 
     private static int countUnsupportedFaces(Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
@@ -2651,7 +2638,7 @@ public final class StepPreviewJsonExporter {
             Plane plane = (Plane) surface;
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             Direction3 normal = plane.normal();
             if (!sameSense) {
@@ -2661,12 +2648,12 @@ public final class StepPreviewJsonExporter {
                     stepId,
                     name,
                     "PLANE",
-                    toPointPayload(plane.origin()),
+                    PayloadConversionHelper.toPointPayload(plane.origin()),
                     new VectorPayload(normal.x(), normal.y(), normal.z()),
                     sameSense,
-                    toColorPayload(metadata.rgb()),
+                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
                     metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
+                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                     metadata.layers(),
                     loops,
                     List.of(),
@@ -2693,7 +2680,7 @@ public final class StepPreviewJsonExporter {
             }
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
@@ -2704,9 +2691,9 @@ public final class StepPreviewJsonExporter {
                     new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
                     new VectorPayload(normal.x(), normal.y(), normal.z()),
                     sameSense,
-                    toColorPayload(metadata.rgb()),
+                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
                     metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
+                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                     metadata.layers(),
                     loops,
                     triangles,
@@ -2733,7 +2720,7 @@ public final class StepPreviewJsonExporter {
             }
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
@@ -2744,9 +2731,9 @@ public final class StepPreviewJsonExporter {
                     new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
                     new VectorPayload(normal.x(), normal.y(), normal.z()),
                     sameSense,
-                    toColorPayload(metadata.rgb()),
+                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
                     metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
+                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                     metadata.layers(),
                     loops,
                     triangles,
@@ -2773,7 +2760,7 @@ public final class StepPreviewJsonExporter {
             }
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
@@ -2784,9 +2771,9 @@ public final class StepPreviewJsonExporter {
                     new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
                     new VectorPayload(normal.x(), normal.y(), normal.z()),
                     sameSense,
-                    toColorPayload(metadata.rgb()),
+                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
                     metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
+                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                     metadata.layers(),
                     loops,
                     triangles,
@@ -2813,7 +2800,7 @@ public final class StepPreviewJsonExporter {
             }
             List<LoopPayload> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
             }
             java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
             List<PointPayload> triangles = triangulateSurfaceGrid(grid, sameSense);
@@ -2824,9 +2811,9 @@ public final class StepPreviewJsonExporter {
                     new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
                     new VectorPayload(normal.x(), normal.y(), normal.z()),
                     sameSense,
-                    toColorPayload(metadata.rgb()),
+                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
                     metadata.transparency(),
-                    toPbrPayload(metadata.pbr()),
+                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                     metadata.layers(),
                     loops,
                     triangles,
@@ -2939,7 +2926,7 @@ public final class StepPreviewJsonExporter {
         }
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepId,
@@ -2948,9 +2935,9 @@ public final class StepPreviewJsonExporter {
                 new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 triangles,
@@ -2992,11 +2979,11 @@ public final class StepPreviewJsonExporter {
             origin = List.of(position.location().x(), position.location().y(), position.location().z());
             axis = List.of(position.axis().x(), position.axis().y(), position.axis().z());
             basisDir = List.of(position.xDirection().x(), position.xDirection().y(), position.xDirection().z());
-            anchor = toPointPayload(position.location());
+            anchor = PayloadConversionHelper.toPointPayload(position.location());
         }
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepId,
@@ -3005,9 +2992,9 @@ public final class StepPreviewJsonExporter {
                 new PointPayload(anchor.x(), anchor.y(), anchor.z()),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 triangles,
@@ -3090,14 +3077,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                toPointPayload(SurfaceGeometryHelper.surfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "cylindrical_strip",
@@ -3176,14 +3163,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                toPointPayload(SurfaceGeometryHelper.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "conical_strip",
@@ -3272,14 +3259,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -3368,14 +3355,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS",
-                toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -3434,14 +3421,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 surfaceTypeName(stepSurface),
-                toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
+                PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3543,14 +3530,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 "RATIONAL_B_SPLINE_SURFACE",
-                toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
+                PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3587,14 +3574,14 @@ public final class StepPreviewJsonExporter {
                 stepFace.id(),
                 faceDisplayName(stepFace),
                 surfaceTypeName(geometry),
-                toPointPayload(patch.pointAt(0.0, 0.0)),
+                PayloadConversionHelper.toPointPayload(patch.pointAt(0.0, 0.0)),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3622,7 +3609,7 @@ public final class StepPreviewJsonExporter {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -3631,9 +3618,9 @@ public final class StepPreviewJsonExporter {
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 triangles,
@@ -3668,7 +3655,7 @@ public final class StepPreviewJsonExporter {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -3677,9 +3664,9 @@ public final class StepPreviewJsonExporter {
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 triangles,
@@ -3719,7 +3706,7 @@ public final class StepPreviewJsonExporter {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -3728,9 +3715,9 @@ public final class StepPreviewJsonExporter {
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
                 loops,
                 triangles,
@@ -3767,11 +3754,11 @@ public final class StepPreviewJsonExporter {
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 sameSense,
-                toColorPayload(metadata.rgb()),
+                PayloadConversionHelper.toColorPayload(metadata.rgb()),
                 metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
+                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -3890,12 +3877,12 @@ public final class StepPreviewJsonExporter {
                         stepFace.id(),
                         faceDisplayName(stepFace),
                         surfaceTypeName(geometry),
-                        toPointPayload(mapper.pointAt(centerU, centerV)),
+                        PayloadConversionHelper.toPointPayload(mapper.pointAt(centerU, centerV)),
                         new VectorPayload(normal.x(), normal.y(), normal.z()),
                         faceSameSense(stepFace),
-                        toColorPayload(metadata.rgb()),
+                        PayloadConversionHelper.toColorPayload(metadata.rgb()),
                         metadata.transparency(),
-                        toPbrPayload(metadata.pbr()),
+                        PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                         metadata.layers(),
                         toParametricLoopPayloads(loops, mapper),
                         triangles,
@@ -5003,7 +4990,7 @@ public final class StepPreviewJsonExporter {
         for (ParametricLoopPayload loop : loops) {
             List<PointPayload> points = new ArrayList<>(loop.points().size());
             for (UvPoint point : loop.points()) {
-                points.add(toPointPayload(mapper.pointAt(point.u(), point.v())));
+                points.add(PayloadConversionHelper.toPointPayload(mapper.pointAt(point.u(), point.v())));
             }
             payloads.add(new LoopPayload(loop.outer(), List.copyOf(points)));
         }
@@ -6494,14 +6481,14 @@ public final class StepPreviewJsonExporter {
     ) {
         Vector3 normal = b.subtract(a).cross(c.subtract(a));
         if (normal.dot(targetNormal) < 0.0) {
-            triangles.add(toPointPayload(a));
-            triangles.add(toPointPayload(c));
-            triangles.add(toPointPayload(b));
+            triangles.add(PayloadConversionHelper.toPointPayload(a));
+            triangles.add(PayloadConversionHelper.toPointPayload(c));
+            triangles.add(PayloadConversionHelper.toPointPayload(b));
             return;
         }
-        triangles.add(toPointPayload(a));
-        triangles.add(toPointPayload(b));
-        triangles.add(toPointPayload(c));
+        triangles.add(PayloadConversionHelper.toPointPayload(a));
+        triangles.add(PayloadConversionHelper.toPointPayload(b));
+        triangles.add(PayloadConversionHelper.toPointPayload(c));
     }
 
 
@@ -7044,7 +7031,7 @@ public final class StepPreviewJsonExporter {
             CartesianPoint end = pointFromStep(edge.end().point());
             return new EdgePayload(
                     edgeId,
-                    toPointPayloads(polyline),
+                    PayloadConversionHelper.toPointPayloads(polyline),
                     edgeCurvePayload(edge.edgeGeometry(), start, end, edge.sameSense(), builder),
                     color
             );
@@ -7059,7 +7046,7 @@ public final class StepPreviewJsonExporter {
                 CartesianPoint end = edge.end().point();
                 EdgeCurvePayload curvePayload = edgeCurvePayload(actual, start, end, true, builder);
                 if (curvePayload != null) {
-                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload, color);
+                    return new EdgePayload(edgeId, PayloadConversionHelper.toPointPayloads(polyline), curvePayload, color);
                 }
             }
         }
@@ -7070,7 +7057,7 @@ public final class StepPreviewJsonExporter {
             if (original != null) {
                 EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.get(0), polyline.get(polyline.size() - 1), true, builder);
                 if (curvePayload != null) {
-                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload, color);
+                    return new EdgePayload(edgeId, PayloadConversionHelper.toPointPayloads(polyline), curvePayload, color);
                 }
             }
         }
@@ -7081,22 +7068,22 @@ public final class StepPreviewJsonExporter {
             if (original != null) {
                 EdgeCurvePayload curvePayload = edgeCurvePayload(original, polyline.get(0), polyline.get(polyline.size() - 1), true, builder);
                 if (curvePayload != null) {
-                    return new EdgePayload(edgeId, toPointPayloads(polyline), curvePayload, color);
+                    return new EdgePayload(edgeId, PayloadConversionHelper.toPointPayloads(polyline), curvePayload, color);
                 }
             }
         }
-        return new EdgePayload(edgeId, toPointPayloads(polyline), null, color);
+        return new EdgePayload(edgeId, PayloadConversionHelper.toPointPayloads(polyline), null, color);
     }
 
     private static ColorPayload resolveEdgeColor(int edgeId, StepMetadataExtractor metadata) {
         StepMetadataExtractor.DisplayMetadata meta = metadata.forItem(edgeId);
-        return meta.rgb() != null ? toColorPayload(meta.rgb()) : null;
+        return meta.rgb() != null ? PayloadConversionHelper.toColorPayload(meta.rgb()) : null;
     }
 
     private static EdgePayload buildTopologyEdgePayload(int edgeId, Edge edge) {
         return new EdgePayload(
                 edgeId,
-                toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
+                PayloadConversionHelper.toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
                 null,
                 null
         );
@@ -7106,7 +7093,7 @@ public final class StepPreviewJsonExporter {
         List<CartesianPoint> points = polyline.points().stream()
                 .map(StepPreviewJsonExporter::pointFromStep)
                 .collect(Collectors.toList());
-        return new EdgePayload(polyline.id(), toPointPayloads(points), null, null);
+        return new EdgePayload(polyline.id(), PayloadConversionHelper.toPointPayloads(points), null, null);
     }
 
     private static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
@@ -7117,7 +7104,7 @@ public final class StepPreviewJsonExporter {
         if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
             closed.add(closed.get(0));
         }
-        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null, null);
+        return new EdgePayload(polyLoop.id(), PayloadConversionHelper.toPointPayloads(List.copyOf(closed)), null, null);
     }
 
     static EdgePayload sampledCurveEdgePayload(StepEntity item, StepCadBuilder builder) {
@@ -7125,7 +7112,7 @@ public final class StepPreviewJsonExporter {
         if (points == null || points.size() < 2) {
             return null;
         }
-        return new EdgePayload(item.id(), toPointPayloads(points), sampledCurvePayload(item, builder), null);
+        return new EdgePayload(item.id(), PayloadConversionHelper.toPointPayloads(points), sampledCurvePayload(item, builder), null);
     }
 
     private static EdgeCurvePayload sampledCurvePayload(StepEntity item, StepCadBuilder builder) {
@@ -8870,13 +8857,6 @@ public final class StepPreviewJsonExporter {
         return points;
     }
 
-    static PointPayload toPointPayload(CartesianPoint point) {
-        return new PointPayload(point.x(), point.y(), point.z());
-    }
-
-    private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
-        return points.stream().map(StepPreviewJsonExporter::toPointPayload).collect(Collectors.toList());
-    }
 
     private static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
         return reducePayloadGeometry(payload, MAX_TOTAL_TRIANGLE_POINTS, MAX_TOTAL_LOOP_POINTS, "payload_geometry_reduced");
@@ -9503,9 +9483,9 @@ public final class StepPreviewJsonExporter {
                 .map(point -> transform(point, matrix))
                 .collect(Collectors.toList());
         int[] rgb = metadata.rgb() != null ? metadata.rgb() : null;
-        ColorPayload color = rgb == null ? face.color() : toColorPayload(rgb);
+        ColorPayload color = rgb == null ? face.color() : PayloadConversionHelper.toColorPayload(rgb);
         double transparency = metadata.transparency() > 0 ? metadata.transparency() : face.transparency();
-        PbrPayload pbr = metadata.pbr() != null ? toPbrPayload(metadata.pbr()) : face.pbr();
+        PbrPayload pbr = metadata.pbr() != null ? PayloadConversionHelper.toPbrPayload(metadata.pbr()) : face.pbr();
         List<String> layers = metadata.layers().isEmpty() ? face.layers() : metadata.layers();
         return new FacePayload(
                 mappedPayloadId(mappedItemId, face.stepId(), 2),
@@ -9662,7 +9642,7 @@ public final class StepPreviewJsonExporter {
                 pmi.add(new PmiPayload(
                         textOccurrence.name(),
                         textOccurrence.text(),
-                        toPointPayload(position),
+                        PayloadConversionHelper.toPointPayload(position),
                         List.of(),
                         targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                         targets
@@ -10068,7 +10048,7 @@ public final class StepPreviewJsonExporter {
         return new PmiPayload(
                 name == null || name.isBlank() ? "POINT_" + id : name,
                 "",
-                toPointPayload(position),
+                PayloadConversionHelper.toPointPayload(position),
                 List.of(),
                 targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 targets
@@ -10481,7 +10461,7 @@ public final class StepPreviewJsonExporter {
         return new PmiPayload(
                 callout.name(),
                 text.text(),
-                toPointPayload(position),
+                PayloadConversionHelper.toPointPayload(position),
                 List.copyOf(leader),
                 targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
                 List.copyOf(targets)
@@ -10652,7 +10632,7 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> sampled = sampleAnnotationFillAreaPoints(fillArea, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -10667,7 +10647,7 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationSymbol, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -10687,7 +10667,7 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationText, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -10697,7 +10677,7 @@ public final class StepPreviewJsonExporter {
             List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationTextCharacter, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
-                    leader.add(toPointPayload(point));
+                    leader.add(PayloadConversionHelper.toPointPayload(point));
                 }
             }
             return;
@@ -10782,37 +10762,37 @@ public final class StepPreviewJsonExporter {
         }
         if (content instanceof StepVertexLoop) {
             StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(toPointPayload(pointFromStep(vertexLoop.loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
         if (content instanceof StepPolyLoop) {
             StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(toPointPayload(pointFromStep(point)));
+                leader.add(PayloadConversionHelper.toPointPayload(pointFromStep(point)));
             }
             return;
         }
         if (content instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(toPointPayload(pointFromStep(vertexShell.extent().loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
         if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) content;
             CartesianPoint point = pointFromReplica(replica, builder);
             if (point != null) {
-                leader.add(toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
             return;
         }
         if (content instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(toPointPayload(pointFromStep(point)));
+            leader.add(PayloadConversionHelper.toPointPayload(pointFromStep(point)));
             return;
         }
         if (content instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(toPointPayload(pointFromStep(vertexPoint.point())));
+            leader.add(PayloadConversionHelper.toPointPayload(pointFromStep(vertexPoint.point())));
             return;
         }
         List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
@@ -10820,7 +10800,7 @@ public final class StepPreviewJsonExporter {
             return;
         }
         for (CartesianPoint point : sampled) {
-            leader.add(toPointPayload(point));
+            leader.add(PayloadConversionHelper.toPointPayload(point));
         }
     }
 
@@ -10868,13 +10848,13 @@ public final class StepPreviewJsonExporter {
         }
         if (loop instanceof VertexLoop) {
             VertexLoop vertexLoop = (VertexLoop) loop;
-            leader.add(toPointPayload(vertexLoop.vertex().point()));
+            leader.add(PayloadConversionHelper.toPointPayload(vertexLoop.vertex().point()));
             return;
         }
         if (loop instanceof PolyLoop) {
             PolyLoop polyLoop = (PolyLoop) loop;
             for (CartesianPoint point : polyLoop.points()) {
-                leader.add(toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
         }
     }
@@ -10890,7 +10870,7 @@ public final class StepPreviewJsonExporter {
             points = reversed;
         }
         for (CartesianPoint point : points) {
-            leader.add(toPointPayload(point));
+            leader.add(PayloadConversionHelper.toPointPayload(point));
         }
     }
 
@@ -10905,7 +10885,7 @@ public final class StepPreviewJsonExporter {
                 continue;
             }
             for (CartesianPoint point : points) {
-                leader.add(toPointPayload(point));
+                leader.add(PayloadConversionHelper.toPointPayload(point));
             }
         }
     }

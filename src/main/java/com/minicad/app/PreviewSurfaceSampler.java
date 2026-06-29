@@ -274,6 +274,6 @@ public final class PreviewSurfaceSampler {
 
     private static PointPayload toPointPayload(CartesianPoint point) {
         // Temporary: delegate to StepPreviewJsonExporter
-        return StepPreviewJsonExporter.toPointPayload(point);
+        return PayloadConversionHelper.toPointPayload(point);
     }
 }
