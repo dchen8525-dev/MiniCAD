@@ -12046,21 +12046,21 @@ public final class StepEntityResolver {
         entityName);
   }
 
-  private StepEntityDefinition definition(StepEntityInstance instance, String name) {
+  StepEntityDefinition definition(StepEntityInstance instance, String name) {
     return instance.requireDefinition(name);
   }
 
-  private static void requireParameterCount(
+  static void requireParameterCount(
       StepEntityInstance instance, StepEntityDefinition definition, int expected) {
     StepParameterReader.requireParameterCount(instance, definition, expected);
   }
 
-  private static void requireParameterCountIn(
+  static void requireParameterCountIn(
       StepEntityInstance instance, StepEntityDefinition definition, int... expectedCounts) {
     StepParameterReader.requireParameterCountIn(instance, definition, expectedCounts);
   }
 
-  private String stringValue(
+  String stringValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (value instanceof StepValue.StringValue) {
@@ -12070,7 +12070,7 @@ public final class StepEntityResolver {
     throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "string");
   }
 
-  private String optionalStringValue(
+  String optionalStringValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = definition.parameters().get(index);
     if (isUnset(value)) {
@@ -12079,7 +12079,7 @@ public final class StepEntityResolver {
     return stringValue(instance, definition, index);
   }
 
-  private List<String> optionalStringListValue(
+  List<String> optionalStringListValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = definition.parameters().get(index);
     if (isUnset(value)) {
@@ -12103,7 +12103,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private double numberValue(
+  double numberValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (value instanceof StepValue.NumberValue) {
@@ -12113,7 +12113,7 @@ public final class StepEntityResolver {
     throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "number");
   }
 
-  private int integerValue(
+  int integerValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     double value = numberValue(instance, definition, index);
     if (value != Math.rint(value)) {
@@ -12129,7 +12129,7 @@ public final class StepEntityResolver {
     return (int) value;
   }
 
-  private Integer optionalIntegerValue(
+  Integer optionalIntegerValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = definition.parameters().get(index);
     if (isUnset(value)) {
@@ -12138,7 +12138,7 @@ public final class StepEntityResolver {
     return integerValue(instance, definition, index);
   }
 
-  private Double optionalNumberValue(
+  Double optionalNumberValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = definition.parameters().get(index);
     if (isUnset(value)) {
@@ -12147,7 +12147,7 @@ public final class StepEntityResolver {
     return numberValue(instance, definition, index);
   }
 
-  private StepDirection optionalDirectionReference(
+  StepDirection optionalDirectionReference(
       StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
     StepValue value = definition.parameters().get(index);
     if (isUnset(value)) {
@@ -12156,7 +12156,7 @@ public final class StepEntityResolver {
     return requireEntity(referenceId(instance, definition, index), StepDirection.class, message);
   }
 
-  private String enumValue(
+  String enumValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (value instanceof StepValue.EnumValue) {
@@ -12166,7 +12166,7 @@ public final class StepEntityResolver {
     throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "enum");
   }
 
-  private boolean booleanValue(
+  boolean booleanValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     String enumVal = enumValue(instance, definition, index);
     if ("T".equals(enumVal)) {
@@ -12187,7 +12187,7 @@ public final class StepEntityResolver {
             + ".");
   }
 
-  private int referenceId(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+  int referenceId(StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (value instanceof StepValue.ReferenceValue) {
       StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
@@ -12196,7 +12196,7 @@ public final class StepEntityResolver {
     throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "reference");
   }
 
-  private StepEntity tryResolveReference(StepValue value) {
+  StepEntity tryResolveReference(StepValue value) {
     value = unwrapTyped(value);
     if (value instanceof StepValue.OmittedValue || value instanceof StepValue.NotProvidedValue) {
       return null;
@@ -12208,12 +12208,12 @@ public final class StepEntityResolver {
     throw new StepResolutionException("parameter must be a reference or omit/not-provided");
   }
 
-  private List<Double> coordinateTriple(
+  List<Double> coordinateTriple(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     return coordinateList(instance, definition, index, 3, 3);
   }
 
-  private List<Double> doubleList(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+  List<Double> doubleList(StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
       throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
@@ -12224,7 +12224,7 @@ public final class StepEntityResolver {
         .collect(Collectors.toList());
   }
 
-  private double numberValueFrom(
+  double numberValueFrom(
       StepEntityInstance instance, StepValue value, StepEntityDefinition definition, int index) {
     value = unwrapTyped(value);
     if (!(value instanceof StepValue.NumberValue)) {
@@ -12234,7 +12234,7 @@ public final class StepEntityResolver {
     return numberValue.value();
   }
 
-  private List<Double> coordinateList(
+  List<Double> coordinateList(
       StepEntityInstance instance,
       StepEntityDefinition definition,
       int index,
@@ -12262,7 +12262,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<Double> numberList(
+  List<Double> numberList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
@@ -12281,7 +12281,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<Integer> intList(
+  List<Integer> intList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
@@ -12300,7 +12300,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<String> stringList(
+  List<String> stringList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
@@ -12319,7 +12319,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private String logicalValue(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+  String logicalValue(StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (value instanceof StepValue.EnumValue) {
       StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
@@ -12337,7 +12337,7 @@ public final class StepEntityResolver {
    * Extracts a list of numbers from a pre-unwrapped StepValue.
    * Useful when the caller has already handled nested list unwrapping.
    */
-  private List<Double> extractNumberList(StepEntityDefinition definition, StepValue value, String paramName) {
+  List<Double> extractNumberList(StepEntityDefinition definition, StepValue value, String paramName) {
     if (!(value instanceof StepValue.ListValue)) {
       throw new StepResolutionException(paramName + " parameter must be a list");
     }
@@ -12354,7 +12354,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<String> literalList(
+  List<String> literalList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
@@ -12369,7 +12369,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<List<Double>> numberGrid(
+  List<List<Double>> numberGrid(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
@@ -12397,7 +12397,7 @@ public final class StepEntityResolver {
     return List.copyOf(grid);
   }
 
-  private <T extends StepEntity> List<List<T>> referenceGrid(
+  <T extends StepEntity> List<List<T>> referenceGrid(
       StepEntityInstance instance,
       StepEntityDefinition definition,
       int index,
@@ -12429,7 +12429,7 @@ public final class StepEntityResolver {
     return List.copyOf(grid);
   }
 
-  private List<Integer> integerList(
+  List<Integer> integerList(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
     List<Double> values = numberList(instance, definition, index);
     List<Integer> result = new ArrayList<>(values.size());
@@ -12449,7 +12449,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private StepResolutionException parameterElementTypeMismatch(
+  StepResolutionException parameterElementTypeMismatch(
       StepEntityInstance instance,
       StepEntityDefinition definition,
       int index,
@@ -12468,11 +12468,11 @@ public final class StepEntityResolver {
             + StepParameterReader.valueType(actualValue));
   }
 
-  private boolean isUnset(StepValue value) {
+  boolean isUnset(StepValue value) {
     return StepParameterReader.isUnset(value);
   }
 
-  private StepValue unwrapTyped(StepValue value) {
+  StepValue unwrapTyped(StepValue value) {
     StepValue current = value;
     while (current instanceof StepValue.TypedValue) {
       StepValue.TypedValue typedValue = (StepValue.TypedValue) current;
@@ -12481,7 +12481,7 @@ public final class StepEntityResolver {
     return current;
   }
 
-  private String literalText(StepValue value) {
+  String literalText(StepValue value) {
     if (value instanceof StepValue.StringValue) {
       StepValue.StringValue stringValue = (StepValue.StringValue) value;
       return stringValue.value();
@@ -12683,7 +12683,7 @@ public final class StepEntityResolver {
             && "SURFACE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
   }
 
-  private <T extends StepEntity> List<T> referenceList(
+  <T extends StepEntity> List<T> referenceList(
       StepEntityInstance instance,
       StepEntityDefinition definition,
       int index,
@@ -12707,7 +12707,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private List<StepEntity> entityReferenceList(
+  List<StepEntity> entityReferenceList(
       StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
     StepValue value = unwrapTyped(definition.parameters().get(index));
     if (!(value instanceof StepValue.ListValue)) {
