@@ -1,9 +1,0 @@
-// Phase 7 final: Reach 96%
-      registry.put(
-          "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "AP242_ASSIGNMENT_OBJECT_RELATIONSHIP"));
-      registry.put(
-          "ASSIGNED_ANALYSIS",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "ASSIGNED_ANALYSIS"));

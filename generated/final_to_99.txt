@@ -1,5 +1,0 @@
-// Final entity to reach 99%+
-      registry.put(
-          "BACK_CHAINING_RULE",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "BACK_CHAINING_RULE"));

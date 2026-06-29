@@ -1,9 +1,0 @@
-// To reach 99.6% (2 entities)
-      registry.put(
-          "CARTESIAN_11",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "CARTESIAN_11"));
-      registry.put(
-          "CDGC_WITH_DIMENSION",
-          (resolver, instance) ->
-              resolver.resolveGenericAssignment(instance, "CDGC_WITH_DIMENSION"));

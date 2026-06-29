@@ -12882,7 +12882,7 @@ public final class StepEntityResolver {
     // (LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(...)).
     // Prefer the more specific entity factories inserted earlier here.
     Map<String, EntityFactory> registry = new LinkedHashMap<>();
-    MiscRegistry.register(registry);
+    StepEntityRegistry.registerAll(registry);
     return registry;
   }
 
