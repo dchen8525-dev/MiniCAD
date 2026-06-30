@@ -15,45 +15,629 @@
 [INFO] 
 [INFO] --- compiler:3.13.0:compile (default-compile) @ mini-cad ---
 [INFO] Recompiling the module because of changed source code.
-[INFO] Compiling 1423 source files with javac [debug release 11] to target\classes
+[INFO] Compiling 1425 source files with javac [debug release 11] to target\classes
 [INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: D:\work\MiniCAD\src\main\java\com\minicad\app\StepDumpApp.java使用了未经检查或不安全的操作。
 [INFO] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepDumpApp.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
 [INFO] -------------------------------------------------------------
 [ERROR] COMPILATION ERROR : 
 [INFO] -------------------------------------------------------------
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[2912,50] 找不到符号
-  符号:   变量 GeometryMeasurementHelper
-  位置: 类型为com.minicad.geometry.OffsetSurface3的变量 offset
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4317,43] 找不到符号
-  符号:   变量 GeometryMeasurementHelper
-  位置: 类型为com.minicad.step.model.geometry.StepOffsetSurface的变量 offsetSurface
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6193,33] 找不到符号
-  符号:   变量 GeometryMeasurementHelper
-  位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve2D的变量 offsetCurve2D
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6197,33] 找不到符号
-  符号:   变量 GeometryMeasurementHelper
-  位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve3D的变量 offsetCurve3D
-[INFO] 4 errors 
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[449,41] 找不到符号
+  符号:   类 StepCartesianPoint
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[449,12] 找不到符号
+  符号:   类 CartesianPoint
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewFaceBuilder.java:[1959,22] 方法引用无效
+  找不到符号
+    符号:   方法 pointFromStep()
+    位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewFaceBuilder.java:[1966,22] 方法引用无效
+  找不到符号
+    符号:   方法 pointFromStep()
+    位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[672,86] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[678,90] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[684,86] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[697,86] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[702,86] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1266,43] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1270,43] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1274,43] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1407,43] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1556,43] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1569,58] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1573,58] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewUvMapper.java:[2223,39] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4402,49] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4403,47] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4534,32] 找不到符号
+  符号:   方法 pointFromStep(orientedEd[...]int())
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4535,30] 找不到符号
+  符号:   方法 pointFromStep(orientedEd[...]int())
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5635,36] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5636,34] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5661,36] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5662,34] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5725,22] 方法引用无效
+  找不到符号
+    符号:   方法 pointFromStep()
+    位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5732,22] 方法引用无效
+  找不到符号
+    符号:   方法 pointFromStep()
+    位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8047,25] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8384,20] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8388,20] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8392,20] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8513,20] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8667,20] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8680,35] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8684,35] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9071,63] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9077,67] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9083,63] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9096,63] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9101,63] 找不到符号
+  符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+  位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[31,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.annotation.StepCurveStyle,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[52,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepPropertyDefinition,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[68,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.unit.StepGlobalUnitAssignedContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[73,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[89,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGlobalUncertaintyAssignedContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[95,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[112,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[129,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[141,38] 找不到符号
+  符号:   类 StepRepresentationRelationshipWithTransformation
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[142,26] 找不到符号
+  符号:   类 StepRepresentationRelationshipWithTransformation
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[143,17] 找不到符号
+  符号:   类 StepRepresentationRelationshipWithTransformation
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[143,82] 找不到符号
+  符号:   类 StepRepresentationRelationshipWithTransformation
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[157,38] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[157,58] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[158,13] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[158,42] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[172,38] 找不到符号
+  符号:   类 StepFillAreaStyleColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[173,26] 找不到符号
+  符号:   类 StepFillAreaStyleColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[174,17] 找不到符号
+  符号:   类 StepFillAreaStyleColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[174,64] 找不到符号
+  符号:   类 StepFillAreaStyleColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[179,32] 找不到符号
+  符号:   方法 collectSemanticTargets(com.minicad.step.model.annotation.StepCurveStyle,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[180,45] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[181,26] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[182,17] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[182,46] 找不到符号
+  符号:   类 StepPointStyle
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[184,45] 找不到符号
+  符号:   类 StepTextStyleForDefinedFont
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[185,26] 找不到符号
+  符号:   类 StepTextStyleForDefinedFont
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[186,17] 找不到符号
+  符号:   类 StepTextStyleForDefinedFont
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[186,58] 找不到符号
+  符号:   类 StepTextStyleForDefinedFont
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[188,45] 找不到符号
+  符号:   类 StepSymbolColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[189,26] 找不到符号
+  符号:   类 StepSymbolColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[190,17] 找不到符号
+  符号:   类 StepSymbolColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[190,50] 找不到符号
+  符号:   类 StepSymbolColour
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[192,45] 找不到符号
+  符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[193,26] 找不到符号
+  符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[194,17] 找不到符号
+  符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[194,76] 找不到符号
+  符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[208,38] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[209,26] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[210,17] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[210,53] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[224,38] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[225,26] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[226,17] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[226,53] 找不到符号
+  符号:   类 StepProductDefinitionShape
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[240,38] 找不到符号
+  符号:   类 StepAppliedDateAssignment
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[241,26] 找不到符号
+  符号:   类 StepAppliedDateAssignment
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[242,17] 找不到符号
+  符号:   类 StepAppliedDateAssignment
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[242,57] 找不到符号
+  符号:   类 StepAppliedDateAssignment
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[256,38] 找不到符号
+  符号:   类 StepApproval
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[257,26] 找不到符号
+  符号:   类 StepApproval
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[258,17] 找不到符号
+  符号:   类 StepApproval
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[258,42] 找不到符号
+  符号:   类 StepApproval
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[272,38] 找不到符号
+  符号:   类 StepSecurityClassification
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[273,26] 找不到符号
+  符号:   类 StepSecurityClassification
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[274,17] 找不到符号
+  符号:   类 StepSecurityClassification
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[274,62] 找不到符号
+  符号:   类 StepSecurityClassification
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[288,38] 找不到符号
+  符号:   类 StepContract
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[289,26] 找不到符号
+  符号:   类 StepContract
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[290,17] 找不到符号
+  符号:   类 StepContract
+  位置: 类 com.minicad.app.TargetCollectorHelper
+[INFO] 100 errors 
 [INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  8.827 s
-[INFO] Finished at: 2026-06-30T07:28:39+08:00
+[INFO] Total time:  8.046 s
+[INFO] Finished at: 2026-06-30T07:38:39+08:00
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project mini-cad: Compilation failure: Compilation failure: 
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[2912,50] 找不到符号
-[ERROR]   符号:   变量 GeometryMeasurementHelper
-[ERROR]   位置: 类型为com.minicad.geometry.OffsetSurface3的变量 offset
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4317,43] 找不到符号
-[ERROR]   符号:   变量 GeometryMeasurementHelper
-[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetSurface的变量 offsetSurface
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6193,33] 找不到符号
-[ERROR]   符号:   变量 GeometryMeasurementHelper
-[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve2D的变量 offsetCurve2D
-[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[6197,33] 找不到符号
-[ERROR]   符号:   变量 GeometryMeasurementHelper
-[ERROR]   位置: 类型为com.minicad.step.model.geometry.StepOffsetCurve3D的变量 offsetCurve3D
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[449,41] 找不到符号
+[ERROR]   符号:   类 StepCartesianPoint
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[449,12] 找不到符号
+[ERROR]   符号:   类 CartesianPoint
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewFaceBuilder.java:[1959,22] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 pointFromStep()
+[ERROR]     位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewFaceBuilder.java:[1966,22] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 pointFromStep()
+[ERROR]     位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[672,86] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[678,90] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[684,86] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[697,86] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[702,86] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1266,43] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1270,43] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1274,43] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1407,43] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1556,43] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1569,58] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewPmiBuilder.java:[1573,58] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/PreviewUvMapper.java:[2223,39] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4402,49] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4403,47] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4534,32] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(orientedEd[...]int())
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[4535,30] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(orientedEd[...]int())
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5635,36] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5636,34] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5661,36] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5662,34] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5725,22] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 pointFromStep()
+[ERROR]     位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[5732,22] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 pointFromStep()
+[ERROR]     位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8047,25] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8384,20] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8388,20] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8392,20] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8513,20] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8667,20] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8680,35] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[8684,35] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9071,63] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9077,67] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9083,63] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9096,63] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/StepPreviewJsonExporter.java:[9101,63] 找不到符号
+[ERROR]   符号:   方法 pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint)
+[ERROR]   位置: 类 com.minicad.app.StepPreviewJsonExporter
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[31,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.annotation.StepCurveStyle,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[52,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepPropertyDefinition,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[68,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.unit.StepGlobalUnitAssignedContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[73,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[89,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGlobalUncertaintyAssignedContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[95,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[112,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[129,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.workflow.StepGeometricRepresentationContext,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[141,38] 找不到符号
+[ERROR]   符号:   类 StepRepresentationRelationshipWithTransformation
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[142,26] 找不到符号
+[ERROR]   符号:   类 StepRepresentationRelationshipWithTransformation
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[143,17] 找不到符号
+[ERROR]   符号:   类 StepRepresentationRelationshipWithTransformation
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[143,82] 找不到符号
+[ERROR]   符号:   类 StepRepresentationRelationshipWithTransformation
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[157,38] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[157,58] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[158,13] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[158,42] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[172,38] 找不到符号
+[ERROR]   符号:   类 StepFillAreaStyleColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[173,26] 找不到符号
+[ERROR]   符号:   类 StepFillAreaStyleColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[174,17] 找不到符号
+[ERROR]   符号:   类 StepFillAreaStyleColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[174,64] 找不到符号
+[ERROR]   符号:   类 StepFillAreaStyleColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[179,32] 找不到符号
+[ERROR]   符号:   方法 collectSemanticTargets(com.minicad.step.model.annotation.StepCurveStyle,java.util.Map<java.lang.Integer,com.minicad.step.model.base.StepEntity>,java.util.Set<java.lang.Integer>)
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[180,45] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[181,26] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[182,17] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[182,46] 找不到符号
+[ERROR]   符号:   类 StepPointStyle
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[184,45] 找不到符号
+[ERROR]   符号:   类 StepTextStyleForDefinedFont
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[185,26] 找不到符号
+[ERROR]   符号:   类 StepTextStyleForDefinedFont
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[186,17] 找不到符号
+[ERROR]   符号:   类 StepTextStyleForDefinedFont
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[186,58] 找不到符号
+[ERROR]   符号:   类 StepTextStyleForDefinedFont
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[188,45] 找不到符号
+[ERROR]   符号:   类 StepSymbolColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[189,26] 找不到符号
+[ERROR]   符号:   类 StepSymbolColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[190,17] 找不到符号
+[ERROR]   符号:   类 StepSymbolColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[190,50] 找不到符号
+[ERROR]   符号:   类 StepSymbolColour
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[192,45] 找不到符号
+[ERROR]   符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[193,26] 找不到符号
+[ERROR]   符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[194,17] 找不到符号
+[ERROR]   符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[194,76] 找不到符号
+[ERROR]   符号:   类 StepSurfaceStyleReflectanceAmbientDiffuseSpecular
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[208,38] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[209,26] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[210,17] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[210,53] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[224,38] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[225,26] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[226,17] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[226,53] 找不到符号
+[ERROR]   符号:   类 StepProductDefinitionShape
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[240,38] 找不到符号
+[ERROR]   符号:   类 StepAppliedDateAssignment
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[241,26] 找不到符号
+[ERROR]   符号:   类 StepAppliedDateAssignment
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[242,17] 找不到符号
+[ERROR]   符号:   类 StepAppliedDateAssignment
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[242,57] 找不到符号
+[ERROR]   符号:   类 StepAppliedDateAssignment
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[256,38] 找不到符号
+[ERROR]   符号:   类 StepApproval
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[257,26] 找不到符号
+[ERROR]   符号:   类 StepApproval
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[258,17] 找不到符号
+[ERROR]   符号:   类 StepApproval
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[258,42] 找不到符号
+[ERROR]   符号:   类 StepApproval
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[272,38] 找不到符号
+[ERROR]   符号:   类 StepSecurityClassification
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[273,26] 找不到符号
+[ERROR]   符号:   类 StepSecurityClassification
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[274,17] 找不到符号
+[ERROR]   符号:   类 StepSecurityClassification
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[274,62] 找不到符号
+[ERROR]   符号:   类 StepSecurityClassification
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[288,38] 找不到符号
+[ERROR]   符号:   类 StepContract
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[289,26] 找不到符号
+[ERROR]   符号:   类 StepContract
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
+[ERROR] /D:/work/MiniCAD/src/main/java/com/minicad/app/TargetCollectorHelper.java:[290,17] 找不到符号
+[ERROR]   符号:   类 StepContract
+[ERROR]   位置: 类 com.minicad.app.TargetCollectorHelper
 [ERROR] -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.

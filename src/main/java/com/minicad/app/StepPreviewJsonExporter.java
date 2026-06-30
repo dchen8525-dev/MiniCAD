@@ -548,16 +548,16 @@ public final class StepPreviewJsonExporter {
                 payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
                 payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
         log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "payload_done",
-                elapsedMillis(payloadStartedAt),
+                SerializationHelper.elapsedMillis(payloadStartedAt),
                         payload.faces().size(),
                         payload.edges().size(),
                         payload.unsupportedFaces().size(),
                         payload.representations().size(),
                         payload.instances().size());
         long jsonStartedAt = System.nanoTime();
-        String json = toJson(payload);
-        log.info("stage={} elapsedMs={}, jsonLength={}", "json_done", elapsedMillis(jsonStartedAt), json.length());
-        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
+        String json = SerializationHelper.toJson(payload);
+        log.info("stage={} elapsedMs={}, jsonLength={}", "json_done", SerializationHelper.elapsedMillis(jsonStartedAt), json.length());
+        log.info("stage={} totalElapsedMs={}", doneStageName, SerializationHelper.elapsedMillis(startedAt));
         return json;
     }
 
@@ -583,16 +583,16 @@ public final class StepPreviewJsonExporter {
                 payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
                 payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
         log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "binary_payload_done",
-                elapsedMillis(payloadStartedAt),
+                SerializationHelper.elapsedMillis(payloadStartedAt),
                 payload.faces().size(),
                 payload.edges().size(),
                 payload.unsupportedFaces().size(),
                 payload.representations().size(),
                 payload.instances().size());
         long binaryStartedAt = System.nanoTime();
-        byte[] binary = toBinary(payload);
-        log.info("stage={} elapsedMs={}, binaryLength={}", "binary_encode_done", elapsedMillis(binaryStartedAt), binary.length);
-        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
+        byte[] binary = SerializationHelper.toBinary(payload);
+        log.info("stage={} elapsedMs={}, binaryLength={}", "binary_encode_done", SerializationHelper.elapsedMillis(binaryStartedAt), binary.length);
+        log.info("stage={} totalElapsedMs={}", doneStageName, SerializationHelper.elapsedMillis(startedAt));
         return binary;
     }
 
@@ -623,27 +623,27 @@ public final class StepPreviewJsonExporter {
                 payload.representations().stream().mapToInt(representation -> representation.faces().size()).sum(),
                 payload.representations().stream().mapToInt(representation -> representation.edges().size()).sum());
         log.info("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}, representations={}, instances={}", "glb_payload_done",
-                elapsedMillis(payloadStartedAt),
+                SerializationHelper.elapsedMillis(payloadStartedAt),
                 payload.faces().size(),
                 payload.edges().size(),
                 payload.unsupportedFaces().size(),
                 payload.representations().size(),
                 payload.instances().size());
         long glbStartedAt = System.nanoTime();
-        byte[] glb = toGlb(payload);
+        byte[] glb = SerializationHelper.toGlb(payload);
         PreviewSerializers.validateGlb(glb);
-        log.info("stage={} elapsedMs={}, glbLength={}", "glb_encode_done", elapsedMillis(glbStartedAt), glb.length);
-        log.info("stage={} totalElapsedMs={}", doneStageName, elapsedMillis(startedAt));
+        log.info("stage={} elapsedMs={}, glbLength={}", "glb_encode_done", SerializationHelper.elapsedMillis(glbStartedAt), glb.length);
+        log.info("stage={} totalElapsedMs={}", doneStageName, SerializationHelper.elapsedMillis(startedAt));
         return glb;
     }
 
     private static CompiledStepDocument compileForExport(String stepText, String parseStageName, String resolveStageName) {
         long parseStartedAt = System.nanoTime();
         StepFile stepFile = StepParser.parse(stepText);
-        log.info("stage={} elapsedMs={}, entityCount={}", parseStageName, elapsedMillis(parseStartedAt), stepFile.entities().size());
+        log.info("stage={} elapsedMs={}, entityCount={}", parseStageName, SerializationHelper.elapsedMillis(parseStartedAt), stepFile.entities().size());
         long resolveStartedAt = System.nanoTime();
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
-        log.info("stage={} elapsedMs={}, resolvedCount={}", resolveStageName, elapsedMillis(resolveStartedAt), resolved.size());
+        log.info("stage={} elapsedMs={}, resolvedCount={}", resolveStageName, SerializationHelper.elapsedMillis(resolveStartedAt), resolved.size());
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
         return new CompiledStepDocument(stepText, stepFile, resolved, builder);
     }
@@ -655,13 +655,13 @@ public final class StepPreviewJsonExporter {
     ) {
         long metadataStartedAt = System.nanoTime();
         StepMetadataExtractor metadata = StepMetadataExtractor.fromResolved(resolved);
-        log.debug("stage={} elapsedMs={}", "metadata_done", elapsedMillis(metadataStartedAt));
+        log.debug("stage={} elapsedMs={}", "metadata_done", SerializationHelper.elapsedMillis(metadataStartedAt));
         ProductMetadataExtractor.ProductMetadata productInfo = ProductMetadataExtractor.extract(stepFile, resolved);
         UnitExtractor.UnitInfo units = UnitExtractor.extract(resolved);
         long assemblyStartedAt = System.nanoTime();
         AssemblyData assembly = buildAssemblyData(resolved, builder, metadata);
         log.info("stage={} elapsedMs={}, representations={}, instances={}, unsupportedFaces={}", "assembly_done",
-                elapsedMillis(assemblyStartedAt),
+                SerializationHelper.elapsedMillis(assemblyStartedAt),
                         assembly.representations().size(),
                         assembly.instances().size(),
                         assembly.unsupportedFaces().size());
@@ -673,7 +673,7 @@ public final class StepPreviewJsonExporter {
             long legacyStartedAt = System.nanoTime();
             legacyGeometry = buildLegacyGeometry(resolved, builder, metadata);
             log.debug("stage={} elapsedMs={}, faces={}, edges={}, unsupportedFaces={}", "legacy_geometry_done",
-                    elapsedMillis(legacyStartedAt),
+                    SerializationHelper.elapsedMillis(legacyStartedAt),
                             legacyGeometry.faces().size(),
                             legacyGeometry.edges().size(),
                             legacyGeometry.unsupportedFaces().size());
@@ -2620,7 +2620,7 @@ public final class StepPreviewJsonExporter {
             }
         }
         log.debug("stage={} elapsedMs={}, processedFaces={}, unsupportedFaces={}", "count_unsupported_faces_done",
-                elapsedMillis(startedAt), processed, unsupported);
+                SerializationHelper.elapsedMillis(startedAt), processed, unsupported);
         return unsupported;
     }
 
@@ -15768,20 +15768,4 @@ public final class StepPreviewJsonExporter {
 
     
     
-    private static String toJson(PreviewPayload payload) {
-        return PreviewSerializers.toJson(payload);
-    }
-
-    private static byte[] toBinary(PreviewPayload payload) {
-        return PreviewSerializers.toBinary(payload);
-    }
-
-    private static byte[] toGlb(PreviewPayload payload) {
-        return PreviewSerializers.toGlb(payload);
-    }
-
-
-    private static long elapsedMillis(long startedAt) {
-        return (System.nanoTime() - startedAt) / 1_000_000L;
-    }
 }
