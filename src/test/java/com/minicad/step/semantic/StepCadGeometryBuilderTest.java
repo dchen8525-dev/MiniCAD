@@ -1,5 +1,6 @@
 package com.minicad.step.semantic;
 
+import com.minicad.geometry.Axis1Placement;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
@@ -30,13 +31,14 @@ class StepCadGeometryBuilderTest {
       Map<Integer, CartesianPoint> points,
       Map<Integer, Direction3> directions,
       Map<Integer, Vector3> vectors,
-      Map<Integer, Axis2Placement3D> placements) {
+      Map<Integer, Axis2Placement3D> placements,
+      Map<Integer, Axis1Placement> axis1Placements) {
     // Create a simple mock for buildVertex callback that throws
     IntFunction<Vertex> buildVertexCallback = id -> {
       throw new UnsupportedOperationException("buildVertex not expected in this test");
     };
     return new StepCadGeometryBuilder(
-        entitiesById, points, directions, vectors, placements, buildVertexCallback);
+        entitiesById, points, directions, vectors, placements, axis1Placements, buildVertexCallback);
   }
 
   private StepCadGeometryBuilder createBuilderWithVertexCallback(
@@ -45,9 +47,10 @@ class StepCadGeometryBuilderTest {
       Map<Integer, Direction3> directions,
       Map<Integer, Vector3> vectors,
       Map<Integer, Axis2Placement3D> placements,
+      Map<Integer, Axis1Placement> axis1Placements,
       IntFunction<Vertex> buildVertexCallback) {
     return new StepCadGeometryBuilder(
-        entitiesById, points, directions, vectors, placements, buildVertexCallback);
+        entitiesById, points, directions, vectors, placements, axis1Placements, buildVertexCallback);
   }
 
   @Test
@@ -58,10 +61,11 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Create builder - should not throw
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Verify builder is not null
     assertNotNull(builder, "Builder should be created successfully");
@@ -74,13 +78,14 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Add a StepCartesianPoint to entitiesById
     StepCartesianPoint stepPoint = new StepCartesianPoint(1, "origin", Arrays.asList(10.0, 20.0, 30.0));
     entitiesById.put(1, stepPoint);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Build the point
     CartesianPoint result = builder.buildPoint(1);
@@ -102,13 +107,14 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Add a 2D StepCartesianPoint to entitiesById
     StepCartesianPoint stepPoint = new StepCartesianPoint(1, "origin", Arrays.asList(5.0, 15.0));
     entitiesById.put(1, stepPoint);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Build the point - should default z to 0.0
     CartesianPoint result = builder.buildPoint(1);
@@ -126,6 +132,7 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     StepCartesianPoint stepPoint = new StepCartesianPoint(1, "test", Arrays.asList(1.0, 2.0, 3.0));
     entitiesById.put(1, stepPoint);
@@ -135,7 +142,7 @@ class StepCadGeometryBuilderTest {
     points.put(1, preCached);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Should return the cached value, not build a new one
     CartesianPoint result = builder.buildPoint(1);
@@ -149,9 +156,10 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     assertThrows(StepResolutionException.class, () -> builder.buildDirection(1));
   }
@@ -163,13 +171,14 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Add a StepDirection
     StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0, 0.0));
     entitiesById.put(1, stepDirection);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Build the direction
     Direction3 result = builder.buildDirection(1);
@@ -191,6 +200,7 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Add a StepDirection (orientation) for the vector
     StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0, 0.0));
@@ -201,7 +211,7 @@ class StepCadGeometryBuilderTest {
     entitiesById.put(2, stepVector);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Build the vector
     Vector3 result = builder.buildVector(2);
@@ -224,6 +234,7 @@ class StepCadGeometryBuilderTest {
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     // Add a StepDirection (orientation) for the vector
     StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(0.0, 1.0, 0.0));
@@ -238,7 +249,7 @@ class StepCadGeometryBuilderTest {
     vectors.put(2, preCached);
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
     // Should return the cached value, not build a new one
     Vector3 result = builder.buildVector(2);
@@ -246,30 +257,32 @@ class StepCadGeometryBuilderTest {
   }
 
   @Test
-  void testBuildPlacementThrowsUnsupportedOperation() {
+  void testBuildPlacementWithMissingEntity() {
     Map<Integer, StepEntity> entitiesById = new HashMap<>();
     Map<Integer, CartesianPoint> points = new HashMap<>();
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
-    assertThrows(UnsupportedOperationException.class, () -> builder.buildPlacement(1));
+    assertThrows(StepResolutionException.class, () -> builder.buildPlacement(1));
   }
 
   @Test
-  void testBuildAxis1PlacementThrowsUnsupportedOperation() {
+  void testBuildAxis1PlacementWithMissingEntity() {
     Map<Integer, StepEntity> entitiesById = new HashMap<>();
     Map<Integer, CartesianPoint> points = new HashMap<>();
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+    Map<Integer, Axis1Placement> axis1Placements = new HashMap<>();
 
     StepCadGeometryBuilder builder = createBuilder(
-        entitiesById, points, directions, vectors, placements);
+        entitiesById, points, directions, vectors, placements, axis1Placements);
 
-    assertThrows(UnsupportedOperationException.class, () -> builder.buildAxis1Placement(1));
+    assertThrows(StepResolutionException.class, () -> builder.buildAxis1Placement(1));
   }
 }

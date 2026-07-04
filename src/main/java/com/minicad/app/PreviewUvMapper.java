@@ -675,7 +675,7 @@ public final class PreviewUvMapper {
         if (directrix == null) {
             return null;
         }
-        StepCadBuilder.Axis1Placement axisPlacement = builder.buildAxis1Placement(revolutionSurface.axisPosition().id());
+        Axis1Placement axisPlacement = builder.buildAxis1Placement(revolutionSurface.axisPosition().id());
         Direction3 axisDirection = axisPlacement.axis();
         CartesianPoint axisOrigin = axisPlacement.location();
         Direction3 radialReference = revolutionReferenceDirection(directrix, axisOrigin, axisDirection);

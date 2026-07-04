@@ -3,6 +3,7 @@ package com.minicad.step.semantic;
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.geometry.Axis1Placement;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.BSplineCurve3;
@@ -271,6 +272,7 @@ public final class StepCadBuilder {
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
     private final Map<Integer, Axis2Placement3D> placements = new LinkedHashMap<>();
+    private final Map<Integer, Axis1Placement> axis1Placements = new LinkedHashMap<>();
     private final Map<Integer, Point2> points2d = new LinkedHashMap<>();
     private final Map<Integer, Direction2> directions2d = new LinkedHashMap<>();
     private final Map<Integer, Line2> lines2d = new LinkedHashMap<>();
@@ -330,6 +332,7 @@ public final class StepCadBuilder {
             directions,
             vectors,
             placements,
+            axis1Placements,
             this::buildVertex
         );
         this.geometryOps = new StepCadGeometryOps(this);
@@ -445,48 +448,19 @@ public final class StepCadBuilder {
      * @return built placement
      */
     public Axis2Placement3D buildPlacement(int id) {
-        Axis2Placement3D existing = placements.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEntity entity = requireExistingEntity(id);
-        if (entity instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement = (StepAxis2Placement3D) entity;
-            Axis2Placement3D built = new Axis2Placement3D(
-                    buildPoint(placement.getLocation().id()),
-                    buildDirection(placement.getAxis().id()),
-                    buildDirection(placement.getRefDirection().id())
-            );
-            placements.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepFeaAxis2Placement3d) {
-            StepFeaAxis2Placement3d feaPlacement = (StepFeaAxis2Placement3d) entity;
-            Axis2Placement3D built = new Axis2Placement3D(
-                    buildPoint(feaPlacement.getLocation().id()),
-                    buildDirection(feaPlacement.getAxis().id()),
-                    buildDirection(feaPlacement.getRefDirection().id())
-            );
-            placements.put(id, built);
-            return built;
-        }
-        throw new UnsupportedGeometryException("entity #" + id + " is not a supported placement");
+        return geometryBuilder.buildPlacement(id);
     }
 
     public Axis1Placement buildAxis1Placement(int id) {
-        StepAxis1Placement placement = requireEntity(id, StepAxis1Placement.class, "AXIS1_PLACEMENT");
-        return new Axis1Placement(buildPoint(placement.getLocation().id()), buildDirection(placement.getAxis().id()));
+        return geometryBuilder.buildAxis1Placement(id);
     }
 
     /**
      * Builds an Axis2Placement3D from an Axis1Placement by deriving a reference direction.
      * Used for surfaces that need full 3D placement but only have axis defined.
      */
-    private Axis2Placement3D buildAxis1PlacementAsAxis2(int id) {
-        Axis1Placement axis1 = buildAxis1Placement(id);
-        // Derive a perpendicular reference direction
-        Direction3 refDir = perpendicularDirection(axis1.getAxis());
-        return new Axis2Placement3D(axis1.getLocation(), axis1.getAxis(), refDir);
+    Axis2Placement3D buildAxis1PlacementAsAxis2(int id) {
+        return geometryBuilder.buildAxis1PlacementAsAxis2(id);
     }
 
     /**
@@ -521,7 +495,6 @@ public final class StepCadBuilder {
 
     /**
      * Builds a CARTESIAN_TRANSFORMATION_OPERATOR_3D into an Axis2Placement3D.
-     * The transformation defines a local coordinate system that can be used as a placement.
      *
      * @param id STEP entity id
      * @return built placement representing the transformed coordinate system
@@ -7201,48 +7174,6 @@ public final class StepCadBuilder {
     private String unsupportedReplicaSurfaceTransformation(StepCartesianTransformationOperator transformation) {
         return geometryOps.unsupportedReplicaSurfaceTransformation(transformation);
     }
-
-
-    
-public final class Axis1Placement {
-    private final CartesianPoint location;
-    private final Direction3 axis;
-
-    public Axis1Placement(CartesianPoint location, Direction3 axis) {
-        this.location = location;
-        this.axis = axis;
-    }
-
-    public CartesianPoint getLocation() {
-        return location;
-    }
-
-    public Direction3 getAxis() {
-        return axis;
-    }
-
-    // Record-style accessors
-    public CartesianPoint location() { return getLocation(); }
-    public Direction3 axis() { return getAxis(); }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Axis1Placement that = (Axis1Placement) o;
-        return Objects.equals(location, that.location) && Objects.equals(axis, that.axis);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(location, axis);
-    }
-
-    @Override
-    public String toString() {
-        return "Axis1Placement{" + "location=" + location + "axis=" + axis + "}";
-    }
-}
 
     /**
      * Builds a paraboloid surface of revolution.

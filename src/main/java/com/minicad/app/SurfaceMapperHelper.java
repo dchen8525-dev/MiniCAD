@@ -1,6 +1,7 @@
 package com.minicad.app;
 
 import com.minicad.common.Epsilon;
+import com.minicad.geometry.Axis1Placement;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.BSplineSurface3;
 import com.minicad.geometry.CartesianPoint;
@@ -792,7 +793,7 @@ class SurfaceMapperHelper {
         if (directrix == null) {
             return null;
         }
-        StepCadBuilder.Axis1Placement axisPlacement = builder.buildAxis1Placement(revolutionSurface.axisPosition().id());
+        Axis1Placement axisPlacement = builder.buildAxis1Placement(revolutionSurface.axisPosition().id());
         Direction3 axisDirection = axisPlacement.axis();
         CartesianPoint axisOrigin = axisPlacement.location();
         Direction3 radialReference = revolutionReferenceDirection(directrix, axisOrigin, axisDirection);
