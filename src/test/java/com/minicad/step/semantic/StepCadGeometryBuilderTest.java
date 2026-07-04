@@ -4,8 +4,11 @@ import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
+import com.minicad.common.StepResolutionException;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.geometry.StepDirection;
+import com.minicad.step.model.geometry.StepVector;
 import com.minicad.topology.Vertex;
 
 import org.junit.jupiter.api.Test;
@@ -140,7 +143,7 @@ class StepCadGeometryBuilderTest {
   }
 
   @Test
-  void testBuildDirectionThrowsUnsupportedOperation() {
+  void testBuildDirectionWithMissingEntity() {
     Map<Integer, StepEntity> entitiesById = new HashMap<>();
     Map<Integer, CartesianPoint> points = new HashMap<>();
     Map<Integer, Direction3> directions = new HashMap<>();
@@ -150,21 +153,96 @@ class StepCadGeometryBuilderTest {
     StepCadGeometryBuilder builder = createBuilder(
         entitiesById, points, directions, vectors, placements);
 
-    assertThrows(UnsupportedOperationException.class, () -> builder.buildDirection(1));
+    assertThrows(StepResolutionException.class, () -> builder.buildDirection(1));
   }
 
   @Test
-  void testBuildVectorThrowsUnsupportedOperation() {
+  void testBuildDirectionWithValidEntity() {
     Map<Integer, StepEntity> entitiesById = new HashMap<>();
     Map<Integer, CartesianPoint> points = new HashMap<>();
     Map<Integer, Direction3> directions = new HashMap<>();
     Map<Integer, Vector3> vectors = new HashMap<>();
     Map<Integer, Axis2Placement3D> placements = new HashMap<>();
 
+    // Add a StepDirection
+    StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0, 0.0));
+    entitiesById.put(1, stepDirection);
+
     StepCadGeometryBuilder builder = createBuilder(
         entitiesById, points, directions, vectors, placements);
 
-    assertThrows(UnsupportedOperationException.class, () -> builder.buildVector(1));
+    // Build the direction
+    Direction3 result = builder.buildDirection(1);
+
+    assertNotNull(result, "Built direction should not be null");
+    assertEquals(1.0, result.x(), 0.001, "X component should be 1.0");
+    assertEquals(0.0, result.y(), 0.001, "Y component should be 0.0");
+    assertEquals(0.0, result.z(), 0.001, "Z component should be 0.0");
+
+    // Verify caching - same instance should be returned
+    Direction3 cached = builder.buildDirection(1);
+    assertSame(result, cached, "Same instance should be returned from cache");
+  }
+
+  @Test
+  void testBuildVectorWithValidEntity() {
+    Map<Integer, StepEntity> entitiesById = new HashMap<>();
+    Map<Integer, CartesianPoint> points = new HashMap<>();
+    Map<Integer, Direction3> directions = new HashMap<>();
+    Map<Integer, Vector3> vectors = new HashMap<>();
+    Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+
+    // Add a StepDirection (orientation) for the vector
+    StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0, 0.0));
+    entitiesById.put(1, stepDirection);
+
+    // Add a StepVector that references the direction
+    StepVector stepVector = new StepVector(2, "vec", stepDirection, 5.0);
+    entitiesById.put(2, stepVector);
+
+    StepCadGeometryBuilder builder = createBuilder(
+        entitiesById, points, directions, vectors, placements);
+
+    // Build the vector
+    Vector3 result = builder.buildVector(2);
+
+    assertNotNull(result, "Built vector should not be null");
+    // Direction (1,0,0) scaled by magnitude 5.0 should give (5,0,0)
+    assertEquals(5.0, result.x(), 0.001, "X component should be 5.0");
+    assertEquals(0.0, result.y(), 0.001, "Y component should be 0.0");
+    assertEquals(0.0, result.z(), 0.001, "Z component should be 0.0");
+
+    // Verify caching - same instance should be returned
+    Vector3 cached = builder.buildVector(2);
+    assertSame(result, cached, "Same instance should be returned from cache");
+  }
+
+  @Test
+  void testBuildVectorCaching() {
+    Map<Integer, StepEntity> entitiesById = new HashMap<>();
+    Map<Integer, CartesianPoint> points = new HashMap<>();
+    Map<Integer, Direction3> directions = new HashMap<>();
+    Map<Integer, Vector3> vectors = new HashMap<>();
+    Map<Integer, Axis2Placement3D> placements = new HashMap<>();
+
+    // Add a StepDirection (orientation) for the vector
+    StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(0.0, 1.0, 0.0));
+    entitiesById.put(1, stepDirection);
+
+    // Add a StepVector that references the direction
+    StepVector stepVector = new StepVector(2, "vec", stepDirection, 3.0);
+    entitiesById.put(2, stepVector);
+
+    // Pre-populate the vector cache
+    Vector3 preCached = new Vector3(100.0, 200.0, 300.0);
+    vectors.put(2, preCached);
+
+    StepCadGeometryBuilder builder = createBuilder(
+        entitiesById, points, directions, vectors, placements);
+
+    // Should return the cached value, not build a new one
+    Vector3 result = builder.buildVector(2);
+    assertSame(preCached, result, "Should return the pre-cached instance");
   }
 
   @Test

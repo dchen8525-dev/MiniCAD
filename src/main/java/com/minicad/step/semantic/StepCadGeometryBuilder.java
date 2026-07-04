@@ -10,6 +10,7 @@ import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.geometry.StepDirection;
 import com.minicad.step.model.geometry.StepPoint;
+import com.minicad.step.model.geometry.StepVector;
 import com.minicad.step.model.topology.StepVertexPoint;
 import com.minicad.topology.Vertex;
 
@@ -106,6 +107,23 @@ final class StepCadGeometryBuilder {
   }
 
   /**
+   * Requires an entity of a specific type.
+   *
+   * @param id the STEP entity ID
+   * @param type the expected type
+   * @param expectedName name for error messages
+   * @return the entity cast to the expected type
+   * @throws StepResolutionException if entity not found or wrong type
+   */
+  private <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
+    StepEntity entity = requireExistingEntity(id);
+    if (!type.isInstance(entity)) {
+      throw new StepResolutionException("entity #" + id + " is not a " + expectedName);
+    }
+    return type.cast(entity);
+  }
+
+  /**
    * Builds a Direction3 from a STEP DIRECTION entity.
    *
    * @param id the STEP entity ID
@@ -135,13 +153,19 @@ final class StepCadGeometryBuilder {
 
   /**
    * Builds a Vector3 from a STEP VECTOR entity.
-   * 
+   *
    * @param id the STEP entity ID
    * @return the Vector3 geometry object
-   * @throws UnsupportedOperationException - not yet implemented
    */
   Vector3 buildVector(int id) {
-    throw new UnsupportedOperationException("buildVector not yet implemented");
+    Vector3 existing = vectors.get(id);
+    if (existing != null) {
+      return existing;
+    }
+    StepVector vector = requireEntity(id, StepVector.class, "VECTOR");
+    Vector3 built = buildDirection(vector.isOrientation().id()).asVector().scale(vector.magnitude());
+    vectors.put(id, built);
+    return built;
   }
 
   /**

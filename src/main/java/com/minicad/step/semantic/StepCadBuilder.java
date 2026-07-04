@@ -435,14 +435,7 @@ public final class StepCadBuilder {
      * @return built vector
      */
     public Vector3 buildVector(int id) {
-        Vector3 existing = vectors.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        com.minicad.step.model.geometry.StepVector vector = requireEntity(id, com.minicad.step.model.geometry.StepVector.class, "VECTOR");
-        Vector3 built = buildDirection(vector.isOrientation().id()).asVector().scale(vector.magnitude());
-        vectors.put(id, built);
-        return built;
+        return geometryBuilder.buildVector(id);
     }
 
     /**
