@@ -269,6 +269,7 @@ public final class StepCadBuilder {
     private final StepShellBuilder shellBuilder;
     private final StepSolidBuilder solidBuilder;
     private final StepCadCurveBuilder curveBuilder;
+    private final StepCadSurfaceBuilder surfaceBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
@@ -375,6 +376,33 @@ public final class StepCadBuilder {
         this.topologyBuilder = new StepTopologyBuilder(this);
         this.shellBuilder = new StepShellBuilder(this);
         this.solidBuilder = new StepSolidBuilder(this);
+        this.surfaceBuilder = new StepCadSurfaceBuilder(
+            this.entitiesById,
+            geometryBuilder,
+            geometryOps,
+            curveBuilder,
+            planes,
+            cylindricalSurfaces,
+            conicalSurfaces,
+            toroidalSurfaces,
+            sphericalSurfaces,
+            ruledSurfaces,
+            constantRadiusSurfaces,
+            linearExtrusionSurfaces,
+            revolutionSurfaces,
+            paraboloidSurfaces,
+            hyperboloidSurfaces,
+            translationSurfaces,
+            projectionSurfaces,
+            bsplineSurfaces,
+            rationalBsplineSurfaces,
+            this::buildPlacement,
+            this::buildAxis1Placement,
+            this::buildCurve3ById,
+            id -> buildCurve2(requireExistingEntity(id)),
+            this::buildPcurve2,
+            this::buildCompositeCurve
+        );
     }
 
     /**
@@ -970,15 +998,7 @@ public final class StepCadBuilder {
      * @return built plane
      */
     public Plane buildPlane(int id) {
-        Plane existing = planes.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepPlane plane = requireEntity(id, StepPlane.class, "PLANE");
-        Axis2Placement3D placement = buildPlacement(plane.getPosition().id());
-        Plane built = new Plane(placement.getLocation(), placement.getAxis());
-        planes.put(id, built);
-        return built;
+        return surfaceBuilder.buildPlane(id);
     }
 
     /**
@@ -1016,14 +1036,7 @@ public final class StepCadBuilder {
      * @return built cylindrical surface
      */
     public CylindricalSurface buildCylindricalSurface(int id) {
-        CylindricalSurface existing = cylindricalSurfaces.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepCylindricalSurface surface = requireEntity(id, StepCylindricalSurface.class, "CYLINDRICAL_SURFACE");
-        CylindricalSurface built = new CylindricalSurface(buildPlacement(surface.getPosition().id()), surface.getRadius());
-        cylindricalSurfaces.put(id, built);
-        return built;
+        return surfaceBuilder.buildCylindricalSurface(id);
     }
 
     /**
@@ -1033,14 +1046,7 @@ public final class StepCadBuilder {
      * @return built conical surface
      */
     public ConicalSurface buildConicalSurface(int id) {
-        ConicalSurface existing = conicalSurfaces.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepConicalSurface surface = requireEntity(id, StepConicalSurface.class, "CONICAL_SURFACE");
-        ConicalSurface built = new ConicalSurface(buildPlacement(surface.getPosition().id()), surface.getRadius(), surface.getSemiAngle());
-        conicalSurfaces.put(id, built);
-        return built;
+        return surfaceBuilder.buildConicalSurface(id);
     }
 
     /**
@@ -1050,14 +1056,7 @@ public final class StepCadBuilder {
      * @return built toroidal surface
      */
     public ToroidalSurface buildToroidalSurface(int id) {
-        ToroidalSurface existing = toroidalSurfaces.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepToroidalSurface surface = requireEntity(id, StepToroidalSurface.class, "TOROIDAL_SURFACE");
-        ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.getPosition().id()), surface.getMajorRadius(), surface.getMinorRadius());
-        toroidalSurfaces.put(id, built);
-        return built;
+        return surfaceBuilder.buildToroidalSurface(id);
     }
 
     /**
@@ -1067,29 +1066,14 @@ public final class StepCadBuilder {
      * @return built toroidal surface
      */
     public ToroidalSurface buildDegenerateToroidalSurface(int id) {
-        ToroidalSurface existing = toroidalSurfaces.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepDegenerateToroidalSurface surface = requireEntity(id, StepDegenerateToroidalSurface.class, "DEGENERATE_TOROIDAL_SURFACE");
-        ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.getPosition().id()), surface.getMajorRadius(), surface.getMinorRadius());
-        toroidalSurfaces.put(id, built);
-        return built;
+        return surfaceBuilder.buildDegenerateToroidalSurface(id);
     }
 
     /**
      * Builds a toroidal surface from TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS.
-     * Uses the position, major radius, and minor radius parameters; the optional
-     * axis curves are ignored for B-Rep generation.
      */
     private ToroidalSurface buildToroidalSurfaceFromSpecifiedBends(StepToroidalSurfaceWithSpecifiedBends surface) {
-        ToroidalSurface existing = toroidalSurfaces.get(surface.id());
-        if (existing != null) {
-            return existing;
-        }
-        ToroidalSurface built = new ToroidalSurface(buildPlacement(surface.getPosition().id()), surface.getMajorRadius(), surface.getMinorRadius());
-        toroidalSurfaces.put(surface.id(), built);
-        return built;
+        return surfaceBuilder.buildToroidalSurfaceFromSpecifiedBends(surface);
     }
 
     /**
