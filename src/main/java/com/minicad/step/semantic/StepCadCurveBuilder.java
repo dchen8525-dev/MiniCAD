@@ -4,9 +4,23 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
+import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.Circle;
+import com.minicad.geometry.Clothoid3;
+import com.minicad.geometry.CompositeCurve3;
 import com.minicad.geometry.Curve3;
+import com.minicad.geometry.DegenerateCurve3;
 import com.minicad.geometry.Direction3;
+import com.minicad.geometry.Ellipse3;
+import com.minicad.geometry.Hyperbola3;
+import com.minicad.geometry.Line3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.geometry.Polyline3;
+import com.minicad.geometry.RationalBSplineCurve3;
+import com.minicad.geometry.SurfaceCurve3;
+import com.minicad.geometry.TrimmedCurve3;
+import com.minicad.geometry.Vector3;
 import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.CompositeCurve2;
@@ -23,12 +37,15 @@ import com.minicad.geometry2d.RationalBSplineCurve2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.geometry2d.Vector2;
 import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.geometry.StepAxis1Placement;
 import com.minicad.step.model.geometry.StepAxis2Placement2D;
+import com.minicad.step.model.geometry.StepAxis2Placement3D;
 import com.minicad.step.model.geometry.StepBezierCurve;
 import com.minicad.step.model.geometry.StepBezierCurve2D;
 import com.minicad.step.model.geometry.StepBSplineCurve;
 import com.minicad.step.model.geometry.StepBSplineCurve2D;
 import com.minicad.step.model.geometry.StepBSplineCurveWithKnots;
+import com.minicad.step.model.geometry.StepBSplineCurveWithKnotsAndBreakpoints;
 import com.minicad.step.model.geometry.StepBoundedCurve;
 import com.minicad.step.model.geometry.StepBoundedCurve2D;
 import com.minicad.step.model.geometry.StepCartesianPoint;
@@ -47,13 +64,13 @@ import com.minicad.step.model.geometry.StepDegeneratePcurve;
 import com.minicad.step.model.geometry.StepDirection;
 import com.minicad.step.model.geometry.StepEllipse;
 import com.minicad.step.model.geometry.StepEllipse2D;
-import com.minicad.step.model.product.StepGeometricReplica;
 import com.minicad.step.model.geometry.StepHyperbola2D;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve;
 import com.minicad.step.model.geometry.StepIndexedPolyCurve2D;
 import com.minicad.step.model.geometry.StepLine;
 import com.minicad.step.model.geometry.StepLine2D;
 import com.minicad.step.model.geometry.StepOffsetCurve2D;
+import com.minicad.step.model.geometry.StepOffsetCurve3D;
 import com.minicad.step.model.geometry.StepOrientedCurve;
 import com.minicad.step.model.geometry.StepParabola2D;
 import com.minicad.step.model.geometry.StepPiecewiseBezierCurve;
@@ -65,12 +82,16 @@ import com.minicad.step.model.geometry.StepQuasiUniformCurve;
 import com.minicad.step.model.geometry.StepQuasiUniformCurve2D;
 import com.minicad.step.model.geometry.StepRationalBSplineCurve;
 import com.minicad.step.model.geometry.StepRationalBSplineCurve2D;
+import com.minicad.step.model.geometry.StepSeamCurve;
+import com.minicad.step.model.geometry.StepSurfaceCurve;
 import com.minicad.step.model.geometry.StepTrimmedCurve;
 import com.minicad.step.model.geometry.StepTrimmedCurve2D;
 import com.minicad.step.model.geometry.StepUniformCurve;
 import com.minicad.step.model.geometry.StepUniformCurve2D;
 import com.minicad.step.model.geometry.StepCurve2D;
 import com.minicad.step.model.geometry.StepVector;
+import com.minicad.step.syntax.StepValue;
+import com.minicad.step.model.product.StepGeometricReplica;
 import com.minicad.step.model.product.StepMappedItem;
 
 import java.util.ArrayList;
@@ -86,9 +107,8 @@ import java.util.stream.Collectors;
  * 
  * This class handles construction of curve geometry objects:
  * - 2D curves: Line2, Circle2, Ellipse2, BSplineCurve2, Polyline2, etc.
- * - 3D curves: Line3, Circle3, Ellipse3, BSplineCurve3, etc. (placeholder for Phase 2)
+ * - 3D curves: Line3, Circle, Ellipse3, BSplineCurve3, etc.
  * 
- * Phase 1 extraction target: methods that build 2D curve types.
  * Caching is provided to avoid rebuilding the same geometry multiple times.
  */
 final class StepCadCurveBuilder {
@@ -115,9 +135,25 @@ final class StepCadCurveBuilder {
     private final Map<Integer, Hyperbola2> hyperbolas2d;
     private final Map<Integer, Parabola2> parabolas2d;
     
+    // 3D geometry caches
+    private final Map<Integer, Line3> lines3d;
+    private final Map<Integer, Circle> circles3d;
+    private final Map<Integer, Ellipse3> ellipses3d;
+    private final Map<Integer, Polyline3> polylines3d;
+    private final Map<Integer, CompositeCurve3> compositeCurves3d;
+    private final Map<Integer, BSplineCurve3> bsplineCurves3d;
+    private final Map<Integer, RationalBSplineCurve3> rationalBsplineCurves3d;
+    private final Map<Integer, TrimmedCurve3> trimmedCurves3d;
+    private final Map<Integer, SurfaceCurve3> surfaceCurves3d;
+    private final Map<Integer, Parabola3> parabolas3d;
+    private final Map<Integer, Hyperbola3> hyperbolas3d;
+    private final Map<Integer, Clothoid3> clothoids3d;
+    
     // Callbacks for cross-dependencies
-    private final IntFunction<Curve3> buildCurve3Callback; // For 3D curves used in 2D context (e.g., degenerate curve sampling)
-
+    private final IntFunction<Axis2Placement3D> buildPlacementCallback;
+    private final IntFunction<com.minicad.geometry.SurfaceGeometry> buildSurfaceCallback;
+    private final IntFunction<Curve3> buildCurve3Callback; // For curves not handled by this builder
+    
     /**
      * Creates a new StepCadCurveBuilder with the specified cache maps and dependencies.
      *
@@ -137,7 +173,21 @@ final class StepCadCurveBuilder {
      * @param trimmedCurves2d cache for TrimmedCurve2 objects
      * @param hyperbolas2d cache for Hyperbola2 objects
      * @param parabolas2d cache for Parabola2 objects
-     * @param buildCurve3Callback callback to build 3D curves (for cross-dependencies like degenerate curve)
+     * @param lines3d cache for Line3 objects
+     * @param circles3d cache for Circle objects
+     * @param ellipses3d cache for Ellipse3 objects
+     * @param polylines3d cache for Polyline3 objects
+     * @param compositeCurves3d cache for CompositeCurve3 objects
+     * @param bsplineCurves3d cache for BSplineCurve3 objects
+     * @param rationalBsplineCurves3d cache for RationalBSplineCurve3 objects
+     * @param trimmedCurves3d cache for TrimmedCurve3 objects
+     * @param surfaceCurves3d cache for SurfaceCurve3 objects
+     * @param parabolas3d cache for Parabola3 objects
+     * @param hyperbolas3d cache for Hyperbola3 objects
+     * @param clothoids3d cache for Clothoid3 objects
+     * @param buildPlacementCallback callback to build Axis2Placement3D
+     * @param buildSurfaceCallback callback to build SurfaceGeometry
+     * @param buildCurve3Callback callback to build Curve3 for types not handled by this builder
      */
     StepCadCurveBuilder(
             Map<Integer, StepEntity> entitiesById,
@@ -156,6 +206,20 @@ final class StepCadCurveBuilder {
             Map<Integer, TrimmedCurve2> trimmedCurves2d,
             Map<Integer, Hyperbola2> hyperbolas2d,
             Map<Integer, Parabola2> parabolas2d,
+            Map<Integer, Line3> lines3d,
+            Map<Integer, Circle> circles3d,
+            Map<Integer, Ellipse3> ellipses3d,
+            Map<Integer, Polyline3> polylines3d,
+            Map<Integer, CompositeCurve3> compositeCurves3d,
+            Map<Integer, BSplineCurve3> bsplineCurves3d,
+            Map<Integer, RationalBSplineCurve3> rationalBsplineCurves3d,
+            Map<Integer, TrimmedCurve3> trimmedCurves3d,
+            Map<Integer, SurfaceCurve3> surfaceCurves3d,
+            Map<Integer, Parabola3> parabolas3d,
+            Map<Integer, Hyperbola3> hyperbolas3d,
+            Map<Integer, Clothoid3> clothoids3d,
+            IntFunction<Axis2Placement3D> buildPlacementCallback,
+            IntFunction<com.minicad.geometry.SurfaceGeometry> buildSurfaceCallback,
             IntFunction<Curve3> buildCurve3Callback) {
         this.entitiesById = entitiesById;
         this.geometryBuilder = geometryBuilder;
@@ -173,6 +237,20 @@ final class StepCadCurveBuilder {
         this.trimmedCurves2d = trimmedCurves2d;
         this.hyperbolas2d = hyperbolas2d;
         this.parabolas2d = parabolas2d;
+        this.lines3d = lines3d;
+        this.circles3d = circles3d;
+        this.ellipses3d = ellipses3d;
+        this.polylines3d = polylines3d;
+        this.compositeCurves3d = compositeCurves3d;
+        this.bsplineCurves3d = bsplineCurves3d;
+        this.rationalBsplineCurves3d = rationalBsplineCurves3d;
+        this.trimmedCurves3d = trimmedCurves3d;
+        this.surfaceCurves3d = surfaceCurves3d;
+        this.parabolas3d = parabolas3d;
+        this.hyperbolas3d = hyperbolas3d;
+        this.clothoids3d = clothoids3d;
+        this.buildPlacementCallback = buildPlacementCallback;
+        this.buildSurfaceCallback = buildSurfaceCallback;
         this.buildCurve3Callback = buildCurve3Callback;
     }
 
@@ -820,7 +898,7 @@ final class StepCadCurveBuilder {
             return new Polyline2(List.of(pt, pt));
         }
         try {
-            Curve3 basisCurve = buildCurve3Callback.apply(basisEntity.id());
+            Curve3 basisCurve = buildCurve3Internal(basisEntity);
             List<CartesianPoint> samples = basisCurve.sample(2);
             if (!samples.isEmpty()) {
                 CartesianPoint first = samples.get(0);
@@ -1200,6 +1278,629 @@ final class StepCadCurveBuilder {
         if (degree < 1 || controlPoints.isEmpty()) {
             throw new UnsupportedGeometryException(typeName + " marker does not carry inherited B-spline geometry");
         }
+    }
+
+    // ==================== 3D Curve Builders ====================
+
+    /**
+     * Builds a Line3 from a STEP LINE entity.
+     */
+    public Line3 buildLine3(int id) {
+        Line3 existing = lines3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepLine line = requireEntity(id, StepLine.class, "LINE");
+        Line3 built = new Line3(
+                geometryBuilder.buildPoint(line.point().id()),
+                geometryBuilder.buildDirection(line.vector().isOrientation().id()),
+                line.vector().magnitude()
+        );
+        lines3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Circle from a STEP CIRCLE entity (3D).
+     */
+    public Circle buildCircle3(int id) {
+        Circle existing = circles3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCircle circle = requireEntity(id, StepCircle.class, "CIRCLE");
+        if (!(circle.getPosition() instanceof StepAxis2Placement3D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D CIRCLE");
+        }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) circle.getPosition();
+        Circle built = new Circle(buildPlacementCallback.apply(placement3d.id()), circle.getRadius());
+        circles3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds an Ellipse3 from a STEP ELLIPSE entity (3D).
+     */
+    public Ellipse3 buildEllipse3(int id) {
+        Ellipse3 existing = ellipses3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
+        if (!(ellipse.getPosition() instanceof StepAxis2Placement3D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D ELLIPSE");
+        }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) ellipse.getPosition();
+        Ellipse3 built = new Ellipse3(buildPlacementCallback.apply(placement3d.id()), ellipse.getSemiAxis1(), ellipse.getSemiAxis2());
+        ellipses3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Polyline3 from a STEP POLYLINE entity.
+     */
+    public Polyline3 buildPolyline3(int id) {
+        Polyline3 existing = polylines3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepPolyline polyline = requireEntity(id, StepPolyline.class, "POLYLINE");
+        List<CartesianPoint> points = polyline.getPoints().stream()
+                .map(point -> geometryBuilder.buildPoint(point.id()))
+                .collect(Collectors.toList());
+        Polyline3 built = new Polyline3(points);
+        polylines3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a CompositeCurve3 from a STEP COMPOSITE_CURVE entity.
+     */
+    public CompositeCurve3 buildCompositeCurve3(int id) {
+        CompositeCurve3 existing = compositeCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEntity entity = requireExistingEntity(id);
+        List<StepCompositeCurveSegment> segments;
+        if (entity instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
+            segments = compositeCurve.getSegments();
+        } else if (entity instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
+            segments = compositeCurveOnSurface.getSegments();
+        } else {
+            throw new StepResolutionException("entity #" + id + " is not a COMPOSITE_CURVE");
+        }
+        List<Curve3> curves = segments.stream()
+                .map(segment -> buildCurve3Internal(segment.parentCurve()))
+                .collect(Collectors.toList());
+        CompositeCurve3 built = new CompositeCurve3(curves);
+        compositeCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a BSplineCurve3 from a STEP B_SPLINE_CURVE_WITH_KNOTS entity.
+     */
+    public BSplineCurve3 buildBSplineCurve3(int id) {
+        BSplineCurve3 existing = bsplineCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineCurveWithKnots spline = requireEntity(id, StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS");
+        List<CartesianPoint> controlPoints = spline.getControlPoints().stream()
+                .map(point -> geometryBuilder.buildPoint(point.id()))
+                .collect(Collectors.toList());
+        BSplineCurve3 built = new BSplineCurve3(spline.getDegree(), controlPoints, spline.getKnotMultiplicities(), spline.getKnots());
+        bsplineCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a BSplineCurve3 from a STEP B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS entity.
+     */
+    public BSplineCurve3 buildBSplineCurveWithBreakpoints(int id) {
+        BSplineCurve3 existing = bsplineCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineCurveWithKnotsAndBreakpoints spline = requireEntity(id, StepBSplineCurveWithKnotsAndBreakpoints.class,
+                "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS");
+        List<CartesianPoint> controlPoints = spline.getControlPoints().stream()
+                .map(point -> geometryBuilder.buildPoint(point.id()))
+                .collect(Collectors.toList());
+        BSplineCurve3 built = new BSplineCurve3(spline.getDegree(), controlPoints, spline.getKnotMultiplicities(), spline.getKnots());
+        bsplineCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a RationalBSplineCurve3 from a STEP RATIONAL_B_SPLINE_CURVE entity.
+     */
+    public RationalBSplineCurve3 buildRationalBSplineCurve3(int id) {
+        RationalBSplineCurve3 existing = rationalBsplineCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepRationalBSplineCurve spline = requireEntity(id, StepRationalBSplineCurve.class, "RATIONAL_B_SPLINE_CURVE");
+        if (spline.getWeightsData().isEmpty()) {
+            throw new UnsupportedGeometryException("RATIONAL_B_SPLINE_CURVE requires weights");
+        }
+        List<CartesianPoint> controlPoints = spline.getControlPoints().stream()
+                .map(point -> geometryBuilder.buildPoint(point.id()))
+                .collect(Collectors.toList());
+        RationalBSplineCurve3 built = new RationalBSplineCurve3(
+                spline.getDegree(),
+                controlPoints,
+                spline.getWeightsData(),
+                spline.getKnotMultiplicities(),
+                spline.getKnots()
+        );
+        rationalBsplineCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a TrimmedCurve3 from a STEP TRIMMED_CURVE entity.
+     */
+    public TrimmedCurve3 buildTrimmedCurve3(int id) {
+        TrimmedCurve3 existing = trimmedCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
+        Curve3 basis = buildCurve3Internal(trimmedCurve.getBasisCurve());
+        for (StepValue trim : trimmedCurve.trim1()) {
+            trimResolver.validateTrimValue(trim, basis, "trim_1");
+        }
+        for (StepValue trim : trimmedCurve.trim2()) {
+            trimResolver.validateTrimValue(trim, basis, "trim_2");
+        }
+        double trimParamStart = trimResolver.resolveTrimParameter(trimmedCurve.trim1(), basis, "trim_1");
+        double trimParamEnd = trimResolver.resolveTrimParameter(trimmedCurve.trim2(), basis, "trim_2");
+        TrimmedCurve3 built = new TrimmedCurve3(basis, trimParamStart, trimParamEnd, trimmedCurve.isSenseAgreement());
+        trimmedCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a SurfaceCurve3 from a STEP SURFACE_CURVE entity.
+     */
+    public SurfaceCurve3 buildSurfaceCurve3(int id) {
+        SurfaceCurve3 existing = surfaceCurves3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepSurfaceCurve surfaceCurve = requireEntity(id, StepSurfaceCurve.class, "SURFACE_CURVE");
+        Curve3 curve3d = buildCurve3Internal(surfaceCurve.getCurve3d());
+        SurfaceCurve3 built = new SurfaceCurve3(curve3d, buildSurfaceCurveBindings(surfaceCurve.associatedGeometry()));
+        surfaceCurves3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a SurfaceCurve3 from a STEP SEAM_CURVE entity.
+     */
+    public SurfaceCurve3 buildSeamCurve(int id) {
+        StepSeamCurve seamCurve = requireEntity(id, StepSeamCurve.class, "SEAM_CURVE");
+        Curve3 curve3d = buildCurve3Internal(seamCurve.getCurve3d());
+        return new SurfaceCurve3(curve3d, buildSurfaceCurveBindings(seamCurve.associatedGeometry()));
+    }
+
+    /**
+     * Builds a Parabola3 from a STEP PARABOLA (via StepConicCurve) entity.
+     */
+    public Parabola3 buildParabola3(int id) {
+        Parabola3 existing = parabolas3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepConicCurve conic = requireEntity(id, StepConicCurve.class, "PARABOLA");
+        if (!"PARABOLA".equals(conic.entityName())) {
+            throw new StepResolutionException("entity #" + id + " is not a PARABOLA");
+        }
+        if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D PARABOLA");
+        }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) conic.getPosition();
+        if (conic.parameters().isEmpty()) {
+            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
+        }
+        double focalDistance = conic.parameters().get(0);
+        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
+        }
+        Parabola3 built = new Parabola3(buildPlacementCallback.apply(placement3d.id()), focalDistance);
+        parabolas3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Hyperbola3 from a STEP HYPERBOLA (via StepConicCurve) entity.
+     */
+    public Hyperbola3 buildHyperbola3(int id) {
+        Hyperbola3 existing = hyperbolas3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepConicCurve conic = requireEntity(id, StepConicCurve.class, "HYPERBOLA");
+        if (!"HYPERBOLA".equals(conic.entityName())) {
+            throw new StepResolutionException("entity #" + id + " is not a HYPERBOLA");
+        }
+        if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 3D HYPERBOLA");
+        }
+        StepAxis2Placement3D placement3d = (StepAxis2Placement3D) conic.getPosition();
+        if (conic.parameters().size() < 2) {
+            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
+        }
+        double semiAxisA = conic.parameters().get(0);
+        double semiAxisB = conic.parameters().get(1);
+        if (!Double.isFinite(semiAxisA) || !Double.isFinite(semiAxisB)
+                || semiAxisA <= Epsilon.EPS || semiAxisB <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
+        }
+        Hyperbola3 built = new Hyperbola3(buildPlacementCallback.apply(placement3d.id()), semiAxisA, semiAxisB);
+        hyperbolas3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Clothoid3 from a STEP CLOTHOID entity.
+     */
+    public Clothoid3 buildClothoid3(int id) {
+        Clothoid3 existing = clothoids3d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepClothoid clothoid = requireEntity(id, StepClothoid.class, "CLOTHOID");
+        // CLOTHOID uses 2D placement, need to convert to 3D
+        Axis2Placement3D position = convert2DPlacementTo3D(clothoid.getPosition());
+        double xAxisIntercept = clothoid.xAxisIntercept();
+        double curvature = clothoid.curvature();
+        if (!Double.isFinite(xAxisIntercept) || !Double.isFinite(curvature)) {
+            throw new UnsupportedGeometryException("CLOTHOID requires finite xAxisIntercept and curvature");
+        }
+        if (Math.abs(curvature) < Epsilon.EPS) {
+            throw new UnsupportedGeometryException("CLOTHOID curvature must be non-zero");
+        }
+        Clothoid3 built = new Clothoid3(position, xAxisIntercept, curvature);
+        clothoids3d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Curve3 from a STEP OFFSET_CURVE_3D entity.
+     */
+    public Curve3 buildOffsetCurve3(int id) {
+        StepOffsetCurve3D offsetCurve = requireEntity(id, StepOffsetCurve3D.class, "OFFSET_CURVE_3D");
+        Curve3 basisCurve = buildCurve3Internal(offsetCurve.getBasisCurve());
+        return approximateOffsetCurve3(basisCurve, offsetCurve.getDistance(), geometryBuilder.buildDirection(offsetCurve.getRefDirection().id()));
+    }
+
+    // ==================== 3D Curve Internal Dispatcher ====================
+
+    /**
+     * Internal dispatcher for building 3D curves from STEP entities.
+     * Handles the core 3D curve types managed by this builder.
+     */
+    Curve3 buildCurve3Internal(StepEntity curve) {
+        if (curve instanceof StepLine) {
+            StepLine line = (StepLine) curve;
+            return buildLine3(line.id());
+        }
+        if (curve instanceof StepCircle) {
+            StepCircle circle = (StepCircle) curve;
+            return buildCircle3(circle.id());
+        }
+        if (curve instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) curve;
+            return buildEllipse3(ellipse.id());
+        }
+        if (curve instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) curve;
+            return buildPolyline3(polyline.id());
+        }
+        if (curve instanceof StepBezierCurve) {
+            return buildImplicitBSplineCurve3((StepBezierCurve) curve);
+        }
+        if (curve instanceof StepUniformCurve) {
+            return buildImplicitBSplineCurve3((StepUniformCurve) curve);
+        }
+        if (curve instanceof StepQuasiUniformCurve) {
+            return buildImplicitBSplineCurve3((StepQuasiUniformCurve) curve);
+        }
+        if (curve instanceof StepPiecewiseBezierCurve) {
+            return buildImplicitBSplineCurve3((StepPiecewiseBezierCurve) curve);
+        }
+        if (curve instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) curve;
+            return buildBSplineCurve3(spline.id());
+        }
+        if (curve instanceof StepBSplineCurve) {
+            StepBSplineCurve spline = (StepBSplineCurve) curve;
+            return buildBSplineCurve3(spline.id());
+        }
+        if (curve instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve spline = (StepRationalBSplineCurve) curve;
+            return buildRationalBSplineCurve3(spline.id());
+        }
+        if (curve instanceof StepSurfaceCurve) {
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) curve;
+            return buildSurfaceCurve3(surfaceCurve.id());
+        }
+        if (curve instanceof StepSeamCurve) {
+            StepSeamCurve seamCurve = (StepSeamCurve) curve;
+            return buildSeamCurve(seamCurve.id());
+        }
+        if (curve instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) curve;
+            return buildTrimmedCurve3(trimmedCurve.id());
+        }
+        if (curve instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) curve;
+            return buildCompositeCurve3(compositeCurve.id());
+        }
+        if (curve instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) curve;
+            return buildCompositeCurve3(compositeCurveOnSurface.id());
+        }
+        if (curve instanceof StepConicCurve) {
+            return buildConicCurve3((StepConicCurve) curve);
+        }
+        if (curve instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) curve;
+            return buildOffsetCurve3(offsetCurve3D.id());
+        }
+        if (curve instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) curve;
+            Curve3 baseCurve = buildCurve3Callback.apply(orientedCurve.curveElement().id());
+            if (!orientedCurve.isOrientation() && baseCurve instanceof CompositeCurve3) {
+                CompositeCurve3 composite = (CompositeCurve3) baseCurve;
+                return reverseCompositeCurve(composite);
+            }
+            return baseCurve;
+        }
+        if (curve instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) curve;
+            Curve3 parent = buildCurve3Callback.apply(replica.parent().id());
+            return geometryOps.transformCurve3(parent, replica.transformation());
+        }
+        if (curve instanceof StepClothoid) {
+            StepClothoid clothoid = (StepClothoid) curve;
+            return buildClothoid3(clothoid.id());
+        }
+        if (curve instanceof StepIndexedPolyCurve) {
+            return buildIndexedPolyCurve3((StepIndexedPolyCurve) curve);
+        }
+        if (curve instanceof StepDegenerateCurve) {
+            return buildDegenerateCurve3((StepDegenerateCurve) curve);
+        }
+        if (curve instanceof StepBoundedCurve) {
+            StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
+            StepEntity actual = entitiesById.get(boundedCurve.id());
+            if (actual != null && actual != boundedCurve) {
+                return buildCurve3Internal(actual);
+            }
+            throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
+        }
+        if (curve instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+            StepBSplineCurveWithKnotsAndBreakpoints spline = (StepBSplineCurveWithKnotsAndBreakpoints) curve;
+            return buildBSplineCurveWithBreakpoints(spline.id());
+        }
+        // For curve types not handled by this builder, delegate to the callback
+        return buildCurve3Callback.apply(curve.id());
+    }
+
+    // ==================== Private 3D Curve Helper Methods ====================
+
+    private BSplineCurve3 buildImplicitBSplineCurve3(StepEntity entity) {
+        BSplineCurve3 existing = bsplineCurves3d.get(entity.id());
+        if (existing != null) {
+            return existing;
+        }
+        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
+        List<CartesianPoint> controlPoints = spline.getControlPoints().stream()
+                .map(point -> geometryBuilder.buildPoint(point.id()))
+                .collect(Collectors.toList());
+        BSplineCurve3 built = new BSplineCurve3(
+                spline.getDegree(),
+                controlPoints,
+                spline.getKnotMultiplicities(),
+                spline.getKnots()
+        );
+        bsplineCurves3d.put(entity.id(), built);
+        return built;
+    }
+
+    private Curve3 buildConicCurve3(StepConicCurve conic) {
+        if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
+            throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
+        }
+        String entityName = conic.entityName();
+        switch (entityName) {
+            case "PARABOLA":
+                return buildParabola3(conic.id());
+            case "HYPERBOLA":
+                return buildHyperbola3(conic.id());
+            case "DEGENERATE_CONIC":
+                StepAxis2Placement3D placement3D = (StepAxis2Placement3D) conic.getPosition();
+                return new DegenerateCurve3(buildPlacementCallback.apply(placement3D.id()).getLocation());
+            case "CONIC_CURVE":
+                try {
+                    return buildParabola3(conic.id());
+                } catch (UnsupportedGeometryException e) {
+                    return buildHyperbola3(conic.id());
+                }
+            default:
+                throw new UnsupportedGeometryException("conic curve type " + entityName + " is unsupported");
+        }
+    }
+
+    private Curve3 buildIndexedPolyCurve3(StepIndexedPolyCurve polyCurve) {
+        List<StepCartesianPoint> stepPoints = polyCurve.getPoints();
+        List<Integer> indices = polyCurve.indices();
+        List<CartesianPoint> points = indices.stream()
+                .map(index -> geometryBuilder.buildPoint(stepPoints.get(index).id()))
+                .collect(Collectors.toList());
+        if (polyCurve.isClosed() && !points.isEmpty()) {
+            points = new ArrayList<>(points);
+            points.add(points.get(0));
+            points = List.copyOf(points);
+        }
+        return new Polyline3(points);
+    }
+
+    private Curve3 buildDegenerateCurve3(StepDegenerateCurve degenerateCurve) {
+        Curve3 basis = buildCurve3Internal(degenerateCurve.getBasisCurve());
+        List<CartesianPoint> sampledPoints = geometryOps.sampleCurve3(basis, 2);
+        if (sampledPoints.isEmpty()) {
+            throw new UnsupportedGeometryException("DEGENERATE_CURVE basis curve has no sample points");
+        }
+        return new DegenerateCurve3(sampledPoints.get(0));
+    }
+
+    private Curve3 buildReplicaCurve3(StepGeometricReplica replica) {
+        Curve3 parent = buildCurve3Internal(replica.parent());
+        return geometryOps.transformCurve3(parent, replica.transformation());
+    }
+
+    private List<SurfaceCurve3.ParametricCurve> buildSurfaceCurveBindings(List<StepEntity> associatedGeometry) {
+        List<SurfaceCurve3.ParametricCurve> bindings = new ArrayList<>();
+        for (StepEntity geometry : associatedGeometry) {
+            StepEntity basisSurfaceEntity = null;
+            if (geometry instanceof StepPcurve) {
+                StepPcurve pcurve = (StepPcurve) geometry;
+                basisSurfaceEntity = pcurve.getBasisSurface();
+            } else if (geometry instanceof StepDegeneratePcurve) {
+                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) geometry;
+                basisSurfaceEntity = pcurve.getBasisSurface();
+            }
+            if (basisSurfaceEntity == null) {
+                continue;
+            }
+            Object builtCurve = buildPcurveCurve2Internal(geometry);
+            if (!(builtCurve instanceof Curve2)) {
+                continue;
+            }
+            Curve2 curve2 = (Curve2) builtCurve;
+            com.minicad.geometry.SurfaceGeometry surface = buildSurfaceCallback.apply(basisSurfaceEntity.id());
+            bindings.add(new SurfaceCurve3.ParametricCurve(surface, curve2));
+        }
+        return List.copyOf(bindings);
+    }
+
+    private Object buildPcurveCurve2Internal(StepEntity entity) {
+        StepEntity item;
+        if (entity instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else {
+            throw new StepResolutionException(stepEntityTypeName(entity) + " is not a PCURVE or DEGENERATE_PCURVE");
+        }
+        return buildCurve2(item);
+    }
+
+    private Axis2Placement3D convert2DPlacementTo3D(StepEntity position) {
+        if (position instanceof StepAxis2Placement3D) {
+            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) position;
+            return buildPlacementCallback.apply(placement3D.id());
+        }
+        if (!(position instanceof StepAxis2Placement2D)) {
+            throw new StepResolutionException("position must be AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
+        }
+        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) position;
+        Point2 origin = buildPoint2(placement2D.getLocation().id());
+        Direction2 refDir = buildDirection2(placement2D.getRefDirection().id());
+        CartesianPoint location3D = new CartesianPoint(origin.getX(), origin.getY(), 0.0);
+        Direction3 axis = new Direction3(0, 0, 1);
+        Direction3 xDirection = new Direction3(refDir.getX(), refDir.getY(), 0);
+        return new Axis2Placement3D(location3D, axis, xDirection);
+    }
+
+    private CompositeCurve3 reverseCompositeCurve(CompositeCurve3 original) {
+        List<Curve3> reversedSegments = new ArrayList<>(original.getSegments());
+        java.util.Collections.reverse(reversedSegments);
+        for (int i = 0; i < reversedSegments.size(); i++) {
+            reversedSegments.set(i, reverseCurve3(reversedSegments.get(i)));
+        }
+        return new CompositeCurve3(List.copyOf(reversedSegments));
+    }
+
+    private Curve3 reverseCurve3(Curve3 curve) {
+        if (curve instanceof Line3) {
+            Line3 line = (Line3) curve;
+            return new Line3(line.getOrigin(), line.getDirection().reverse(), line.getParameterScale());
+        }
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
+            List<CartesianPoint> reversedPoints = new ArrayList<>(polyline.getPoints());
+            java.util.Collections.reverse(reversedPoints);
+            return new Polyline3(reversedPoints);
+        }
+        if (curve instanceof CompositeCurve3) {
+            return reverseCompositeCurve((CompositeCurve3) curve);
+        }
+        if (curve instanceof Circle) {
+            Circle circle = (Circle) curve;
+            Axis2Placement3D p = circle.getPosition();
+            return new Circle(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), circle.getRadius());
+        }
+        if (curve instanceof Ellipse3) {
+            Ellipse3 ellipse = (Ellipse3) curve;
+            Axis2Placement3D p = ellipse.getPosition();
+            return new Ellipse3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), ellipse.getSemiAxis1(), ellipse.getSemiAxis2());
+        }
+        if (curve instanceof Parabola3) {
+            Parabola3 parabola = (Parabola3) curve;
+            Axis2Placement3D p = parabola.getPosition();
+            return new Parabola3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), parabola.getFocalLength());
+        }
+        if (curve instanceof Hyperbola3) {
+            Hyperbola3 hyperbola = (Hyperbola3) curve;
+            Axis2Placement3D p = hyperbola.getPosition();
+            return new Hyperbola3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), hyperbola.getSemiAxisA(), hyperbola.getSemiAxisB());
+        }
+        if (curve instanceof Clothoid3) {
+            Clothoid3 clothoid = (Clothoid3) curve;
+            Axis2Placement3D p = clothoid.getPosition();
+            return new Clothoid3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), clothoid.xAxisIntercept(), clothoid.curvature());
+        }
+        if (curve instanceof DegenerateCurve3) {
+            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
+            return new DegenerateCurve3(degenerate.point());
+        }
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmed = (TrimmedCurve3) curve;
+            return new TrimmedCurve3(reverseCurve3(trimmed.getBasisCurve()), trimmed.getTrimParamEnd(), trimmed.getTrimParamStart(), !trimmed.isSenseAgreement());
+        }
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
+            return new SurfaceCurve3(reverseCurve3(surfaceCurve.getCurve3d()), surfaceCurve.getParametricCurves());
+        }
+        if (curve instanceof BSplineCurve3) {
+            BSplineCurve3 bspline = (BSplineCurve3) curve;
+            return new BSplineCurve3(bspline.getDegree(), reverseList(bspline.getControlPoints()), bspline.getKnotMultiplicities(), bspline.getKnots());
+        }
+        if (curve instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
+            return new RationalBSplineCurve3(rational.getDegree(), reverseList(rational.getControlPoints()), rational.getWeights(), rational.getKnotMultiplicities(), rational.getKnots());
+        }
+        return curve;
+    }
+
+    private static <T> List<T> reverseList(List<T> list) {
+        List<T> reversed = new ArrayList<>(list);
+        java.util.Collections.reverse(reversed);
+        return List.copyOf(reversed);
+    }
+
+    private Curve3 approximateOffsetCurve3(Curve3 basisCurve, double distance, Direction3 refDirection) {
+        return geometryOps.approximateOffsetCurve3(basisCurve, distance, refDirection);
     }
 
     // ==================== Data Classes ====================

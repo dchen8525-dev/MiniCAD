@@ -1,6 +1,20 @@
 package com.minicad.step.semantic;
 
+import com.minicad.geometry.Axis2Placement3D;
+import com.minicad.geometry.BSplineCurve3;
+import com.minicad.geometry.Circle;
+import com.minicad.geometry.Clothoid3;
+import com.minicad.geometry.CompositeCurve3;
 import com.minicad.geometry.Curve3;
+import com.minicad.geometry.Ellipse3;
+import com.minicad.geometry.Hyperbola3;
+import com.minicad.geometry.Line3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.geometry.Polyline3;
+import com.minicad.geometry.RationalBSplineCurve3;
+import com.minicad.geometry.SurfaceCurve3;
+import com.minicad.geometry.SurfaceGeometry;
+import com.minicad.geometry.TrimmedCurve3;
 import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.CompositeCurve2;
@@ -46,7 +60,7 @@ class StepCadCurveBuilderTest {
      * Creates a StepCadCurveBuilder with minimal dependencies for testing.
      */
     private StepCadCurveBuilder createMinimalBuilder(Map<Integer, StepEntity> entitiesById) {
-        // Create empty cache maps
+        // Create empty 2D cache maps
         Map<Integer, Point2> points2d = new LinkedHashMap<>();
         Map<Integer, Direction2> directions2d = new LinkedHashMap<>();
         Map<Integer, Line2> lines2d = new LinkedHashMap<>();
@@ -60,11 +74,25 @@ class StepCadCurveBuilderTest {
         Map<Integer, Hyperbola2> hyperbolas2d = new LinkedHashMap<>();
         Map<Integer, Parabola2> parabolas2d = new LinkedHashMap<>();
 
+        // Create empty 3D cache maps
+        Map<Integer, Line3> lines3d = new LinkedHashMap<>();
+        Map<Integer, Circle> circles3d = new LinkedHashMap<>();
+        Map<Integer, Ellipse3> ellipses3d = new LinkedHashMap<>();
+        Map<Integer, Polyline3> polylines3d = new LinkedHashMap<>();
+        Map<Integer, CompositeCurve3> compositeCurves3d = new LinkedHashMap<>();
+        Map<Integer, BSplineCurve3> bsplineCurves3d = new LinkedHashMap<>();
+        Map<Integer, RationalBSplineCurve3> rationalBsplineCurves3d = new LinkedHashMap<>();
+        Map<Integer, TrimmedCurve3> trimmedCurves3d = new LinkedHashMap<>();
+        Map<Integer, SurfaceCurve3> surfaceCurves3d = new LinkedHashMap<>();
+        Map<Integer, Parabola3> parabolas3d = new LinkedHashMap<>();
+        Map<Integer, Hyperbola3> hyperbolas3d = new LinkedHashMap<>();
+        Map<Integer, Clothoid3> clothoids3d = new LinkedHashMap<>();
+
         // Create placeholder dependencies
         Map<Integer, com.minicad.geometry.CartesianPoint> points = new LinkedHashMap<>();
         Map<Integer, com.minicad.geometry.Direction3> directions = new LinkedHashMap<>();
         Map<Integer, com.minicad.geometry.Vector3> vectors = new LinkedHashMap<>();
-        Map<Integer, com.minicad.geometry.Axis2Placement3D> placements = new LinkedHashMap<>();
+        Map<Integer, Axis2Placement3D> placements = new LinkedHashMap<>();
         Map<Integer, com.minicad.geometry.Axis1Placement> axis1Placements = new LinkedHashMap<>();
 
         IntFunction<com.minicad.topology.Vertex> buildVertexCallback = id -> {
@@ -80,6 +108,14 @@ class StepCadCurveBuilderTest {
                 entitiesById, 
                 id -> geometryBuilder.buildPoint(id),
                 id -> new Point2(0, 0)); // Placeholder for buildPoint2
+
+        IntFunction<Axis2Placement3D> buildPlacementCallback = id -> {
+            throw new UnsupportedOperationException("buildPlacement not expected in this test");
+        };
+
+        IntFunction<SurfaceGeometry> buildSurfaceCallback = id -> {
+            throw new UnsupportedOperationException("buildSurface not expected in this test");
+        };
 
         IntFunction<Curve3> buildCurve3Callback = id -> {
             throw new UnsupportedOperationException("buildCurve3 not expected in this test");
@@ -102,6 +138,20 @@ class StepCadCurveBuilderTest {
                 trimmedCurves2d,
                 hyperbolas2d,
                 parabolas2d,
+                lines3d,
+                circles3d,
+                ellipses3d,
+                polylines3d,
+                compositeCurves3d,
+                bsplineCurves3d,
+                rationalBsplineCurves3d,
+                trimmedCurves3d,
+                surfaceCurves3d,
+                parabolas3d,
+                hyperbolas3d,
+                clothoids3d,
+                buildPlacementCallback,
+                buildSurfaceCallback,
                 buildCurve3Callback);
     }
 
