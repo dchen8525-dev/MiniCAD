@@ -260,6 +260,7 @@ import java.util.Objects;
 public final class StepCadBuilder {
 
     private final Map<Integer, StepEntity> entitiesById;
+    private final StepCadGeometryBuilder geometryBuilder;
     private final StepCadGeometryOps geometryOps;
     private final StepTrimResolver trimResolver;
     private final StepProfileBuilder profileBuilder;
@@ -323,6 +324,14 @@ public final class StepCadBuilder {
 
     private StepCadBuilder(Map<Integer, StepEntity> entitiesById) {
         this.entitiesById = Map.copyOf(entitiesById);
+        this.geometryBuilder = new StepCadGeometryBuilder(
+            this.entitiesById,
+            points,
+            directions,
+            vectors,
+            placements,
+            this::buildVertex
+        );
         this.geometryOps = new StepCadGeometryOps(this);
         this.trimResolver = new StepTrimResolver(entitiesById, this::buildPoint, this::buildPoint2);
         this.profileBuilder = new StepProfileBuilder(geometryOps, e -> (Curve2) buildCurve2(e));
@@ -348,32 +357,7 @@ public final class StepCadBuilder {
      * @return built point
      */
     public CartesianPoint buildPoint(int id) {
-        CartesianPoint existing = points.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEntity entity = requireExistingEntity(id);
-        if (entity instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) entity;
-            CartesianPoint built = new CartesianPoint(
-                    point.coordinates().get(0),
-                    point.coordinates().get(1),
-                    point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0
-            );
-            points.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepPoint) {
-            // POINT has no coordinates; return origin
-            CartesianPoint built = new CartesianPoint(0.0, 0.0, 0.0);
-            points.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) entity;
-            return buildVertex(vertexPoint.id()).point();
-        }
-        throw new UnsupportedGeometryException("entity #" + id + " is not a supported 3D point");
+        return geometryBuilder.buildPoint(id);
     }
 
     public Point2 buildPoint2(int id) {
