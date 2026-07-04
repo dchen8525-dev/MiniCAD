@@ -268,6 +268,7 @@ public final class StepCadBuilder {
     private final StepTopologyBuilder topologyBuilder;
     private final StepShellBuilder shellBuilder;
     private final StepSolidBuilder solidBuilder;
+    private final StepCadCurveBuilder curveBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
     private final Map<Integer, Direction3> directions = new LinkedHashMap<>();
     private final Map<Integer, Vector3> vectors = new LinkedHashMap<>();
@@ -337,6 +338,25 @@ public final class StepCadBuilder {
         );
         this.geometryOps = new StepCadGeometryOps(this);
         this.trimResolver = new StepTrimResolver(entitiesById, this::buildPoint, this::buildPoint2);
+        this.curveBuilder = new StepCadCurveBuilder(
+            this.entitiesById,
+            geometryBuilder,
+            geometryOps,
+            trimResolver,
+            points2d,
+            directions2d,
+            lines2d,
+            circles2d,
+            ellipses2d,
+            polylines2d,
+            compositeCurves2d,
+            splineCurves2d,
+            rationalSplineCurves2d,
+            trimmedCurves2d,
+            hyperbolas2d,
+            parabolas2d,
+            this::buildCurve3ById
+        );
         this.profileBuilder = new StepProfileBuilder(geometryOps, e -> (Curve2) buildCurve2(e));
         this.topologyBuilder = new StepTopologyBuilder(this);
         this.shellBuilder = new StepShellBuilder(this);
@@ -364,17 +384,7 @@ public final class StepCadBuilder {
     }
 
     public Point2 buildPoint2(int id) {
-        Point2 existing = points2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepCartesianPoint point = requireEntity(id, StepCartesianPoint.class, "CARTESIAN_POINT");
-        if (point.coordinates().size() != 2) {
-            throw new StepResolutionException("entity #" + id + " is not a 2D CARTESIAN_POINT");
-        }
-        Point2 built = new Point2(point.coordinates().get(0), point.coordinates().get(1));
-        points2d.put(id, built);
-        return built;
+        return curveBuilder.buildPoint2(id);
     }
 
     /**
@@ -415,20 +425,7 @@ public final class StepCadBuilder {
     }
 
     public Direction2 buildDirection2(int id) {
-        Direction2 existing = directions2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepDirection direction = requireEntity(id, StepDirection.class, "DIRECTION");
-        if (direction.directionRatios().size() != 2) {
-            throw new StepResolutionException("entity #" + id + " is not a 2D DIRECTION");
-        }
-        Direction2 built = Direction2.from(new com.minicad.geometry2d.Vector2(
-                direction.directionRatios().get(0),
-                direction.directionRatios().get(1)
-        ));
-        directions2d.put(id, built);
-        return built;
+        return curveBuilder.buildDirection2(id);
     }
 
     /**
@@ -556,185 +553,47 @@ public final class StepCadBuilder {
     }
 
     public Line2 buildLine2(int id) {
-        Line2 existing = lines2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepLine line = requireEntity(id, StepLine.class, "LINE");
-        if (line.point().coordinates().size() != 2 || line.vector().isOrientation().directionRatios().size() != 2) {
-            throw new StepResolutionException("entity #" + id + " is not a 2D LINE");
-        }
-        Line2 built = new Line2(
-                buildPoint2(line.point().id()),
-                buildDirection2(line.vector().isOrientation().id()),
-                line.vector().magnitude()
-        );
-        lines2d.put(id, built);
-        return built;
+        return curveBuilder.buildLine2(id);
     }
 
     public Object buildPcurve2(int id) {
-        StepEntity entity = requireEntity(id, StepEntity.class, "PCURVE or DEGENERATE_PCURVE");
-        StepEntity item;
-        if (entity instanceof StepPcurve) {
-            StepPcurve pcurve = (StepPcurve) entity;
-            item = pcurve.referenceToCurve().items().get(0);
-        } else if (entity instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) entity;
-            item = pcurve.referenceToCurve().items().get(0);
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a PCURVE or DEGENERATE_PCURVE");
-        }
-        return buildCurve2(item);
+        return curveBuilder.buildPcurve2(id);
     }
 
     public BSplineCurve2 buildBSplineCurve2(int id) {
-        BSplineCurve2 existing = splineCurves2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepBSplineCurveWithKnots spline = requireEntity(id, StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS");
-        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
-        for (StepCartesianPoint point : spline.getControlPoints()) {
-            if (point.coordinates().size() != 2) {
-                throw new UnsupportedGeometryException("B_SPLINE_CURVE_WITH_KNOTS is not a 2D spline");
-            }
-            controlPoints.add(buildPoint2(point.id()));
-        }
-        BSplineCurve2 built = new BSplineCurve2(
-                spline.getDegree(),
-                controlPoints,
-                spline.getKnotMultiplicities(),
-                spline.getKnots()
-        );
-        splineCurves2d.put(id, built);
-        return built;
+        return curveBuilder.buildBSplineCurve2(id);
     }
 
     public BSplineCurve2 buildBezierCurve2(int id) {
-        return buildImplicitBSplineCurve2(requireEntity(id, StepBezierCurve.class, "BEZIER_CURVE"));
+        return curveBuilder.buildBezierCurve2(id);
     }
 
     public BSplineCurve2 buildUniformCurve2(int id) {
-        return buildImplicitBSplineCurve2(requireEntity(id, StepUniformCurve.class, "UNIFORM_CURVE"));
+        return curveBuilder.buildUniformCurve2(id);
     }
 
     public BSplineCurve2 buildQuasiUniformCurve2(int id) {
-        return buildImplicitBSplineCurve2(requireEntity(id, StepQuasiUniformCurve.class, "QUASI_UNIFORM_CURVE"));
+        return curveBuilder.buildQuasiUniformCurve2(id);
     }
 
     public BSplineCurve2 buildPiecewiseBezierCurve2(int id) {
-        return buildImplicitBSplineCurve2(requireEntity(id, StepPiecewiseBezierCurve.class, "PIECEWISE_BEZIER_CURVE"));
-    }
-
-    private BSplineCurve2 buildImplicitBSplineCurve2(StepEntity entity) {
-        BSplineCurve2 existing = splineCurves2d.get(entity.id());
-        if (existing != null) {
-            return existing;
-        }
-        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
-        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
-        for (StepCartesianPoint point : spline.getControlPoints()) {
-            if (point.coordinates().size() != 2) {
-                throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " is not a 2D spline");
-            }
-            controlPoints.add(buildPoint2(point.id()));
-        }
-        BSplineCurve2 built = new BSplineCurve2(
-                spline.getDegree(),
-                controlPoints,
-                spline.getKnotMultiplicities(),
-                spline.getKnots()
-        );
-        splineCurves2d.put(entity.id(), built);
-        return built;
+        return curveBuilder.buildPiecewiseBezierCurve2(id);
     }
 
     public Circle2 buildCircle2(int id) {
-        Circle2 existing = circles2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepCircle circle = requireEntity(id, StepCircle.class, "CIRCLE");
-        if (!(circle.getPosition() instanceof StepAxis2Placement2D)) {
-            throw new StepResolutionException("entity #" + id + " is not a 2D CIRCLE");
-        }
-        StepAxis2Placement2D placement2d = (StepAxis2Placement2D) circle.getPosition();
-        Circle2 built = new Circle2(
-                buildPoint2(placement2d.getLocation().id()),
-                buildDirection2(placement2d.getRefDirection().id()),
-                circle.getRadius()
-        );
-        circles2d.put(id, built);
-        return built;
+        return curveBuilder.buildCircle2(id);
     }
 
     public Ellipse2 buildEllipse2(int id) {
-        Ellipse2 existing = ellipses2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
-        if (!(ellipse.getPosition() instanceof StepAxis2Placement2D)) {
-            throw new StepResolutionException("entity #" + id + " is not a 2D ELLIPSE");
-        }
-        StepAxis2Placement2D placement2d = (StepAxis2Placement2D) ellipse.getPosition();
-        Ellipse2 built = new Ellipse2(
-                buildPoint2(placement2d.getLocation().id()),
-                buildDirection2(placement2d.getRefDirection().id()),
-                ellipse.getSemiAxis1(),
-                ellipse.getSemiAxis2()
-        );
-        ellipses2d.put(id, built);
-        return built;
+        return curveBuilder.buildEllipse2(id);
     }
 
     public Polyline2 buildPolyline2(int id) {
-        Polyline2 existing = polylines2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepPolyline polyline = requireEntity(id, StepPolyline.class, "POLYLINE");
-        List<Point2> points = new ArrayList<>(polyline.getPoints().size());
-        for (StepCartesianPoint point : polyline.getPoints()) {
-            if (point.coordinates().size() != 2) {
-                throw new StepResolutionException("entity #" + id + " is not a 2D POLYLINE");
-            }
-            points.add(buildPoint2(point.id()));
-        }
-        Polyline2 built = new Polyline2(points);
-        polylines2d.put(id, built);
-        return built;
+        return curveBuilder.buildPolyline2(id);
     }
 
     public CompositeCurve2 buildCompositeCurve2(int id) {
-        CompositeCurve2 existing = compositeCurves2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEntity entity = requireExistingEntity(id);
-        List<StepCompositeCurveSegment> segments;
-        if (entity instanceof StepCompositeCurve) {
-            StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
-            segments = compositeCurve.getSegments();
-        } else if (entity instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
-            segments = compositeCurveOnSurface.getSegments();
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a COMPOSITE_CURVE");
-        }
-        List<Curve2> curves = new ArrayList<>(segments.size());
-        for (StepCompositeCurveSegment segment : segments) {
-            Object built = buildCurve2(segment.parentCurve());
-            if (!(built instanceof Curve2)) {
-                throw new UnsupportedGeometryException("COMPOSITE_CURVE segment is not a supported 2D curve");
-            }
-            Curve2 curve = (Curve2) built;
-            curves.add(curve);
-        }
-        CompositeCurve2 built = new CompositeCurve2(curves);
-        compositeCurves2d.put(id, built);
-        return built;
+        return curveBuilder.buildCompositeCurve2(id);
     }
 
     private CompositeCurve2 buildCompositeCurve2D(StepCompositeCurve2D compositeCurve2D) {
@@ -757,190 +616,7 @@ public final class StepCadBuilder {
     }
 
     Object buildCurve2(StepEntity item) {
-        if (item instanceof StepLine) {
-            StepLine line = (StepLine) item;
-            return buildLine2(line.id());
-        }
-        if (item instanceof StepCircle) {
-            StepCircle circle = (StepCircle) item;
-            return buildCircle2(circle.id());
-        }
-        if (item instanceof StepEllipse) {
-            StepEllipse ellipse = (StepEllipse) item;
-            return buildEllipse2(ellipse.id());
-        }
-        if (item instanceof StepPolyline) {
-            StepPolyline polyline = (StepPolyline) item;
-            return buildPolyline2(polyline.id());
-        }
-        if (item instanceof StepBezierCurve) {
-            StepBezierCurve curve = (StepBezierCurve) item;
-            return buildBezierCurve2(curve.id());
-        }
-        if (item instanceof StepUniformCurve) {
-            StepUniformCurve curve = (StepUniformCurve) item;
-            return buildUniformCurve2(curve.id());
-        }
-        if (item instanceof StepQuasiUniformCurve) {
-            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
-            return buildQuasiUniformCurve2(curve.id());
-        }
-        if (item instanceof StepPiecewiseBezierCurve) {
-            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
-            return buildPiecewiseBezierCurve2(curve.id());
-        }
-        if (item instanceof StepCompositeCurve) {
-            StepCompositeCurve compositeCurve = (StepCompositeCurve) item;
-            return buildCompositeCurve2(compositeCurve.id());
-        }
-        if (item instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) item;
-            return buildCompositeCurve2(compositeCurveOnSurface.id());
-        }
-        if (item instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) item;
-            return buildConicCurve2(conic);
-        }
-        if (item instanceof StepCircle2D) {
-            StepCircle2D circle2D = (StepCircle2D) item;
-            return buildCircle2D(circle2D);
-        }
-        if (item instanceof StepEllipse2D) {
-            StepEllipse2D ellipse2D = (StepEllipse2D) item;
-            return buildEllipse2D(ellipse2D);
-        }
-        if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return buildOffsetCurve2(offsetCurve2D.id());
-        }
-        if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            return buildCurve2(orientedCurve.curveElement());
-        }
-        if (item instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            return buildReplicaCurve2(replica);
-        }
-        if (item instanceof StepBSplineCurveWithKnots) {
-            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
-            return buildBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepBSplineCurve) {
-            StepBSplineCurve spline = (StepBSplineCurve) item;
-            return buildBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepRationalBSplineCurve) {
-            StepRationalBSplineCurve spline = (StepRationalBSplineCurve) item;
-            return buildRationalBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepTrimmedCurve) {
-            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-            return buildTrimmedCurve2(trimmedCurve.id());
-        }
-        if (item instanceof StepIndexedPolyCurve) {
-            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
-            return buildIndexedPolyCurve2(polyCurve);
-        }
-        if (item instanceof StepDegenerateCurve) {
-            StepDegenerateCurve degenerateCurve = (StepDegenerateCurve) item;
-            return buildDegenerateCurve2(degenerateCurve);
-        }
-        if (item instanceof StepClothoid) {
-            StepClothoid clothoid = (StepClothoid) item;
-            return buildClothoid2(clothoid);
-        }
-        // 2D-specific curve types
-        if (item instanceof StepPolyline2D) {
-            StepPolyline2D polyline2D = (StepPolyline2D) item;
-            return buildPolyline2D(polyline2D);
-        }
-        if (item instanceof StepTrimmedCurve2D) {
-            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
-            return buildTrimmedCurve2D(trimmedCurve2D);
-        }
-        if (item instanceof StepBSplineCurve2D) {
-            StepBSplineCurve2D spline2D = (StepBSplineCurve2D) item;
-            return buildBSplineCurve2D(spline2D);
-        }
-        if (item instanceof StepRationalBSplineCurve2D) {
-            StepRationalBSplineCurve2D rationalSpline2D = (StepRationalBSplineCurve2D) item;
-            return buildRationalBSplineCurve2D(rationalSpline2D);
-        }
-        if (item instanceof StepBezierCurve2D) {
-            StepBezierCurve2D bezier2D = (StepBezierCurve2D) item;
-            return buildBezierCurve2D(bezier2D);
-        }
-        if (item instanceof StepQuasiUniformCurve2D) {
-            StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) item;
-            return buildQuasiUniformCurve2D(quasiUniform2D);
-        }
-        if (item instanceof StepUniformCurve2D) {
-            StepUniformCurve2D uniform2D = (StepUniformCurve2D) item;
-            return buildUniformCurve2D(uniform2D);
-        }
-        if (item instanceof StepPiecewiseBezierCurve2D) {
-            StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) item;
-            return buildPiecewiseBezierCurve2D(piecewiseBezier2D);
-        }
-        if (item instanceof StepIndexedPolyCurve2D) {
-            StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) item;
-            return buildIndexedPolyCurve2D(polyCurve2D);
-        }
-        if (item instanceof StepDegenerateCurve2D) {
-            StepDegenerateCurve2D degenerateCurve2D = (StepDegenerateCurve2D) item;
-            return buildDegenerateCurve2D(degenerateCurve2D);
-        }
-        if (item instanceof StepHyperbola2D) {
-            StepHyperbola2D hyperbola2D = (StepHyperbola2D) item;
-            return buildHyperbola2D(hyperbola2D);
-        }
-        if (item instanceof StepParabola2D) {
-            StepParabola2D parabola2D = (StepParabola2D) item;
-            return buildParabola2D(parabola2D);
-        }
-        if (item instanceof StepLine2D) {
-            StepLine2D line2D = (StepLine2D) item;
-            return buildLine2D(line2D);
-        }
-        // Bounded curve wraps an underlying 2D curve
-        if (item instanceof StepBoundedCurve2D) {
-            StepBoundedCurve2D boundedCurve2D = (StepBoundedCurve2D) item;
-            return buildCurve2(boundedCurve2D.getCurve());
-        }
-        // Composite 2D curve
-        if (item instanceof StepCompositeCurve2D) {
-            StepCompositeCurve2D compositeCurve2D = (StepCompositeCurve2D) item;
-            return buildCompositeCurve2D(compositeCurve2D);
-        }
-        // Bounded curve marker (3D) - marker type with no geometry data
-        if (item instanceof StepBoundedCurve) {
-            StepBoundedCurve boundedCurve = (StepBoundedCurve) item;
-            StepEntity actual = entitiesById.get(boundedCurve.id());
-            if (actual != null && actual != boundedCurve) {
-                return buildCurve2(actual);
-            }
-            throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
-        }
-        // PCURVE and DEGENERATE_PCURVE: parameter-space curves on surfaces
-        if (item instanceof StepPcurve) {
-            StepPcurve pcurve = (StepPcurve) item;
-            return buildPcurveCurve2(pcurve);
-        }
-        if (item instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
-            return buildPcurveCurve2(pcurve);
-        }
-        // CURVE_2D: parametric curve with polynomial equation coefficients
-        if (item instanceof StepCurve2D) {
-            StepCurve2D curve2D = (StepCurve2D) item;
-            return buildCurve2DParametric(curve2D);
-        }
-        // MAPPED_ITEM: dispatch through to mapping target
-        if (item instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) item;
-            return buildCurve2(mappedItem.mappingTarget());
-        }
-        throw new UnsupportedGeometryException("2D curve type " + stepEntityTypeName(item) + " is not supported");
+        return curveBuilder.buildCurve2(item);
     }
 
     /**
@@ -1277,31 +953,11 @@ public final class StepCadBuilder {
     }
 
     public TrimmedCurve2 buildTrimmedCurve2(int id) {
-        TrimmedCurve2 existing = trimmedCurves2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
-        Object basis = buildCurve2(trimmedCurve.getBasisCurve());
-        if (!(basis instanceof Curve2)) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
-        }
-        Curve2 basisCurve = (Curve2) basis;
-        double trimParamStart = trimResolver.resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
-        double trimParamEnd = trimResolver.resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
-        TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimParamStart, trimParamEnd, trimmedCurve.isSenseAgreement());
-        trimmedCurves2d.put(id, built);
-        return built;
+        return curveBuilder.buildTrimmedCurve2(id);
     }
 
     public Curve2 buildOffsetCurve2(int id) {
-        StepOffsetCurve2D offsetCurve = requireEntity(id, StepOffsetCurve2D.class, "OFFSET_CURVE_2D");
-        Object basisObject = buildCurve2(offsetCurve.getBasisCurve());
-        if (!(basisObject instanceof Curve2)) {
-            throw new UnsupportedGeometryException("OFFSET_CURVE_2D basis curve is not a supported 2D curve");
-        }
-        Curve2 basisCurve = (Curve2) basisObject;
-        return approximateOffsetCurve2(basisCurve, offsetCurve.getDistance());
+        return curveBuilder.buildOffsetCurve2(id);
     }
 
     /**
@@ -4962,6 +4618,14 @@ public final class StepCadBuilder {
         );
         bsplineCurves.put(entity.id(), built);
         return built;
+    }
+
+    /**
+     * Builds a Curve3 by entity ID (for callback from StepCadCurveBuilder).
+     */
+    private Curve3 buildCurve3ById(int id) {
+        StepEntity entity = requireExistingEntity(id);
+        return buildCurve3(entity);
     }
 
     private Curve3 buildCurve3(StepEntity curve) {

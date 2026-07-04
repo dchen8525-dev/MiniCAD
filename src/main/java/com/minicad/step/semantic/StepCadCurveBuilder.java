@@ -1,0 +1,1231 @@
+package com.minicad.step.semantic;
+
+import com.minicad.common.Epsilon;
+import com.minicad.common.StepResolutionException;
+import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.geometry.Axis2Placement3D;
+import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.Curve3;
+import com.minicad.geometry.Direction3;
+import com.minicad.geometry2d.BSplineCurve2;
+import com.minicad.geometry2d.Circle2;
+import com.minicad.geometry2d.CompositeCurve2;
+import com.minicad.geometry2d.Curve2;
+import com.minicad.geometry2d.DegenerateCurve2;
+import com.minicad.geometry2d.Direction2;
+import com.minicad.geometry2d.Ellipse2;
+import com.minicad.geometry2d.Hyperbola2;
+import com.minicad.geometry2d.Line2;
+import com.minicad.geometry2d.Parabola2;
+import com.minicad.geometry2d.Point2;
+import com.minicad.geometry2d.Polyline2;
+import com.minicad.geometry2d.RationalBSplineCurve2;
+import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.geometry2d.Vector2;
+import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.geometry.StepAxis2Placement2D;
+import com.minicad.step.model.geometry.StepBezierCurve;
+import com.minicad.step.model.geometry.StepBezierCurve2D;
+import com.minicad.step.model.geometry.StepBSplineCurve;
+import com.minicad.step.model.geometry.StepBSplineCurve2D;
+import com.minicad.step.model.geometry.StepBSplineCurveWithKnots;
+import com.minicad.step.model.geometry.StepBoundedCurve;
+import com.minicad.step.model.geometry.StepBoundedCurve2D;
+import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.geometry.StepCartesianTransformationOperator;
+import com.minicad.step.model.geometry.StepCircle;
+import com.minicad.step.model.geometry.StepCircle2D;
+import com.minicad.step.model.geometry.StepClothoid;
+import com.minicad.step.model.geometry.StepCompositeCurve;
+import com.minicad.step.model.geometry.StepCompositeCurve2D;
+import com.minicad.step.model.geometry.StepCompositeCurveOnSurface;
+import com.minicad.step.model.geometry.StepCompositeCurveSegment;
+import com.minicad.step.model.geometry.StepConicCurve;
+import com.minicad.step.model.geometry.StepDegenerateCurve;
+import com.minicad.step.model.geometry.StepDegenerateCurve2D;
+import com.minicad.step.model.geometry.StepDegeneratePcurve;
+import com.minicad.step.model.geometry.StepDirection;
+import com.minicad.step.model.geometry.StepEllipse;
+import com.minicad.step.model.geometry.StepEllipse2D;
+import com.minicad.step.model.product.StepGeometricReplica;
+import com.minicad.step.model.geometry.StepHyperbola2D;
+import com.minicad.step.model.geometry.StepIndexedPolyCurve;
+import com.minicad.step.model.geometry.StepIndexedPolyCurve2D;
+import com.minicad.step.model.geometry.StepLine;
+import com.minicad.step.model.geometry.StepLine2D;
+import com.minicad.step.model.geometry.StepOffsetCurve2D;
+import com.minicad.step.model.geometry.StepOrientedCurve;
+import com.minicad.step.model.geometry.StepParabola2D;
+import com.minicad.step.model.geometry.StepPiecewiseBezierCurve;
+import com.minicad.step.model.geometry.StepPiecewiseBezierCurve2D;
+import com.minicad.step.model.geometry.StepPolyline;
+import com.minicad.step.model.geometry.StepPolyline2D;
+import com.minicad.step.model.geometry.StepPcurve;
+import com.minicad.step.model.geometry.StepQuasiUniformCurve;
+import com.minicad.step.model.geometry.StepQuasiUniformCurve2D;
+import com.minicad.step.model.geometry.StepRationalBSplineCurve;
+import com.minicad.step.model.geometry.StepRationalBSplineCurve2D;
+import com.minicad.step.model.geometry.StepTrimmedCurve;
+import com.minicad.step.model.geometry.StepTrimmedCurve2D;
+import com.minicad.step.model.geometry.StepUniformCurve;
+import com.minicad.step.model.geometry.StepUniformCurve2D;
+import com.minicad.step.model.geometry.StepCurve2D;
+import com.minicad.step.model.geometry.StepVector;
+import com.minicad.step.model.product.StepMappedItem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+
+/**
+ * Builder for 2D and 3D curve geometry objects extracted from StepCadBuilder.
+ * 
+ * This class handles construction of curve geometry objects:
+ * - 2D curves: Line2, Circle2, Ellipse2, BSplineCurve2, Polyline2, etc.
+ * - 3D curves: Line3, Circle3, Ellipse3, BSplineCurve3, etc. (placeholder for Phase 2)
+ * 
+ * Phase 1 extraction target: methods that build 2D curve types.
+ * Caching is provided to avoid rebuilding the same geometry multiple times.
+ */
+final class StepCadCurveBuilder {
+
+    // Entity lookup
+    private final Map<Integer, StepEntity> entitiesById;
+    
+    // Dependencies
+    private final StepCadGeometryBuilder geometryBuilder;
+    private final StepCadGeometryOps geometryOps;
+    private final StepTrimResolver trimResolver;
+    
+    // 2D geometry caches
+    private final Map<Integer, Point2> points2d;
+    private final Map<Integer, Direction2> directions2d;
+    private final Map<Integer, Line2> lines2d;
+    private final Map<Integer, Circle2> circles2d;
+    private final Map<Integer, Ellipse2> ellipses2d;
+    private final Map<Integer, Polyline2> polylines2d;
+    private final Map<Integer, CompositeCurve2> compositeCurves2d;
+    private final Map<Integer, BSplineCurve2> splineCurves2d;
+    private final Map<Integer, RationalBSplineCurve2> rationalSplineCurves2d;
+    private final Map<Integer, TrimmedCurve2> trimmedCurves2d;
+    private final Map<Integer, Hyperbola2> hyperbolas2d;
+    private final Map<Integer, Parabola2> parabolas2d;
+    
+    // Callbacks for cross-dependencies
+    private final IntFunction<Curve3> buildCurve3Callback; // For 3D curves used in 2D context (e.g., degenerate curve sampling)
+
+    /**
+     * Creates a new StepCadCurveBuilder with the specified cache maps and dependencies.
+     *
+     * @param entitiesById map of STEP entity ID to resolved entity
+     * @param geometryBuilder builder for basic geometry (points, directions)
+     * @param geometryOps geometry operations helper
+     * @param trimResolver resolver for trim parameters
+     * @param points2d cache for Point2 objects
+     * @param directions2d cache for Direction2 objects
+     * @param lines2d cache for Line2 objects
+     * @param circles2d cache for Circle2 objects
+     * @param ellipses2d cache for Ellipse2 objects
+     * @param polylines2d cache for Polyline2 objects
+     * @param compositeCurves2d cache for CompositeCurve2 objects
+     * @param splineCurves2d cache for BSplineCurve2 objects
+     * @param rationalSplineCurves2d cache for RationalBSplineCurve2 objects
+     * @param trimmedCurves2d cache for TrimmedCurve2 objects
+     * @param hyperbolas2d cache for Hyperbola2 objects
+     * @param parabolas2d cache for Parabola2 objects
+     * @param buildCurve3Callback callback to build 3D curves (for cross-dependencies like degenerate curve)
+     */
+    StepCadCurveBuilder(
+            Map<Integer, StepEntity> entitiesById,
+            StepCadGeometryBuilder geometryBuilder,
+            StepCadGeometryOps geometryOps,
+            StepTrimResolver trimResolver,
+            Map<Integer, Point2> points2d,
+            Map<Integer, Direction2> directions2d,
+            Map<Integer, Line2> lines2d,
+            Map<Integer, Circle2> circles2d,
+            Map<Integer, Ellipse2> ellipses2d,
+            Map<Integer, Polyline2> polylines2d,
+            Map<Integer, CompositeCurve2> compositeCurves2d,
+            Map<Integer, BSplineCurve2> splineCurves2d,
+            Map<Integer, RationalBSplineCurve2> rationalSplineCurves2d,
+            Map<Integer, TrimmedCurve2> trimmedCurves2d,
+            Map<Integer, Hyperbola2> hyperbolas2d,
+            Map<Integer, Parabola2> parabolas2d,
+            IntFunction<Curve3> buildCurve3Callback) {
+        this.entitiesById = entitiesById;
+        this.geometryBuilder = geometryBuilder;
+        this.geometryOps = geometryOps;
+        this.trimResolver = trimResolver;
+        this.points2d = points2d;
+        this.directions2d = directions2d;
+        this.lines2d = lines2d;
+        this.circles2d = circles2d;
+        this.ellipses2d = ellipses2d;
+        this.polylines2d = polylines2d;
+        this.compositeCurves2d = compositeCurves2d;
+        this.splineCurves2d = splineCurves2d;
+        this.rationalSplineCurves2d = rationalSplineCurves2d;
+        this.trimmedCurves2d = trimmedCurves2d;
+        this.hyperbolas2d = hyperbolas2d;
+        this.parabolas2d = parabolas2d;
+        this.buildCurve3Callback = buildCurve3Callback;
+    }
+
+    // ==================== 2D Point and Direction ====================
+    
+    /**
+     * Builds a Point2 from a STEP CARTESIAN_POINT entity.
+     *
+     * @param id the STEP entity ID
+     * @return the Point2 geometry object
+     */
+    Point2 buildPoint2(int id) {
+        Point2 existing = points2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCartesianPoint point = requireEntity(id, StepCartesianPoint.class, "CARTESIAN_POINT");
+        if (point.coordinates().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D CARTESIAN_POINT");
+        }
+        Point2 built = new Point2(point.coordinates().get(0), point.coordinates().get(1));
+        points2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Direction2 from a STEP DIRECTION entity.
+     *
+     * @param id the STEP entity ID
+     * @return the Direction2 geometry object
+     */
+    Direction2 buildDirection2(int id) {
+        Direction2 existing = directions2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepDirection direction = requireEntity(id, StepDirection.class, "DIRECTION");
+        if (direction.directionRatios().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D DIRECTION");
+        }
+        Direction2 built = Direction2.from(new Vector2(
+                direction.directionRatios().get(0),
+                direction.directionRatios().get(1)
+        ));
+        directions2d.put(id, built);
+        return built;
+    }
+
+    // ==================== 2D Curve Builders ====================
+
+    /**
+     * Builds a Line2 from a STEP LINE entity.
+     */
+    public Line2 buildLine2(int id) {
+        Line2 existing = lines2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepLine line = requireEntity(id, StepLine.class, "LINE");
+        if (line.point().coordinates().size() != 2 || line.vector().isOrientation().directionRatios().size() != 2) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D LINE");
+        }
+        Line2 built = new Line2(
+                buildPoint2(line.point().id()),
+                buildDirection2(line.vector().isOrientation().id()),
+                line.vector().magnitude()
+        );
+        lines2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Circle2 from a STEP CIRCLE entity.
+     */
+    public Circle2 buildCircle2(int id) {
+        Circle2 existing = circles2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepCircle circle = requireEntity(id, StepCircle.class, "CIRCLE");
+        if (!(circle.getPosition() instanceof StepAxis2Placement2D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D CIRCLE");
+        }
+        StepAxis2Placement2D placement2d = (StepAxis2Placement2D) circle.getPosition();
+        Circle2 built = new Circle2(
+                buildPoint2(placement2d.getLocation().id()),
+                buildDirection2(placement2d.getRefDirection().id()),
+                circle.getRadius()
+        );
+        circles2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds an Ellipse2 from a STEP ELLIPSE entity.
+     */
+    public Ellipse2 buildEllipse2(int id) {
+        Ellipse2 existing = ellipses2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEllipse ellipse = requireEntity(id, StepEllipse.class, "ELLIPSE");
+        if (!(ellipse.getPosition() instanceof StepAxis2Placement2D)) {
+            throw new StepResolutionException("entity #" + id + " is not a 2D ELLIPSE");
+        }
+        StepAxis2Placement2D placement2d = (StepAxis2Placement2D) ellipse.getPosition();
+        Ellipse2 built = new Ellipse2(
+                buildPoint2(placement2d.getLocation().id()),
+                buildDirection2(placement2d.getRefDirection().id()),
+                ellipse.getSemiAxis1(),
+                ellipse.getSemiAxis2()
+        );
+        ellipses2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a BSplineCurve2 from a STEP B_SPLINE_CURVE_WITH_KNOTS entity.
+     */
+    public BSplineCurve2 buildBSplineCurve2(int id) {
+        BSplineCurve2 existing = splineCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepBSplineCurveWithKnots spline = requireEntity(id, StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS");
+        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
+        for (StepCartesianPoint point : spline.getControlPoints()) {
+            if (point.coordinates().size() != 2) {
+                throw new UnsupportedGeometryException("B_SPLINE_CURVE_WITH_KNOTS is not a 2D spline");
+            }
+            controlPoints.add(buildPoint2(point.id()));
+        }
+        BSplineCurve2 built = new BSplineCurve2(
+                spline.getDegree(),
+                controlPoints,
+                spline.getKnotMultiplicities(),
+                spline.getKnots()
+        );
+        splineCurves2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a BSplineCurve2 from a STEP BEZIER_CURVE entity.
+     */
+    public BSplineCurve2 buildBezierCurve2(int id) {
+        return buildImplicitBSplineCurve2(requireEntity(id, StepBezierCurve.class, "BEZIER_CURVE"));
+    }
+
+    /**
+     * Builds a BSplineCurve2 from a STEP UNIFORM_CURVE entity.
+     */
+    public BSplineCurve2 buildUniformCurve2(int id) {
+        return buildImplicitBSplineCurve2(requireEntity(id, StepUniformCurve.class, "UNIFORM_CURVE"));
+    }
+
+    /**
+     * Builds a BSplineCurve2 from a STEP QUASI_UNIFORM_CURVE entity.
+     */
+    public BSplineCurve2 buildQuasiUniformCurve2(int id) {
+        return buildImplicitBSplineCurve2(requireEntity(id, StepQuasiUniformCurve.class, "QUASI_UNIFORM_CURVE"));
+    }
+
+    /**
+     * Builds a BSplineCurve2 from a STEP PIECEWISE_BEZIER_CURVE entity.
+     */
+    public BSplineCurve2 buildPiecewiseBezierCurve2(int id) {
+        return buildImplicitBSplineCurve2(requireEntity(id, StepPiecewiseBezierCurve.class, "PIECEWISE_BEZIER_CURVE"));
+    }
+
+    /**
+     * Builds a BSplineCurve2 from implicit B-spline curve data.
+     */
+    private BSplineCurve2 buildImplicitBSplineCurve2(StepEntity entity) {
+        BSplineCurve2 existing = splineCurves2d.get(entity.id());
+        if (existing != null) {
+            return existing;
+        }
+        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
+        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
+        for (StepCartesianPoint point : spline.getControlPoints()) {
+            if (point.coordinates().size() != 2) {
+                throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " is not a 2D spline");
+            }
+            controlPoints.add(buildPoint2(point.id()));
+        }
+        BSplineCurve2 built = new BSplineCurve2(
+                spline.getDegree(),
+                controlPoints,
+                spline.getKnotMultiplicities(),
+                spline.getKnots()
+        );
+        splineCurves2d.put(entity.id(), built);
+        return built;
+    }
+
+    /**
+     * Builds a RationalBSplineCurve2 from a STEP RATIONAL_B_SPLINE_CURVE entity.
+     */
+    public RationalBSplineCurve2 buildRationalBSplineCurve2(int id) {
+        RationalBSplineCurve2 existing = rationalSplineCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepRationalBSplineCurve spline = requireEntity(id, StepRationalBSplineCurve.class, "RATIONAL_B_SPLINE_CURVE");
+        if (spline.getWeightsData().isEmpty()) {
+            throw new UnsupportedGeometryException("RATIONAL_B_SPLINE_CURVE requires weights");
+        }
+        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
+        for (StepCartesianPoint point : spline.getControlPoints()) {
+            if (point.coordinates().size() != 2) {
+                throw new UnsupportedGeometryException("RATIONAL_B_SPLINE_CURVE is not a 2D spline");
+            }
+            controlPoints.add(buildPoint2(point.id()));
+        }
+        RationalBSplineCurve2 built = new RationalBSplineCurve2(
+                spline.getDegree(),
+                controlPoints,
+                spline.getWeightsData(),
+                spline.getKnotMultiplicities(),
+                spline.getKnots()
+        );
+        rationalSplineCurves2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a Polyline2 from a STEP POLYLINE entity.
+     */
+    public Polyline2 buildPolyline2(int id) {
+        Polyline2 existing = polylines2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepPolyline polyline = requireEntity(id, StepPolyline.class, "POLYLINE");
+        List<Point2> points = new ArrayList<>(polyline.getPoints().size());
+        for (StepCartesianPoint point : polyline.getPoints()) {
+            if (point.coordinates().size() != 2) {
+                throw new StepResolutionException("entity #" + id + " is not a 2D POLYLINE");
+            }
+            points.add(buildPoint2(point.id()));
+        }
+        Polyline2 built = new Polyline2(points);
+        polylines2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a TrimmedCurve2 from a STEP TRIMMED_CURVE entity.
+     */
+    public TrimmedCurve2 buildTrimmedCurve2(int id) {
+        TrimmedCurve2 existing = trimmedCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepTrimmedCurve trimmedCurve = requireEntity(id, StepTrimmedCurve.class, "TRIMMED_CURVE");
+        Object basis = buildCurve2(trimmedCurve.getBasisCurve());
+        if (!(basis instanceof Curve2)) {
+            throw new UnsupportedGeometryException("TRIMMED_CURVE basis curve is not a supported 2D curve");
+        }
+        Curve2 basisCurve = (Curve2) basis;
+        double trimParamStart = trimResolver.resolveTrimParam2(trimmedCurve.trim1(), basisCurve, "trim_1");
+        double trimParamEnd = trimResolver.resolveTrimParam2(trimmedCurve.trim2(), basisCurve, "trim_2");
+        TrimmedCurve2 built = new TrimmedCurve2(basisCurve, trimParamStart, trimParamEnd, trimmedCurve.isSenseAgreement());
+        trimmedCurves2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds a CompositeCurve2 from a STEP COMPOSITE_CURVE entity.
+     */
+    public CompositeCurve2 buildCompositeCurve2(int id) {
+        CompositeCurve2 existing = compositeCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        StepEntity entity = requireExistingEntity(id);
+        List<StepCompositeCurveSegment> segments;
+        if (entity instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
+            segments = compositeCurve.getSegments();
+        } else if (entity instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
+            segments = compositeCurveOnSurface.getSegments();
+        } else {
+            throw new StepResolutionException("entity #" + id + " is not a COMPOSITE_CURVE");
+        }
+        List<Curve2> curves = new ArrayList<>(segments.size());
+        for (StepCompositeCurveSegment segment : segments) {
+            Object built = buildCurve2(segment.parentCurve());
+            if (!(built instanceof Curve2)) {
+                throw new UnsupportedGeometryException("COMPOSITE_CURVE segment is not a supported 2D curve");
+            }
+            Curve2 curve = (Curve2) built;
+            curves.add(curve);
+        }
+        CompositeCurve2 built = new CompositeCurve2(curves);
+        compositeCurves2d.put(id, built);
+        return built;
+    }
+
+    /**
+     * Builds an OffsetCurve2 from a STEP OFFSET_CURVE_2D entity.
+     */
+    public Curve2 buildOffsetCurve2(int id) {
+        StepOffsetCurve2D offsetCurve = requireEntity(id, StepOffsetCurve2D.class, "OFFSET_CURVE_2D");
+        Object basisObject = buildCurve2(offsetCurve.getBasisCurve());
+        if (!(basisObject instanceof Curve2)) {
+            throw new UnsupportedGeometryException("OFFSET_CURVE_2D basis curve is not a supported 2D curve");
+        }
+        Curve2 basisCurve = (Curve2) basisObject;
+        return approximateOffsetCurve2(basisCurve, offsetCurve.getDistance());
+    }
+
+    /**
+     * Builds a PCURVE or DEGENERATE_PCURVE as a 2D curve.
+     */
+    public Object buildPcurve2(int id) {
+        StepEntity entity = requireEntity(id, StepEntity.class, "PCURVE or DEGENERATE_PCURVE");
+        StepEntity item;
+        if (entity instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else {
+            throw new StepResolutionException("entity #" + id + " is not a PCURVE or DEGENERATE_PCURVE");
+        }
+        return buildCurve2(item);
+    }
+
+    /**
+     * Builds a 2D curve from a STEP entity.
+     * Dispatches to the appropriate build method based on entity type.
+     */
+    Object buildCurve2(StepEntity item) {
+        if (item instanceof StepLine) {
+            StepLine line = (StepLine) item;
+            return buildLine2(line.id());
+        }
+        if (item instanceof StepCircle) {
+            StepCircle circle = (StepCircle) item;
+            return buildCircle2(circle.id());
+        }
+        if (item instanceof StepEllipse) {
+            StepEllipse ellipse = (StepEllipse) item;
+            return buildEllipse2(ellipse.id());
+        }
+        if (item instanceof StepPolyline) {
+            StepPolyline polyline = (StepPolyline) item;
+            return buildPolyline2(polyline.id());
+        }
+        if (item instanceof StepBezierCurve) {
+            StepBezierCurve curve = (StepBezierCurve) item;
+            return buildBezierCurve2(curve.id());
+        }
+        if (item instanceof StepUniformCurve) {
+            StepUniformCurve curve = (StepUniformCurve) item;
+            return buildUniformCurve2(curve.id());
+        }
+        if (item instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
+            return buildQuasiUniformCurve2(curve.id());
+        }
+        if (item instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
+            return buildPiecewiseBezierCurve2(curve.id());
+        }
+        if (item instanceof StepCompositeCurve) {
+            StepCompositeCurve compositeCurve = (StepCompositeCurve) item;
+            return buildCompositeCurve2(compositeCurve.id());
+        }
+        if (item instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) item;
+            return buildCompositeCurve2(compositeCurveOnSurface.id());
+        }
+        if (item instanceof StepConicCurve) {
+            StepConicCurve conic = (StepConicCurve) item;
+            return buildConicCurve2(conic);
+        }
+        if (item instanceof StepCircle2D) {
+            StepCircle2D circle2D = (StepCircle2D) item;
+            return buildCircle2D(circle2D);
+        }
+        if (item instanceof StepEllipse2D) {
+            StepEllipse2D ellipse2D = (StepEllipse2D) item;
+            return buildEllipse2D(ellipse2D);
+        }
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
+            return buildOffsetCurve2(offsetCurve2D.id());
+        }
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
+            return buildCurve2(orientedCurve.curveElement());
+        }
+        if (item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            return buildReplicaCurve2(replica);
+        }
+        if (item instanceof StepBSplineCurveWithKnots) {
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
+            return buildBSplineCurve2(spline.id());
+        }
+        if (item instanceof StepBSplineCurve) {
+            StepBSplineCurve spline = (StepBSplineCurve) item;
+            return buildBSplineCurve2(spline.id());
+        }
+        if (item instanceof StepRationalBSplineCurve) {
+            StepRationalBSplineCurve spline = (StepRationalBSplineCurve) item;
+            return buildRationalBSplineCurve2(spline.id());
+        }
+        if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
+            return buildTrimmedCurve2(trimmedCurve.id());
+        }
+        if (item instanceof StepIndexedPolyCurve) {
+            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
+            return buildIndexedPolyCurve2(polyCurve);
+        }
+        if (item instanceof StepDegenerateCurve) {
+            StepDegenerateCurve degenerateCurve = (StepDegenerateCurve) item;
+            return buildDegenerateCurve2(degenerateCurve);
+        }
+        if (item instanceof StepClothoid) {
+            StepClothoid clothoid = (StepClothoid) item;
+            return buildClothoid2(clothoid);
+        }
+        // 2D-specific curve types
+        if (item instanceof StepPolyline2D) {
+            StepPolyline2D polyline2D = (StepPolyline2D) item;
+            return buildPolyline2D(polyline2D);
+        }
+        if (item instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
+            return buildTrimmedCurve2D(trimmedCurve2D);
+        }
+        if (item instanceof StepBSplineCurve2D) {
+            StepBSplineCurve2D spline2D = (StepBSplineCurve2D) item;
+            return buildBSplineCurve2D(spline2D);
+        }
+        if (item instanceof StepRationalBSplineCurve2D) {
+            StepRationalBSplineCurve2D rationalSpline2D = (StepRationalBSplineCurve2D) item;
+            return buildRationalBSplineCurve2D(rationalSpline2D);
+        }
+        if (item instanceof StepBezierCurve2D) {
+            StepBezierCurve2D bezier2D = (StepBezierCurve2D) item;
+            return buildBezierCurve2D(bezier2D);
+        }
+        if (item instanceof StepQuasiUniformCurve2D) {
+            StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) item;
+            return buildQuasiUniformCurve2D(quasiUniform2D);
+        }
+        if (item instanceof StepUniformCurve2D) {
+            StepUniformCurve2D uniform2D = (StepUniformCurve2D) item;
+            return buildUniformCurve2D(uniform2D);
+        }
+        if (item instanceof StepPiecewiseBezierCurve2D) {
+            StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) item;
+            return buildPiecewiseBezierCurve2D(piecewiseBezier2D);
+        }
+        if (item instanceof StepIndexedPolyCurve2D) {
+            StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) item;
+            return buildIndexedPolyCurve2D(polyCurve2D);
+        }
+        if (item instanceof StepDegenerateCurve2D) {
+            StepDegenerateCurve2D degenerateCurve2D = (StepDegenerateCurve2D) item;
+            return buildDegenerateCurve2D(degenerateCurve2D);
+        }
+        if (item instanceof StepHyperbola2D) {
+            StepHyperbola2D hyperbola2D = (StepHyperbola2D) item;
+            return buildHyperbola2D(hyperbola2D);
+        }
+        if (item instanceof StepParabola2D) {
+            StepParabola2D parabola2D = (StepParabola2D) item;
+            return buildParabola2D(parabola2D);
+        }
+        if (item instanceof StepLine2D) {
+            StepLine2D line2D = (StepLine2D) item;
+            return buildLine2D(line2D);
+        }
+        // Bounded curve wraps an underlying 2D curve
+        if (item instanceof StepBoundedCurve2D) {
+            StepBoundedCurve2D boundedCurve2D = (StepBoundedCurve2D) item;
+            return buildCurve2(boundedCurve2D.getCurve());
+        }
+        // Composite 2D curve
+        if (item instanceof StepCompositeCurve2D) {
+            StepCompositeCurve2D compositeCurve2D = (StepCompositeCurve2D) item;
+            return buildCompositeCurve2D(compositeCurve2D);
+        }
+        // Bounded curve marker (3D) - marker type with no geometry data
+        if (item instanceof StepBoundedCurve) {
+            StepBoundedCurve boundedCurve = (StepBoundedCurve) item;
+            StepEntity actual = entitiesById.get(boundedCurve.id());
+            if (actual != null && actual != boundedCurve) {
+                return buildCurve2(actual);
+            }
+            throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
+        }
+        // PCURVE and DEGENERATE_PCURVE: parameter-space curves on surfaces
+        if (item instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) item;
+            return buildPcurveCurve2(pcurve);
+        }
+        if (item instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
+            return buildPcurveCurve2(pcurve);
+        }
+        // CURVE_2D: parametric curve with polynomial equation coefficients
+        if (item instanceof StepCurve2D) {
+            StepCurve2D curve2D = (StepCurve2D) item;
+            return buildCurve2DParametric(curve2D);
+        }
+        // MAPPED_ITEM: dispatch through to mapping target
+        if (item instanceof StepMappedItem) {
+            StepMappedItem mappedItem = (StepMappedItem) item;
+            return buildCurve2(mappedItem.mappingTarget());
+        }
+        throw new UnsupportedGeometryException("2D curve type " + stepEntityTypeName(item) + " is not supported");
+    }
+
+    // ==================== Private 2D Curve Builders ====================
+
+    private CompositeCurve2 buildCompositeCurve2D(StepCompositeCurve2D compositeCurve2D) {
+        CompositeCurve2 existing = compositeCurves2d.get(compositeCurve2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        List<Curve2> curves = new ArrayList<>(compositeCurve2D.getSegments().size());
+        for (StepCompositeCurveSegment segment : compositeCurve2D.getSegments()) {
+            Object built = buildCurve2(segment.parentCurve());
+            if (!(built instanceof Curve2)) {
+                throw new UnsupportedGeometryException("COMPOSITE_CURVE_2D segment is not a supported 2D curve");
+            }
+            Curve2 curve = (Curve2) built;
+            curves.add(curve);
+        }
+        CompositeCurve2 built = new CompositeCurve2(curves);
+        compositeCurves2d.put(compositeCurve2D.id(), built);
+        return built;
+    }
+
+    private Object buildPcurveCurve2(StepEntity entity) {
+        StepEntity item;
+        if (entity instanceof StepPcurve) {
+            StepPcurve pcurve = (StepPcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else if (entity instanceof StepDegeneratePcurve) {
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) entity;
+            item = pcurve.referenceToCurve().items().get(0);
+        } else {
+            throw new StepResolutionException(stepEntityTypeName(entity) + " is not a PCURVE or DEGENERATE_PCURVE");
+        }
+        return buildCurve2(item);
+    }
+
+    private Curve2 buildConicCurve2(StepConicCurve conic) {
+        if (!(conic.getPosition() instanceof StepAxis2Placement2D)) {
+            throw new UnsupportedGeometryException("2D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_2D");
+        }
+        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) conic.getPosition();
+        Point2 origin = buildPoint2(placement2D.getLocation().id());
+        Direction2 xDirection = buildDirection2(placement2D.getRefDirection().id());
+        String entityName = conic.entityName();
+        switch (entityName) {
+            case "PARABOLA":
+                return buildParabola2(origin, xDirection, conic.parameters());
+            case "HYPERBOLA":
+                return buildHyperbola2(origin, xDirection, conic.parameters());
+            case "DEGENERATE_CONIC":
+                return new Polyline2(List.of(origin, origin));
+            case "CONIC_CURVE":
+                try {
+                    return buildParabola2(origin, xDirection, conic.parameters());
+                } catch (UnsupportedGeometryException e) {
+                    return buildHyperbola2(origin, xDirection, conic.parameters());
+                }
+            default:
+                throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
+        }
+    }
+
+    private Parabola2 buildParabola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
+        if (parameters.isEmpty()) {
+            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
+        }
+        double focalDistance = parameters.get(0);
+        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
+        }
+        Direction2 yDirection = new Direction2(-xDirection.getY(), xDirection.getX());
+        return new Parabola2(origin, yDirection, focalDistance);
+    }
+
+    private Hyperbola2 buildHyperbola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
+        if (parameters.size() < 2) {
+            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
+        }
+        double semiAxisA = parameters.get(0);
+        double semiAxisB = parameters.get(1);
+        if (!Double.isFinite(semiAxisA) || !Double.isFinite(semiAxisB)
+                || semiAxisA <= Epsilon.EPS || semiAxisB <= Epsilon.EPS) {
+            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
+        }
+        return new Hyperbola2(origin, xDirection, semiAxisA, semiAxisB);
+    }
+
+    private Curve2 buildReplicaCurve2(StepGeometricReplica replica) {
+        Object built = buildCurve2(replica.parent());
+        if (!(built instanceof Curve2)) {
+            throw new UnsupportedGeometryException(replica.entityName() + " parent is not a supported 2D curve");
+        }
+        Curve2 parent = (Curve2) built;
+        return transformCurve2(parent, replica.transformation());
+    }
+
+    private Polyline2 buildIndexedPolyCurve2(StepIndexedPolyCurve polyCurve) {
+        List<StepCartesianPoint> stepPoints = polyCurve.getPoints();
+        List<Integer> indices = polyCurve.indices();
+        List<Point2> points = indices.stream()
+                .map(index -> {
+                    StepCartesianPoint stepPoint = stepPoints.get(index);
+                    CartesianPoint point3D = geometryBuilder.buildPoint(stepPoint.id());
+                    return new Point2(point3D.getX(), point3D.getY());
+                })
+                .collect(Collectors.toList());
+        if (polyCurve.isClosed() && !points.isEmpty()) {
+            points = new ArrayList<>(points);
+            points.add(points.get(0));
+            points = List.copyOf(points);
+        }
+        return new Polyline2(points);
+    }
+
+    private Polyline2 buildDegenerateCurve2(StepDegenerateCurve degenerateCurve) {
+        StepEntity basisEntity = degenerateCurve.getBasisCurve();
+        if (basisEntity instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) basisEntity;
+            List<Double> coords = point.coordinates();
+            Point2 pt = coords.size() >= 2
+                ? new Point2(coords.get(0), coords.get(1))
+                : new Point2(0, 0);
+            return new Polyline2(List.of(pt, pt));
+        }
+        try {
+            Curve3 basisCurve = buildCurve3Callback.apply(basisEntity.id());
+            List<CartesianPoint> samples = basisCurve.sample(2);
+            if (!samples.isEmpty()) {
+                CartesianPoint first = samples.get(0);
+                Point2 pt = new Point2(first.getX(), first.getY());
+                return new Polyline2(List.of(pt, pt));
+            }
+        } catch (Exception e) {
+            // Ignore and use default
+        }
+        return new Polyline2(List.of(new Point2(0, 0), new Point2(0, 0)));
+    }
+
+    private Polyline2 buildClothoid2(StepClothoid clothoid) {
+        StepEntity positionEntity = clothoid.getPosition();
+        Point2 origin;
+        Direction2 xDir;
+        if (positionEntity instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) positionEntity;
+            origin = buildPoint2(placement2D.getLocation().id());
+            xDir = buildDirection2(placement2D.getRefDirection().id());
+        } else {
+            origin = new Point2(0, 0);
+            xDir = new Direction2(1, 0);
+        }
+        double xAxisIntercept = clothoid.xAxisIntercept();
+        double curvature = clothoid.curvature();
+
+        if (!Double.isFinite(xAxisIntercept) || !Double.isFinite(curvature) || curvature == 0) {
+            return new Polyline2(List.of(origin, origin));
+        }
+
+        int segments = 64;
+        List<Point2> points = new ArrayList<>(segments + 1);
+        Direction2 yDir = new Direction2(-xDir.getY(), xDir.getX());
+
+        double A = xAxisIntercept / Math.sqrt(Math.PI / 2);
+        double maxT = Math.sqrt(Math.abs(curvature) * Math.PI);
+
+        for (int i = 0; i <= segments; i++) {
+            double t = (maxT * i) / segments;
+            double fresnelC = fresnelCos(t);
+            double fresnelS = fresnelSin(t);
+            double x = A * fresnelC;
+            double y = A * fresnelS;
+            Point2 pt = origin.add(xDir.asVector().scale(x).add(yDir.asVector().scale(y)));
+            points.add(pt);
+        }
+        return new Polyline2(points);
+    }
+
+    private double fresnelCos(double t) {
+        if (t < 0.5) {
+            return t - t*t*t*t*t/10.0 + t*t*t*t*t*t*t*t*t/216.0;
+        }
+        double t2 = t * t;
+        return 0.5 + Math.sin(t2) / (2 * Math.PI * t);
+    }
+
+    private double fresnelSin(double t) {
+        if (t < 0.5) {
+            return t*t*t/3.0 - t*t*t*t*t*t*t/42.0;
+        }
+        double t2 = t * t;
+        return 0.5 - Math.cos(t2) / (2 * Math.PI * t);
+    }
+
+    // 2D-specific curve types
+
+    private Polyline2 buildPolyline2D(StepPolyline2D polyline2D) {
+        List<Point2> points = polyline2D.getPoints().stream()
+                .map(p -> buildPoint2(p.id()))
+                .collect(Collectors.toList());
+        return new Polyline2(points);
+    }
+
+    private TrimmedCurve2 buildTrimmedCurve2D(StepTrimmedCurve2D trimmedCurve2D) {
+        Curve2 basisCurve = (Curve2) buildCurve2(trimmedCurve2D.getBasisCurve());
+        double trim1 = trimmedCurve2D.trim1();
+        double trim2 = trimmedCurve2D.trim2();
+        return new TrimmedCurve2(basisCurve, trim1, trim2, trimmedCurve2D.isSenseAgreement());
+    }
+
+    private BSplineCurve2 buildBSplineCurve2D(StepBSplineCurve2D spline2D) {
+        BSplineCurve2 existing = splineCurves2d.get(spline2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        List<Point2> controlPoints = spline2D.getControlPoints().stream()
+                .map(p -> buildPoint2(p.id()))
+                .collect(Collectors.toList());
+        BSplineCurve2 built = new BSplineCurve2(spline2D.getDegree(), controlPoints, List.of(1), List.of(0.0, 1.0));
+        splineCurves2d.put(spline2D.id(), built);
+        return built;
+    }
+
+    private RationalBSplineCurve2 buildRationalBSplineCurve2D(StepRationalBSplineCurve2D rationalSpline2D) {
+        RationalBSplineCurve2 existing = rationalSplineCurves2d.get(rationalSpline2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        List<Point2> controlPoints = rationalSpline2D.getControlPoints().stream()
+                .map(p -> buildPoint2(p.id()))
+                .collect(Collectors.toList());
+        RationalBSplineCurve2 built = new RationalBSplineCurve2(
+                rationalSpline2D.getDegree(), controlPoints, rationalSpline2D.getWeights(), List.of(1), List.of(0.0, 1.0));
+        rationalSplineCurves2d.put(rationalSpline2D.id(), built);
+        return built;
+    }
+
+    private BSplineCurve2 buildBezierCurve2D(StepBezierCurve2D bezier2D) {
+        return buildImplicitBSplineCurve2D(bezier2D.id(), bezier2D.getDegree(), bezier2D.getControlPoints());
+    }
+
+    private BSplineCurve2 buildQuasiUniformCurve2D(StepQuasiUniformCurve2D quasiUniform2D) {
+        return buildImplicitBSplineCurve2D(quasiUniform2D.id(), quasiUniform2D.getDegree(), quasiUniform2D.getControlPoints());
+    }
+
+    private BSplineCurve2 buildUniformCurve2D(StepUniformCurve2D uniform2D) {
+        return buildImplicitBSplineCurve2D(uniform2D.id(), uniform2D.getDegree(), uniform2D.getControlPoints());
+    }
+
+    private BSplineCurve2 buildPiecewiseBezierCurve2D(StepPiecewiseBezierCurve2D piecewiseBezier2D) {
+        return buildImplicitBSplineCurve2D(piecewiseBezier2D.id(), piecewiseBezier2D.getDegree(), piecewiseBezier2D.getControlPoints());
+    }
+
+    private BSplineCurve2 buildImplicitBSplineCurve2D(int id, int degree, List<StepCartesianPoint> controlPoints) {
+        BSplineCurve2 existing = splineCurves2d.get(id);
+        if (existing != null) {
+            return existing;
+        }
+        List<Point2> points = controlPoints.stream()
+                .map(p -> buildPoint2(p.id()))
+                .collect(Collectors.toList());
+        BSplineCurve2 built = new BSplineCurve2(degree, points, List.of(1), List.of(0.0, 1.0));
+        splineCurves2d.put(id, built);
+        return built;
+    }
+
+    private Polyline2 buildIndexedPolyCurve2D(StepIndexedPolyCurve2D polyCurve2D) {
+        List<StepCartesianPoint> stepPoints = polyCurve2D.getPoints();
+        List<Integer> indices = polyCurve2D.indices();
+        List<Point2> points = indices.stream()
+                .map(index -> buildPoint2(stepPoints.get(index).id()))
+                .collect(Collectors.toList());
+        return new Polyline2(points);
+    }
+
+    private DegenerateCurve2 buildDegenerateCurve2D(StepDegenerateCurve2D degenerateCurve2D) {
+        Point2 point = buildPoint2(degenerateCurve2D.point().id());
+        return new DegenerateCurve2(point);
+    }
+
+    private Hyperbola2 buildHyperbola2D(StepHyperbola2D hyperbola2D) {
+        Hyperbola2 existing = hyperbolas2d.get(hyperbola2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        StepAxis2Placement2D position = hyperbola2D.getPosition();
+        Point2 center = buildPoint2(position.getLocation().id());
+        Direction2 xDir = buildDirection2(position.getRefDirection().id());
+        Hyperbola2 built = new Hyperbola2(center, xDir, hyperbola2D.getSemiAxis1(), hyperbola2D.getSemiAxis2());
+        hyperbolas2d.put(hyperbola2D.id(), built);
+        return built;
+    }
+
+    private Parabola2 buildParabola2D(StepParabola2D parabola2D) {
+        Parabola2 existing = parabolas2d.get(parabola2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        StepAxis2Placement2D position = parabola2D.getPosition();
+        Point2 center = buildPoint2(position.getLocation().id());
+        Direction2 xDir = buildDirection2(position.getRefDirection().id());
+        Parabola2 built = new Parabola2(center, xDir, parabola2D.focalDist());
+        parabolas2d.put(parabola2D.id(), built);
+        return built;
+    }
+
+    private Line2 buildLine2D(StepLine2D line2D) {
+        Point2 point = buildPoint2(line2D.point2d().id());
+        Direction2 dir = buildDirection2(line2D.direction2d().id());
+        return new Line2(point, dir);
+    }
+
+    private Circle2 buildCircle2D(StepCircle2D circle2D) {
+        Circle2 existing = circles2d.get(circle2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        StepAxis2Placement2D position = circle2D.getPosition();
+        Point2 center = buildPoint2(position.getLocation().id());
+        Direction2 xDir = buildDirection2(position.getRefDirection().id());
+        Circle2 built = new Circle2(center, xDir, circle2D.getRadius());
+        circles2d.put(circle2D.id(), built);
+        return built;
+    }
+
+    private Ellipse2 buildEllipse2D(StepEllipse2D ellipse2D) {
+        Ellipse2 existing = ellipses2d.get(ellipse2D.id());
+        if (existing != null) {
+            return existing;
+        }
+        StepAxis2Placement2D position = ellipse2D.getPosition();
+        Point2 center = buildPoint2(position.getLocation().id());
+        Direction2 xDir = buildDirection2(position.getRefDirection().id());
+        Ellipse2 built = new Ellipse2(center, xDir, ellipse2D.getSemiAxis1(), ellipse2D.getSemiAxis2());
+        ellipses2d.put(ellipse2D.id(), built);
+        return built;
+    }
+
+    private Polyline2 buildCurve2DParametric(StepCurve2D curve2D) {
+        double[] eq = curve2D.equation();
+        if (eq.length < 2) {
+            throw new UnsupportedGeometryException("CURVE_2D equation must have at least 2 coefficients");
+        }
+        int half = eq.length / 2;
+        double[] xCoeffs = Arrays.copyOfRange(eq, 0, half);
+        double[] yCoeffs = Arrays.copyOfRange(eq, half, eq.length);
+
+        Axis2Placement3D placement = null;
+        if (curve2D.getPosition() instanceof StepAxis2Placement2D) {
+            StepAxis2Placement2D pos2D = (StepAxis2Placement2D) curve2D.getPosition();
+            CartesianPoint origin = geometryBuilder.buildPoint(pos2D.getLocation().id());
+            Direction3 xDir = new Direction3(1, 0, 0);
+            if (pos2D.getRefDirection() != null) {
+                StepDirection dir = pos2D.getRefDirection();
+                List<Double> dirs = dir.directionRatios();
+                if (dirs != null && dirs.size() >= 2) {
+                    xDir = Direction3.from(new com.minicad.geometry.Vector3(dirs.get(0), dirs.get(1), 0));
+                }
+            }
+            Direction3 axis = Direction3.zAxis();
+            placement = new Axis2Placement3D(origin, axis, xDir);
+        }
+
+        int samples = Math.max(64, eq.length * 16);
+        List<Point2> points = new ArrayList<>(samples + 1);
+        for (int i = 0; i <= samples; i++) {
+            double t = (double) i / samples;
+            double x = evaluatePolynomial(xCoeffs, t);
+            double y = evaluatePolynomial(yCoeffs, t);
+            if (placement != null) {
+                double gx = placement.getLocation().getX() + x * placement.xDirection().getX() + y * placement.yDirection().getX();
+                double gy = placement.getLocation().getY() + x * placement.xDirection().getY() + y * placement.yDirection().getY();
+                points.add(new Point2(gx, gy));
+            } else {
+                points.add(new Point2(x, y));
+            }
+        }
+        return new Polyline2(points);
+    }
+
+    private static double evaluatePolynomial(double[] coeffs, double t) {
+        double result = 0.0;
+        double tPower = 1.0;
+        for (double coeff : coeffs) {
+            result += coeff * tPower;
+            tPower *= t;
+        }
+        return result;
+    }
+
+    // ==================== Helper Methods ====================
+
+    private Curve2 approximateOffsetCurve2(Curve2 basisCurve, double distance) {
+        return geometryOps.approximateOffsetCurve2(basisCurve, distance);
+    }
+
+    private Curve2 transformCurve2(Curve2 curve, StepCartesianTransformationOperator transformation) {
+        return geometryOps.transformCurve2(curve, transformation);
+    }
+
+    private StepEntity requireExistingEntity(int id) {
+        StepEntity entity = entitiesById.get(id);
+        if (entity == null) {
+            throw new StepResolutionException("missing resolved entity #" + id);
+        }
+        return entity;
+    }
+
+    private <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
+        StepEntity entity = requireExistingEntity(id);
+        if (!type.isInstance(entity)) {
+            throw new StepResolutionException("entity #" + id + " is not a " + expectedName);
+        }
+        return type.cast(entity);
+    }
+
+    private static String stepEntityTypeName(StepEntity entity) {
+        return entity.getClass().getSimpleName().replace("Step", "");
+    }
+
+    // ==================== Implicit B-Spline Curve Data ====================
+
+    private ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
+        if (entity instanceof StepBezierCurve) {
+            StepBezierCurve curve = (StepBezierCurve) entity;
+            return implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        }
+        if (entity instanceof StepUniformCurve) {
+            StepUniformCurve curve = (StepUniformCurve) entity;
+            return implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        }
+        if (entity instanceof StepQuasiUniformCurve) {
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
+            return implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        }
+        if (entity instanceof StepPiecewiseBezierCurve) {
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
+            return implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        }
+        throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
+    }
+
+    private ImplicitBSplineCurveData implicitBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
+        validateImplicitCurveData(degree, controlPoints, typeName);
+        if (controlPoints.size() != degree + 1) {
+            throw new UnsupportedGeometryException(typeName + " requires controlPointCount = degree + 1");
+        }
+        return new ImplicitBSplineCurveData(
+                degree,
+                controlPoints,
+                List.of(degree + 1, degree + 1),
+                List.of(0.0, 1.0)
+        );
+    }
+
+    private ImplicitBSplineCurveData implicitUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
+        validateImplicitCurveData(degree, controlPoints, typeName);
+        int knotCount = controlPoints.size() + degree + 1;
+        List<Integer> multiplicities = new ArrayList<>(knotCount);
+        List<Double> knots = new ArrayList<>(knotCount);
+        for (int index = 0; index < knotCount; index++) {
+            multiplicities.add(1);
+            knots.add((double) index);
+        }
+        return new ImplicitBSplineCurveData(degree, controlPoints, multiplicities, knots);
+    }
+
+    private ImplicitBSplineCurveData implicitQuasiUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
+        validateImplicitCurveData(degree, controlPoints, typeName);
+        int interiorCount = controlPoints.size() - degree - 1;
+        List<Integer> multiplicities = new ArrayList<>();
+        List<Double> knots = new ArrayList<>();
+        multiplicities.add(degree + 1);
+        knots.add(0.0);
+        for (int index = 1; index <= interiorCount; index++) {
+            multiplicities.add(1);
+            knots.add((double) index);
+        }
+        multiplicities.add(degree + 1);
+        knots.add((double) (interiorCount + 1));
+        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
+    }
+
+    private ImplicitBSplineCurveData implicitPiecewiseBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
+        validateImplicitCurveData(degree, controlPoints, typeName);
+        int segmentCount = controlPoints.size() - 1;
+        if (segmentCount % degree != 0) {
+            throw new UnsupportedGeometryException(typeName + " requires (controlPointCount - 1) to be divisible by degree");
+        }
+        int pieceCount = segmentCount / degree;
+        List<Integer> multiplicities = new ArrayList<>();
+        List<Double> knots = new ArrayList<>();
+        multiplicities.add(degree + 1);
+        knots.add(0.0);
+        for (int index = 1; index < pieceCount; index++) {
+            multiplicities.add(degree);
+            knots.add((double) index);
+        }
+        multiplicities.add(degree + 1);
+        knots.add((double) pieceCount);
+        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
+    }
+
+    private void validateImplicitCurveData(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
+        if (degree < 1 || controlPoints.isEmpty()) {
+            throw new UnsupportedGeometryException(typeName + " marker does not carry inherited B-spline geometry");
+        }
+    }
+
+    // ==================== Data Classes ====================
+
+    private static class ImplicitBSplineCurveData {
+        private final int degree;
+        private final List<StepCartesianPoint> controlPoints;
+        private final List<Integer> knotMultiplicities;
+        private final List<Double> knots;
+
+        ImplicitBSplineCurveData(int degree, List<StepCartesianPoint> controlPoints,
+                                  List<Integer> knotMultiplicities, List<Double> knots) {
+            this.degree = degree;
+            this.controlPoints = controlPoints;
+            this.knotMultiplicities = knotMultiplicities;
+            this.knots = knots;
+        }
+
+        int degree() { return degree; }
+        List<StepCartesianPoint> controlPoints() { return controlPoints; }
+        List<Integer> knotMultiplicities() { return knotMultiplicities; }
+        List<Double> knots() { return knots; }
+
+        int getDegree() { return degree; }
+        List<StepCartesianPoint> getControlPoints() { return controlPoints; }
+        List<Integer> getKnotMultiplicities() { return knotMultiplicities; }
+        List<Double> getKnots() { return knots; }
+    }
+}
