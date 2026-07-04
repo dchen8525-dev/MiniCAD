@@ -265,7 +265,7 @@ public final class StepCadBuilder {
     private final StepCadGeometryOps geometryOps;
     private final StepTrimResolver trimResolver;
     private final StepProfileBuilder profileBuilder;
-    private final StepTopologyBuilder topologyBuilder;
+    private final StepCadTopologyBuilder topologyBuilder;
     private final StepShellBuilder shellBuilder;
     private final StepSolidBuilder solidBuilder;
     private final StepCadCurveBuilder curveBuilder;
@@ -314,15 +314,7 @@ public final class StepCadBuilder {
     private final Map<Integer, Parabola3> parabolas = new LinkedHashMap<>();
     private final Map<Integer, Hyperbola3> hyperbolas = new LinkedHashMap<>();
     private final Map<Integer, Clothoid3> clothoids = new LinkedHashMap<>();
-    private final Map<Integer, Vertex> vertices = new LinkedHashMap<>();
-    private final Map<Integer, Edge> edges = new LinkedHashMap<>();
-    private final Map<Integer, OrientedEdge> orientedEdges = new LinkedHashMap<>();
-    private final Map<Integer, EdgeLoop> loops = new LinkedHashMap<>();
-    private final Map<Integer, VertexLoop> vertexLoops = new LinkedHashMap<>();
-    private final Map<Integer, com.minicad.topology.PolyLoop> polyLoops = new LinkedHashMap<>();
-    private final Map<Integer, CompositeCurve3> paths = new LinkedHashMap<>();
-    private final Map<Integer, FaceBound> faceBounds = new LinkedHashMap<>();
-    private final Map<Integer, Face> faces = new LinkedHashMap<>();
+    // Topology caches are now managed by StepCadTopologyBuilder
     private final Map<Integer, Shell> shells = new LinkedHashMap<>();
     private final Map<Integer, Solid> solids = new LinkedHashMap<>();
 
@@ -373,7 +365,13 @@ public final class StepCadBuilder {
             this::buildCurve3ById
         );
         this.profileBuilder = new StepProfileBuilder(geometryOps, e -> (Curve2) buildCurve2(e));
-        this.topologyBuilder = new StepTopologyBuilder(this);
+        this.topologyBuilder = new StepCadTopologyBuilder(
+            this,
+            this.entitiesById,
+            geometryBuilder::buildPoint,
+            this::buildCurve3ById,
+            this::buildSupportedFaceGeometryById
+        );
         this.shellBuilder = new StepShellBuilder(this);
         this.solidBuilder = new StepSolidBuilder(this);
         this.surfaceBuilder = new StepCadSurfaceBuilder(
@@ -1500,31 +1498,7 @@ public final class StepCadBuilder {
      * @return built vertex
      */
     public Vertex buildVertex(int id) {
-        Vertex existing = vertices.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEntity entity = requireExistingEntity(id);
-        Vertex built;
-        if (entity instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) entity;
-            built = new Vertex(buildPoint(vertexPoint.point().id()));
-        } else if (entity instanceof StepVertex) {
-            StepVertex vertex = (StepVertex) entity;
-            // VERTEX is the abstract base type. In complex entity syntax,
-            // the actual vertex subtype (VERTEX_POINT) may be resolved at the same ID.
-            StepEntity actual = entitiesById.get(vertex.id());
-            if (actual != null && actual != vertex && actual instanceof StepVertexPoint) {
-                StepVertexPoint vp = (StepVertexPoint) actual;
-                built = new Vertex(buildPoint(vp.point().id()));
-            } else {
-                throw new StepResolutionException("entity #" + id + " is an abstract VERTEX with no concrete VERTEX_POINT subtype");
-            }
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a VERTEX_POINT or VERTEX");
-        }
-        vertices.put(id, built);
-        return built;
+        return topologyBuilder.buildVertex(id);
     }
 
     /**
@@ -1534,194 +1508,7 @@ public final class StepCadBuilder {
      * @return built edge
      */
     public Edge buildEdge(int id) {
-        Edge existing = edges.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepEntity entity = requireExistingEntity(id);
-        Edge built;
-        if (entity instanceof StepSeamEdge) {
-            StepSeamEdge seamEdge = (StepSeamEdge) entity;
-            // Seam edge: start and end vertices are the same (closed edge on a surface seam).
-            // In complex entity syntax, the actual curve geometry may be at the same ID.
-            StepEntity actual = entitiesById.get(seamEdge.id());
-            Curve3 curve = null;
-            if (actual != null && actual != seamEdge) {
-                if (actual instanceof StepEdgeCurve) {
-            StepEdgeCurve ec = (StepEdgeCurve) actual;
-                    curve = buildCurve3(ec.edgeGeometry());
-                } else if (actual instanceof StepSurfaceCurve) {
-            StepSurfaceCurve sc = (StepSurfaceCurve) actual;
-                    curve = buildSurfaceCurve(sc.id()).getCurve3d();
-                }
-            }
-            if (curve == null) {
-                throw new UnsupportedGeometryException("SEAM_EDGE #" + seamEdge.id() + " has no associated curve geometry");
-            }
-            Vertex vertex = buildVertex(seamEdge.edgeStart().id());
-            built = buildEdgeWithProjection(vertex, vertex, curve, true);
-        } else if (entity instanceof StepEdgeCurve) {
-            StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
-            Curve3 curve = buildCurve3(edgeCurve.edgeGeometry());
-            Vertex startVertex = buildVertex(edgeCurve.getStart().id());
-            Vertex endVertex = buildVertex(edgeCurve.getEnd().id());
-            built = buildEdgeWithProjection(startVertex, endVertex, curve, edgeCurve.isSameSense());
-        } else if (entity instanceof StepFilletEdge) {
-            StepFilletEdge filletEdge = (StepFilletEdge) entity;
-            // Fillet edge wraps an original edge - build the underlying edge geometry.
-            // The fillet parameters (radius, adjacent faces) are not represented in our Edge topology.
-            built = buildEdge(filletEdge.originalEdge().id());
-        } else if (entity instanceof StepChamferEdge) {
-            StepChamferEdge chamferEdge = (StepChamferEdge) entity;
-            // Chamfer edge wraps an original edge - build the underlying edge geometry.
-            // The chamfer parameters (angle, width, adjacent faces) are not represented in our Edge topology.
-            built = buildEdge(chamferEdge.originalEdge().id());
-        } else if (entity instanceof StepSubedge) {
-            StepSubedge subedge = (StepSubedge) entity;
-            Edge parent = buildEdge(subedge.parentEdge().id());
-            built = buildEdgeWithProjection(
-                    buildVertex(subedge.getStart().id()),
-                    buildVertex(subedge.getEnd().id()),
-                    parent.getCurve(),
-                    parent.isSameSense());
-        } else if (entity instanceof StepEdge) {
-            StepEdge edge = (StepEdge) entity;
-            // EDGE is the abstract base type. In complex entity syntax,
-            // the actual edge subtype (EDGE_CURVE, SUBEDGE) may be resolved at the same ID.
-            StepEntity actual = entitiesById.get(edge.id());
-            if (actual != null && actual != edge) {
-                if (actual instanceof StepEdgeCurve || actual instanceof StepSubedge) {
-                    built = buildEdge(actual.id());
-                } else {
-                    throw new StepResolutionException("entity #" + id + " is an abstract EDGE with unsupported subtype " + stepEntityTypeName(actual));
-                }
-            } else {
-                throw new StepResolutionException("entity #" + id + " is an abstract EDGE with no concrete subtype");
-            }
-        } else if (entity instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) entity;
-            // MAPPED_ITEM: dispatch through to mapping target for edge geometry
-            built = buildEdge(mappedItem.mappingTarget().id());
-        } else {
-            throw new StepResolutionException("entity #" + id + " is not a SEAM_EDGE, EDGE_CURVE, FILLET_EDGE, CHAMFER_EDGE, SUBEDGE or EDGE");
-        }
-        edges.put(id, built);
-        return built;
-    }
-
-    /**
-     * Builds an edge, projecting vertices onto the curve if needed.
-     * Industrial STEP files often have vertex coordinates rounded to a limited
-     * number of decimal places, causing them to miss the curve by microns.
-     */
-    private static final double VERTEX_PROJECTION_TOLERANCE = 1.0e-2;
-
-    private Edge buildEdgeWithProjection(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
-        try {
-            return new Edge(start, end, curve, sameSense);
-        } catch (com.minicad.common.TopologyException e) {
-            // Project off-curve vertices onto the curve using closest-point projection
-            CartesianPoint startPoint = start.point();
-            CartesianPoint endPoint = end.point();
-            CartesianPoint projectedStart = projectOntoCurve(startPoint, curve);
-            CartesianPoint projectedEnd = projectOntoCurve(endPoint, curve);
-            // Use projected vertices - if they're within tolerance, the edge will succeed
-            Vertex vStart = (projectedStart.distanceTo(startPoint) > VERTEX_PROJECTION_TOLERANCE) ? start : new Vertex(projectedStart);
-            Vertex vEnd = (projectedEnd.distanceTo(endPoint) > VERTEX_PROJECTION_TOLERANCE) ? end : new Vertex(projectedEnd);
-            return new Edge(vStart, vEnd, curve, sameSense);
-        }
-    }
-
-    /**
-     * Projects a point onto a curve using closest-point projection.
-     * Handles all supported curve types.
-     */
-    private static CartesianPoint projectOntoCurve(CartesianPoint point, Curve3 curve) {
-        if (curve instanceof com.minicad.geometry.BSplineCurve3) {
-            com.minicad.geometry.BSplineCurve3 bspline = (com.minicad.geometry.BSplineCurve3) curve;
-            return bspline.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.RationalBSplineCurve3) {
-            com.minicad.geometry.RationalBSplineCurve3 rational = (com.minicad.geometry.RationalBSplineCurve3) curve;
-            return rational.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.Line3) {
-            com.minicad.geometry.Line3 line = (com.minicad.geometry.Line3) curve;
-            // Project onto infinite line: t is signed distance along direction
-            Vector3 offset = point.subtract(line.getOrigin());
-            double t = offset.dot(line.getDirection().asVector());
-            return line.getOrigin().add(line.getDirection().asVector().scale(t));
-        }
-        if (curve instanceof com.minicad.geometry.Circle) {
-            com.minicad.geometry.Circle circle = (com.minicad.geometry.Circle) curve;
-            // Project onto circle: normalize vector from center, scale by radius
-            CartesianPoint center = circle.getPosition().getLocation();
-            Vector3 fromCenter = point.subtract(center);
-            if (fromCenter.normSquared() <= com.minicad.common.Epsilon.EPS) {
-                // Point is at center - pick arbitrary point on circle
-                Vector3 xDir = circle.getPosition().xDirection().asVector();
-                return center.add(xDir.scale(circle.getRadius()));
-            }
-            return center.add(fromCenter.normalize().asVector().scale(circle.getRadius()));
-        }
-        if (curve instanceof com.minicad.geometry.Ellipse3) {
-            com.minicad.geometry.Ellipse3 ellipse = (com.minicad.geometry.Ellipse3) curve;
-            // Approximate by sampling - good enough for projection
-            return ellipse.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.Polyline3) {
-            com.minicad.geometry.Polyline3 polyline = (com.minicad.geometry.Polyline3) curve;
-            // Find closest point on polyline segments
-            return polylineClosestPoint(point, polyline);
-        }
-        if (curve instanceof com.minicad.geometry.TrimmedCurve3) {
-            com.minicad.geometry.TrimmedCurve3 trimmed = (com.minicad.geometry.TrimmedCurve3) curve;
-            return projectOntoCurve(point, trimmed.getBasisCurve());
-        }
-        if (curve instanceof com.minicad.geometry.SurfaceCurve3) {
-            com.minicad.geometry.SurfaceCurve3 sc = (com.minicad.geometry.SurfaceCurve3) curve;
-            return projectOntoCurve(point, sc.getCurve3d());
-        }
-        if (curve instanceof com.minicad.geometry.CompositeCurve3) {
-            com.minicad.geometry.CompositeCurve3 composite = (com.minicad.geometry.CompositeCurve3) curve;
-            // Find closest point across all segments
-            CartesianPoint closest = null;
-            double minDist = Double.POSITIVE_INFINITY;
-            for (Curve3 segment : composite.getSegments()) {
-                CartesianPoint candidate = projectOntoCurve(point, segment);
-                double dist = point.distanceTo(candidate);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closest = candidate;
-                }
-            }
-            return closest;
-        }
-        // Fallback: return original point (Edge constructor will validate)
-        return point;
-    }
-
-    private static CartesianPoint polylineClosestPoint(CartesianPoint point, com.minicad.geometry.Polyline3 polyline) {
-        List<CartesianPoint> points = polyline.getPoints();
-        CartesianPoint closest = points.get(0);
-        double minDist = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < points.size() - 1; i++) {
-            CartesianPoint p = closestPointOnSegment(point, points.get(i), points.get(i + 1));
-            double dist = point.distanceTo(p);
-            if (dist < minDist) {
-                minDist = dist;
-                closest = p;
-            }
-        }
-        return closest;
-    }
-
-    private static CartesianPoint closestPointOnSegment(CartesianPoint point, CartesianPoint a, CartesianPoint b) {
-        Vector3 ab = b.subtract(a);
-        double lenSq = ab.normSquared();
-        if (lenSq <= com.minicad.common.Epsilon.EPS) return a;
-        double t = Math.max(0, Math.min(1, point.subtract(a).dot(ab) / lenSq));
-        return new CartesianPoint(a.getX() + ab.getX() * t, a.getY() + ab.getY() * t, a.getZ() + ab.getZ() * t);
+        return topologyBuilder.buildEdge(id);
     }
 
     /**
@@ -1731,13 +1518,7 @@ public final class StepCadBuilder {
      * @return built oriented edge
      */
     public OrientedEdge buildOrientedEdge(int id) {
-        OrientedEdge existing = orientedEdges.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        OrientedEdge built = topologyBuilder.buildOrientedEdge(id);
-        orientedEdges.put(id, built);
-        return built;
+        return topologyBuilder.buildOrientedEdge(id);
     }
 
     /**
@@ -1747,13 +1528,7 @@ public final class StepCadBuilder {
      * @return built edge loop
      */
     public EdgeLoop buildEdgeLoop(int id) {
-        EdgeLoop existing = loops.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        EdgeLoop built = topologyBuilder.buildEdgeLoop(id);
-        loops.put(id, built);
-        return built;
+        return topologyBuilder.buildEdgeLoop(id);
     }
 
     /**
@@ -1763,13 +1538,7 @@ public final class StepCadBuilder {
      * @return built vertex loop
      */
     public VertexLoop buildVertexLoop(int id) {
-        VertexLoop existing = vertexLoops.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        VertexLoop built = topologyBuilder.buildVertexLoop(id);
-        vertexLoops.put(id, built);
-        return built;
+        return topologyBuilder.buildVertexLoop(id);
     }
 
     /**
@@ -1779,13 +1548,7 @@ public final class StepCadBuilder {
      * @return built poly loop
      */
     public com.minicad.topology.PolyLoop buildPolyLoop(int id) {
-        com.minicad.topology.PolyLoop existing = polyLoops.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        com.minicad.topology.PolyLoop built = topologyBuilder.buildPolyLoop(id);
-        polyLoops.put(id, built);
-        return built;
+        return topologyBuilder.buildPolyLoop(id);
     }
 
     /**
@@ -1795,13 +1558,7 @@ public final class StepCadBuilder {
      * @return built composite curve representing the path geometry
      */
     public CompositeCurve3 buildPath(int id) {
-        CompositeCurve3 existing = paths.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        CompositeCurve3 built = topologyBuilder.buildPath(id);
-        paths.put(id, built);
-        return built;
+        return topologyBuilder.buildPath(id);
     }
 
     /**
@@ -1811,13 +1568,7 @@ public final class StepCadBuilder {
      * @return built face bound
      */
     public FaceBound buildFaceBound(int id) {
-        FaceBound existing = faceBounds.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        FaceBound built = topologyBuilder.buildFaceBound(id);
-        faceBounds.put(id, built);
-        return built;
+        return topologyBuilder.buildFaceBound(id);
     }
 
     /**
@@ -1827,13 +1578,7 @@ public final class StepCadBuilder {
      * @return built face
      */
     public Face buildFace(int id) {
-        Face existing = faces.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        Face built = topologyBuilder.buildFace(id);
-        faces.put(id, built);
-        return built;
+        return topologyBuilder.buildFace(id);
     }
 
     /**
