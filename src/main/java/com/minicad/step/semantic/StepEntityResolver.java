@@ -2494,7 +2494,7 @@ public final class StepEntityResolver {
     return edge.isOrientation() ? edge.edgeElement().getEnd().id() : edge.edgeElement().getStart().id();
   }
 
-  private static boolean isPathEntity(StepEntity entity) {
+  static boolean isPathEntity(StepEntity entity) {
     return entity instanceof StepPath
         || entity instanceof StepOpenPath
         || entity instanceof StepSubpath
@@ -2882,7 +2882,7 @@ public final class StepEntityResolver {
         booleanValue(instance, definition, 4));
   }
 
-  private boolean isConnectedFaceSetEntity(StepEntity entity) {
+  boolean isConnectedFaceSetEntity(StepEntity entity) {
     return entity instanceof StepConnectedFaceSet || entity instanceof StepConnectedFaceSubSet;
   }
 
@@ -6513,21 +6513,21 @@ public final class StepEntityResolver {
   }
 
 
-  private boolean isOpenShellEntity(StepEntity entity) {
+  boolean isOpenShellEntity(StepEntity entity) {
     return entity instanceof StepOpenShell
         || entity instanceof StepSurfacedOpenShell
         || entity instanceof StepOrientedOpenShell;
   }
 
-  private boolean isClosedShellEntity(StepEntity entity) {
+  boolean isClosedShellEntity(StepEntity entity) {
     return entity instanceof StepClosedShell || entity instanceof StepOrientedClosedShell;
   }
 
-  private boolean isShellEntity(StepEntity entity) {
+  boolean isShellEntity(StepEntity entity) {
     return isOpenShellEntity(entity) || isClosedShellEntity(entity);
   }
 
-  private boolean isBooleanOperandEntity(StepEntity entity) {
+  boolean isBooleanOperandEntity(StepEntity entity) {
     return entity instanceof StepManifoldSolidBrep
         || entity instanceof StepBrepWithVoids
         || entity instanceof StepCsgPrimitive
@@ -11495,7 +11495,7 @@ public final class StepEntityResolver {
     return new StepGeometricSet(instance.id(), stringValue(instance, definition, 0), elements);
   }
 
-  private boolean isSupportedGeometricCurveSetElement(StepEntity element) {
+  boolean isSupportedGeometricCurveSetElement(StepEntity element) {
     return isSupportedCurveReference(element)
         || isPointLikeSetElement(element)
         || element instanceof StepEdgeCurve
@@ -11518,7 +11518,7 @@ public final class StepEntityResolver {
         || element instanceof StepGeometricCurveSet;
   }
 
-  private boolean isSupportedGeometricSetElement(StepEntity element) {
+  boolean isSupportedGeometricSetElement(StepEntity element) {
     return isSupportedGeometricCurveSetElement(element)
         || isSupportedSurfaceReference(element)
         || element instanceof StepVertexLoop
@@ -11547,7 +11547,7 @@ public final class StepEntityResolver {
         || element instanceof StepGeometricCurveSet;
   }
 
-  private static boolean isPointLikeSetElement(StepEntity element) {
+  static boolean isPointLikeSetElement(StepEntity element) {
     return element instanceof StepCartesianPoint
         || element instanceof StepVertexPoint
         || (element instanceof StepGeometricReplica
@@ -12527,7 +12527,7 @@ public final class StepEntityResolver {
     return entity;
   }
 
-  private boolean isAnnotationOccurrence(StepEntity entity) {
+  boolean isAnnotationOccurrence(StepEntity entity) {
     return entity instanceof StepAnnotationTextOccurrence
         || entity instanceof StepAnnotationPointOccurrence
         || entity instanceof StepAnnotationCurveOccurrence
@@ -12543,7 +12543,7 @@ public final class StepEntityResolver {
         || entity instanceof StepTerminatorSymbol;
   }
 
-  private boolean isSupportedAnnotationUsageItem(StepEntity entity) {
+  boolean isSupportedAnnotationUsageItem(StepEntity entity) {
     return entity instanceof StepDraughtingCallout || isSupportedAnnotationWrapperItem(entity);
   }
 
