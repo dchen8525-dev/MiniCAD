@@ -267,7 +267,7 @@ public final class StepCadBuilder {
     private final StepProfileBuilder profileBuilder;
     private final StepCadTopologyBuilder topologyBuilder;
     private final StepShellBuilder shellBuilder;
-    private final StepSolidBuilder solidBuilder;
+    private final StepCadSolidBuilder solidBuilder;
     private final StepCadCurveBuilder curveBuilder;
     private final StepCadSurfaceBuilder surfaceBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
@@ -373,7 +373,7 @@ public final class StepCadBuilder {
             this::buildSupportedFaceGeometryById
         );
         this.shellBuilder = new StepShellBuilder(this);
-        this.solidBuilder = new StepSolidBuilder(this);
+        this.solidBuilder = new StepCadSolidBuilder(this);
         this.surfaceBuilder = new StepCadSurfaceBuilder(
             this.entitiesById,
             geometryBuilder,
