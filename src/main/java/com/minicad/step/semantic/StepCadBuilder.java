@@ -408,21 +408,7 @@ public final class StepCadBuilder {
      * @return built direction
      */
     public Direction3 buildDirection(int id) {
-        Direction3 existing = directions.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepDirection direction = requireEntity(id, StepDirection.class, "DIRECTION");
-        if (direction.directionRatios().size() != 3) {
-            throw new StepResolutionException("entity #" + id + " is not a 3D DIRECTION");
-        }
-        Direction3 built = Direction3.from(new Vector3(
-                direction.directionRatios().get(0),
-                direction.directionRatios().get(1),
-                direction.directionRatios().get(2)
-        ));
-        directions.put(id, built);
-        return built;
+        return geometryBuilder.buildDirection(id);
     }
 
     public Direction2 buildDirection2(int id) {

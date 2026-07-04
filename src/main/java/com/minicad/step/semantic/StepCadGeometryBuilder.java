@@ -8,6 +8,7 @@ import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.geometry.StepDirection;
 import com.minicad.step.model.geometry.StepPoint;
 import com.minicad.step.model.topology.StepVertexPoint;
 import com.minicad.topology.Vertex;
@@ -106,13 +107,30 @@ final class StepCadGeometryBuilder {
 
   /**
    * Builds a Direction3 from a STEP DIRECTION entity.
-   * 
+   *
    * @param id the STEP entity ID
    * @return the Direction3 geometry object
-   * @throws UnsupportedOperationException - not yet implemented
    */
   Direction3 buildDirection(int id) {
-    throw new UnsupportedOperationException("buildDirection not yet implemented");
+    Direction3 existing = directions.get(id);
+    if (existing != null) {
+      return existing;
+    }
+    StepEntity entity = requireExistingEntity(id);
+    if (!(entity instanceof StepDirection)) {
+      throw new StepResolutionException("entity #" + id + " is not a DIRECTION");
+    }
+    StepDirection direction = (StepDirection) entity;
+    if (direction.directionRatios().size() != 3) {
+      throw new StepResolutionException("entity #" + id + " is not a 3D DIRECTION");
+    }
+    Direction3 built = Direction3.from(new Vector3(
+        direction.directionRatios().get(0),
+        direction.directionRatios().get(1),
+        direction.directionRatios().get(2)
+    ));
+    directions.put(id, built);
+    return built;
   }
 
   /**
