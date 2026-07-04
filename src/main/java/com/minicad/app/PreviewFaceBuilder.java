@@ -304,20 +304,20 @@ public final class PreviewFaceBuilder {
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (PreviewUvCoords.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
         List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
-        double lowerHeight = averageAxialHeight(surface, lowerArcPoints);
-        double upperHeight = averageAxialHeight(surface, upperArcPoints);
+        double lowerHeight = PreviewUvCoords.averageAxialHeight(surface, lowerArcPoints);
+        double upperHeight = PreviewUvCoords.averageAxialHeight(surface, upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
             return null;
         }
 
-        List<Double> angles = unwrapAngles(surface, lowerArcPoints);
+        List<Double> angles = PreviewUvCoords.unwrapAngles(surface, lowerArcPoints);
         if (angles.size() < 2) {
             return null;
         }
@@ -328,12 +328,12 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = cylindricalNormal(surface, angles.get(0), sameSense);
+        Vector3 startNormal = PreviewUvCoords.cylindricalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(surfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(PreviewUvCoords.surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -393,20 +393,20 @@ public final class PreviewFaceBuilder {
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (PreviewUvCoords.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
         List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
         List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
-        double lowerHeight = averageAxialHeight(surface.position(), lowerArcPoints);
-        double upperHeight = averageAxialHeight(surface.position(), upperArcPoints);
+        double lowerHeight = PreviewUvCoords.averageAxialHeight(surface.position(), lowerArcPoints);
+        double upperHeight = PreviewUvCoords.averageAxialHeight(surface.position(), upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
             return null;
         }
 
-        List<Double> angles = unwrapAngles(surface.position(), lowerArcPoints);
+        List<Double> angles = PreviewUvCoords.unwrapAngles(surface.position(), lowerArcPoints);
         if (angles.size() < 2) {
             return null;
         }
@@ -417,12 +417,12 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = conicalNormal(surface, angles.get(0), sameSense);
+        Vector3 startNormal = PreviewUvCoords.conicalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
+                PayloadConversionHelper.toPointPayload(PreviewUvCoords.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -474,9 +474,9 @@ public final class PreviewFaceBuilder {
         OrientedEdge upperArc = outerLoop.edges().get(2);
 
         List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
-        List<Double> lowerU = unwrapAngles(surface.position(), lowerPoints);
-        double lowerV = averageSphericalV(surface.position(), surface.radius(), lowerPoints);
-        double upperV = averageSphericalV(surface.position(), surface.radius(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc));
+        List<Double> lowerU = PreviewUvCoords.unwrapAngles(surface.position(), lowerPoints);
+        double lowerV = PreviewUvCoords.sphericalV(surface.position(), lowerPoints.get(0), surface.radius());
+        double upperV = PreviewUvCoords.sphericalV(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc).get(0), surface.radius());
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || lowerU.size() < 2) {
             return null;
         }
@@ -487,12 +487,12 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = sphericalNormal(surface.position(), lowerU.get(0), lowerV, sameSense);
+        Vector3 startNormal = PreviewUvCoords.sphericalNormal(surface.position(), lowerU.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "SPHERICAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(PreviewUvCoords.sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -586,12 +586,12 @@ public final class PreviewFaceBuilder {
             return null;
         }
 
-        Vector3 startNormal = toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
+        Vector3 startNormal = PreviewUvCoords.toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
                 StepPreviewJsonExporter.faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
+                PayloadConversionHelper.toPointPayload(PreviewUvCoords.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
                 sameSense,
                 toColorPayload(metadata.rgb()),
@@ -2292,33 +2292,18 @@ public final class PreviewFaceBuilder {
             if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
                 continue;
             }
-            CartesianPoint lower0 = surfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = surfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = surfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = surfacePoint(surface, angle1, upperHeight);
-            Vector3 targetNormal = cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
+            CartesianPoint lower0 = PreviewUvCoords.surfacePoint(surface, angle0, lowerHeight);
+            CartesianPoint lower1 = PreviewUvCoords.surfacePoint(surface, angle1, lowerHeight);
+            CartesianPoint upper0 = PreviewUvCoords.surfacePoint(surface, angle0, upperHeight);
+            CartesianPoint upper1 = PreviewUvCoords.surfacePoint(surface, angle1, upperHeight);
+            Vector3 targetNormal = PreviewUvCoords.cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
             appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
             appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
         }
         return List.copyOf(triangles);
     }
 
-    private static CartesianPoint surfacePoint(CylindricalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * surface.radius())
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * surface.radius()));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    private static Vector3 cylindricalNormal(CylindricalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        return sameSense ? radial : radial.scale(-1.0);
-    }
-
-    // ─── Conical strip helpers ───────────────────────────────────────────
+    // ─── Conical strip triangulation ───────────────────────────────────────
 
     private static List<PointPayload> triangulateConicalStrip(
             ConicalSurface surface,
@@ -2334,36 +2319,18 @@ public final class PreviewFaceBuilder {
             if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
                 continue;
             }
-            CartesianPoint lower0 = conicalSurfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = conicalSurfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = conicalSurfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = conicalSurfacePoint(surface, angle1, upperHeight);
-            Vector3 targetNormal = conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
+            CartesianPoint lower0 = PreviewUvCoords.conicalSurfacePoint(surface, angle0, lowerHeight);
+            CartesianPoint lower1 = PreviewUvCoords.conicalSurfacePoint(surface, angle1, lowerHeight);
+            CartesianPoint upper0 = PreviewUvCoords.conicalSurfacePoint(surface, angle0, upperHeight);
+            CartesianPoint upper1 = PreviewUvCoords.conicalSurfacePoint(surface, angle1, upperHeight);
+            Vector3 targetNormal = PreviewUvCoords.conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
             appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
             appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
         }
         return List.copyOf(triangles);
     }
 
-    private static CartesianPoint conicalSurfacePoint(ConicalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        double radius = surface.radius() + height * Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * radius)
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * radius));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    private static Vector3 conicalNormal(ConicalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        double slope = Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        Vector3 normal = radial.subtract(placement.axis().asVector().scale(slope));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    // ─── Spherical strip helpers ─────────────────────────────────────────
+    // ─── Spherical strip triangulation ────────────────────────────────────
 
     private static List<PointPayload> triangulateSphericalStrip(
             SphericalSurface surface,
@@ -2379,54 +2346,15 @@ public final class PreviewFaceBuilder {
             double angle0 = angles.get(index);
             double angle1 = angles.get(index + 1);
             if (Math.abs(angle1 - angle0) <= Epsilon.EPS) continue;
-            CartesianPoint p00 = sphericalSurfacePoint(placement, radius, angle0, lowerV);
-            CartesianPoint p10 = sphericalSurfacePoint(placement, radius, angle1, lowerV);
-            CartesianPoint p01 = sphericalSurfacePoint(placement, radius, angle0, upperV);
-            CartesianPoint p11 = sphericalSurfacePoint(placement, radius, angle1, upperV);
-            Vector3 targetNormal = sphericalNormal(placement, (angle0 + angle1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
+            CartesianPoint p00 = PreviewUvCoords.sphericalSurfacePoint(placement, radius, angle0, lowerV);
+            CartesianPoint p10 = PreviewUvCoords.sphericalSurfacePoint(placement, radius, angle1, lowerV);
+            CartesianPoint p01 = PreviewUvCoords.sphericalSurfacePoint(placement, radius, angle0, upperV);
+            CartesianPoint p11 = PreviewUvCoords.sphericalSurfacePoint(placement, radius, angle1, upperV);
+            Vector3 targetNormal = PreviewUvCoords.sphericalNormal(placement, (angle0 + angle1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
             appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
             appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
         }
         return List.copyOf(triangles);
-    }
-
-    private static double sphericalU(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    private static double sphericalV(Axis2Placement3D placement, double radius, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double z = offset.dot(placement.axis().asVector());
-        double normalized = radius <= 1.0e-12 ? 0.0 : z / radius;
-        normalized = Math.max(-1.0, Math.min(1.0, normalized));
-        return Math.asin(normalized);
-    }
-
-    private static double averageSphericalV(Axis2Placement3D placement, double radius, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += sphericalV(placement, radius, point);
-        }
-        return total / points.size();
-    }
-
-    private static CartesianPoint sphericalSurfacePoint(Axis2Placement3D placement, double radius, double u, double v) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return placement.location().add(normal.scale(radius));
-    }
-
-    private static Vector3 sphericalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
     }
 
     // ─── Toroidal strip helpers ──────────────────────────────────────────
@@ -2445,11 +2373,11 @@ public final class PreviewFaceBuilder {
             if (Math.abs(u1 - u0) <= Epsilon.EPS) {
                 continue;
             }
-            CartesianPoint p00 = toroidalSurfacePoint(surface, u0, lowerV);
-            CartesianPoint p10 = toroidalSurfacePoint(surface, u1, lowerV);
-            CartesianPoint p01 = toroidalSurfacePoint(surface, u0, upperV);
-            CartesianPoint p11 = toroidalSurfacePoint(surface, u1, upperV);
-            Vector3 targetNormal = toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
+            CartesianPoint p00 = PreviewUvCoords.toroidalSurfacePoint(surface, u0, lowerV);
+            CartesianPoint p10 = PreviewUvCoords.toroidalSurfacePoint(surface, u1, lowerV);
+            CartesianPoint p01 = PreviewUvCoords.toroidalSurfacePoint(surface, u0, upperV);
+            CartesianPoint p11 = PreviewUvCoords.toroidalSurfacePoint(surface, u1, upperV);
+            Vector3 targetNormal = PreviewUvCoords.toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
             appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
             appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
         }
@@ -2554,51 +2482,6 @@ public final class PreviewFaceBuilder {
     }
 
     // ─── Angle/height helpers ────────────────────────────────────────────
-
-    private static List<Double> unwrapAngles(CylindricalSurface surface, List<CartesianPoint> points) {
-        return unwrapAngles(surface.position(), points);
-    }
-
-    private static List<Double> unwrapAngles(Axis2Placement3D placement, List<CartesianPoint> points) {
-        List<Double> angles = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double angle = cylindricalAngle(placement, point);
-            if (!angles.isEmpty()) {
-                double previous = angles.get(angles.size() - 1);
-                while (angle - previous > Math.PI) {
-                    angle -= Math.PI * 2.0;
-                }
-                while (angle - previous < -Math.PI) {
-                    angle += Math.PI * 2.0;
-                }
-            }
-            angles.add(angle);
-        }
-        return List.copyOf(angles);
-    }
-
-    private static double averageAxialHeight(CylindricalSurface surface, List<CartesianPoint> points) {
-        return averageAxialHeight(surface.position(), points);
-    }
-
-    private static double averageAxialHeight(Axis2Placement3D placement, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += axialHeight(placement, point);
-        }
-        return total / points.size();
-    }
-
-    private static double axialHeight(Axis2Placement3D placement, CartesianPoint point) {
-        return point.subtract(placement.location()).dot(placement.axis().asVector());
-    }
-
-    private static double cylindricalAngle(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
 
     // ─── Triangle orientation ────────────────────────────────────────────
 

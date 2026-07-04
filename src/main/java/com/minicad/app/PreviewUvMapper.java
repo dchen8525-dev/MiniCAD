@@ -136,18 +136,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(PreviewUvCoords.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return surfacePoint(surface, u, v);
+                    return PreviewUvCoords.surfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return cylindricalNormal(surface, u, true);
+                    return PreviewUvCoords.cylindricalNormal(surface, u, true);
                 }
 
                 @Override
@@ -162,18 +162,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(PreviewUvCoords.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return conicalSurfacePoint(surface, u, v);
+                    return PreviewUvCoords.conicalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return conicalNormal(surface, u, true);
+                    return PreviewUvCoords.conicalNormal(surface, u, true);
                 }
 
                 @Override
@@ -188,18 +188,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, sphericalV(surface.position(), point, surface.radius()));
+                    double u = unwrapPeriodic(PreviewUvCoords.sphericalU(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.sphericalV(surface.position(), point, surface.radius()));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return sphericalSurfacePoint(surface.position(), surface.radius(), u, v);
+                    return PreviewUvCoords.sphericalSurfacePoint(surface.position(), surface.radius(), u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return sphericalNormal(surface.position(), u, v, true);
+                    return PreviewUvCoords.sphericalNormal(surface.position(), u, v, true);
                 }
 
                 @Override
@@ -216,19 +216,19 @@ public final class PreviewUvMapper {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(PreviewUvCoords.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(PreviewUvCoords.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return PreviewUvCoords.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return PreviewUvCoords.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -250,19 +250,19 @@ public final class PreviewUvMapper {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(PreviewUvCoords.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(PreviewUvCoords.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return PreviewUvCoords.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return PreviewUvCoords.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -391,18 +391,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface, point));
+                    double u = unwrapPeriodic(PreviewUvCoords.cylindricalAngle(surface, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.axialHeight(surface, point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return surfacePoint(surface, u, v);
+                    return PreviewUvCoords.surfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return cylindricalNormal(surface, u, true);
+                    return PreviewUvCoords.cylindricalNormal(surface, u, true);
                 }
 
                 @Override
@@ -417,18 +417,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, axialHeight(surface.position(), point));
+                    double u = unwrapPeriodic(PreviewUvCoords.cylindricalAngle(surface.position(), point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.axialHeight(surface.position(), point));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return conicalSurfacePoint(surface, u, v);
+                    return PreviewUvCoords.conicalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return conicalNormal(surface, u, true);
+                    return PreviewUvCoords.conicalNormal(surface, u, true);
                 }
 
                 @Override
@@ -443,18 +443,18 @@ public final class PreviewUvMapper {
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    double u = unwrapPeriodic(sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
-                    return new UvPoint(u, sphericalV(placement, point, sphericalSurface.radius()));
+                    double u = unwrapPeriodic(PreviewUvCoords.sphericalU(placement, point), previous == null ? null : previous.u(), Math.PI * 2.0);
+                    return new UvPoint(u, PreviewUvCoords.sphericalV(placement, point, sphericalSurface.radius()));
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return sphericalSurfacePoint(placement, sphericalSurface.radius(), u, v);
+                    return PreviewUvCoords.sphericalSurfacePoint(placement, sphericalSurface.radius(), u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return sphericalNormal(placement, u, v, true);
+                    return PreviewUvCoords.sphericalNormal(placement, u, v, true);
                 }
 
                 @Override
@@ -473,19 +473,19 @@ public final class PreviewUvMapper {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(placement, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(PreviewUvCoords.toroidalU(placement, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(PreviewUvCoords.toroidalV(placement, majorRadius, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(placement, majorRadius, minorRadius, u, v);
+                    return PreviewUvCoords.toroidalSurfacePoint(placement, majorRadius, minorRadius, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(placement, u, v, true);
+                    return PreviewUvCoords.toroidalNormal(placement, u, v, true);
                 }
 
                 @Override
@@ -507,19 +507,19 @@ public final class PreviewUvMapper {
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
                     Double previousU = previous == null ? null : previous.u();
                     Double previousV = previous == null ? null : previous.v();
-                    double u = unwrapPeriodic(toroidalU(surface, point), previousU, Math.PI * 2.0);
-                    double v = unwrapPeriodic(toroidalV(surface, point), previousV, Math.PI * 2.0);
+                    double u = unwrapPeriodic(PreviewUvCoords.toroidalU(surface, point), previousU, Math.PI * 2.0);
+                    double v = unwrapPeriodic(PreviewUvCoords.toroidalV(surface, point), previousV, Math.PI * 2.0);
                     return new UvPoint(u, v);
                 }
 
                 @Override
                 public CartesianPoint pointAt(double u, double v) {
-                    return toroidalSurfacePoint(surface, u, v);
+                    return PreviewUvCoords.toroidalSurfacePoint(surface, u, v);
                 }
 
                 @Override
                 public Vector3 normalAt(double u, double v) {
-                    return toroidalNormal(surface, u, v, true);
+                    return PreviewUvCoords.toroidalNormal(surface, u, v, true);
                 }
 
                 @Override
@@ -962,7 +962,7 @@ public final class PreviewUvMapper {
                 loopPoints = reverseClosedLoop(loopPoints);
             }
             loopPoints = normalizePeriodicLoop(loopPoints, mapper);
-            if (!sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
+            if (!PreviewPcurveSampler.sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
                 loopPoints.add(loopPoints.get(0));
             }
             loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
@@ -1165,10 +1165,10 @@ public final class PreviewUvMapper {
             }
             if (built instanceof Line2) {
             Line2 line = (Line2) built;
-                UvPoint start = snapToLine(projectedStart, line);
-                UvPoint end = snapToLine(projectedEnd, line);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleLinePcurve(line, start, end);
+                UvPoint start = PreviewPcurveSampler.snapToLine(projectedStart, line);
+                UvPoint end = PreviewPcurveSampler.snapToLine(projectedEnd, line);
+                double score = PreviewPcurveSampler.distanceSquared(projectedStart, start) + PreviewPcurveSampler.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PreviewPcurveSampler.sampleLinePcurve(line, start, end);
                 if (best == null || score < bestScore) {
                     best = samples;
                     bestScore = score;
@@ -1177,9 +1177,9 @@ public final class PreviewUvMapper {
             }
             if (built instanceof BSplineCurve2) {
             BSplineCurve2 spline = (BSplineCurve2) built;
-                List<UvPoint> samples = sampleSplinePcurve(spline, projectedStart, projectedEnd);
+                List<UvPoint> samples = PreviewPcurveSampler.sampleSplinePcurve(spline, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
+                    double score = PreviewPcurveSampler.distanceSquared(projectedStart, samples.get(0)) + PreviewPcurveSampler.distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -1189,10 +1189,10 @@ public final class PreviewUvMapper {
             }
             if (built instanceof Circle2) {
             Circle2 circle = (Circle2) built;
-                UvPoint start = snapToCircle(projectedStart, circle);
-                UvPoint end = snapToCircle(projectedEnd, circle);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleCirclePcurve(circle, start, end);
+                UvPoint start = PreviewPcurveSampler.snapToCircle(projectedStart, circle);
+                UvPoint end = PreviewPcurveSampler.snapToCircle(projectedEnd, circle);
+                double score = PreviewPcurveSampler.distanceSquared(projectedStart, start) + PreviewPcurveSampler.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PreviewPcurveSampler.sampleCirclePcurve(circle, start, end);
                 if (!samples.isEmpty() && (best == null || score < bestScore)) {
                     best = samples;
                     bestScore = score;
@@ -1201,10 +1201,10 @@ public final class PreviewUvMapper {
             }
             if (built instanceof Ellipse2) {
             Ellipse2 ellipse = (Ellipse2) built;
-                UvPoint start = snapToEllipse(projectedStart, ellipse);
-                UvPoint end = snapToEllipse(projectedEnd, ellipse);
-                double score = distanceSquared(projectedStart, start) + distanceSquared(projectedEnd, end);
-                List<UvPoint> samples = sampleEllipsePcurve(ellipse, start, end);
+                UvPoint start = PreviewPcurveSampler.snapToEllipse(projectedStart, ellipse);
+                UvPoint end = PreviewPcurveSampler.snapToEllipse(projectedEnd, ellipse);
+                double score = PreviewPcurveSampler.distanceSquared(projectedStart, start) + PreviewPcurveSampler.distanceSquared(projectedEnd, end);
+                List<UvPoint> samples = PreviewPcurveSampler.sampleEllipsePcurve(ellipse, start, end);
                 if (!samples.isEmpty() && (best == null || score < bestScore)) {
                     best = samples;
                     bestScore = score;
@@ -1213,9 +1213,9 @@ public final class PreviewUvMapper {
             }
             if (built instanceof TrimmedCurve2) {
             TrimmedCurve2 trimmed = (TrimmedCurve2) built;
-                List<UvPoint> samples = sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
+                List<UvPoint> samples = PreviewPcurveSampler.sampleTrimmedPcurve(trimmed, projectedStart, projectedEnd);
                 if (!samples.isEmpty()) {
-                    double score = distanceSquared(projectedStart, samples.get(0)) + distanceSquared(projectedEnd, samples.get(samples.size() - 1));
+                    double score = PreviewPcurveSampler.distanceSquared(projectedStart, samples.get(0)) + PreviewPcurveSampler.distanceSquared(projectedEnd, samples.get(samples.size() - 1));
                     if (best == null || score < bestScore) {
                         best = samples;
                         bestScore = score;
@@ -1432,504 +1432,6 @@ public final class PreviewUvMapper {
             break;
         }
         return Set.copyOf(ids);
-    }
-
-    // ─── pcurve snap / sample helpers ─────────────────────────────────────
-
-    public static UvPoint snapToLine(UvPoint point, Line2 line) {
-        com.minicad.geometry2d.Point2 snapped = line.closestPoint(new com.minicad.geometry2d.Point2(point.u(), point.v()));
-        return new UvPoint(snapped.x(), snapped.y());
-    }
-
-    public static UvPoint snapToCircle(UvPoint point, Circle2 circle) {
-        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(circle.center());
-        double norm = offset.norm();
-        if (norm <= Epsilon.EPS) {
-            com.minicad.geometry2d.Point2 fallback = circle.pointAt(0.0);
-            return new UvPoint(fallback.x(), fallback.y());
-        }
-        com.minicad.geometry2d.Point2 snapped = circle.center().add(offset.scale(circle.radius() / norm));
-        return new UvPoint(snapped.x(), snapped.y());
-    }
-
-    public static UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
-        double angle = ellipse.angleOf(ellipse.pointAt(ellipse.angleOf(snapEllipseSeed(point, ellipse))));
-        com.minicad.geometry2d.Point2 snapped = ellipse.pointAt(angle);
-        return new UvPoint(snapped.x(), snapped.y());
-    }
-
-    public static List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startParameter = line.parameterOf(startPoint);
-        double endParameter = line.parameterOf(endPoint);
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(endParameter - startParameter) * 6.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double parameter = startParameter + (endParameter - startParameter) * index / segments;
-            com.minicad.geometry2d.Point2 point = line.pointAt(parameter);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    public static List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint projectedStart, UvPoint projectedEnd) {
-        List<com.minicad.geometry2d.Point2> sampled = spline.sample(48);
-        if (sampled.size() < 2) {
-            return List.of();
-        }
-        int startIndex = closestPointIndex(sampled, projectedStart);
-        int endIndex = closestPointIndex(sampled, projectedEnd);
-        if (startIndex == endIndex) {
-            return List.of(projectedStart, projectedEnd);
-        }
-        List<UvPoint> points = new ArrayList<>();
-        int step = startIndex <= endIndex ? 1 : -1;
-        for (int index = startIndex; index != endIndex + step; index += step) {
-            com.minicad.geometry2d.Point2 point = sampled.get(index);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, projectedStart);
-        points.set(points.size() - 1, projectedEnd);
-        return List.copyOf(points);
-    }
-
-    public static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startAngle = circle.angleOf(startPoint);
-        double endAngle = circle.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            com.minicad.geometry2d.Point2 point = circle.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    public static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
-        com.minicad.geometry2d.Point2 startPoint = new com.minicad.geometry2d.Point2(start.u(), start.v());
-        com.minicad.geometry2d.Point2 endPoint = new com.minicad.geometry2d.Point2(end.u(), end.v());
-        double startAngle = ellipse.angleOf(startPoint);
-        double endAngle = ellipse.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            com.minicad.geometry2d.Point2 point = ellipse.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    public static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint projectedStart, UvPoint projectedEnd) {
-        UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());
-        UvPoint trimEnd = new UvPoint(trimmed.trimEnd().x(), trimmed.trimEnd().y());
-        List<UvPoint> forward = sampleCurve2(trimmed.basisCurve(), trimStart, trimEnd);
-        List<UvPoint> reverse = sampleCurve2(trimmed.basisCurve(), trimEnd, trimStart);
-        if (forward.isEmpty() && reverse.isEmpty()) {
-            return List.of();
-        }
-        List<UvPoint> preferred;
-        if (!trimmed.senseAgreement()) {
-            preferred = reverse.isEmpty() ? forward : reverse;
-        } else {
-            preferred = score(projectedStart, projectedEnd, forward) <= score(projectedStart, projectedEnd, reverse)
-                    ? forward
-                    : reverse;
-        }
-        return alignTrimmedSamples(preferred, projectedStart, projectedEnd);
-    }
-
-    public static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return sampleLinePcurve(line, start, end);
-        }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
-            return sampleCirclePcurve(circle, start, end);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
-            return sampleEllipsePcurve(ellipse, start, end);
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            return sampleSplinePcurve(spline, start, end);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
-            return sampleTrimmedPcurve(trimmed, start, end);
-        }
-        return List.of();
-    }
-
-    public static double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
-        if (samples.isEmpty()) {
-            return Double.POSITIVE_INFINITY;
-        }
-        return distanceSquared(start, samples.get(0)) + distanceSquared(end, samples.get(samples.size() - 1));
-    }
-
-    public static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
-        if (samples.isEmpty()) {
-            return samples;
-        }
-        List<UvPoint> aligned = new ArrayList<>(samples);
-        double forwardScore = distanceSquared(projectedStart, aligned.get(0)) + distanceSquared(projectedEnd, aligned.get(aligned.size() - 1));
-        double reverseScore = distanceSquared(projectedStart, aligned.get(aligned.size() - 1)) + distanceSquared(projectedEnd, aligned.get(0));
-        if (reverseScore < forwardScore) {
-            java.util.Collections.reverse(aligned);
-        }
-        aligned.set(0, projectedStart);
-        aligned.set(aligned.size() - 1, projectedEnd);
-        return List.copyOf(aligned);
-    }
-
-    public static com.minicad.geometry2d.Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
-        com.minicad.geometry2d.Vector2 offset = new com.minicad.geometry2d.Point2(point.u(), point.v()).subtract(ellipse.center());
-        if (offset.norm() <= Epsilon.EPS) {
-            return ellipse.pointAt(0.0);
-        }
-        com.minicad.geometry2d.Vector2 x = ellipse.xDirection().asVector();
-        com.minicad.geometry2d.Vector2 y = new com.minicad.geometry2d.Vector2(-x.y(), x.x());
-        double nx = offset.dot(x) / ellipse.semiAxis1();
-        double ny = offset.dot(y) / ellipse.semiAxis2();
-        double norm = Math.hypot(nx, ny);
-        if (norm <= Epsilon.EPS) {
-            return ellipse.pointAt(0.0);
-        }
-        double angle = Math.atan2(ny / norm, nx / norm);
-        return ellipse.pointAt(angle);
-    }
-
-    // ─── closestPointIndex / sameUv / distanceSquared ─────────────────────
-
-    public static int closestPointIndex(List<com.minicad.geometry2d.Point2> points, UvPoint target) {
-        int bestIndex = 0;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            com.minicad.geometry2d.Point2 point = points.get(index);
-            double du = point.x() - target.u();
-            double dv = point.y() - target.v();
-            double distance = du * du + dv * dv;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestIndex = index;
-            }
-        }
-        return bestIndex;
-    }
-
-    public static boolean sameUv(UvPoint left, UvPoint right) {
-        return distanceSquared(left, right) <= 1.0e-12;
-    }
-
-    public static double distanceSquared(UvPoint left, UvPoint right) {
-        double du = left.u() - right.u();
-        double dv = left.v() - right.v();
-        return du * du + dv * dv;
-    }
-
-    // ─── signedArea / contains / isOnPolygonBoundary / isOnSegment ────────
-
-    public static double signedArea(List<UvPoint> points) {
-        if (points.size() < 3) {
-            return 0.0;
-        }
-        double area = 0.0;
-        for (int index = 0; index + 1 < points.size(); index++) {
-            UvPoint current = points.get(index);
-            UvPoint next = points.get(index + 1);
-            area += current.u() * next.v() - next.u() * current.v();
-        }
-        return area * 0.5;
-    }
-
-    public static boolean contains(List<UvPoint> polygon, UvPoint point) {
-        if (polygon.size() < 3) {
-            return false;
-        }
-        if (isOnPolygonBoundary(polygon, point)) {
-            return true;
-        }
-        boolean inside = false;
-        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
-            UvPoint a = polygon.get(i);
-            UvPoint b = polygon.get(j);
-            boolean intersects = ((a.v() > point.v()) != (b.v() > point.v()))
-                    && (point.u() < (b.u() - a.u()) * (point.v() - a.v()) / ((b.v() - a.v()) + 1.0e-12) + a.u());
-            if (intersects) {
-                inside = !inside;
-            }
-        }
-        return inside;
-    }
-
-    public static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
-        for (int index = 0; index + 1 < polygon.size(); index++) {
-            if (isOnSegment(polygon.get(index), polygon.get(index + 1), point)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
-        double abU = b.u() - a.u();
-        double abV = b.v() - a.v();
-        double lengthSquared = abU * abU + abV * abV;
-        if (lengthSquared <= 1.0e-18) {
-            return distanceSquared(a, point) <= 1.0e-18;
-        }
-        double apU = point.u() - a.u();
-        double apV = point.v() - a.v();
-        double cross = abU * apV - abV * apU;
-        if (Math.abs(cross) > 1.0e-9) {
-            return false;
-        }
-        double dot = apU * abU + apV * abV;
-        if (dot < -1.0e-9) {
-            return false;
-        }
-        return dot <= lengthSquared + 1.0e-9;
-    }
-
-    // ─── Cylindrical / conical / spherical / toroidal coordinate math ────
-
-    public static List<Double> unwrapAngles(CylindricalSurface surface, List<CartesianPoint> points) {
-        return unwrapAngles(surface.position(), points);
-    }
-
-    public static List<Double> unwrapAngles(Axis2Placement3D placement, List<CartesianPoint> points) {
-        List<Double> angles = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double angle = cylindricalAngle(placement, point);
-            if (!angles.isEmpty()) {
-                double previous = angles.get(angles.size() - 1);
-                while (angle - previous > Math.PI) {
-                    angle -= Math.PI * 2.0;
-                }
-                while (angle - previous < -Math.PI) {
-                    angle += Math.PI * 2.0;
-                }
-            }
-            angles.add(angle);
-        }
-        return List.copyOf(angles);
-    }
-
-    public static double averageAxialHeight(CylindricalSurface surface, List<CartesianPoint> points) {
-        return averageAxialHeight(surface.position(), points);
-    }
-
-    public static double averageAxialHeight(Axis2Placement3D placement, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += axialHeight(placement, point);
-        }
-        return total / points.size();
-    }
-
-    public static double axialHeight(CylindricalSurface surface, CartesianPoint point) {
-        return axialHeight(surface.position(), point);
-    }
-
-    public static double axialHeight(Axis2Placement3D placement, CartesianPoint point) {
-        return point.subtract(placement.location()).dot(placement.axis().asVector());
-    }
-
-    public static double cylindricalAngle(CylindricalSurface surface, CartesianPoint point) {
-        return cylindricalAngle(surface.position(), point);
-    }
-
-    public static double cylindricalAngle(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    public static CartesianPoint surfacePoint(CylindricalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * surface.radius())
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * surface.radius()));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    public static Vector3 cylindricalNormal(CylindricalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        return sameSense ? radial : radial.scale(-1.0);
-    }
-
-    public static CartesianPoint conicalSurfacePoint(ConicalSurface surface, double angle, double height) {
-        Axis2Placement3D placement = surface.position();
-        double radius = surface.radius() + height * Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * radius)
-                .add(placement.yDirection().asVector().scale(Math.sin(angle) * radius));
-        Vector3 axial = placement.axis().asVector().scale(height);
-        return placement.location().add(radial.add(axial));
-    }
-
-    public static Vector3 conicalNormal(ConicalSurface surface, double angle, boolean sameSense) {
-        Axis2Placement3D placement = surface.position();
-        double slope = Math.tan(surface.semiAngle());
-        Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
-                .add(placement.yDirection().asVector().scale(Math.sin(angle)));
-        Vector3 normal = radial.subtract(placement.axis().asVector().scale(slope));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    public static double sphericalU(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    public static double sphericalV(Axis2Placement3D placement, CartesianPoint point, double radius) {
-        Vector3 offset = point.subtract(placement.location());
-        double z = offset.dot(placement.axis().asVector());
-        double normalized = radius <= 1.0e-12 ? 0.0 : z / radius;
-        normalized = Math.max(-1.0, Math.min(1.0, normalized));
-        return Math.asin(normalized);
-    }
-
-    public static CartesianPoint sphericalSurfacePoint(Axis2Placement3D placement, double radius, double u, double v) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return placement.location().add(normal.scale(radius));
-    }
-
-    public static Vector3 sphericalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
-        double cosV = Math.cos(v);
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    public static CartesianPoint toroidalSurfacePoint(ToroidalSurface surface, double u, double v) {
-        return toroidalSurfacePoint(surface.position(), surface.majorRadius(), surface.minorRadius(), u, v);
-    }
-
-    public static CartesianPoint toroidalSurfacePoint(
-            Axis2Placement3D placement,
-            double majorRadius,
-            double minorRadius,
-            double u,
-            double v
-    ) {
-        double radial = majorRadius + minorRadius * Math.cos(v);
-        Vector3 xy = placement.xDirection().asVector().scale(Math.cos(u) * radial)
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * radial));
-        Vector3 z = placement.axis().asVector().scale(minorRadius * Math.sin(v));
-        return placement.location().add(xy.add(z));
-    }
-
-    public static Vector3 toroidalNormal(ToroidalSurface surface, double u, double v, boolean sameSense) {
-        return toroidalNormal(surface.position(), u, v, sameSense);
-    }
-
-    public static Vector3 toroidalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
-        Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * Math.cos(v))
-                .add(placement.yDirection().asVector().scale(Math.sin(u) * Math.cos(v)))
-                .add(placement.axis().asVector().scale(Math.sin(v)));
-        return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
-    }
-
-    public static List<Double> unwrapToroidalU(ToroidalSurface surface, List<CartesianPoint> points) {
-        List<Double> values = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double value = toroidalU(surface, point);
-            if (!values.isEmpty()) {
-                double previous = values.get(values.size() - 1);
-                while (value - previous > Math.PI) {
-                    value -= Math.PI * 2.0;
-                }
-                while (value - previous < -Math.PI) {
-                    value += Math.PI * 2.0;
-                }
-            }
-            values.add(value);
-        }
-        return List.copyOf(values);
-    }
-
-    public static List<Double> unwrapToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
-        List<Double> values = new ArrayList<>(points.size());
-        for (CartesianPoint point : points) {
-            double value = toroidalV(surface, point);
-            if (!values.isEmpty()) {
-                double previous = values.get(values.size() - 1);
-                while (value - previous > Math.PI) {
-                    value -= Math.PI * 2.0;
-                }
-                while (value - previous < -Math.PI) {
-                    value += Math.PI * 2.0;
-                }
-            }
-            values.add(value);
-        }
-        return List.copyOf(values);
-    }
-
-    public static double averageToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
-        double total = 0.0;
-        for (CartesianPoint point : points) {
-            total += toroidalV(surface, point);
-        }
-        return total / points.size();
-    }
-
-    public static double toroidalU(ToroidalSurface surface, CartesianPoint point) {
-        return toroidalU(surface.position(), point);
-    }
-
-    public static double toroidalU(Axis2Placement3D placement, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        return Math.atan2(y, x);
-    }
-
-    public static double toroidalV(ToroidalSurface surface, CartesianPoint point) {
-        return toroidalV(surface.position(), surface.majorRadius(), point);
-    }
-
-    public static double toroidalV(Axis2Placement3D placement, double majorRadius, CartesianPoint point) {
-        Vector3 offset = point.subtract(placement.location());
-        double x = offset.dot(placement.xDirection().asVector());
-        double y = offset.dot(placement.yDirection().asVector());
-        double z = offset.dot(placement.axis().asVector());
-        double rho = Math.sqrt(x * x + y * y);
-        return Math.atan2(z, rho - majorRadius);
     }
 
     // ─── Private helper methods (copied from StepPreviewJsonExporter) ─────
