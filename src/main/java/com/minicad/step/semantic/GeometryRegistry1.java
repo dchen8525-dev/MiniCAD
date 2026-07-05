@@ -186,17 +186,11 @@ public final class GeometryRegistry1 {
               resolver.resolveRepresentationRelationship(
                   instance, "SURFACE_DISTANCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION"));
 
-// Entity: PLANE_ANGLE_MEASURE_WITH_UNIT
-      registry.put(
-          "PLANE_ANGLE_MEASURE_WITH_UNIT",
-          (resolver, instance) ->
-              resolver.resolveTypedMeasureWithUnit(
-                  instance, "PLANE_ANGLE_MEASURE_WITH_UNIT", "PLANE_ANGLE_UNIT"));
+// Entity: PLANE_ANGLE_MEASURE_WITH_UNIT (moved to UnitRegistry for consistent ordering)
+// Removed from GeometryRegistry1 to ensure proper registry order with CONVERSION_BASED_UNIT
 
-// Entity: PLANE_ANGLE_UNIT
-      registry.put(
-          "PLANE_ANGLE_UNIT",
-          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "PLANE_ANGLE_UNIT"));
+// Entity: PLANE_ANGLE_UNIT (moved to UnitRegistry for consistent ordering)
+// Removed from GeometryRegistry1 to ensure proper registry order with CONVERSION_BASED_UNIT
 
 // Entity: NEAR_POINT_RELATIONSHIP
       registry.put(

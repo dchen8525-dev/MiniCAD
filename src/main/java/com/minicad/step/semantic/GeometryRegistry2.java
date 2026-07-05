@@ -257,12 +257,6 @@ public final class GeometryRegistry2 {
           "PRE_DEFINED_SURFACE_SIDE_STYLE",
           StepEntityResolver::resolvePreDefinedSurfaceSideStyle);
 
-// Entity: PRE_DEFINED_CURVE_FONT
-      registry.put("PRE_DEFINED_CURVE_FONT", StepEntityResolver::resolvePreDefinedCurveFont);
-
-// Entity: CURVE_STYLE
-      registry.put("CURVE_STYLE", StepEntityResolver::resolveCurveStyle);
-
 // Entity: POINT_STYLE
       registry.put("POINT_STYLE", StepEntityResolver::resolvePointStyle);
 
@@ -275,9 +269,6 @@ public final class GeometryRegistry2 {
       registry.put(
           "CHARACTER_GLYPH_STYLE_OUTLINE",
           StepEntityResolver::resolveCharacterGlyphStyleOutline);
-
-// Entity: SURFACE_STYLE_FILL_AREA
-      registry.put("SURFACE_STYLE_FILL_AREA", StepEntityResolver::resolveSurfaceStyleFillArea);
 
 // Entity: SURFACE_STYLE_BOUNDARY
       registry.put("SURFACE_STYLE_BOUNDARY", StepEntityResolver::resolveSurfaceStyleBoundary);
@@ -309,12 +300,6 @@ public final class GeometryRegistry2 {
 
 // Entity: SURFACE_STYLE_PARAMETER_LINE
       registry.put("SURFACE_STYLE_PARAMETER_LINE", StepEntityResolver::resolveSurfaceStyleParameterLine);
-
-// Entity: SURFACE_SIDE_STYLE
-      registry.put("SURFACE_SIDE_STYLE", StepEntityResolver::resolveSurfaceSideStyle);
-
-// Entity: SURFACE_STYLE_USAGE
-      registry.put("SURFACE_STYLE_USAGE", StepEntityResolver::resolveSurfaceStyleUsage);
 
 // Entity: DIMENSION_CURVE_TERMINATOR_TO_PROJECTION_CURVE_ASSOCIATIVITY
       registry.put(
@@ -778,8 +763,8 @@ public final class GeometryRegistry2 {
 // Entity: MACHINED_SURFACE
       registry.put("MACHINED_SURFACE", StepEntityResolver::resolveMachinedSurface);
 
-// Entity: PLANE_ANGLE_UNIT_WITH_UNIT
-      registry.put("PLANE_ANGLE_UNIT_WITH_UNIT", StepEntityResolver::resolvePlaneAngleUnitWithUnit);
+// Entity: PLANE_ANGLE_UNIT_WITH_UNIT (moved to UnitRegistry for consistent ordering)
+// Removed from GeometryRegistry2 to ensure proper registry order with CONVERSION_BASED_UNIT
 
 // Entity: SWEPT_PROFILE_AREA_OUTLINE
       registry.put("SWEPT_PROFILE_AREA_OUTLINE", StepEntityResolver::resolveSweptProfileAreaOutline);
@@ -807,12 +792,6 @@ public final class GeometryRegistry2 {
 
 // Entity: FILL_AREA_STYLE_OUTLINE
       registry.put("FILL_AREA_STYLE_OUTLINE", StepEntityResolver::resolveFillAreaStyleOutline);
-
-// Entity: CURVE_STYLE_FONT
-      registry.put("CURVE_STYLE_FONT", StepEntityResolver::resolveCurveStyleFont);
-
-// Entity: CURVE_STYLE_RENDERING
-      registry.put("CURVE_STYLE_RENDERING", StepEntityResolver::resolveCurveStyleRendering);
 
 // Entity: CURVE_STYLE_WITH_FONT
       registry.put("CURVE_STYLE_WITH_FONT", StepEntityResolver::resolveCurveStyleWithFont);

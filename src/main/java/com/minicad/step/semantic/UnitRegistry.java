@@ -250,11 +250,26 @@ public final class UnitRegistry {
 // Entity: CONVERSION_BASED_UNIT_WITH_OFFSET
       registry.put("CONVERSION_BASED_UNIT_WITH_OFFSET", StepEntityResolver::resolveConversionBasedUnitWithOffset);
 
-// Entity: CONVERSION_BASED_UNIT
+// Entity: CONVERSION_BASED_UNIT (must be before NAMED_UNIT for complex entity priority)
       registry.put("CONVERSION_BASED_UNIT", (resolver, instance) -> resolver.resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT"));
 
 // Entity: NAMED_UNIT
       registry.put("NAMED_UNIT", StepEntityResolver::resolveNamedUnit);
+
+// Entity: PLANE_ANGLE_UNIT (moved from GeometryRegistry1 to ensure consistent ordering)
+      registry.put(
+          "PLANE_ANGLE_UNIT",
+          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "PLANE_ANGLE_UNIT"));
+
+// Entity: PLANE_ANGLE_MEASURE_WITH_UNIT (moved from GeometryRegistry1 to ensure consistent ordering)
+      registry.put(
+          "PLANE_ANGLE_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "PLANE_ANGLE_MEASURE_WITH_UNIT", "PLANE_ANGLE_UNIT"));
+
+// Entity: PLANE_ANGLE_UNIT_WITH_UNIT (moved from GeometryRegistry2 to ensure consistent ordering)
+      registry.put("PLANE_ANGLE_UNIT_WITH_UNIT", StepEntityResolver::resolvePlaneAngleUnitWithUnit);
 
 // Entity: LENGTH_UNIT
       registry.put(
@@ -507,6 +522,240 @@ public final class UnitRegistry {
 
 // Entity: CONVERSION_BASED_UNIT_AND_UNIT
       registry.put("CONVERSION_BASED_UNIT_AND_UNIT", StepEntityResolver::resolveConversionBasedUnitAndUnit);
+
+// Entity: MASS_DENSITY_MEASURE_WITH_UNIT
+      registry.put(
+          "MASS_DENSITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "MASS_DENSITY_MEASURE_WITH_UNIT", "MASS_DENSITY_UNIT"));
+
+// Entity: MASS_DENSITY_UNIT
+      registry.put(
+          "MASS_DENSITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "MASS_DENSITY_UNIT"));
+
+// Entity: DYNAMIC_VISCOSITY_MEASURE_WITH_UNIT
+      registry.put(
+          "DYNAMIC_VISCOSITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "DYNAMIC_VISCOSITY_MEASURE_WITH_UNIT", "DYNAMIC_VISCOSITY_UNIT"));
+
+// Entity: DYNAMIC_VISCOSITY_UNIT
+      registry.put(
+          "DYNAMIC_VISCOSITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "DYNAMIC_VISCOSITY_UNIT"));
+
+// Entity: KINEMATIC_VISCOSITY_MEASURE_WITH_UNIT
+      registry.put(
+          "KINEMATIC_VISCOSITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "KINEMATIC_VISCOSITY_MEASURE_WITH_UNIT", "KINEMATIC_VISCOSITY_UNIT"));
+
+// Entity: KINEMATIC_VISCOSITY_UNIT
+      registry.put(
+          "KINEMATIC_VISCOSITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "KINEMATIC_VISCOSITY_UNIT"));
+
+// Entity: MOMENT_OF_INERTIA_MEASURE_WITH_UNIT
+      registry.put(
+          "MOMENT_OF_INERTIA_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "MOMENT_OF_INERTIA_MEASURE_WITH_UNIT", "MOMENT_OF_INERTIA_UNIT"));
+
+// Entity: MOMENT_OF_INERTIA_UNIT
+      registry.put(
+          "MOMENT_OF_INERTIA_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "MOMENT_OF_INERTIA_UNIT"));
+
+// Entity: THERMAL_CONDUCTIVITY_MEASURE_WITH_UNIT
+      registry.put(
+          "THERMAL_CONDUCTIVITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "THERMAL_CONDUCTIVITY_MEASURE_WITH_UNIT", "THERMAL_CONDUCTIVITY_UNIT"));
+
+// Entity: THERMAL_CONDUCTIVITY_UNIT
+      registry.put(
+          "THERMAL_CONDUCTIVITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "THERMAL_CONDUCTIVITY_UNIT"));
+
+// Entity: HEAT_FLUX_DENSITY_MEASURE_WITH_UNIT
+      registry.put(
+          "HEAT_FLUX_DENSITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "HEAT_FLUX_DENSITY_MEASURE_WITH_UNIT", "HEAT_FLUX_DENSITY_UNIT"));
+
+// Entity: HEAT_FLUX_DENSITY_UNIT
+      registry.put(
+          "HEAT_FLUX_DENSITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "HEAT_FLUX_DENSITY_UNIT"));
+
+// Entity: TORQUE_UNIT
+      registry.put(
+          "TORQUE_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "TORQUE_UNIT"));
+
+// Entity: LINEAR_FORCE_UNIT
+      registry.put(
+          "LINEAR_FORCE_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "LINEAR_FORCE_UNIT"));
+
+// Entity: LINEAR_STIFFNESS_UNIT
+      registry.put(
+          "LINEAR_STIFFNESS_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "LINEAR_STIFFNESS_UNIT"));
+
+// Entity: ROTATIONAL_STIFFNESS_UNIT
+      registry.put(
+          "ROTATIONAL_STIFFNESS_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "ROTATIONAL_STIFFNESS_UNIT"));
+
+// Entity: LINEAR_MOMENT_UNIT
+      registry.put(
+          "LINEAR_MOMENT_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "LINEAR_MOMENT_UNIT"));
+
+// Entity: SPECIFIC_HEAT_CAPACITY_MEASURE_WITH_UNIT
+      registry.put(
+          "SPECIFIC_HEAT_CAPACITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "SPECIFIC_HEAT_CAPACITY_MEASURE_WITH_UNIT", "SPECIFIC_HEAT_CAPACITY_UNIT"));
+
+// Entity: SPECIFIC_HEAT_CAPACITY_UNIT
+      registry.put(
+          "SPECIFIC_HEAT_CAPACITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "SPECIFIC_HEAT_CAPACITY_UNIT"));
+
+// Entity: AREA_DENSITY_MEASURE_WITH_UNIT
+      registry.put(
+          "AREA_DENSITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "AREA_DENSITY_MEASURE_WITH_UNIT", "AREA_DENSITY_UNIT"));
+
+// Entity: AREA_DENSITY_UNIT
+      registry.put(
+          "AREA_DENSITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "AREA_DENSITY_UNIT"));
+
+// Entity: VOLUMETRIC_FLOW_RATE_MEASURE_WITH_UNIT
+      registry.put(
+          "VOLUMETRIC_FLOW_RATE_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "VOLUMETRIC_FLOW_RATE_MEASURE_WITH_UNIT", "VOLUMETRIC_FLOW_RATE_UNIT"));
+
+// Entity: VOLUMETRIC_FLOW_RATE_UNIT
+      registry.put(
+          "VOLUMETRIC_FLOW_RATE_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "VOLUMETRIC_FLOW_RATE_UNIT"));
+
+// Entity: MASS_FLOW_RATE_MEASURE_WITH_UNIT
+      registry.put(
+          "MASS_FLOW_RATE_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "MASS_FLOW_RATE_MEASURE_WITH_UNIT", "MASS_FLOW_RATE_UNIT"));
+
+// Entity: MASS_FLOW_RATE_UNIT
+      registry.put(
+          "MASS_FLOW_RATE_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "MASS_FLOW_RATE_UNIT"));
+
+// Entity: ROTATIONAL_FREQUENCY_UNIT
+      registry.put(
+          "ROTATIONAL_FREQUENCY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "ROTATIONAL_FREQUENCY_UNIT"));
+
+// Entity: ROTATIONAL_FREQUENCY_MEASURE_WITH_UNIT
+      registry.put(
+          "ROTATIONAL_FREQUENCY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "ROTATIONAL_FREQUENCY_MEASURE_WITH_UNIT", "ROTATIONAL_FREQUENCY_UNIT"));
+
+// Entity: ANGULAR_VELOCITY_UNIT
+      registry.put(
+          "ANGULAR_VELOCITY_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "ANGULAR_VELOCITY_UNIT"));
+
+// Entity: ANGULAR_VELOCITY_MEASURE_WITH_UNIT
+      registry.put(
+          "ANGULAR_VELOCITY_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "ANGULAR_VELOCITY_MEASURE_WITH_UNIT", "ANGULAR_VELOCITY_UNIT"));
+
+// Entity: ANGULAR_ACCELERATION_UNIT
+      registry.put(
+          "ANGULAR_ACCELERATION_UNIT",
+          (resolver, instance) ->
+              resolver.resolveStandaloneDerivedUnitKind(instance, "ANGULAR_ACCELERATION_UNIT"));
+
+// Entity: ANGULAR_ACCELERATION_MEASURE_WITH_UNIT
+      registry.put(
+          "ANGULAR_ACCELERATION_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "ANGULAR_ACCELERATION_MEASURE_WITH_UNIT", "ANGULAR_ACCELERATION_UNIT"));
+
+// Entity: TORQUE_MEASURE_WITH_UNIT
+      registry.put(
+          "TORQUE_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "TORQUE_MEASURE_WITH_UNIT", "TORQUE_UNIT"));
+
+// Entity: LINEAR_FORCE_MEASURE_WITH_UNIT
+      registry.put(
+          "LINEAR_FORCE_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "LINEAR_FORCE_MEASURE_WITH_UNIT", "LINEAR_FORCE_UNIT"));
+
+// Entity: LINEAR_STIFFNESS_MEASURE_WITH_UNIT
+      registry.put(
+          "LINEAR_STIFFNESS_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "LINEAR_STIFFNESS_MEASURE_WITH_UNIT", "LINEAR_STIFFNESS_UNIT"));
+
+// Entity: ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT
+      registry.put(
+          "ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "ROTATIONAL_STIFFNESS_MEASURE_WITH_UNIT", "ROTATIONAL_STIFFNESS_UNIT"));
+
+// Entity: LINEAR_MOMENT_MEASURE_WITH_UNIT
+      registry.put(
+          "LINEAR_MOMENT_MEASURE_WITH_UNIT",
+          (resolver, instance) ->
+              resolver.resolveTypedMeasureWithUnit(
+                  instance, "LINEAR_MOMENT_MEASURE_WITH_UNIT", "LINEAR_MOMENT_UNIT"));
 
 
   }

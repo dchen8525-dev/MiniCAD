@@ -659,7 +659,7 @@ public final class StepPreviewJsonExporter {
         ProductMetadataExtractor.ProductMetadata productInfo = ProductMetadataExtractor.extract(stepFile, resolved);
         UnitExtractor.UnitInfo units = UnitExtractor.extract(resolved);
         long assemblyStartedAt = System.nanoTime();
-        AssemblyData assembly = buildAssemblyData(resolved, builder, metadata);
+        AssemblyData assembly = buildAssemblyData(resolved, builder, metadata, units);
         log.info("stage={} elapsedMs={}, representations={}, instances={}, unsupportedFaces={}", "assembly_done",
                 SerializationHelper.elapsedMillis(assemblyStartedAt),
                         assembly.representations().size(),
@@ -753,7 +753,7 @@ public final class StepPreviewJsonExporter {
                     "units.coordinates_not_normalized",
                     null,
                     null,
-                    "geometry coordinates are emitted in source STEP units; scaleToMeters is metadata only"));
+                    "geometry coordinates are emitted in source STEP units; assembly transforms are scaled to meters"));
         }
         for (UnsupportedBooleanPayload item : unsupportedBooleans) {
             issues.add(MiniCadIssue.unsupported(item.stepId(), item.name(), item.reason()));
@@ -1744,6 +1744,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "cylindrical face build failed: " + ex.getMessage()));
             }
         }
         if (previewGeometry instanceof StepConicalSurface) {
@@ -1757,6 +1759,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "conical face build failed: " + ex.getMessage()));
             }
         }
         if (previewGeometry instanceof StepSphericalSurface) {
@@ -1839,6 +1843,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "toroidal surface with specified bends face build failed: " + ex.getMessage()));
             }
         }
         if (previewGeometry instanceof StepToroidalSurface) {
@@ -1852,6 +1858,8 @@ public final class StepPreviewJsonExporter {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "toroidal face build failed: " + ex.getMessage()));
             }
         }
         if (previewGeometry instanceof StepCylindricalSurface
@@ -1972,6 +1980,7 @@ public final class StepPreviewJsonExporter {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to fallback
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
         }
@@ -1985,6 +1994,7 @@ public final class StepPreviewJsonExporter {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to fallback tessellation
             }
             // Fallback: tessellate via sampled grid if parametric mapping fails
             try {
@@ -1997,7 +2007,11 @@ public final class StepPreviewJsonExporter {
                         return new PreviewFaceResult(payload, null);
                     }
                 }
+            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to unsupported face payload
             } catch (Exception ex) {
+                // C03: Catch unexpected errors - log and return unsupported face payload
+                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed: unexpected error - " + ex.getMessage()));
             }
             return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
         }
@@ -2161,9 +2175,13 @@ public final class StepPreviewJsonExporter {
     private static AssemblyData buildAssemblyData(
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder,
-            StepMetadataExtractor metadata
+            StepMetadataExtractor metadata,
+            UnitExtractor.UnitInfo units
     ) {
-        AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);
+        // F04: Assembly transforms should stay in source units when units are not normalized
+        // When scaleToMeters != 1.0 (units not normalized), pass 1.0 to keep transforms in source units
+        // When scaleToMeters == 1.0 (units normalized or SI), pass 1.0 (no scaling needed)
+        AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved, 1.0);
         Map<Integer, RepresentationPayload> representations = new LinkedHashMap<>();
         List<UnsupportedFacePayload> unsupportedFaces = new ArrayList<>();
         for (AssemblyRepresentation assemblyRepresentation : graph.representations()) {

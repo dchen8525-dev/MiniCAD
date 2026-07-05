@@ -855,7 +855,8 @@ public final class StepEntityResolver {
   }
 
   private static Map<String, Integer> createRegistryOrder(Map<String, EntityFactory> registry) {
-    Map<String, Integer> order = new HashMap<>();
+    // Use LinkedHashMap to preserve insertion order from registry
+    Map<String, Integer> order = new LinkedHashMap<>();
     int index = 0;
     for (String entityName : registry.keySet()) {
       order.put(entityName, index++);
@@ -6853,6 +6854,22 @@ public final class StepEntityResolver {
         entityName);
   }
 
+  // Flexible resolver for entities that allow relating/related to be broader types
+  // Returns StepGenericEntity since relating/related may not be StepProductDefinition
+  StepGenericEntity resolveProductDefinitionRelationshipFlexible(
+      StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = definition(instance, entityName);
+    requireParameterCount(instance, definition, 5);
+    return new StepGenericEntity(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        stringValue(instance, definition, 1),
+        optionalStringValue(instance, definition, 2),
+        resolve(referenceId(instance, definition, 3)),
+        resolve(referenceId(instance, definition, 4)),
+        entityName);
+  }
+
   StepProductDefinitionRelationshipRelationship
       resolveProductDefinitionRelationshipRelationship(StepEntityInstance instance) {
     return resolveProductDefinitionRelationshipRelationship(
@@ -6882,8 +6899,10 @@ public final class StepEntityResolver {
   StepProductDefinitionShape resolveProductDefinitionShape(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_SHAPE");
     requireParameterCount(instance, definition, 3);
-    StepEntity resolvedDefinition = resolve(referenceId(instance, definition, 2));
-    if (!(resolvedDefinition instanceof StepProductDefinition)
+    StepValue definitionParam = definition.parameters().get(2);
+    StepEntity resolvedDefinition = tryResolveReference(definitionParam);
+    if (resolvedDefinition != null
+        && !(resolvedDefinition instanceof StepProductDefinition)
         && !(resolvedDefinition instanceof StepNextAssemblyUsageOccurrence)) {
       throw new StepResolutionException(
           "PRODUCT_DEFINITION_SHAPE definition must reference PRODUCT_DEFINITION or NEXT_ASSEMBLY_USAGE_OCCURRENCE"
