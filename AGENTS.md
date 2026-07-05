@@ -851,19 +851,52 @@ Fix:
 
 **No work needed**: K03 fully implemented with comprehensive contributor guide
 
-## K04. Add architecture diagram text
+## K04. Add architecture diagram text ✅ ALREADY IMPLEMENTED
 
-Fix:
-- `syntax -> semantic model -> geometry/topology -> exporter`.
-- Explain where to add new entity support.
+**Problem**: Add architecture diagram showing syntax → semantic → geometry/topology → exporter flow.
 
-## K05. Add troubleshooting
+**Discovery**: ✅ Complete architecture diagram in README.md (lines 468-519)
 
-Fix:
-- Java version.
-- Maven commands.
-- Common parse errors.
-- Large file limitations.
+**Implementation Details** (from README.md):
+- **Architecture Diagram**: Detailed ASCII diagram showing 4 layers
+  - Syntax layer (step.syntax): Tokenizer → Parser → AST
+  - Semantic layer (step.semantic): Resolver → Builder → B-Rep
+  - Geometry layer (geometry/topology): Curve, Surface, Topology types
+  - Application layer (app): CLI, Web viewer, GLB exporter
+- **Data Flow**: 5-step process (Input → Parse → Resolve → Build → Export)
+- **Extension Guide**: 5 steps for adding new entity support (lines 531-537)
+  - Create model class
+  - Add resolve method
+  - Register in MiscRegistry
+  - Add build method (if geometry)
+  - Add tests
+
+**Evidence**: Comprehensive architecture documentation with extension instructions
+
+**No work needed**: K04 fully implemented with detailed diagram and guide
+
+## K05. Add troubleshooting ✅ ALREADY IMPLEMENTED
+
+**Problem**: Add troubleshooting guide for Java version, Maven commands, parse errors, large files.
+
+**Discovery**: ✅ Complete troubleshooting section in README.md (lines 620-716)
+
+**Implementation Details** (from README.md "常见问题" section):
+- **6 troubleshooting scenarios**:
+  1. Java version errors (UnsupportedClassVersionError) - with JAVA_HOME setup
+  2. Maven dependency download failures - with mirror configuration
+  3. Test failures - with clean rebuild instructions
+  4. Web viewer startup (port conflicts) - with --port parameter
+  5. STEP parse failures - with syntax/entity/encoding causes
+  6. Large file performance - with JVM heap memory settings
+
+**Evidence**: Each scenario has:
+- Clear error description
+- Root cause explanation
+- Step-by-step solution
+- Command examples
+
+**No work needed**: K05 fully implemented with comprehensive troubleshooting guide
 
 ---
 
