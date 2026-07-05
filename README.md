@@ -74,7 +74,7 @@ MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目�
 |----------|--------------:|------:|-----------:|--------:|---------:|-------:|------------:|------|
 | **AP214 Curated** | 64 | 59 | 64 | 59 | 59 | 51 | 51 | 基于仓库 AP214/automotive_design 示例抽取的 curated baseline，不是完整 AP214 schema |
 | **AP242 Ed2** | 2122 | 445 | 1550 | 434 | 334 | 441 | 301 | 基于 `schemas/ap242ed2_dis2_mim_lf_v1.101.exp` 的 schema 覆盖扫描 |
-| **All scanned entities** | 2651 | 1264 | 2103 | 752 | 425 | 496 | - | 见 [doc/generated/coverage.md](doc/generated/coverage.md) |
+| **All scanned entities** | 2651 | 1264 | 2357 | 752 | 425 | 496 | - | 见 [doc/generated/MINI_CAD_CAPABILITY_REPORT.md](doc/generated/MINI_CAD_CAPABILITY_REPORT.md) |
 
 覆盖等级：
 
