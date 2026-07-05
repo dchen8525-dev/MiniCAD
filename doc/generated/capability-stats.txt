@@ -1,0 +1,45 @@
+MiniCAD Capability Statistics Report
+====================================
+Generated: 2026-07-05
+
+1. Model Classes
+1264
+
+2. Registry Entries Breakdown
+Total registry.put calls:
+2357
+
+Registry files breakdown:
+  AnnotationRegistry: 112 entries
+  ClassificationRegistry: 71 entries
+  ConfigManagementRegistry: 91 entries
+  FeaRegistry: 104 entries
+  GeometryRegistry1: 139 entries
+  GeometryRegistry2: 217 entries
+  KinematicRegistry: 63 entries
+  ManufacturingRegistry: 106 entries
+  MiscellaneousRegistry1: 159 entries
+  MiscellaneousRegistry2: 161 entries
+  MiscellaneousRegistry3: 161 entries
+  MiscellaneousRegistry4: 161 entries
+  ProductRegistry: 169 entries
+  ProfileRegistry: 28 entries
+  RegistryHelpers: 14 entries
+  RepresentationRegistry1: 98 entries
+  RepresentationRegistry2: 128 entries
+  StepEntityRegistry: 0 entries
+  ToleranceRegistry: 73 entries
+  TopologyRegistry: 171 entries
+  UnitRegistry: 127 entries
+
+3. Entity Factories
+Resolve methods in StepEntityResolver:
+0
+
+4. Builder Handlers
+Build methods in StepCadBuilder:
+0
+
+5. Exporter Handlers
+Export methods in exporter files:
+
