@@ -789,30 +789,67 @@ Fix:
 
 # K. Documentation
 
-## K01. README overclaims industrial completeness
+## K01. README overclaims industrial completeness ✅ ALREADY HONEST
 
-Problem: README says complete STEP parsing and industrial CAD compatibility, while AGENTS says many areas still need correctness/completeness. :contentReference[oaicite:27]{index=27}
+**Problem**: README says complete STEP parsing and industrial CAD compatibility, while AGENTS says many areas still need correctness/completeness.
 
-Fix:
-- Rewrite project status:
-  - experimental
-  - supported subset
-  - known limitations
-- Keep honest capability table.
+**Discovery**: ✅ README already honest about project positioning
 
-## K02. Add SECURITY.md
+**Evidence** (from README.md lines 3-19):
+- Line 3: "实验性的 Java CAD 内核" (Experimental Java CAD kernel)
+- Line 7: "面向 STEP (ISO 10303) 子集的实验性 CAD 内核" (Experimental subset CAD kernel)
+- Line 7: "但不宣称完整兼容 AP214/AP242" (Does not claim full AP214/AP242 compatibility)
+- Line 12: "但仍需要更多拓扑和几何正确性验证" (Still needs topology/geometry validation)
+- Line 19: "该报告是能力信号，不是几何正确性或规范完整性的证明" (Not proof of correctness)
 
-Fix:
-- Explain local viewer threat model.
-- Reporting process.
-- File upload limits.
+**Assessment**: ✅ README correctly positions as experimental, subset, needs validation
 
-## K03. Add CONTRIBUTING.md
+**No work needed**: K01 already honest and aligned with AGENTS.md findings
 
-Fix:
-- Build/test commands.
-- Test requirements.
-- Entity support policy.
+## K02. Add SECURITY.md ✅ ALREADY IMPLEMENTED
+
+**Problem**: Explain local viewer threat model, reporting process, file upload limits.
+
+**Discovery**: ✅ Professional-grade SECURITY.md exists
+
+**Implementation Details** (from SECURITY.md):
+- **Threat Model**: Local viewer + STEP parser analysis
+- **Trust Boundary**: Local network, upload limits, cache limits
+- **Security Features**:
+  - Upload size limits (50MB default)
+  - Cache size limits (1GB default, LRU)
+  - Path traversal protection (whitelist validation)
+  - Atomic cache writes
+  - Security headers (nosniff, CSP, etc.)
+  - Loopback binding (127.0.0.1 default)
+- **Reporting Process**: GitHub private vulnerability reporting
+- **Response Timeline**: 7-day initial, 14-day triage
+- **Supported Versions**: 0.1.x
+
+**Evidence**: Complete security policy with all requested elements
+
+**No work needed**: K02 fully implemented with professional documentation
+
+## K03. Add CONTRIBUTING.md ✅ ALREADY IMPLEMENTED
+
+**Problem**: Build/test commands, test requirements, entity support policy.
+
+**Discovery**: ✅ Comprehensive CONTRIBUTING.md exists
+
+**Implementation Details** (from CONTRIBUTING.md):
+- **Build/Test Commands**: Complete Maven commands including baseline verification
+- **Code Style**: Spotless configuration, naming conventions
+- **Testing Requirements**: Coverage, naming, regression tests
+- **Entity Support Policy**: 
+  - 5-step process for adding entities
+  - Support levels L0-L4 defined
+  - Unsupported entity handling policy
+- **Pull Request Process**: Template, review process, checklist
+- **Architecture Overview**: Package descriptions, key components
+
+**Evidence**: Uses accurate statistics (line 200: "1264 entity model classes")
+
+**No work needed**: K03 fully implemented with comprehensive contributor guide
 
 ## K04. Add architecture diagram text
 
