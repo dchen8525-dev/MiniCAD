@@ -8,27 +8,19 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param name shape name
  * @param description optional description
- * @param definition referenced product definition or product definition relationship
- */
-/**
- * Minimal product definition shape.
- *
- * @param id STEP instance id
- * @param name shape name
- * @param description optional description
- * @param definition referenced product definition or product definition relationship
+ * @param definition referenced product definition or product definition relationship (may be null for profile definitions)
  */
 public final class StepProductDefinitionShape implements StepEntity {
     private final int id;
     private final String name;
     private final String description;
-    private final StepEntity definition;
+    private final StepEntity definition;  // May be null for profile definitions in complex entities
 
     public StepProductDefinitionShape(int id, String name, String description, StepEntity definition) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.definition = definition;
+        this.definition = definition;  // Accepts null for omitted parameter
     }
 
     public int getId() {

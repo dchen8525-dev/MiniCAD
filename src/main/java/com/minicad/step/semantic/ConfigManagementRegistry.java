@@ -11,15 +11,6 @@ public final class ConfigManagementRegistry {
   private ConfigManagementRegistry() {}
 
   public static void register(Map<String, EntityFactory> registry) {
-// Entity: DOCUMENT_TYPE
-      registry.put("DOCUMENT_TYPE", StepEntityResolver::resolveDocumentType);
-
-// Entity: DOCUMENT
-      registry.put("DOCUMENT", StepEntityResolver::resolveDocument);
-
-// Entity: DOCUMENT_RELATIONSHIP
-      registry.put("DOCUMENT_RELATIONSHIP", StepEntityResolver::resolveDocumentRelationship);
-
 // Entity: DOCUMENT_USAGE_CONSTRAINT
       registry.put(
           "DOCUMENT_USAGE_CONSTRAINT", StepEntityResolver::resolveDocumentUsageConstraint);
@@ -30,18 +21,6 @@ public final class ConfigManagementRegistry {
 // Entity: APPLIED_DOCUMENT_REFERENCE
       registry.put(
           "APPLIED_DOCUMENT_REFERENCE", StepEntityResolver::resolveAppliedDocumentReference);
-
-// Entity: APPROVAL_STATUS
-      registry.put("APPROVAL_STATUS", StepEntityResolver::resolveApprovalStatus);
-
-// Entity: APPROVAL
-      registry.put("APPROVAL", StepEntityResolver::resolveApproval);
-
-// Entity: APPROVAL_ROLE
-      registry.put("APPROVAL_ROLE", StepEntityResolver::resolveApprovalRole);
-
-// Entity: APPROVAL_ASSIGNMENT
-      registry.put("APPROVAL_ASSIGNMENT", StepEntityResolver::resolveApprovalAssignment);
 
 // Entity: APPLIED_APPROVAL_ASSIGNMENT
       registry.put(

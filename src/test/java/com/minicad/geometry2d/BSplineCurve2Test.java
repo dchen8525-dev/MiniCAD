@@ -1,5 +1,6 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.GeometryException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -36,13 +37,14 @@ class BSplineCurve2Test {
     @Test
     void bsplineQuadraticPointAt() {
         // Quadratic B-spline (degree 2)
+        // For degree=2 with 3 control points: expandedCount = 3 + 2 + 1 = 6
         List<Point2> controlPoints = List.of(
             new Point2(0, 0),
             new Point2(5, 10),
             new Point2(10, 0)
         );
-        List<Double> knots = List.of(0.0, 0.5, 1.0);
-        List<Integer> multiplicities = List.of(3, 1, 3);
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(3, 3); // 3+3=6 matches 3+2+1=6
 
         BSplineCurve2 bspline = new BSplineCurve2(2, controlPoints, multiplicities, knots);
 
@@ -298,5 +300,114 @@ class BSplineCurve2Test {
 
         Point2 p1 = bspline.pointAt(1);
         assertEquals(10.0, p1.x(), 1e-10);
+    }
+
+    // ========================================================================
+    // D06: B-Spline knot validation tests
+    // ========================================================================
+
+    @Test
+    void bsplineValidationKnotMultiplicityCountMismatch() {
+        // Knot and multiplicity lists have different sizes
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(2); // Wrong size
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationKnotValuesNotStrictlyIncreasing() {
+        // Knot values are not strictly increasing
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(0.0, 0.0); // Not strictly increasing
+        List<Integer> multiplicities = List.of(2, 2);
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationKnotValuesDecreasing() {
+        // Knot values are decreasing
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(1.0, 0.0); // Decreasing
+        List<Integer> multiplicities = List.of(2, 2);
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationNegativeMultiplicity() {
+        // Multiplicity is negative
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(2, -1); // Negative multiplicity
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationZeroMultiplicity() {
+        // Multiplicity is zero
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(2, 0); // Zero multiplicity
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationExpandedKnotCountMismatch() {
+        // Expanded knot count does not match control points + degree + 1
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(10, 0)
+        );
+        List<Double> knots = List.of(0.0, 1.0);
+        List<Integer> multiplicities = List.of(2, 1); // Wrong expanded count: 2+1=3, expected 1+1+1=3
+
+        assertThrows(GeometryException.class, () ->
+            new BSplineCurve2(1, controlPoints, multiplicities, knots));
+    }
+
+    @Test
+    void bsplineValidationValidKnots() {
+        // Valid B-spline with correct knot validation
+        // For degree=2 with 3 control points: expandedCount = 3 + 2 + 1 = 6
+        List<Point2> controlPoints = List.of(
+            new Point2(0, 0),
+            new Point2(5, 10),
+            new Point2(10, 0)
+        );
+
+        // Correct example:
+        List<Double> correctKnots = List.of(0.0, 1.0);
+        List<Integer> correctMultiplicities = List.of(3, 3);
+        // Expanded: 3+3=6, matches 3+2+1=6
+
+        BSplineCurve2 validBspline = new BSplineCurve2(2, controlPoints, correctMultiplicities, correctKnots);
+        assertNotNull(validBspline);
+        assertEquals(0.0, validBspline.startParameter(), 1e-10);
+        assertEquals(1.0, validBspline.endParameter(), 1e-10);
     }
 }

@@ -35,9 +35,31 @@ public final class BSplineCurve2 implements Curve2 {
         if (degree < 1) {
             throw new GeometryException("B-spline degree must be at least 1, got " + degree);
         }
-        // Validate control points (must have at least degree+1 points)
-        if (controlPoints == null || controlPoints.size() < degree + 1) {
-            throw new GeometryException("B-spline requires at least " + (degree + 1) + " control points for degree " + degree + ", got " + (controlPoints == null ? 0 : controlPoints.size()));
+        // Validate control points (must have more control points than degree)
+        if (controlPoints == null || controlPoints.size() <= degree) {
+            throw new GeometryException("B-spline requires more control points than its degree");
+        }
+        // Validate knot values and multiplicities
+        if (knots == null || knotMultiplicities == null || knots.size() != knotMultiplicities.size()) {
+            throw new GeometryException("knot values and multiplicities must have equal size");
+        }
+        double previous = Double.NEGATIVE_INFINITY;
+        int expandedCount = 0;
+        for (int i = 0; i < knots.size(); i++) {
+            double knot = knots.get(i);
+            int multiplicity = knotMultiplicities.get(i);
+            if (!Double.isFinite(knot) || knot <= previous) {
+                throw new GeometryException("knot values must be finite and strictly increasing");
+            }
+            if (multiplicity <= 0) {
+                throw new GeometryException("knot multiplicities must be positive");
+            }
+            previous = knot;
+            expandedCount += multiplicity;
+        }
+        // Validate expanded knot count matches control points and degree
+        if (expandedCount != controlPoints.size() + degree + 1) {
+            throw new GeometryException("expanded knot count does not match control points and degree");
         }
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);

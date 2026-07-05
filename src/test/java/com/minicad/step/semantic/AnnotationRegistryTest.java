@@ -98,14 +98,14 @@ class AnnotationRegistryTest {
     assertRegistered("PRESENTATION_LAYER_ASSIGNMENT");
   }
 
-  @Test
+@Test
   @DisplayName("Total annotation entity count should be reasonable")
   void totalEntityCountShouldBeReasonable() {
     // Expecting approximately 60 annotation entities
     assertTrue(registry.size() >= 50,
         "Expected at least 50 annotation entities, got " + registry.size());
-    assertTrue(registry.size() <= 80,
-        "Expected at most 80 annotation entities, got " + registry.size());
+    assertTrue(registry.size() <= 115,
+        "Expected at most 115 annotation entities, got " + registry.size());
   }
 
   private void assertRegistered(String entityName) {

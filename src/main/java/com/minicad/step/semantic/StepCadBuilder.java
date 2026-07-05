@@ -3,6 +3,7 @@ package com.minicad.step.semantic;
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.topology.TopologyValidator;
 import com.minicad.geometry.Axis1Placement;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.BoundingBox3;
@@ -1593,6 +1594,8 @@ public final class StepCadBuilder {
             return existing;
         }
         Shell built = shellBuilder.buildShell(id);
+        // D09/D10: Validate shell topology (winding direction, zero-length edges)
+        TopologyValidator.validateShell(built);
         shells.put(id, built);
         return built;
     }

@@ -309,5 +309,29 @@ public final class ClassificationRegistry {
           "WEEK_OF_YEAR_AND_DAY_DATE",
           (resolver, instance) -> resolver.resolveRepresentationItem(instance));
 
+// Entity: APPROVAL (moved from ConfigManagementRegistry for test organization)
+      registry.put("APPROVAL", StepEntityResolver::resolveApproval);
+
+// Entity: APPROVAL_STATUS (moved from ConfigManagementRegistry for test organization)
+      registry.put("APPROVAL_STATUS", StepEntityResolver::resolveApprovalStatus);
+
+// Entity: APPROVAL_ROLE (moved from ConfigManagementRegistry for test organization)
+      registry.put("APPROVAL_ROLE", StepEntityResolver::resolveApprovalRole);
+
+// Entity: APPROVAL_ASSIGNMENT (moved from ConfigManagementRegistry for test organization)
+      registry.put("APPROVAL_ASSIGNMENT", StepEntityResolver::resolveApprovalAssignment);
+
+// Entity: DOCUMENT (moved from ConfigManagementRegistry for test organization)
+      registry.put("DOCUMENT", StepEntityResolver::resolveDocument);
+
+// Entity: DOCUMENT_TYPE (moved from ConfigManagementRegistry for test organization)
+      registry.put("DOCUMENT_TYPE", StepEntityResolver::resolveDocumentType);
+
+// Entity: DOCUMENT_RELATIONSHIP (moved from ConfigManagementRegistry for test organization)
+      registry.put("DOCUMENT_RELATIONSHIP", StepEntityResolver::resolveDocumentRelationship);
+
+// Entity: EXTERNAL_SOURCE (moved from MiscellaneousRegistry1 for test organization)
+      registry.put("EXTERNAL_SOURCE", StepEntityResolver::resolveExternalSource);
+
   }
 }

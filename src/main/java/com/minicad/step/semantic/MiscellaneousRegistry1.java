@@ -26,12 +26,7 @@ public final class MiscellaneousRegistry1 {
               resolver.resolveCsgPrimitive(
                   instance, "ELLIPSOID", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
 
-// Entity: RIGHT_CIRCULAR_CONE
-      registry.put(
-          "RIGHT_CIRCULAR_CONE",
-          (resolver, instance) ->
-              resolver.resolveCsgPrimitive(
-                  instance, "RIGHT_CIRCULAR_CONE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 2));
+// NOTE: RIGHT_CIRCULAR_CONE moved to ProductRegistry (before CSG_PRIMITIVE for complex entity priority)
 
 // Entity: BOX_DOMAIN
       registry.put("BOX_DOMAIN", StepEntityResolver::resolveBoxDomain);
@@ -207,9 +202,6 @@ public final class MiscellaneousRegistry1 {
 
 // Entity: ID_ATTRIBUTE
       registry.put("ID_ATTRIBUTE", StepEntityResolver::resolveIdAttribute);
-
-// Entity: EXTERNAL_SOURCE
-      registry.put("EXTERNAL_SOURCE", StepEntityResolver::resolveExternalSource);
 
 // Entity: EXTERNALLY_DEFINED_ITEM
       registry.put("EXTERNALLY_DEFINED_ITEM",

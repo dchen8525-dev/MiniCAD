@@ -33,7 +33,29 @@ public final class StepAssemblyGraphBuilder {
     private StepAssemblyGraphBuilder() {
     }
 
+    /**
+     * Build assembly graph without unit scaling (default: scale factor = 1.0).
+     *
+     * @param resolved resolved STEP entities
+     * @return assembly graph
+     */
     public static AssemblyGraph build(Map<Integer, StepEntity> resolved) {
+        return build(resolved, 1.0);
+    }
+
+    /**
+     * Build assembly graph with unit scaling.
+     * <p>
+     * F04: Assembly transforms must apply after unit conversion consistently.
+     * This method applies the given scale factor to all translation components
+     * of assembly transformation matrices.
+     *
+     * @param resolved resolved STEP entities
+     * @param scaleToMeters scale factor to convert STEP file units to meters
+     *                      (e.g., 0.001 for millimeters, 0.0254 for inches, 1.0 for meters)
+     * @return assembly graph with scaled transforms
+     */
+    public static AssemblyGraph build(Map<Integer, StepEntity> resolved, double scaleToMeters) {
         Map<Integer, String> representationNames = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
             if (!(entity instanceof StepRepresentation)) {
@@ -119,7 +141,8 @@ public final class StepAssemblyGraphBuilder {
                     contextByOccurrence,
                     productByDefinitionId,
                     resolved,
-                    nodes
+                    nodes,
+                    scaleToMeters
             );
         }
 
@@ -176,7 +199,8 @@ public final class StepAssemblyGraphBuilder {
             Map<Integer, StepContextDependentShapeRepresentation> contextByOccurrence,
             Map<Integer, StepProduct> productByDefinitionId,
             Map<Integer, StepEntity> resolved,
-            List<AssemblyNode> nodes
+            List<AssemblyNode> nodes,
+            double scaleToMeters
     ) {
         String effectiveNodeId = nodeId != null
                 ? nodeId
@@ -206,7 +230,7 @@ public final class StepAssemblyGraphBuilder {
             StepContextDependentShapeRepresentation contextDependent = contextByOccurrence.get(child.id());
             double[] childLocalMatrix = contextDependent == null
                     ? identityMatrix()
-                    : localTransformationMatrixFor(contextDependent, resolved);
+                    : localTransformationMatrixFor(contextDependent, resolved, scaleToMeters);
             double[] childWorldMatrix = multiplyMatrices(worldMatrix, childLocalMatrix);
             String childNodeId = effectiveNodeId + "/occ-" + child.id() + "-pd-" + child.relatedProductDefinition().id();
             addNode(
@@ -221,7 +245,8 @@ public final class StepAssemblyGraphBuilder {
                     contextByOccurrence,
                     productByDefinitionId,
                     resolved,
-                    nodes
+                    nodes,
+                    scaleToMeters
             );
         }
     }
@@ -238,10 +263,18 @@ public final class StepAssemblyGraphBuilder {
             StepContextDependentShapeRepresentation contextDependent,
             Map<Integer, StepEntity> resolved
     ) {
+        return localTransformationMatrixFor(contextDependent, resolved, 1.0);
+    }
+
+    static double[] localTransformationMatrixFor(
+            StepContextDependentShapeRepresentation contextDependent,
+            Map<Integer, StepEntity> resolved,
+            double scaleToMeters
+    ) {
         StepEntity relation = resolved.get(contextDependent.representationRelationship().id());
         if (relation instanceof StepRepresentationRelationshipWithTransformation) {
             StepRepresentationRelationshipWithTransformation withTransformation = (StepRepresentationRelationshipWithTransformation) relation;
-            return matrixFor(withTransformation.transformationOperator());
+            return matrixFor(withTransformation.transformationOperator(), scaleToMeters);
         }
         if (relation instanceof StepShapeRepresentationRelationship
                 || relation instanceof StepRepresentationRelationship) {
@@ -251,12 +284,20 @@ public final class StepAssemblyGraphBuilder {
     }
 
     static double[] matrixFor(StepItemDefinedTransformation transformation) {
-        double[] from = matrixForPlacement(transformation.transformItem1());
-        double[] to = matrixForPlacement(transformation.transformItem2());
+        return matrixFor(transformation, 1.0);
+    }
+
+    static double[] matrixFor(StepItemDefinedTransformation transformation, double scaleToMeters) {
+        double[] from = matrixForPlacement(transformation.transformItem1(), scaleToMeters);
+        double[] to = matrixForPlacement(transformation.transformItem2(), scaleToMeters);
         return multiplyMatrices(to, inverseRigidTransform(from));
     }
 
     static double[] matrixForPlacement(StepAxis2Placement3D placement) {
+        return matrixForPlacement(placement, 1.0);
+    }
+
+    static double[] matrixForPlacement(StepAxis2Placement3D placement, double scaleToMeters) {
         Vector3 z = directionVector(placement.axis()).normalize().asVector();
         Vector3 xSeed = directionVector(placement.refDirection()).normalize().asVector();
         Vector3 cross = z.cross(xSeed);
@@ -267,10 +308,14 @@ public final class StepAssemblyGraphBuilder {
         Vector3 y = cross.normalize().asVector();
         Vector3 x = y.cross(z).normalize().asVector();
         List<Double> origin = placement.location().coordinates();
+        // Apply unit scale to translation components (F04)
+        double tx = origin.get(0) * scaleToMeters;
+        double ty = origin.get(1) * scaleToMeters;
+        double tz = origin.get(2) * scaleToMeters;
         return new double[]{
-                x.x(), y.x(), z.x(), origin.get(0),
-                x.y(), y.y(), z.y(), origin.get(1),
-                x.z(), y.z(), z.z(), origin.get(2),
+                x.x(), y.x(), z.x(), tx,
+                x.y(), y.y(), z.y(), ty,
+                x.z(), y.z(), z.z(), tz,
                 0.0, 0.0, 0.0, 1.0
         };
     }

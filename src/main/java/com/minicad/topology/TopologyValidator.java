@@ -147,6 +147,12 @@ public final class TopologyValidator {
                 ));
             }
         }
+
+        // D09: Validate FACE_BOUND winding direction (inner bounds must be opposite to outer)
+        validateFaceBoundsOrientation(face, faceIndex, issues);
+
+        // D10: Detect zero-length edges in face bounds
+        detectZeroLengthEdgesInFace(face, faceIndex, issues);
     }
 
     private static double planarOuterArea(Face face) {
@@ -300,4 +306,198 @@ public static final class ValidationResult {
         return "ValidationResult{" + "issues=" + issues + "}";
     }
 }
+
+    // ========================================================================
+    // D09: FACE_BOUND winding direction validation
+    // ========================================================================
+
+    /**
+     * Validates that inner bounds are wound opposite to outer bound.
+     * This ensures holes are correctly oriented for proper face definition.
+     *
+     * @param face face to validate
+     * @param faceIndex face index in shell
+     * @param issues list to add validation issues
+     */
+    private static void validateFaceBoundsOrientation(Face face, int faceIndex, List<MiniCadIssue> issues) {
+        List<FaceBound> bounds = face.getBounds();
+        if (bounds.isEmpty()) {
+            return;
+        }
+
+        // Find outer bound
+        FaceBound outerBound = bounds.stream()
+                .filter(FaceBound::outer)
+                .findFirst()
+                .orElse(null);
+
+        if (outerBound == null) {
+            // No outer bound - cannot validate winding direction
+            return;
+        }
+
+        // Calculate winding direction of outer bound
+        WindingDirection outerWinding = calculateWindingDirection(outerBound.getLoop());
+        if (outerWinding == WindingDirection.UNKNOWN) {
+            // Cannot determine winding direction (e.g., VertexLoop)
+            return;
+        }
+
+        // Validate inner bounds wound opposite to outer
+        for (int boundIndex = 0; boundIndex < bounds.size(); boundIndex++) {
+            FaceBound bound = bounds.get(boundIndex);
+            if (!bound.outer()) {
+                WindingDirection innerWinding = calculateWindingDirection(bound.getLoop());
+                if (innerWinding == WindingDirection.UNKNOWN) {
+                    continue;
+                }
+
+                // Inner bound should wound opposite to outer (considering orientation flag)
+                boolean orientationMatches = (outerWinding == innerWinding);
+                boolean expectedOrientationMatches = !bound.orientation(); // Inner should be opposite
+
+                if (orientationMatches != expectedOrientationMatches) {
+                    String message = bound.orientation()
+                            ? "inner bound at face " + faceIndex + " bound " + boundIndex
+                              + " winds same as outer but should wind opposite"
+                            : "inner bound at face " + faceIndex + " bound " + boundIndex
+                              + " winds opposite to outer but orientation flag is reversed";
+
+                    issues.add(MiniCadIssue.error(
+                            "face_bound.winding_direction",
+                            null,
+                            null,
+                            message
+                    ));
+                }
+            }
+        }
+    }
+
+    /**
+     * Calculates winding direction of a loop (clockwise or counterclockwise).
+     * Uses signed area calculation projected to the best-fit plane.
+     *
+     * @param loop loop to analyze
+     * @return winding direction
+     */
+    private static WindingDirection calculateWindingDirection(Loop loop) {
+        if (loop instanceof EdgeLoop) {
+            EdgeLoop edgeLoop = (EdgeLoop) loop;
+            List<CartesianPoint> points = edgeLoop.vertices().stream()
+                    .map(Vertex::point)
+                    .collect(Collectors.toList());
+            return calculateWindingFromPoints(points);
+        } else if (loop instanceof PolyLoop) {
+            PolyLoop polyLoop = (PolyLoop) loop;
+            return calculateWindingFromPoints(polyLoop.getPoints());
+        } else if (loop instanceof VertexLoop) {
+            // Vertex loop has no meaningful winding direction
+            return WindingDirection.UNKNOWN;
+        }
+        return WindingDirection.UNKNOWN;
+    }
+
+    /**
+     * Calculates winding direction from a list of points.
+     * Uses signed area calculation in 2D projection.
+     *
+     * @param points ordered points of the loop
+     * @return winding direction
+     */
+    private static WindingDirection calculateWindingFromPoints(List<CartesianPoint> points) {
+        if (points.size() < 3) {
+            return WindingDirection.UNKNOWN;
+        }
+
+        // Calculate signed area in 2D projection (use X-Y plane)
+        // For more accuracy, should project to the best-fit plane of the points
+        double signedArea = 0.0;
+        for (int i = 0; i < points.size(); i++) {
+            CartesianPoint current = points.get(i);
+            CartesianPoint next = points.get((i + 1) % points.size());
+            signedArea += (current.getX() * next.getY() - next.getX() * current.getY());
+        }
+
+        // Positive signed area = counterclockwise (CCW)
+        // Negative signed area = clockwise (CW)
+        if (Math.abs(signedArea) < Epsilon.EPS) {
+            return WindingDirection.UNKNOWN;
+        }
+
+        return signedArea > 0 ? WindingDirection.CounterClockwise : WindingDirection.Clockwise;
+    }
+
+    /**
+     * Winding direction enumeration.
+     */
+    private enum WindingDirection {
+        Clockwise,
+        CounterClockwise,
+        UNKNOWN
+    }
+
+    // ========================================================================
+    // D10: Zero-length edge detection
+    // ========================================================================
+
+    /**
+     * Detects zero-length edges in face bounds.
+     *
+     * @param face face to check
+     * @param faceIndex face index in shell
+     * @param issues list to add validation issues
+     */
+    private static void detectZeroLengthEdgesInFace(Face face, int faceIndex, List<MiniCadIssue> issues) {
+        for (int boundIndex = 0; boundIndex < face.getBounds().size(); boundIndex++) {
+            FaceBound bound = face.getBounds().get(boundIndex);
+            Loop loop = bound.getLoop();
+
+            if (loop instanceof EdgeLoop) {
+                EdgeLoop edgeLoop = (EdgeLoop) loop;
+                for (int edgeIndex = 0; edgeIndex < edgeLoop.edges().size(); edgeIndex++) {
+                    OrientedEdge orientedEdge = edgeLoop.edges().get(edgeIndex);
+                    Edge edge = orientedEdge.getEdge();
+                    double length = edge.length();
+
+                    if (length < Epsilon.EPS) {
+                        issues.add(MiniCadIssue.error(
+                                "edge.zero_length",
+                                null,
+                                null,
+                                "zero-length edge at face " + faceIndex + " bound " + boundIndex
+                                        + " edge " + edgeIndex + " (" + describeEdge(edge) + ")"
+                        ));
+                    }
+                }
+            } else if (loop instanceof PolyLoop) {
+                PolyLoop polyLoop = (PolyLoop) loop;
+                List<CartesianPoint> points = polyLoop.getPoints();
+                for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+                    CartesianPoint p1 = points.get(pointIndex);
+                    CartesianPoint p2 = points.get((pointIndex + 1) % points.size());
+                    double segmentLength = p1.distanceTo(p2);
+
+                    if (segmentLength < Epsilon.EPS) {
+                        issues.add(MiniCadIssue.error(
+                                "polyloop.zero_length_segment",
+                                null,
+                                null,
+                                "zero-length segment at face " + faceIndex + " bound " + boundIndex
+                                        + " point " + pointIndex + " (" + describePoint(p1) + " -> " + describePoint(p2) + ")"
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    private static String describePoint(CartesianPoint point) {
+        return String.format(
+                "%.6f,%.6f,%.6f",
+                point.getX(),
+                point.getY(),
+                point.getZ()
+        );
+    }
 }

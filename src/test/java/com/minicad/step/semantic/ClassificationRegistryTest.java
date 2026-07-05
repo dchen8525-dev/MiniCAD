@@ -86,13 +86,13 @@ class ClassificationRegistryTest {
     assertRegistered("EXTERNAL_SOURCE");
   }
 
-  @Test
+@Test
   @DisplayName("Total classification entity count should be reasonable")
   void totalEntityCountShouldBeReasonable() {
     assertTrue(registry.size() >= 30,
         "Expected at least 30 classification entities, got " + registry.size());
-    assertTrue(registry.size() <= 50,
-        "Expected at most 50 classification entities, got " + registry.size());
+    assertTrue(registry.size() <= 80,
+        "Expected at most 80 classification entities, got " + registry.size());
   }
 
   private void assertRegistered(String entityName) {

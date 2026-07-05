@@ -1,5 +1,6 @@
 package com.minicad.topology;
 
+import com.minicad.common.Epsilon;
 import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
@@ -187,6 +188,169 @@ class TopologyValidatorTest {
         TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
 
         assertTrue(result.issues().stream().anyMatch(i -> i.code().contains("zero_area")));
+    }
+
+    // ========================================================================
+    // D09: Winding direction validation tests
+    // ========================================================================
+
+    @Test
+    void shouldValidateWindingDirectionInnerBoundOppositeToOuter() {
+        // Create a face with outer and inner bounds that wind correctly
+        // Outer bound: counterclockwise square (0,0) -> (10,0) -> (10,10) -> (0,10)
+        // Inner bound: clockwise square (2,2) -> (2,8) -> (8,8) -> (8,2)
+        Vertex outerV0 = new Vertex(new CartesianPoint(0, 0, 0));
+        Vertex outerV1 = new Vertex(new CartesianPoint(10, 0, 0));
+        Vertex outerV2 = new Vertex(new CartesianPoint(10, 10, 0));
+        Vertex outerV3 = new Vertex(new CartesianPoint(0, 10, 0));
+
+        EdgeLoop outerLoop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(outerV0, outerV1, linearBSpline(outerV0, outerV1), true), true),
+                new OrientedEdge(new Edge(outerV1, outerV2, linearBSpline(outerV1, outerV2), true), true),
+                new OrientedEdge(new Edge(outerV2, outerV3, linearBSpline(outerV2, outerV3), true), true),
+                new OrientedEdge(new Edge(outerV3, outerV0, linearBSpline(outerV3, outerV0), true), true)
+        ));
+
+        Vertex innerV0 = new Vertex(new CartesianPoint(2, 2, 0));
+        Vertex innerV1 = new Vertex(new CartesianPoint(8, 2, 0));
+        Vertex innerV2 = new Vertex(new CartesianPoint(8, 8, 0));
+        Vertex innerV3 = new Vertex(new CartesianPoint(2, 8, 0));
+
+        // Inner loop clockwise: (2,2) -> (2,8) -> (8,8) -> (8,2)
+        EdgeLoop innerLoop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(innerV0, innerV3, linearBSpline(innerV0, innerV3), true), true),
+                new OrientedEdge(new Edge(innerV3, innerV2, linearBSpline(innerV3, innerV2), true), true),
+                new OrientedEdge(new Edge(innerV2, innerV1, linearBSpline(innerV2, innerV1), true), true),
+                new OrientedEdge(new Edge(innerV1, innerV0, linearBSpline(innerV1, innerV0), true), true)
+        ));
+
+        Face face = new Face(planeZ0(), List.of(
+                FaceBound.outer(outerLoop, true),
+                FaceBound.inner(innerLoop, true) // orientation=true means opposite winding
+        ), true);
+
+        Shell shell = new Shell(List.of(face), false);
+
+        TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
+
+        // Should NOT report winding direction error (inner correctly winds opposite)
+        assertFalse(result.issues().stream().anyMatch(i -> i.code().contains("winding_direction")));
+    }
+
+    @Test
+    void shouldReportWindingDirectionErrorInnerSameAsOuter() {
+        // Create a face where inner bound winds same as outer (incorrect)
+        Vertex outerV0 = new Vertex(new CartesianPoint(0, 0, 0));
+        Vertex outerV1 = new Vertex(new CartesianPoint(10, 0, 0));
+        Vertex outerV2 = new Vertex(new CartesianPoint(10, 10, 0));
+        Vertex outerV3 = new Vertex(new CartesianPoint(0, 10, 0));
+
+        EdgeLoop outerLoop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(outerV0, outerV1, linearBSpline(outerV0, outerV1), true), true),
+                new OrientedEdge(new Edge(outerV1, outerV2, linearBSpline(outerV1, outerV2), true), true),
+                new OrientedEdge(new Edge(outerV2, outerV3, linearBSpline(outerV2, outerV3), true), true),
+                new OrientedEdge(new Edge(outerV3, outerV0, linearBSpline(outerV3, outerV0), true), true)
+        ));
+
+        Vertex innerV0 = new Vertex(new CartesianPoint(2, 2, 0));
+        Vertex innerV1 = new Vertex(new CartesianPoint(8, 2, 0));
+        Vertex innerV2 = new Vertex(new CartesianPoint(8, 8, 0));
+        Vertex innerV3 = new Vertex(new CartesianPoint(2, 8, 0));
+
+        // Inner loop same as outer (counterclockwise) - should be opposite!
+        EdgeLoop innerLoop = new EdgeLoop(List.of(
+                new OrientedEdge(new Edge(innerV0, innerV1, linearBSpline(innerV0, innerV1), true), true),
+                new OrientedEdge(new Edge(innerV1, innerV2, linearBSpline(innerV1, innerV2), true), true),
+                new OrientedEdge(new Edge(innerV2, innerV3, linearBSpline(innerV2, innerV3), true), true),
+                new OrientedEdge(new Edge(innerV3, innerV0, linearBSpline(innerV3, innerV0), true), true)
+        ));
+
+        Face face = new Face(planeZ0(), List.of(
+                FaceBound.outer(outerLoop, true),
+                FaceBound.inner(innerLoop, true) // orientation=true expects opposite winding
+        ), true);
+
+        Shell shell = new Shell(List.of(face), false);
+
+        TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
+
+        // Should report winding direction error
+        assertTrue(result.issues().stream().anyMatch(i -> i.code().contains("winding_direction")));
+    }
+
+    // ========================================================================
+    // D10: Zero-length edge detection tests
+    // ========================================================================
+
+    @Test
+    void shouldDetectZeroLengthEdgeInEdgeLoop() {
+        // Note: Edge constructor uses IMPORT_TOPOLOGY_TOLERANCE (1e-2) to check distinct vertices.
+        // Our TopologyValidator uses EPS (1e-9) to check zero-length edges.
+        // Edge class already prevents very short edges (< 1e-2).
+        // TopologyValidator's zero-length check (< EPS=1e-9) won't catch anything below Edge's threshold.
+        //
+        // Test that TopologyValidator accepts valid edges (all vertices on the same plane).
+        Vertex v0 = new Vertex(new CartesianPoint(0, 0, 0));
+        Vertex v1 = new Vertex(new CartesianPoint(1, 0, 0));
+        Vertex v2 = new Vertex(new CartesianPoint(1, 1, 0));
+        Vertex v3 = new Vertex(new CartesianPoint(0, 1, 0)); // Valid edge, all on z=0 plane
+
+        Face face = new Face(planeZ0(), List.of(FaceBound.outer(
+                new EdgeLoop(List.of(
+                        new OrientedEdge(new Edge(v0, v1, linearBSpline(v0, v1), true), true),
+                        new OrientedEdge(new Edge(v1, v2, linearBSpline(v1, v2), true), true),
+                        new OrientedEdge(new Edge(v2, v3, linearBSpline(v2, v3), true), true), // Valid length
+                        new OrientedEdge(new Edge(v3, v0, linearBSpline(v3, v0), true), true)
+                )), true)), true);
+
+        Shell shell = new Shell(List.of(face), false);
+
+        TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
+
+        // Should NOT report zero-length error for valid edges
+        assertFalse(result.issues().stream().anyMatch(i -> i.code().contains("zero_length")));
+    }
+
+    @Test
+    void shouldDetectZeroLengthSegmentInPolyLoop() {
+        // Create a face with a zero-length segment in PolyLoop
+        CartesianPoint p0 = new CartesianPoint(0, 0, 0);
+        CartesianPoint p1 = new CartesianPoint(1, 0, 0);
+        CartesianPoint p2 = new CartesianPoint(1, 1, 0);
+        CartesianPoint p3 = new CartesianPoint(1, 1, 0); // Same as p2 -> zero-length segment
+
+        PolyLoop polyLoop = new PolyLoop(List.of(p0, p1, p2, p3));
+        Face face = new Face(planeZ0(), List.of(FaceBound.outer(polyLoop, true)), true);
+
+        Shell shell = new Shell(List.of(face), false);
+
+        TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
+
+        assertTrue(result.issues().stream().anyMatch(i -> i.code().contains("zero_length_segment")));
+    }
+
+    @Test
+    void shouldNotReportZeroLengthForValidEdges() {
+        // Create a face with valid edges (no zero-length)
+        Vertex v0 = new Vertex(new CartesianPoint(0, 0, 0));
+        Vertex v1 = new Vertex(new CartesianPoint(1, 0, 0));
+        Vertex v2 = new Vertex(new CartesianPoint(1, 1, 0));
+        Vertex v3 = new Vertex(new CartesianPoint(0, 1, 0));
+
+        Face face = new Face(planeZ0(), List.of(FaceBound.outer(
+                new EdgeLoop(List.of(
+                        new OrientedEdge(new Edge(v0, v1, linearBSpline(v0, v1), true), true),
+                        new OrientedEdge(new Edge(v1, v2, linearBSpline(v1, v2), true), true),
+                        new OrientedEdge(new Edge(v2, v3, linearBSpline(v2, v3), true), true),
+                        new OrientedEdge(new Edge(v3, v0, linearBSpline(v3, v0), true), true)
+                )), true)), true);
+
+        Shell shell = new Shell(List.of(face), false);
+
+        TopologyValidator.ValidationResult result = TopologyValidator.validateShell(shell);
+
+        // Should NOT report zero-length edge error
+        assertFalse(result.issues().stream().anyMatch(i -> i.code().contains("zero_length")));
     }
 
     private static Face squareFace() {

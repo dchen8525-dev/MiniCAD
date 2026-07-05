@@ -603,5 +603,41 @@ public final class RepresentationRegistry2 {
 // Entity: TEXT_FILE_REPRESENTATION
       registry.put("TEXT_FILE_REPRESENTATION", StepEntityResolver::resolveTextFileRepresentation);
 
+// Entity: GEOMETRIC_SET_SHAPE_REPRESENTATION (shape representation)
+      registry.put(
+          "GEOMETRIC_SET_SHAPE_REPRESENTATION",
+          (resolver, instance) ->
+              resolver.resolveRepresentation(instance, "GEOMETRIC_SET_SHAPE_REPRESENTATION", true));
+
+// Entity: REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT
+      registry.put(
+          "REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "REPRESENTATION_RELATIONSHIP_WITH_SAME_CONTEXT"));
+
+// Entity: BREAKDOWN_CONTEXT
+      registry.put(
+          "BREAKDOWN_CONTEXT",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationship(instance, "BREAKDOWN_CONTEXT"));
+
+// Entity: BREAKDOWN_ELEMENT_USAGE
+      registry.put(
+          "BREAKDOWN_ELEMENT_USAGE",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationship(instance, "BREAKDOWN_ELEMENT_USAGE"));
+
+// Entity: SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION (shape representation)
+      registry.put(
+          "SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION",
+          (resolver, instance) ->
+              resolver.resolveRepresentation(instance, "SHELL_BASED_SURFACE_MODEL_SHAPE_REPRESENTATION", true));
+
+// Entity: SURFACE_MODEL_SHAPE_REPRESENTATION (shape representation)
+      registry.put(
+          "SURFACE_MODEL_SHAPE_REPRESENTATION",
+          (resolver, instance) ->
+              resolver.resolveRepresentation(instance, "SURFACE_MODEL_SHAPE_REPRESENTATION", true));
+
   }
 }

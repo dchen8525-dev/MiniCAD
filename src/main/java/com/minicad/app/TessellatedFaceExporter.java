@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.common.GeometryException;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.product.StepTessellatedFace;
@@ -35,8 +36,23 @@ final class TessellatedFaceExporter {
             points.add(new PointPayload(cx, cy, cz));
         }
         List<FacePayload> faces = new ArrayList<>(tessellated.faceIndices().size());
+        int faceIndexCount = 0;
         for (List<Integer> faceIndex : tessellated.faceIndices()) {
+            faceIndexCount++;
             if (faceIndex.size() < 3) continue;
+
+            // D04: Validate indices are within valid range
+            for (int idx : faceIndex) {
+                if (idx < 1) {
+                    throw new GeometryException("tessellated face set #" + tessellated.id()
+                            + " face #" + faceIndexCount + " has invalid index " + idx + " (must be >= 1)");
+                }
+                if (idx > points.size()) {
+                    throw new GeometryException("tessellated face set #" + tessellated.id()
+                            + " face #" + faceIndexCount + " index " + idx + " exceeds coordinate count " + points.size());
+                }
+            }
+
             PointPayload p1 = points.get(faceIndex.get(0) - 1);
             PointPayload p2 = points.get(faceIndex.get(1) - 1);
             PointPayload p3 = points.get(faceIndex.get(2) - 1);

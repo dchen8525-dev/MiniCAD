@@ -25,6 +25,12 @@ public final class StepEntityRegistry {
     // Topology entities
     TopologyRegistry.register(registry);
 
+    // Annotation/Presentation entities
+    AnnotationRegistry.register(registry);
+
+    // Profile entities (must be before Product for complex entity priority)
+    ProfileRegistry.register(registry);
+
     // Product entities (BREP, CSG, assemblies)
     ProductRegistry.register(registry);
 
@@ -32,14 +38,8 @@ public final class StepEntityRegistry {
     RepresentationRegistry1.register(registry);
     RepresentationRegistry2.register(registry);
 
-    // Profile entities
-    ProfileRegistry.register(registry);
-
     // Tolerance/GD&T entities
     ToleranceRegistry.register(registry);
-
-    // Annotation/Presentation entities
-    AnnotationRegistry.register(registry);
 
     // Unit/Measure entities
     UnitRegistry.register(registry);

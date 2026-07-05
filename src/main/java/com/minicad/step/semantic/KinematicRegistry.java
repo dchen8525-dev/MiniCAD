@@ -253,6 +253,52 @@ public final class KinematicRegistry {
 // Entity: MECHANISM_DEFINITION
       registry.put("MECHANISM_DEFINITION", StepEntityResolver::resolveMechanismDefinition);
 
+// Entity: KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "KINEMATIC_FRAME_BACKGROUND_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: KINEMATIC_LINK_SEQUENCE
+      registry.put(
+          "KINEMATIC_LINK_SEQUENCE",
+          (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+
+// Entity: MECHANISM_STATE_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "MECHANISM_STATE_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "MECHANISM_STATE_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: KINEMATIC_GROUND_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "KINEMATIC_GROUND_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "KINEMATIC_GROUND_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: KINEMATIC_PAIR_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "KINEMATIC_PAIR_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "KINEMATIC_PAIR_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "KINEMATIC_LINK_REPRESENTATION_RELATIONSHIP"));
+
+// Entity: MECHANISM_REPRESENTATION_RELATIONSHIP
+      registry.put(
+          "MECHANISM_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveRepresentationRelationship(instance, "MECHANISM_REPRESENTATION_RELATIONSHIP"));
 
   }
 }

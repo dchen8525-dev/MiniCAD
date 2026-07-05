@@ -431,5 +431,77 @@ public final class AnnotationRegistry {
 // Entity: DRAUGHTING_PRE_DEFINED_TERMINATOR_SYMBOL
       registry.put("DRAUGHTING_PRE_DEFINED_TERMINATOR_SYMBOL", StepEntityResolver::resolveDraughtingPreDefinedTerminatorSymbol);
 
+// Entity: APPLIED_AREA
+      registry.put(
+          "APPLIED_AREA",
+          (resolver, instance) -> resolver.resolveShapeAspect(instance, "APPLIED_AREA"));
+
+// Entity: EXTERNALLY_DEFINED_MARKER
+      registry.put(
+          "EXTERNALLY_DEFINED_MARKER",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_MARKER"));
+
+// Entity: EXTERNALLY_DEFINED_CHARACTER_GLYPH
+      registry.put(
+          "EXTERNALLY_DEFINED_CHARACTER_GLYPH",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_CHARACTER_GLYPH"));
+
+// Entity: EXTERNALLY_DEFINED_DIMENSION_DEFINITION
+      registry.put(
+          "EXTERNALLY_DEFINED_DIMENSION_DEFINITION",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_DIMENSION_DEFINITION"));
+
+// Entity: EXTERNALLY_DEFINED_TERMINATOR_SYMBOL
+      registry.put(
+          "EXTERNALLY_DEFINED_TERMINATOR_SYMBOL",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_TERMINATOR_SYMBOL"));
+
+// Entity: EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM
+      registry.put(
+          "EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_PICTURE_REPRESENTATION_ITEM"));
+
+// Entity: EXTERNALLY_DEFINED_TEXT_STYLE
+      registry.put(
+          "EXTERNALLY_DEFINED_TEXT_STYLE",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_TEXT_STYLE"));
+
+// Entity: EXTERNALLY_DEFINED_TILE
+      registry.put(
+          "EXTERNALLY_DEFINED_TILE",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_TILE"));
+
+// Entity: EXTERNALLY_DEFINED_STYLE
+      registry.put(
+          "EXTERNALLY_DEFINED_STYLE",
+          (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "EXTERNALLY_DEFINED_STYLE"));
+
+// Entity: ANNOTATION_PLANE (moved from GeometryRegistry for test organization)
+      registry.put("ANNOTATION_PLANE", StepEntityResolver::resolveAnnotationPlane);
+
+// Entity: ANNOTATION_CURVE_OCCURRENCE (moved from GeometryRegistry for test organization)
+      registry.put("ANNOTATION_CURVE_OCCURRENCE", StepEntityResolver::resolveAnnotationCurveOccurrence);
+
+// Entity: CURVE_STYLE (moved from GeometryRegistry2 for test organization)
+      registry.put("CURVE_STYLE", StepEntityResolver::resolveCurveStyle);
+
+// Entity: CURVE_STYLE_FONT (moved from GeometryRegistry2 for test organization)
+      registry.put("CURVE_STYLE_FONT", StepEntityResolver::resolveCurveStyleFont);
+
+// Entity: CURVE_STYLE_RENDERING (moved from GeometryRegistry2 for test organization)
+      registry.put("CURVE_STYLE_RENDERING", StepEntityResolver::resolveCurveStyleRendering);
+
+// Entity: PRE_DEFINED_CURVE_FONT (moved from GeometryRegistry2 for test organization)
+      registry.put("PRE_DEFINED_CURVE_FONT", StepEntityResolver::resolvePreDefinedCurveFont);
+
+// Entity: SURFACE_STYLE_FILL_AREA (moved from GeometryRegistry2 for test organization)
+      registry.put("SURFACE_STYLE_FILL_AREA", StepEntityResolver::resolveSurfaceStyleFillArea);
+
+// Entity: SURFACE_SIDE_STYLE (moved from GeometryRegistry2 for test organization)
+      registry.put("SURFACE_SIDE_STYLE", StepEntityResolver::resolveSurfaceSideStyle);
+
+// Entity: SURFACE_STYLE_USAGE (moved from GeometryRegistry2 for test organization)
+      registry.put("SURFACE_STYLE_USAGE", StepEntityResolver::resolveSurfaceStyleUsage);
+
   }
 }

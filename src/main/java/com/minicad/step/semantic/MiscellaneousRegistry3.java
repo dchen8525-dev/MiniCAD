@@ -64,11 +64,11 @@ public final class MiscellaneousRegistry3 {
           (resolver, instance) ->
               resolver.resolveGenericProperty(instance, "CAMERA_MODEL_D3_MULTI_CLIPPING_INTERSECTION"));
 
-// Entity: CIRCULAR_CLOSED_PROFILE
+// Entity: CIRCULAR_CLOSED_PROFILE (SHAPE_ASPECT subtype)
       registry.put(
           "CIRCULAR_CLOSED_PROFILE",
           (resolver, instance) ->
-              resolver.resolveGenericProperty(instance, "CIRCULAR_CLOSED_PROFILE"));
+              resolver.resolveShapeAspect(instance, "CIRCULAR_CLOSED_PROFILE"));
 
 // Entity: DRAPED_DEFINED_TRANSFORMATION
       registry.put(

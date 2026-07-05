@@ -34,6 +34,8 @@ class LineCountTest {
         // MiscRegistry.java removed - now split into specialized registries
         "StepEntityResolver.java",  // Core resolver with many methods (13324 lines)
         "StepCadBuilder.java",  // Complex builder logic (7429 lines)
+        "StepCadCurveBuilder.java",  // Curve building logic (1932 lines)
+        "StepCadSurfaceBuilder.java",  // Surface building logic (1840 lines)
         "StepCadGeometryOps.java",  // Geometry operations (1023 lines)
         "StepPreviewJsonExporter.java",  // Export logic (18094 lines)
         "StepDumpApp.java",  // CLI app (3632 lines)
