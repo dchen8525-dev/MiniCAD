@@ -143,6 +143,29 @@ public final class ProductRegistry {
 // Entity: PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP
       registry.put("PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP", StepEntityResolver::resolveProductDefinitionRelationshipRelationship);
 
+// Entity: BREAKDOWN_OF
+      registry.put(
+          "BREAKDOWN_OF",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationship(instance, "BREAKDOWN_OF"));
+
+// Entity: SUPPLIED_PART_RELATIONSHIP
+      registry.put(
+          "SUPPLIED_PART_RELATIONSHIP",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationship(instance, "SUPPLIED_PART_RELATIONSHIP"));
+
+// Entity: ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE
+      registry.put(
+          "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationshipRelationship(instance, "ASSEMBLY_COMPONENT_USAGE_SUBSTITUTE"));
+
+// Entity: PRODUCT_DEFINITION_SUBSTITUTE
+      registry.put(
+          "PRODUCT_DEFINITION_SUBSTITUTE",
+          (resolver, instance) ->
+              resolver.resolveProductDefinitionRelationshipRelationship(instance, "PRODUCT_DEFINITION_SUBSTITUTE"));
 
 // Entity: PRODUCT_DEFINITION_USAGE_RELATIONSHIP
       registry.put(
@@ -238,15 +261,8 @@ public final class ProductRegistry {
           (resolver, instance) ->
               resolver.resolveTypedMeasureWithUnit(instance, "VOLUME_MEASURE_WITH_UNIT", "VOLUME_UNIT"));
 
-// Entity: SOLID_ANGLE_UNIT
-      registry.put(
-          "SOLID_ANGLE_UNIT",
-          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "SOLID_ANGLE_UNIT"));
-
-// Entity: VOLUME_UNIT
-      registry.put(
-          "VOLUME_UNIT",
-          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "VOLUME_UNIT"));
+// Entity: SOLID_ANGLE_UNIT (moved to UnitRegistry for consistent ordering)
+// Entity: VOLUME_UNIT (moved to UnitRegistry for consistent ordering)
 
 // Entity: A3M_EQUIVALENCE_CRITERION_FOR_ASSEMBLY
       registry.put(
@@ -844,6 +860,15 @@ public final class ProductRegistry {
       registry.put(
           "ASSEMBLY_STEP",
           (resolver, instance) -> resolver.resolveRepresentationItem(instance));
+
+// Entity: RIGHT_CIRCULAR_CONE (must be before CSG_PRIMITIVE for complex entity priority)
+      registry.put(
+          "RIGHT_CIRCULAR_CONE",
+          (resolver, instance) ->
+              resolver.resolveCsgPrimitive(
+                  instance, "RIGHT_CIRCULAR_CONE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 2));
+
+// NOTE: CONVERSION_BASED_UNIT kept in UnitRegistry (moving causes CONVERSION_BASED_UNIT_WITH_OFFSET failure)
 
 // Entity: CSG_PRIMITIVE
       registry.put("CSG_PRIMITIVE", (resolver, instance) ->

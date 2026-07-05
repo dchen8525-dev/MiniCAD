@@ -247,6 +247,16 @@ public final class UnitRegistry {
 // Entity: SI_UNIT
       registry.put("SI_UNIT", StepEntityResolver::resolveSiUnit);
 
+// Entity: SOLID_ANGLE_UNIT (moved from ProductRegistry, must be AFTER SI_UNIT for proper complex entity resolution)
+      registry.put(
+          "SOLID_ANGLE_UNIT",
+          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "SOLID_ANGLE_UNIT"));
+
+// Entity: VOLUME_UNIT (moved from ProductRegistry)
+      registry.put(
+          "VOLUME_UNIT",
+          (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "VOLUME_UNIT"));
+
 // Entity: CONVERSION_BASED_UNIT_WITH_OFFSET
       registry.put("CONVERSION_BASED_UNIT_WITH_OFFSET", StepEntityResolver::resolveConversionBasedUnitWithOffset);
 
