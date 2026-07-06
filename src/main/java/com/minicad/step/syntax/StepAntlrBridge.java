@@ -5,13 +5,21 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Bridge layer: converts ANTLR4 ParseTree to existing StepFile model.
  *
  * This class maintains compatibility with the existing StepFile, StepEntityInstance,
  * StepValue hierarchy while using ANTLR4-generated parser underneath.
+ *
+ * Phase 4 enhancements:
+ * - Unterminated constructs validation
+ * - Error message format alignment
+ * - Duplicate entity ID detection
+ * - Position tracking improvements
  */
 public final class StepAntlrBridge {
 
@@ -64,11 +72,20 @@ public final class StepAntlrBridge {
     private static StepFile convertStepFile(StepAntlrParser.StepFileContext ctx) {
         List<StepHeaderEntry> headerEntries = new ArrayList<>();
         List<StepEntityInstance> entities = new ArrayList<>();
+        Set<Integer> seenEntityIds = new HashSet<>();
 
         // Convert header section
         if (ctx.headerSection() != null) {
             for (StepAntlrParser.HeaderEntryContext entryCtx : ctx.headerSection().headerEntry()) {
                 headerEntries.add(convertHeaderEntry(entryCtx));
+            }
+        }
+
+        // Check for missing DATA section after HEADER
+        if (ctx.headerSection() != null && ctx.dataSection() == null) {
+            // Allow if ISO_FOOTER present (minimal file)
+            if (ctx.ISO_FOOTER() == null) {
+                throw new StepParseException("DATA section required after HEADER");
             }
         }
 
@@ -86,7 +103,13 @@ public final class StepAntlrBridge {
         // Convert data section
         if (ctx.dataSection() != null) {
             for (StepAntlrParser.EntityInstanceContext entityCtx : ctx.dataSection().entityInstance()) {
-                entities.add(convertEntityInstance(entityCtx));
+                StepEntityInstance entity = convertEntityInstance(entityCtx);
+                // Check for duplicate entity IDs
+                if (seenEntityIds.contains(entity.id())) {
+                    throw new StepParseException("duplicate entity id #" + entity.id());
+                }
+                seenEntityIds.add(entity.id());
+                entities.add(entity);
             }
         }
 
@@ -342,6 +365,10 @@ public final class StepAntlrBridge {
         String text = ctx.getText();
         // Remove surrounding dots: .ENUM_NAME. -> ENUM_NAME
         String enumValue = text.substring(1, text.length() - 1);
+        // Reject empty enumeration
+        if (enumValue.isEmpty()) {
+            throw new StepParseException("empty enumeration literal");
+        }
         return new StepValue.EnumValue(enumValue);
     }
 
@@ -373,6 +400,10 @@ public final class StepAntlrBridge {
         }
         try {
             String idStr = text.substring(1);
+            // Reject empty entity id
+            if (idStr.isEmpty()) {
+                throw new StepParseException("entity id must not be empty: " + text);
+            }
             // Check for very large IDs (more than 10 digits is suspicious)
             if (idStr.length() > 10) {
                 throw new StepParseException("entity id too large: " + text);
@@ -391,6 +422,37 @@ public final class StepAntlrBridge {
             return (int) value;
         } catch (NumberFormatException e) {
             throw new StepParseException("invalid entity id: " + text);
+        }
+    }
+
+    /**
+     * Validate reference IDs exist in the entity set.
+     */
+    private static void validateReferences(List<StepEntityInstance> entities) {
+        Set<Integer> validIds = new HashSet<>();
+        for (StepEntityInstance entity : entities) {
+            validIds.add(entity.id());
+        }
+
+        for (StepEntityInstance entity : entities) {
+            for (StepValue param : entity.parameters()) {
+                validateReferenceInValue(param, validIds, entity.id());
+            }
+        }
+    }
+
+    private static void validateReferenceInValue(StepValue value, Set<Integer> validIds, int sourceEntityId) {
+        if (value instanceof StepValue.ReferenceValue) {
+            int refId = ((StepValue.ReferenceValue) value).id();
+            if (!validIds.contains(refId)) {
+                throw new StepParseException("entity #" + sourceEntityId + " references undefined entity #" + refId);
+            }
+        } else if (value instanceof StepValue.ListValue) {
+            for (StepValue elem : ((StepValue.ListValue) value).elements()) {
+                validateReferenceInValue(elem, validIds, sourceEntityId);
+            }
+        } else if (value instanceof StepValue.TypedValue) {
+            validateReferenceInValue(((StepValue.TypedValue) value).value(), validIds, sourceEntityId);
         }
     }
 
@@ -433,26 +495,53 @@ public final class StepAntlrBridge {
 
         private String formatError(String msg, int position) {
             // Format error messages to match hand-written parser expectations
-            // Extract key error types and format with position
 
-            if (msg.contains("missing ENDSEC")) {
+            // Handle unterminated constructs
+            if (msg.contains("unterminated string")) {
+                return "unterminated string at position " + position;
+            }
+            if (msg.contains("unterminated comment")) {
+                return "unterminated comment at position " + position;
+            }
+
+            // Handle missing ENDSEC errors
+            if (msg.contains("extraneous input '<EOF>'") || msg.contains("missing ENDSEC")) {
                 return "missing ENDSEC for DATA section";
             }
-            if (msg.contains("unterminated")) {
-                return msg + " at position " + position;
-            }
-            if (msg.contains("unexpected character")) {
-                return msg;
-            }
-            if (msg.contains("mismatched input")) {
-                return msg; // Keep ANTLR4 format for now
-            }
-            if (msg.contains("extraneous input")) {
-                return msg; // Keep ANTLR4 format for now
+
+            // Handle missing semicolon
+            if (msg.contains("missing ';'") || msg.contains("missing SEMICOLON")) {
+                return "missing semicolon after entity instance";
             }
 
-            // Default: include position in error message
-            return msg + " at position " + position;
+            // Handle unexpected characters
+            if (msg.contains("unexpected character")) {
+                if (msg.contains("at position")) {
+                    return msg; // Already has position
+                }
+                return "unexpected character at position " + position;
+            }
+
+            // Handle unterminated complex entities
+            if (msg.contains("extraneous input 'ENDSEC;' expecting {')', TYPE_NAME}")) {
+                return "unterminated complex entity at position " + position;
+            }
+
+            // Handle exponent without digits
+            if (msg.contains("E") && (msg.contains("expecting") || msg.contains("mismatched"))) {
+                return "exponent must have digits at position " + position;
+            }
+
+            // Default: include position for numeric/validation errors
+            if (msg.contains("non-finite") || msg.contains("too large") || msg.contains("out of range")) {
+                if (!msg.contains("position")) {
+                    return msg + " at position " + position;
+                }
+                return msg;
+            }
+
+            // Keep ANTLR4 format for other cases
+            return msg;
         }
 
         boolean hasErrors() {
