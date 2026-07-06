@@ -783,9 +783,11 @@ public final class StepEntityResolver {
   final Map<Integer, StepEntityInstance> instancesById;
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
   private final Deque<Integer> resolutionStack = new ArrayDeque<>();
+  private final StepTopologyResolver topologyResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
+    this.topologyResolver = new StepTopologyResolver(this);
   }
 
   /**
@@ -2266,625 +2268,147 @@ public final class StepEntityResolver {
   }
 
   StepVertexPoint resolveVertexPoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VERTEX_POINT");
-    requireParameterCount(instance, definition, 2);
-    return new StepVertexPoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepCartesianPoint.class,
-            "VERTEX_POINT geometry must reference CARTESIAN_POINT"));
+    return topologyResolver.resolveVertexPoint(instance);
   }
 
   StepEdgeCurve resolveEdgeCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EDGE_CURVE");
-    requireParameterCount(instance, definition, 5);
-    StepEntity edgeGeometry = resolve(referenceId(instance, definition, 3));
-    if (!isSupportedCurveReference(edgeGeometry)) {
-      throw new UnsupportedStepEntityException(
-          "EDGE_CURVE geometry must reference a supported curve");
-    }
-    return new StepEdgeCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepVertexPoint.class,
-            "EDGE_CURVE start must reference VERTEX_POINT"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepVertexPoint.class,
-            "EDGE_CURVE end must reference VERTEX_POINT"),
-        edgeGeometry,
-        booleanValue(instance, definition, 4));
+    return topologyResolver.resolveEdgeCurve(instance);
   }
 
   StepOrientedEdge resolveOrientedEdge(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORIENTED_EDGE");
-    requireParameterCount(instance, definition, 5);
-    StepEdgeCurve edgeElement =
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepEdgeCurve.class,
-            "ORIENTED_EDGE edge_element must reference EDGE_CURVE");
-    boolean orientation = booleanValue(instance, definition, 4);
-    if (!isUnset(definition.parameters().get(1)) || !isUnset(definition.parameters().get(2))) {
-      StepVertexPoint explicitStart =
-          requireEntity(
-              referenceId(instance, definition, 1),
-              StepVertexPoint.class,
-              "ORIENTED_EDGE edge_start must reference VERTEX_POINT");
-      StepVertexPoint explicitEnd =
-          requireEntity(
-              referenceId(instance, definition, 2),
-              StepVertexPoint.class,
-              "ORIENTED_EDGE edge_end must reference VERTEX_POINT");
-      StepVertexPoint expectedStart = orientation ? edgeElement.getStart() : edgeElement.getEnd();
-      StepVertexPoint expectedEnd = orientation ? edgeElement.getEnd() : edgeElement.getStart();
-      if (explicitStart.id() != expectedStart.id() || explicitEnd.id() != expectedEnd.id()) {
-        throw new StepResolutionException(
-            "ORIENTED_EDGE explicit edge_start/edge_end must match edge_element orientation");
-      }
-    }
-    return new StepOrientedEdge(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        edgeElement,
-        orientation);
+    return topologyResolver.resolveOrientedEdge(instance);
   }
 
   StepSubedge resolveSubedge(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SUBEDGE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity parentEdge = resolve(referenceId(instance, definition, 3));
-    if (!(parentEdge instanceof StepEdgeCurve) && !(parentEdge instanceof StepSubedge)) {
-      throw new UnsupportedStepEntityException(
-          "SUBEDGE parent_edge must reference EDGE_CURVE or SUBEDGE");
-    }
-    if (parentEdge.id() == instance.id()) {
-      throw new UnsupportedStepEntityException("SUBEDGE parent_edge must not self-reference");
-    }
-    return new StepSubedge(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireVertexLike(
-            referenceId(instance, definition, 1),
-            "SUBEDGE edge_start must reference VERTEX or VERTEX_POINT"),
-        requireVertexLike(
-            referenceId(instance, definition, 2),
-            "SUBEDGE edge_end must reference VERTEX or VERTEX_POINT"),
-        parentEdge);
+    return topologyResolver.resolveSubedge(instance);
   }
 
   StepConnectedEdgeSet resolveConnectedEdgeSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONNECTED_EDGE_SET");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> edges = entityReferenceList(
-        instance,
-        definition,
-        1,
-        "CONNECTED_EDGE_SET edges must contain edge references");
-    for (StepEntity edge : edges) {
-      if (!(edge instanceof StepEdgeCurve)
-          && !(edge instanceof StepOrientedEdge)
-          && !(edge instanceof StepSubedge)
-          && !(edge instanceof StepEdge)) {
-        throw new UnsupportedStepEntityException(
-            "CONNECTED_EDGE_SET edges must reference EDGE subtypes");
-      }
-    }
-    return new StepConnectedEdgeSet(instance.id(), stringValue(instance, definition, 0), edges);
+    return topologyResolver.resolveConnectedEdgeSet(instance);
   }
 
-  StepEdgeBasedWireframeModel resolveEdgeBasedWireframeModel(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EDGE_BASED_WIREFRAME_MODEL");
-    requireParameterCount(instance, definition, 2);
-    return new StepEdgeBasedWireframeModel(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepConnectedEdgeSet.class,
-            "EDGE_BASED_WIREFRAME_MODEL ebwm_boundary must contain CONNECTED_EDGE_SET references"));
+  StepEdgeBasedWireframeModel resolveEdgeBasedWireframeModel(StepEntityInstance instance) {
+    return topologyResolver.resolveEdgeBasedWireframeModel(instance);
   }
 
   StepEdgeLoop resolveEdgeLoop(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EDGE_LOOP");
-    requireParameterCount(instance, definition, 2);
-    List<StepOrientedEdge> edges =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepOrientedEdge.class,
-            "EDGE_LOOP edge list must contain ORIENTED_EDGE references");
-    return new StepEdgeLoop(instance.id(), stringValue(instance, definition, 0), edges);
+    return topologyResolver.resolveEdgeLoop(instance);
   }
 
   StepPath resolvePath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PATH");
-    requireParameterCount(instance, definition, 2);
-    List<StepOrientedEdge> edges =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepOrientedEdge.class,
-            "PATH edge list must contain ORIENTED_EDGE references");
-    return new StepPath(instance.id(), stringValue(instance, definition, 0), edges);
+    return topologyResolver.resolvePath(instance);
   }
 
   StepOpenPath resolveOpenPath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "OPEN_PATH");
-    requireParameterCount(instance, definition, 2);
-    List<StepOrientedEdge> edges =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepOrientedEdge.class,
-            "OPEN_PATH edge list must contain ORIENTED_EDGE references");
-    if (!edges.isEmpty()) {
-      StepOrientedEdge first = edges.get(0);
-      StepOrientedEdge last = edges.get(edges.size() - 1);
-      if (orientedEdgeStartId(first) == orientedEdgeEndId(last)) {
-        throw new UnsupportedStepEntityException(
-            "OPEN_PATH start vertex must differ from end vertex");
-      }
-    }
-    return new StepOpenPath(instance.id(), stringValue(instance, definition, 0), edges);
+    return topologyResolver.resolveOpenPath(instance);
   }
 
   StepSubpath resolveSubpath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SUBPATH");
-    requireParameterCount(instance, definition, 3);
-    List<StepOrientedEdge> edges =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepOrientedEdge.class,
-            "SUBPATH edge list must contain ORIENTED_EDGE references");
-    StepEntity parentPath = resolve(referenceId(instance, definition, 2));
-    if (!isPathEntity(parentPath)) {
-      throw new UnsupportedStepEntityException(
-          "SUBPATH parent_path must reference PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH or EDGE_LOOP");
-    }
-    if (parentPath.id() == instance.id()) {
-      throw new UnsupportedStepEntityException("SUBPATH parent_path must not reference itself");
-    }
-    return new StepSubpath(instance.id(), stringValue(instance, definition, 0), edges, parentPath);
+    return topologyResolver.resolveSubpath(instance);
   }
 
   StepOrientedPath resolveOrientedPath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORIENTED_PATH");
-    requireParameterCountIn(instance, definition, 2, 3);
-    boolean hasStandaloneName = definition.parameters().size() == 3;
-    String name =
-        hasStandaloneName
-            ? stringValue(instance, definition, 0)
-            : instance.hasDefinition("PATH") ? stringValue(instance, definition(instance, "PATH"), 0) : "";
-    int pathIndex = hasStandaloneName ? 1 : 0;
-    StepEntity pathElement = resolve(referenceId(instance, definition, pathIndex));
-    if (!isPathEntity(pathElement)) {
-      throw new UnsupportedStepEntityException(
-          "ORIENTED_PATH path_element must reference PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH or EDGE_LOOP");
-    }
-    boolean orientation = booleanValue(instance, definition, pathIndex + 1);
-    List<StepOrientedEdge> sourceEdges = pathEdges(pathElement);
-    List<StepOrientedEdge> edges;
-    if (orientation) {
-      edges = sourceEdges;
-    } else {
-      List<StepOrientedEdge> reversed = new ArrayList<>(sourceEdges);
-      Collections.reverse(reversed);
-      edges = reversed;
-    }
-    return new StepOrientedPath(instance.id(), name, pathElement, orientation, edges);
-  }
-
-  private static int orientedEdgeStartId(StepOrientedEdge edge) {
-    return edge.isOrientation() ? edge.edgeElement().getStart().id() : edge.edgeElement().getEnd().id();
-  }
-
-  private static int orientedEdgeEndId(StepOrientedEdge edge) {
-    return edge.isOrientation() ? edge.edgeElement().getEnd().id() : edge.edgeElement().getStart().id();
+    return topologyResolver.resolveOrientedPath(instance);
   }
 
   static boolean isPathEntity(StepEntity entity) {
-    return entity instanceof StepPath
-        || entity instanceof StepOpenPath
-        || entity instanceof StepSubpath
-        || entity instanceof StepOrientedPath
-        || entity instanceof StepEdgeLoop;
-  }
-
-  private static List<StepOrientedEdge> pathEdges(StepEntity entity) {
-    if (entity instanceof StepPath) {
-      StepPath path = (StepPath) entity;
-      return path.edges();
-    }
-    if (entity instanceof StepOpenPath) {
-      StepOpenPath openPath = (StepOpenPath) entity;
-      return openPath.edges();
-    }
-    if (entity instanceof StepSubpath) {
-      StepSubpath subpath = (StepSubpath) entity;
-      return subpath.edges();
-    }
-    if (entity instanceof StepOrientedPath) {
-      StepOrientedPath orientedPath = (StepOrientedPath) entity;
-      return orientedPath.edges();
-    }
-    if (entity instanceof StepEdgeLoop) {
-      StepEdgeLoop edgeLoop = (StepEdgeLoop) entity;
-      return edgeLoop.edges();
-    }
-    throw new IllegalArgumentException("Unknown value type: " + entity);
+    return StepTopologyResolver.isPathEntity(entity);
   }
 
   StepVertexLoop resolveVertexLoop(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VERTEX_LOOP");
-    requireParameterCount(instance, definition, 2);
-    return new StepVertexLoop(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepVertexPoint.class,
-            "VERTEX_LOOP loop_vertex must reference VERTEX_POINT"));
+    return topologyResolver.resolveVertexLoop(instance);
   }
 
   StepPolyLoop resolvePolyLoop(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "POLY_LOOP");
-    requireParameterCount(instance, definition, 2);
-    List<StepCartesianPoint> polygon =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepCartesianPoint.class,
-            "POLY_LOOP polygon must contain CARTESIAN_POINT references");
-    if (polygon.size() < 3) {
-      throw new UnsupportedStepEntityException("POLY_LOOP requires at least 3 points");
-    }
-    return new StepPolyLoop(instance.id(), stringValue(instance, definition, 0), polygon);
+    return topologyResolver.resolvePolyLoop(instance);
   }
 
   StepFaceBound resolveFaceBound(StepEntityInstance instance, boolean outer) {
-    StepEntityDefinition definition =
-        definition(instance, outer ? "FACE_OUTER_BOUND" : "FACE_BOUND");
-    requireParameterCount(instance, definition, 3);
-    return new StepFaceBound(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepLoop.class,
-            "FACE_BOUND loop must reference LOOP subtype"),
-        booleanValue(instance, definition, 2),
-        outer);
+    return topologyResolver.resolveFaceBound(instance, outer);
   }
 
   StepAdvancedFace resolveAdvancedFace(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ADVANCED_FACE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity faceGeometry = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedSurfaceReference(faceGeometry)) {
-      throw new UnsupportedStepEntityException(
-          "ADVANCED_FACE geometry must reference a supported surface but got "
-              + faceGeometry.getClass().getSimpleName());
-    }
-    return new StepAdvancedFace(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceBound.class,
-            "ADVANCED_FACE bounds must contain FACE_BOUND references"),
-        faceGeometry,
-        booleanValue(instance, definition, 3));
+    return topologyResolver.resolveAdvancedFace(instance);
   }
 
   StepFaceSurface resolveFaceSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FACE_SURFACE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity faceGeometry = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedSurfaceReference(faceGeometry)) {
-      throw new UnsupportedStepEntityException(
-          "FACE_SURFACE geometry must reference a supported surface but got "
-              + faceGeometry.getClass().getSimpleName());
-    }
-    return new StepFaceSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceBound.class,
-            "FACE_SURFACE bounds must contain FACE_BOUND references"),
-        faceGeometry,
-        booleanValue(instance, definition, 3));
+    return topologyResolver.resolveFaceSurface(instance);
   }
 
   StepOrientedFace resolveOrientedFace(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORIENTED_FACE");
-    requireParameterCount(instance, definition, 3);
-    StepFaceEntity faceElement =
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepFaceEntity.class,
-            "ORIENTED_FACE face_element must reference FACE subtype");
-    return new StepOrientedFace(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        faceElement,
-        booleanValue(instance, definition, 2));
+    return topologyResolver.resolveOrientedFace(instance);
   }
 
   StepOpenShell resolveOpenShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "OPEN_SHELL");
-    requireParameterCount(instance, definition, 2);
-    return new StepOpenShell(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceEntity.class,
-            "OPEN_SHELL faces must contain FACE subtype references"));
+    return topologyResolver.resolveOpenShell(instance);
   }
 
   StepClosedShell resolveClosedShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CLOSED_SHELL");
-    requireParameterCount(instance, definition, 2);
-    return new StepClosedShell(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceEntity.class,
-            "CLOSED_SHELL faces must contain FACE subtype references"));
+    return topologyResolver.resolveClosedShell(instance);
   }
 
   StepSurfacedOpenShell resolveSurfacedOpenShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACED_OPEN_SHELL");
-    requireParameterCount(instance, definition, 2);
-    List<StepFaceEntity> faces =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceEntity.class,
-            "SURFACED_OPEN_SHELL faces must contain FACE subtype references");
-    for (StepFaceEntity face : faces) {
-      if (!(face instanceof StepFaceSurface)) {
-        throw new StepResolutionException(
-            "SURFACED_OPEN_SHELL faces must reference FACE_SURFACE or subtype");
-      }
-    }
-    return new StepSurfacedOpenShell(instance.id(), stringValue(instance, definition, 0), faces);
+    return topologyResolver.resolveSurfacedOpenShell(instance);
   }
 
   StepOrientedOpenShell resolveOrientedOpenShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORIENTED_OPEN_SHELL");
-    requireParameterCount(instance, definition, 3);
-    StepEntity openShellElement = resolve(referenceId(instance, definition, 1));
-    if (!(openShellElement instanceof StepOpenShell)
-        && !(openShellElement instanceof StepSurfacedOpenShell)
-        && !(openShellElement instanceof StepOrientedOpenShell)) {
-      throw new StepResolutionException(
-          "ORIENTED_OPEN_SHELL open_shell_element must reference OPEN_SHELL");
-    }
-    return new StepOrientedOpenShell(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        openShellElement,
-        booleanValue(instance, definition, 2));
+    return topologyResolver.resolveOrientedOpenShell(instance);
   }
 
   StepOrientedClosedShell resolveOrientedClosedShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORIENTED_CLOSED_SHELL");
-    requireParameterCount(instance, definition, 3);
-    StepEntity closedShellElement = resolve(referenceId(instance, definition, 1));
-    if (!(closedShellElement instanceof StepClosedShell)
-        && !(closedShellElement instanceof StepOrientedClosedShell)) {
-      throw new StepResolutionException(
-          "ORIENTED_CLOSED_SHELL closed_shell_element must reference CLOSED_SHELL");
-    }
-    return new StepOrientedClosedShell(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        closedShellElement,
-        booleanValue(instance, definition, 2));
+    return topologyResolver.resolveOrientedClosedShell(instance);
   }
 
   StepConnectedFaceSet resolveConnectedFaceSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONNECTED_FACE_SET");
-    requireParameterCount(instance, definition, 2);
-    return new StepConnectedFaceSet(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceEntity.class,
-            "CONNECTED_FACE_SET cfs_faces must contain FACE subtype references"));
+    return topologyResolver.resolveConnectedFaceSet(instance);
   }
 
   StepConnectedFaceSubSet resolveConnectedFaceSubSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONNECTED_FACE_SUB_SET");
-    requireParameterCount(instance, definition, 3);
-    StepEntity parentFaceSet = resolve(referenceId(instance, definition, 2));
-    if (!isConnectedFaceSetEntity(parentFaceSet)) {
-      throw new StepResolutionException(
-          "CONNECTED_FACE_SUB_SET parent_face_set must reference CONNECTED_FACE_SET or CONNECTED_FACE_SUB_SET");
-    }
-    if (parentFaceSet.id() == instance.id()) {
-      throw new StepResolutionException(
-          "CONNECTED_FACE_SUB_SET parent_face_set cannot reference itself");
-    }
-    return new StepConnectedFaceSubSet(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFaceEntity.class,
-            "CONNECTED_FACE_SUB_SET cfs_faces must contain FACE subtype references"),
-        parentFaceSet);
+    return topologyResolver.resolveConnectedFaceSubSet(instance);
   }
 
   StepVertexShell resolveVertexShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VERTEX_SHELL");
-    requireParameterCount(instance, definition, 2);
-    return new StepVertexShell(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepVertexLoop.class,
-            "VERTEX_SHELL vertex_shell_extent must reference VERTEX_LOOP"));
+    return topologyResolver.resolveVertexShell(instance);
   }
 
   StepWireShell resolveWireShell(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "WIRE_SHELL");
-    requireParameterCount(instance, definition, 2);
-    List<StepLoop> loops =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepLoop.class,
-            "WIRE_SHELL wire_shell_extent must contain LOOP references");
-    return new StepWireShell(instance.id(), stringValue(instance, definition, 0), loops);
+    return topologyResolver.resolveWireShell(instance);
   }
 
   StepManifoldSolidBrep resolveManifoldSolidBrep(StepEntityInstance instance) {
-    return resolveManifoldSolidBrep(instance, "MANIFOLD_SOLID_BREP");
+    return topologyResolver.resolveManifoldSolidBrep(instance);
   }
 
-  StepManifoldSolidBrep resolveManifoldSolidBrep(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    StepEntity outer = resolve(referenceId(instance, definition, 1));
-    if (!isClosedShellEntity(outer)) {
-      throw new StepResolutionException(entityName + " outer must reference CLOSED_SHELL");
-    }
-    return new StepManifoldSolidBrep(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        outer);
+  StepManifoldSolidBrep resolveManifoldSolidBrep(StepEntityInstance instance, String entityName) {
+    return topologyResolver.resolveManifoldSolidBrep(instance, entityName);
   }
 
   StepNonManifoldSolidBrep resolveNonManifoldSolidBrep(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NON_MANIFOLD_SOLID_BREP");
-    requireParameterCount(instance, definition, 2);
-    StepEntity outer = resolve(referenceId(instance, definition, 1));
-    if (!(outer instanceof StepClosedShell) && !(outer instanceof StepOpenShell)) {
-      throw new StepResolutionException(
-          "NON_MANIFOLD_SOLID_BREP outer must reference CLOSED_SHELL or OPEN_SHELL");
-    }
-    return new StepNonManifoldSolidBrep(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        outer);
+    return topologyResolver.resolveNonManifoldSolidBrep(instance);
   }
 
   StepFacettedBrep resolveFacettedBrep(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FACETTED_BREP");
-    requireParameterCount(instance, definition, 2);
-    StepEntity outer = resolve(referenceId(instance, definition, 1));
-    if (!isClosedShellEntity(outer) && !isOpenShellEntity(outer)) {
-      throw new StepResolutionException(
-          "FACETTED_BREP outer must reference CLOSED_SHELL or OPEN_SHELL");
-    }
-    return new StepFacettedBrep(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        outer);
+    return topologyResolver.resolveFacettedBrep(instance);
   }
 
   StepShellBasedSurfaceModel resolveShellBasedSurfaceModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHELL_BASED_SURFACE_MODEL");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> shells =
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "SHELL_BASED_SURFACE_MODEL shells must contain shell references");
-    for (StepEntity shell : shells) {
-      if (!isShellEntity(shell)) {
-        throw new StepResolutionException(
-            "SHELL_BASED_SURFACE_MODEL shells must reference OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
-      }
-    }
-    return new StepShellBasedSurfaceModel(
-        instance.id(), stringValue(instance, definition, 0), shells);
+    return topologyResolver.resolveShellBasedSurfaceModel(instance);
   }
 
-  StepFaceBasedSurfaceModel resolveFaceBasedSurfaceModel(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FACE_BASED_SURFACE_MODEL");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> faceSets =
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "FACE_BASED_SURFACE_MODEL fbsm_faces must contain connected face sets");
-    for (StepEntity faceSet : faceSets) {
-      if (!isConnectedFaceSetEntity(faceSet)
-          && !isShellEntity(faceSet)) {
-        throw new StepResolutionException(
-            "FACE_BASED_SURFACE_MODEL fbsm_faces must reference CONNECTED_FACE_SET, CONNECTED_FACE_SUB_SET, OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL");
-      }
-    }
-    return new StepFaceBasedSurfaceModel(
-        instance.id(), stringValue(instance, definition, 0), faceSets);
+  StepFaceBasedSurfaceModel resolveFaceBasedSurfaceModel(StepEntityInstance instance) {
+    return topologyResolver.resolveFaceBasedSurfaceModel(instance);
   }
 
   StepManifoldSurfaceModel resolveManifoldSurfaceModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MANIFOLD_SURFACE_MODEL");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> shells =
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "MANIFOLD_SURFACE_MODEL shells must contain shell references");
-    return new StepManifoldSurfaceModel(
-        instance.id(), stringValue(instance, definition, 0), shells);
+    return topologyResolver.resolveManifoldSurfaceModel(instance);
   }
 
   StepSurfacedEdgeCurve resolveSurfacedEdgeCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACED_EDGE_CURVE");
-    requireParameterCount(instance, definition, 5);
-    return new StepSurfacedEdgeCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        booleanValue(instance, definition, 4));
+    return topologyResolver.resolveSurfacedEdgeCurve(instance);
   }
 
   boolean isConnectedFaceSetEntity(StepEntity entity) {
-    return entity instanceof StepConnectedFaceSet || entity instanceof StepConnectedFaceSubSet;
+    return topologyResolver.isConnectedFaceSetEntity(entity);
   }
 
   StepGeometricTolerance resolveGeometricTolerance(StepEntityInstance instance) {
@@ -6515,17 +6039,15 @@ public final class StepEntityResolver {
 
 
   boolean isOpenShellEntity(StepEntity entity) {
-    return entity instanceof StepOpenShell
-        || entity instanceof StepSurfacedOpenShell
-        || entity instanceof StepOrientedOpenShell;
+    return topologyResolver.isOpenShellEntity(entity);
   }
 
   boolean isClosedShellEntity(StepEntity entity) {
-    return entity instanceof StepClosedShell || entity instanceof StepOrientedClosedShell;
+    return topologyResolver.isClosedShellEntity(entity);
   }
 
   boolean isShellEntity(StepEntity entity) {
-    return isOpenShellEntity(entity) || isClosedShellEntity(entity);
+    return topologyResolver.isShellEntity(entity);
   }
 
   boolean isBooleanOperandEntity(StepEntity entity) {
@@ -12538,14 +12060,6 @@ public final class StepEntityResolver {
     return type.cast(entity);
   }
 
-  StepEntity requireVertexLike(int id, String message) {
-    StepEntity entity = resolve(id);
-    if (!(entity instanceof StepVertex) && !(entity instanceof StepVertexPoint)) {
-      throw new StepResolutionException(message + " but got " + entity.getClass().getSimpleName());
-    }
-    return entity;
-  }
-
   boolean isAnnotationOccurrence(StepEntity entity) {
     return entity instanceof StepAnnotationTextOccurrence
         || entity instanceof StepAnnotationPointOccurrence
@@ -12626,7 +12140,7 @@ public final class StepEntityResolver {
         || entity instanceof StepPlacedDatumTargetFeature;
   }
 
-  private boolean isSupportedCurveReference(StepEntity entity) {
+  boolean isSupportedCurveReference(StepEntity entity) {
     return entity instanceof StepLine
         || entity instanceof StepLineSegment
         || entity instanceof StepCircle
@@ -12670,7 +12184,7 @@ public final class StepEntityResolver {
             && "CURVE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
   }
 
-  private boolean isSupportedSurfaceReference(StepEntity entity) {
+  boolean isSupportedSurfaceReference(StepEntity entity) {
     return entity instanceof StepPlane
         || entity instanceof StepSurface
         || entity instanceof StepBoundedSurface
