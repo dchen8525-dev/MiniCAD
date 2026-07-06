@@ -157,10 +157,10 @@ HASH          : '#';
 // Integer: simple integer without exponent
 INTEGER       : [0-9]+;
 
-// Real: support large exponents (E9999, E-9999, E308, E0)
-REAL          : [0-9]+ '.' [0-9]* EXPONENT?
-              | '.' [0-9]+ EXPONENT?
-              | [0-9]+ EXPONENT
+// Real: support large exponents (E9999, E-9999, E308, E0) and negative numbers
+REAL          : MINUS? [0-9]+ '.' [0-9]* EXPONENT?
+              | MINUS? '.' [0-9]+ EXPONENT?
+              | MINUS? [0-9]+ EXPONENT
               ;
 
 // Exponent: must have at least one digit after E/e and optional sign
