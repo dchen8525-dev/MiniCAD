@@ -269,6 +269,7 @@ public final class StepCadBuilder {
     private final StepCadTopologyBuilder topologyBuilder;
     private final StepShellBuilder shellBuilder;
     private final StepCadSolidBuilder solidBuilder;
+    private final StepCadBooleanBuilder booleanBuilder;
     private final StepCadCurveBuilder curveBuilder;
     private final StepCadSurfaceBuilder surfaceBuilder;
     private final Map<Integer, CartesianPoint> points = new LinkedHashMap<>();
@@ -375,6 +376,7 @@ public final class StepCadBuilder {
         );
         this.shellBuilder = new StepShellBuilder(this);
         this.solidBuilder = new StepCadSolidBuilder(this);
+        this.booleanBuilder = new StepCadBooleanBuilder(this, this.entitiesById);
         this.surfaceBuilder = new StepCadSurfaceBuilder(
             this.entitiesById,
             geometryBuilder,
@@ -1873,8 +1875,7 @@ public final class StepCadBuilder {
      * @return built solid
      */
     Solid buildCsgVolumeSolid(StepCsgVolume csgVolume) {
-        // CSG_VOLUME has a treeRoot that may be a boolean result, primitive, or replica
-        return buildBooleanOperandSolid(csgVolume.treeRoot());
+        return booleanBuilder.buildCsgVolumeSolid(csgVolume);
     }
 
     /**
@@ -2020,20 +2021,6 @@ public final class StepCadBuilder {
                     sideNormal));
         }
         return new Solid(new Shell(faces, true));
-    }
-
-    /**
-     * Builds a half-space solid for use as a boolean operand.
-     */
-    private Solid buildHalfSpaceSolidAsSolid(StepHalfSpaceSolid halfSpace) {
-        return buildHalfSpaceSolid(halfSpace);
-    }
-
-    /**
-     * Builds a polygonal bounded half-space for use as a boolean operand.
-     */
-    private Solid buildPolygonalBoundedHalfSpaceAsSolid(StepPolygonalBoundedHalfSpace polyHalfSpace) {
-        return buildPolygonalBoundedHalfSpace(polyHalfSpace);
     }
 
     /**
@@ -2695,258 +2682,7 @@ public final class StepCadBuilder {
     }
 
     Solid buildCsgPrimitive(StepCsgPrimitive csgPrimitive) {
-        String entityName = csgPrimitive.entityName();
-        switch (entityName) {
-            case "BLOCK":
-                return buildBlockPrimitive(csgPrimitive);
-            case "SPHERE":
-                return buildSpherePrimitive(csgPrimitive);
-            case "ELLIPSOID":
-                return buildEllipsoidPrimitive(csgPrimitive);
-            case "RIGHT_CIRCULAR_CYLINDER":
-                return buildRightCircularCylinderPrimitive(csgPrimitive);
-            case "TORUS":
-                return buildTorusPrimitive(csgPrimitive);
-            case "RIGHT_ANGULAR_WEDGE":
-                return buildRightAngularWedgePrimitive(csgPrimitive);
-            case "RIGHT_CIRCULAR_CONE":
-                return buildRightCircularConePrimitive(csgPrimitive);
-            default:
-                throw new UnsupportedGeometryException(entityName + " construction is unsupported");
-        }
-    }
-
-    private Solid buildBlockPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis2Placement3D)) {
-            throw new UnsupportedGeometryException("BLOCK position must be an AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().size() < 3) {
-            throw new UnsupportedGeometryException("BLOCK requires x, y and z dimensions");
-        }
-        Axis2Placement3D blockPlacement = buildPlacement(placement.id());
-        double x = csgPrimitive.dimensions().get(0);
-        double y = csgPrimitive.dimensions().get(1);
-        double z = csgPrimitive.dimensions().get(2);
-        if (x <= 0.0 || y <= 0.0 || z <= 0.0) {
-            throw new UnsupportedGeometryException("BLOCK dimensions must be positive");
-        }
-        CartesianPoint origin = blockPlacement.getLocation();
-        Vector3 alongX = blockPlacement.xDirection().asVector().scale(x);
-        Vector3 alongY = blockPlacement.yDirection().asVector().scale(y);
-        Vector3 alongZ = blockPlacement.getAxis().asVector().scale(z);
-        List<CartesianPoint> bottom = List.of(
-                origin,
-                origin.add(alongX),
-                origin.add(alongX.add(alongY)),
-                origin.add(alongY)
-        );
-        List<CartesianPoint> top = bottom.stream().map(point -> point.add(alongZ)).collect(Collectors.toList());
-
-        List<Face> faces = new ArrayList<>();
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom), blockPlacement.getAxis().reverse()));
-        faces.add(faceFromPolyLoop(closeLoop3(top), blockPlacement.getAxis()));
-        for (int index = 0; index < bottom.size(); index++) {
-            CartesianPoint startBottom = bottom.get(index);
-            CartesianPoint endBottom = bottom.get((index + 1) % bottom.size());
-            CartesianPoint endTop = top.get((index + 1) % top.size());
-            CartesianPoint startTop = top.get(index);
-            faces.add(faceFromPolyLoop(
-                    List.of(startBottom, endBottom, endTop, startTop, startBottom),
-                    quadNormal(startBottom, endBottom, endTop, startTop)
-            ));
-        }
-        return new Solid(new Shell(faces, true));
-    }
-
-    private Solid buildSpherePrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis2Placement3D)) {
-            throw new UnsupportedGeometryException("SPHERE position must be an AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().isEmpty()) {
-            throw new UnsupportedGeometryException("SPHERE requires a radius");
-        }
-        double radius = csgPrimitive.dimensions().get(0);
-        if (radius <= 0.0) {
-            throw new UnsupportedGeometryException("SPHERE radius must be positive");
-        }
-        return buildEllipsoidLike(buildPlacement(placement.id()), radius, radius, radius, 24, 12);
-    }
-
-    private Solid buildEllipsoidPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis2Placement3D)) {
-            throw new UnsupportedGeometryException("ELLIPSOID position must be an AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().size() < 3) {
-            throw new UnsupportedGeometryException("ELLIPSOID requires three semi axes");
-        }
-        double rx = csgPrimitive.dimensions().get(0);
-        double ry = csgPrimitive.dimensions().get(1);
-        double rz = csgPrimitive.dimensions().get(2);
-        if (rx <= 0.0 || ry <= 0.0 || rz <= 0.0) {
-            throw new UnsupportedGeometryException("ELLIPSOID semi axes must be positive");
-        }
-        return buildEllipsoidLike(buildPlacement(placement.id()), rx, ry, rz, 24, 12);
-    }
-
-    private Solid buildRightCircularCylinderPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis1Placement)) {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER position must be an AXIS1_PLACEMENT");
-        }
-        StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().size() < 2) {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER requires height and radius");
-        }
-        double height = csgPrimitive.dimensions().get(0);
-        double radius = csgPrimitive.dimensions().get(1);
-        if (height <= 0.0 || radius <= 0.0) {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CYLINDER dimensions must be positive");
-        }
-        Axis1Placement axis = buildAxis1Placement(placement.id());
-        CircularFrame frame = circularFrame(axis.getAxis());
-        Vector3 alongAxis = axis.getAxis().asVector().scale(height);
-        List<CartesianPoint> bottom = sampleCircle3(axis.getLocation(), frame.getX(), frame.getY(), radius, 48);
-        List<CartesianPoint> top = bottom.stream().map(point -> point.add(alongAxis)).collect(Collectors.toList());
-        List<Face> faces = new ArrayList<>();
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom), axis.getAxis().reverse()));
-        faces.add(faceFromPolyLoop(closeLoop3(top), axis.getAxis()));
-        for (int index = 0; index < bottom.size(); index++) {
-            CartesianPoint a = bottom.get(index);
-            CartesianPoint b = bottom.get((index + 1) % bottom.size());
-            CartesianPoint c = top.get((index + 1) % top.size());
-            CartesianPoint d = top.get(index);
-            faces.add(faceFromPolyLoop(List.of(a, b, c, d, a), quadNormal(a, b, c, d)));
-        }
-        return new Solid(new Shell(faces, true));
-    }
-
-    private Solid buildTorusPrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis1Placement)) {
-            throw new UnsupportedGeometryException("TORUS position must be an AXIS1_PLACEMENT");
-        }
-        StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().size() < 2) {
-            throw new UnsupportedGeometryException("TORUS requires major and minor radii");
-        }
-        double majorRadius = csgPrimitive.dimensions().get(0);
-        double minorRadius = csgPrimitive.dimensions().get(1);
-        if (majorRadius <= 0.0 || minorRadius <= 0.0 || majorRadius <= minorRadius) {
-            throw new UnsupportedGeometryException("TORUS radii must satisfy major > minor > 0");
-        }
-        Axis1Placement axis = buildAxis1Placement(placement.id());
-        CircularFrame frame = circularFrame(axis.getAxis());
-        int uSegments = 32;
-        int vSegments = 16;
-        List<List<CartesianPoint>> grid = new ArrayList<>(uSegments);
-        for (int uIndex = 0; uIndex < uSegments; uIndex++) {
-            double u = Math.PI * 2.0 * uIndex / uSegments;
-            Vector3 radial = frame.getX().scale(Math.cos(u)).add(frame.getY().scale(Math.sin(u)));
-            Vector3 tangent = frame.getX().scale(-Math.sin(u)).add(frame.getY().scale(Math.cos(u)));
-            List<CartesianPoint> ring = new ArrayList<>(vSegments);
-            for (int vIndex = 0; vIndex < vSegments; vIndex++) {
-                double v = Math.PI * 2.0 * vIndex / vSegments;
-                Vector3 offset = radial.scale(majorRadius + Math.cos(v) * minorRadius)
-                        .add(axis.getAxis().asVector().scale(Math.sin(v) * minorRadius));
-                ring.add(axis.getLocation().add(offset));
-            }
-            grid.add(List.copyOf(ring));
-        }
-        List<Face> faces = new ArrayList<>();
-        for (int uIndex = 0; uIndex < uSegments; uIndex++) {
-            List<CartesianPoint> current = grid.get(uIndex);
-            List<CartesianPoint> next = grid.get((uIndex + 1) % uSegments);
-            for (int vIndex = 0; vIndex < vSegments; vIndex++) {
-                CartesianPoint a = current.get(vIndex);
-                CartesianPoint b = current.get((vIndex + 1) % vSegments);
-                CartesianPoint c = next.get((vIndex + 1) % vSegments);
-                CartesianPoint d = next.get(vIndex);
-                addTriangleFace(faces, a, b, c, outwardApproximation(a, axis.getLocation()));
-                addTriangleFace(faces, a, c, d, outwardApproximation(d, axis.getLocation()));
-            }
-        }
-        return new Solid(new Shell(faces, true));
-    }
-
-    private Solid buildRightAngularWedgePrimitive(StepCsgPrimitive csgPrimitive) {
-        if (!(csgPrimitive.getPosition() instanceof StepAxis2Placement3D)) {
-            throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE position must be an AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.getPosition();
-        if (csgPrimitive.dimensions().size() < 4) {
-            throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE requires x, y, z and ltx dimensions");
-        }
-        double x = csgPrimitive.dimensions().get(0);
-        double y = csgPrimitive.dimensions().get(1);
-        double z = csgPrimitive.dimensions().get(2);
-        double ltx = csgPrimitive.dimensions().get(3);
-        if (x <= 0.0 || y <= 0.0 || z <= 0.0 || ltx <= 0.0 || ltx > x) {
-            throw new UnsupportedGeometryException("RIGHT_ANGULAR_WEDGE dimensions must satisfy x,y,z,ltx > 0 and ltx <= x");
-        }
-        Axis2Placement3D wedgePlacement = buildPlacement(placement.id());
-        CartesianPoint a = pointOnPlacement(wedgePlacement, 0.0, 0.0, 0.0);
-        CartesianPoint b = pointOnPlacement(wedgePlacement, x, 0.0, 0.0);
-        CartesianPoint c = pointOnPlacement(wedgePlacement, x, y, 0.0);
-        CartesianPoint d = pointOnPlacement(wedgePlacement, 0.0, y, 0.0);
-        CartesianPoint e = pointOnPlacement(wedgePlacement, 0.0, 0.0, z);
-        CartesianPoint f = pointOnPlacement(wedgePlacement, x, 0.0, z);
-        CartesianPoint g = pointOnPlacement(wedgePlacement, ltx, y, z);
-        CartesianPoint h = pointOnPlacement(wedgePlacement, 0.0, y, z);
-        List<Face> faces = new ArrayList<>();
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(a, b, c, d)), wedgePlacement.getAxis().reverse()));
-        faces.add(faceFromPolyLoop(closeLoop3(List.of(e, f, g, h)), wedgePlacement.getAxis()));
-        faces.add(faceFromPolyLoop(List.of(a, b, f, e, a), quadNormal(a, b, f, e)));
-        faces.add(faceFromPolyLoop(List.of(d, h, g, c, d), quadNormal(d, h, g, c)));
-        faces.add(faceFromPolyLoop(List.of(a, d, h, e, a), quadNormal(a, d, h, e)));
-        addTriangleFace(faces, b, c, g, quadNormal(b, c, g, f).asVector());
-        addTriangleFace(faces, b, g, f, quadNormal(b, c, g, f).asVector());
-        return new Solid(new Shell(faces, true));
-    }
-
-    private Solid buildRightCircularConePrimitive(StepCsgPrimitive csgPrimitive) {
-        // Accept either AXIS1_PLACEMENT or AXIS2_PLACEMENT_3D
-        Axis1Placement axis;
-        if (csgPrimitive.getPosition() instanceof StepAxis1Placement) {
-            StepAxis1Placement placement = (StepAxis1Placement) csgPrimitive.getPosition();
-            axis = buildAxis1Placement(placement.id());
-        } else if (csgPrimitive.getPosition() instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement = (StepAxis2Placement3D) csgPrimitive.getPosition();
-            // Use the z-axis direction from AXIS2_PLACEMENT_3D as the cone axis
-            Axis2Placement3D pl = buildPlacement(placement.id());
-            axis = new Axis1Placement(pl.getLocation(), pl.getAxis());
-        } else {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE position must be an AXIS1_PLACEMENT or AXIS2_PLACEMENT_3D");
-        }
-        if (csgPrimitive.dimensions().size() < 2) {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE requires height and radius");
-        }
-        double height = csgPrimitive.dimensions().get(0);
-        double radius = csgPrimitive.dimensions().get(1);
-        if (height <= 0.0 || radius <= 0.0) {
-            throw new UnsupportedGeometryException("RIGHT_CIRCULAR_CONE dimensions must be positive");
-        }
-        CircularFrame frame = circularFrame(axis.getAxis());
-        Vector3 alongAxis = axis.getAxis().asVector().scale(height);
-        CartesianPoint apex = axis.getLocation().add(alongAxis);
-        List<CartesianPoint> base = sampleCircle3(axis.getLocation(), frame.getX(), frame.getY(), radius, 48);
-        List<Face> faces = new ArrayList<>();
-        // Base face
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(base), axis.getAxis().reverse()));
-        // Lateral faces as triangles connecting base to apex
-        for (int index = 0; index < base.size(); index++) {
-            CartesianPoint a = base.get(index);
-            CartesianPoint b = base.get((index + 1) % base.size());
-            Vector3 midVector = new Vector3(
-                    (a.getX() + b.getX()) / 2.0 - apex.getX(),
-                    (a.getY() + b.getY()) / 2.0 - apex.getY(),
-                    (a.getZ() + b.getZ()) / 2.0 - apex.getZ()
-            );
-            Vector3 edgeVector = new Vector3(b.getX() - a.getX(), b.getY() - a.getY(), b.getZ() - a.getZ());
-            Vector3 normal = edgeVector.cross(midVector).normalize().asVector();
-            addTriangleFace(faces, a, b, apex, normal);
-        }
-        return new Solid(new Shell(faces, true));
+        return booleanBuilder.buildCsgPrimitive(csgPrimitive);
     }
 
     Solid buildSweptDiskSolid(StepSweptDiskSolid sweptDiskSolid) {
@@ -3352,314 +3088,11 @@ public final class StepCadBuilder {
     }
 
     Solid buildBooleanResult(String operator, StepEntity first, StepEntity second) {
-        String normalizedOperator = operator == null ? "" : operator.replace(".", "").trim().toUpperCase();
-        switch (normalizedOperator) {
-            case "DIFFERENCE": {
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, false);
-                }
-                throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT difference requires HALF_SPACE_SOLID or BOXED_HALF_SPACE second operand");
-            }
-            case "INTERSECTION": {
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, true);
-                }
-                halfSpaceSolid = asHalfSpaceOperand(first);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid, true);
-                }
-                throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT intersection requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand");
-            }
-            case "UNION": {
-                // UNION with half-space: extend solid into half-space region
-                // This is the inverse of DIFFERENCE with half-space
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid);
-                }
-                halfSpaceSolid = asHalfSpaceOperand(first);
-                if (halfSpaceSolid != null) {
-                    return unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid);
-                }
-                throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported");
-            }
-            default:
-                throw new UnsupportedGeometryException("BOOLEAN_RESULT operator " + normalizedOperator + " is unsupported");
-        }
-    }
-
-    private StepHalfSpaceSolid asHalfSpaceOperand(StepEntity operand) {
-        if (operand instanceof StepHalfSpaceSolid) {
-            StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) operand;
-            return halfSpaceSolid;
-        }
-        return null;
+        return booleanBuilder.buildBooleanResult(operator, first, second);
     }
 
     Solid buildBooleanOperandSolid(StepEntity operand) {
-        if (operand instanceof StepManifoldSolidBrep) {
-            StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) operand;
-            return buildSolid(solidBrep.id());
-        }
-        if (operand instanceof StepFacettedBrep) {
-            StepFacettedBrep facettedBrep = (StepFacettedBrep) operand;
-            return buildSolid(facettedBrep.id());
-        }
-        if (operand instanceof StepBrepWithVoids) {
-            StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) operand;
-            return buildSolid(brepWithVoids.id());
-        }
-        if (operand instanceof StepNonManifoldSolidBrep) {
-            StepNonManifoldSolidBrep nonManifold = (StepNonManifoldSolidBrep) operand;
-            return buildSolid(nonManifold.id());
-        }
-        if (operand instanceof StepAdvancedBrep) {
-            StepAdvancedBrep advancedBrep = (StepAdvancedBrep) operand;
-            return buildSolid(advancedBrep.id());
-        }
-        if (operand instanceof StepCsgPrimitive) {
-            StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) operand;
-            return buildCsgPrimitive(csgPrimitive);
-        }
-        if (operand instanceof StepCsgPrimitive3D) {
-            StepCsgPrimitive3D csg3D = (StepCsgPrimitive3D) operand;
-            // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
-            StepEntity actual = entitiesById.get(csg3D.getPosition().id());
-            if (actual != null && actual instanceof StepCsgPrimitive) {
-                StepCsgPrimitive primitive = (StepCsgPrimitive) actual;
-                return buildCsgPrimitive(primitive);
-            }
-            throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
-        }
-        if (operand instanceof StepCsgVolume) {
-            StepCsgVolume csgVolume = (StepCsgVolume) operand;
-            return buildCsgVolumeSolid(csgVolume);
-        }
-        if (operand instanceof StepCsgSolid) {
-            StepCsgSolid csgSolid = (StepCsgSolid) operand;
-            return buildBooleanOperandSolid(csgSolid.treeRootExpression());
-        }
-        if (operand instanceof StepSolidReplica) {
-            StepSolidReplica solidReplica = (StepSolidReplica) operand;
-            return buildSolid(solidReplica.id());
-        }
-        if (operand instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) operand;
-            return buildSweptAreaSolid(sweptAreaSolid);
-        }
-        if (operand instanceof StepSweptDiskSolid) {
-            StepSweptDiskSolid sweptDiskSolid = (StepSweptDiskSolid) operand;
-            return buildSweptDiskSolid(sweptDiskSolid);
-        }
-        if (operand instanceof StepExtrudedAreaSolidTapered) {
-            StepExtrudedAreaSolidTapered taperedExtrusion = (StepExtrudedAreaSolidTapered) operand;
-            return buildExtrudedAreaSolidTapered(taperedExtrusion);
-        }
-        if (operand instanceof StepRevolvedAreaSolidTapered) {
-            StepRevolvedAreaSolidTapered taperedRevolution = (StepRevolvedAreaSolidTapered) operand;
-            return buildRevolvedAreaSolidTapered(taperedRevolution);
-        }
-        if (operand instanceof StepSurfaceCurveSweptAreaSolid) {
-            StepSurfaceCurveSweptAreaSolid surfaceCurveSweep = (StepSurfaceCurveSweptAreaSolid) operand;
-            return buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
-        }
-        if (operand instanceof StepBooleanClippingResult) {
-            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) operand;
-            return buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
-        }
-        if (operand instanceof StepBooleanResult) {
-            StepBooleanResult booleanResult = (StepBooleanResult) operand;
-            return buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
-        }
-        if (operand instanceof StepHalfSpaceSolid) {
-            StepHalfSpaceSolid halfSpace = (StepHalfSpaceSolid) operand;
-            return buildHalfSpaceSolidAsSolid(halfSpace);
-        }
-        if (operand instanceof StepPolygonalBoundedHalfSpace) {
-            StepPolygonalBoundedHalfSpace polyHalfSpace = (StepPolygonalBoundedHalfSpace) operand;
-            return buildPolygonalBoundedHalfSpaceAsSolid(polyHalfSpace);
-        }
-        if (operand instanceof StepSolidModel) {
-            StepSolidModel solidModel = (StepSolidModel) operand;
-            // SolidModel is the abstract base type; check for concrete subtype at same ID.
-            StepEntity actual = entitiesById.get(solidModel.id());
-            if (actual != null && actual != solidModel && canBuildAsSolid(actual)) {
-                return buildSolid(solidModel.id());
-            }
-            throw new StepResolutionException("entity #" + solidModel.id() + " is an abstract SOLID_MODEL with no concrete subtype");
-        }
-        if (operand instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) operand;
-            return buildBooleanOperandSolid(mappedItem.mappingTarget());
-        }
-        throw new UnsupportedGeometryException("boolean operand " + stepEntityTypeName(operand) + " is unsupported");
-    }
-
-    private Solid clipSolidWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid, boolean keepAgreementSide) {
-        Plane plane = buildSupportedPlaneGeometry(halfSpaceSolid.baseSurface(), halfSpaceSolid.entityName());
-        if (plane == null) {
-            throw new UnsupportedGeometryException(halfSpaceSolid.entityName() + " requires PLANE geometry");
-        }
-        boolean keepPositive = keepAgreementSide ? halfSpaceSolid.agreementFlag() : !halfSpaceSolid.agreementFlag();
-        Solid clipped = clipSolidWithPlane(solid, plane, keepPositive, "BOOLEAN_RESULT clipping");
-        if (halfSpaceSolid.enclosure() == null) {
-            return clipped;
-        }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
-            throw new UnsupportedGeometryException(
-                    halfSpaceSolid.entityName() + " construction with "
-                            + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
-        }
-        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
-        return clipSolidWithBoxDomain(clipped, boxDomain, "BOOLEAN_RESULT clipping");
-    }
-
-    private Solid unionWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid) {
-        Plane plane = buildSupportedPlaneGeometry(halfSpaceSolid.baseSurface(), halfSpaceSolid.entityName());
-        if (plane == null) {
-            throw new UnsupportedGeometryException(halfSpaceSolid.entityName() + " requires PLANE geometry");
-        }
-        // Union with half-space: extend solid into half-space agreement side
-        // This creates a new solid that includes both the original solid and the half-space region
-        // For bounded half-space (BOXED_HALF_SPACE), union creates solid + box portion on agreement side
-        if (halfSpaceSolid.enclosure() == null) {
-            // Unbounded half-space union would create infinite geometry - not supported
-            throw new UnsupportedGeometryException(
-                    "BOOLEAN_RESULT union with unbounded HALF_SPACE_SOLID is not supported");
-        }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
-            throw new UnsupportedGeometryException(
-                    halfSpaceSolid.entityName() + " union with "
-                            + stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
-        }
-        // Build box domain geometry and merge with solid
-        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
-        Solid boxSolid = buildBoxDomainSolid(boxDomain);
-        // Clip box to half-space agreement side
-        boolean keepAgreementSide = halfSpaceSolid.agreementFlag();
-        Solid halfSpaceBox = clipSolidWithPlane(boxSolid, plane, keepAgreementSide, "UNION half-space box");
-        // Merge solids: union of solid and halfSpaceBox
-        return mergeSolids(solid, halfSpaceBox);
-    }
-
-    private Solid buildBoxDomainSolid(StepBoxDomain boxDomain) {
-        CartesianPoint min = buildPoint(boxDomain.corner().id());
-        if (boxDomain.dimensions().size() < 3) {
-            throw new UnsupportedGeometryException("BOX_DOMAIN requires x, y and z dimensions");
-        }
-        double dx = boxDomain.dimensions().get(0);
-        double dy = boxDomain.dimensions().get(1);
-        double dz = boxDomain.dimensions().get(2);
-        if (dx <= 0.0 || dy <= 0.0 || dz <= 0.0) {
-            throw new UnsupportedGeometryException("BOX_DOMAIN dimensions must be positive");
-        }
-        CartesianPoint max = new CartesianPoint(min.getX() + dx, min.getY() + dy, min.getZ() + dz);
-        // Build box from 6 faces
-        List<Face> faces = new ArrayList<>();
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(min.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), min.getZ())
-        ), new Direction3(0.0, 0.0, -1.0)));
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(min.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), max.getZ())
-        ), new Direction3(0.0, 0.0, 1.0)));
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(min.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), min.getZ())
-        ), new Direction3(-1.0, 0.0, 0.0)));
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(max.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), min.getZ())
-        ), new Direction3(1.0, 0.0, 0.0)));
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(min.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), max.getZ()),
-                new CartesianPoint(max.getX(), min.getY(), min.getZ()),
-                new CartesianPoint(min.getX(), min.getY(), min.getZ())
-        ), new Direction3(0.0, -1.0, 0.0)));
-        faces.add(faceFromPolyLoop(List.of(
-                new CartesianPoint(min.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), min.getZ()),
-                new CartesianPoint(max.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), max.getZ()),
-                new CartesianPoint(min.getX(), max.getY(), min.getZ())
-        ), new Direction3(0.0, 1.0, 0.0)));
-        return new Solid(new Shell(faces, true));
-    }
-
-    private Solid mergeSolids(Solid first, Solid second) {
-        // Simple merge: combine all faces from both solids
-        // This works when solids don't overlap or share boundaries
-        List<Face> mergedFaces = new ArrayList<>();
-        mergedFaces.addAll(first.getOuterShell().getFaces());
-        mergedFaces.addAll(second.getOuterShell().getFaces());
-        return new Solid(new Shell(mergedFaces, true));
-    }
-
-    private Solid clipSolidWithBoxDomain(Solid solid, StepBoxDomain boxDomain, String context) {
-        CartesianPoint min = buildPoint(boxDomain.corner().id());
-        if (boxDomain.dimensions().size() < 3) {
-            throw new UnsupportedGeometryException("BOX_DOMAIN requires x, y and z dimensions");
-        }
-        double dx = boxDomain.dimensions().get(0);
-        double dy = boxDomain.dimensions().get(1);
-        double dz = boxDomain.dimensions().get(2);
-        if (dx <= 0.0 || dy <= 0.0 || dz <= 0.0) {
-            throw new UnsupportedGeometryException("BOX_DOMAIN dimensions must be positive");
-        }
-        CartesianPoint max = new CartesianPoint(min.getX() + dx, min.getY() + dy, min.getZ() + dz);
-        Solid clipped = solid;
-        clipped = clipSolidWithPlane(clipped, axisAlignedPlane(min, 1.0, 0.0, 0.0), true, context);
-        clipped = clipSolidWithPlane(clipped, axisAlignedPlane(max, 1.0, 0.0, 0.0), false, context);
-        clipped = clipSolidWithPlane(clipped, axisAlignedPlane(min, 0.0, 1.0, 0.0), true, context);
-        clipped = clipSolidWithPlane(clipped, axisAlignedPlane(max, 0.0, 1.0, 0.0), false, context);
-        clipped = clipSolidWithPlane(clipped, axisAlignedPlane(min, 0.0, 0.0, 1.0), true, context);
-        return clipSolidWithPlane(clipped, axisAlignedPlane(max, 0.0, 0.0, 1.0), false, context);
-    }
-
-    private Plane axisAlignedPlane(CartesianPoint origin, double x, double y, double z) {
-        return new Plane(origin, Direction3.from(new Vector3(x, y, z)));
-    }
-
-    private Solid clipSolidWithPlane(Solid solid, Plane plane, boolean keepPositive, String context) {
-        List<Face> clippedFaces = new ArrayList<>();
-        List<CartesianPoint> capPoints = new ArrayList<>();
-        for (Face face : solid.getOuterShell().getFaces()) {
-            List<CartesianPoint> polygon = outerLoopPoints(face);
-            List<CartesianPoint> clipped = clipPolygonWithPlane(polygon, plane, keepPositive, capPoints);
-            if (clipped.size() >= 3) {
-                Plane facePlane = requirePlaneSurface(face, context);
-                clippedFaces.add(faceFromPolyLoop(closeLoop3(clipped), polygonNormal(clipped, facePlane.getNormal().asVector())));
-            }
-        }
-        List<CartesianPoint> capLoop = buildCapLoop(capPoints, plane);
-        if (capLoop.size() >= 3) {
-            Direction3 capNormal = keepPositive ? plane.getNormal().reverse() : plane.getNormal();
-            clippedFaces.add(faceFromPolyLoop(closeLoop3(capLoop), capNormal));
-        }
-        if (clippedFaces.isEmpty()) {
-            throw new UnsupportedGeometryException(context + " removed the entire solid");
-        }
-        return new Solid(new Shell(clippedFaces, true));
+        return booleanBuilder.buildBooleanOperandSolid(operand);
     }
 
     private Solid buildExtrudedAreaSolid(StepSweptAreaSolid sweptAreaSolid) {
@@ -3833,7 +3266,7 @@ public final class StepCadBuilder {
         return solidPlacement.getLocation().add(alongX.add(alongY));
     }
 
-    private Face faceFromPolyLoop(List<CartesianPoint> points, Direction3 normal) {
+    Face faceFromPolyLoop(List<CartesianPoint> points, Direction3 normal) {
         Plane plane = new Plane(points.get(0), normal);
         return new Face(plane, List.of(FaceBound.outer(new PolyLoop(points), true)), true);
     }
@@ -3858,153 +3291,6 @@ public final class StepCadBuilder {
 
     private List<List<CartesianPoint>> reverseClosedLoops3(List<List<CartesianPoint>> loops) {
         return loops.stream().map(this::reverseClosedLoop3).collect(Collectors.toList());
-    }
-
-    private List<CartesianPoint> outerLoopPoints(Face face) {
-        for (FaceBound bound : face.getBounds()) {
-            if (!bound.isOuter()) {
-                continue;
-            }
-            if (bound.getLoop() instanceof PolyLoop) {
-                PolyLoop polyLoop = (PolyLoop) bound.getLoop();
-                List<CartesianPoint> points = polyLoop.getPoints();
-                return stripClosedPoint(points);
-            }
-            if (bound.getLoop() instanceof EdgeLoop) {
-                EdgeLoop edgeLoop = (EdgeLoop) bound.getLoop();
-                List<CartesianPoint> points = new ArrayList<>(edgeLoop.edges().size());
-                for (OrientedEdge edge : edgeLoop.edges()) {
-                    points.add(edge.startVertex().point());
-                }
-                return points;
-            }
-        }
-        throw new UnsupportedGeometryException("boolean clipping requires a polygonal outer loop");
-    }
-
-    private Plane requirePlaneSurface(Face face, String context) {
-        if (face.getSurface() instanceof Plane) {
-            Plane plane = (Plane) face.getSurface();
-            return plane;
-        }
-        throw new UnsupportedGeometryException(context + " requires planar topology faces");
-    }
-
-    private List<CartesianPoint> stripClosedPoint(List<CartesianPoint> points) {
-        if (points.size() >= 2 && points.get(0).distanceTo(points.get(points.size() - 1)) <= 1.0e-9) {
-            return List.copyOf(points.subList(0, points.size() - 1));
-        }
-        return List.copyOf(points);
-    }
-
-    private List<CartesianPoint> clipPolygonWithPlane(
-            List<CartesianPoint> polygon,
-            Plane plane,
-            boolean keepPositive,
-            List<CartesianPoint> capPoints
-    ) {
-        List<CartesianPoint> output = new ArrayList<>();
-        for (int index = 0; index < polygon.size(); index++) {
-            CartesianPoint current = polygon.get(index);
-            CartesianPoint next = polygon.get((index + 1) % polygon.size());
-            double currentDistance = signedDistanceForHalfSpace(current, plane, keepPositive);
-            double nextDistance = signedDistanceForHalfSpace(next, plane, keepPositive);
-            boolean currentInside = currentDistance >= -1.0e-9;
-            boolean nextInside = nextDistance >= -1.0e-9;
-            if (currentInside && nextInside) {
-                addDistinctPoint(output, next);
-            } else if (currentInside) {
-                CartesianPoint intersection = interpolatePlaneIntersection(current, next, currentDistance, nextDistance);
-                addDistinctPoint(output, intersection);
-                addDistinctPoint(capPoints, intersection);
-            } else if (nextInside) {
-                CartesianPoint intersection = interpolatePlaneIntersection(current, next, currentDistance, nextDistance);
-                addDistinctPoint(output, intersection);
-                addDistinctPoint(output, next);
-                addDistinctPoint(capPoints, intersection);
-            }
-        }
-        if (!output.isEmpty() && output.get(0).distanceTo(output.get(output.size() - 1)) <= 1.0e-9) {
-            output.remove(output.size() - 1);
-        }
-        return List.copyOf(output);
-    }
-
-    private double signedDistanceForHalfSpace(CartesianPoint point, Plane plane, boolean keepPositive) {
-        double distance = plane.signedDistanceTo(point);
-        return keepPositive ? distance : -distance;
-    }
-
-    private CartesianPoint interpolatePlaneIntersection(
-            CartesianPoint start,
-            CartesianPoint end,
-            double startDistance,
-            double endDistance
-    ) {
-        double t = startDistance / (startDistance - endDistance);
-        Vector3 edge = end.subtract(start);
-        return start.add(edge.scale(t));
-    }
-
-    private void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
-            points.add(candidate);
-        }
-    }
-
-    private List<CartesianPoint> buildCapLoop(List<CartesianPoint> capPoints, Plane plane) {
-        List<CartesianPoint> unique = uniquePoints(capPoints);
-        if (unique.size() < 3) {
-            return List.of();
-        }
-        CartesianPoint centroid = averagePoint(unique);
-        Vector3 xAxis = planeBasis(plane.getNormal());
-        Vector3 yAxis = plane.getNormal().asVector().cross(xAxis);
-        unique.sort((left, right) -> {
-            double leftAngle = Math.atan2(left.subtract(centroid).dot(yAxis), left.subtract(centroid).dot(xAxis));
-            double rightAngle = Math.atan2(right.subtract(centroid).dot(yAxis), right.subtract(centroid).dot(xAxis));
-            return Double.compare(leftAngle, rightAngle);
-        });
-        return List.copyOf(unique);
-    }
-
-    private List<CartesianPoint> uniquePoints(List<CartesianPoint> points) {
-        List<CartesianPoint> unique = new ArrayList<>();
-        for (CartesianPoint point : points) {
-            boolean duplicate = false;
-            for (CartesianPoint existing : unique) {
-                if (existing.distanceTo(point) <= 1.0e-9) {
-                    duplicate = true;
-                    break;
-                }
-            }
-            if (!duplicate) {
-                unique.add(point);
-            }
-        }
-        return unique;
-    }
-
-    private CartesianPoint averagePoint(List<CartesianPoint> points) {
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
-        for (CartesianPoint point : points) {
-            x += point.getX();
-            y += point.getY();
-            z += point.getZ();
-        }
-        double scale = 1.0 / points.size();
-        return new CartesianPoint(x * scale, y * scale, z * scale);
-    }
-
-    private Vector3 planeBasis(Direction3 normal) {
-        Vector3 reference = Math.abs(normal.getZ()) < 0.9 ? new Vector3(0.0, 0.0, 1.0) : new Vector3(1.0, 0.0, 0.0);
-        Vector3 xAxis = normal.asVector().cross(reference);
-        if (xAxis.isZero()) {
-            xAxis = normal.asVector().cross(new Vector3(0.0, 1.0, 0.0));
-        }
-        return xAxis.normalize().asVector();
     }
 
     private CartesianPoint rotateAroundAxis(CartesianPoint point, Axis1Placement axis, double angle) {
@@ -4852,7 +4138,7 @@ public final class StepCadBuilder {
         return List.copyOf(points);
     }
 
-    private Plane buildSupportedPlaneGeometry(StepEntity geometry, String faceType) {
+    Plane buildSupportedPlaneGeometry(StepEntity geometry, String faceType) {
         SurfaceGeometry surface = buildSupportedFaceGeometry(geometry, faceType);
         if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
@@ -6015,11 +5301,11 @@ public final class StepCadBuilder {
     }
 
 
-    private List<CartesianPoint> closeLoop3(List<CartesianPoint> points) {
+    List<CartesianPoint> closeLoop3(List<CartesianPoint> points) {
         return geometryOps.closeLoop3(points);
     }
 
-    private List<CartesianPoint> reverseClosedLoop3(List<CartesianPoint> points) {
+    List<CartesianPoint> reverseClosedLoop3(List<CartesianPoint> points) {
         return geometryOps.reverseClosedLoop3(points);
     }
 
