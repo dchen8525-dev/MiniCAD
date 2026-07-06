@@ -50,9 +50,9 @@ public class test_real_step {
                 
                 // Show entity types
                 if (file.entities().size() > 0 && file.entities().size() <= 10) {
-                    System.out.println("   Types: " + 
+                    System.out.println("   Types: " +
                         file.entities().stream()
-                            .map(e -> e.type())
+                            .map(e -> e.name())
                             .distinct()
                             .collect(Collectors.joining(", ")));
                 }
