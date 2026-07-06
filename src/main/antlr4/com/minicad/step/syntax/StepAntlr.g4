@@ -163,7 +163,8 @@ REAL          : [0-9]+ '.' [0-9]* EXPONENT?
               | [0-9]+ EXPONENT
               ;
 
-// Exponent: allow very large/small values
+// Exponent: must have at least one digit after E/e and optional sign
+// Reject: E, E+, E- without digits
 EXPONENT      : [eE] [+-]? [0-9]+;
 
 // Special numbers: NaN, INF, -INF (uppercase only, lowercase rejected by parser)
