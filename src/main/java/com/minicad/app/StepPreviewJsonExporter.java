@@ -14169,14 +14169,7 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting
     ) {
-        Set<StepEntity> targets = new LinkedHashSet<>();
-        for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepCurveStyle && ((StepCurveStyle) candidate).curveFont().id() == curveFontId) {
-            StepCurveStyle curveStyle = (StepCurveStyle) candidate;
-                targets.addAll(collectSemanticTargets(curveStyle, resolved, visiting));
-            }
-        }
-        return Set.copyOf(targets);
+        return PreviewMaterialExporter.collectTargetsForCurveFont(curveFontId, resolved, visiting, StepPreviewJsonExporter::collectSemanticTargets);
     }
 
     private static Set<StepEntity> collectTargetsForRepresentationContext(
@@ -14297,14 +14290,7 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting
     ) {
-        Set<StepEntity> targets = new LinkedHashSet<>();
-        for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPointStyle && ((StepPointStyle) candidate).marker().id() == markerId) {
-            StepPointStyle pointStyle = (StepPointStyle) candidate;
-                targets.addAll(collectSemanticTargets(pointStyle, resolved, visiting));
-            }
-        }
-        return Set.copyOf(targets);
+        return PreviewMaterialExporter.collectTargetsForPointMarker(markerId, resolved, visiting, StepPreviewJsonExporter::collectSemanticTargets);
     }
 
     private static Set<StepEntity> collectTargetsForStyleColour(
@@ -14312,35 +14298,7 @@ public final class StepPreviewJsonExporter {
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting
     ) {
-        Set<StepEntity> targets = new LinkedHashSet<>();
-        for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepFillAreaStyleColour
-                    && ((StepFillAreaStyleColour) candidate).colour().id() == colourId) {
-                StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) candidate;
-                targets.addAll(collectSemanticTargets(fillAreaStyleColour, resolved, visiting));
-            } else if (candidate instanceof StepCurveStyle
-                    && ((StepCurveStyle) candidate).colour().id() == colourId) {
-                StepCurveStyle curveStyle = (StepCurveStyle) candidate;
-                targets.addAll(collectSemanticTargets(curveStyle, resolved, visiting));
-            } else if (candidate instanceof StepPointStyle
-                    && ((StepPointStyle) candidate).colour().id() == colourId) {
-                StepPointStyle pointStyle = (StepPointStyle) candidate;
-                targets.addAll(collectSemanticTargets(pointStyle, resolved, visiting));
-            } else if (candidate instanceof StepTextStyleForDefinedFont
-                    && ((StepTextStyleForDefinedFont) candidate).textColour().id() == colourId) {
-                StepTextStyleForDefinedFont textStyle = (StepTextStyleForDefinedFont) candidate;
-                targets.addAll(collectSemanticTargets(textStyle, resolved, visiting));
-            } else if (candidate instanceof StepSymbolColour
-                    && ((StepSymbolColour) candidate).colour().id() == colourId) {
-                StepSymbolColour symbolColour = (StepSymbolColour) candidate;
-                targets.addAll(collectSemanticTargets(symbolColour, resolved, visiting));
-            } else if (candidate instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular
-                    && ((StepSurfaceStyleReflectanceAmbientDiffuseSpecular) candidate).specularColour().id() == colourId) {
-                StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) candidate;
-                targets.addAll(collectSemanticTargets(style, resolved, visiting));
-            }
-        }
-        return Set.copyOf(targets);
+        return PreviewMaterialExporter.collectTargetsForStyleColour(colourId, resolved, visiting, StepPreviewJsonExporter::collectSemanticTargets);
     }
 
     private static Set<StepEntity> collectTargetsForProductDefinition(
