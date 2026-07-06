@@ -995,7 +995,7 @@ public final class StepPreviewJsonExporter {
                 String baseName = entity == null ? null : entity.name();
                 int faceIndex = 0;
                 for (Face face : solid.outerShell().faces()) {
-                    faces.add(facePayloadFromTopologyFace(
+                    faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
                             solidId * 1000 + faceIndex++,
                             face,
                             baseName,
@@ -1005,7 +1005,7 @@ public final class StepPreviewJsonExporter {
                 }
                 for (var voidShell : solid.voidShells()) {
                     for (Face face : voidShell.faces()) {
-                        faces.add(facePayloadFromTopologyFace(
+                        faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
                                 solidId * 1000 + faceIndex++,
                                 face,
                                 baseName,
@@ -1720,7 +1720,7 @@ public final class StepPreviewJsonExporter {
                     return trimmed;
                 }
                 if (geometry instanceof StepPlane) {
-                    FacePayload payload = facePayloadFromTopologyFace(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
+                    FacePayload payload = PreviewMeshExporter.facePayloadFromTopologyFace(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
                     logPreviewFacePayload("face_payload_built", payload);
                     return new PreviewFaceResult(payload, null);
                 }
@@ -2000,7 +2000,7 @@ public final class StepPreviewJsonExporter {
             try {
                 List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
                 if (!bounds.isEmpty()) {
-                    BSplineSurface3 surface = buildFreeFormSurface(freeForm, builder);
+                    BSplineSurface3 surface = PreviewMeshExporter.buildFreeFormSurface(freeForm, builder);
                     FacePayload payload = toSampledSurfaceFacePayload(stepFace, surface, "FREE_FORM_SURFACE", bounds, metadata);
                     if (payload != null) {
                         logPreviewFacePayload("face_payload_built", payload);
@@ -2644,395 +2644,8 @@ public final class StepPreviewJsonExporter {
 
 
 
-    static FacePayload facePayloadFromTopologyFace(
-            int stepId,
-            Face face,
-            String name,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        SurfaceGeometry surface = face.surface();
-        boolean sameSense = face.sameSense();
-        if (surface instanceof Plane) {
-            Plane plane = (Plane) surface;
-            List<LoopPayload> loops = new ArrayList<>();
-            for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-            }
-            Direction3 normal = plane.normal();
-            if (!sameSense) {
-                normal = normal.reverse();
-            }
-            return new FacePayload(
-                    stepId,
-                    name,
-                    "PLANE",
-                    PayloadConversionHelper.toPointPayload(plane.origin()),
-                    new VectorPayload(normal.x(), normal.y(), normal.z()),
-                    sameSense,
-                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    loops,
-                    List.of(),
-                    new FaceSurfacePayload(
-                            "plane_face",
-                            List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
-                            List.of(plane.normal().x(), plane.normal().y(), plane.normal().z()),
-                            basisDirectionForNormal(normal),
-                            0.0,
-                            null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null
-                    ),
-                    null
-            );
-        }
-        // Paraboloid surface: parametric payload for viewer rebuild
-        if (surface instanceof ParaboloidSurface) {
-            ParaboloidSurface paraboloid = (ParaboloidSurface) surface;
-            Axis2Placement3D pos = paraboloid.position();
-            Vector3 normal = surface.normalAt(0.5, 0.5);
-            if (!sameSense) {
-                normal = normal.scale(-1.0);
-            }
-            List<LoopPayload> loops = new ArrayList<>();
-            for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-            }
-            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-            return new FacePayload(
-                    stepId,
-                    name,
-                    "PARABOLOID_SURFACE",
-                    new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
-                    new VectorPayload(normal.x(), normal.y(), normal.z()),
-                    sameSense,
-                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    loops,
-                    triangles,
-                    new FaceSurfacePayload(
-                            "paraboloid_surface",
-                            List.of(pos.location().x(), pos.location().y(), pos.location().z()),
-                            List.of(pos.axis().x(), pos.axis().y(), pos.axis().z()),
-                            List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
-                            paraboloid.focalLength(),
-                            null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null
-                    ),
-                    null
-            );
-        }
-        // Hyperboloid surface: parametric payload for viewer rebuild
-        if (surface instanceof HyperboloidSurface) {
-            HyperboloidSurface hyperboloid = (HyperboloidSurface) surface;
-            Axis2Placement3D pos = hyperboloid.position();
-            Vector3 normal = surface.normalAt(0.5, 0.5);
-            if (!sameSense) {
-                normal = normal.scale(-1.0);
-            }
-            List<LoopPayload> loops = new ArrayList<>();
-            for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-            }
-            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-            return new FacePayload(
-                    stepId,
-                    name,
-                    "HYPERBOLOID_SURFACE",
-                    new PointPayload(pos.location().x(), pos.location().y(), pos.location().z()),
-                    new VectorPayload(normal.x(), normal.y(), normal.z()),
-                    sameSense,
-                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    loops,
-                    triangles,
-                    new FaceSurfacePayload(
-                            "hyperboloid_surface",
-                            List.of(pos.location().x(), pos.location().y(), pos.location().z()),
-                            List.of(pos.axis().x(), pos.axis().y(), pos.axis().z()),
-                            List.of(pos.xDirection().x(), pos.xDirection().y(), pos.xDirection().z()),
-                            hyperboloid.radius(),
-                            null, hyperboloid.semiAxis(), 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null
-                    ),
-                    null
-            );
-        }
-        // Surface of translation: parametric payload for viewer rebuild
-        if (surface instanceof SurfaceOfTranslation3) {
-            SurfaceOfTranslation3 translation = (SurfaceOfTranslation3) surface;
-            Vector3 dir = translation.direction();
-            Vector3 normal = surface.normalAt(0.5, 0.5);
-            if (!sameSense) {
-                normal = normal.scale(-1.0);
-            }
-            List<LoopPayload> loops = new ArrayList<>();
-            for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-            }
-            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-            return new FacePayload(
-                    stepId,
-                    name,
-                    "SURFACE_OF_TRANSLATION",
-                    new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
-                    new VectorPayload(normal.x(), normal.y(), normal.z()),
-                    sameSense,
-                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    loops,
-                    triangles,
-                    new FaceSurfacePayload(
-                            "surface_of_translation",
-                            null,
-                            List.of(dir.x(), dir.y(), dir.z()),
-                            null,
-                            0.0,
-                            null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null
-                    ),
-                    null
-            );
-        }
-        // Surface of projection: parametric payload for viewer rebuild
-        if (surface instanceof SurfaceOfProjection3) {
-            SurfaceOfProjection3 projection = (SurfaceOfProjection3) surface;
-            Vector3 dir = projection.projectionDirection();
-            Vector3 normal = surface.normalAt(0.5, 0.5);
-            if (!sameSense) {
-                normal = normal.scale(-1.0);
-            }
-            List<LoopPayload> loops = new ArrayList<>();
-            for (FaceBound bound : face.bounds()) {
-                loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-            }
-            java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-            List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-            return new FacePayload(
-                    stepId,
-                    name,
-                    "SURFACE_OF_PROJECTION",
-                    new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
-                    new VectorPayload(normal.x(), normal.y(), normal.z()),
-                    sameSense,
-                    PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                    metadata.transparency(),
-                    PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                    metadata.layers(),
-                    loops,
-                    triangles,
-                    new FaceSurfacePayload(
-                            "surface_of_projection",
-                            null,
-                            List.of(dir.x(), dir.y(), dir.z()),
-                            null,
-                            0.0,
-                            null, null, 0.0, 0.0, 0.0, 0.0,
-                            null, null, null, null, null, null, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null
-                    ),
-                    null
-            );
-        }
-        // Cylindrical surface: parametric payload
-        if (surface instanceof CylindricalSurface) {
-            CylindricalSurface cyl = (CylindricalSurface) surface;
-            Axis2Placement3D pos = cyl.position();
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "CYLINDRICAL_SURFACE", "cylindrical_surface",
-                    pos, null, null, cyl.radius(), 0.0, 0.0, face.bounds());
-        }
-        // Conical surface: parametric payload
-        if (surface instanceof ConicalSurface) {
-            ConicalSurface cone = (ConicalSurface) surface;
-            Axis2Placement3D pos = cone.position();
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "CONICAL_SURFACE", "conical_surface",
-                    pos, null, null, cone.radius(), cone.semiAngle(), 0.0, face.bounds());
-        }
-        // Spherical surface: parametric payload
-        if (surface instanceof SphericalSurface) {
-            SphericalSurface sphere = (SphericalSurface) surface;
-            Axis2Placement3D pos = sphere.position();
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SPHERICAL_SURFACE", "spherical_surface",
-                    pos, null, null, sphere.radius(), 0.0, 0.0, face.bounds());
-        }
-        // Toroidal surface: parametric payload
-        if (surface instanceof ToroidalSurface) {
-            ToroidalSurface torus = (ToroidalSurface) surface;
-            Axis2Placement3D pos = torus.position();
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "TOROIDAL_SURFACE", "toroidal_surface",
-                    pos, null, null, torus.majorRadius(), torus.minorRadius(), 0.0, face.bounds());
-        }
-        // B-Spline surface: parametric payload
-        if (surface instanceof BSplineSurface3) {
-            BSplineSurface3 bspline = (BSplineSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "BSPLINE_SURFACE", "bspline_surface",
-                    null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, face.bounds());
-        }
-        // Rational B-Spline surface: parametric payload
-        if (surface instanceof RationalBSplineSurface3) {
-            RationalBSplineSurface3 rational = (RationalBSplineSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
-                    null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, face.bounds());
-        }
-        // Surface of linear extrusion: parametric payload
-        if (surface instanceof SurfaceOfLinearExtrusion3) {
-            SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        // Surface of revolution: parametric payload
-        if (surface instanceof SurfaceOfRevolution3) {
-            SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_REVOLUTION", "surface_of_revolution",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        // Ruled surface: parametric payload
-        if (surface instanceof RuledSurface3) {
-            RuledSurface3 ruled = (RuledSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "RULED_SURFACE", "ruled_surface",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        // Surface of constant radius: parametric payload
-        if (surface instanceof SurfaceOfConstantRadius3) {
-            SurfaceOfConstantRadius3 constRadius = (SurfaceOfConstantRadius3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
-                    null, null, null, constRadius.radius(), 0.0, 0.0, face.bounds());
-        }
-        // Offset surface: parametric payload
-        if (surface instanceof OffsetSurface3) {
-            OffsetSurface3 offset = (OffsetSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "OFFSET_SURFACE", "offset_surface",
-                    null, null, null, 0.0, offset.distance(), 0.0, face.bounds());
-        }
-        // Non-planar: generic grid-based triangulation
-        java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-        if (grid.isEmpty()) {
-            throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " produced no sample grid");
-        }
-        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-        if (triangles.isEmpty()) {
-            throw new UnsupportedGeometryException(surfaceTypeNameForGeometry(surface) + " triangulation produced no cells");
-        }
-        Vector3 normal = surface.normalAt(0.5, 0.5);
-        if (!sameSense) {
-            normal = normal.scale(-1.0);
-        }
-        List<LoopPayload> loops = new ArrayList<>();
-        for (FaceBound bound : face.bounds()) {
-            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-        }
-        return new FacePayload(
-                stepId,
-                name,
-                surfaceTypeNameForGeometry(surface),
-                new PointPayload(triangles.get(0).x(), triangles.get(0).y(), triangles.get(0).z()),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                sameSense,
-                PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                loops,
-                triangles,
-                null,
-                null
-        );
-    }
-
-    /**
-     * Creates a FacePayload by sampling the surface grid and populating parametric metadata.
-     */
-    private static FacePayload newFacePayloadFromGrid(
-            SurfaceGeometry surface,
-            int stepId,
-            String name,
-            boolean sameSense,
-            StepMetadataExtractor.DisplayMetadata metadata,
-            String displayName,
-            String surfaceType,
-            Axis2Placement3D position,
-            Integer uDegree,
-            Integer vDegree,
-            double scalarA,
-            double scalarB,
-            double scalarC,
-            List<FaceBound> bounds
-    ) {
-        java.util.List<java.util.List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
-        if (grid.isEmpty()) return null;
-        List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
-        if (triangles.isEmpty()) return null;
-        Vector3 normal = surface.normalAt(0.5, 0.5);
-        if (!sameSense) normal = normal.scale(-1.0);
-        PointPayload anchor = triangles.get(0);
-        List<Double> origin = null;
-        List<Double> axis = null;
-        List<Double> basisDir = null;
-        if (position != null) {
-            origin = List.of(position.location().x(), position.location().y(), position.location().z());
-            axis = List.of(position.axis().x(), position.axis().y(), position.axis().z());
-            basisDir = List.of(position.xDirection().x(), position.xDirection().y(), position.xDirection().z());
-            anchor = PayloadConversionHelper.toPointPayload(position.location());
-        }
-        List<LoopPayload> loops = new ArrayList<>();
-        for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
-        }
-        return new FacePayload(
-                stepId,
-                displayName,
-                displayName,
-                new PointPayload(anchor.x(), anchor.y(), anchor.z()),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                sameSense,
-                PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                loops,
-                triangles,
-                new FaceSurfacePayload(
-                        surfaceType,
-                        origin,
-                        axis,
-                        basisDir,
-                        scalarA,
-                        Double.valueOf(scalarB), Double.valueOf(scalarC), 0.0, 0.0, 0.0, 0.0,
-                        uDegree, vDegree, null, null, null, null, null,
-                        null, null, null, null, null, null, null, null, null, null, null, null
-                ),
-                null
-        );
-    }
-
-    private static List<List<CartesianPoint>> sampleTopologySurfaceGrid(SurfaceGeometry surface) {
-        return surface.sampleGrid(TOPOLOGY_SURFACE_GRID_SEGMENTS, TOPOLOGY_SURFACE_GRID_SEGMENTS);
-    }
+    // facePayloadFromTopologyFace, newFacePayloadFromGrid, and sampleTopologySurfaceGrid
+    // have been extracted to PreviewMeshExporter.java
 
     private static FacePayload toCylindricalFacePayload(
             StepFaceEntity stepFace,
@@ -3421,7 +3034,7 @@ public final class StepPreviewJsonExporter {
         if (patch == null) {
             return null;
         }
-        BSplineSurface3 surface = buildBsplineSurface(stepSurface, builder);
+        BSplineSurface3 surface = PreviewMeshExporter.buildBsplineSurface(stepSurface, builder);
         int uSegments = Math.max(patch.uSegments(), 10);
         int vSegments = Math.max(patch.vSegments(), 10);
         List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(
@@ -4264,7 +3877,7 @@ public final class StepPreviewJsonExporter {
                 || surfaceGeometry instanceof StepUniformSurface
                 || surfaceGeometry instanceof StepQuasiUniformSurface
                 || surfaceGeometry instanceof StepPiecewiseBezierSurface) {
-            BSplineSurface3 surface = buildBsplineSurface(surfaceGeometry, builder);
+            BSplineSurface3 surface = PreviewMeshExporter.buildBsplineSurface(surfaceGeometry, builder);
             List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
                     .map(row -> row.stream()
                             .map(point -> List.of(point.x(), point.y(), point.z()))

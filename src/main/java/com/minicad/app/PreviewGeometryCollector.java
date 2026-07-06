@@ -227,7 +227,7 @@ public final class PreviewGeometryCollector {
                 String baseName = entity == null ? null : entity.name();
                 int faceIndex = 0;
                 for (Face face : solid.outerShell().faces()) {
-                    faces.add(StepPreviewJsonExporter.facePayloadFromTopologyFace(
+                    faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
                             solidId * 1000 + faceIndex++,
                             face,
                             baseName,
@@ -237,7 +237,7 @@ public final class PreviewGeometryCollector {
                 }
                 for (var voidShell : solid.voidShells()) {
                     for (Face face : voidShell.faces()) {
-                        faces.add(StepPreviewJsonExporter.facePayloadFromTopologyFace(
+                        faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
                                 solidId * 1000 + faceIndex++,
                                 face,
                                 baseName,
