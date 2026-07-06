@@ -66,6 +66,17 @@ public final class StepAntlrBridge {
             }
         }
 
+        // Check for multiple DATA sections (not supported)
+        int dataSectionCount = 0;
+        for (ParseTree child : ctx.children) {
+            if (child instanceof StepAntlrParser.DataSectionContext) {
+                dataSectionCount++;
+            }
+        }
+        if (dataSectionCount > 1) {
+            throw new StepParseException("multiple DATA sections are not supported");
+        }
+
         // Convert data section
         if (ctx.dataSection() != null) {
             for (StepAntlrParser.EntityInstanceContext entityCtx : ctx.dataSection().entityInstance()) {
@@ -176,25 +187,30 @@ public final class StepAntlrBridge {
         if (ctx instanceof StepAntlrParser.IntNumContext) {
             String text = ((StepAntlrParser.IntNumContext) ctx).INTEGER().getText();
             try {
+                // Check if it's too large for int
+                if (text.length() > 19) {
+                    throw new StepParseException("integer too large: " + text);
+                }
                 long value = Long.parseLong(text);
+                if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
+                    throw new StepParseException("integer out of range: " + text);
+                }
                 return new StepValue.NumberValue((double) value, text);
             } catch (NumberFormatException e) {
-                // Too large for long, treat as real
-                return new StepValue.NumberValue(Double.parseDouble(text), text);
+                throw new StepParseException("invalid integer: " + text);
             }
         } else if (ctx instanceof StepAntlrParser.RealNumContext) {
             String text = ((StepAntlrParser.RealNumContext) ctx).REAL().getText();
             double value = parseRealNumber(text);
+            // Check for non-finite values
+            if (!Double.isFinite(value)) {
+                throw new StepParseException("non-finite number '" + text + "'");
+            }
             return new StepValue.NumberValue(value, text);
         } else if (ctx instanceof StepAntlrParser.SpecialNumContext) {
             String text = ((StepAntlrParser.SpecialNumContext) ctx).SPECIAL_NUMBER().getText();
-            // Handle NaN, INF, -INF
-            if (text.equals("NAN")) {
-                throw new StepParseException("NaN is not supported in STEP");
-            } else if (text.equals("INF") || text.equals("-INF")) {
-                throw new StepParseException("Infinity is not supported in STEP: " + text);
-            }
-            return new StepValue.NumberValue(0.0, text); // Fallback
+            // Reject NaN and Infinity explicitly
+            throw new StepParseException("non-finite number '" + text + "'");
         }
         throw new StepParseException("unknown number type: " + ctx.getText());
     }
@@ -243,13 +259,19 @@ public final class StepAntlrBridge {
                 // Doubled quote
                 result.append('\'');
                 i += 2;
-            } else if (content.startsWith("\\S\\", i) && i + 3 < content.length()) {
+            } else if (content.startsWith("\\S\\", i)) {
                 // \S\X single byte escape (ISO 8859-1)
+                if (i + 3 >= content.length()) {
+                    throw new StepParseException("truncated \\S\\ escape at end of string");
+                }
                 char ch = content.charAt(i + 3);
                 result.append(ch);
                 i += 4;
-            } else if (content.startsWith("\\X\\", i) && i + 3 < content.length()) {
+            } else if (content.startsWith("\\X\\", i)) {
                 // \X\HH single hex byte
+                if (i + 4 >= content.length()) {
+                    throw new StepParseException("truncated \\X\\ escape at end of string");
+                }
                 String hex = content.substring(i + 3, i + 5);
                 try {
                     int value = Integer.parseInt(hex, 16);
@@ -265,6 +287,9 @@ public final class StepAntlrBridge {
                     throw new StepParseException("unterminated \\X2\\ escape");
                 }
                 String hexSeq = content.substring(i + 4, end);
+                if (hexSeq.length() % 4 != 0) {
+                    throw new StepParseException("invalid \\X2\\ hex sequence length");
+                }
                 try {
                     for (int j = 0; j < hexSeq.length(); j += 4) {
                         int value = Integer.parseInt(hexSeq.substring(j, j + 4), 16);
@@ -281,6 +306,9 @@ public final class StepAntlrBridge {
                     throw new StepParseException("unterminated \\X4\\ escape");
                 }
                 String hexSeq = content.substring(i + 4, end);
+                if (hexSeq.length() % 8 != 0) {
+                    throw new StepParseException("invalid \\X4\\ hex sequence length");
+                }
                 try {
                     for (int j = 0; j < hexSeq.length(); j += 8) {
                         long value = Long.parseLong(hexSeq.substring(j, j + 8), 16);
@@ -290,9 +318,12 @@ public final class StepAntlrBridge {
                 } catch (NumberFormatException e) {
                     throw new StepParseException("invalid hex sequence in \\X4\\");
                 }
-            } else if (content.startsWith("\\P\\", i) && i + 2 < content.length()) {
-                // \P\A code page directive (skip for now)
-                i += 3;
+            } else if (content.startsWith("\\P\\", i)) {
+                // \P\ code page directive - reject all code page directives (not supported)
+                throw new StepParseException("unsupported code page escape: \\P\\");
+            } else if (content.startsWith("\\", i) && i + 1 < content.length()) {
+                // Any other backslash escape is invalid
+                throw new StepParseException("unsupported string escape: \\Z\\ or similar");
             } else {
                 result.append(content.charAt(i));
                 i += 1;
@@ -335,9 +366,17 @@ public final class StepAntlrBridge {
             throw new StepParseException("entity id must start with #: " + text);
         }
         try {
-            long value = Long.parseLong(text.substring(1));
+            String idStr = text.substring(1);
+            // Check for very large IDs (more than 10 digits is suspicious)
+            if (idStr.length() > 10) {
+                throw new StepParseException("entity id too large: " + text);
+            }
+            long value = Long.parseLong(idStr);
             if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
                 throw new StepParseException("entity id out of range: " + text);
+            }
+            if (value < 0) {
+                throw new StepParseException("entity id must be positive: " + text);
             }
             return (int) value;
         } catch (NumberFormatException e) {

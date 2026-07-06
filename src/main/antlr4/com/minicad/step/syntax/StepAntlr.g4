@@ -166,8 +166,11 @@ REAL          : [0-9]+ '.' [0-9]* EXPONENT?
 // Exponent: allow very large/small values
 EXPONENT      : [eE] [+-]? [0-9]+;
 
-// Special numbers: NaN, INF, -INF (uppercase only)
-SPECIAL_NUMBER: 'NAN' | 'INF' | MINUS 'INF';
+// Special numbers: NaN, INF, -INF (uppercase only, lowercase rejected by parser)
+SPECIAL_NUMBER: 'NAN' | 'INF' | MINUS 'INF'
+              | 'nan' | 'NaN'  // lowercase will be rejected
+              | 'inf' | 'Inf' | 'infinity' | 'Infinity' | MINUS 'inf' | MINUS 'infinity'
+              ;
 
 // String literal with escape sequence support
 // STEP strings support: '' (doubled quote), \S\, \P\, \X\, \X2\, \X4
