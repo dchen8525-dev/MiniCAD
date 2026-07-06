@@ -1,5 +1,4 @@
 package com.minicad.app;
-
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
@@ -11,7 +10,6 @@ import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.*;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -49,7 +47,6 @@ public final class StepMeshExporter {
 
     private StepMeshExporter() {
     }
-
     /**
      * Exports STEP text to OBJ format.
      */
@@ -57,12 +54,10 @@ public final class StepMeshExporter {
         MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
         return formatObj(mesh);
     }
-
     static String exportObj(CompiledStepDocument compiled) {
         MeshData mesh = buildMesh(compiled);
         return formatObj(mesh);
     }
-
     /**
      * Exports STEP text to binary STL format.
      */
@@ -70,12 +65,10 @@ public final class StepMeshExporter {
         MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
         return formatStlBinary(mesh);
     }
-
     static byte[] exportStlBinary(CompiledStepDocument compiled) {
         MeshData mesh = buildMesh(compiled);
         return formatStlBinary(mesh);
     }
-
     /**
      * Exports STEP text to text STL format.
      */
@@ -83,14 +76,10 @@ public final class StepMeshExporter {
         MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
         return formatStlText(mesh);
     }
-
     static String exportStlText(CompiledStepDocument compiled) {
         MeshData mesh = buildMesh(compiled);
         return formatStlText(mesh);
     }
-
-    // ── Pipeline ──────────────────────────────────────────────────────────────
-
     private static MeshData buildMesh(CompiledStepDocument compiled) {
         Map<Integer, StepEntity> resolved = compiled.resolved();
         StepCadBuilder builder = compiled.builder();
@@ -100,7 +89,6 @@ public final class StepMeshExporter {
                 .filter(e -> e instanceof com.minicad.step.model.base.StepFaceEntity)
                 .map(e -> (com.minicad.step.model.base.StepFaceEntity) e)
                 .collect(Collectors.toList());
-
         Triangulator t = new Triangulator();
         for (com.minicad.step.model.base.StepFaceEntity faceEntity : faceEntities) {
             try {
@@ -110,7 +98,6 @@ public final class StepMeshExporter {
                         new Object[]{faceEntity.id(), e.getMessage()});
             }
         }
-
         // Sequential triangulation of solids/shells (complex dependencies)
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
@@ -134,10 +121,8 @@ public final class StepMeshExporter {
                 }
             }
         }
-
         return t.toMeshData();
     }
-
     private static boolean isSemanticFaceBackedEntity(StepEntity entity) {
         return entity instanceof com.minicad.step.model.base.StepFaceEntity
                 || entity instanceof com.minicad.step.model.topology.StepOpenShell
@@ -153,7 +138,6 @@ public final class StepMeshExporter {
                 || entity instanceof com.minicad.step.model.product.StepManifoldSolidBrep
                 || entity instanceof com.minicad.step.model.product.StepBrepWithVoids;
     }
-
     private static boolean isShellCandidate(StepEntity entity) {
         return entity instanceof com.minicad.step.model.topology.StepOpenShell
                 || entity instanceof com.minicad.step.model.topology.StepClosedShell
@@ -165,9 +149,6 @@ public final class StepMeshExporter {
                 || entity instanceof com.minicad.step.model.geometry.StepManifoldSurfaceModel
                 || entity instanceof com.minicad.step.model.product.StepShellBasedSurfaceModel;
     }
-
-    // ── Triangulation ─────────────────────────────────────────────────────────
-
     private static class Triangulator {
         private final Map<MeshVertex, Integer> vertexIndex = new LinkedHashMap<>();
         private final List<int[]> faceIndices = new ArrayList<>();
@@ -189,7 +170,6 @@ public final class StepMeshExporter {
                 this.ny = ny;
                 this.nz = nz;
             }
-
             MeshVertex(CartesianPoint p, Vector3 n) {
                 this(Math.round(p.x() * VERTEX_ROUNDING) / VERTEX_ROUNDING,
                      Math.round(p.y() * VERTEX_ROUNDING) / VERTEX_ROUNDING,
@@ -198,33 +178,22 @@ public final class StepMeshExporter {
                      Math.round(n.y() * VERTEX_ROUNDING) / VERTEX_ROUNDING,
                      Math.round(n.z() * VERTEX_ROUNDING) / VERTEX_ROUNDING);
             }
-
             double x() { return x; }
             double y() { return y; }
             double z() { return z; }
             double nx() { return nx; }
             double ny() { return ny; }
             double nz() { return nz; }
-
-            @Override
-            public boolean equals(Object o) {
+            @Override public boolean equals(Object o) {
                 if (this == o) return true;
                 if (!(o instanceof MeshVertex)) return false;
                 MeshVertex that = (MeshVertex) o;
-                return Double.compare(x, that.x) == 0
-                       && Double.compare(y, that.y) == 0
-                       && Double.compare(z, that.z) == 0
-                       && Double.compare(nx, that.nx) == 0
-                       && Double.compare(ny, that.ny) == 0
-                       && Double.compare(nz, that.nz) == 0;
+                return Double.compare(x, that.x) == 0 && Double.compare(y, that.y) == 0
+                       && Double.compare(z, that.z) == 0 && Double.compare(nx, that.nx) == 0
+                       && Double.compare(ny, that.ny) == 0 && Double.compare(nz, that.nz) == 0;
             }
-
-            @Override
-            public int hashCode() {
-                return java.util.Objects.hash(x, y, z, nx, ny, nz);
-            }
+            @Override public int hashCode() { return java.util.Objects.hash(x, y, z, nx, ny, nz); }
         }
-
         int addVertex(CartesianPoint p, Vector3 n) {
             MeshVertex key = new MeshVertex(p, n);
             Integer idx = vertexIndex.get(key);
@@ -235,11 +204,9 @@ public final class StepMeshExporter {
             vertexIndex.put(key, idx);
             return idx;
         }
-
         void addTriangle(int v0, int v1, int v2) {
             faceIndices.add(new int[]{v0, v1, v2});
         }
-
         void merge(Triangulator other) {
             for (Map.Entry<MeshVertex, Integer> entry : other.vertexIndex.entrySet()) {
                 MeshVertex key = entry.getKey();
@@ -261,20 +228,17 @@ public final class StepMeshExporter {
                 });
             }
         }
-
         void triangulateSolid(Solid solid) {
             triangulateShell(solid.outerShell());
             for (Shell shell : solid.voidShells()) {
                 triangulateShell(shell);
             }
         }
-
         void triangulateShell(Shell shell) {
             for (Face face : shell.faces()) {
                 triangulateFace(face);
             }
         }
-
         void triangulateFace(Face face) {
             SurfaceGeometry surface = face.surface();
             boolean flipped = !face.sameSense();
@@ -288,7 +252,6 @@ public final class StepMeshExporter {
                 triangulateCurvedFace(face, surface, flipped);
             }
         }
-
         void triangulateSemanticFace(com.minicad.step.model.base.StepFaceEntity stepFace, StepCadBuilder builder) {
             StepEntity faceGeometry = semanticFaceGeometry(stepFace);
             boolean flipped = !semanticFaceSameSense(stepFace);
@@ -297,7 +260,6 @@ public final class StepMeshExporter {
                     && triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)) {
                 return;
             }
-
             Face builtFace = builder.buildFace(stepFace.id());
             if (surface == null) {
                 surface = builtFace.surface();
@@ -309,14 +271,11 @@ public final class StepMeshExporter {
                 triangulateFace(builtFace);
             }
         }
-
         private void triangulatePlanarFace(Face face, Plane plane, boolean flipped) {
             FaceBound outer = face.outerBound();
             if (outer == null) return;
-
             Vector3 normal = plane.normal().asVector();
             if (flipped) normal = normal.negate();
-
             PlanarFrame frame = PlanarFrame.forPlane(plane);
             List<ProjectedLoop> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
@@ -332,12 +291,10 @@ public final class StepMeshExporter {
             if (loops.isEmpty()) {
                 return;
             }
-
             List<ProjectedVertex> polygon = buildSimplePolygon(loops);
             if (polygon.size() < 3) {
                 return;
             }
-
             for (int[] triangle : earClip(polygon)) {
                 int v0 = addVertex(polygon.get(triangle[0]).point(), normal);
                 int v1 = addVertex(polygon.get(triangle[1]).point(), normal);
@@ -349,11 +306,9 @@ public final class StepMeshExporter {
                 }
             }
         }
-
         private void triangulateCurvedFace(Face face, SurfaceGeometry surface, boolean flipped) {
             int uSegs = DEFAULT_CURVE_SEGMENTS;
             int vSegs = DEFAULT_CURVE_SEGMENTS;
-
             BoundingBox3 bbox = surface.boundingBox();
             double diag = Math.sqrt(
                 Math.pow(bbox.maxX() - bbox.minX(), 2) +
@@ -366,10 +321,8 @@ public final class StepMeshExporter {
                 uSegs = base;
                 vSegs = base;
             }
-
             List<List<CartesianPoint>> grid = surface.sampleGrid(uSegs, vSegs);
             if (grid.isEmpty() || grid.get(0).isEmpty()) return;
-
             int rows = grid.size();
             int cols = grid.get(0).size();
 
@@ -379,10 +332,8 @@ public final class StepMeshExporter {
                     CartesianPoint p10 = grid.get(i + 1).get(j);
                     CartesianPoint p11 = grid.get(i + 1).get(j + 1);
                     CartesianPoint p01 = grid.get(i).get(j + 1);
-
                     Vector3 n = computeNormal(p00, p10, p11);
                     if (flipped) n = n.negate();
-
                     int v00 = addVertex(p00, n);
                     int v10 = addVertex(p10, n);
                     int v11 = addVertex(p11, n);
@@ -398,13 +349,11 @@ public final class StepMeshExporter {
                 }
             }
         }
-
         private boolean triangulateParametricFace(Face face, SurfaceGeometry surface, boolean flipped) {
             ParametricMapper mapper = mapperFor(surface);
             if (mapper == null) {
                 return false;
             }
-
             List<ParametricLoop> loops = buildParametricLoops(face, mapper);
             if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoop::outer)) {
                 return false;
@@ -417,7 +366,6 @@ public final class StepMeshExporter {
             int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
             int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
             int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
-
             int trianglesBefore = faceIndices.size();
             for (int ui = 0; ui < uSegments; ui++) {
                 double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
@@ -429,7 +377,6 @@ public final class StepMeshExporter {
                     if (!containsParametricLoops(normalizedLoops, center)) {
                         continue;
                     }
-
                     CartesianPoint p00 = mapper.pointAt(u0, v0);
                     CartesianPoint p10 = mapper.pointAt(u1, v0);
                     CartesianPoint p01 = mapper.pointAt(u0, v1);
@@ -444,7 +391,6 @@ public final class StepMeshExporter {
             }
             return faceIndices.size() > trianglesBefore;
         }
-
         private boolean triangulateSemanticParametricFace(
                 com.minicad.step.model.base.StepFaceEntity stepFace,
                 StepEntity faceGeometry,
@@ -468,7 +414,6 @@ public final class StepMeshExporter {
             int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
             int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
             int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
-
             int trianglesBefore = faceIndices.size();
             for (int ui = 0; ui < uSegments; ui++) {
                 double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
@@ -480,7 +425,6 @@ public final class StepMeshExporter {
                     if (!containsParametricLoops(normalizedLoops, center)) {
                         continue;
                     }
-
                     CartesianPoint p00 = mapper.pointAt(u0, v0);
                     CartesianPoint p10 = mapper.pointAt(u1, v0);
                     CartesianPoint p01 = mapper.pointAt(u0, v1);
@@ -495,7 +439,6 @@ public final class StepMeshExporter {
             }
             return faceIndices.size() > trianglesBefore;
         }
-
         private List<CartesianPoint> extractLoopPoints(Loop loop) {
             if (loop instanceof PolyLoop) {
             PolyLoop poly = (PolyLoop) loop;
@@ -518,7 +461,6 @@ public final class StepMeshExporter {
             }
             return List.of();
         }
-
         private Vector3 computeNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c) {
             Vector3 ab = b.subtract(a);
             Vector3 ac = c.subtract(a);
@@ -529,7 +471,6 @@ public final class StepMeshExporter {
             }
             return n.normalize().asVector();
         }
-
         private void appendOrientedTriangle(
                 CartesianPoint p0,
                 CartesianPoint p1,
@@ -549,7 +490,6 @@ public final class StepMeshExporter {
                 addTriangle(v0, v1, v2);
             }
         }
-
         private List<CartesianPoint> orientSamples(OrientedEdge orientedEdge, List<CartesianPoint> samples) {
             if (samples.isEmpty()) {
                 return List.of(
@@ -573,7 +513,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(oriented);
         }
-
         private ProjectedLoop projectLoop(List<CartesianPoint> points, PlanarFrame frame, boolean outer) {
             List<ProjectedVertex> projected = new ArrayList<>();
             for (CartesianPoint point : points) {
@@ -588,7 +527,6 @@ public final class StepMeshExporter {
             removeCollinear(projected);
             return new ProjectedLoop(projected, outer);
         }
-
         private List<ProjectedVertex> buildSimplePolygon(List<ProjectedLoop> loops) {
             ProjectedLoop outer = loops.stream().filter(ProjectedLoop::outer).findFirst().orElse(null);
             if (outer == null) {
@@ -607,7 +545,6 @@ public final class StepMeshExporter {
             removeCollinear(polygon);
             return polygon;
         }
-
         private List<ProjectedVertex> ensureOrientation(List<ProjectedVertex> vertices, boolean ccw) {
             List<ProjectedVertex> oriented = new ArrayList<>(vertices);
             boolean isCcw = signedArea(oriented) > 0.0;
@@ -616,7 +553,6 @@ public final class StepMeshExporter {
             }
             return oriented;
         }
-
         private List<ProjectedVertex> mergeHole(List<ProjectedVertex> outer, List<ProjectedVertex> hole) {
             if (outer.size() < 3 || hole.size() < 3) {
                 return outer;
@@ -627,7 +563,6 @@ public final class StepMeshExporter {
             if (outerIndex < 0) {
                 return List.of();
             }
-
             List<ProjectedVertex> merged = new ArrayList<>(outer.size() + hole.size() + 2);
             for (int i = 0; i <= outerIndex; i++) {
                 merged.add(outer.get(i));
@@ -643,7 +578,6 @@ public final class StepMeshExporter {
             }
             return merged;
         }
-
         private int findVisibleOuterVertex(
                 List<ProjectedVertex> outer,
                 ProjectedVertex holeVertex,
@@ -667,7 +601,6 @@ public final class StepMeshExporter {
             }
             return bestIndex;
         }
-
         private boolean isVisibleBridge(
                 ProjectedVertex a,
                 ProjectedVertex b,
@@ -703,14 +636,12 @@ public final class StepMeshExporter {
             }
             return true;
         }
-
         private List<int[]> earClip(List<ProjectedVertex> polygon) {
             List<int[]> triangles = new ArrayList<>();
             List<Integer> indices = new ArrayList<>(polygon.size());
             for (int i = 0; i < polygon.size(); i++) {
                 indices.add(i);
             }
-
             int guard = 0;
             while (indices.size() > 3 && guard < polygon.size() * polygon.size()) {
                 boolean clipped = false;
@@ -731,13 +662,11 @@ public final class StepMeshExporter {
                 }
                 guard++;
             }
-
             if (indices.size() == 3) {
                 triangles.add(new int[]{indices.get(0), indices.get(1), indices.get(2)});
             }
             return triangles;
         }
-
         private boolean isEar(
                 int prev,
                 int curr,
@@ -765,7 +694,6 @@ public final class StepMeshExporter {
             }
             return true;
         }
-
         private boolean pointInTriangle(ProjectedVertex p, ProjectedVertex a, ProjectedVertex b, ProjectedVertex c) {
             double c1 = cross(a, b, p);
             double c2 = cross(b, c, p);
@@ -774,7 +702,6 @@ public final class StepMeshExporter {
             boolean hasPositive = c1 > PLANAR_EPS || c2 > PLANAR_EPS || c3 > PLANAR_EPS;
             return !(hasNegative && hasPositive);
         }
-
         private boolean containsPoint(List<ProjectedVertex> polygon, ProjectedVertex point) {
             boolean inside = false;
             for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
@@ -791,7 +718,6 @@ public final class StepMeshExporter {
             }
             return inside;
         }
-
         private boolean segmentsIntersect(ProjectedVertex a, ProjectedVertex b, ProjectedVertex c, ProjectedVertex d) {
             double abC = cross(a, b, c);
             double abD = cross(a, b, d);
@@ -806,7 +732,6 @@ public final class StepMeshExporter {
                     || (Math.abs(cdA) <= PLANAR_EPS && isOnSegment(c, d, a))
                     || (Math.abs(cdB) <= PLANAR_EPS && isOnSegment(c, d, b));
         }
-
         private boolean isOnSegment(ProjectedVertex a, ProjectedVertex b, ProjectedVertex p) {
             if (Math.abs(cross(a, b, p)) > PLANAR_EPS) {
                 return false;
@@ -816,7 +741,6 @@ public final class StepMeshExporter {
                     && p.v() >= Math.min(a.v(), b.v()) - PLANAR_EPS
                     && p.v() <= Math.max(a.v(), b.v()) + PLANAR_EPS;
         }
-
         private int rightmostIndex(List<ProjectedVertex> vertices) {
             int index = 0;
             for (int i = 1; i < vertices.size(); i++) {
@@ -829,7 +753,6 @@ public final class StepMeshExporter {
             }
             return index;
         }
-
         private double signedArea(List<ProjectedVertex> vertices) {
             double area = 0.0;
             for (int i = 0; i < vertices.size(); i++) {
@@ -839,7 +762,6 @@ public final class StepMeshExporter {
             }
             return area * 0.5;
         }
-
         private void removeCollinear(List<ProjectedVertex> vertices) {
             int index = 0;
             while (vertices.size() >= 3 && index < vertices.size()) {
@@ -856,21 +778,17 @@ public final class StepMeshExporter {
                 index++;
             }
         }
-
         private boolean samePoint(ProjectedVertex a, ProjectedVertex b) {
             return Math.abs(a.u() - b.u()) <= PLANAR_EPS && Math.abs(a.v() - b.v()) <= PLANAR_EPS;
         }
-
         private double cross(ProjectedVertex a, ProjectedVertex b, ProjectedVertex c) {
             return (b.u() - a.u()) * (c.v() - a.v()) - (b.v() - a.v()) * (c.u() - a.u());
         }
-
         private double distanceSquared(ProjectedVertex a, ProjectedVertex b) {
             double du = a.u() - b.u();
             double dv = a.v() - b.v();
             return du * du + dv * dv;
         }
-
         private static final class ProjectedVertex {
             private final CartesianPoint point;
             private final double u;
@@ -881,30 +799,17 @@ public final class StepMeshExporter {
                 this.u = u;
                 this.v = v;
             }
-
             CartesianPoint point() { return point; }
             double u() { return u; }
             double v() { return v; }
-
-            @Override
-            public boolean equals(Object o) {
+            @Override public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
                 ProjectedVertex that = (ProjectedVertex) o;
                 return Objects.equals(point, that.point) && Double.compare(u, that.u) == 0 && Double.compare(v, that.v) == 0;
             }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(point, u, v);
-            }
-
-            @Override
-            public String toString() {
-                return "ProjectedVertex{point=" + point + ", u=" + u + ", v=" + v + "}";
-            }
+            @Override public int hashCode() { return Objects.hash(point, u, v); }
         }
-
         private static final class ProjectedLoop {
             private final List<ProjectedVertex> vertices;
             private final boolean outer;
@@ -913,29 +818,16 @@ public final class StepMeshExporter {
                 this.vertices = vertices == null ? null : List.copyOf(vertices);
                 this.outer = outer;
             }
-
             List<ProjectedVertex> vertices() { return vertices; }
             boolean outer() { return outer; }
-
-            @Override
-            public boolean equals(Object o) {
+            @Override public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
                 ProjectedLoop that = (ProjectedLoop) o;
                 return outer == that.outer && Objects.equals(vertices, that.vertices);
             }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(vertices, outer);
-            }
-
-            @Override
-            public String toString() {
-                return "ProjectedLoop{vertices=" + vertices + ", outer=" + outer + "}";
-            }
+            @Override public int hashCode() { return Objects.hash(vertices, outer); }
         }
-
         private static final class UvPoint {
             private final double u;
             private final double v;
@@ -944,29 +836,11 @@ public final class StepMeshExporter {
                 this.u = u;
                 this.v = v;
             }
-
             double u() { return u; }
             double v() { return v; }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                UvPoint that = (UvPoint) o;
-                return Double.compare(u, that.u) == 0 && Double.compare(v, that.v) == 0;
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(u, v);
-            }
-
-            @Override
-            public String toString() {
-                return "UvPoint{u=" + u + ", v=" + v + "}";
-            }
+            @Override public boolean equals(Object o) { return this == o || o != null && getClass() == o.getClass() && Double.compare(u, ((UvPoint) o).u) == 0 && Double.compare(v, ((UvPoint) o).v) == 0; }
+            @Override public int hashCode() { return Objects.hash(u, v); }
         }
-
         private static final class ParametricLoop {
             private final boolean outer;
             private final List<UvPoint> points;
@@ -975,29 +849,16 @@ public final class StepMeshExporter {
                 this.outer = outer;
                 this.points = points == null ? null : List.copyOf(points);
             }
-
             boolean outer() { return outer; }
             List<UvPoint> points() { return points; }
-
-            @Override
-            public boolean equals(Object o) {
+            @Override public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
                 ParametricLoop that = (ParametricLoop) o;
                 return outer == that.outer && Objects.equals(points, that.points);
             }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(outer, points);
-            }
-
-            @Override
-            public String toString() {
-                return "ParametricLoop{outer=" + outer + ", points=" + points + "}";
-            }
+            @Override public int hashCode() { return Objects.hash(outer, points); }
         }
-
         private static class UvBounds {
             private final double minU;
             private final double maxU;
@@ -1010,42 +871,33 @@ public final class StepMeshExporter {
                 this.minV = minV;
                 this.maxV = maxV;
             }
-
             double minU() { return minU; }
             double maxU() { return maxU; }
             double minV() { return minV; }
             double maxV() { return maxV; }
-
             double uSpan() {
                 return maxU - minU;
             }
-
             double vSpan() {
                 return maxV - minV;
             }
         }
-
         @FunctionalInterface
         private interface SurfacePointSampler {
             CartesianPoint pointAt(double u, double v);
         }
-
         private interface ParametricMapper {
             CartesianPoint pointAt(double u, double v);
-
             Vector3 normalAt(double u, double v);
-
             UvPoint project(CartesianPoint point, UvPoint previous);
 
             default Double uPeriod() {
                 return null;
             }
-
             default Double vPeriod() {
                 return null;
             }
         }
-
         private ParametricMapper mapperFor(SurfaceGeometry surface) {
             if (surface instanceof CylindricalSurface) {
             CylindricalSurface cylinder = (CylindricalSurface) surface;
@@ -1054,12 +906,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return cylinder.pointAt(u, v);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return cylinder.normalAt(u);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         Vector3 offset = point.subtract(cylinder.position().location());
@@ -1071,7 +921,6 @@ public final class StepMeshExporter {
                         );
                         return new UvPoint(u, v);
                     }
-
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
@@ -1085,12 +934,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return cone.pointAt(u, v);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return cone.normalAt(u);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         Vector3 offset = point.subtract(cone.position().location());
@@ -1102,7 +949,6 @@ public final class StepMeshExporter {
                         );
                         return new UvPoint(u, v);
                     }
-
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
@@ -1116,12 +962,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return torus.pointAt(u, v);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return torus.normalAt(u, v);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         Vector3 offset = point.subtract(torus.position().location());
@@ -1133,12 +977,10 @@ public final class StepMeshExporter {
                         double v = Math.atan2(localZ, radialDist - torus.majorRadius());
                         return new UvPoint(u, v);
                     }
-
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
                     }
-
                     @Override
                     public Double vPeriod() {
                         return Math.PI * 2.0;
@@ -1152,12 +994,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return sphere.pointAt(u, v);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return sphere.normalAt(u, v);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         Vector3 offset = point.subtract(sphere.position().location());
@@ -1172,7 +1012,6 @@ public final class StepMeshExporter {
                         double v = Math.acos(offset.dot(sphere.position().axis().asVector()) / radial);
                         return new UvPoint(u, v);
                     }
-
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
@@ -1186,12 +1025,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return revolution.pointAt(v, u);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return revolution.normalAt(v, u);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         return approximateUv(point, previous, 96, 64,
@@ -1200,7 +1037,6 @@ public final class StepMeshExporter {
                                 true,
                                 (u, v) -> revolution.pointAt(v, u));
                     }
-
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
@@ -1214,12 +1050,10 @@ public final class StepMeshExporter {
                     public CartesianPoint pointAt(double u, double v) {
                         return extrusion.pointAt(u, v);
                     }
-
                     @Override
                     public Vector3 normalAt(double u, double v) {
                         return extrusion.normalAt(u, v);
                     }
-
                     @Override
                     public UvPoint project(CartesianPoint point, UvPoint previous) {
                         return approximateUv(point, previous, 64, 48,
@@ -1232,7 +1066,6 @@ public final class StepMeshExporter {
             }
             return null;
         }
-
         private UvPoint approximateUv(
                 CartesianPoint point,
                 UvPoint previous,
@@ -1291,17 +1124,13 @@ public final class StepMeshExporter {
             }
             return best;
         }
-
-
         private double clamp(double value, double min, double max) {
             return Math.max(min, Math.min(max, value));
         }
-
         private double wrapPeriodic(double value, double period) {
             double wrapped = value % period;
             return wrapped < 0.0 ? wrapped + period : wrapped;
         }
-
         private double unwrapPeriodic(double value, double reference, double period) {
             double unwrapped = value;
             while (unwrapped - reference > period * 0.5) {
@@ -1312,7 +1141,6 @@ public final class StepMeshExporter {
             }
             return unwrapped;
         }
-
         private List<ParametricLoop> buildParametricLoops(Face face, ParametricMapper mapper) {
             List<ParametricLoop> loops = new ArrayList<>();
             for (FaceBound bound : face.bounds()) {
@@ -1333,7 +1161,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(loops);
         }
-
         private List<UvPoint> reverseLoop(List<UvPoint> points) {
             if (points.isEmpty()) {
                 return points;
@@ -1342,7 +1169,6 @@ public final class StepMeshExporter {
             Collections.reverse(reversed);
             return List.copyOf(reversed);
         }
-
         private List<ParametricLoop> buildSemanticParametricLoops(
                 com.minicad.step.model.base.StepFaceEntity stepFace,
                 StepEntity faceGeometry,
@@ -1384,7 +1210,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(loops);
         }
-
         private List<UvPoint> extractLoopUvPoints(Loop loop, ParametricMapper mapper, SurfaceGeometry surface) {
             if (loop instanceof PolyLoop) {
             PolyLoop polyLoop = (PolyLoop) loop;
@@ -1420,7 +1245,6 @@ public final class StepMeshExporter {
             }
             return List.of();
         }
-
         private List<UvPoint> sampleSemanticOrientedEdge(
                 com.minicad.step.model.topology.StepOrientedEdge orientedEdge,
                 StepEntity faceGeometry,
@@ -1440,7 +1264,6 @@ public final class StepMeshExporter {
             UvPoint projectedEnd = projectedStart == null
                     ? mapper.project(endPoint3d, null)
                     : mapper.project(endPoint3d, projectedStart);
-
             List<UvPoint> best = List.of();
             double bestScore = Double.POSITIVE_INFINITY;
             for (StepEntity pcurve : pcurves) {
@@ -1462,14 +1285,12 @@ public final class StepMeshExporter {
             if (!best.isEmpty()) {
                 return best;
             }
-
             Edge edge = builder.buildEdge(orientedEdge.edgeElement().id());
             List<CartesianPoint> points3d = edge.sample(DEFAULT_CURVE_SEGMENTS);
             if (!orientedEdge.orientation()) {
                 points3d = new ArrayList<>(points3d);
                 Collections.reverse(points3d);
             }
-            
             // No pcurves available - project start/end and interpolate in UV space
             // This is more robust than projecting every point, especially when intermediate
             // 3D points don't lie exactly on the surface
@@ -1480,7 +1301,6 @@ public final class StepMeshExporter {
             if (startUv == null || endUv == null) {
                 return List.of();
             }
-            
             // Linearly interpolate in UV space
             List<UvPoint> uvPoints = new ArrayList<>();
             for (int i = 0; i < points3d.size(); i++) {
@@ -1491,7 +1311,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(uvPoints);
         }
-
         private CartesianPoint mapPointIntoFaceGeometry(
                 CartesianPoint point,
                 StepEntity faceGeometry,
@@ -1532,7 +1351,6 @@ public final class StepMeshExporter {
             }
             return mapped;
         }
-
         private StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
             StepEntity current = edgeGeometry;
             for (int depth = 0; depth < 16; depth++) {
@@ -1552,7 +1370,6 @@ public final class StepMeshExporter {
             }
             return current;
         }
-
         private List<StepEntity> associatedGeometry(StepEntity edgeGeometry) {
             if (edgeGeometry instanceof com.minicad.step.model.geometry.StepSurfaceCurve) {
                 com.minicad.step.model.geometry.StepSurfaceCurve surfaceCurve = (com.minicad.step.model.geometry.StepSurfaceCurve) edgeGeometry;
@@ -1564,7 +1381,6 @@ public final class StepMeshExporter {
             }
             return List.of();
         }
-
         private List<StepEntity> matchingPcurves(List<StepEntity> associatedGeometry, StepEntity faceGeometry) {
             Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
             List<StepEntity> matches = new ArrayList<>();
@@ -1583,7 +1399,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(matches);
         }
-
         private Set<Integer> acceptablePcurveBasisSurfaceIds(StepEntity faceGeometry) {
             LinkedHashSet<Integer> ids = new LinkedHashSet<>();
             StepEntity current = faceGeometry;
@@ -1620,7 +1435,6 @@ public final class StepMeshExporter {
             }
             return Set.copyOf(ids);
         }
-
         private CartesianPoint pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint point) {
             return new CartesianPoint(
                     point.coordinates().get(0),
@@ -1628,7 +1442,6 @@ public final class StepMeshExporter {
                     point.coordinates().get(2)
             );
         }
-
         private StepEntity semanticFaceGeometry(com.minicad.step.model.base.StepFaceEntity stepFace) {
             if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace) {
                 com.minicad.step.model.topology.StepAdvancedFace advancedFace = (com.minicad.step.model.topology.StepAdvancedFace) stepFace;
@@ -1644,7 +1457,6 @@ public final class StepMeshExporter {
             }
             throw new IllegalArgumentException("unsupported face subtype");
         }
-
         private boolean semanticFaceSameSense(com.minicad.step.model.base.StepFaceEntity stepFace) {
             if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace) {
                 com.minicad.step.model.topology.StepAdvancedFace advancedFace = (com.minicad.step.model.topology.StepAdvancedFace) stepFace;
@@ -1661,7 +1473,6 @@ public final class StepMeshExporter {
             }
             throw new IllegalArgumentException("unsupported face subtype");
         }
-
         private SurfaceGeometry buildSemanticSurfaceGeometry(StepEntity geometry, StepCadBuilder builder) {
             if (geometry instanceof com.minicad.step.model.geometry.StepPlane) {
                 com.minicad.step.model.geometry.StepPlane plane = (com.minicad.step.model.geometry.StepPlane) geometry;
@@ -1752,7 +1563,6 @@ public final class StepMeshExporter {
             }
             return null;
         }
-
         private SurfaceGeometry offsetSemanticSurfaceGeometry(SurfaceGeometry base, double distance) {
             if (base == null) {
                 return null;
@@ -1788,7 +1598,6 @@ public final class StepMeshExporter {
             }
             return null;
         }
-
         private ConicalSurface offsetConicalSurface(ConicalSurface conicalSurface, double distance) {
             double semiAngle = conicalSurface.semiAngle();
             double radialOffset = distance * Math.cos(semiAngle);
@@ -1802,7 +1611,6 @@ public final class StepMeshExporter {
                     conicalSurface.radius() + radialOffset,
                     semiAngle);
         }
-
         private SurfaceGeometry transformSemanticSurfaceGeometry(
                 SurfaceGeometry surface,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -1867,7 +1675,6 @@ public final class StepMeshExporter {
             }
             return null;
         }
-
         private Curve3 transformSemanticCurve3(
                 Curve3 curve,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -1955,7 +1762,6 @@ public final class StepMeshExporter {
             }
             return null;
         }
-
         private Axis2Placement3D transformPlacement(
                 Axis2Placement3D placement,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -1966,7 +1772,6 @@ public final class StepMeshExporter {
                     transformDirection3(placement.axis(), transformation, builder),
                     transformDirection3(placement.refDirection(), transformation, builder));
         }
-
         private CartesianPoint transformPoint3(
                 CartesianPoint point,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -1981,7 +1786,6 @@ public final class StepMeshExporter {
                     .add(basisZ.scale(point.z() * scale));
             return builder.buildPoint(transformation.localOrigin().id()).add(offset);
         }
-
         private Direction3 transformDirection3(
                 Direction3 direction,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -1996,7 +1800,6 @@ public final class StepMeshExporter {
                             .add(basisY.scale(source.y()))
                             .add(basisZ.scale(source.z())));
         }
-
         private Vector3 transformVector3(
                 Vector3 vector,
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
@@ -2010,7 +1813,6 @@ public final class StepMeshExporter {
                     .add(basisY.scale(vector.y() * scale))
                     .add(basisZ.scale(vector.z() * scale));
         }
-
         private Vector3 transformAxis1_3(
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 StepCadBuilder builder
@@ -2019,7 +1821,6 @@ public final class StepMeshExporter {
                     ? new Vector3(1.0, 0.0, 0.0)
                     : builder.buildDirection(transformation.axis1().id()).asVector();
         }
-
         private Vector3 transformAxis2OrDefault3(
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 Vector3 axis1,
@@ -2031,7 +1832,6 @@ public final class StepMeshExporter {
             Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
             return axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
         }
-
         private Vector3 transformAxis3OrDefault3(
                 com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
                 Vector3 axis1,
@@ -2044,11 +1844,9 @@ public final class StepMeshExporter {
             Vector3 cross = axis1.cross(axis2);
             return cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
         }
-
         private double transformationScale(com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation) {
             return transformation.scale() == null ? 1.0 : transformation.scale();
         }
-
         private List<UvPoint> extractEdgeUvPoints(OrientedEdge orientedEdge, ParametricMapper mapper, SurfaceGeometry surface) {
             List<UvPoint> pcurvePoints = extractSurfaceCurveUvPoints(orientedEdge, mapper, surface);
             if (!pcurvePoints.isEmpty()) {
@@ -2067,7 +1865,6 @@ public final class StepMeshExporter {
             }
             return uvPoints;
         }
-
         private List<UvPoint> extractSurfaceCurveUvPoints(OrientedEdge orientedEdge, ParametricMapper mapper, SurfaceGeometry surface) {
             Curve3 curve = orientedEdge.edge().curve();
             if (!(curve instanceof SurfaceCurve3)) {
@@ -2102,7 +1899,6 @@ public final class StepMeshExporter {
             }
             return best;
         }
-
         private List<SurfaceCurve3.ParametricCurve> matchingParametricCurves(SurfaceCurve3 surfaceCurve, SurfaceGeometry surface) {
             List<SurfaceCurve3.ParametricCurve> matches = new ArrayList<>();
             for (SurfaceCurve3.ParametricCurve binding : surfaceCurve.parametricCurves()) {
@@ -2112,7 +1908,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(matches);
         }
-
         private List<UvPoint> orientUvSamples(OrientedEdge orientedEdge, List<UvPoint> samples, ParametricMapper mapper) {
             if (samples.isEmpty()) {
                 return List.of();
@@ -2141,7 +1936,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(oriented);
         }
-
         private UvPoint alignToReference(UvPoint point, UvPoint reference, ParametricMapper mapper) {
             if (point == null || reference == null) {
                 return point;
@@ -2168,7 +1962,6 @@ public final class StepMeshExporter {
             }
             return new UvPoint(u, v);
         }
-
         private double uvDistance(UvPoint a, UvPoint b) {
             if (a == null || b == null) {
                 return Double.POSITIVE_INFINITY;
@@ -2177,12 +1970,10 @@ public final class StepMeshExporter {
             double dv = a.v() - b.v();
             return du * du + dv * dv;
         }
-
         private UvPoint snapToLine(UvPoint point, Line2 line) {
             Point2 snapped = line.closestPoint(new Point2(point.u(), point.v()));
             return new UvPoint(snapped.x(), snapped.y());
         }
-
         private UvPoint snapToCircle(UvPoint point, Circle2 circle) {
             com.minicad.geometry2d.Vector2 offset = new Point2(point.u(), point.v()).subtract(circle.center());
             double norm = offset.norm();
@@ -2193,13 +1984,11 @@ public final class StepMeshExporter {
             Point2 snapped = circle.center().add(offset.scale(circle.radius() / norm));
             return new UvPoint(snapped.x(), snapped.y());
         }
-
         private UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
             double angle = ellipse.angleOf(ellipse.pointAt(ellipse.angleOf(snapEllipseSeed(point, ellipse))));
             Point2 snapped = ellipse.pointAt(angle);
             return new UvPoint(snapped.x(), snapped.y());
         }
-
         private Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
             com.minicad.geometry2d.Vector2 offset = new Point2(point.u(), point.v()).subtract(ellipse.center());
             if (offset.norm() <= PLANAR_EPS) {
@@ -2216,7 +2005,6 @@ public final class StepMeshExporter {
             double angle = Math.atan2(ny / norm, nx / norm);
             return ellipse.pointAt(angle);
         }
-
         private List<UvPoint> sampleCurve2(Curve2 curve, UvPoint start, UvPoint end) {
             if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
@@ -2240,7 +2028,6 @@ public final class StepMeshExporter {
             }
             return List.of();
         }
-
         private List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
             Point2 startPoint = new Point2(start.u(), start.v());
             Point2 endPoint = new Point2(end.u(), end.v());
@@ -2257,7 +2044,6 @@ public final class StepMeshExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-
         private List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint start, UvPoint end) {
             List<Point2> sampled = spline.sample(48);
             if (sampled.size() < 2) {
@@ -2278,7 +2064,6 @@ public final class StepMeshExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-
         private int closestPointIndex(List<Point2> points, UvPoint target) {
             int bestIndex = 0;
             double bestDistance = Double.POSITIVE_INFINITY;
@@ -2294,7 +2079,6 @@ public final class StepMeshExporter {
             }
             return bestIndex;
         }
-
         private List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
             Point2 startPoint = new Point2(start.u(), start.v());
             Point2 endPoint = new Point2(end.u(), end.v());
@@ -2317,7 +2101,6 @@ public final class StepMeshExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-
         private List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
             Point2 startPoint = new Point2(start.u(), start.v());
             Point2 endPoint = new Point2(end.u(), end.v());
@@ -2340,7 +2123,6 @@ public final class StepMeshExporter {
             points.set(points.size() - 1, end);
             return List.copyOf(points);
         }
-
         private List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint start, UvPoint end) {
             UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());
             UvPoint trimEnd = new UvPoint(trimmed.trimEnd().x(), trimmed.trimEnd().y());
@@ -2357,14 +2139,12 @@ public final class StepMeshExporter {
             }
             return alignTrimmedSamples(preferred, start, end);
         }
-
         private double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
             if (samples.isEmpty()) {
                 return Double.POSITIVE_INFINITY;
             }
             return uvDistance(start, samples.get(0)) + uvDistance(end, samples.get(samples.size() - 1));
         }
-
         private List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint start, UvPoint end) {
             if (samples.isEmpty()) {
                 return samples;
@@ -2379,7 +2159,6 @@ public final class StepMeshExporter {
             aligned.set(aligned.size() - 1, end);
             return List.copyOf(aligned);
         }
-
         private List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricMapper mapper) {
             if (points.size() < 2) {
                 return points;
@@ -2415,7 +2194,6 @@ public final class StepMeshExporter {
             }
             return normalized;
         }
-
         private List<ParametricLoop> normalizeLoopRoles(List<ParametricLoop> loops) {
             if (loops.stream().anyMatch(ParametricLoop::outer)) {
                 return loops;
@@ -2438,7 +2216,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(normalized);
         }
-
         private List<ParametricLoop> normalizeLoopPeriods(List<ParametricLoop> loops, ParametricMapper mapper) {
             if (loops.isEmpty()) {
                 return loops;
@@ -2491,7 +2268,6 @@ public final class StepMeshExporter {
             }
             return List.copyOf(normalized);
         }
-
         private UvPoint centroidUv(List<UvPoint> points) {
             if (points.isEmpty()) {
                 return new UvPoint(0.0, 0.0);
@@ -2511,7 +2287,6 @@ public final class StepMeshExporter {
             }
             return new UvPoint(sumU / count, sumV / count);
         }
-
         private UvBounds boundsOf(List<ParametricLoop> loops) {
             double minU = Double.POSITIVE_INFINITY;
             double maxU = Double.NEGATIVE_INFINITY;
@@ -2529,7 +2304,6 @@ public final class StepMeshExporter {
             }
             return found ? new UvBounds(minU, maxU, minV, maxV) : null;
         }
-
         private boolean containsParametricLoops(List<ParametricLoop> loops, UvPoint point) {
             ParametricLoop outer = loops.stream().filter(ParametricLoop::outer).findFirst().orElse(null);
             if (outer == null) {
@@ -2549,7 +2323,7 @@ public final class StepMeshExporter {
                     UvBounds holeBox = loopBoundingBox(hole);
                     if (point.u() < holeBox.minU() || point.u() > holeBox.maxU()
                             || point.v() < holeBox.minV() || point.v() > holeBox.maxV()) {
-                        continue; // point outside hole bbox → cannot be inside hole
+                        continue; // point outside hole bbox - cannot be inside hole
                     }
                     if (containsUvPolygon(hole.points(), point)) {
                         return false;
@@ -2558,7 +2332,6 @@ public final class StepMeshExporter {
             }
             return true;
         }
-
         private UvBounds loopBoundingBox(ParametricLoop loop) {
             double minU = Double.POSITIVE_INFINITY;
             double maxU = Double.NEGATIVE_INFINITY;
@@ -2574,7 +2347,6 @@ public final class StepMeshExporter {
             }
             return new UvBounds(minU, maxU, minV, maxV);
         }
-
         private boolean containsUvPolygon(List<UvPoint> polygon, UvPoint point) {
             if (polygon.size() < 3) {
                 return false;
@@ -2594,7 +2366,6 @@ public final class StepMeshExporter {
             }
             return inside;
         }
-
         private boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
             for (int i = 0; i + 1 < polygon.size(); i++) {
                 if (isOnSegment(polygon.get(i), polygon.get(i + 1), point)) {
@@ -2603,7 +2374,6 @@ public final class StepMeshExporter {
             }
             return false;
         }
-
         private boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
             double abU = b.u() - a.u();
             double abV = b.v() - a.v();
@@ -2623,17 +2393,14 @@ public final class StepMeshExporter {
             }
             return dot <= lengthSquared + 1.0e-9;
         }
-
         private boolean sameUv(UvPoint left, UvPoint right) {
             return distanceSquared(left, right) <= 1.0e-12;
         }
-
         private double distanceSquared(UvPoint left, UvPoint right) {
             double du = left.u() - right.u();
             double dv = left.v() - right.v();
             return du * du + dv * dv;
         }
-
         private double signedAreaUv(List<UvPoint> points) {
             if (points.size() < 3) {
                 return 0.0;
@@ -2646,11 +2413,9 @@ public final class StepMeshExporter {
             }
             return area * 0.5;
         }
-
         private double triangleArea(CartesianPoint a, CartesianPoint b, CartesianPoint c) {
             return b.subtract(a).cross(c.subtract(a)).norm() * 0.5;
         }
-
         private static class PlanarFrame {
             private final CartesianPoint origin;
             private final Vector3 xAxis;
@@ -2661,11 +2426,9 @@ public final class StepMeshExporter {
                 this.xAxis = xAxis;
                 this.yAxis = yAxis;
             }
-
             CartesianPoint origin() { return origin; }
             Vector3 xAxis() { return xAxis; }
             Vector3 yAxis() { return yAxis; }
-
             static PlanarFrame forPlane(Plane plane) {
                 Vector3 normal = plane.normal().asVector();
                 Vector3 xSeed = Math.abs(normal.x()) < 0.9 ? new Vector3(1, 0, 0) : new Vector3(0, 1, 0);
@@ -2673,13 +2436,11 @@ public final class StepMeshExporter {
                 Vector3 yAxis = normal.cross(xAxis).normalize().asVector();
                 return new PlanarFrame(plane.origin(), xAxis, yAxis);
             }
-
             ProjectedVertex project(CartesianPoint point) {
                 Vector3 offset = point.subtract(origin);
                 return new ProjectedVertex(point, offset.dot(xAxis), offset.dot(yAxis));
             }
         }
-
         MeshData toMeshData() {
             List<double[]> v = new ArrayList<>(vertexIndex.size());
             List<double[]> n = new ArrayList<>(vertexIndex.size());
@@ -2696,50 +2457,31 @@ public final class StepMeshExporter {
         }
     }
 
-
     public static final class MeshData {
-    private final List<double[]> vertices;
-    private final List<double[]> normals;
-    private final List<int[]> triangles;
+        private final List<double[]> vertices;
+        private final List<double[]> normals;
+        private final List<int[]> triangles;
 
-    public MeshData(List<double[]> vertices, List<double[]> normals, List<int[]> triangles) {
-        this.vertices = vertices == null ? null : java.util.List.copyOf(vertices);
-        this.normals = normals == null ? null : java.util.List.copyOf(normals);
-        this.triangles = triangles == null ? null : java.util.List.copyOf(triangles);
+        public MeshData(List<double[]> vertices, List<double[]> normals, List<int[]> triangles) {
+            this.vertices = vertices == null ? null : java.util.List.copyOf(vertices);
+            this.normals = normals == null ? null : java.util.List.copyOf(normals);
+            this.triangles = triangles == null ? null : java.util.List.copyOf(triangles);
+        }
+        public List<double[]> getVertices() { return vertices; }
+        public List<double[]> getNormals() { return normals; }
+        public List<int[]> getTriangles() { return triangles; }
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            MeshData that = (MeshData) o;
+            return Objects.equals(vertices, that.vertices) && Objects.equals(normals, that.normals) && Objects.equals(triangles, that.triangles);
+        }
+        @Override public int hashCode() { return Objects.hash(vertices, normals, triangles); }
+        @Override
+        public String toString() {
+            return "MeshData{" + "vertices=" + vertices + "normals=" + normals + "triangles=" + triangles + "}";
+        }
     }
-
-    public List<double[]> getVertices() {
-        return vertices;
-    }
-
-    public List<double[]> getNormals() {
-        return normals;
-    }
-
-    public List<int[]> getTriangles() {
-        return triangles;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MeshData that = (MeshData) o;
-        return Objects.equals(vertices, that.vertices) && Objects.equals(normals, that.normals) && Objects.equals(triangles, that.triangles);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(vertices, normals, triangles);
-    }
-
-    @Override
-    public String toString() {
-        return "MeshData{" + "vertices=" + vertices + "normals=" + normals + "triangles=" + triangles + "}";
-    }
-}
-
-    // ── OBJ Format ────────────────────────────────────────────────────────────
 
     private static String formatObj(MeshData mesh) {
         int vCount = mesh.getVertices().size();
@@ -2756,14 +2498,12 @@ public final class StepMeshExporter {
             append6(sb, v[1]); sb.append(' ');
             append6(sb, v[2]); sb.append('\n');
         }
-
         for (double[] n : mesh.getNormals()) {
             sb.append("vn ");
             append6(sb, n[0]); sb.append(' ');
             append6(sb, n[1]); sb.append(' ');
             append6(sb, n[2]); sb.append('\n');
         }
-
         for (int[] tri : mesh.getTriangles()) {
             int v0 = tri[0] + 1;
             int v1 = tri[1] + 1;
@@ -2772,20 +2512,14 @@ public final class StepMeshExporter {
                     .append(v1).append("//").append(v1).append(' ')
                     .append(v2).append("//").append(v2).append('\n');
         }
-
         return sb.toString();
     }
-
-    // ── STL Binary Format ────────────────────────────────────────────────────
-
     private static byte[] formatStlBinary(MeshData mesh) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.writeBytes(new byte[80]);
-
         ByteBuffer bb = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(mesh.getTriangles().size());
         baos.writeBytes(bb.array());
-
         bb = ByteBuffer.allocate(50).order(ByteOrder.LITTLE_ENDIAN);
         for (int[] tri : mesh.getTriangles()) {
             double[] n = mesh.getNormals().get(tri[0]);
@@ -2799,17 +2533,12 @@ public final class StepMeshExporter {
                 bb.putFloat((float) v[1]);
                 bb.putFloat((float) v[2]);
             }
-
             bb.putShort((short) 0);
             baos.writeBytes(bb.array());
             bb.clear();
         }
-
         return baos.toByteArray();
     }
-
-    // ── STL Text Format ──────────────────────────────────────────────────────
-
     private static String formatStlText(MeshData mesh) {
         StringBuilder sb = new StringBuilder();
         sb.append("solid MiniCAD\n");
@@ -2831,11 +2560,9 @@ public final class StepMeshExporter {
             sb.append("    endloop\n");
             sb.append("  endfacet\n");
         }
-
         sb.append("endsolid MiniCAD\n");
         return sb.toString();
     }
-
     /** Fast double-to-string with 6 decimal places, avoiding String.format overhead. */
     private static void append6(StringBuilder sb, double d) {
         // Handle sign

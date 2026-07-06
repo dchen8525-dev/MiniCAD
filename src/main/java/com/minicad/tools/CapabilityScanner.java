@@ -161,7 +161,7 @@ public class CapabilityScanner {
         }
 
         // Look for resolve methods in StepEntityResolver
-        File resolverFile = Paths.get(semanticPath, "StepEntityResolver.java").toFile();
+        File resolverFile = semanticPath.resolve("StepEntityResolver.java").toFile();
         if (resolverFile.exists()) {
             Pattern resolveMethodPattern = Pattern.compile(
                     "private static StepEntity resolve([A-Z][a-zA-Z]+)\\s*\\("
@@ -188,7 +188,7 @@ public class CapabilityScanner {
         }
 
         // Look for build methods in StepCadBuilder
-        File builderFile = Paths.get(semanticPath, "StepCadBuilder.java").toFile();
+        File builderFile = semanticPath.resolve("StepCadBuilder.java").toFile();
         if (builderFile.exists()) {
             Pattern buildMethodPattern = Pattern.compile(
                     "private static ([A-Z][a-zA-Z]+) build([A-Z][a-zA-Z]+)\\s*\\("
