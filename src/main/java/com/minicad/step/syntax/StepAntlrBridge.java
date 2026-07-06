@@ -38,6 +38,9 @@ public final class StepAntlrBridge {
             throw new StepParseException("STEP text must not be null or blank");
         }
 
+        // Pre-parse validation for unterminated constructs (Phase 5)
+        validateUnterminatedConstructs(stepText);
+
         // Create ANTLR4 lexer and parser
         CharStream input = CharStreams.fromString(stepText);
         StepAntlrLexer lexer = new StepAntlrLexer(input);
@@ -47,7 +50,7 @@ public final class StepAntlrBridge {
         // Add custom error listener with position tracking
         lexer.removeErrorListeners();
         parser.removeErrorListeners();
-        StepPositionErrorListener errorListener = new StepPositionErrorListener(input);
+        StepPositionErrorListener errorListener = new StepPositionErrorListener(stepText);
         lexer.addErrorListener(errorListener);
         parser.addErrorListener(errorListener);
 
@@ -66,6 +69,51 @@ public final class StepAntlrBridge {
             throw e;
         } catch (Exception e) {
             throw new StepParseException("conversion error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Phase 5: Pre-parse validation for unterminated constructs.
+     * ANTLR4 lexer is more tolerant, so we check manually.
+     */
+    private static void validateUnterminatedConstructs(String text) {
+        // Check for unterminated strings
+        boolean inString = false;
+        boolean inComment = false;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+
+            if (!inComment && ch == '\'') {
+                if (i + 1 < text.length() && text.charAt(i + 1) == '\'') {
+                    // Doubled quote, skip both
+                    i += 1;
+                } else {
+                    inString = !inString;
+                }
+            }
+
+            if (!inString && text.startsWith("/*", i)) {
+                inComment = true;
+                i += 1; // Skip /*
+            }
+
+            if (inComment && text.startsWith("*/", i)) {
+                inComment = false;
+                i += 1; // Skip */
+            }
+
+            // Check for lone backslash at end of string
+            if (inString && ch == '\\' && i == text.length() - 1) {
+                throw new StepParseException("lone backslash at end of string");
+            }
+        }
+
+        if (inString) {
+            throw new StepParseException("unterminated string at position " + (text.length() - 1));
+        }
+
+        if (inComment) {
+            throw new StepParseException("unterminated comment at position " + (text.length() - 1));
         }
     }
 
@@ -460,37 +508,42 @@ public final class StepAntlrBridge {
      * Custom error listener with position tracking.
      */
     private static final class StepPositionErrorListener extends BaseErrorListener {
-        private final CharStream input;
+        private final String sourceText;
+        private final List<Integer> lineStartPositions;
         private final List<String> errors = new ArrayList<>();
 
-        public StepPositionErrorListener(CharStream input) {
-            this.input = input;
+        public StepPositionErrorListener(String sourceText) {
+            this.sourceText = sourceText;
+            this.lineStartPositions = calculateLineStartPositions(sourceText);
+        }
+
+        private List<Integer> calculateLineStartPositions(String text) {
+            List<Integer> positions = new ArrayList<>();
+            positions.add(0); // First line starts at 0
+            for (int i = 0; i < text.length(); i++) {
+                if (text.charAt(i) == '\n' && i + 1 < text.length()) {
+                    positions.add(i + 1);
+                }
+            }
+            return positions;
         }
 
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                                 int line, int charPositionInLine,
                                 String msg, RecognitionException e) {
-            // Calculate overall position in file
-            int position = calculatePosition(line, charPositionInLine);
+            // Calculate exact position in file
+            int position = calculateExactPosition(line, charPositionInLine);
             String error = formatError(msg, position);
             errors.add(error);
         }
 
-        private int calculatePosition(int line, int charPositionInLine) {
-            // ANTLR4 provides line/column, but tests expect overall position
-            // For now, estimate position from line number
-            // More accurate would require tracking line start positions
-            try {
-                int lineStart = 0;
-                int currentLine = 1;
-                String sourceName = input.getSourceName();
-
-                // Simple estimation: assume ~50 chars per line (average STEP line)
-                return (line - 1) * 50 + charPositionInLine;
-            } catch (Exception e) {
+        private int calculateExactPosition(int line, int charPositionInLine) {
+            // Use line start positions for exact calculation
+            if (line <= 0 || line > lineStartPositions.size()) {
                 return charPositionInLine; // Fallback
             }
+            return lineStartPositions.get(line - 1) + charPositionInLine;
         }
 
         private String formatError(String msg, int position) {
