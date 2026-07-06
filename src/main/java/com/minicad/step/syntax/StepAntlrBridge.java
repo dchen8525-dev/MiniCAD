@@ -547,9 +547,9 @@ public final class StepAntlrBridge {
         }
 
         private String formatError(String msg, int position) {
-            // Format error messages to match hand-written parser expectations
+            // Phase 6: Comprehensive error message format alignment
 
-            // Handle unterminated constructs
+            // Handle unterminated constructs with exact position
             if (msg.contains("unterminated string")) {
                 return "unterminated string at position " + position;
             }
@@ -557,43 +557,82 @@ public final class StepAntlrBridge {
                 return "unterminated comment at position " + position;
             }
 
-            // Handle missing ENDSEC errors
-            if (msg.contains("extraneous input '<EOF>'") || msg.contains("missing ENDSEC")) {
+            // Handle missing ENDSEC errors exactly
+            if (msg.contains("extraneous input '<EOF>'") || msg.contains("expecting 'ENDSEC;'")) {
+                return "missing ENDSEC for DATA section";
+            }
+            if (msg.contains("missing ENDSEC")) {
                 return "missing ENDSEC for DATA section";
             }
 
             // Handle missing semicolon
-            if (msg.contains("missing ';'") || msg.contains("missing SEMICOLON")) {
+            if (msg.contains("missing ';'") || msg.contains("missing SEMICOLON") ||
+                msg.contains("expecting ';'")) {
                 return "missing semicolon after entity instance";
             }
 
-            // Handle unexpected characters
+            // Handle unexpected characters with position
             if (msg.contains("unexpected character")) {
-                if (msg.contains("at position")) {
-                    return msg; // Already has position
+                if (!msg.contains("position")) {
+                    // Extract character from message if possible
+                    return msg + " at position " + position;
                 }
-                return "unexpected character at position " + position;
+                return msg;
             }
 
-            // Handle unterminated complex entities
+            // Handle invalid characters
+            if (msg.contains("mismatched input") && msg.contains("expecting")) {
+                // Check for specific invalid character patterns
+                if (msg.contains("]") ) {
+                    return "unexpected character ']' at position " + position;
+                }
+                return msg; // Keep ANTLR4 format for other cases
+            }
+
+            // Handle unterminated complex entities with opening position
             if (msg.contains("extraneous input 'ENDSEC;' expecting {')', TYPE_NAME}")) {
                 return "unterminated complex entity at position " + position;
             }
 
-            // Handle exponent without digits
-            if (msg.contains("E") && (msg.contains("expecting") || msg.contains("mismatched"))) {
+            // Handle exponent format errors
+            if (msg.contains("E") && msg.contains("expecting") && msg.contains("digits")) {
                 return "exponent must have digits at position " + position;
             }
 
-            // Default: include position for numeric/validation errors
-            if (msg.contains("non-finite") || msg.contains("too large") || msg.contains("out of range")) {
+            // Handle enumeration errors
+            if (msg.contains("empty enumeration")) {
+                return msg;
+            }
+            if (msg.contains("unterminated enumeration")) {
+                return "unterminated enumeration at position " + position;
+            }
+
+            // Handle numeric validation errors with position
+            if (msg.contains("non-finite") || msg.contains("too large") ||
+                msg.contains("out of range") || msg.contains("invalid")) {
                 if (!msg.contains("position")) {
                     return msg + " at position " + position;
                 }
                 return msg;
             }
 
-            // Keep ANTLR4 format for other cases
+            // Handle entity ID errors with position
+            if (msg.contains("entity id")) {
+                if (!msg.contains("position")) {
+                    return msg + " at position " + position;
+                }
+                return msg;
+            }
+
+            // Handle DATA section errors
+            if (msg.contains("multiple DATA sections")) {
+                return msg;
+            }
+            if (msg.contains("DATA section required")) {
+                return msg;
+            }
+
+            // Default: keep original message
             return msg;
         }
 
