@@ -628,6 +628,10 @@ public final class StepAntlrBridge {
 
             // Handle invalid characters
             if (msg.contains("mismatched input") && msg.contains("expecting")) {
+                // Check for multiple DATA sections
+                if (msg.contains("DATA;") && (msg.contains("<EOF>") || msg.contains("END-ISO-10303-21"))) {
+                    return "multiple DATA sections are not supported";
+                }
                 // Check for specific invalid character patterns
                 if (msg.contains("]") ) {
                     return "unexpected character ']' at position " + position;
