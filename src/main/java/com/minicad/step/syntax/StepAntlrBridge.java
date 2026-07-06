@@ -35,10 +35,10 @@ public final class StepAntlrBridge {
      */
     public static StepFile parse(String stepText) {
         if (stepText == null) {
-            throw new StepParseException("STEP text must not be null");
+            throw new StepParseException("STEP text must not be null or blank");
         }
         if (stepText.isBlank()) {
-            throw new StepParseException("STEP text must not be blank");
+            throw new StepParseException("STEP text must not be null or blank");
         }
 
         // Pre-parse validation for unterminated constructs (Phase 5)
