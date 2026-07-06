@@ -181,17 +181,24 @@ public final class StepAntlrBridge {
 
     private static StepEntityInstance convertEntityInstance(StepAntlrParser.EntityInstanceContext ctx) {
         int id = extractEntityId(ctx.entityId());
-        String type = extractEntityTypeName(ctx);
 
-        List<StepValue> parameters = new ArrayList<>();
         if (ctx.simpleEntity() != null) {
-            parameters = convertSimpleEntityParameters(ctx.simpleEntity());
+            // Simple entity: single definition
+            String type = ctx.simpleEntity().typeName().getText();
+            List<StepValue> parameters = convertSimpleEntityParameters(ctx.simpleEntity());
+            return new StepEntityInstance(id, type, parameters);
         } else if (ctx.complexEntity() != null) {
-            // Complex entities: handle multiple subtypes
-            parameters = convertComplexEntityParameters(ctx.complexEntity());
+            // Complex entity: multiple definitions (each subtype is one definition)
+            List<StepEntityDefinition> definitions = new ArrayList<>();
+            for (StepAntlrParser.SimpleEntityContext simpleCtx : ctx.complexEntity().simpleEntity()) {
+                String subtypeName = simpleCtx.typeName().getText();
+                List<StepValue> subtypeParams = convertSimpleEntityParameters(simpleCtx);
+                definitions.add(new StepEntityDefinition(subtypeName, subtypeParams));
+            }
+            return new StepEntityInstance(id, definitions);
         }
 
-        return new StepEntityInstance(id, type, parameters);
+        throw new StepParseException("entity instance must have simpleEntity or complexEntity");
     }
 
     private static String extractEntityTypeName(StepAntlrParser.EntityInstanceContext ctx) {
