@@ -1,0 +1,370 @@
+package com.minicad.step.syntax;
+
+import com.minicad.common.StepParseException;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Bridge layer: converts ANTLR4 ParseTree to existing StepFile model.
+ *
+ * This class maintains compatibility with the existing StepFile, StepEntityInstance,
+ * StepValue hierarchy while using ANTLR4-generated parser underneath.
+ */
+public final class StepAntlrBridge {
+
+    private StepAntlrBridge() {
+    }
+
+    /**
+     * Parse STEP text and convert to StepFile model.
+     *
+     * @param stepText STEP physical file content
+     * @return StepFile model with header entries and entity instances
+     * @throws StepParseException if parsing fails
+     */
+    public static StepFile parse(String stepText) {
+        if (stepText == null || stepText.isBlank()) {
+            throw new StepParseException("STEP text must not be null or blank");
+        }
+
+        // Create ANTLR4 lexer and parser
+        CharStream input = CharStreams.fromString(stepText);
+        StepAntlrLexer lexer = new StepAntlrLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        StepAntlrParser parser = new StepAntlrParser(tokens);
+
+        // Add custom error listener for better error messages
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+        StepErrorListener errorListener = new StepErrorListener();
+        lexer.addErrorListener(errorListener);
+        parser.addErrorListener(errorListener);
+
+        // Parse STEP file
+        StepAntlrParser.StepFileContext tree = parser.stepFile();
+
+        // Check for errors
+        if (errorListener.hasErrors()) {
+            throw new StepParseException(errorListener.getFirstError());
+        }
+
+        // Convert ParseTree to StepFile model
+        return convertStepFile(tree);
+    }
+
+    private static StepFile convertStepFile(StepAntlrParser.StepFileContext ctx) {
+        List<StepHeaderEntry> headerEntries = new ArrayList<>();
+        List<StepEntityInstance> entities = new ArrayList<>();
+
+        // Convert header section
+        if (ctx.headerSection() != null) {
+            for (StepAntlrParser.HeaderEntryContext entryCtx : ctx.headerSection().headerEntry()) {
+                headerEntries.add(convertHeaderEntry(entryCtx));
+            }
+        }
+
+        // Convert data section
+        if (ctx.dataSection() != null) {
+            for (StepAntlrParser.EntityInstanceContext entityCtx : ctx.dataSection().entityInstance()) {
+                entities.add(convertEntityInstance(entityCtx));
+            }
+        }
+
+        return new StepFile(headerEntries, entities);
+    }
+
+    private static StepHeaderEntry convertHeaderEntry(StepAntlrParser.HeaderEntryContext ctx) {
+        // HEADER entries are TYPE_NAME(parameters) format
+        String name = ctx.typeName().getText();
+        List<StepValue> parameters = new ArrayList<>();
+        
+        if (ctx.parameterList() != null) {
+            parameters = convertParameterList(ctx.parameterList().parameter());
+        }
+
+        return new StepHeaderEntry(name, parameters);
+    }
+
+    private static StepEntityInstance convertEntityInstance(StepAntlrParser.EntityInstanceContext ctx) {
+        int id = extractEntityId(ctx.entityId());
+        String type = extractEntityTypeName(ctx);
+
+        List<StepValue> parameters = new ArrayList<>();
+        if (ctx.simpleEntity() != null) {
+            parameters = convertSimpleEntityParameters(ctx.simpleEntity());
+        } else if (ctx.complexEntity() != null) {
+            // Complex entities: handle multiple subtypes
+            parameters = convertComplexEntityParameters(ctx.complexEntity());
+        }
+
+        return new StepEntityInstance(id, type, parameters);
+    }
+
+    private static String extractEntityTypeName(StepAntlrParser.EntityInstanceContext ctx) {
+        if (ctx.simpleEntity() != null) {
+            return ctx.simpleEntity().typeName().getText();
+        } else if (ctx.complexEntity() != null) {
+            // Complex entity: concatenate type names
+            StringBuilder sb = new StringBuilder();
+            for (StepAntlrParser.SimpleEntityContext simpleCtx : ctx.complexEntity().simpleEntity()) {
+                if (sb.length() > 0) {
+                    sb.append("+");
+                }
+                sb.append(simpleCtx.typeName().getText());
+            }
+            return sb.toString();
+        }
+        return "UNKNOWN";
+    }
+
+    private static List<StepValue> convertSimpleEntityParameters(StepAntlrParser.SimpleEntityContext ctx) {
+        if (ctx.parameterList() == null) {
+            return List.of();
+        }
+        return convertParameterList(ctx.parameterList().parameter());
+    }
+
+    private static List<StepValue> convertComplexEntityParameters(StepAntlrParser.ComplexEntityContext ctx) {
+        // Complex entities: merge parameters from all subtypes
+        List<StepValue> allParams = new ArrayList<>();
+        for (StepAntlrParser.SimpleEntityContext simpleCtx : ctx.simpleEntity()) {
+            allParams.addAll(convertSimpleEntityParameters(simpleCtx));
+        }
+        return allParams;
+    }
+
+    private static List<StepValue> convertParameterList(List<StepAntlrParser.ParameterContext> params) {
+        List<StepValue> values = new ArrayList<>();
+        for (StepAntlrParser.ParameterContext paramCtx : params) {
+            values.add(convertParameter(paramCtx));
+        }
+        return values;
+    }
+
+    private static StepValue convertParameter(StepAntlrParser.ParameterContext ctx) {
+        // Handle different parameter types based on alternative labels
+        if (ctx instanceof StepAntlrParser.RefParamContext) {
+            return convertReference(((StepAntlrParser.RefParamContext) ctx).reference());
+        } else if (ctx instanceof StepAntlrParser.NumParamContext) {
+            return convertNumber(((StepAntlrParser.NumParamContext) ctx).number());
+        } else if (ctx instanceof StepAntlrParser.StrParamContext) {
+            return convertString(((StepAntlrParser.StrParamContext) ctx).string());
+        } else if (ctx instanceof StepAntlrParser.EnumParamContext) {
+            return convertEnumeration(((StepAntlrParser.EnumParamContext) ctx).enumeration());
+        } else if (ctx instanceof StepAntlrParser.OmittedParamContext) {
+            return new StepValue.OmittedValue();
+        } else if (ctx instanceof StepAntlrParser.NotProvidedParamContext) {
+            return new StepValue.NotProvidedValue();
+        } else if (ctx instanceof StepAntlrParser.ListParamContext) {
+            return convertList(((StepAntlrParser.ListParamContext) ctx).list());
+        } else if (ctx instanceof StepAntlrParser.TypedParamContext) {
+            return convertTypedParameter(((StepAntlrParser.TypedParamContext) ctx).typedParameter());
+        }
+
+        throw new StepParseException("unknown parameter type: " + ctx.getText());
+    }
+
+    private static StepValue convertReference(StepAntlrParser.ReferenceContext ctx) {
+        int refId = extractEntityId(ctx.entityId());
+        return new StepValue.ReferenceValue(refId);
+    }
+
+    private static StepValue convertNumber(StepAntlrParser.NumberContext ctx) {
+        if (ctx instanceof StepAntlrParser.IntNumContext) {
+            String text = ((StepAntlrParser.IntNumContext) ctx).INTEGER().getText();
+            try {
+                long value = Long.parseLong(text);
+                return new StepValue.NumberValue((double) value, text);
+            } catch (NumberFormatException e) {
+                // Too large for long, treat as real
+                return new StepValue.NumberValue(Double.parseDouble(text), text);
+            }
+        } else if (ctx instanceof StepAntlrParser.RealNumContext) {
+            String text = ((StepAntlrParser.RealNumContext) ctx).REAL().getText();
+            double value = parseRealNumber(text);
+            return new StepValue.NumberValue(value, text);
+        } else if (ctx instanceof StepAntlrParser.SpecialNumContext) {
+            String text = ((StepAntlrParser.SpecialNumContext) ctx).SPECIAL_NUMBER().getText();
+            // Handle NaN, INF, -INF
+            if (text.equals("NAN")) {
+                throw new StepParseException("NaN is not supported in STEP");
+            } else if (text.equals("INF") || text.equals("-INF")) {
+                throw new StepParseException("Infinity is not supported in STEP: " + text);
+            }
+            return new StepValue.NumberValue(0.0, text); // Fallback
+        }
+        throw new StepParseException("unknown number type: " + ctx.getText());
+    }
+
+    private static double parseRealNumber(String text) {
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+            // Handle very large exponents (E9999, E308)
+            // If exponent too large, return 0.0 or MAX_VALUE
+            if (text.contains("E") || text.contains("e")) {
+                String[] parts = text.split("[eE]");
+                if (parts.length == 2) {
+                    try {
+                        int exponent = Integer.parseInt(parts[1].replace("+", ""));
+                        if (exponent > 308) {
+                            return Double.MAX_VALUE;
+                        } else if (exponent < -308) {
+                            return 0.0;
+                        }
+                    } catch (NumberFormatException exErr) {
+                        // Exponent too large, return MAX_VALUE
+                        return Double.MAX_VALUE;
+                    }
+                }
+            }
+            throw new StepParseException("invalid real number: " + text);
+        }
+    }
+
+    private static StepValue convertString(StepAntlrParser.StringContext ctx) {
+        String raw = ctx.STRING().getText();
+        // Remove surrounding quotes
+        String content = raw.substring(1, raw.length() - 1);
+        // Handle STEP string escapes
+        String decoded = decodeStepString(content);
+        return new StepValue.StringValue(decoded);
+    }
+
+    private static String decodeStepString(String content) {
+        // STEP string escapes: '' -> ', \S\X -> single byte, etc.
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while (i < content.length()) {
+            if (i + 1 < content.length() && content.charAt(i) == '\'' && content.charAt(i + 1) == '\'') {
+                // Doubled quote
+                result.append('\'');
+                i += 2;
+            } else if (content.startsWith("\\S\\", i) && i + 3 < content.length()) {
+                // \S\X single byte escape (ISO 8859-1)
+                char ch = content.charAt(i + 3);
+                result.append(ch);
+                i += 4;
+            } else if (content.startsWith("\\X\\", i) && i + 3 < content.length()) {
+                // \X\HH single hex byte
+                String hex = content.substring(i + 3, i + 5);
+                try {
+                    int value = Integer.parseInt(hex, 16);
+                    result.append((char) value);
+                    i += 5;
+                } catch (NumberFormatException e) {
+                    throw new StepParseException("invalid hex escape: \\X\\" + hex);
+                }
+            } else if (content.startsWith("\\X2\\", i)) {
+                // \X2\HHHH...\X0\ UTF-16 sequence
+                int end = content.indexOf("\\X0\\", i + 4);
+                if (end == -1) {
+                    throw new StepParseException("unterminated \\X2\\ escape");
+                }
+                String hexSeq = content.substring(i + 4, end);
+                try {
+                    for (int j = 0; j < hexSeq.length(); j += 4) {
+                        int value = Integer.parseInt(hexSeq.substring(j, j + 4), 16);
+                        result.append((char) value);
+                    }
+                    i = end + 4;
+                } catch (NumberFormatException e) {
+                    throw new StepParseException("invalid hex sequence in \\X2\\");
+                }
+            } else if (content.startsWith("\\X4\\", i)) {
+                // \X4\HHHHHHHH...\X0\ UTF-32 sequence
+                int end = content.indexOf("\\X0\\", i + 4);
+                if (end == -1) {
+                    throw new StepParseException("unterminated \\X4\\ escape");
+                }
+                String hexSeq = content.substring(i + 4, end);
+                try {
+                    for (int j = 0; j < hexSeq.length(); j += 8) {
+                        long value = Long.parseLong(hexSeq.substring(j, j + 8), 16);
+                        result.append((char) value);
+                    }
+                    i = end + 4;
+                } catch (NumberFormatException e) {
+                    throw new StepParseException("invalid hex sequence in \\X4\\");
+                }
+            } else if (content.startsWith("\\P\\", i) && i + 2 < content.length()) {
+                // \P\A code page directive (skip for now)
+                i += 3;
+            } else {
+                result.append(content.charAt(i));
+                i += 1;
+            }
+        }
+        return result.toString();
+    }
+
+    private static StepValue convertEnumeration(StepAntlrParser.EnumerationContext ctx) {
+        String text = ctx.getText();
+        // Remove surrounding dots: .ENUM_NAME. -> ENUM_NAME
+        String enumValue = text.substring(1, text.length() - 1);
+        return new StepValue.EnumValue(enumValue);
+    }
+
+    private static StepValue convertList(StepAntlrParser.ListContext ctx) {
+        if (ctx.parameterList() == null) {
+            return new StepValue.ListValue(List.of());
+        }
+        List<StepValue> values = convertParameterList(ctx.parameterList().parameter());
+        return new StepValue.ListValue(values);
+    }
+
+    private static StepValue convertTypedParameter(StepAntlrParser.TypedParameterContext ctx) {
+        String typeName = ctx.typeName().getText();
+        // Typed parameter has parameterList (can have multiple parameters)
+        List<StepValue> wrappedValues = convertParameterList(ctx.parameterList().parameter());
+        // If single parameter, wrap it; if multiple, wrap as list
+        if (wrappedValues.size() == 1) {
+            return new StepValue.TypedValue(typeName, wrappedValues.get(0));
+        } else {
+            return new StepValue.TypedValue(typeName, new StepValue.ListValue(wrappedValues));
+        }
+    }
+
+    private static int extractEntityId(StepAntlrParser.EntityIdContext ctx) {
+        String text = ctx.getText();
+        // Remove # prefix
+        if (!text.startsWith("#")) {
+            throw new StepParseException("entity id must start with #: " + text);
+        }
+        try {
+            long value = Long.parseLong(text.substring(1));
+            if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
+                throw new StepParseException("entity id out of range: " + text);
+            }
+            return (int) value;
+        } catch (NumberFormatException e) {
+            throw new StepParseException("invalid entity id: " + text);
+        }
+    }
+
+    /**
+     * Custom error listener for better error messages.
+     */
+    private static final class StepErrorListener extends BaseErrorListener {
+        private final List<String> errors = new ArrayList<>();
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine,
+                                String msg, RecognitionException e) {
+            String error = String.format("line %d:%d - %s", line, charPositionInLine, msg);
+            errors.add(error);
+        }
+
+        boolean hasErrors() {
+            return !errors.isEmpty();
+        }
+
+        String getFirstError() {
+            return errors.isEmpty() ? "unknown error" : errors.get(0);
+        }
+    }
+}
