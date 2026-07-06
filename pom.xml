@@ -16,6 +16,7 @@
         <jetty.version>11.0.24</jetty.version>
         <slf4j.version>2.0.17</slf4j.version>
         <exec.mainClass>com.minicad.app.StepDumpApp</exec.mainClass>
+        <antlr4.version>4.13.1</antlr4.version>
     </properties>
 
     <dependencyManagement>
@@ -59,6 +60,11 @@
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
             <version>2.0.56</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>${antlr4.version}</version>
         </dependency>
     </dependencies>
 
@@ -110,6 +116,24 @@
                     <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
+            <!-- ANTLR4 grammar compilation -->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr4.version}</version>
+                <executions>
+                    <execution>
+                        <id>antlr</id>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <listener>true</listener>
+                    <visitor>true</visitor>
+                </configuration>
+            </plugin>
             <!-- Spotless formatter: validates Java formatting but excludes generated STEP model files -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -128,6 +152,7 @@
                         </includes>
                         <excludes>
                             <exclude>src/main/java/com/minicad/step/model/**/*.java</exclude>
+                            <exclude>target/generated-sources/antlr4/**/*.java</exclude>
                         </excludes>
                         <trimTrailingWhitespace/>
                         <endWithNewline/>
