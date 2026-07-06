@@ -784,10 +784,12 @@ public final class StepEntityResolver {
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
   private final Deque<Integer> resolutionStack = new ArrayDeque<>();
   private final StepTopologyResolver topologyResolver;
+  private final StepProductResolver productResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
     this.topologyResolver = new StepTopologyResolver(this);
+    this.productResolver = new StepProductResolver(this);
   }
 
   /**
@@ -3221,22 +3223,7 @@ public final class StepEntityResolver {
   }
 
   StepAssemblyProcessPlan resolveAssemblyProcessPlan(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_PROCESS_PLAN");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 2,
-            "ASSEMBLY_PROCESS_PLAN items must contain entity references");
-    List<StepEntity> assemblySequence =
-        entityReferenceList(
-            instance, definition, 4,
-            "ASSEMBLY_PROCESS_PLAN assembly_sequence must contain entity references");
-    return new StepAssemblyProcessPlan(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        items,
-        resolve(referenceId(instance, definition, 3)),
-        assemblySequence);
+    return productResolver.resolveAssemblyProcessPlan(instance);
   }
 
   StepMachiningProcessPlan resolveMachiningProcessPlan(StepEntityInstance instance) {
@@ -3438,73 +3425,31 @@ public final class StepEntityResolver {
   }
 
   StepMakeFromFeature resolveMakeFromFeature(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MAKE_FROM_FEATURE");
-    requireParameterCount(instance, definition, 4);
-    return new StepMakeFromFeature(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveMakeFromFeature(instance);
   }
 
   StepMakeFromUsageOption resolveMakeFromUsageOption(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MAKE_FROM_USAGE_OPTION");
-    requireParameterCount(instance, definition, 4);
-    return new StepMakeFromUsageOption(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveMakeFromUsageOption(instance);
   }
 
   StepQuantifiedAssemblyComponentUsage resolveQuantifiedAssemblyComponentUsage(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "QUANTIFIED_ASSEMBLY_COMPONENT_USAGE");
-    requireParameterCount(instance, definition, 5);
-    return new StepQuantifiedAssemblyComponentUsage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        integerValue(instance, definition, 3));
+    return productResolver.resolveQuantifiedAssemblyComponentUsage(instance);
   }
 
   StepSpecifiedHigherUsageOccurrence resolveSpecifiedHigherUsageOccurrence(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SPECIFIED_HIGHER_USAGE_OCCURRENCE");
-    requireParameterCount(instance, definition, 4);
-    return new StepSpecifiedHigherUsageOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveSpecifiedHigherUsageOccurrence(instance);
   }
 
   StepAlternateProductRelationship resolveAlternateProductRelationship(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ALTERNATE_PRODUCT_RELATIONSHIP");
-    requireParameterCount(instance, definition, 5);
-    return new StepAlternateProductRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return productResolver.resolveAlternateProductRelationship(instance);
   }
 
   StepProductDefinitionWithAssociatedDocuments resolveProductDefinitionWithAssociatedDocuments(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> docs =
-        entityReferenceList(
-            instance, definition, 2,
-            "PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS documents must contain entity references");
-    return new StepProductDefinitionWithAssociatedDocuments(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        docs);
+    return productResolver.resolveProductDefinitionWithAssociatedDocuments(instance);
   }
 
   StepShapeAspectShapeRepresentation resolveShapeAspectShapeRepresentation(
@@ -3518,25 +3463,12 @@ public final class StepEntityResolver {
   }
 
   StepMakeFromBuildAssembly resolveMakeFromBuildAssembly(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MAKE_FROM_BUILD_ASSEMBLY");
-    requireParameterCount(instance, definition, 4);
-    return new StepMakeFromBuildAssembly(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveMakeFromBuildAssembly(instance);
   }
 
   StepAssemblyComponentRelationship resolveAssemblyComponentRelationship(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_COMPONENT_RELATIONSHIP");
-    requireParameterCount(instance, definition, 5);
-    return new StepAssemblyComponentRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return productResolver.resolveAssemblyComponentRelationship(instance);
   }
 
   StepDesignMakeFrom resolveDesignMakeFrom(StepEntityInstance instance) {
@@ -3552,13 +3484,7 @@ public final class StepEntityResolver {
 
   StepInterpolatedConfigurationSegment resolveInterpolatedConfigurationSegment(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "INTERPOLATED_CONFIGURATION_SEGMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepInterpolatedConfigurationSegment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveInterpolatedConfigurationSegment(instance);
   }
 
   StepRangeDimensionalSize resolveRangeDimensionalSize(StepEntityInstance instance) {
@@ -3573,13 +3499,7 @@ public final class StepEntityResolver {
   }
 
   StepDesignedPartDesignVersion resolveDesignedPartDesignVersion(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DESIGNED_PART_DESIGN_VERSION");
-    requireParameterCount(instance, definition, 4);
-    return new StepDesignedPartDesignVersion(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return productResolver.resolveDesignedPartDesignVersion(instance);
   }
 
   StepSurfaceStyleRendering resolveSurfaceStyleRendering(StepEntityInstance instance) {
@@ -5391,15 +5311,7 @@ public final class StepEntityResolver {
   }
 
   StepProductVersion resolveProductVersion(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_VERSION");
-    requireParameterCount(instance, definition, 6);
-    return new StepProductVersion(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return productResolver.resolveProductVersion(instance);
   }
 
   StepProjectInformation resolveProjectInformation(StepEntityInstance instance) {
@@ -5675,14 +5587,7 @@ public final class StepEntityResolver {
   }
 
   StepMakeFromRelationship resolveMakeFromRelationship(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MAKE_FROM_RELATIONSHIP");
-    requireParameterCount(instance, definition, 5);
-    return new StepMakeFromRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return productResolver.resolveMakeFromRelationship(instance);
   }
 
   StepTextLiteralWithDraughtingCallout resolveTextLiteralWithDraughtingCallout(StepEntityInstance instance) {
@@ -6170,272 +6075,94 @@ public final class StepEntityResolver {
   }
 
   StepProductContext resolveProductContext(StepEntityInstance instance) {
-    return resolveProductContext(instance, "PRODUCT_CONTEXT");
+    return productResolver.resolveProductContext(instance);
   }
 
   StepProductContext resolveProductContext(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    boolean stepOrder =
-        unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
-    return new StepProductContext(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stepOrder ? stringValue(instance, definition, 2) : stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, stepOrder ? 1 : 2),
-            StepApplicationContext.class,
-            entityName + " frame_of_reference must reference APPLICATION_CONTEXT"),
-        entityName);
+    return productResolver.resolveProductContext(instance, entityName);
   }
 
   StepProduct resolveProduct(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT");
-    requireParameterCount(instance, definition, 4);
-    return new StepProduct(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        referenceList(
-            instance,
-            definition,
-            3,
-            StepProductContext.class,
-            "PRODUCT frame_of_reference must contain PRODUCT_CONTEXT references"));
+    return productResolver.resolveProduct(instance);
   }
 
   StepProductRelatedProductCategory resolveProductRelatedProductCategory(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_RELATED_PRODUCT_CATEGORY");
-    requireParameterCount(instance, definition, 3);
-    return new StepProductRelatedProductCategory(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        referenceList(
-            instance,
-            definition,
-            2,
-            StepProduct.class,
-            "PRODUCT_RELATED_PRODUCT_CATEGORY products must contain PRODUCT references"));
+    return productResolver.resolveProductRelatedProductCategory(instance);
   }
 
   StepProductCategory resolveProductCategory(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_CATEGORY");
-    requireParameterCount(instance, definition, 2);
-    return new StepProductCategory(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1));
+    return productResolver.resolveProductCategory(instance);
   }
 
   StepProductCategoryRelationship resolveProductCategoryRelationship(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_CATEGORY_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepProductCategoryRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProductCategory.class,
-            "PRODUCT_CATEGORY_RELATIONSHIP category must reference PRODUCT_CATEGORY"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductCategory.class,
-            "PRODUCT_CATEGORY_RELATIONSHIP sub_category must reference PRODUCT_CATEGORY"));
+    return productResolver.resolveProductCategoryRelationship(instance);
   }
 
   StepProductRelationship resolveProductRelationship(StepEntityInstance instance) {
-    return resolveProductRelationship(instance, "PRODUCT_RELATIONSHIP");
+    return productResolver.resolveProductRelationship(instance);
   }
 
   StepProductRelationship resolveProductRelationship(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    return new StepProductRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProduct.class,
-            entityName + " relating_product must reference PRODUCT"),
-        requireEntity(
-            referenceId(instance, definition, 4),
-            StepProduct.class,
-            entityName + " related_product must reference PRODUCT"),
-        entityName);
+    return productResolver.resolveProductRelationship(instance, entityName);
   }
 
   StepProductDefinitionFormation resolveProductDefinitionFormation(
       StepEntityInstance instance) {
-    StepEntityDefinition definition;
-    if (instance.hasDefinition("PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE")) {
-      definition = definition(instance, "PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE");
-      requireParameterCount(instance, definition, 4);
-    } else {
-      definition = definition(instance, "PRODUCT_DEFINITION_FORMATION");
-      requireParameterCount(instance, definition, 3);
-    }
-    return new StepProductDefinitionFormation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProduct.class,
-            "PRODUCT_DEFINITION_FORMATION of_product must reference PRODUCT"));
+    return productResolver.resolveProductDefinitionFormation(instance);
   }
 
   StepProductDefinitionFormationRelationship
       resolveProductDefinitionFormationRelationship(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP");
-    requireParameterCount(instance, definition, 5);
-    return new StepProductDefinitionFormationRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductDefinitionFormation.class,
-            "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP relating_product_definition_formation must reference PRODUCT_DEFINITION_FORMATION"),
-        requireEntity(
-            referenceId(instance, definition, 4),
-            StepProductDefinitionFormation.class,
-            "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP related_product_definition_formation must reference PRODUCT_DEFINITION_FORMATION"));
+    return productResolver.resolveProductDefinitionFormationRelationship(instance);
   }
 
   StepProductDefinitionContext resolveProductDefinitionContext(
       StepEntityInstance instance) {
-    return resolveProductDefinitionContext(instance, "PRODUCT_DEFINITION_CONTEXT");
+    return productResolver.resolveProductDefinitionContext(instance);
   }
 
   StepProductDefinitionContext resolveProductDefinitionContext(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    boolean stepOrder =
-        unwrapTyped(definition.parameters().get(1)) instanceof StepValue.ReferenceValue;
-    return new StepProductDefinitionContext(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stepOrder ? stringValue(instance, definition, 2) : stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, stepOrder ? 1 : 2),
-            StepApplicationContext.class,
-            entityName + " frame_of_reference must reference APPLICATION_CONTEXT"),
-        entityName);
+    return productResolver.resolveProductDefinitionContext(instance, entityName);
   }
 
   StepProductDefinition resolveProductDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION");
-    requireParameterCount(instance, definition, 4);
-    return new StepProductDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProductDefinitionFormation.class,
-            "PRODUCT_DEFINITION formation must reference PRODUCT_DEFINITION_FORMATION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductDefinitionContext.class,
-            "PRODUCT_DEFINITION frame_of_reference must reference PRODUCT_DEFINITION_CONTEXT"));
+    return productResolver.resolveProductDefinition(instance);
   }
 
   StepProductDefinitionRelationship resolveProductDefinitionRelationship(
       StepEntityInstance instance) {
-    return resolveProductDefinitionRelationship(instance, "PRODUCT_DEFINITION_RELATIONSHIP");
+    return productResolver.resolveProductDefinitionRelationship(instance);
   }
 
   StepProductDefinitionRelationship resolveProductDefinitionRelationship(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    return new StepProductDefinitionRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductDefinition.class,
-            entityName + " relating_product_definition must reference PRODUCT_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 4),
-            StepProductDefinition.class,
-            entityName + " related_product_definition must reference PRODUCT_DEFINITION"),
-        entityName);
+    return productResolver.resolveProductDefinitionRelationship(instance, entityName);
   }
 
   // Flexible resolver for entities that allow relating/related to be broader types
   // Returns StepGenericEntity since relating/related may not be StepProductDefinition
   StepGenericEntity resolveProductDefinitionRelationshipFlexible(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        entityName);
+    return productResolver.resolveProductDefinitionRelationshipFlexible(instance, entityName);
   }
 
   StepProductDefinitionRelationshipRelationship
       resolveProductDefinitionRelationshipRelationship(StepEntityInstance instance) {
-    return resolveProductDefinitionRelationshipRelationship(
-        instance, "PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP");
+    return productResolver.resolveProductDefinitionRelationshipRelationship(instance);
   }
 
   StepProductDefinitionRelationshipRelationship resolveProductDefinitionRelationshipRelationship(
       StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    return new StepProductDefinitionRelationshipRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductDefinitionRelationship.class,
-            entityName + " relating_product_definition_relationship must reference PRODUCT_DEFINITION_RELATIONSHIP"),
-        requireEntity(
-            referenceId(instance, definition, 4),
-            StepProductDefinitionRelationship.class,
-            entityName + " related_product_definition_relationship must reference PRODUCT_DEFINITION_RELATIONSHIP"),
-        entityName);
+    return productResolver.resolveProductDefinitionRelationshipRelationship(instance, entityName);
   }
 
   StepProductDefinitionShape resolveProductDefinitionShape(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_SHAPE");
-    requireParameterCount(instance, definition, 3);
-    StepValue definitionParam = definition.parameters().get(2);
-    StepEntity resolvedDefinition = tryResolveReference(definitionParam);
-    if (resolvedDefinition != null
-        && !(resolvedDefinition instanceof StepProductDefinition)
-        && !(resolvedDefinition instanceof StepNextAssemblyUsageOccurrence)) {
-      throw new StepResolutionException(
-          "PRODUCT_DEFINITION_SHAPE definition must reference PRODUCT_DEFINITION or NEXT_ASSEMBLY_USAGE_OCCURRENCE"
-              + " but got "
-              + resolvedDefinition.getClass().getSimpleName());
-    }
-    return new StepProductDefinitionShape(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        resolvedDefinition);
+    return productResolver.resolveProductDefinitionShape(instance);
   }
 
   StepPropertyDefinition resolvePropertyDefinition(StepEntityInstance instance) {
@@ -7275,16 +7002,7 @@ public final class StepEntityResolver {
 
   StepProductDefinitionEffectivity resolveProductDefinitionEffectivity(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRODUCT_DEFINITION_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepProductDefinitionEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProductDefinition.class,
-            "PRODUCT_DEFINITION_EFFECTIVITY product_definition must reference PRODUCT_DEFINITION"));
+    return productResolver.resolveProductDefinitionEffectivity(instance);
   }
 
   StepEffectivityRelationship resolveEffectivityRelationship(
@@ -7589,18 +7307,7 @@ public final class StepEntityResolver {
 
   StepShapeDefinitionRepresentation resolveShapeDefinitionRepresentation(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_DEFINITION_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepShapeDefinitionRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepProductDefinitionShape.class,
-            "SHAPE_DEFINITION_REPRESENTATION definition must reference PRODUCT_DEFINITION_SHAPE"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "SHAPE_DEFINITION_REPRESENTATION used_representation must reference SHAPE_REPRESENTATION"));
+    return productResolver.resolveShapeDefinitionRepresentation(instance);
   }
 
   StepPropertyDefinitionRepresentation resolvePropertyDefinitionRepresentation(
@@ -7843,52 +7550,16 @@ public final class StepEntityResolver {
   }
 
   StepRepresentationMap resolveRepresentationMap(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REPRESENTATION_MAP");
-    requireParameterCount(instance, definition, 2);
-    StepEntity mappedOrigin = resolve(referenceId(instance, definition, 0));
-    if (!(mappedOrigin instanceof StepAxis2Placement2D)
-        && !(mappedOrigin instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "REPRESENTATION_MAP mapped_origin must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepRepresentationMap(
-        instance.id(),
-        mappedOrigin,
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "REPRESENTATION_MAP mapped_representation must reference REPRESENTATION"));
+    return productResolver.resolveRepresentationMap(instance);
   }
 
   StepSymbolRepresentationMap resolveSymbolRepresentationMap(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SYMBOL_REPRESENTATION_MAP");
-    requireParameterCount(instance, definition, 2);
-    StepEntity mappedOrigin = resolve(referenceId(instance, definition, 0));
-    if (!(mappedOrigin instanceof StepAxis2Placement2D)
-        && !(mappedOrigin instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "SYMBOL_REPRESENTATION_MAP mapped_origin must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepSymbolRepresentationMap(
-        instance.id(),
-        mappedOrigin,
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "SYMBOL_REPRESENTATION_MAP mapped_representation must reference REPRESENTATION"));
+    return productResolver.resolveSymbolRepresentationMap(instance);
   }
 
   StepMappedItem resolveMappedItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MAPPED_ITEM");
-    requireParameterCount(instance, definition, 2);
-    return new StepMappedItem(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepRepresentationMap.class,
-            "MAPPED_ITEM mapping_source must reference REPRESENTATION_MAP"),
-        resolve(referenceId(instance, definition, 1)));
+    return productResolver.resolveMappedItem(instance);
   }
 
   StepCartesianTransformationOperator resolveCartesianTransformationOperator2D(
@@ -8131,48 +7802,12 @@ public final class StepEntityResolver {
 
   StepNextAssemblyUsageOccurrence resolveNextAssemblyUsageOccurrence(
       StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NEXT_ASSEMBLY_USAGE_OCCURRENCE");
-    requireParameterCountIn(instance, definition, 5, 6);
-    return new StepNextAssemblyUsageOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        stringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepProductDefinition.class,
-            "NEXT_ASSEMBLY_USAGE_OCCURRENCE relating_product_definition must reference PRODUCT_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 4),
-            StepProductDefinition.class,
-            "NEXT_ASSEMBLY_USAGE_OCCURRENCE related_product_definition must reference PRODUCT_DEFINITION"),
-        definition.parameters().size() > 5 ? optionalStringValue(instance, definition, 5) : null);
+    return productResolver.resolveNextAssemblyUsageOccurrence(instance);
   }
 
   StepContextDependentShapeRepresentation resolveContextDependentShapeRepresentation(
       StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "CONTEXT_DEPENDENT_SHAPE_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    StepEntity relationship = resolve(referenceId(instance, definition, 0));
-    if (!(relationship instanceof StepShapeRepresentationRelationship)
-        && !(relationship instanceof StepRepresentationRelationship)
-        && !(relationship instanceof StepRepresentationRelationshipWithTransformation)) {
-      throw new StepResolutionException(
-          "CONTEXT_DEPENDENT_SHAPE_REPRESENTATION representation_relation must reference a representation relationship"
-              + " but got "
-              + relationship.getClass().getSimpleName());
-    }
-    StepEntity representedProductRelation = resolve(referenceId(instance, definition, 1));
-    if (!(representedProductRelation instanceof StepNextAssemblyUsageOccurrence)
-        && !(representedProductRelation instanceof StepProductDefinitionShape)) {
-      throw new StepResolutionException(
-          "CONTEXT_DEPENDENT_SHAPE_REPRESENTATION represented_product_relation must reference"
-              + " NEXT_ASSEMBLY_USAGE_OCCURRENCE or PRODUCT_DEFINITION_SHAPE but got "
-              + representedProductRelation.getClass().getSimpleName());
-    }
-    return new StepContextDependentShapeRepresentation(
-        instance.id(), relationship, representedProductRelation);
+    return productResolver.resolveContextDependentShapeRepresentation(instance);
   }
 
   StepMeasureWithUnit resolveMeasureWithUnit(StepEntityInstance instance) {
