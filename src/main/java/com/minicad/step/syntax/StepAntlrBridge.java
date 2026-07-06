@@ -34,8 +34,11 @@ public final class StepAntlrBridge {
      * @throws StepParseException if parsing fails
      */
     public static StepFile parse(String stepText) {
-        if (stepText == null || stepText.isBlank()) {
-            throw new StepParseException("STEP text must not be null or blank");
+        if (stepText == null) {
+            throw new StepParseException("STEP text must not be null");
+        }
+        if (stepText.isBlank()) {
+            throw new StepParseException("STEP text must not be blank");
         }
 
         // Pre-parse validation for unterminated constructs (Phase 5)
@@ -502,13 +505,13 @@ public final class StepAntlrBridge {
             long value = Long.parseLong(idStr);
             // Reject entity id zero
             if (value == 0) {
-                throw new StepParseException("entity id must be positive: " + text);
+                throw new StepParseException("entity id '" + text + "' must be positive");
             }
             if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
-                throw new StepParseException("entity id out of range: " + text);
+                throw new StepParseException("entity id '" + text + "' out of range");
             }
             if (value < 0) {
-                throw new StepParseException("entity id must be positive: " + text);
+                throw new StepParseException("entity id '" + text + "' must be positive");
             }
             return (int) value;
         } catch (NumberFormatException e) {
