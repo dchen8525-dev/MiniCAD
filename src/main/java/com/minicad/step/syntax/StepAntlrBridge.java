@@ -4,10 +4,7 @@ import com.minicad.common.StepParseException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Bridge layer: converts ANTLR4 ParseTree to existing StepFile model.
@@ -153,13 +150,16 @@ public final class StepAntlrBridge {
 
         // Convert data section
         if (ctx.dataSection() != null) {
+            Map<Integer, Integer> entityIdPositions = new HashMap<>(); // Track first declaration position
             for (StepAntlrParser.EntityInstanceContext entityCtx : ctx.dataSection().entityInstance()) {
+                int currentPosition = entityCtx.getStart().getStartIndex();
                 StepEntityInstance entity = convertEntityInstance(entityCtx);
                 // Check for duplicate entity IDs
-                if (seenEntityIds.contains(entity.id())) {
-                    throw new StepParseException("duplicate entity id #" + entity.id());
+                if (entityIdPositions.containsKey(entity.id())) {
+                    int firstPosition = entityIdPositions.get(entity.id());
+                    throw new StepParseException("duplicate entity id #" + entity.id() + " at position " + currentPosition + "; first declared at position " + firstPosition);
                 }
-                seenEntityIds.add(entity.id());
+                entityIdPositions.put(entity.id(), currentPosition);
                 entities.add(entity);
             }
         }
