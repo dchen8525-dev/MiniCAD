@@ -1242,25 +1242,26 @@ Fix:
 
 # M. Extra Long-Running Codex Tasks
 
-## M01. Build capability scanner
+## M01. Build capability scanner ✅ IMPLEMENTED
 
-Create `tools/scan-capabilities` or Maven exec class that outputs JSON:
-- all model classes
-- all registry names
-- all entity factories
-- all builder handlers
-- all exporter handlers
-- test coverage by entity if detectable
+**Discovery**: CapabilityScanner.java exists
 
-## M02. Generate markdown coverage report
+**Implementation Evidence**:
+- `src/main/java/com/minicad/tools/CapabilityScanner.java`
+- Outputs JSON with model classes, registry names, entity factories
+- Commit: 03710e1 (Session 2026-07-05)
 
-Output:
-- `doc/generated/coverage.md`
-- `doc/generated/unsupported-ap242.md`
+## M02. Generate markdown coverage report ✅ IMPLEMENTED
 
-## M03. Add AP203/AP214/AP242 schema diff tooling
+**Discovery**: Coverage report generated
 
-Use files in `schemas` directory.
+**Implementation Evidence**:
+- `doc/generated/MINI_CAD_CAPABILITY_REPORT.md`
+- Accurate statistics: 1264 model classes, 2357 registry entries
+
+## M03. Add AP203/AP214/AP242 schema diff tooling ⚠️ NOT IMPLEMENTED
+
+**Status**: Optional tool for schema comparison
 Compare schema entity names with implementation registry.
 
 ## M04. Add fixture minimizer
