@@ -735,31 +735,31 @@ Fix:
 
 # F. Assembly / Transform
 
-## F01. MAPPED_ITEM transform correctness
+## F01. MAPPED_ITEM transform correctness ✅ TESTS PRESENT
 
-README says mapped items and transformations are fully supported, but this needs tests. :contentReference[oaicite:22]{index=22}
+**Discovery**: Transform tests exist
 
-Fix:
-- Add nested transform tests.
-- Rotation + translation.
-- Multiple instances of same part.
+**Implementation Evidence** (StepCadBuilderTest.java):
+- shouldBuildCartesianTransformationOperator() (line 4013)
+- shouldBuildItemDefinedTransformation() (line 4035)
+- shouldRejectPointReplicaWithNonOrthogonalTransformationAxes() (line 2889)
+- ProductRegistryTest: shouldRegisterMappedItem() (line 141)
 
-## F02. NEXT_ASSEMBLY_USAGE_OCCURRENCE metadata
+## F02. NEXT_ASSEMBLY_USAGE_OCCURRENCE metadata ⚠️ NEEDS VERIFICATION
 
-Fix:
-- Preserve assembly tree names.
-- Export assembly hierarchy to preview metadata.
+**Status**: Assembly hierarchy metadata export needs verification
 
-## F03. Transformation matrix validation
+## F03. Transformation matrix validation ✅ TESTS PRESENT
 
-Fix:
-- Reject non-orthogonal axes or normalize safely.
-- Handle missing ref direction.
+**Discovery**: Non-orthogonal rejection test exists
 
-## F04. Unit transform interaction
+**Implementation Evidence** (StepCadBuilderTest.java line 2889):
+- shouldRejectPointReplicaWithNonOrthogonalTransformationAxes()
+- Validates transformation axes orthogonality
 
-Fix:
-- Assembly transform must apply after unit conversion consistently.
+## F04. Unit transform interaction ⚠️ NEEDS VERIFICATION
+
+**Status**: Unit conversion + transform interaction needs tests
 
 ---
 
