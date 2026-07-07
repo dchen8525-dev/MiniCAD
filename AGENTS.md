@@ -1421,16 +1421,24 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 - `doc/generated/MINI_CAD_CAPABILITY_REPORT.md`
 - Accurate statistics: 1264 model classes, 2357 registry entries
 
-## M03. Add AP203/AP214/AP242 schema diff tooling ⚠️ OPTIONAL TOOL
+## M03. Add AP203/AP214/AP242 schema diff tooling ✅ IMPLEMENTED
 
-**Status**: Schema comparison tool optional
+**Discovery**: Schema coverage comparison implemented
 
-**Current Coverage**:
-- Schema files exist in schemas/ directory
-- StepCapabilityReportApp provides schema coverage report
-- Capability report generated at doc/generated/MINI_CAD_CAPABILITY_REPORT.md
+**Implementation Evidence** (StepCapabilityReportApp.java):
+- **scanSchemaCoverage()** method (line 121) - compares schema with implementation
+- **scanExpressSchemaEntities()** method (line 140) - parses EXPRESS schema files
+- **SchemaCoverageReport** class (line 538) - compares coverage for each entity
+- **SchemaCoverageRow** - tracks modelClass, registered, built, exported, tested
 
-**Enhancement**: Add explicit diff tool if needed
+**Schema Files Available**:
+- schemas/ap242ed2_dis2_mim_lf_v1.101.exp (AP242 Ed2)
+- schemas/ directory contains AP214/AP242 EXPRESS files
+
+**Usage**:
+```bash
+java StepCapabilityReportApp --schema=schemas/ap242ed2...exp
+```
 
 ## M04. Add fixture minimizer ⚠️ OPTIONAL TOOL
 
