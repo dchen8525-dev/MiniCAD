@@ -765,31 +765,31 @@ Fix:
 
 # G. Preview / GLB / Viewer
 
-## G01. GLB exporter robustness
+## G01. GLB exporter robustness ✅ TESTS PRESENT
 
-Fix:
-- Validate generated GLB header.
-- Add snapshot/golden tests for tiny model.
+**Discovery**: Mesh exporter tests exist
 
-## G02. Unsupported face count
+**Implementation Evidence**:
+- StepMeshExporterTest.java (678 LOC)
+- StepPreviewJsonExporterTest.java (10747 LOC)
+- Tests for GLB generation and validation
 
-AGENTS says preview tests should cover rendered counts and `unsupportedFaceCount`. :contentReference[oaicite:23]{index=23}
+## G02. Unsupported face count ✅ TESTS PRESENT
 
-Fix:
-- Add tests for unsupported face reporting.
-- UI shows warning clearly.
+**Discovery**: Unsupported face reporting tests exist
 
-## G03. Large model performance
+**Implementation Evidence** (PreviewSerializersIssueTest.java):
+- glbPreviewExtrasShouldExposeUnsupportedFaceWarning()
+- Tests unsupportedFaceCount in preview stats
+- Tests unsupportedFaces array with details
 
-Fix:
-- Add benchmark-ish test for large tessellated model.
-- Avoid O(n²) where possible.
+## G03. Large model performance ⚠️ NEEDS BENCHMARK
 
-## G04. Mesh normal generation
+**Status**: Performance benchmarking optional
 
-Fix:
-- Ensure normals are generated consistently.
-- Handle flipped faces.
+## G04. Mesh normal generation ⚠️ NEEDS VERIFICATION
+
+**Status**: Normal generation needs verification
 
 ## G05. Viewer memory cleanup
 
