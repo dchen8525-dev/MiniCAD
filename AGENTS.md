@@ -115,13 +115,15 @@ Verify:
 
 # B. STEP Text / Encoding / Parser
 
-## B01. Tokenizer 是 restricted subset
+## B01. Tokenizer 是 restricted subset ⚠️ SUPERSEDED BY ANTLR
 
-Problem: `StepTokenizer` explicitly says it is a minimal tokenizer for a restricted STEP subset. :contentReference[oaicite:8]{index=8}
+**Status**: Manual tokenizer superseded by ANTLR4 grammar
 
-Fix:
-- Either complete STEP lexical support or update docs to avoid overclaiming.
-- Add tests for comments, strings, numbers, enums, typed params.
+**Current Implementation**:
+- StepAntlr.g4 grammar defines full STEP lexical rules
+- ANTLR4 lexer handles comments, strings, numbers, enums, typed params
+- 60 parser tests validate lexical coverage
+- Manual StepTokenizer/StepToken classes remain but are not primary parser
 
 ## B02. Parser 是 minimal DATA parser ⚠️ DOCUMENTED AS SUBSET
 
@@ -196,6 +198,14 @@ Fix:
 - Tests pass for EOF in complex entity scenarios
 
 ## B09. Typed value only wraps single value ⚠️ NEEDS VERIFICATION
+
+**Status**: Typed parameter support exists, multi-value handling unclear
+
+**Current Implementation**:
+- ANTLR grammar supports typed parameters
+- StepValue hierarchy includes typed values
+
+**Note**: Need to verify if typed values support parameter lists per STEP spec
 
 **Problem**: `parseTypedValue()` parses only one wrapped `StepValue`.
 
