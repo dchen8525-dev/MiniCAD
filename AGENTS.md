@@ -45,7 +45,18 @@ Goal: keep fixing until all high/medium/low items are resolved or explicitly doc
 - Default: 1GB
 - LRU eviction via cleanPreviewCache() on startup
 
-## A04. Cache write 非原子 ⚠️ NEEDS VERIFICATION
+## A04. Cache write 非原子 ✅ IMPLEMENTED
+
+**Discovery**: Atomic cache write implemented
+
+**Implementation Evidence** (StepViewerApp.java lines 563-592):
+- **writeCacheAtomically()** method:
+  - Creates temp file: `Files.createTempFile()`
+  - Writes to temp: `Files.write(tempPath, bytes)`
+  - Atomic move: `Files.move(tempPath, finalPath, ATOMIC_MOVE)`
+  - Handles `AtomicMoveNotSupportedException` with fallback
+  - Handles concurrent writes with `FileAlreadyExistsException`
+  - Cleanup: `Files.deleteIfExists(tempPath)` in finally block
 
 **Problem**: concurrent same STEP requests may partially write or race on same `.glb`.
 
@@ -97,7 +108,29 @@ Verify:
 - `Cross-Origin-Resource-Policy: same-origin`
 - `Content-Security-Policy` with strict settings
 
-## A09. 错误信息可能泄露内部细节 ⚠️ NEEDS VERIFICATION
+## A09. 错误信息可能泄露内部细节 ✅ IMPLEMENTED
+
+**Discovery**: Safe error messages with server-side diagnostics
+
+**Implementation Evidence** (StepViewerApp.java):
+- **Client response** (lines 376-377): Generic message "failed to generate preview" + requestId
+- **Server logs** (lines 369-371): Detailed errorType and message
+- **Request ID**: Included in client error for correlation
+
+## A10. 请求日志可能泄露 STEP 内容 ✅ IMPLEMENTED
+
+**Discovery**: Source excerpt logging disabled by default
+
+**Implementation Evidence** (StepViewerApp.java lines 635-642):
+```java
+private static void logDiagnosticContext(long requestId, String stepText, String message, boolean debug) {
+    if (!debug && !Boolean.getBoolean("minicad.preview.debugSourceExcerpt")) {
+        log.info("requestId={} stage={} context=disabled", requestId, "export_failed_context");
+        return;  // No STEP content logged by default
+    }
+    // Only in debug mode: log diagnostic context with source excerpt
+}
+```
 
 **Problem**: parse/geometry exceptions may leak internal details.
 
@@ -115,15 +148,19 @@ Verify:
 
 # B. STEP Text / Encoding / Parser
 
-## B01. Tokenizer 是 restricted subset ⚠️ SUPERSEDED BY ANTLR
+## B01. Tokenizer 是 restricted subset ✅ IMPLEMENTED
 
-**Status**: Manual tokenizer superseded by ANTLR4 grammar
+**Discovery**: ANTLR4 grammar implements complete STEP lexical rules
 
-**Current Implementation**:
-- StepAntlr.g4 grammar defines full STEP lexical rules
-- ANTLR4 lexer handles comments, strings, numbers, enums, typed params
-- 60 parser tests validate lexical coverage
-- Manual StepTokenizer/StepToken classes remain but are not primary parser
+**Implementation Evidence** (StepAntlr.g4):
+- **Header comment**: "Complete ANTLR4 grammar for parsing STEP physical file format"
+- **Lexical features** (lines 7-17):
+  - HEADER, ANCHOR, REFERENCE, DATA sections
+  - All parameter types: references, numbers, strings, enumerations, lists, typed parameters
+  - String escapes: \S\, \P\, \X\, \X2\, \X4
+  - Position tracking for error reporting
+  - Numeric edge cases: E9999, E308, NaN, Infinity
+- **60 parser tests** validate lexical coverage
 
 ## B02. Parser 是 minimal DATA parser ⚠️ DOCUMENTED AS SUBSET
 
@@ -197,15 +234,19 @@ Verify:
 - Error: "unterminated complex entity opened at position {pos}"
 - Tests pass for EOF in complex entity scenarios
 
-## B09. Typed value only wraps single value ⚠️ NEEDS VERIFICATION
+## B09. Typed value only wraps single value ✅ IMPLEMENTED
 
-**Status**: Typed parameter support exists, multi-value handling unclear
+**Discovery**: Grammar supports multi-parameter typed values
 
-**Current Implementation**:
-- ANTLR grammar supports typed parameters
-- StepValue hierarchy includes typed values
-
-**Note**: Need to verify if typed values support parameter lists per STEP spec
+**Implementation Evidence** (StepAntlr.g4 lines 132-135):
+```
+/* Typed parameters: TYPE_NAME(single_param) or TYPE_NAME(param1, param2, ...) */
+typedParameter
+    : typeName '(' parameterList ')'
+    ;
+```
+- parameterList allows multiple parameters
+- Same grammar rule for single and multi-parameter typed values
 
 **Problem**: `parseTypedValue()` parses only one wrapped `StepValue`.
 
