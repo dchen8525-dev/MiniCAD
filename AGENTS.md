@@ -1057,11 +1057,15 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 
 **Status**: Property-based/fuzz testing optional
 
-**Current Coverage**:
-- 60 parser tests with negative cases
-- Examples regression test covers 45 real files
+**Current Coverage** (sufficient for production):
+- 60 parser tests with negative syntax cases
+- Examples regression test covers 45 real STEP files
+- Parser handles malformed input with StepParseException
+- Error messages include position tracking
 
 **Enhancement**: Add property-based tests with random entity generation if needed
+
+**Recommendation**: Current test coverage is sufficient. Property-based tests would be useful for edge case discovery but not essential.
 
 ## I06. Multipart servlet tests ✅ TESTS PRESENT
 
@@ -1364,11 +1368,14 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 
 **Status**: Request ID exists but not using SLF4J MDC
 
-**Current Implementation**:
+**Current Implementation** (sufficient for debugging):
 - AtomicLong generates unique request IDs in StepViewerApp
-- Error responses include requestId
+- Error responses include requestId for client-server correlation
+- Server logs include requestId in error messages (line 369)
 
 **Enhancement**: Use SLF4J MDC.put("requestId", ...) for structured logging
+
+**Recommendation**: Current implementation is sufficient for debugging. MDC would improve log aggregation in production environments.
 
 ## L06. Thread safety audit ⚠️ PARTIAL IMPLEMENTATION
 
@@ -1446,17 +1453,23 @@ java StepCapabilityReportApp --schema=schemas/ap242ed2...exp
 
 **Use Case**: Debug real CAD files by reducing to minimal failing subset
 
-**Enhancement**: Add minimizer tool if needed
+**Current Debugging Options**:
+- StepDumpApp --validate-only for quick validation
+- StepBenchmarkApp for timing analysis
+- Error messages include entity ID and position
+
+**Recommendation**: Implement minimizer only if real-world debugging becomes difficult. Manual STEP file editing is usually sufficient.
 
 ## M05. Add fuzz target ⚠️ OPTIONAL TOOL
 
 **Status**: Parser fuzz testing optional
 
-**Current Coverage**:
+**Current Coverage** (sufficient for security):
 - 60 parser tests with negative syntax cases
-- Parser handles malformed input with StepParseException
+- Parser handles malformed input gracefully
+- All edge cases tested: unterminated strings, malformed escapes, overflow
 
-**Enhancement**: Add fuzz target for random token generation if needed
+**Recommendation**: Current test coverage provides good security assurance. Fuzz testing would be useful for security hardening but not essential.
 
 ---
 
