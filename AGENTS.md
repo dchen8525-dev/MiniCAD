@@ -276,7 +276,7 @@ Fix:
 - ✅ Added capability scanner tool (M01): src/main/java/com/minicad/tools/CapabilityScanner.java
 - ✅ Generated accurate report (M02): doc/generated/MINI_CAD_CAPABILITY_REPORT.md
 - ✅ README.md already shows 1264 (line 33) - aligned
-- ⚠️ README.md needs update for registry count (line 77: 2103 → 2357)
+- ✅ README.md shows 2357 registry entries (line 77) - aligned
 - ✅ AGENTS.md now has accurate numbers above
 
 ## C02. “注册”与”真正支持”混淆 ✅ RESOLVED
@@ -312,7 +312,7 @@ Fix:
 - ✅ Generated coverage report (M02)
 - ✅ Accurate statistics documented
 - ✅ Coverage percentages calculated
-- ⚠️ README.md needs update with matrix (line 77-88)
+- ✅ README.md capability table updated (line 77+)
 
 ## C03. Unsupported entity behavior inconsistent
 
@@ -357,12 +357,27 @@ Fix:
 - Audit all factories for omitted `$` and not-provided `*`.
 - Add tests per common entity.
 
-## C10. Select type handling incomplete
+## C10. Select type handling incomplete ✅ RESOLVED
 
-Fix:
-- Audit SELECT fields.
-- Add typed select decoding helper.
-- Add tests for representative AP242 selects.
+**Previous Problem**: SELECT type handling incomplete, missing typed select decoding helper.
+
+**Resolution**: SelectTypeRegistry implemented with full validation
+
+**Implementation Evidence**:
+- **SelectTypeRegistry.java**: 272 LOC with 7 SELECT type categories
+- **StepParameterReader.typedSelection()**: Method with entity ID context
+- **StepParameterReaderTest**: 8 SELECT validation tests added
+
+**SELECT Type Categories Implemented**:
+- MEASURE_SELECT: LENGTH_MEASURE, etc.
+- ACTION_SELECT
+- DEFINITION_SELECT
+- GEOMETRIC_SELECT
+- REPRESENTATION_SELECT: INTEGER_REPRESENTATION_ITEM, etc.
+- ORGANIZATION_SELECT
+- DATETIME_SELECT
+
+**Commit**: 60717ac, 3e084f9, 9e070db (Session 2026-07-07)
 
 ---
 
