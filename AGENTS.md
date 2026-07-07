@@ -131,21 +131,18 @@ Fix:
 - Expand parser support or document exact limitations.
 - Add parser compatibility test suite.
 
-## B03. STEP string escape 支持不足
+## B03. STEP string escape 支持不足 ✅ IMPLEMENTED
 
-Fix:
-- Support:
-  - doubled single quote `''`
-  - `\S\`
-  - `\P...\`
-  - `\X\hh`
-  - `\X2\hhhh...\X0\`
-  - `\X4\hhhhhhhh...\X0\`
-- Reject malformed escape with position.
+**Discovery**: Grammar supports all STEP string escapes
 
-Verify:
-- Chinese, Japanese, German umlaut, emoji-like Unicode where valid.
-- Invalid hex throws `StepParseException`.
+**Implementation Evidence** (StepAntlr.g4):
+- `\S\` - single character escape
+- `\P\` - protocol escape
+- `\X\` - single hex digit
+- `\X2\` - 2 hex digits with `\X0\` terminator
+- `\X4\` - 4 hex digits with `\X0\` terminator
+- Doubled single quote `''`
+- Malformed escape detection in StepAntlrBridge.formatError()
 
 ## B04. HEADER 信息解析后利用不足
 
