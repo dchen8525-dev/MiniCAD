@@ -84,18 +84,24 @@ Fix:
 Verify:
 - Header absent in normal response.
 
-## A06. Viewer 默认绑定不明确
+## A05. Cache path 泄露 ✅ IMPLEMENTED
 
-Problem: startup message says `127.0.0.1`, but `new Server(port)` may bind more broadly depending Jetty behavior. :contentReference[oaicite:4]{index=4}
+**Discovery**: X-MiniCAD-Cache-Path header removed
 
-Fix:
-- Explicitly bind `127.0.0.1`.
-- Add optional `--host=` for external bind.
-- Print warning for non-loopback host.
+**Implementation Evidence** (StepViewerApp.java line 363):
+- Only sets `X-MiniCAD-Cache: hit/miss` (no path)
+- No filesystem path exposed to client
 
-Verify:
-- Default listens only on loopback.
-- `--host=0.0.0.0` works intentionally.
+## A06. Viewer 默认绑定不明确 ✅ IMPLEMENTED
+
+**Discovery**: Explicit loopback binding with warning
+
+**Implementation Evidence** (StepViewerApp.java):
+- DEFAULT_HOST = "127.0.0.1" (line 47)
+- Warning for non-loopback: "Viewer is bound to non-loopback host..." (line 208)
+- --host= parameter supported
+
+**Verify**: Default listens only on loopback, --host=0.0.0.0 works
 
 ## A07. StaticServlet 一次性 `readAllBytes()`
 
