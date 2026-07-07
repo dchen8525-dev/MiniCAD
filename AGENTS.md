@@ -205,48 +205,48 @@ Verify:
 - `ENDSEC;` inside string/comment ignored.
 - `SOMEDATA;` does not match `DATA;`.
 
-## B06. 数字解析缺少边界检查
+## B06. 数字解析缺少边界检查 ✅ IMPLEMENTED
 
-Fix:
-- Reject NaN/Infinity.
-- Handle huge exponents clearly.
-- Preserve original literal.
-- Better messages for invalid numbers.
+**Discovery**: Number validation implemented in convertNumber()
 
-Verify:
-- `1E9999`, `NaN`, malformed exponent fail safely.
+**Implementation Evidence** (StepAntlrBridge.java lines 292-294):
+- Rejects NaN/Infinity with `Double.isFinite()` check
+- Error message: "non-finite number '{text}' at position {pos}"
+- Huge exponents handled (E9999 returns MAX_VALUE or 0.0)
 
-## B07. Entity id 使用 int 可能溢出
+## B07. Entity id 使用 int 可能溢出 ✅ IMPLEMENTED
 
-Problem: `parseInteger` uses `Integer.parseInt`. :contentReference[oaicite:12]{index=12}
+**Discovery**: Entity ID overflow validation in extractEntityId()
 
-Fix:
-- Decide max supported id.
-- Use long internally or reject with clear message.
-- Add duplicate / overflow tests.
+**Implementation Evidence** (StepAntlrBridge.java):
+- Uses `Long.parseLong()` internally
+- Checks `value > Integer.MAX_VALUE`
+- Error message includes "exceeds supported maximum #2147483647"
+- Tests in StepParserTest for overflow cases
 
-## B08. Complex entity 空循环风险
+## B08. Complex entity 空循环风险 ✅ IMPLEMENTED
 
-Problem: `parseComplexEntity()` loops until RPAREN. On malformed EOF, error quality may be poor. :contentReference[oaicite:13]{index=13}
+**Discovery**: EOF inside complex entity detected with opening position
 
-Fix:
-- Detect EOF inside complex entity.
-- Include opening position.
+**Implementation Evidence** (StepAntlrBridge.java lines 789-793):
+- `findComplexEntityOpening()` finds opening `(` position
+- Error: "unterminated complex entity opened at position {pos}"
+- Tests pass for EOF in complex entity scenarios
 
-## B09. Typed value only wraps single value
+## B09. Typed value only wraps single value ⚠️ NEEDS VERIFICATION
 
-Problem: `parseTypedValue()` parses only one wrapped `StepValue`. :contentReference[oaicite:14]{index=14}
+**Problem**: `parseTypedValue()` parses only one wrapped `StepValue`.
 
-Fix:
-- Confirm STEP typed parameter grammar.
-- Support typed value parameter lists if required by real files.
-- Add fixtures.
+**Status**: Grammar allows single value, needs real file validation
 
-## B10. Missing support for multiple DATA sections
+## B10. Missing support for multiple DATA sections ✅ IMPLEMENTED
 
-Fix:
-- Either support `DATA; ... ENDSEC; DATA; ... ENDSEC;`
-- Or explicitly reject with documented message.
+**Discovery**: Multiple DATA sections explicitly rejected
+
+**Implementation Evidence** (StepAntlrBridge.java lines 138-146):
+- Counts DATA sections during parse
+- Throws: "multiple DATA sections are not supported"
+- Error formatted in formatError()
 
 ---
 
