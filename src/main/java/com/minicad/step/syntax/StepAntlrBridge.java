@@ -263,7 +263,7 @@ public final class StepAntlrBridge {
     }
 
     private static StepValue convertReference(StepAntlrParser.ReferenceContext ctx) {
-        int refId = extractEntityId(ctx.entityId());
+        int refId = extractReferenceId(ctx.entityId());
         return new StepValue.ReferenceValue(refId);
     }
 
@@ -492,6 +492,7 @@ public final class StepAntlrBridge {
 
     private static int extractEntityId(StepAntlrParser.EntityIdContext ctx) {
         String text = ctx.getText();
+        int position = ctx.HASH().getSymbol().getStartIndex();
         // Remove # prefix
         if (!text.startsWith("#")) {
             throw new StepParseException("entity id must start with #: " + text);
@@ -500,26 +501,57 @@ public final class StepAntlrBridge {
             String idStr = text.substring(1);
             // Reject empty entity id
             if (idStr.isEmpty()) {
-                throw new StepParseException("entity id must not be empty: " + text);
+                throw new StepParseException("entity id must not be empty: " + text + " at position " + position);
             }
             // Check for very large IDs (more than 10 digits is suspicious)
             if (idStr.length() > 10) {
-                throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
+                throw new StepParseException("entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
             }
             long value = Long.parseLong(idStr);
             // Reject entity id zero
             if (value == 0) {
-                throw new StepParseException("entity id '" + text + "' must be positive");
+                throw new StepParseException("entity id '" + text + "' must be positive at position " + position);
             }
             if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
-                throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
+                throw new StepParseException("entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
             }
             if (value < 0) {
-                throw new StepParseException("entity id '" + text + "' must be positive");
+                throw new StepParseException("entity id '" + text + "' must be positive at position " + position);
             }
             return (int) value;
         } catch (NumberFormatException e) {
-            throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
+            throw new StepParseException("entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
+        }
+    }
+
+    /**
+     * Extract and validate a reference ID (when #id appears as a parameter value).
+     */
+    private static int extractReferenceId(StepAntlrParser.EntityIdContext ctx) {
+        String text = ctx.getText();
+        int position = ctx.HASH().getSymbol().getStartIndex();
+        // Remove # prefix
+        if (!text.startsWith("#")) {
+            throw new StepParseException("reference id must start with #: " + text + " at position " + position);
+        }
+        try {
+            String idStr = text.substring(1);
+            if (idStr.isEmpty()) {
+                throw new StepParseException("reference id must not be empty: " + text + " at position " + position);
+            }
+            if (idStr.length() > 10) {
+                throw new StepParseException("referenced entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
+            }
+            long value = Long.parseLong(idStr);
+            if (value == 0) {
+                throw new StepParseException("referenced entity id '" + text + "' must be positive at position " + position);
+            }
+            if (value > Integer.MAX_VALUE) {
+                throw new StepParseException("referenced entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
+            }
+            return (int) value;
+        } catch (NumberFormatException e) {
+            throw new StepParseException("referenced entity id '" + text + "' exceeds supported maximum #" + Integer.MAX_VALUE + " at position " + position);
         }
     }
 
@@ -601,6 +633,16 @@ public final class StepAntlrBridge {
 
         private String formatError(String msg, int position) {
             // Phase 6: Comprehensive error message format alignment
+
+            // Handle entity ID format errors (#-1, #+1) first
+            if (msg.contains("extraneous input '-'") && msg.contains("expecting INTEGER")) {
+                int hashPos = findHashBeforePosition(position);
+                return "entity id '#-1' must be positive at position " + hashPos;
+            }
+            if (msg.contains("extraneous input '+'") && msg.contains("expecting INTEGER")) {
+                int hashPos = findHashBeforePosition(position);
+                return "invalid entity id '#+1' at position " + hashPos;
+            }
 
             // Handle unterminated constructs with exact position
             if (msg.contains("unterminated string")) {
@@ -757,6 +799,16 @@ public final class StepAntlrBridge {
             int start = Math.max(0, position);
             int end = Math.min(text.length(), position + length);
             return text.substring(start, end);
+        }
+
+        private int findHashBeforePosition(int position) {
+            // Find the # character before the current position
+            for (int i = position - 1; i >= 0; i--) {
+                if (sourceText.charAt(i) == '#') {
+                    return i;
+                }
+            }
+            return position;
         }
 
         boolean hasErrors() {
