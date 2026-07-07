@@ -643,14 +643,24 @@ public final class StepAntlrBridge {
                     }
                     return "missing DATA section";
                 }
+                // Check for exponent errors
+                if (msg.contains("'E'") || (position < sourceText.length() && getSnippet(sourceText, Math.max(0, position - 3), 8).matches("[0-9]*E[+-]?[^0-9]"))) {
+                    return "invalid exponent at position " + position;
+                }
+                // Check for header ENDSEC issues
+                if (msg.contains("'END-ISO-10303-21;'") || msg.contains("END-ISO-10303-21")) {
+                    if (sourceText.contains("HEADER;") && position > sourceText.indexOf("HEADER;")) {
+                        if (!sourceText.substring(0, position).contains("DATA;")) {
+                            return "missing DATA section after HEADER";
+                        }
+                        return "missing ENDSEC for HEADER section";
+                    }
+                }
                 // Check for string escape errors - when STRING fails to parse
-                // This happens when there's a malformed escape sequence inside a string
                 if (msg.contains("mismatched input '''") || msg.contains("''' expecting")) {
-                    // Look at the source text to determine the specific string error
                     if (position < sourceText.length()) {
                         String snippet = getSnippet(sourceText, position, 20);
-                        // Check for various malformed escape patterns
-                        if (snippet.contains("\\Z\\") || snippet.contains("\\Z") && !snippet.contains("\\X2\\")) {
+                        if (snippet.contains("\\Z\\") || (snippet.contains("\\Z") && !snippet.contains("\\X2\\"))) {
                             return "unsupported string escape at position " + position;
                         }
                         if (snippet.endsWith("\\") || snippet.contains("\\'") ||
@@ -675,7 +685,14 @@ public final class StepAntlrBridge {
 
             // Handle exponent format errors
             if (msg.contains("extraneous input 'E'") || msg.contains("mismatched input 'E'") ||
-                msg.contains("'E' expecting")) {
+                msg.contains("'E' expecting") || (msg.contains("'E'") && msg.contains("expecting"))) {
+                // Check source for exponent pattern
+                if (position < sourceText.length()) {
+                    String snippet = getSnippet(sourceText, Math.max(0, position - 3), 8);
+                    if (snippet.matches("[0-9]*E[+-]?[^0-9]") || snippet.contains("E+") || snippet.contains("E-")) {
+                        return "invalid exponent at position " + position;
+                    }
+                }
                 return "invalid exponent at position " + position;
             }
             if (msg.contains("E") && msg.contains("expecting") && msg.contains("digits")) {
@@ -695,9 +712,16 @@ public final class StepAntlrBridge {
                 return "unterminated enum literal at position " + position;
             }
 
-            // Handle missing ENDSEC for HEADER
-            if (msg.contains("'END-ISO-10303-21;'") && (msg.contains("expecting 'ENDSEC;'") || msg.contains("expecting {'ENDSEC;'"))) {
-                return "missing ENDSEC for HEADER section";
+            // Handle missing ENDSEC for HEADER - check source text
+            if (msg.contains("'END-ISO-10303-21;'") || msg.contains("END-ISO-10303-21")) {
+                // Check if this is in HEADER section context
+                if (sourceText.contains("HEADER;") && position > sourceText.indexOf("HEADER;")) {
+                    // Check if DATA section exists
+                    if (!sourceText.substring(0, position).contains("DATA;")) {
+                        return "missing DATA section after HEADER";
+                    }
+                    return "missing ENDSEC for HEADER section";
+                }
             }
 
             // Handle numeric validation errors with position
