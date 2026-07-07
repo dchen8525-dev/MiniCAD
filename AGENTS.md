@@ -79,52 +79,37 @@ Verify:
 
 **Verify**: Default listens only on loopback, --host=0.0.0.0 works
 
-## A07. StaticServlet 一次性 `readAllBytes()`
+## A07. StaticServlet 一次性 `readAllBytes()` ✅ IMPLEMENTED
 
-Problem: static resources are read fully into memory. Small now, but avoid bad pattern. :contentReference[oaicite:5]{index=5}
+**Discovery**: StaticServlet uses streaming, not readAllBytes
 
-Fix:
-- Stream static resources to response.
-- Set content length only when available.
+**Implementation Evidence** (StepViewerApp.java line 246):
+- Uses `input.transferTo(response.getOutputStream())`
+- No readAllBytes() for static resources
 
-Verify:
-- `/`, `/viewer.js`, `/vendor/*` still work.
+## A08. 缺少 HTTP 安全头 ✅ IMPLEMENTED
 
-## A08. 缺少 HTTP 安全头
+**Discovery**: Security headers implemented
 
-Fix:
-- Add:
-  - `X-Content-Type-Options: nosniff`
-  - `Referrer-Policy: no-referrer`
-  - `Content-Security-Policy`
-  - `Cross-Origin-Resource-Policy: same-origin`
+**Implementation Evidence** (StepViewerApp.java lines 627-633):
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: no-referrer`
+- `Cross-Origin-Resource-Policy: same-origin`
+- `Content-Security-Policy` with strict settings
 
-Verify:
-- Tests assert headers on static and API responses.
+## A09. 错误信息可能泄露内部细节 ⚠️ NEEDS VERIFICATION
 
-## A09. 错误信息可能泄露内部细节
+**Problem**: parse/geometry exceptions may leak internal details.
 
-Problem: parse/geometry exceptions are returned directly to browser. :contentReference[oaicite:6]{index=6}
+**Status**: Need to verify error message sanitization
 
-Fix:
-- Return safe message to client.
-- Log detailed diagnostic server-side.
-- Include request id in client error.
+## A10. 请求日志可能泄露 STEP 内容 ✅ IMPLEMENTED
 
-Verify:
-- Bad STEP returns generic + requestId.
-- Logs still include diagnostic context.
+**Discovery**: Source excerpt logging disabled by default
 
-## A10. 请求日志可能泄露 STEP 内容
-
-Problem: diagnostic context logs source excerpts around parse position. :contentReference[oaicite:7]{index=7}
-
-Fix:
-- Disable source excerpt logging by default.
-- Enable only with debug property.
-
-Verify:
-- Parse failure logs no STEP content by default.
+**Implementation Evidence** (StepViewerApp.java lines 635-639):
+- `minicad.preview.debugSourceExcerpt` property
+- Source excerpts only logged when debug enabled
 
 ---
 
