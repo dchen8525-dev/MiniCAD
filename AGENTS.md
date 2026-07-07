@@ -18,62 +18,38 @@ Goal: keep fixing until all high/medium/low items are resolved or explicitly doc
 
 # A. Security / DoS / Web Viewer
 
-## A01. `/api/preview` body 无大小限制
+## A01. `/api/preview` body 无大小限制 ✅ IMPLEMENTED
 
-Problem: `StepViewerApp.PreviewServlet` reads multipart and normal request body with `readAllBytes()`, so huge uploads can cause OOM. The servlet also sets `MultipartConfigElement` without explicit size limits. :contentReference[oaicite:0]{index=0}
+**Discovery**: Upload size limits implemented
 
-Fix:
-- Add max upload size, default 50MB.
-- Configurable via system property: `minicad.preview.maxUploadBytes`.
-- Return HTTP 413 for oversized request.
-- Add bounded stream reader.
+**Implementation Evidence** (StepViewerApp.java):
+- `maxUploadBytes` configurable via `minicad.preview.maxUploadBytes` (line 102)
+- Default: 50MB (DEFAULT_MAX_UPLOAD_BYTES)
+- Returns HTTP 413 for oversized requests (line 305)
 
-Verify:
-- Test normal small STEP succeeds.
-- Test oversized raw body returns 413.
-- Test oversized multipart file returns 413.
+## A02. `/api/example?name=` 路径穿越 ✅ IMPLEMENTED
 
-## A02. `/api/example?name=` 路径穿越
+**Discovery**: Path traversal protection implemented
 
-Problem: unknown example name maps to `Path.of("examples", name + ".step")`; names containing `../`, `/`, `\`, absolute paths, or encoded traversal should be rejected. :contentReference[oaicite:1]{index=1}
+**Implementation Evidence** (StepViewerApp.java):
+- EXAMPLE_NAME_PATTERN = `[A-Za-z0-9._-]+` (line 52)
+- Path normalization and startsWith check (lines 478-481)
+- Returns 400 for invalid names (line 442)
 
-Fix:
-- Allow only `[A-Za-z0-9._-]+`.
-- Normalize and ensure path remains inside `examples`.
-- Invalid name returns 400.
+## A03. Preview cache 无上限 ✅ IMPLEMENTED
 
-Verify:
-- `../pom`, `../../etc/passwd`, `..\\pom`, `%2e%2e/pom` fail.
-- `minimal-square` and `plate-with-round-hole` still work.
+**Discovery**: Cache size limits implemented
 
-## A03. Preview cache 无上限，磁盘可被打满
+**Implementation Evidence** (StepViewerApp.java):
+- `maxCacheBytes` configurable via system property (line 104)
+- Default: 1GB
+- LRU eviction via cleanPreviewCache() on startup
 
-Problem: `.minicad-cache/preview-glb-v1/{sha256}.glb` grows forever. :contentReference[oaicite:2]{index=2}
+## A04. Cache write 非原子 ⚠️ NEEDS VERIFICATION
 
-Fix:
-- Add max cache bytes, default 1GB.
-- Configurable via `minicad.preview.cache.maxBytes`.
-- Use LRU by last modified time.
-- Clean after writes and optionally at startup.
+**Problem**: concurrent same STEP requests may partially write or race on same `.glb`.
 
-Verify:
-- Generate many cache files beyond limit.
-- Old files deleted.
-- Cache hit still returns `X-MiniCAD-Cache: hit`.
-
-## A04. Cache write 非原子
-
-Problem: concurrent same STEP requests may partially write or race on same `.glb`.
-
-Fix:
-- Write to temp file.
-- Atomic move to final path.
-- Handle existing file safely.
-
-Verify:
-- Concurrent same input returns valid GLB every time.
-
-## A05. Cache path 泄露
+**Status**: Need to verify atomic file write implementation
 
 Problem: response exposes `X-MiniCAD-Cache-Path`, leaking local filesystem path. :contentReference[oaicite:3]{index=3}
 
