@@ -31,11 +31,8 @@ public final class StepAntlrBridge {
      * @throws StepParseException if parsing fails
      */
     public static StepFile parse(String stepText) {
-        if (stepText == null) {
-            throw new StepParseException("STEP text must not be null or blank");
-        }
-        if (stepText.isBlank()) {
-            throw new StepParseException("STEP text must not be null or blank");
+        if (stepText == null || stepText.isBlank()) {
+            throw new StepParseException("STEP text must not be blank");
         }
 
         // Pre-parse validation for unterminated constructs (Phase 5)
@@ -133,7 +130,7 @@ public final class StepAntlrBridge {
         if (ctx.headerSection() != null && ctx.dataSection() == null) {
             // Allow if ISO_FOOTER present (minimal file)
             if (ctx.ISO_FOOTER() == null) {
-                throw new StepParseException("DATA section required after HEADER");
+                throw new StepParseException("missing DATA section");
             }
         }
 
@@ -624,7 +621,7 @@ public final class StepAntlrBridge {
             // Handle missing semicolon
             if (msg.contains("missing ';'") || msg.contains("missing SEMICOLON") ||
                 msg.contains("expecting ';'")) {
-                return "missing semicolon after entity instance";
+                return "expected ';' after entity instance at position " + position;
             }
 
             // Handle unexpected characters with position
@@ -638,15 +635,16 @@ public final class StepAntlrBridge {
 
             // Handle invalid characters
             if (msg.contains("mismatched input") && msg.contains("expecting")) {
-                // Check for multiple DATA sections
-                if (msg.contains("DATA;") && (msg.contains("<EOF>") || msg.contains("END-ISO-10303-21"))) {
-                    return "multiple DATA sections are not supported";
+                // Check for missing DATA section (when expecting DATA; but got something else)
+                if (msg.contains("expecting") && msg.contains("'DATA;'")) {
+                    return "missing DATA section";
                 }
                 // Check for specific invalid character patterns
                 if (msg.contains("]") ) {
                     return "unexpected character ']' at position " + position;
                 }
-                return msg; // Keep ANTLR4 format for other cases
+                // Keep ANTLR4 format for other cases
+                return msg;
             }
 
             // Handle unterminated complex entities with opening position
