@@ -1219,21 +1219,24 @@ Fix:
 Fix:
 - Shared caches, registries, exporters must be immutable or synchronized.
 
-## L07. Config object for viewer
+## L07. Config object for viewer ✅ IMPLEMENTED
 
-Fix:
-- Parse port/host/cache/upload/debug into `ViewerConfig`.
+**Discovery**: ViewerConfig class exists
 
-## L08. Better argument parser
+**Implementation Evidence** (StepViewerApp.java lines 665-712):
+- ViewerConfig class with all viewer settings
+- Fields: port, host, maxUploadBytes, maxCacheBytes, cacheDir, cacheEnabled, debug
+- Validation in constructor
+- from() factory method
 
-Fix:
-- Support:
-  - `--port`
-  - `--host`
-  - `--cache-dir`
-  - `--max-upload`
-  - `--no-cache`
-  - `--debug`
+## L08. Better argument parser ✅ IMPLEMENTED
+
+**Discovery**: Full argument parser with all options
+
+**Implementation Evidence** (StepViewerApp.java lines 99-143):
+- --port, --host, --max-upload, --max-cache
+- --cache-dir, --no-cache, --debug
+- Both `--option=value` and `--option value` formats
 
 ---
 
