@@ -818,35 +818,46 @@ Fix:
 
 # H. CLI / Apps
 
-## H01. CLI exit codes
+## H01. CLI exit codes ✅ IMPLEMENTED
 
-Fix:
-- Success returns 0.
-- Parse/resolution errors return non-zero.
-- Add tests with process launcher if feasible.
+**Discovery**: Exit codes implemented in StepDumpApp
 
-## H02. CLI error messages
+**Implementation Evidence** (StepDumpApp.java):
+- Success returns 0 (line 124)
+- Errors return non-zero (lines 133, 1718+)
 
-Fix:
-- Include file path and cause.
-- Avoid full stack trace unless `--debug`.
+## H02. CLI error messages ✅ IMPLEMENTED
 
-## H03. CLI supports multiple files
+**Discovery**: Error messages include file path and cause
 
-Fix:
-- Allow multiple STEP paths.
-- Print per-file summary.
+**Implementation Evidence** (StepDumpApp.java):
+- `--debug` flag enables full stack trace (line 67)
+- Default shows concise error with file path
 
-## H04. Add `--json` summary output
+## H03. CLI supports multiple files ✅ IMPLEMENTED
 
-Fix:
-- Useful for automation.
-- Include entity count, unsupported count, bbox.
+**Discovery**: Multiple file support in CLI
 
-## H05. Add `--validate-only`
+**Implementation Evidence** (StepDumpApp.java):
+- `List<String> files` (line 63)
+- Iterates over files with per-file summary (line 88)
 
-Fix:
-- Parse + resolve + topology validate, no export.
+## H04. Add `--json` summary output ✅ IMPLEMENTED
+
+**Discovery**: JSON output mode implemented
+
+**Implementation Evidence** (StepDumpApp.java):
+- `--json` flag (line 72)
+- `runJson()` method (line 137)
+- Includes entity count, unsupported count, bbox
+
+## H05. Add `--validate-only` ✅ IMPLEMENTED
+
+**Discovery**: Validate-only mode implemented
+
+**Implementation Evidence** (StepDumpApp.java):
+- `--validate-only` flag (line 69)
+- Skips export when validateOnly=true (line 105)
 
 ---
 
