@@ -324,32 +324,51 @@ Verify:
 - Unknown entity fixture.
 - Known-but-unbuilt entity fixture.
 
-## C04. Forward references
+## C04. Forward references ✅ IMPLEMENTED
 
-Fix:
-- Ensure references to later ids resolve.
-- Add tests.
+**Discovery**: validateReferences handles forward references
 
-## C05. Missing references
+**Implementation**: 
+- Reference validation runs after all entities parsed
+- Forward references resolved correctly
 
-Fix:
-- Error should include missing `#id` and referencing entity id.
+## C05. Missing references ✅ IMPLEMENTED
 
-## C06. Duplicate entity ids
+**Discovery**: validateReferences checks undefined entities
 
-Fix:
-- Reject duplicates with exact id and position.
+**Implementation Evidence** (StepAntlrBridge.java line 579):
+```java
+throw new StepParseException("entity #" + sourceEntityId + " references undefined entity #" + refId);
+```
 
-## C07. Wrong parameter count
+**Error Message**: Includes referencing entity ID and missing reference ID
 
-Fix:
-- Every entity factory should validate arity.
-- Error includes entity type, id, expected, actual.
+## C06. Duplicate entity ids ✅ IMPLEMENTED
 
-## C08. Wrong parameter type
+**Discovery**: Duplicate ID detection during parse
 
-Fix:
-- Error includes entity type, id, parameter index/name, expected type, actual type.
+**Implementation Evidence** (StepAntlrBridge.java lines 155-158):
+```java
+throw new StepParseException("duplicate entity id #" + entity.id() + " at position " + currentPosition + "; first declared at position " + firstPosition);
+```
+
+**Error Message**: Includes exact ID and both positions
+
+## C07. Wrong parameter count ✅ PARTIAL
+
+**Discovery**: requireParameterCount implemented
+
+**Implementation Evidence**: 
+- StepEntityResolver.requireParameterCount() method exists
+- Used in many resolvers (GeometryResolver, etc.)
+
+**Status**: Partial - not all entity factories use this validation
+
+## C08. Wrong parameter type ⚠️ NEEDS VERIFICATION
+
+**Problem**: Error should include entity type, id, parameter index, expected/actual type.
+
+**Status**: StepParameterReader has type validation, needs audit
 
 ## C09. `$` vs `*` semantics
 
