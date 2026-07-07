@@ -1264,6 +1264,7 @@ public final class StepEntityResolver {
 
   StepFreeFormSurface resolveFreeFormSurface(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "FREE_FORM_SURFACE");
+    requireParameterCount(instance, definition, 8);
     // Free form surface is complex - use a simpler resolution approach
     List<List<StepEntity>> controlPoints = resolveFreeFormControlPoints(instance, definition, 2);
     List<Double> knotVectors = numberList(instance, definition, 6);
@@ -10880,22 +10881,24 @@ public final class StepEntityResolver {
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "MEASURE_REPRESENTATION_ITEM");
     requireParameterCount(instance, definition, 3);
-    StepValue value = definition.parameters().get(1);
-    if (!(value instanceof StepValue.TypedValue)) {
-      throw new StepResolutionException(
-          "MEASURE_REPRESENTATION_ITEM parameter 1 must be a typed measure value");
-    }
-    StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
-    StepValue unwrapped = unwrapTyped(typedValue.value());
+
+    // Use enhanced typedSelection with validation
+    StepParameterReader.TypedSelection selection = typedSelection(instance, definition, 1);
+    validateSelectTypeName(instance, definition, 1, selection,
+        SelectTypeRegistry.MEASURE_SELECT_TYPES);
+
+    StepValue unwrapped = selection.value();
     if (!(unwrapped instanceof StepValue.NumberValue)) {
       throw new StepResolutionException(
-          "MEASURE_REPRESENTATION_ITEM typed measure must wrap a number");
+          "entity #" + instance.id() + " MEASURE_REPRESENTATION_ITEM" +
+          " parameter 1 typed measure must wrap a number, actual: " + 
+          StepParameterReader.valueType(unwrapped));
     }
     StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
     return new StepMeasureRepresentationItem(
         instance.id(),
         stringValue(instance, definition, 0),
-        typedValue.typeName(),
+        selection.typeName(),
         numberValue.value(),
         resolve(referenceId(instance, definition, 2)));
   }
@@ -10912,17 +10915,16 @@ public final class StepEntityResolver {
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "VALUE_REPRESENTATION_ITEM");
     requireParameterCount(instance, definition, 2);
-    StepValue value = definition.parameters().get(1);
-    if (!(value instanceof StepValue.TypedValue)) {
-      throw new StepResolutionException(
-          "VALUE_REPRESENTATION_ITEM parameter 1 must be a typed value");
-    }
-    StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
+
+    // Use enhanced typedSelection with validation
+    StepParameterReader.TypedSelection selection = typedSelection(instance, definition, 1);
+    validateSelectTypeKnown(instance, definition, 1, selection);
+
     return new StepValueRepresentationItem(
         instance.id(),
         stringValue(instance, definition, 0),
-        typedValue.typeName(),
-        literalText(typedValue.value()));
+        selection.typeName(),
+        literalText(selection.value()));
   }
 
   StepItemIdentifiedRepresentationUsage resolveItemIdentifiedRepresentationUsage(
@@ -11647,6 +11649,45 @@ public final class StepEntityResolver {
   boolean isUnset(StepValue value) {
     return StepParameterReader.isUnset(value);
   }
+
+  // ---------------------------------------------------------------------------
+  // SELECT type handling helpers (C10)
+  // ---------------------------------------------------------------------------
+
+  /** Wrapper for StepParameterReader.typedSelection with entity ID context. */
+  StepParameterReader.TypedSelection typedSelection(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepParameterReader.typedSelection(instance, definition, index);
+  }
+
+  /** Wrapper for StepParameterReader.optionalTypedSelection with entity ID context. */
+  StepParameterReader.TypedSelection optionalTypedSelection(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepParameterReader.optionalTypedSelection(instance, definition, index);
+  }
+
+  /** Wrapper for StepParameterReader.validateSelectTypeName. */
+  void validateSelectTypeName(
+      StepEntityInstance instance,
+      StepEntityDefinition definition,
+      int index,
+      StepParameterReader.TypedSelection selection,
+      java.util.Set<String> allowedTypes) {
+    StepParameterReader.validateSelectTypeName(instance, definition, index, selection, allowedTypes);
+  }
+
+  /** Wrapper for StepParameterReader.validateSelectTypeKnown. */
+  void validateSelectTypeKnown(
+      StepEntityInstance instance,
+      StepEntityDefinition definition,
+      int index,
+      StepParameterReader.TypedSelection selection) {
+    StepParameterReader.validateSelectTypeKnown(instance, definition, index, selection);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Core value helpers
+  // ---------------------------------------------------------------------------
 
   StepValue unwrapTyped(StepValue value) {
     StepValue current = value;

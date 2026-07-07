@@ -4,6 +4,7 @@ import com.minicad.common.GeometryException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
+import com.minicad.geometry.BoundingBox3;
 import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.BSplineSurface3;
 import com.minicad.geometry.CartesianPoint;
@@ -4087,5 +4088,109 @@ class StepCadBuilderTest {
 
         Object curve2 = builder.buildOffsetCurve2(5);
         assertNotNull(curve2);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Bounding Box Tests (I04)
+    // ---------------------------------------------------------------------------
+
+    @Test
+    void shouldComputeBoundingBoxForBlockPrimitive() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
+        + "#5=BLOCK('BLK',#4,10.0,20.0,30.0);\n"
+        + "ENDSEC;"
+        );
+
+        Solid solid = builder.buildSolid(5);
+        assertNotNull(solid);
+
+        BoundingBox3 bbox = solid.boundingBox();
+        // Block with x=10, y=20, z=30 at origin
+        assertEquals(0.0, bbox.minX(), 1e-9);
+        assertEquals(0.0, bbox.minY(), 1e-9);
+        assertEquals(0.0, bbox.minZ(), 1e-9);
+        assertEquals(10.0, bbox.maxX(), 1e-9);
+        assertEquals(20.0, bbox.maxY(), 1e-9);
+        assertEquals(30.0, bbox.maxZ(), 1e-9);
+    }
+
+    @Test
+    void shouldComputeBoundingBoxForSpherePrimitive() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(5.0,5.0,5.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
+        + "#5=SPHERE('SP',#4,3.0);\n"
+        + "ENDSEC;"
+        );
+
+        Solid solid = builder.buildSolid(5);
+        assertNotNull(solid);
+
+        BoundingBox3 bbox = solid.boundingBox();
+        // Sphere radius 3, center at (5,5,5)
+        assertEquals(2.0, bbox.minX(), 1e-9); // 5-3
+        assertEquals(2.0, bbox.minY(), 1e-9); // 5-3
+        assertEquals(2.0, bbox.minZ(), 1e-9); // 5-3
+        assertEquals(8.0, bbox.maxX(), 1e-9); // 5+3
+        assertEquals(8.0, bbox.maxY(), 1e-9); // 5+3
+        assertEquals(8.0, bbox.maxZ(), 1e-9); // 5+3
+    }
+
+    @Test
+    void shouldComputeBoundingBoxForCylinderPrimitive() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=AXIS1_PLACEMENT('AX1',#1,#2);\n"
+        // RIGHT_CIRCULAR_CYLINDER params: position, height, radius
+        + "#4=RIGHT_CIRCULAR_CYLINDER('CY',#3,5.0,2.0);\n"
+        + "ENDSEC;"
+        );
+
+        Solid solid = builder.buildSolid(4);
+        assertNotNull(solid);
+
+        BoundingBox3 bbox = solid.boundingBox();
+        // Cylinder height 5, radius 2, axis along Z at origin
+        assertEquals(-2.0, bbox.minX(), 1e-9);
+        assertEquals(-2.0, bbox.minY(), 1e-9);
+        assertEquals(0.0, bbox.minZ(), 1e-9);
+        assertEquals(2.0, bbox.maxX(), 1e-9);
+        assertEquals(2.0, bbox.maxY(), 1e-9);
+        assertEquals(5.0, bbox.maxZ(), 1e-9);
+    }
+
+    @Test
+    void shouldComputeBoundingBoxForTorusPrimitive() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=AXIS1_PLACEMENT('AX1',#1,#2);\n"
+        + "#4=TORUS('TO',#3,4.0,1.0);\n"
+        + "ENDSEC;"
+        );
+
+        Solid solid = builder.buildSolid(4);
+        assertNotNull(solid);
+
+        BoundingBox3 bbox = solid.boundingBox();
+        // Torus major radius 4, minor radius 1, axis along Z
+        // Outer extent: major + minor = 5 in XY, minor = 1 in Z
+        assertEquals(-5.0, bbox.minX(), 1e-9);
+        assertEquals(-5.0, bbox.minY(), 1e-9);
+        assertEquals(-1.0, bbox.minZ(), 1e-9);
+        assertEquals(5.0, bbox.maxX(), 1e-9);
+        assertEquals(5.0, bbox.maxY(), 1e-9);
+        assertEquals(1.0, bbox.maxZ(), 1e-9);
     }
 }

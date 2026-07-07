@@ -179,6 +179,23 @@ public final class StepParameterReader {
 
   /**
    * Reads a typed SELECT-style parameter while preserving the outer wrapper name.
+   * Enhanced version with entity ID context in error messages.
+   */
+  public static TypedSelection typedSelection(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = definition.parameters().get(index);
+    if (value instanceof StepValue.TypedValue) {
+      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
+      return new TypedSelection(typedValue.typeName(), unwrapTyped(typedValue.value()));
+    }
+    throw new StepResolutionException(
+        "entity #" + instance.id() + " " + definition.name() +
+        " parameter " + index + " must be a typed SELECT value, actual: " + valueType(value));
+  }
+
+  /**
+   * Reads a typed SELECT-style parameter while preserving the outer wrapper name.
+   * Legacy version without entity ID (deprecated - use version with instance parameter).
    */
   public static TypedSelection typedSelection(
       StepEntityDefinition definition, int index, String entityName) {
@@ -192,7 +209,19 @@ public final class StepParameterReader {
   }
 
   /**
-   * Reads an optional typed SELECT-style parameter.
+   * Reads an optional typed SELECT-style parameter with entity ID context.
+   */
+  public static TypedSelection optionalTypedSelection(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    StepValue value = definition.parameters().get(index);
+    if (isUnset(value)) {
+      return null;
+    }
+    return typedSelection(instance, definition, index);
+  }
+
+  /**
+   * Reads an optional typed SELECT-style parameter (legacy version).
    */
   public static TypedSelection optionalTypedSelection(
       StepEntityDefinition definition, int index, String entityName) {
@@ -201,6 +230,52 @@ public final class StepParameterReader {
       return null;
     }
     return typedSelection(definition, index, entityName);
+  }
+
+  /**
+   * Validates that the SELECT type name matches one of the allowed types.
+   *
+   * @param instance the entity instance (for error context)
+   * @param definition the entity definition (for error context)
+   * @param index the parameter index (for error context)
+   * @param selection the typed selection to validate
+   * @param allowedTypes the set of allowed SELECT type names
+   * @throws StepResolutionException if the type name is not in the allowed set
+   */
+  public static void validateSelectTypeName(
+      StepEntityInstance instance,
+      StepEntityDefinition definition,
+      int index,
+      TypedSelection selection,
+      java.util.Set<String> allowedTypes) {
+    if (!allowedTypes.contains(selection.typeName())) {
+      throw new StepResolutionException(
+          "entity #" + instance.id() + " " + definition.name() +
+          " parameter " + index + " SELECT type name must be one of " + allowedTypes +
+          ", actual: " + selection.typeName());
+    }
+  }
+
+  /**
+   * Validates that the SELECT type name is a known AP242 SELECT type.
+   *
+   * @param instance the entity instance (for error context)
+   * @param definition the entity definition (for error context)
+   * @param index the parameter index (for error context)
+   * @param selection the typed selection to validate
+   * @throws StepResolutionException if the type name is not a known SELECT type
+   */
+  public static void validateSelectTypeKnown(
+      StepEntityInstance instance,
+      StepEntityDefinition definition,
+      int index,
+      TypedSelection selection) {
+    if (!SelectTypeRegistry.isValidSelectType(selection.typeName())) {
+      throw new StepResolutionException(
+          "entity #" + instance.id() + " " + definition.name() +
+          " parameter " + index + " SELECT type name '" + selection.typeName() +
+          "' is not a known AP242 SELECT type");
+    }
   }
 
   /**

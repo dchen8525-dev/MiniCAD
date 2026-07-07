@@ -14,6 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -624,6 +625,105 @@ class StepParameterReaderTest {
     assertEquals(
         "entity #1 TEST parameter 0 type mismatch: expected number, actual string",
         exception.getMessage());
+  }
+
+  // ---------------------------------------------------------------------------
+  // SELECT type validation tests (C10)
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void typedSelectionWithEntityIdIncludesEntityIdInError() {
+    var inst = instanceWithDef("TEST_ENTITY", List.of(new StepValue.NumberValue(1.0, "1")));
+    var def = def(inst, "TEST_ENTITY");
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.typedSelection(inst, def, 0));
+
+    assertTrue(exception.getMessage().contains("entity #1"));
+    assertTrue(exception.getMessage().contains("TEST_ENTITY"));
+    assertTrue(exception.getMessage().contains("must be a typed SELECT value"));
+    assertTrue(exception.getMessage().contains("actual: number"));
+  }
+
+  @Test
+  void optionalTypedSelectionReturnsNullWhenOmitted() {
+    var inst = instanceWithDef("TEST", List.of(new StepValue.OmittedValue()));
+    var def = def(inst, "TEST");
+
+    assertNull(StepParameterReader.optionalTypedSelection(inst, def, 0));
+  }
+
+  @Test
+  void optionalTypedSelectionReturnsSelectionWhenPresent() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("LENGTH_MEASURE", new StepValue.NumberValue(5.0, "5"))));
+    var def = def(inst, "TEST");
+
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.optionalTypedSelection(inst, def, 0);
+
+    assertNotNull(selection);
+    assertEquals("LENGTH_MEASURE", selection.typeName());
+  }
+
+  @Test
+  void validateSelectTypeNameAcceptsValidType() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("LENGTH_MEASURE", new StepValue.NumberValue(5.0, "5"))));
+    var def = def(inst, "TEST");
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.typedSelection(inst, def, 0);
+
+    assertDoesNotThrow(() ->
+        StepParameterReader.validateSelectTypeName(inst, def, 0, selection,
+            SelectTypeRegistry.MEASURE_SELECT_TYPES));
+  }
+
+  @Test
+  void validateSelectTypeNameRejectsInvalidType() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("INVALID_TYPE", new StepValue.NumberValue(5.0, "5"))));
+    var def = def(inst, "TEST");
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.typedSelection(inst, def, 0);
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.validateSelectTypeName(inst, def, 0, selection,
+            SelectTypeRegistry.MEASURE_SELECT_TYPES));
+
+    assertTrue(exception.getMessage().contains("entity #1"));
+    assertTrue(exception.getMessage().contains("TEST"));
+    assertTrue(exception.getMessage().contains("SELECT type name must be one of"));
+    assertTrue(exception.getMessage().contains("INVALID_TYPE"));
+  }
+
+  @Test
+  void validateSelectTypeKnownAcceptsKnownType() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("LENGTH_MEASURE", new StepValue.NumberValue(5.0, "5"))));
+    var def = def(inst, "TEST");
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.typedSelection(inst, def, 0);
+
+    assertDoesNotThrow(() ->
+        StepParameterReader.validateSelectTypeKnown(inst, def, 0, selection));
+  }
+
+  @Test
+  void validateSelectTypeKnownRejectsUnknownType() {
+    var inst = instanceWithDef("TEST", List.of(
+        new StepValue.TypedValue("UNKNOWN_SELECT", new StepValue.NumberValue(5.0, "5"))));
+    var def = def(inst, "TEST");
+    StepParameterReader.TypedSelection selection =
+        StepParameterReader.typedSelection(inst, def, 0);
+
+    StepResolutionException exception = assertThrows(StepResolutionException.class,
+        () -> StepParameterReader.validateSelectTypeKnown(inst, def, 0, selection));
+
+    assertTrue(exception.getMessage().contains("entity #1"));
+    assertTrue(exception.getMessage().contains("TEST"));
+    assertTrue(exception.getMessage().contains("is not a known AP242 SELECT type"));
+    assertTrue(exception.getMessage().contains("UNKNOWN_SELECT"));
   }
 
   // ---------------------------------------------------------------------------
