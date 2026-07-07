@@ -670,6 +670,10 @@ public final class StepAntlrBridge {
             }
 
             // Handle exponent format errors
+            if (msg.contains("extraneous input 'E'") || msg.contains("mismatched input 'E'") ||
+                msg.contains("'E' expecting")) {
+                return "invalid exponent at position " + position;
+            }
             if (msg.contains("E") && msg.contains("expecting") && msg.contains("digits")) {
                 return "exponent must have digits at position " + position;
             }
@@ -678,8 +682,18 @@ public final class StepAntlrBridge {
             if (msg.contains("empty enumeration")) {
                 return msg;
             }
-            if (msg.contains("unterminated enumeration")) {
-                return "unterminated enumeration at position " + position;
+            // Check for empty enum literal .. pattern
+            if (msg.contains("missing TYPE_NAME") && msg.contains("'.'")) {
+                return "empty enum literal at position " + position;
+            }
+            // Check for unterminated enum literal .T pattern
+            if (msg.contains("missing '.'") || msg.contains("unterminated enumeration")) {
+                return "unterminated enum literal at position " + position;
+            }
+
+            // Handle missing ENDSEC for HEADER
+            if (msg.contains("'END-ISO-10303-21;'") && (msg.contains("expecting 'ENDSEC;'") || msg.contains("expecting {'ENDSEC;'"))) {
+                return "missing ENDSEC for HEADER section";
             }
 
             // Handle numeric validation errors with position
