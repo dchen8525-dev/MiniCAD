@@ -40,6 +40,7 @@ class LineCountTest {
         "StepPreviewJsonExporter.java",  // Export logic (18094 lines)
         "StepDumpApp.java",  // CLI app (3632 lines)
         "StepMeshExporter.java",  // Mesh export (2857 lines)
+        "MeshTriangulatorParametric.java",  // Parametric surface triangulation (1407 lines)
         "PreviewSerializers.java",  // Preview serialization (2171 lines)
         "PreviewUvMapper.java",  // UV mapping (2286 lines)
         "PreviewCurveEvaluator.java",  // Curve evaluation (1734 lines)
