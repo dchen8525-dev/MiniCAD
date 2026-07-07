@@ -504,7 +504,7 @@ public final class StepAntlrBridge {
             }
             // Check for very large IDs (more than 10 digits is suspicious)
             if (idStr.length() > 10) {
-                throw new StepParseException("entity id too large: " + text);
+                throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
             }
             long value = Long.parseLong(idStr);
             // Reject entity id zero
@@ -512,14 +512,14 @@ public final class StepAntlrBridge {
                 throw new StepParseException("entity id '" + text + "' must be positive");
             }
             if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
-                throw new StepParseException("entity id '" + text + "' out of range");
+                throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
             }
             if (value < 0) {
                 throw new StepParseException("entity id '" + text + "' must be positive");
             }
             return (int) value;
         } catch (NumberFormatException e) {
-            throw new StepParseException("invalid entity id: " + text);
+            throw new StepParseException("entity id '" + text + "' exceeds supported maximum");
         }
     }
 
@@ -637,6 +637,10 @@ public final class StepAntlrBridge {
             if (msg.contains("mismatched input") && msg.contains("expecting")) {
                 // Check for missing DATA section (when expecting DATA; but got something else)
                 if (msg.contains("expecting") && msg.contains("'DATA;'")) {
+                    // Check if there's already a DATA section parsed - then this is multiple DATA
+                    if (sourceText.indexOf("DATA;") < position && sourceText.substring(0, position).contains("ENDSEC;")) {
+                        return "multiple DATA sections are not supported";
+                    }
                     return "missing DATA section";
                 }
                 // Check for string escape errors - when STRING fails to parse
