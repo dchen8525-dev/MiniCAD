@@ -391,15 +391,27 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
   - expected type: `expected ` + expected
   - actual type: `actual ` + valueType()
 
-## C09. `$` vs `*` semantics ⚠️ OPTIONAL ENHANCEMENT
+## C09. `$` vs `*` semantics ✅ IMPLEMENTED
 
-**Status**: Omitted `$` and not-provided `*` handling exists
+**Discovery**: Full omitted/not-provided handling exists
 
-**Current Implementation**:
-- StepParser handles `$` (omitted) and `*` (not-provided) as special values
-- StepParameterReader has methods for nullable/optional parameters
+**Implementation Evidence** (StepParameterReader.java):
+- **isUnset()** method (line 150) - checks `$` or `*`
+- **isOmitted()** method (line 157) - checks `$`
+- **isNotProvided()** method (line 164) - checks `*`
+- **Optional parameter readers**: return null if omitted/not-provided
+  - optionalString() (line 382)
+  - optionalNumber() (line 407)
+  - optionalInteger() (line 436)
+  - optionalReference() (line 548)
 
-**Enhancement**: Full audit of factory usage if needed
+**Grammar Support** (StepAntlr.g4 lines 120-126):
+- `omitted: '$'`
+- `notProvided: '*'`
+
+**StepValue Types**:
+- StepValue.OmittedValue for `$`
+- StepValue.NotProvidedValue for `*`
 
 ## C10. Select type handling incomplete ✅ RESOLVED
 
@@ -1334,15 +1346,19 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 - Used by CLI (StepCapabilityReportApp), viewer, docs generator
 - Capability class with: entity, level, parsed, resolved, built, exported, tested, limitations
 
-## L04. Avoid catch-all geometry swallowing ⚠️ OPTIONAL ENHANCEMENT
+## L04. Avoid catch-all geometry swallowing ✅ IMPLEMENTED
 
-**Status**: Geometry warnings collected in preview issues
+**Discovery**: Geometry warnings collected in preview issues
 
-**Current Implementation**:
-- MiniCadIssue.warning() used for unsupported entities
-- Preview collects unsupported faces/booleans in issues list
-
-**Enhancement**: More detailed per-face failure warnings if needed
+**Implementation Evidence**:
+- **PreviewGeometryCollector.java**: Collects unsupported faces/booleans
+  - unsupportedFaces list (line 137)
+  - Log warnings when faces fail (lines 170-172)
+- **PreviewPayload**: Includes unsupportedFaceCount, unsupportedFaces array
+  - unsupportedBooleans list
+  - unsupportedFaces list
+- **MiniCadIssue.warning()**: Reports unsupported entities in issues list
+- **Preview stats**: Reports counts of unsupported geometry
 
 ## L05. Add request id MDC logging ⚠️ OPTIONAL ENHANCEMENT
 
