@@ -633,11 +633,28 @@ public final class StepAntlrBridge {
                 return msg;
             }
 
-            // Handle invalid characters
+// Handle invalid characters
             if (msg.contains("mismatched input") && msg.contains("expecting")) {
                 // Check for missing DATA section (when expecting DATA; but got something else)
                 if (msg.contains("expecting") && msg.contains("'DATA;'")) {
                     return "missing DATA section";
+                }
+                // Check for string escape errors - when STRING fails to parse
+                // This happens when there's a malformed escape sequence inside a string
+                if (msg.contains("mismatched input '''") || msg.contains("''' expecting")) {
+                    // Look at the source text to determine the specific string error
+                    if (position < sourceText.length()) {
+                        String snippet = getSnippet(sourceText, position, 20);
+                        // Check for various malformed escape patterns
+                        if (snippet.contains("\\Z\\") || snippet.contains("\\Z") && !snippet.contains("\\X2\\")) {
+                            return "unsupported string escape at position " + position;
+                        }
+                        if (snippet.endsWith("\\") || snippet.contains("\\'") ||
+                            (snippet.contains("\\") && !snippet.contains("\\S\\") && !snippet.contains("\\P\\")
+                             && !snippet.contains("\\X\\") && !snippet.contains("\\X2\\") && !snippet.contains("\\X4\\"))) {
+                            return "malformed string escape at position " + position;
+                        }
+                    }
                 }
                 // Check for specific invalid character patterns
                 if (msg.contains("]") ) {
@@ -692,6 +709,12 @@ public final class StepAntlrBridge {
 
             // Default: keep original message
             return msg;
+        }
+
+        private String getSnippet(String text, int position, int length) {
+            int start = Math.max(0, position);
+            int end = Math.min(text.length(), position + length);
+            return text.substring(start, end);
         }
 
         boolean hasErrors() {
