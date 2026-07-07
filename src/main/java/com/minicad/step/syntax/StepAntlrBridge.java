@@ -128,8 +128,9 @@ public final class StepAntlrBridge {
 
         // Check for missing DATA section after HEADER
         if (ctx.headerSection() != null && ctx.dataSection() == null) {
-            // Allow if ISO_FOOTER present (minimal file)
-            if (ctx.ISO_FOOTER() == null) {
+            // Only allow if file is minimal ISO header/footer without any content
+            // If there are header entries, DATA section is required
+            if (!headerEntries.isEmpty()) {
                 throw new StepParseException("missing DATA section");
             }
         }
@@ -643,6 +644,17 @@ public final class StepAntlrBridge {
                 int hashPos = findHashBeforePosition(position);
                 return "invalid entity id '#+1' at position " + hashPos;
             }
+            // Handle missing header ENDSEC (DATA appears before header ENDSEC)
+            if (msg.contains("extraneous input 'DATA;'")) {
+                if (sourceText.contains("HEADER;")) {
+                    int headerPos = sourceText.indexOf("HEADER;");
+                    // Check if there's ENDSEC between HEADER and DATA
+                    String between = sourceText.substring(headerPos, position);
+                    if (!between.contains("ENDSEC;")) {
+                        return "missing ENDSEC for HEADER section";
+                    }
+                }
+            }
 
             // Handle unterminated constructs with exact position
             if (msg.contains("unterminated string")) {
@@ -698,13 +710,42 @@ public final class StepAntlrBridge {
                         return "missing ENDSEC for HEADER section";
                     }
                 }
+                // Check for missing header ENDSEC (DATA appears before header ENDSEC)
+                if (msg.contains("DATA;") || (sourceText.substring(Math.max(0, position-5), Math.min(sourceText.length(), position+5)).contains("DATA;"))) {
+                    if (sourceText.contains("HEADER;")) {
+                        int headerPos = sourceText.indexOf("HEADER;");
+                        // Check if there's ENDSEC between HEADER and DATA
+                        String between = sourceText.substring(headerPos, position);
+                        if (!between.contains("ENDSEC;")) {
+                            return "missing ENDSEC for HEADER section";
+                        }
+                    }
+                }
                 // Check for string escape errors - when STRING fails to parse
                 if (msg.contains("mismatched input '''") || msg.contains("''' expecting")) {
                     if (position < sourceText.length()) {
-                        String snippet = getSnippet(sourceText, position, 20);
-                        if (snippet.contains("\\Z\\") || (snippet.contains("\\Z") && !snippet.contains("\\X2\\"))) {
+                        String snippet = getSnippet(sourceText, position, 30);
+                        // Check for malformed \X\ escape first (should have hex digits after)
+                        if (snippet.contains("\\X\\")) {
+                            int xPos = snippet.indexOf("\\X\\");
+                            if (xPos + 3 < snippet.length()) {
+                                char nextChar = snippet.charAt(xPos + 3);
+                                if (!isHexDigit(nextChar) && nextChar != '\\') {
+                                    return "malformed \\X\\ string escape at position " + position;
+                                }
+                            }
+                        }
+                        // Check for malformed long escape \X2\ or \X4\ (should have hex digits and \X0\ terminator)
+                        if (snippet.contains("\\X2\\") || snippet.contains("\\X4\\")) {
+                            if (!snippet.contains("\\X0\\")) {
+                                return "malformed long string escape at position " + position;
+                            }
+                        }
+                        // Check for unsupported escapes
+                        if (snippet.contains("\\Z\\") || (snippet.contains("\\Z") && !snippet.contains("\\X2\\") && !snippet.contains("\\X\\"))) {
                             return "unsupported string escape at position " + position;
                         }
+                        // Check for other malformed escapes
                         if (snippet.endsWith("\\") || snippet.contains("\\'") ||
                             (snippet.contains("\\") && !snippet.contains("\\S\\") && !snippet.contains("\\P\\")
                              && !snippet.contains("\\X\\") && !snippet.contains("\\X2\\") && !snippet.contains("\\X4\\"))) {
@@ -716,13 +757,40 @@ public final class StepAntlrBridge {
                 if (msg.contains("]") ) {
                     return "unexpected character ']' at position " + position;
                 }
+                // Handle empty complex entity (#1=();) - check for mismatched ')' expecting TYPE_NAME
+                if (msg.contains("mismatched input ')'") && msg.contains("expecting TYPE_NAME")) {
+                    // Check source text for pattern () directly at position
+                    int openingPos = findComplexEntityOpening(position);
+                    if (openingPos >= 0 && openingPos < sourceText.length()) {
+                        // Check if this is an empty complex entity - pattern is #<id>=(<nothing>)
+                        int eqPos = openingPos - 1;
+                        while (eqPos >= 0 && sourceText.charAt(eqPos) == ' ') eqPos--;
+                        if (eqPos >= 0 && sourceText.charAt(eqPos) == '=') {
+                            // This is complex entity opening, check if next char is )
+                            if (openingPos + 1 < sourceText.length() && sourceText.charAt(openingPos + 1) == ')') {
+                                return "complex entity must have at least one definition at position " + openingPos;
+                            }
+                        }
+                    }
+                }
+                // Check for malformed long escape \X2\ or \X4\ (unterminated)
+                if (position < sourceText.length()) {
+                    String snippet = getSnippet(sourceText, position, 30);
+                    if (snippet.contains("\\X2\\") || snippet.contains("\\X4\\")) {
+                        if (!snippet.contains("\\X0\\")) {
+                            return "malformed long string escape at position " + position;
+                        }
+                    }
+                }
                 // Keep ANTLR4 format for other cases
                 return msg;
             }
 
             // Handle unterminated complex entities with opening position
             if (msg.contains("extraneous input 'ENDSEC;' expecting {')', TYPE_NAME}")) {
-                return "unterminated complex entity at position " + position;
+                // Find the opening position of the complex entity
+                int openingPos = findComplexEntityOpening(position);
+                return "unterminated complex entity opened at position " + openingPos;
             }
 
             // Handle exponent format errors
@@ -801,11 +869,39 @@ public final class StepAntlrBridge {
             return text.substring(start, end);
         }
 
+        private boolean isHexDigit(char c) {
+            return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
+        }
+
         private int findHashBeforePosition(int position) {
             // Find the # character before the current position
             for (int i = position - 1; i >= 0; i--) {
                 if (sourceText.charAt(i) == '#') {
                     return i;
+                }
+            }
+            return position;
+        }
+
+        private int findComplexEntityOpening(int position) {
+            // Find the opening '(' of the complex entity
+            // Look backwards for pattern like #1=(A(
+            for (int i = position - 1; i >= 0; i--) {
+                if (sourceText.charAt(i) == '(') {
+                    // Check if this is the opening of complex entity (#1=(...)
+                    // Look for pattern: #<digits>=(
+                    int j = i - 1;
+                    while (j >= 0 && sourceText.charAt(j) == ' ') j--;
+                    if (j >= 0 && sourceText.charAt(j) == '=') {
+                        j--;
+                        while (j >= 0 && sourceText.charAt(j) == ' ') j--;
+                        // Now we should be at the entity ID digits
+                        // Find the # before the ID
+                        while (j >= 0 && Character.isDigit(sourceText.charAt(j))) j--;
+                        if (j >= 0 && sourceText.charAt(j) == '#') {
+                            return i; // Return position of the opening '('
+                        }
+                    }
                 }
             }
             return position;
