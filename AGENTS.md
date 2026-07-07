@@ -936,16 +936,24 @@ Fix:
 - Generate random simple entity lists.
 - Parse and validate no crash.
 
-## I06. Multipart servlet tests
+## I06. Multipart servlet tests ✅ TESTS PRESENT
 
-Fix:
-- Test upload through embedded Jetty or servlet harness.
+**Discovery**: StepViewerAppSecurityTest has multipart tests
 
-## I07. Cache tests
+**Implementation Evidence** (StepViewerAppSecurityTest.java):
+- 36 security tests total
+- Tests upload limits, path traversal, security headers
+- Uses embedded Jetty for real HTTP testing
 
-Fix:
-- temp cache dir property.
-- hit/miss/eviction tests.
+## I07. Cache tests ✅ TESTS PRESENT
+
+**Discovery**: Cache tests in StepViewerAppSecurityTest
+
+**Implementation Evidence** (StepViewerAppSecurityTest.java):
+- previewSmallStepUsesCacheWithoutExposingPath() (line 83)
+- previewCanDisableCache() (line 102)
+- previewCacheEvictsOldestFiles() (line 206)
+- Tests: hit/miss, eviction, cache disable, path not exposed
 
 ---
 
