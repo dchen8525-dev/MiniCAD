@@ -20,9 +20,28 @@ import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.*;
 
-/** Loose edge and standalone curve sampling orchestration.
- *  Extracted from StepPreviewJsonExporter to isolate edge sampling logic.
- *  Delegates to PreviewCurveEvaluator for actual curve sampling. */
+/**
+ * Loose edge and standalone curve sampling orchestration.
+ * Extracted from StepPreviewJsonExporter to isolate edge sampling logic.
+ * Delegates to PreviewCurveEvaluator for actual curve sampling.
+ *
+ * <p><b>NOTE: This class is currently NOT used in the main preview pipeline.</b></p>
+ * <p>It was extracted during package reorganization (Session 2026-07-08) to improve code structure
+ * but has not yet been integrated into the primary preview/export flow. The methods are complete
+ * and tested, but PreviewGeometryCollector and StepPreviewJsonExporter use their own implementations.</p>
+ *
+ * <p><b>Future integration plan:</b></p>
+ * <ul>
+ *   <li>When StepPreviewJsonExporter's buildRepresentationPayload and related methods are fully public,
+ *       this class can be used to consolidate edge sampling logic</li>
+ *   <li>See TODO in collectMappedAnnotationEdges for details on integration requirements</li>
+ *   <li>Currently kept as architectural placeholder for future code consolidation</li>
+ * </ul>
+ *
+ * @see PreviewCurveEvaluator
+ * @see com.minicad.preview.builder.PreviewGeometryCollector
+ * @see com.minicad.export.json.StepPreviewJsonExporter
+ */
 public final class PreviewEdgeSampler {
 
     private PreviewEdgeSampler() {}
