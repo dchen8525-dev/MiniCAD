@@ -1,5 +1,8 @@
 package com.minicad.app;
 
+import com.minicad.builder.CompiledStepDocument;
+import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.helper.metadata.StepTextReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

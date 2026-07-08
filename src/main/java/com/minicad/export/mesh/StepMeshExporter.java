@@ -480,7 +480,7 @@ public final class StepMeshExporter {
         MeshData mesh = buildMesh(CompiledStepDocument.compile(stepText));
         return formatObj(mesh);
     }
-    static String exportObj(CompiledStepDocument compiled) {
+    public static String exportObj(CompiledStepDocument compiled) {
         MeshData mesh = buildMesh(compiled);
         return formatObj(mesh);
     }

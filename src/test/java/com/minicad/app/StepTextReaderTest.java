@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.helper.metadata.StepTextReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

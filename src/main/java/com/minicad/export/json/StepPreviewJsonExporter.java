@@ -592,7 +592,7 @@ public final class StepPreviewJsonExporter {
         return export(compileForExport(stepText, "parse_done", "resolve_done"), startedAt, "export_done");
     }
 
-    static String export(CompiledStepDocument compiled) {
+    public static String export(CompiledStepDocument compiled) {
         return export(compiled, System.nanoTime(), "export_done");
     }
 
@@ -662,7 +662,7 @@ public final class StepPreviewJsonExporter {
         return exportGlb(compileForExport(stepText, "glb_parse_done", "glb_resolve_done"), startedAt, "glb_export_done");
     }
 
-    static byte[] exportGlb(CompiledStepDocument compiled) {
+    public static byte[] exportGlb(CompiledStepDocument compiled) {
         return exportGlb(compiled, System.nanoTime(), "glb_export_done");
     }
 

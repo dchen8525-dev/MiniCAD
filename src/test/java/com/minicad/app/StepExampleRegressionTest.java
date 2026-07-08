@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.helper.metadata.StepTextReader;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.params.ParameterizedTest;

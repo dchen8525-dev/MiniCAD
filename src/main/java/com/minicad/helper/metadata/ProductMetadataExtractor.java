@@ -59,7 +59,7 @@ public final class ProductMetadataExtractor {
         public List<String> schemaNames() { return schemaNames; }
         public List<ComponentInfo> components() { return components; }
 
-        boolean isEmpty() {
+        public boolean isEmpty() {
             return fileName == null && fileDescription == null && productName == null
                     && productDescription == null && productIdentifier == null
                     && schemaNames.isEmpty() && components.isEmpty();

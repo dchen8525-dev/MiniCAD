@@ -2,6 +2,19 @@ package com.minicad.app;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.minicad.builder.CompiledStepDocument;
+import com.minicad.export.json.PreviewSerializers;
+import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.preview.payload.BoundsPayload;
+import com.minicad.preview.payload.ColorPayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.PreviewPayload;
+import com.minicad.preview.payload.PreviewStats;
+import com.minicad.preview.payload.ValidationPayload;
+import com.minicad.preview.payload.ValidationReportPayload;
+import com.minicad.preview.payload.VectorPayload;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;

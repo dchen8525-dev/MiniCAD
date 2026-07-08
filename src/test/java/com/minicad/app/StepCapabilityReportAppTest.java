@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.builder.StepCapabilityRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

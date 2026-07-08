@@ -1,6 +1,8 @@
 package com.minicad.app;
 
 import com.minicad.geometry.*;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.sampling.PreviewSurfaceSampler;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

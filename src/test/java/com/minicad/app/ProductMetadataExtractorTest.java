@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.helper.metadata.ProductMetadataExtractor;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;

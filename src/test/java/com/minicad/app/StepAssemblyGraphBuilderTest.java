@@ -1,5 +1,6 @@
 package com.minicad.app;
 
+import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyNode;
 import com.minicad.step.model.base.StepEntity;
