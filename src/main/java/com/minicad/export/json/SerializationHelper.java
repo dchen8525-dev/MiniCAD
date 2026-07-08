@@ -1,5 +1,7 @@
 package com.minicad.export.json;
 
+import com.minicad.preview.payload.PreviewPayload;
+
 class SerializationHelper {
     static String toJson(PreviewPayload payload) {
         return PreviewSerializers.toJson(payload);

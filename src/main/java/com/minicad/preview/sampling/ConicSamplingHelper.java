@@ -1,7 +1,9 @@
 package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.helper.geometry.MathUtilityHelper;
 import com.minicad.step.model.geometry.StepConicCurve;
 import com.minicad.step.semantic.StepCadBuilder;
 
@@ -12,13 +14,13 @@ import java.util.List;
  * Helper class for sampling conic curve points.
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
-final class ConicSamplingHelper {
+public final class ConicSamplingHelper {
 
     private ConicSamplingHelper() {
         // Utility class
     }
 
-    static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
+    public static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
         double[] matrix = StepPreviewJsonExporter.matrixForPlacementEntity(curve.position(), builder);
         if (matrix == null) {
             return null;
@@ -34,14 +36,14 @@ final class ConicSamplingHelper {
         } else return null;
     }
 
-    static List<CartesianPoint> sampleConicCirclePoints(StepConicCurve curve, double[] matrix) {
+    public static List<CartesianPoint> sampleConicCirclePoints(StepConicCurve curve, double[] matrix) {
         if (curve.parameters().isEmpty()) return null;
         double radius = curve.parameters().get(0);
         if (!Double.isFinite(radius) || radius <= Epsilon.EPS) return null;
         return sampleConicPointsInMatrix(matrix, radius, radius, 72);
     }
 
-    static List<CartesianPoint> sampleConicEllipsePoints(StepConicCurve curve, double[] matrix) {
+    public static List<CartesianPoint> sampleConicEllipsePoints(StepConicCurve curve, double[] matrix) {
         if (curve.parameters().size() < 2) return null;
         double semiMajor = curve.parameters().get(0);
         double semiMinor = curve.parameters().get(1);
@@ -50,7 +52,7 @@ final class ConicSamplingHelper {
         return sampleConicPointsInMatrix(matrix, semiMajor, semiMinor, 72);
     }
 
-    static List<CartesianPoint> sampleConicPointsInMatrix(double[] matrix, double rx, double ry, int segments) {
+    public static List<CartesianPoint> sampleConicPointsInMatrix(double[] matrix, double rx, double ry, int segments) {
         List<CartesianPoint> points = new ArrayList<>(segments + 1);
         for (int i = 0; i <= segments; i++) {
             double angle = 2.0 * Math.PI * i / segments;
@@ -60,7 +62,7 @@ final class ConicSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<CartesianPoint> sampleParabolaPoints(StepConicCurve curve, double[] matrix) {
+    public static List<CartesianPoint> sampleParabolaPoints(StepConicCurve curve, double[] matrix) {
         if (curve.parameters().isEmpty()) {
             return null;
         }
@@ -79,7 +81,7 @@ final class ConicSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<CartesianPoint> sampleHyperbolaPoints(StepConicCurve curve, double[] matrix) {
+    public static List<CartesianPoint> sampleHyperbolaPoints(StepConicCurve curve, double[] matrix) {
         if (curve.parameters().size() < 2) {
             return null;
         }

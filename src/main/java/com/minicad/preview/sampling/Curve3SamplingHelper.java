@@ -1,6 +1,7 @@
 package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
 import com.minicad.geometry.Ellipse3;
@@ -13,13 +14,13 @@ import java.util.List;
  * Helper class for 3D curve sampling utilities.
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
-final class Curve3SamplingHelper {
+public final class Curve3SamplingHelper {
 
     private Curve3SamplingHelper() {
         // Utility class
     }
 
-    static double arcSweep(double startAngle, double endAngle, boolean closed, boolean naturalForward) {
+    public static double arcSweep(double startAngle, double endAngle, boolean closed, boolean naturalForward) {
         double delta = endAngle - startAngle;
         if (closed) {
             return naturalForward ? Math.PI * 2.0 : -Math.PI * 2.0;
@@ -30,7 +31,7 @@ final class Curve3SamplingHelper {
         return delta > 0.0 ? delta - Math.PI * 2.0 : delta;
     }
 
-    static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
+    public static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
         List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseCurve(trimmedCurve.basisCurve());
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
@@ -51,7 +52,7 @@ final class Curve3SamplingHelper {
         return List.copyOf(trimmed);
     }
 
-    static int nearestPointIndex(List<CartesianPoint> points, CartesianPoint target) {
+    public static int nearestPointIndex(List<CartesianPoint> points, CartesianPoint target) {
         int nearestIndex = 0;
         double nearestDistance = Double.POSITIVE_INFINITY;
         for (int index = 0; index < points.size(); index++) {
@@ -64,7 +65,7 @@ final class Curve3SamplingHelper {
         return nearestIndex;
     }
 
-    static void appendClosedTrimmedPoints(
+    public static void appendClosedTrimmedPoints(
             List<CartesianPoint> target,
             List<CartesianPoint> basisPoints,
             int startIndex,
@@ -79,7 +80,7 @@ final class Curve3SamplingHelper {
         }
     }
 
-    static void appendOpenTrimmedPoints(
+    public static void appendOpenTrimmedPoints(
             List<CartesianPoint> target,
             List<CartesianPoint> basisPoints,
             int startIndex,
@@ -96,13 +97,13 @@ final class Curve3SamplingHelper {
         }
     }
 
-    static void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
+    public static void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
         if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
             points.add(candidate);
         }
     }
 
-    static List<CartesianPoint> sampleCircleArc(Circle circle, CartesianPoint start, CartesianPoint end, boolean naturalForward) {
+    public static List<CartesianPoint> sampleCircleArc(Circle circle, CartesianPoint start, CartesianPoint end, boolean naturalForward) {
         // Project points onto circle if they're close (numerical tolerance)
         CartesianPoint projectedStart = circle.contains(start) ? start : circle.closestPointTo(start);
         CartesianPoint projectedEnd = circle.contains(end) ? end : circle.closestPointTo(end);
@@ -130,7 +131,7 @@ final class Curve3SamplingHelper {
         return points;
     }
 
-    static List<CartesianPoint> sampleEllipseArc(Ellipse3 ellipse, CartesianPoint start, CartesianPoint end, boolean naturalForward) {
+    public static List<CartesianPoint> sampleEllipseArc(Ellipse3 ellipse, CartesianPoint start, CartesianPoint end, boolean naturalForward) {
         double startAngle = ellipse.angleOf(start);
         double endAngle = ellipse.angleOf(end);
         double delta = endAngle - startAngle;

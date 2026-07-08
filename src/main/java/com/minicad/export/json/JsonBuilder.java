@@ -5,14 +5,14 @@ import java.util.Map;
 
 /**
  * Simple JSON serialization utilities for StepDumpApp output.
- * Package-private helper class with static methods.
+ * Helper class with static methods.
  */
-final class JsonBuilder {
+public final class JsonBuilder {
 
     private JsonBuilder() {
     }
 
-    static String toJson(List<Map<String, Object>> results) {
+    public static String toJson(List<Map<String, Object>> results) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (int i = 0; i < results.size(); i++) {

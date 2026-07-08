@@ -1,6 +1,12 @@
 package com.minicad.export.glb;
 
 import com.minicad.common.GeometryException;
+import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.VectorPayload;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.product.StepTessellatedFace;
@@ -14,7 +20,7 @@ import java.util.List;
  * Helper methods for building tessellated face payloads.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class TessellatedFaceExporter {
+public final class TessellatedFaceExporter {
 
     private TessellatedFaceExporter() {
         // Static helper class - no instances
@@ -23,7 +29,7 @@ final class TessellatedFaceExporter {
     /**
      * Builds face payloads from a tessellated face set (triangle mesh).
      */
-    static List<FacePayload> buildTessellatedFacePayloads(
+    public static List<FacePayload> buildTessellatedFacePayloads(
             StepTessellatedFaceSet tessellated,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
@@ -83,7 +89,7 @@ final class TessellatedFaceExporter {
     /**
      * Builds a face payload from a tessellated face (single triangle or triangle set).
      */
-    static FacePayload buildTessellatedFacePayload(
+    public static FacePayload buildTessellatedFacePayload(
             StepTessellatedFace tessellatedFace,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
@@ -122,7 +128,7 @@ final class TessellatedFaceExporter {
      * Computes the face normal from three triangle vertices using the cross product.
      * Returns null if the normal is degenerate (near-zero length).
      */
-    static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
+    public static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
         double nx = (p2.y() - p1.y()) * (p3.z() - p1.z()) - (p2.z() - p1.z()) * (p3.y() - p1.y());
         double ny = (p2.z() - p1.z()) * (p3.x() - p1.x()) - (p2.x() - p1.x()) * (p3.z() - p1.z());
         double nz = (p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x());
@@ -134,7 +140,7 @@ final class TessellatedFaceExporter {
     /**
      * Converts a STEP vertex entity to a PointPayload.
      */
-    static PointPayload pointPayloadFromVertex(StepEntity vertex) {
+    public static PointPayload pointPayloadFromVertex(StepEntity vertex) {
         if (vertex instanceof StepCartesianPoint) {
             StepCartesianPoint cp = (StepCartesianPoint) vertex;
             double cx = cp.coordinates().get(0);

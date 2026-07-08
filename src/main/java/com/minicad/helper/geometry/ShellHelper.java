@@ -25,7 +25,7 @@ import java.util.List;
  * Helper methods for shell entity handling.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class ShellHelper {
+public final class ShellHelper {
 
     private ShellHelper() {
         // Static helper class - no instances
@@ -35,7 +35,7 @@ final class ShellHelper {
      * Returns the faces of a shell-like entity.
      * Supports open/closed shells, connected face sets, and face subsets.
      */
-    static List<StepFaceEntity> shellFaces(StepEntity entity) {
+    public static List<StepFaceEntity> shellFaces(StepEntity entity) {
         if (entity instanceof StepOpenShell) {
             StepOpenShell openShell = (StepOpenShell) entity;
             return openShell.faces();
@@ -71,7 +71,7 @@ final class ShellHelper {
     /**
      * Checks if an entity is a shell entity (open or closed shell).
      */
-    static boolean isShellEntity(StepEntity entity) {
+    public static boolean isShellEntity(StepEntity entity) {
         return entity instanceof StepOpenShell
                 || entity instanceof StepSurfacedOpenShell
                 || entity instanceof StepOrientedOpenShell
@@ -82,7 +82,7 @@ final class ShellHelper {
     /**
      * Checks if an entity is shell-like (shell, connected face set, tessellated, etc.).
      */
-    static boolean isShellLikeEntity(StepEntity entity) {
+    public static boolean isShellLikeEntity(StepEntity entity) {
         return isShellEntity(entity)
                 || entity instanceof StepConnectedFaceSet
                 || entity instanceof StepConnectedFaceSubSet

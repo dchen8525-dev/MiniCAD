@@ -4,7 +4,7 @@ package com.minicad.preview.payload;
  * Validation context payload for STEP preview export.
  * Extracted from StepPreviewPayloadTypes to reduce file size.
  */
-final class ValidationContext {
+public final class ValidationContext {
     private final int representationCount;
     private final int instanceCount;
     private final PointPayload center;

@@ -2,6 +2,7 @@ package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
 import com.minicad.step.model.annotation.StepAnnotationCurveOccurrence;
@@ -24,6 +25,9 @@ import com.minicad.step.model.topology.StepLoop;
 import com.minicad.step.model.topology.StepWireShell;
 import com.minicad.step.model.workflow.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
+import com.minicad.preview.payload.EdgeCurvePayload;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.PointPayload;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -682,7 +686,7 @@ public final class PreviewCurveEvaluator {
     private static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
         if (placement instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return com.minicad.app.StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
+            return com.minicad.builder.StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
         }
         if (placement instanceof StepAxis2Placement2D) {
             StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
@@ -1724,7 +1728,7 @@ public final class PreviewCurveEvaluator {
 
     // ─── Payload conversion ──────────────────────────────────────────────
 
-    static PointPayload toPointPayload(CartesianPoint point) {
+    public static PointPayload toPointPayload(CartesianPoint point) {
         return new PointPayload(point.x(), point.y(), point.z());
     }
 

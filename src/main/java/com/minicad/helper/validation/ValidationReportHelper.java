@@ -1,5 +1,13 @@
 package com.minicad.helper.validation;
 
+import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
+import com.minicad.preview.payload.BoundsPayload;
+import com.minicad.preview.payload.GeometrySummary;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.builder.PmiPayload;
+import com.minicad.preview.payload.ValidationCheckPayload;
+import com.minicad.preview.payload.ValidationContext;
+import com.minicad.preview.payload.ValidationReportPayload;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.base.StepMeasureRepresentationItem;
 
@@ -11,13 +19,13 @@ import java.util.Map;
  * Helper class for building validation report payloads.
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
-final class ValidationReportHelper {
+public final class ValidationReportHelper {
 
     private ValidationReportHelper() {
         // Utility class
     }
 
-    static void includePmi(BoundsAccumulator bounds, List<PmiPayload> pmi) {
+    public static void includePmi(BoundsAccumulator bounds, List<PmiPayload> pmi) {
         for (PmiPayload item : pmi) {
             bounds.include(item.position());
             for (PointPayload point : item.leader()) {
@@ -26,7 +34,7 @@ final class ValidationReportHelper {
         }
     }
 
-    static ValidationReportPayload buildValidationReport(
+    public static ValidationReportPayload buildValidationReport(
             Map<Integer, StepEntity> resolved,
             GeometrySummary summary,
             ValidationContext context
@@ -70,7 +78,7 @@ final class ValidationReportHelper {
         );
     }
 
-    static Double actualValidationValue(String propertyId, GeometrySummary summary, ValidationContext context) {
+    public static Double actualValidationValue(String propertyId, GeometrySummary summary, ValidationContext context) {
         if ("surface_area".equals(propertyId)) {
             return summary.approxSurfaceArea();
         }

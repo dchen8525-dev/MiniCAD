@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * Loads STEP text from disk with conservative charset fallbacks for CAD exports.
  */
-final class StepTextReader {
+public final class StepTextReader {
 
     private static final List<Charset> CHARSET_FALLBACKS = List.of(
             StandardCharsets.UTF_8,
@@ -27,15 +27,15 @@ final class StepTextReader {
     private StepTextReader() {
     }
 
-    static String read(Path path) throws IOException {
+    public static String read(Path path) throws IOException {
         return readDecoded(Files.readAllBytes(path)).text();
     }
 
-    static String read(byte[] bytes) throws IOException {
+    public static String read(byte[] bytes) throws IOException {
         return readDecoded(bytes).text();
     }
 
-    static DecodedStepText readDecoded(byte[] bytes) throws IOException {
+    public static DecodedStepText readDecoded(byte[] bytes) throws IOException {
         CharacterCodingException lastFailure = null;
         for (Charset charset : CHARSET_FALLBACKS) {
             try {
@@ -58,7 +58,7 @@ final class StepTextReader {
         return decoded.toString();
     }
 
-    static final class DecodedStepText {
+    public static final class DecodedStepText {
         private final String text;
         private final Charset charset;
 
@@ -67,8 +67,8 @@ final class StepTextReader {
             this.charset = charset;
         }
 
-        String text() { return text; }
-        Charset charset() { return charset; }
+        public String text() { return text; }
+        public Charset charset() { return charset; }
 
         @Override
         public boolean equals(Object o) {

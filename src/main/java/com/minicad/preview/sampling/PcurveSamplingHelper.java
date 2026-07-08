@@ -8,6 +8,7 @@ import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.geometry2d.Vector2;
+import com.minicad.preview.payload.UvPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +17,18 @@ import java.util.List;
  * Helper methods for pcurve (parametric curve) sampling.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class PcurveSamplingHelper {
+public final class PcurveSamplingHelper {
 
     private PcurveSamplingHelper() {
         // Static helper class - no instances
     }
 
-    static UvPoint snapToLine(UvPoint point, Line2 line) {
+    public static UvPoint snapToLine(UvPoint point, Line2 line) {
         Point2 snapped = line.closestPoint(new Point2(point.u(), point.v()));
         return new UvPoint(snapped.x(), snapped.y());
     }
 
-    static UvPoint snapToCircle(UvPoint point, Circle2 circle) {
+    public static UvPoint snapToCircle(UvPoint point, Circle2 circle) {
         Vector2 offset = new Point2(point.u(), point.v()).subtract(circle.center());
         double norm = offset.norm();
         if (norm <= Epsilon.EPS) {
@@ -38,13 +39,13 @@ final class PcurveSamplingHelper {
         return new UvPoint(snapped.x(), snapped.y());
     }
 
-    static UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
+    public static UvPoint snapToEllipse(UvPoint point, Ellipse2 ellipse) {
         double angle = ellipse.angleOf(ellipse.pointAt(ellipse.angleOf(snapEllipseSeed(point, ellipse))));
         Point2 snapped = ellipse.pointAt(angle);
         return new UvPoint(snapped.x(), snapped.y());
     }
 
-    static List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
+    public static List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
         Point2 startPoint = new Point2(start.u(), start.v());
         Point2 endPoint = new Point2(end.u(), end.v());
         double startParameter = line.parameterOf(startPoint);
@@ -61,7 +62,7 @@ final class PcurveSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint projectedStart, UvPoint projectedEnd) {
+    public static List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint projectedStart, UvPoint projectedEnd) {
         List<Point2> sampled = spline.sample(48);
         if (sampled.size() < 2) {
             return List.of();
@@ -82,7 +83,7 @@ final class PcurveSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
+    public static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
         Point2 startPoint = new Point2(start.u(), start.v());
         Point2 endPoint = new Point2(end.u(), end.v());
         double startAngle = circle.angleOf(startPoint);
@@ -105,7 +106,7 @@ final class PcurveSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
+    public static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
         Point2 startPoint = new Point2(start.u(), start.v());
         Point2 endPoint = new Point2(end.u(), end.v());
         double startAngle = ellipse.angleOf(startPoint);
@@ -128,7 +129,7 @@ final class PcurveSamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint projectedStart, UvPoint projectedEnd) {
+    public static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint projectedStart, UvPoint projectedEnd) {
         UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());
         UvPoint trimEnd = new UvPoint(trimmed.trimEnd().x(), trimmed.trimEnd().y());
         List<UvPoint> forward = sampleCurve2(trimmed.basisCurve(), trimStart, trimEnd);
@@ -147,7 +148,7 @@ final class PcurveSamplingHelper {
         return alignTrimmedSamples(preferred, projectedStart, projectedEnd);
     }
 
-    static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
+    public static List<UvPoint> sampleCurve2(com.minicad.geometry2d.Curve2 curve, UvPoint start, UvPoint end) {
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
             return sampleLinePcurve(line, start, end);
@@ -171,14 +172,14 @@ final class PcurveSamplingHelper {
         return List.of();
     }
 
-    static double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
+    public static double score(UvPoint start, UvPoint end, List<UvPoint> samples) {
         if (samples.isEmpty()) {
             return Double.POSITIVE_INFINITY;
         }
         return distanceSquared(start, samples.get(0)) + distanceSquared(end, samples.get(samples.size() - 1));
     }
 
-    static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
+    public static List<UvPoint> alignTrimmedSamples(List<UvPoint> samples, UvPoint projectedStart, UvPoint projectedEnd) {
         if (samples.isEmpty()) {
             return samples;
         }
@@ -193,7 +194,7 @@ final class PcurveSamplingHelper {
         return List.copyOf(aligned);
     }
 
-    static Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
+    public static Point2 snapEllipseSeed(UvPoint point, Ellipse2 ellipse) {
         Vector2 offset = new Point2(point.u(), point.v()).subtract(ellipse.center());
         if (offset.norm() <= Epsilon.EPS) {
             return ellipse.pointAt(0.0);
@@ -210,7 +211,7 @@ final class PcurveSamplingHelper {
         return ellipse.pointAt(angle);
     }
 
-    static int closestPointIndex(List<Point2> points, UvPoint target) {
+    public static int closestPointIndex(List<Point2> points, UvPoint target) {
         int bestIndex = 0;
         double bestDistance = Double.POSITIVE_INFINITY;
         for (int index = 0; index < points.size(); index++) {
@@ -226,11 +227,11 @@ final class PcurveSamplingHelper {
         return bestIndex;
     }
 
-    static boolean sameUv(UvPoint left, UvPoint right) {
+    public static boolean sameUv(UvPoint left, UvPoint right) {
         return distanceSquared(left, right) <= 1.0e-12;
     }
 
-    static double distanceSquared(UvPoint left, UvPoint right) {
+    public static double distanceSquared(UvPoint left, UvPoint right) {
         double du = left.u() - right.u();
         double dv = left.v() - right.v();
         return du * du + dv * dv;

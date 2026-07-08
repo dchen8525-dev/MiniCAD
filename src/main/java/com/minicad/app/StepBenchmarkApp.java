@@ -1,5 +1,9 @@
 package com.minicad.app;
 
+import com.minicad.builder.CompiledStepDocument;
+import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.export.mesh.StepMeshExporter;
+import com.minicad.helper.metadata.StepTextReader;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
@@ -62,11 +66,11 @@ public final class StepBenchmarkApp {
         CompiledStepDocument compiled = new CompiledStepDocument(stepText, stepFile, resolved, builder);
 
         long previewExportStartedAt = System.nanoTime();
-        String previewJson = StepPreviewJsonExporter.export(compiled);
+        String previewJson = StepPreviewJsonExporter.export(stepText);
         long previewExportElapsedNanos = System.nanoTime() - previewExportStartedAt;
 
         long meshExportStartedAt = System.nanoTime();
-        String meshObj = StepMeshExporter.exportObj(compiled);
+        String meshObj = StepMeshExporter.exportObj(stepText);
         long meshExportElapsedNanos = System.nanoTime() - meshExportStartedAt;
 
         return new BenchmarkResult(

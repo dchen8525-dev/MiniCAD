@@ -6,15 +6,20 @@ import com.minicad.geometry.ConicalSurface;
 import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
+import com.minicad.helper.geometry.SurfaceGeometryHelper;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.SurfacePatch;
+import com.minicad.preview.payload.UvPoint;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Helper class for triangulation-related methods extracted from StepPreviewJsonExporter.
  */
-final class TriangulationHelper {
+public final class TriangulationHelper {
 
-    static List<PointPayload> triangulateCylindricalStrip(
+    public static List<PointPayload> triangulateCylindricalStrip(
             CylindricalSurface surface,
             double lowerHeight,
             double upperHeight,
@@ -41,7 +46,7 @@ final class TriangulationHelper {
         return List.copyOf(triangles);
     }
 
-    static List<PointPayload> triangulateConicalStrip(
+    public static List<PointPayload> triangulateConicalStrip(
             ConicalSurface surface,
             double lowerHeight,
             double upperHeight,
@@ -68,7 +73,7 @@ final class TriangulationHelper {
         return List.copyOf(triangles);
     }
 
-    static List<PointPayload> triangulateToroidalStrip(
+    public static List<PointPayload> triangulateToroidalStrip(
             ToroidalSurface surface,
             double lowerV,
             double upperV,
@@ -93,7 +98,7 @@ final class TriangulationHelper {
         return List.copyOf(triangles);
     }
 
-    static List<PointPayload> triangulatePatch(SurfacePatch patch, boolean sameSense) {
+    public static List<PointPayload> triangulatePatch(SurfacePatch patch, boolean sameSense) {
         List<PointPayload> triangles = new ArrayList<>();
         for (int u = 0; u < patch.uSegments(); u++) {
             for (int v = 0; v < patch.vSegments(); v++) {
@@ -112,7 +117,7 @@ final class TriangulationHelper {
         return List.copyOf(triangles);
     }
 
-    static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
+    public static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
         List<PointPayload> triangles = new ArrayList<>();
         if (grid.size() < 2 || grid.get(0).size() < 2) {
             return List.of();
@@ -137,7 +142,7 @@ final class TriangulationHelper {
         return List.copyOf(triangles);
     }
 
-    static void appendOrientedTriangle(
+    public static void appendOrientedTriangle(
             List<PointPayload> triangles,
             CartesianPoint a,
             CartesianPoint b,
@@ -156,7 +161,7 @@ final class TriangulationHelper {
         triangles.add(PayloadConversionHelper.toPointPayload(c));
     }
 
-    static double signedArea(List<UvPoint> points) {
+    public static double signedArea(List<UvPoint> points) {
         if (points.size() < 3) {
             return 0.0;
         }
@@ -169,7 +174,7 @@ final class TriangulationHelper {
         return area * 0.5;
     }
 
-    static boolean contains(List<UvPoint> polygon, UvPoint point) {
+    public static boolean contains(List<UvPoint> polygon, UvPoint point) {
         if (polygon.size() < 3) {
             return false;
         }
@@ -189,7 +194,7 @@ final class TriangulationHelper {
         return inside;
     }
 
-    static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
+    public static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
         for (int index = 0; index + 1 < polygon.size(); index++) {
             if (isOnSegment(polygon.get(index), polygon.get(index + 1), point)) {
                 return true;
@@ -198,7 +203,7 @@ final class TriangulationHelper {
         return false;
     }
 
-    static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
+    public static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
         double abU = b.u() - a.u();
         double abV = b.v() - a.v();
         double lengthSquared = abU * abU + abV * abV;

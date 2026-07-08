@@ -7,9 +7,25 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.app.StepAssemblyGraphBuilder.AssemblyGraph;
-import com.minicad.app.StepAssemblyGraphBuilder.AssemblyNode;
-import com.minicad.app.StepAssemblyGraphBuilder.AssemblyRepresentation;
+import com.minicad.builder.StepAssemblyGraphBuilder;
+import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyGraph;
+import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyNode;
+import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyRepresentation;
+import com.minicad.export.glb.PreviewMeshExporter;
+import com.minicad.export.glb.TessellatedFaceExporter;
+import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.helper.geometry.ShellHelper;
+import com.minicad.helper.geometry.SurfaceGeometryHelper;
+import com.minicad.helper.metadata.ProductMetadataExtractor;
+import com.minicad.helper.validation.ValidationReportHelper;
+import com.minicad.preview.builder.PmiTargetHelper;
+import com.minicad.preview.sampling.Curve2SamplingHelper;
+import com.minicad.preview.sampling.Curve3SamplingHelper;
+import com.minicad.preview.sampling.ConicSamplingHelper;
+import com.minicad.preview.mapper.SurfaceMapperHelper;
+import com.minicad.preview.statistics.GeometryMeasurementHelper;
+import com.minicad.preview.statistics.PreviewStatisticsHelper;
+import com.minicad.export.glb.PreviewMaterialExporter;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.BSplineSurface3;
@@ -485,6 +501,50 @@ import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
+import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.helper.metadata.UnitExtractor;
+import com.minicad.helper.validation.ValidationReportHelper;
+import com.minicad.builder.CompiledStepDocument;
+import com.minicad.preview.payload.AssemblyData;
+import com.minicad.preview.payload.AssemblyMetrics;
+import com.minicad.preview.payload.BoundsPayload;
+import com.minicad.preview.payload.ColorPayload;
+import com.minicad.preview.payload.EdgeCurvePayload;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.FaceSurfacePayload;
+import com.minicad.preview.payload.GeometryCollection;
+import com.minicad.preview.payload.GeometrySummary;
+import com.minicad.preview.payload.InstancePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.PbrPayload;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.PayloadReductionHelper;
+import com.minicad.preview.sampling.PcurveSamplingHelper;
+import com.minicad.preview.sampling.TriangulationHelper;
+import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.preview.builder.PmiPayload;
+import com.minicad.preview.builder.PmiTargetPayload;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.PreviewPayload;
+import com.minicad.preview.payload.PreviewPayloadCopies;
+import com.minicad.preview.payload.PreviewStats;
+import com.minicad.preview.payload.PreviewFaceResult;
+import com.minicad.preview.payload.RepresentationBuildResult;
+import com.minicad.preview.payload.RepresentationPayload;
+import com.minicad.preview.payload.UnsupportedBooleanPayload;
+import com.minicad.preview.payload.UnsupportedFacePayload;
+import com.minicad.preview.payload.SurfacePatch;
+import com.minicad.preview.payload.UvBounds;
+import com.minicad.preview.payload.UvPoint;
+import com.minicad.preview.payload.ValidationContext;
+import com.minicad.preview.payload.ValidationPayload;
+import com.minicad.preview.payload.ValidationReportPayload;
+import com.minicad.preview.payload.VectorPayload;
+import com.minicad.preview.sampling.CurveEvaluator;
+import com.minicad.preview.mapper.ParametricSurfaceMapper;
+import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
 import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
 import com.minicad.topology.Face;
@@ -1642,7 +1702,7 @@ public final class StepPreviewJsonExporter {
         return false;
     }
 
-    static double[] matrixForMappedPlacement(
+    public static double[] matrixForMappedPlacement(
             StepEntity mappedOrigin,
             StepEntity mappingTarget,
             StepCadBuilder builder
@@ -1658,7 +1718,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
+    public static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
         if (placement instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
             return StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
@@ -1688,7 +1748,7 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    static PreviewFaceResult buildPreviewFaceResult(
+    public static PreviewFaceResult buildPreviewFaceResult(
             StepFaceEntity stepFace,
             StepCadBuilder builder,
             StepMetadataExtractor.DisplayMetadata metadata
@@ -2247,7 +2307,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static RepresentationBuildResult buildRepresentationPayload(
+    public static RepresentationBuildResult buildRepresentationPayload(
             StepRepresentation representation,
             String displayName,
             Map<Integer, StepEntity> resolved,
@@ -2257,7 +2317,7 @@ public final class StepPreviewJsonExporter {
         return buildRepresentationPayload(representation, displayName, resolved, builder, metadata, new LinkedHashSet<>());
     }
 
-    static RepresentationBuildResult buildRepresentationPayload(
+    public static RepresentationBuildResult buildRepresentationPayload(
             StepRepresentation representation,
             String displayName,
             Map<Integer, StepEntity> resolved,
@@ -2539,7 +2599,7 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepSurfacePatch;
     }
 
-    static List<StepRepresentation> linkedShapeRepresentations(
+    public static List<StepRepresentation> linkedShapeRepresentations(
             StepRepresentation seed,
             Map<Integer, StepEntity> resolved
     ) {
@@ -2586,7 +2646,7 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    static StepMetadataExtractor.DisplayMetadata mergeMetadata(
+    public static StepMetadataExtractor.DisplayMetadata mergeMetadata(
             StepMetadataExtractor.DisplayMetadata inherited,
             StepMetadataExtractor.DisplayMetadata direct
     ) {
@@ -2600,7 +2660,7 @@ public final class StepPreviewJsonExporter {
         return new StepMetadataExtractor.DisplayMetadata(rgb, List.copyOf(layers), transparency, pbr);
     }
 
-    static String faceDisplayName(StepFaceEntity stepFace) {
+    public static String faceDisplayName(StepFaceEntity stepFace) {
         if (stepFace instanceof StepOrientedFace) {
             StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
             return faceDisplayName(orientedFace.faceElement());
@@ -3066,7 +3126,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
+    public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof StepBSplineSurfaceWithKnots) {
             StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
@@ -3098,7 +3158,7 @@ public final class StepPreviewJsonExporter {
         throw new UnsupportedGeometryException(surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
     }
 
-    static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
+    public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
         int uCount = surface.controlPoints().size();
         int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
         if (uCount < 2 || vCount < 2) {
@@ -4448,7 +4508,7 @@ public final class StepPreviewJsonExporter {
     
 
 
-    static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
+    public static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
         // Converted from switch expression to if-else for Java 11 compatibility
         if (curve instanceof StepLine) {
             StepLine line = (StepLine) curve;
@@ -4834,7 +4894,7 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    static String surfaceTypeName(StepEntity geometry) {
+    public static String surfaceTypeName(StepEntity geometry) {
         if (geometry instanceof StepLine) {
             return "LINE";
         }
@@ -5243,7 +5303,7 @@ public final class StepPreviewJsonExporter {
         return reversed;
     }
 
-    static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
+    public static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
         Edge edge = orientedEdge.edge();
         boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
         return sampleEdge(orientedEdge.startVertex().point(), orientedEdge.endVertex().point(), edge.curve(), naturalForward);
@@ -5278,7 +5338,7 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    static EdgePayload buildEdgePayload(
+    public static EdgePayload buildEdgePayload(
             int edgeId,
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder,
@@ -5369,7 +5429,7 @@ public final class StepPreviewJsonExporter {
         return new EdgePayload(polyLoop.id(), PayloadConversionHelper.toPointPayloads(List.copyOf(closed)), null, null);
     }
 
-    static EdgePayload sampledCurveEdgePayload(StepEntity item, StepCadBuilder builder) {
+    public static EdgePayload sampledCurveEdgePayload(StepEntity item, StepCadBuilder builder) {
         List<CartesianPoint> points = sampleLooseEdgePoints(item, builder);
         if (points == null || points.size() < 2) {
             return null;
@@ -5971,7 +6031,7 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
+    public static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
         if (item instanceof StepAnnotationFillArea) {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
             return sampleAnnotationFillAreaPoints(fillArea, builder);
@@ -6138,7 +6198,7 @@ public final class StepPreviewJsonExporter {
         return points.isEmpty() ? null : List.copyOf(points);
     }
 
-    static List<CartesianPoint> sampleAnnotationFillAreaPoints(
+    public static List<CartesianPoint> sampleAnnotationFillAreaPoints(
             StepAnnotationFillArea fillArea,
             StepCadBuilder builder
     ) {
@@ -6378,7 +6438,7 @@ public final class StepPreviewJsonExporter {
     }
 
 
-    static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
+    public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
         if (curve instanceof TrimmedCurve3) {
             TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             return Curve3SamplingHelper.sampleTrimmedCurve3(trimmedCurve, 72);
@@ -6837,7 +6897,7 @@ public final class StepPreviewJsonExporter {
     }
 
 
-    static double[] mappedItemMatrix(StepMappedItem mappedItem, StepCadBuilder builder) {
+    public static double[] mappedItemMatrix(StepMappedItem mappedItem, StepCadBuilder builder) {
         StepRepresentationMap mappingSource = mappedItem.mappingSource();
         if (!(mappingSource.mappedOrigin() instanceof com.minicad.step.model.geometry.StepAxis2Placement3D)) {
             return null;
@@ -6860,7 +6920,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static double[] matrixForTransformationOperator(
+    public static double[] matrixForTransformationOperator(
             com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
@@ -6891,11 +6951,11 @@ public final class StepPreviewJsonExporter {
         };
     }
 
-    static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
+    public static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
         return transformMappedEdge(edge, mappedItemId, matrix, null, null);
     }
 
-    static EdgePayload transformMappedEdge(
+    public static EdgePayload transformMappedEdge(
             EdgePayload edge,
             int mappedItemId,
             double[] matrix,
@@ -6961,7 +7021,7 @@ public final class StepPreviewJsonExporter {
         );
     }
 
-    static FacePayload transformMappedFace(
+    public static FacePayload transformMappedFace(
             FacePayload face,
             int mappedItemId,
             double[] matrix,
@@ -12361,7 +12421,7 @@ public final class StepPreviewJsonExporter {
         return builder.toString();
     }
 
-    static String definitionTypeName(StepEntity definition) {
+    public static String definitionTypeName(StepEntity definition) {
         String entityName = tryEntityName(definition);
         if (entityName != null) {
             return entityName;
@@ -14549,7 +14609,7 @@ public final class StepPreviewJsonExporter {
         return Set.copyOf(targets);
     }
 
-    static CartesianPoint pointFromStep(StepCartesianPoint point) {
+    public static CartesianPoint pointFromStep(StepCartesianPoint point) {
         double x = point.coordinates().get(0);
         double y = point.coordinates().size() > 1 ? point.coordinates().get(1) : 0.0;
         double z = point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0;

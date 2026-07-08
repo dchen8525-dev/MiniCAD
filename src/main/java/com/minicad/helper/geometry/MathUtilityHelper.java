@@ -1,13 +1,15 @@
 package com.minicad.helper.geometry;
 
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.VectorPayload;
 
 /**
  * Helper class for mathematical utility methods extracted from StepPreviewJsonExporter.
  */
-final class MathUtilityHelper {
+public final class MathUtilityHelper {
 
-    static double unwrapPeriodic(double value, Double previous, double period) {
+    public static double unwrapPeriodic(double value, Double previous, double period) {
         if (previous == null) {
             return value;
         }
@@ -20,11 +22,11 @@ final class MathUtilityHelper {
         return value;
     }
 
-    static double clamp(double value, double min, double max) {
+    public static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
 
-    static double[] inverseUniformScaleTransform(double[] matrix) {
+    public static double[] inverseUniformScaleTransform(double[] matrix) {
         double sx = Math.sqrt(matrix[0] * matrix[0] + matrix[4] * matrix[4] + matrix[8] * matrix[8]);
         double sy = Math.sqrt(matrix[1] * matrix[1] + matrix[5] * matrix[5] + matrix[9] * matrix[9]);
         double sz = Math.sqrt(matrix[2] * matrix[2] + matrix[6] * matrix[6] + matrix[10] * matrix[10]);
@@ -61,7 +63,7 @@ final class MathUtilityHelper {
         };
     }
 
-    static CartesianPoint transformCartesian(CartesianPoint point, double[] matrix) {
+    public static CartesianPoint transformCartesian(CartesianPoint point, double[] matrix) {
         double x = point.x();
         double y = point.y();
         double z = point.z();
@@ -72,7 +74,7 @@ final class MathUtilityHelper {
         );
     }
 
-    static VectorPayload transform(VectorPayload vector, double[] matrix) {
+    public static VectorPayload transform(VectorPayload vector, double[] matrix) {
         double x = matrix[0] * vector.x() + matrix[1] * vector.y() + matrix[2] * vector.z();
         double y = matrix[4] * vector.x() + matrix[5] * vector.y() + matrix[6] * vector.z();
         double z = matrix[8] * vector.x() + matrix[9] * vector.y() + matrix[10] * vector.z();
@@ -83,7 +85,7 @@ final class MathUtilityHelper {
         return new VectorPayload(x / length, y / length, z / length);
     }
 
-    static PointPayload transform(PointPayload point, double[] matrix) {
+    public static PointPayload transform(PointPayload point, double[] matrix) {
         double x = point.x();
         double y = point.y();
         double z = point.z();

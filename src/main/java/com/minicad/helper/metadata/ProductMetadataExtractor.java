@@ -19,12 +19,12 @@ import java.util.Objects;
 /**
  * Extracts product metadata from STEP header and resolved entities.
  */
-final class ProductMetadataExtractor {
+public final class ProductMetadataExtractor {
 
     private ProductMetadataExtractor() {
     }
 
-    static final class ProductMetadata {
+    public static final class ProductMetadata {
         private final String fileName;
         private final String fileDescription;
         private final String productName;
@@ -33,7 +33,7 @@ final class ProductMetadataExtractor {
         private final List<String> schemaNames;
         private final List<ComponentInfo> components;
 
-        ProductMetadata(
+        public ProductMetadata(
                 String fileName,
                 String fileDescription,
                 String productName,
@@ -51,13 +51,13 @@ final class ProductMetadataExtractor {
             this.components = components;
         }
 
-        String fileName() { return fileName; }
-        String fileDescription() { return fileDescription; }
-        String productName() { return productName; }
-        String productDescription() { return productDescription; }
-        String productIdentifier() { return productIdentifier; }
-        List<String> schemaNames() { return schemaNames; }
-        List<ComponentInfo> components() { return components; }
+        public String fileName() { return fileName; }
+        public String fileDescription() { return fileDescription; }
+        public String productName() { return productName; }
+        public String productDescription() { return productDescription; }
+        public String productIdentifier() { return productIdentifier; }
+        public List<String> schemaNames() { return schemaNames; }
+        public List<ComponentInfo> components() { return components; }
 
         boolean isEmpty() {
             return fileName == null && fileDescription == null && productName == null
@@ -65,24 +65,24 @@ final class ProductMetadataExtractor {
                     && schemaNames.isEmpty() && components.isEmpty();
         }
 
-        static final class ComponentInfo {
+        public static final class ComponentInfo {
             private final String name;
             private final String identifier;
             private final String description;
 
-            ComponentInfo(String name, String identifier, String description) {
+            public ComponentInfo(String name, String identifier, String description) {
                 this.name = name;
                 this.identifier = identifier;
                 this.description = description;
             }
 
-            String name() { return name; }
-            String identifier() { return identifier; }
-            String description() { return description; }
+            public String name() { return name; }
+            public String identifier() { return identifier; }
+            public String description() { return description; }
         }
     }
 
-    static ProductMetadata extract(StepFile stepFile, Map<Integer, StepEntity> resolved) {
+    public static ProductMetadata extract(StepFile stepFile, Map<Integer, StepEntity> resolved) {
         String fileName = null;
         String fileDescription = null;
         List<String> schemaNames = stepFile.schemaNames();

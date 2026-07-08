@@ -2,6 +2,36 @@ package com.minicad.export.json;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.MiniCadIssue;
+import com.minicad.helper.metadata.ProductMetadataExtractor;
+import com.minicad.helper.metadata.UnitExtractor;
+import com.minicad.preview.builder.PmiPayload;
+import com.minicad.preview.builder.PmiTargetPayload;
+import com.minicad.preview.payload.BoundsPayload;
+import com.minicad.preview.payload.BinaryEdgePayload;
+import com.minicad.preview.payload.BinaryFacePayload;
+import com.minicad.preview.payload.BinaryLoopPayload;
+import com.minicad.preview.payload.BinaryPreviewPayload;
+import com.minicad.preview.payload.BinaryRepresentationPayload;
+import com.minicad.preview.payload.ColorPayload;
+import com.minicad.preview.payload.EdgeCurvePayload;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.FaceSurfacePayload;
+import com.minicad.preview.payload.InstancePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.PbrPayload;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.PreviewPayload;
+import com.minicad.preview.payload.PreviewStats;
+import com.minicad.preview.payload.RepresentationPayload;
+import com.minicad.preview.payload.UnsupportedBooleanPayload;
+import com.minicad.preview.payload.UnsupportedFacePayload;
+import com.minicad.preview.payload.ValidationCheckPayload;
+import com.minicad.preview.payload.ValidationPayload;
+import com.minicad.preview.payload.ValidationReportPayload;
+import com.minicad.preview.payload.VectorPayload;
+import com.minicad.export.glb.PreviewGlbBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -1299,12 +1329,19 @@ public final class PreviewSerializers {
     // ─── Inner classes ───────────────────────────────────────────────────
 
     public static final class BoundsAccumulator {
-        private double minX = Double.POSITIVE_INFINITY;
-        private double minY = Double.POSITIVE_INFINITY;
-        private double minZ = Double.POSITIVE_INFINITY;
-        private double maxX = Double.NEGATIVE_INFINITY;
-        private double maxY = Double.NEGATIVE_INFINITY;
-        private double maxZ = Double.NEGATIVE_INFINITY;
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double minZ = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        double maxZ = Double.NEGATIVE_INFINITY;
+
+        public double minX() { return minX; }
+        public double minY() { return minY; }
+        public double minZ() { return minZ; }
+        public double maxX() { return maxX; }
+        public double maxY() { return maxY; }
+        public double maxZ() { return maxZ; }
 
         public void include(PointPayload point) {
             minX = Math.min(minX, point.x());
@@ -1350,5 +1387,18 @@ public final class PreviewSerializers {
         public byte[] toByteArray() {
             return output.toByteArray();
         }
+    }
+
+    public static final class PointRange {
+        private final int offset;
+        private final int count;
+
+        public PointRange(int offset, int count) {
+            this.offset = offset;
+            this.count = count;
+        }
+
+        public int offset() { return offset; }
+        public int count() { return count; }
     }
 }

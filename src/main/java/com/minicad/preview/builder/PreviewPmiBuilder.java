@@ -1,9 +1,15 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Vector3;
 import com.minicad.geometry2d.Curve2;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.RepresentationPayload;
+import com.minicad.preview.payload.InstancePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.EdgePayload;
 import com.minicad.topology.Face;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.Loop;
@@ -54,6 +60,8 @@ import com.minicad.step.model.kinematic.StepKinematicPropertyTopologyRepresentat
 import com.minicad.step.model.unit.*;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.syntax.StepValue;
+import com.minicad.preview.payload.AssemblyData;
+import com.minicad.preview.payload.PointPayload;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1314,7 +1322,7 @@ public final class PreviewPmiBuilder {
         return pointFromPlacement(annotationSymbol.mappingTarget());
     }
 
-    static CartesianPoint pointFromAnnotationFillArea(
+    public static CartesianPoint pointFromAnnotationFillArea(
             StepAnnotationFillArea fillArea,
             StepCadBuilder builder
     ) {
@@ -1325,7 +1333,7 @@ public final class PreviewPmiBuilder {
         return sampled.get(0);
     }
 
-    static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
+    public static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
         if (occurrence instanceof StepAnnotationPointOccurrence) {
             StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) occurrence;
             return pointFromAnnotationPoint(pointOccurrence.item(), builder);
@@ -1508,7 +1516,7 @@ public final class PreviewPmiBuilder {
         return pointFromAnnotationPoint(item, builder);
     }
 
-    static void collectPlaceholderPositions(
+    public static void collectPlaceholderPositions(
             StepEntity item,
             List<CartesianPoint> positions,
             StepCadBuilder builder
@@ -1575,7 +1583,7 @@ public final class PreviewPmiBuilder {
         return null;
     }
 
-    static CartesianPoint transformPoint(
+    public static CartesianPoint transformPoint(
             CartesianPoint point,
             StepCartesianTransformationOperator transformation,
             StepCadBuilder builder

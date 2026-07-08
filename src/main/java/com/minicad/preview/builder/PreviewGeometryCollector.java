@@ -1,6 +1,17 @@
 package com.minicad.preview.builder;
 
+import com.minicad.builder.StepAssemblyGraphBuilder;
+import com.minicad.export.glb.PreviewMeshExporter;
+import com.minicad.export.glb.TessellatedFaceExporter;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
+import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.GeometryCollection;
+import com.minicad.preview.payload.PreviewFaceResult;
+import com.minicad.preview.payload.RepresentationBuildResult;
+import com.minicad.preview.payload.UnsupportedFacePayload;
 import com.minicad.step.model.annotation.*;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.base.StepFaceEntity;

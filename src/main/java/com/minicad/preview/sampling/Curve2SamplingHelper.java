@@ -36,13 +36,13 @@ import java.util.List;
  * Helper class for 2D curve sampling and type name utilities.
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
-final class Curve2SamplingHelper {
+public final class Curve2SamplingHelper {
 
     private Curve2SamplingHelper() {
         // Utility class
     }
 
-    static List<Point2> sampleLooseCurve2(Curve2 curve) {
+    public static List<Point2> sampleLooseCurve2(Curve2 curve) {
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
             return List.of(line.pointAt(0.0), line.pointAt(1.0));
@@ -100,7 +100,7 @@ final class Curve2SamplingHelper {
         throw new UnsupportedGeometryException("2D curve sampling for " + curveTypeName(curve) + " is unsupported");
     }
 
-    static List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {
+    public static List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {
         List<Point2> sampled = sampleLooseCurve2(trimmedCurve.basisCurve());
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
@@ -121,7 +121,7 @@ final class Curve2SamplingHelper {
         return List.copyOf(trimmed);
     }
 
-    static int nearestPointIndex2(List<Point2> points, Point2 target) {
+    public static int nearestPointIndex2(List<Point2> points, Point2 target) {
         int nearestIndex = 0;
         double nearestDistance = Double.POSITIVE_INFINITY;
         for (int index = 0; index < points.size(); index++) {
@@ -134,7 +134,7 @@ final class Curve2SamplingHelper {
         return nearestIndex;
     }
 
-    static void appendClosedTrimmedPoints2(
+    public static void appendClosedTrimmedPoints2(
             List<Point2> target,
             List<Point2> basisPoints,
             int startIndex,
@@ -149,7 +149,7 @@ final class Curve2SamplingHelper {
         }
     }
 
-    static void appendOpenTrimmedPoints2(
+    public static void appendOpenTrimmedPoints2(
             List<Point2> target,
             List<Point2> basisPoints,
             int startIndex,
@@ -166,13 +166,13 @@ final class Curve2SamplingHelper {
         }
     }
 
-    static void addDistinctPoint2(List<Point2> points, Point2 candidate) {
+    public static void addDistinctPoint2(List<Point2> points, Point2 candidate) {
         if (points.isEmpty() || points.get(points.size() - 1).subtract(candidate).norm() > 1.0e-9) {
             points.add(candidate);
         }
     }
 
-    static String curveTypeName(Curve3 curve) {
+    public static String curveTypeName(Curve3 curve) {
         if (curve instanceof Line3) {
             return "LINE";
         }
@@ -215,7 +215,7 @@ final class Curve2SamplingHelper {
         return curve.getClass().getSimpleName();
     }
 
-    static String curveTypeName(Curve2 curve) {
+    public static String curveTypeName(Curve2 curve) {
         if (curve instanceof Line2) {
             return "LINE";
         }
@@ -252,7 +252,7 @@ final class Curve2SamplingHelper {
         return curve.getClass().getSimpleName();
     }
 
-    static List<Point2> sampleCircle2Points(Circle2 circle, int segments) {
+    public static List<Point2> sampleCircle2Points(Circle2 circle, int segments) {
         List<Point2> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             points.add(circle.pointAt(Math.PI * 2.0 * index / segments));
@@ -260,7 +260,7 @@ final class Curve2SamplingHelper {
         return List.copyOf(points);
     }
 
-    static List<Point2> sampleEllipse2Points(Ellipse2 ellipse, int segments) {
+    public static List<Point2> sampleEllipse2Points(Ellipse2 ellipse, int segments) {
         List<Point2> points = new ArrayList<>(segments + 1);
         for (int index = 0; index <= segments; index++) {
             points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));

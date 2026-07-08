@@ -31,7 +31,7 @@ public final class StepCapabilityRegistry {
         }
     }
 
-    static Map<String, Capability> load(InputStream input) throws IOException {
+    public static Map<String, Capability> load(InputStream input) throws IOException {
         Map<String, Capability> capabilities = new LinkedHashMap<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;

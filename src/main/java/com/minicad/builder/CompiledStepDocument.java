@@ -73,8 +73,8 @@ import java.util.Objects;
  * The internal {@code StepCadBuilder} maintains mutable caches during build
  * operations, so compiled documents should not be shared across concurrent threads.
  *
- * @see com.minicad.app.StepPreviewJsonExporter
- * @see com.minicad.app.StepMeshExporter
+ * @see com.minicad.export.json.StepPreviewJsonExporter
+ * @see com.minicad.export.mesh.StepMeshExporter
  * @see com.minicad.step.semantic.StepCadBuilder
  * @see com.minicad.step.semantic.StepCadGeometryOps
  * @see com.minicad.step.semantic.StepTrimResolver

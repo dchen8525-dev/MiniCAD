@@ -1,8 +1,8 @@
 package com.minicad.geometry;
 
-import com.minicad.app.StepAssemblyGraphBuilder;
-import com.minicad.app.StepAssemblyGraphBuilder.AssemblyGraph;
-import com.minicad.app.StepAssemblyGraphBuilder.AssemblyNode;
+import com.minicad.builder.StepAssemblyGraphBuilder;
+import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyGraph;
+import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyNode;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepParser;

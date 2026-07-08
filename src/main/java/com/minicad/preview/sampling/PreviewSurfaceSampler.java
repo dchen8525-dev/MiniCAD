@@ -2,7 +2,11 @@ package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.SurfacePatch;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.*;
 import com.minicad.step.semantic.StepCadBuilder;

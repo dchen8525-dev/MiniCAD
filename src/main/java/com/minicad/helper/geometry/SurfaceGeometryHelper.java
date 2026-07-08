@@ -14,7 +14,7 @@ import java.util.List;
  * Helper methods for computing surface coordinates and normals.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class SurfaceGeometryHelper {
+public final class SurfaceGeometryHelper {
 
     private SurfaceGeometryHelper() {
         // Static helper class - no instances
@@ -22,11 +22,11 @@ final class SurfaceGeometryHelper {
 
     // === Cylindrical surface helpers ===
 
-    static List<Double> unwrapAngles(CylindricalSurface surface, List<CartesianPoint> points) {
+    public static List<Double> unwrapAngles(CylindricalSurface surface, List<CartesianPoint> points) {
         return unwrapAngles(surface.position(), points);
     }
 
-    static List<Double> unwrapAngles(Axis2Placement3D placement, List<CartesianPoint> points) {
+    public static List<Double> unwrapAngles(Axis2Placement3D placement, List<CartesianPoint> points) {
         List<Double> angles = new ArrayList<>(points.size());
         for (CartesianPoint point : points) {
             double angle = cylindricalAngle(placement, point);
@@ -44,11 +44,11 @@ final class SurfaceGeometryHelper {
         return List.copyOf(angles);
     }
 
-    static double averageAxialHeight(CylindricalSurface surface, List<CartesianPoint> points) {
+    public static double averageAxialHeight(CylindricalSurface surface, List<CartesianPoint> points) {
         return averageAxialHeight(surface.position(), points);
     }
 
-    static double averageAxialHeight(Axis2Placement3D placement, List<CartesianPoint> points) {
+    public static double averageAxialHeight(Axis2Placement3D placement, List<CartesianPoint> points) {
         double total = 0.0;
         for (CartesianPoint point : points) {
             total += axialHeight(placement, point);
@@ -56,26 +56,26 @@ final class SurfaceGeometryHelper {
         return total / points.size();
     }
 
-    static double axialHeight(CylindricalSurface surface, CartesianPoint point) {
+    public static double axialHeight(CylindricalSurface surface, CartesianPoint point) {
         return axialHeight(surface.position(), point);
     }
 
-    static double axialHeight(Axis2Placement3D placement, CartesianPoint point) {
+    public static double axialHeight(Axis2Placement3D placement, CartesianPoint point) {
         return point.subtract(placement.location()).dot(placement.axis().asVector());
     }
 
-    static double cylindricalAngle(CylindricalSurface surface, CartesianPoint point) {
+    public static double cylindricalAngle(CylindricalSurface surface, CartesianPoint point) {
         return cylindricalAngle(surface.position(), point);
     }
 
-    static double cylindricalAngle(Axis2Placement3D placement, CartesianPoint point) {
+    public static double cylindricalAngle(Axis2Placement3D placement, CartesianPoint point) {
         Vector3 offset = point.subtract(placement.location());
         double x = offset.dot(placement.xDirection().asVector());
         double y = offset.dot(placement.yDirection().asVector());
         return Math.atan2(y, x);
     }
 
-    static CartesianPoint surfacePoint(CylindricalSurface surface, double angle, double height) {
+    public static CartesianPoint surfacePoint(CylindricalSurface surface, double angle, double height) {
         Axis2Placement3D placement = surface.position();
         Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * surface.radius())
                 .add(placement.yDirection().asVector().scale(Math.sin(angle) * surface.radius()));
@@ -83,7 +83,7 @@ final class SurfaceGeometryHelper {
         return placement.location().add(radial.add(axial));
     }
 
-    static Vector3 cylindricalNormal(CylindricalSurface surface, double angle, boolean sameSense) {
+    public static Vector3 cylindricalNormal(CylindricalSurface surface, double angle, boolean sameSense) {
         Axis2Placement3D placement = surface.position();
         Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
                 .add(placement.yDirection().asVector().scale(Math.sin(angle)));
@@ -92,7 +92,7 @@ final class SurfaceGeometryHelper {
 
     // === Conical surface helpers ===
 
-    static CartesianPoint conicalSurfacePoint(ConicalSurface surface, double angle, double height) {
+    public static CartesianPoint conicalSurfacePoint(ConicalSurface surface, double angle, double height) {
         Axis2Placement3D placement = surface.position();
         double radius = surface.radius() + height * Math.tan(surface.semiAngle());
         Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle) * radius)
@@ -101,7 +101,7 @@ final class SurfaceGeometryHelper {
         return placement.location().add(radial.add(axial));
     }
 
-    static Vector3 conicalNormal(ConicalSurface surface, double angle, boolean sameSense) {
+    public static Vector3 conicalNormal(ConicalSurface surface, double angle, boolean sameSense) {
         Axis2Placement3D placement = surface.position();
         double slope = Math.tan(surface.semiAngle());
         Vector3 radial = placement.xDirection().asVector().scale(Math.cos(angle))
@@ -112,14 +112,14 @@ final class SurfaceGeometryHelper {
 
     // === Spherical surface helpers ===
 
-    static double sphericalU(Axis2Placement3D placement, CartesianPoint point) {
+    public static double sphericalU(Axis2Placement3D placement, CartesianPoint point) {
         Vector3 offset = point.subtract(placement.location());
         double x = offset.dot(placement.xDirection().asVector());
         double y = offset.dot(placement.yDirection().asVector());
         return Math.atan2(y, x);
     }
 
-    static double sphericalV(Axis2Placement3D placement, CartesianPoint point, double radius) {
+    public static double sphericalV(Axis2Placement3D placement, CartesianPoint point, double radius) {
         Vector3 offset = point.subtract(placement.location());
         double z = offset.dot(placement.axis().asVector());
         double normalized = radius <= 1.0e-12 ? 0.0 : z / radius;
@@ -127,7 +127,7 @@ final class SurfaceGeometryHelper {
         return Math.asin(normalized);
     }
 
-    static CartesianPoint sphericalSurfacePoint(Axis2Placement3D placement, double radius, double u, double v) {
+    public static CartesianPoint sphericalSurfacePoint(Axis2Placement3D placement, double radius, double u, double v) {
         double cosV = Math.cos(v);
         Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
                 .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
@@ -135,7 +135,7 @@ final class SurfaceGeometryHelper {
         return placement.location().add(normal.scale(radius));
     }
 
-    static Vector3 sphericalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
+    public static Vector3 sphericalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
         double cosV = Math.cos(v);
         Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * cosV)
                 .add(placement.yDirection().asVector().scale(Math.sin(u) * cosV))
@@ -145,11 +145,11 @@ final class SurfaceGeometryHelper {
 
     // === Toroidal surface helpers ===
 
-    static CartesianPoint toroidalSurfacePoint(ToroidalSurface surface, double u, double v) {
+    public static CartesianPoint toroidalSurfacePoint(ToroidalSurface surface, double u, double v) {
         return toroidalSurfacePoint(surface.position(), surface.majorRadius(), surface.minorRadius(), u, v);
     }
 
-    static CartesianPoint toroidalSurfacePoint(
+    public static CartesianPoint toroidalSurfacePoint(
             Axis2Placement3D placement,
             double majorRadius,
             double minorRadius,
@@ -163,18 +163,18 @@ final class SurfaceGeometryHelper {
         return placement.location().add(xy.add(z));
     }
 
-    static Vector3 toroidalNormal(ToroidalSurface surface, double u, double v, boolean sameSense) {
+    public static Vector3 toroidalNormal(ToroidalSurface surface, double u, double v, boolean sameSense) {
         return toroidalNormal(surface.position(), u, v, sameSense);
     }
 
-    static Vector3 toroidalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
+    public static Vector3 toroidalNormal(Axis2Placement3D placement, double u, double v, boolean sameSense) {
         Vector3 normal = placement.xDirection().asVector().scale(Math.cos(u) * Math.cos(v))
                 .add(placement.yDirection().asVector().scale(Math.sin(u) * Math.cos(v)))
                 .add(placement.axis().asVector().scale(Math.sin(v)));
         return sameSense ? normal.normalize().asVector() : normal.normalize().reverse().asVector();
     }
 
-    static List<Double> unwrapToroidalU(ToroidalSurface surface, List<CartesianPoint> points) {
+    public static List<Double> unwrapToroidalU(ToroidalSurface surface, List<CartesianPoint> points) {
         List<Double> values = new ArrayList<>(points.size());
         for (CartesianPoint point : points) {
             double value = toroidalU(surface, point);
@@ -192,7 +192,7 @@ final class SurfaceGeometryHelper {
         return List.copyOf(values);
     }
 
-    static List<Double> unwrapToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
+    public static List<Double> unwrapToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
         List<Double> values = new ArrayList<>(points.size());
         for (CartesianPoint point : points) {
             double value = toroidalV(surface, point);
@@ -210,7 +210,7 @@ final class SurfaceGeometryHelper {
         return List.copyOf(values);
     }
 
-    static double averageToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
+    public static double averageToroidalV(ToroidalSurface surface, List<CartesianPoint> points) {
         double total = 0.0;
         for (CartesianPoint point : points) {
             total += toroidalV(surface, point);
@@ -218,22 +218,22 @@ final class SurfaceGeometryHelper {
         return total / points.size();
     }
 
-    static double toroidalU(ToroidalSurface surface, CartesianPoint point) {
+    public static double toroidalU(ToroidalSurface surface, CartesianPoint point) {
         return toroidalU(surface.position(), point);
     }
 
-    static double toroidalU(Axis2Placement3D placement, CartesianPoint point) {
+    public static double toroidalU(Axis2Placement3D placement, CartesianPoint point) {
         Vector3 offset = point.subtract(placement.location());
         double x = offset.dot(placement.xDirection().asVector());
         double y = offset.dot(placement.yDirection().asVector());
         return Math.atan2(y, x);
     }
 
-    static double toroidalV(ToroidalSurface surface, CartesianPoint point) {
+    public static double toroidalV(ToroidalSurface surface, CartesianPoint point) {
         return toroidalV(surface.position(), surface.majorRadius(), point);
     }
 
-    static double toroidalV(Axis2Placement3D placement, double majorRadius, CartesianPoint point) {
+    public static double toroidalV(Axis2Placement3D placement, double majorRadius, CartesianPoint point) {
         Vector3 offset = point.subtract(placement.location());
         double x = offset.dot(placement.xDirection().asVector());
         double y = offset.dot(placement.yDirection().asVector());

@@ -1,5 +1,7 @@
 package com.minicad.app;
 
+import com.minicad.builder.StepCapabilityRegistry;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

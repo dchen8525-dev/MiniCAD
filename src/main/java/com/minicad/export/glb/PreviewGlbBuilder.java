@@ -1,6 +1,25 @@
 package com.minicad.export.glb;
 
 import com.minicad.common.Epsilon;
+import com.minicad.export.json.PreviewSerializers;
+import com.minicad.preview.payload.ColorPayload;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.EdgeCurvePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.FaceSurfacePayload;
+import com.minicad.preview.payload.InstancePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.PbrPayload;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.PreviewPayload;
+import com.minicad.preview.payload.RepresentationPayload;
+import com.minicad.preview.payload.RepresentationMeshes;
+import com.minicad.preview.payload.FaceNode;
+import com.minicad.preview.payload.EdgeNode;
+import com.minicad.preview.payload.FloatArrayData;
+import com.minicad.preview.payload.IntArrayData;
+import com.minicad.preview.payload.IndexedTriangleMesh;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

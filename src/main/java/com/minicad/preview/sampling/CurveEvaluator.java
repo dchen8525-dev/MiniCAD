@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Interface for evaluating curves at specific parameters.
  */
-interface CurveEvaluator {
+public interface CurveEvaluator {
     double start();
 
     double end();

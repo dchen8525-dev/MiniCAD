@@ -9,6 +9,7 @@ import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
+import com.minicad.builder.CompiledStepDocument;
 import com.minicad.topology.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

@@ -1,5 +1,6 @@
 package com.minicad.preview.sampling;
 
+import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
@@ -7,6 +8,7 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry2d.Curve2;
+import com.minicad.preview.payload.EdgePayload;
 import com.minicad.step.model.annotation.*;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.geometry.*;

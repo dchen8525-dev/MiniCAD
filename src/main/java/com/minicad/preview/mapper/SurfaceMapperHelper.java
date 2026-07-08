@@ -1,6 +1,7 @@
 package com.minicad.preview.mapper;
 
 import com.minicad.common.Epsilon;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.Axis1Placement;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.BSplineSurface3;
@@ -13,6 +14,11 @@ import com.minicad.geometry.RationalBSplineSurface3;
 import com.minicad.geometry.SphericalSurface;
 import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
+import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.helper.geometry.SurfaceGeometryHelper;
+import com.minicad.preview.payload.UvPoint;
+import com.minicad.preview.payload.VectorPayload;
+import com.minicad.preview.sampling.CurveEvaluator;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.model.product.StepGeometricReplica;
@@ -53,8 +59,8 @@ import java.util.List;
  * Helper class for parametric surface mapping operations.
  * Extracted from StepPreviewJsonExporter for maintainability.
  */
-class SurfaceMapperHelper {
-    static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
+public class SurfaceMapperHelper {
+    public static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof StepRectangularTrimmedSurface) {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             return mapperForSurface(trimmedSurface.basisSurface(), builder);
@@ -633,7 +639,7 @@ class SurfaceMapperHelper {
         }
         return null;
     }
-    static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
+    public static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
         double uStart = surface.uStart();
         double uEnd = surface.uEnd();
         double vStart = surface.vStart();
@@ -695,7 +701,7 @@ class SurfaceMapperHelper {
         }
         return new UvPoint(bestU, bestV);
     }
-    static UvPoint nearestUvOnRationalBSplineSurface(
+    public static UvPoint nearestUvOnRationalBSplineSurface(
             RationalBSplineSurface3 surface,
             CartesianPoint point,
             UvPoint previous
@@ -750,7 +756,7 @@ class SurfaceMapperHelper {
         }
         return new UvPoint(bestU, bestV);
     }
-    static ParametricSurfaceMapper extrusionMapper(
+    public static ParametricSurfaceMapper extrusionMapper(
             StepSurfaceOfLinearExtrusion extrusionSurface,
             StepCadBuilder builder
     ) {
@@ -785,7 +791,7 @@ class SurfaceMapperHelper {
             }
         };
     }
-    static ParametricSurfaceMapper revolutionMapper(
+    public static ParametricSurfaceMapper revolutionMapper(
             StepSurfaceOfRevolution revolutionSurface,
             StepCadBuilder builder
     ) {
@@ -849,7 +855,7 @@ class SurfaceMapperHelper {
             }
         };
     }
-    static double closestParameter(CurveEvaluator curve, CartesianPoint point, Double preferred) {
+    public static double closestParameter(CurveEvaluator curve, CartesianPoint point, Double preferred) {
         int coarseSegments = 160;
         double start = curve.start();
         double end = curve.end();
@@ -886,7 +892,7 @@ class SurfaceMapperHelper {
         }
         return bestParameter;
     }
-    static Direction3 revolutionReferenceDirection(
+    public static Direction3 revolutionReferenceDirection(
             CurveEvaluator directrix,
             CartesianPoint axisOrigin,
             Direction3 axisDirection
@@ -902,7 +908,7 @@ class SurfaceMapperHelper {
         Vector3 radial = seed.subtract(axis.scale(seed.dot(axis)));
         return Direction3.from(radial);
     }
-    static CartesianPoint toRevolutionMeridianPoint(
+    public static CartesianPoint toRevolutionMeridianPoint(
             CartesianPoint point,
             CartesianPoint axisOrigin,
             Direction3 axisDirection,
@@ -916,7 +922,7 @@ class SurfaceMapperHelper {
                 .add(axisDirection.asVector().scale(axisCoordinate))
                 .add(radialReference.asVector().scale(radius));
     }
-    static CartesianPoint revolveAroundAxis(
+    public static CartesianPoint revolveAroundAxis(
             CartesianPoint point,
             CartesianPoint axisOrigin,
             Direction3 axisDirection,
@@ -933,7 +939,7 @@ class SurfaceMapperHelper {
         return axisOrigin.add(rotated);
     }
 
-    static Vector3 tangentAlongRevolutionDirectrix(
+    public static Vector3 tangentAlongRevolutionDirectrix(
             CurveEvaluator directrix,
             CartesianPoint axisOrigin,
             Direction3 axisDirection,
@@ -954,7 +960,7 @@ class SurfaceMapperHelper {
         CartesianPoint p1 = revolveAroundAxis(directrix.pointAt(u1), axisOrigin, axisDirection, radialReference, tangentialReference, v);
         return p1.subtract(p0);
     }
-    static Vector3 tangentAroundRevolution(
+    public static Vector3 tangentAroundRevolution(
             CartesianPoint axisOrigin,
             Direction3 axisDirection,
             Direction3 radialReference,
@@ -966,11 +972,11 @@ class SurfaceMapperHelper {
         Vector3 radial = radialComponent(rotated, axisOrigin, axisDirection);
         return axisDirection.asVector().cross(radial);
     }
-    static Vector3 radialComponent(CartesianPoint point, CartesianPoint axisOrigin, Direction3 axisDirection) {
+    public static Vector3 radialComponent(CartesianPoint point, CartesianPoint axisOrigin, Direction3 axisDirection) {
         Vector3 offset = point.subtract(axisOrigin);
         return offset.subtract(axisDirection.asVector().scale(offset.dot(axisDirection.asVector())));
     }
-    static Vector3 fallbackNormal(Vector3 preferredAxis) {
+    public static Vector3 fallbackNormal(Vector3 preferredAxis) {
         Vector3 seed = Math.abs(preferredAxis.x()) < 0.9 ? new Vector3(1.0, 0.0, 0.0) : new Vector3(0.0, 1.0, 0.0);
         Vector3 normal = preferredAxis.cross(seed);
         if (normal.norm() <= Epsilon.EPS) {

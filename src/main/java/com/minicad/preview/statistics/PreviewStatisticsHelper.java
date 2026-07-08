@@ -4,6 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.minicad.helper.geometry.ShellHelper;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.UvBounds;
+import com.minicad.preview.payload.UnsupportedBooleanPayload;
+import com.minicad.preview.payload.UnsupportedFacePayload;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.product.StepBooleanClippingResult;
 import com.minicad.step.model.product.StepBooleanResult;
@@ -22,9 +27,6 @@ import com.minicad.step.model.product.StepSurfaceCurveSweptAreaSolid;
 import com.minicad.step.model.product.StepSweptAreaSolid;
 import com.minicad.step.model.product.StepSweptDiskSolid;
 import com.minicad.step.model.product.StepBlockVolume;
-
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,13 +34,13 @@ import java.util.stream.Collectors;
  * Helper methods for preview statistics and summarization.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class PreviewStatisticsHelper {
+public final class PreviewStatisticsHelper {
 
     private PreviewStatisticsHelper() {
         // Static helper class - no instances
     }
 
-    static int countEntities(Map<Integer, StepEntity> resolved, Class<? extends StepEntity> type) {
+    public static int countEntities(Map<Integer, StepEntity> resolved, Class<? extends StepEntity> type) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
             if (type.isInstance(entity)) {
@@ -48,7 +50,7 @@ final class PreviewStatisticsHelper {
         return count;
     }
 
-    static int countSolidEntities(Map<Integer, StepEntity> resolved) {
+    public static int countSolidEntities(Map<Integer, StepEntity> resolved) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepManifoldSolidBrep
@@ -74,7 +76,7 @@ final class PreviewStatisticsHelper {
         return count;
     }
 
-    static String summarizeUnsupportedFacesBySurfaceType(List<UnsupportedFacePayload> unsupportedFaces) {
+    public static String summarizeUnsupportedFacesBySurfaceType(List<UnsupportedFacePayload> unsupportedFaces) {
         Map<String, Long> counts = unsupportedFaces.stream()
                 .collect(Collectors.groupingBy(
                         face -> face.surfaceType() == null ? "UNKNOWN" : face.surfaceType(),
@@ -87,7 +89,7 @@ final class PreviewStatisticsHelper {
                 .collect(Collectors.joining("|"));
     }
 
-    static String summarizeUnsupportedFacesByReason(List<UnsupportedFacePayload> unsupportedFaces) {
+    public static String summarizeUnsupportedFacesByReason(List<UnsupportedFacePayload> unsupportedFaces) {
         Map<String, Long> counts = unsupportedFaces.stream()
                 .collect(Collectors.groupingBy(
                         face -> face.reason() == null ? "unknown" : face.reason(),
@@ -100,7 +102,7 @@ final class PreviewStatisticsHelper {
                 .collect(Collectors.joining("|"));
     }
 
-    static String summarizeUnsupportedBooleansByType(List<UnsupportedBooleanPayload> unsupportedBooleans) {
+    public static String summarizeUnsupportedBooleansByType(List<UnsupportedBooleanPayload> unsupportedBooleans) {
         Map<String, Long> counts = unsupportedBooleans.stream()
                 .collect(Collectors.groupingBy(
                         UnsupportedBooleanPayload::type,
@@ -113,7 +115,7 @@ final class PreviewStatisticsHelper {
                 .collect(Collectors.joining("|"));
     }
 
-    static String summarizeUnsupportedBooleansByReason(List<UnsupportedBooleanPayload> unsupportedBooleans) {
+    public static String summarizeUnsupportedBooleansByReason(List<UnsupportedBooleanPayload> unsupportedBooleans) {
         Map<String, Long> counts = unsupportedBooleans.stream()
                 .collect(Collectors.groupingBy(
                         item -> item.reason() == null ? "unknown" : item.reason(),
@@ -126,13 +128,13 @@ final class PreviewStatisticsHelper {
                 .collect(Collectors.joining("|"));
     }
 
-    static String summarizeLoopPointCounts(List<ParametricLoopPayload> loops) {
+    public static String summarizeLoopPointCounts(List<ParametricLoopPayload> loops) {
         return loops.stream()
                 .map(loop -> (loop.outer() ? "outer" : "inner") + ":" + loop.points().size())
                 .collect(Collectors.joining("|"));
     }
 
-    static String formatUvBounds(UvBounds bounds) {
+    public static String formatUvBounds(UvBounds bounds) {
         return String.format(
                 "(minU=%.6f,minV=%.6f,maxU=%.6f,maxV=%.6f,uSpan=%.6f,vSpan=%.6f)",
                 bounds.minU(),
@@ -144,7 +146,7 @@ final class PreviewStatisticsHelper {
         );
     }
 
-    static int countShells(Map<Integer, StepEntity> resolved) {
+    public static int countShells(Map<Integer, StepEntity> resolved) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {
             if (ShellHelper.isShellLikeEntity(entity)) {

@@ -259,14 +259,14 @@ public final class StepAssemblyGraphBuilder {
         return nodeId.substring(0, slash);
     }
 
-    static double[] localTransformationMatrixFor(
+    public static double[] localTransformationMatrixFor(
             StepContextDependentShapeRepresentation contextDependent,
             Map<Integer, StepEntity> resolved
     ) {
         return localTransformationMatrixFor(contextDependent, resolved, 1.0);
     }
 
-    static double[] localTransformationMatrixFor(
+    public static double[] localTransformationMatrixFor(
             StepContextDependentShapeRepresentation contextDependent,
             Map<Integer, StepEntity> resolved,
             double scaleToMeters
@@ -283,21 +283,21 @@ public final class StepAssemblyGraphBuilder {
         return identityMatrix();
     }
 
-    static double[] matrixFor(StepItemDefinedTransformation transformation) {
+    public static double[] matrixFor(StepItemDefinedTransformation transformation) {
         return matrixFor(transformation, 1.0);
     }
 
-    static double[] matrixFor(StepItemDefinedTransformation transformation, double scaleToMeters) {
+    public static double[] matrixFor(StepItemDefinedTransformation transformation, double scaleToMeters) {
         double[] from = matrixForPlacement(transformation.transformItem1(), scaleToMeters);
         double[] to = matrixForPlacement(transformation.transformItem2(), scaleToMeters);
         return multiplyMatrices(to, inverseRigidTransform(from));
     }
 
-    static double[] matrixForPlacement(StepAxis2Placement3D placement) {
+    public static double[] matrixForPlacement(StepAxis2Placement3D placement) {
         return matrixForPlacement(placement, 1.0);
     }
 
-    static double[] matrixForPlacement(StepAxis2Placement3D placement, double scaleToMeters) {
+    public static double[] matrixForPlacement(StepAxis2Placement3D placement, double scaleToMeters) {
         Vector3 z = directionVector(placement.axis()).normalize().asVector();
         Vector3 xSeed = directionVector(placement.refDirection()).normalize().asVector();
         Vector3 cross = z.cross(xSeed);
@@ -325,7 +325,7 @@ public final class StepAssemblyGraphBuilder {
         return new Vector3(ratios.get(0), ratios.get(1), ratios.get(2));
     }
 
-    static double[] inverseRigidTransform(double[] matrix) {
+    public static double[] inverseRigidTransform(double[] matrix) {
         double r00 = matrix[0];
         double r01 = matrix[1];
         double r02 = matrix[2];
@@ -347,7 +347,7 @@ public final class StepAssemblyGraphBuilder {
         };
     }
 
-    static double[] multiplyMatrices(double[] left, double[] right) {
+    public static double[] multiplyMatrices(double[] left, double[] right) {
         double[] result = new double[16];
         for (int row = 0; row < 4; row++) {
             for (int col = 0; col < 4; col++) {
@@ -361,7 +361,7 @@ public final class StepAssemblyGraphBuilder {
         return result;
     }
 
-    static double[] identityMatrix() {
+    public static double[] identityMatrix() {
         return new double[]{
                 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,

@@ -6,15 +6,15 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class PayloadReductionHelper {
+public class PayloadReductionHelper {
     private static final Logger log = LoggerFactory.getLogger(PayloadReductionHelper.class);
-    static final int MAX_TOTAL_TRIANGLE_POINTS = 1000000;
-    static final int MAX_TOTAL_LOOP_POINTS = 500000;
-    static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
+    public static final int MAX_TOTAL_TRIANGLE_POINTS = 1000000;
+    public static final int MAX_TOTAL_LOOP_POINTS = 500000;
+    public static PreviewPayload reducePayloadGeometry(PreviewPayload payload) {
         return reducePayloadGeometry(payload, MAX_TOTAL_TRIANGLE_POINTS, MAX_TOTAL_LOOP_POINTS, "payload_geometry_reduced");
     }
 
-    static PreviewPayload reducePayloadGeometry(
+    public static PreviewPayload reducePayloadGeometry(
             PreviewPayload payload,
             int maxTrianglePoints,
             int maxLoopPoints,
@@ -70,7 +70,7 @@ class PayloadReductionHelper {
         return reduced;
     }
 
-    static FacePayload reduceFacePayload(FacePayload face, int triangleFactor, int loopFactor) {
+    public static FacePayload reduceFacePayload(FacePayload face, int triangleFactor, int loopFactor) {
         return new FacePayload(
                 face.stepId(),
                 face.name(),
@@ -89,7 +89,7 @@ class PayloadReductionHelper {
         );
     }
 
-    static List<PointPayload> reduceTrianglePoints(List<PointPayload> triangles, int factor) {
+    public static List<PointPayload> reduceTrianglePoints(List<PointPayload> triangles, int factor) {
         if (factor <= 1 || triangles.size() <= 3) {
             return triangles;
         }
@@ -116,7 +116,7 @@ class PayloadReductionHelper {
         return List.copyOf(reduced);
     }
 
-    static List<LoopPayload> reduceLoopPoints(List<LoopPayload> loops, int factor) {
+    public static List<LoopPayload> reduceLoopPoints(List<LoopPayload> loops, int factor) {
         if (factor <= 1) {
             return loops;
         }
@@ -139,7 +139,7 @@ class PayloadReductionHelper {
         return List.copyOf(reduced);
     }
 
-    static int countTrianglePoints(PreviewPayload payload) {
+    public static int countTrianglePoints(PreviewPayload payload) {
         int count = payload.faces().stream().mapToInt(face -> face.triangles().size()).sum();
         count += payload.representations().stream()
                 .flatMap(representation -> representation.faces().stream())
@@ -148,7 +148,7 @@ class PayloadReductionHelper {
         return count;
     }
 
-    static int countLoopPoints(PreviewPayload payload) {
+    public static int countLoopPoints(PreviewPayload payload) {
         int count = payload.faces().stream()
                 .flatMap(face -> face.loops().stream())
                 .mapToInt(loop -> loop.points().size())
@@ -161,7 +161,7 @@ class PayloadReductionHelper {
         return count;
     }
 
-    static int countEdgePoints(PreviewPayload payload) {
+    public static int countEdgePoints(PreviewPayload payload) {
         int count = payload.edges().stream().mapToInt(edge -> edge.points().size()).sum();
         count += payload.representations().stream()
                 .flatMap(representation -> representation.edges().stream())
@@ -170,7 +170,7 @@ class PayloadReductionHelper {
         return count;
     }
 
-    static int countPmiPoints(PreviewPayload payload) {
+    public static int countPmiPoints(PreviewPayload payload) {
         return payload.pmi().stream().mapToInt(item -> item.leader().size() + 1).sum();
     }
 }

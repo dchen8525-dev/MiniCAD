@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.step.model.topology.StepAdvancedFace;
 import com.minicad.step.model.annotation.StepAnnotationFillArea;
 import com.minicad.step.model.annotation.StepAnnotationSymbol;
@@ -51,13 +52,13 @@ import com.minicad.step.model.topology.StepVertexLoop;
 import com.minicad.step.model.topology.StepVertexShell;
 import com.minicad.step.model.topology.StepWireShell;
 
-final class PmiTargetHelper {
+public final class PmiTargetHelper {
 
     private PmiTargetHelper() {
         // Utility class
     }
 
-    static String pmiTargetType(StepEntity target) {
+    public static String pmiTargetType(StepEntity target) {
         if (target instanceof StepFaceEntity) {
             return "face";
         }
@@ -145,7 +146,7 @@ final class PmiTargetHelper {
         return "entity";
     }
 
-    static String pmiTargetName(StepEntity target) {
+    public static String pmiTargetName(StepEntity target) {
         if (target instanceof StepFaceEntity) {
             StepFaceEntity face = (StepFaceEntity) target;
             return StepPreviewJsonExporter.faceDisplayName(face);

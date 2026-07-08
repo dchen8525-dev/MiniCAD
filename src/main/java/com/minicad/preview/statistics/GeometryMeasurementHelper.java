@@ -1,11 +1,17 @@
 package com.minicad.preview.statistics;
 
 import com.minicad.common.Epsilon;
+import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.preview.payload.EdgePayload;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.VectorPayload;
 
 import java.util.List;
 
-class GeometryMeasurementHelper {
-    static double approximateSurfaceArea(List<FacePayload> faces) {
+public class GeometryMeasurementHelper {
+    public static double approximateSurfaceArea(List<FacePayload> faces) {
         double total = 0.0;
         for (FacePayload face : faces) {
             if (!face.triangles().isEmpty()) {
@@ -17,7 +23,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double approximateSurfaceArea(List<FacePayload> faces, double[] matrix) {
+    public static double approximateSurfaceArea(List<FacePayload> faces, double[] matrix) {
         double total = 0.0;
         for (FacePayload face : faces) {
             if (!face.triangles().isEmpty()) {
@@ -29,7 +35,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double approximateEdgeLength(List<EdgePayload> edges) {
+    public static double approximateEdgeLength(List<EdgePayload> edges) {
         double total = 0.0;
         for (EdgePayload edge : edges) {
             for (int i = 0; i + 1 < edge.points().size(); i++) {
@@ -39,7 +45,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double approximateEdgeLength(List<EdgePayload> edges, double[] matrix) {
+    public static double approximateEdgeLength(List<EdgePayload> edges, double[] matrix) {
         double total = 0.0;
         for (EdgePayload edge : edges) {
             for (int i = 0; i + 1 < edge.points().size(); i++) {
@@ -49,7 +55,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double triangleArea(List<PointPayload> triangles) {
+    public static double triangleArea(List<PointPayload> triangles) {
         double total = 0.0;
         for (int i = 0; i + 2 < triangles.size(); i += 3) {
             PointPayload a = triangles.get(i);
@@ -69,7 +75,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double triangleArea(List<PointPayload> triangles, double[] matrix) {
+    public static double triangleArea(List<PointPayload> triangles, double[] matrix) {
         double total = 0.0;
         for (int i = 0; i + 2 < triangles.size(); i += 3) {
             PointPayload a = MathUtilityHelper.transform(triangles.get(i), matrix);
@@ -89,7 +95,7 @@ class GeometryMeasurementHelper {
         return total;
     }
 
-    static double loopArea(FacePayload face) {
+    public static double loopArea(FacePayload face) {
         double total = 0.0;
         for (LoopPayload loop : face.loops()) {
             double area = polygonArea(loop.points(), face.normal());
@@ -98,7 +104,7 @@ class GeometryMeasurementHelper {
         return Math.abs(total);
     }
 
-    static double loopArea(FacePayload face, double[] matrix) {
+    public static double loopArea(FacePayload face, double[] matrix) {
         double total = 0.0;
         for (LoopPayload loop : face.loops()) {
             double area = polygonArea(loop.points(), face.normal(), matrix);
@@ -107,7 +113,7 @@ class GeometryMeasurementHelper {
         return Math.abs(total);
     }
 
-    static double polygonArea(List<PointPayload> points, VectorPayload normal) {
+    public static double polygonArea(List<PointPayload> points, VectorPayload normal) {
         if (points.size() < 3) {
             return 0.0;
         }
@@ -134,7 +140,7 @@ class GeometryMeasurementHelper {
         return Math.abs((areaVectorX * nx + areaVectorY * ny + areaVectorZ * nz) * 0.5);
     }
 
-    static double polygonArea(List<PointPayload> points, VectorPayload normal, double[] matrix) {
+    public static double polygonArea(List<PointPayload> points, VectorPayload normal, double[] matrix) {
         if (points.size() < 3) {
             return 0.0;
         }
@@ -161,7 +167,7 @@ class GeometryMeasurementHelper {
         return Math.abs((areaVectorX * nx + areaVectorY * ny + areaVectorZ * nz) * 0.5);
     }
 
-    static double distance(PointPayload a, PointPayload b) {
+    public static double distance(PointPayload a, PointPayload b) {
         double dx = b.x() - a.x();
         double dy = b.y() - a.y();
         double dz = b.z() - a.z();

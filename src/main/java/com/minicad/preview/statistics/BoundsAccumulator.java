@@ -1,11 +1,13 @@
 package com.minicad.preview.statistics;
 
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.preview.payload.BoundsPayload;
+import com.minicad.preview.payload.PointPayload;
 
 /**
  * Helper class for accumulating bounding box coordinates.
  */
-final class BoundsAccumulator {
+public final class BoundsAccumulator {
     double minX = Double.POSITIVE_INFINITY;
     double minY = Double.POSITIVE_INFINITY;
     double minZ = Double.POSITIVE_INFINITY;

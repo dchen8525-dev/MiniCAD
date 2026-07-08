@@ -11,7 +11,7 @@ import java.util.Set;
  * Material and style export helpers for STEP preview export.
  * Extracted from StepPreviewJsonExporter to isolate material/style/color handling logic.
  */
-final class PreviewMaterialExporter {
+public final class PreviewMaterialExporter {
 
     private PreviewMaterialExporter() {}
 
@@ -22,7 +22,7 @@ final class PreviewMaterialExporter {
      * Handles FillAreaStyleColour, CurveStyle, PointStyle, TextStyleForDefinedFont,
      * SymbolColour, and SurfaceStyleReflectanceAmbientDiffuseSpecular colour references.
      */
-    static Set<StepEntity> collectTargetsForStyleColour(
+    public static Set<StepEntity> collectTargetsForStyleColour(
             int colourId,
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting,
@@ -63,7 +63,7 @@ final class PreviewMaterialExporter {
      * Collects targets for a curve font entity.
      * Handles CurveStyle curveFont references.
      */
-    static Set<StepEntity> collectTargetsForCurveFont(
+    public static Set<StepEntity> collectTargetsForCurveFont(
             int curveFontId,
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting,
@@ -83,7 +83,7 @@ final class PreviewMaterialExporter {
      * Collects targets for a point marker entity.
      * Handles PointStyle marker references.
      */
-    static Set<StepEntity> collectTargetsForPointMarker(
+    public static Set<StepEntity> collectTargetsForPointMarker(
             int markerId,
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting,
@@ -105,7 +105,7 @@ final class PreviewMaterialExporter {
      * Functional interface to delegate semantic targets collection to the parent class.
      */
     @FunctionalInterface
-    interface SemanticTargetsCollector {
+    public interface SemanticTargetsCollector {
         Set<StepEntity> collect(StepEntity entity, Map<Integer, StepEntity> resolved, Set<Integer> visiting);
     }
 }

@@ -5,6 +5,8 @@ import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.helper.metadata.StepTextReader;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;

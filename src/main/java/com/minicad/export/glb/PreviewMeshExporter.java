@@ -3,7 +3,23 @@ package com.minicad.export.glb;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
+import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.preview.builder.PreviewFaceBuilder;
+import com.minicad.preview.mapper.ParametricSurfaceMapper;
+import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.FaceSurfacePayload;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.PayloadConversionHelper;
+import com.minicad.preview.payload.PointPayload;
+import com.minicad.preview.payload.PreviewPayloadCopies;
+import com.minicad.preview.payload.UvBounds;
+import com.minicad.preview.payload.UvPoint;
+import com.minicad.preview.payload.VectorPayload;
+import com.minicad.preview.sampling.TriangulationHelper;
 import com.minicad.step.model.base.StepEntity;
 import com.minicad.step.model.base.StepFaceEntity;
 import com.minicad.step.model.geometry.*;
@@ -20,7 +36,7 @@ import java.util.stream.Collectors;
  * Handles vertex data, face indices, triangle generation, and mesh serialization.
  * Extracted from StepPreviewJsonExporter for better code organization.
  */
-final class PreviewMeshExporter {
+public final class PreviewMeshExporter {
 
     private static final int TOPOLOGY_SURFACE_GRID_SEGMENTS = 16;
 
@@ -31,7 +47,7 @@ final class PreviewMeshExporter {
     /**
      * Creates a FacePayload from a topology Face object.
      */
-    static FacePayload facePayloadFromTopologyFace(
+    public static FacePayload facePayloadFromTopologyFace(
             int stepId,
             Face face,
             String name,
@@ -394,7 +410,7 @@ final class PreviewMeshExporter {
 
     // ─── Parametric Triangulation ────────────────────────────────────────────────────
 
-    static List<PointPayload> triangulateParametricFace(
+    public static List<PointPayload> triangulateParametricFace(
             ParametricSurfaceMapper mapper,
             List<ParametricLoopPayload> loops,
             UvBounds bounds,
@@ -453,7 +469,7 @@ final class PreviewMeshExporter {
         return List.copyOf(triangles);
     }
 
-    static List<PointPayload> triangulateParametricFaceAdaptive(
+    public static List<PointPayload> triangulateParametricFaceAdaptive(
             ParametricSurfaceMapper mapper,
             List<ParametricLoopPayload> loops,
             UvBounds bounds,
@@ -480,7 +496,7 @@ final class PreviewMeshExporter {
 
     // ─── Parametric Loop Utilities ───────────────────────────────────────────────────
 
-    static List<ParametricLoopPayload> normalizeLoopRoles(
+    public static List<ParametricLoopPayload> normalizeLoopRoles(
             StepFaceEntity stepFace,
             StepEntity geometry,
             List<ParametricLoopPayload> loops
@@ -507,7 +523,7 @@ final class PreviewMeshExporter {
         return List.copyOf(normalized);
     }
 
-    static UvBounds boundsOf(List<ParametricLoopPayload> loops) {
+    public static UvBounds boundsOf(List<ParametricLoopPayload> loops) {
         double minU = Double.POSITIVE_INFINITY;
         double minV = Double.POSITIVE_INFINITY;
         double maxU = Double.NEGATIVE_INFINITY;
@@ -527,7 +543,7 @@ final class PreviewMeshExporter {
         return new UvBounds(minU, minV, maxU, maxV);
     }
 
-    static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
+    public static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
         if (points.size() < 2) {
             return points;
         }
@@ -566,7 +582,7 @@ final class PreviewMeshExporter {
         return normalized;
     }
 
-    static List<LoopPayload> toParametricLoopPayloads(
+    public static List<LoopPayload> toParametricLoopPayloads(
             List<ParametricLoopPayload> loops,
             ParametricSurfaceMapper mapper
     ) {
@@ -583,21 +599,21 @@ final class PreviewMeshExporter {
 
     // ─── Grid Sampling ──────────────────────────────────────────────────────────────
 
-    static List<List<CartesianPoint>> sampleTopologySurfaceGrid(SurfaceGeometry surface) {
+    public static List<List<CartesianPoint>> sampleTopologySurfaceGrid(SurfaceGeometry surface) {
         return surface.sampleGrid(TOPOLOGY_SURFACE_GRID_SEGMENTS, TOPOLOGY_SURFACE_GRID_SEGMENTS);
     }
 
-    static List<List<CartesianPoint>> sampleSurfaceGrid(BSplineSurface3 surface, int uSegments, int vSegments) {
+    public static List<List<CartesianPoint>> sampleSurfaceGrid(BSplineSurface3 surface, int uSegments, int vSegments) {
         return surface.sampleGrid(Math.max(uSegments, 2), Math.max(vSegments, 2));
     }
 
-    static List<List<CartesianPoint>> sampleSurfaceGrid(RationalBSplineSurface3 surface, int uSegments, int vSegments) {
+    public static List<List<CartesianPoint>> sampleSurfaceGrid(RationalBSplineSurface3 surface, int uSegments, int vSegments) {
         return surface.sampleGrid(Math.max(uSegments, 2), Math.max(vSegments, 2));
     }
 
     // ─── Face Surface Payload ───────────────────────────────────────────────────────
 
-    static FaceSurfacePayload faceSurfacePayload(
+    public static FaceSurfacePayload faceSurfacePayload(
             StepEntity geometry,
             UvBounds uvBounds,
             StepCadBuilder builder
@@ -760,7 +776,7 @@ final class PreviewMeshExporter {
         return null;
     }
 
-    static FaceSurfacePayload withSurfaceSourceMetadata(FaceSurfacePayload base, StepEntity geometry) {
+    public static FaceSurfacePayload withSurfaceSourceMetadata(FaceSurfacePayload base, StepEntity geometry) {
         if (base == null || geometry == null) {
             return base;
         }
@@ -843,7 +859,7 @@ final class PreviewMeshExporter {
 
     // ─── B-Spline Surface Building ──────────────────────────────────────────────────
 
-    static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
+    public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof StepBSplineSurfaceWithKnots) {
             StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
@@ -877,7 +893,7 @@ final class PreviewMeshExporter {
                 StepPreviewJsonExporter.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
     }
 
-    static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
+    public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
         int uCount = surface.controlPoints().size();
         int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
         if (uCount < 2 || vCount < 2) {

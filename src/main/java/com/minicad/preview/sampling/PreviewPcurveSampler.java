@@ -9,6 +9,7 @@ import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.geometry2d.Vector2;
+import com.minicad.preview.payload.UvPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;

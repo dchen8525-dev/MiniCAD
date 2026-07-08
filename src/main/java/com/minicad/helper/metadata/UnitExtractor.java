@@ -11,27 +11,27 @@ import java.util.Map;
 /**
  * Extracts unit information from resolved STEP entities.
  */
-final class UnitExtractor {
+public final class UnitExtractor {
 
     private UnitExtractor() {
     }
 
-    static final class UnitInfo {
+    public static final class UnitInfo {
         private final String lengthUnit;
         private final Double scaleToMeters;
         private final String angleUnit;
 
-        UnitInfo(String lengthUnit, Double scaleToMeters, String angleUnit) {
+        public UnitInfo(String lengthUnit, Double scaleToMeters, String angleUnit) {
             this.lengthUnit = lengthUnit;
             this.scaleToMeters = scaleToMeters;
             this.angleUnit = angleUnit;
         }
 
-        String lengthUnit() { return lengthUnit; }
-        Double scaleToMeters() { return scaleToMeters; }
-        String angleUnit() { return angleUnit; }
+        public String lengthUnit() { return lengthUnit; }
+        public Double scaleToMeters() { return scaleToMeters; }
+        public String angleUnit() { return angleUnit; }
 
-        boolean isEmpty() {
+        public boolean isEmpty() {
             return lengthUnit == null && angleUnit == null;
         }
     }
@@ -67,7 +67,7 @@ final class UnitExtractor {
             Map.entry("MILE_STATUTE", 1609.344)
     );
 
-    static UnitInfo extract(Map<Integer, StepEntity> resolved) {
+    public static UnitInfo extract(Map<Integer, StepEntity> resolved) {
         String lengthUnit = null;
         String angleUnit = null;
         Double scaleToMeters = null;
