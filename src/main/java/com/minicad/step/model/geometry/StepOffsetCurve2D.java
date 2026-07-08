@@ -1,6 +1,6 @@
 package com.minicad.step.model.geometry;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Minimal OFFSET_CURVE_2D parse-only curve.

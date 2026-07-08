@@ -9,7 +9,7 @@ import com.minicad.preview.payload.ParametricLoopPayload;
 import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UnsupportedBooleanPayload;
 import com.minicad.preview.payload.UnsupportedFacePayload;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.product.StepBooleanClippingResult;
 import com.minicad.step.model.product.StepBooleanResult;
 import com.minicad.step.model.product.StepBrepWithVoids;

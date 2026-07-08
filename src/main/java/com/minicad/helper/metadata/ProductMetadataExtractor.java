@@ -1,6 +1,6 @@
 package com.minicad.helper.metadata;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.product.StepProduct;
 import com.minicad.step.model.product.StepProductDefinition;
 import com.minicad.step.model.product.StepProductDefinitionShape;

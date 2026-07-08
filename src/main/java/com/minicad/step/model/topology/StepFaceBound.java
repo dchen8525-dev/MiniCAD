@@ -1,6 +1,6 @@
 package com.minicad.step.model.topology;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Resolved FACE_BOUND or FACE_OUTER_BOUND.

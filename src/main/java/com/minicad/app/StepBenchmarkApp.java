@@ -4,7 +4,7 @@ import com.minicad.builder.CompiledStepDocument;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.export.mesh.StepMeshExporter;
 import com.minicad.helper.metadata.StepTextReader;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -145,7 +145,7 @@ public final class StepBenchmarkApp {
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
             StepEntity entity = entry.getValue();
-            if (entity instanceof com.minicad.step.model.base.StepFaceEntity) {
+            if (entity instanceof com.minicad.step.model.core.base.StepFaceEntity) {
                 try {
                     builder.buildFace(id);
                     facesBuilt++;

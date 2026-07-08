@@ -1,6 +1,6 @@
 package com.minicad.step.model.action;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 
 public final class StepActionDirective implements StepEntity {

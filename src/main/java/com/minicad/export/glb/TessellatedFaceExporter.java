@@ -7,7 +7,7 @@ import com.minicad.preview.payload.LoopPayload;
 import com.minicad.preview.payload.PayloadConversionHelper;
 import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.payload.VectorPayload;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.product.StepTessellatedFace;
 import com.minicad.step.model.product.StepTessellatedFaceSet;

@@ -6,7 +6,7 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
 import com.minicad.common.StepResolutionException;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.geometry.StepDirection;
 import com.minicad.step.model.geometry.StepVector;

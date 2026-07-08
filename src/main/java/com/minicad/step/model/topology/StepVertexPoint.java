@@ -1,6 +1,6 @@
 package com.minicad.step.model.topology;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import java.util.Objects;

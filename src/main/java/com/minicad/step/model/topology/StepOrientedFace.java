@@ -2,7 +2,7 @@ package com.minicad.step.model.topology;
 
 import java.util.List;
 
-import com.minicad.step.model.base.StepFaceEntity;
+import com.minicad.step.model.core.base.StepFaceEntity;
 import java.util.Objects;
 
 /**

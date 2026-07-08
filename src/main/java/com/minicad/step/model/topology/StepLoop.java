@@ -1,6 +1,6 @@
 package com.minicad.step.model.topology;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 
 /**
  * Marker interface for resolved STEP loop subtypes.

@@ -68,7 +68,7 @@ public class ModelClassGenerator {
 
     // Imports
     Set<String> imports = new TreeSet<>();
-    imports.add("com.minicad.step.model.base.StepEntity");
+    imports.add("com.minicad.step.model.core.base.StepEntity");
 
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);

@@ -1,6 +1,6 @@
 package com.minicad.step.model.geometry;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 
 import com.minicad.step.model.workflow.StepRepresentation;
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package com.minicad.step.model.annotation;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Minimal SURFACE_STYLE_CONTROL_GRID.

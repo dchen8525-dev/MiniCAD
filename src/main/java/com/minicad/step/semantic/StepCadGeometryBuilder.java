@@ -7,7 +7,7 @@ import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepAxis1Placement;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;
 import com.minicad.step.model.geometry.StepCartesianPoint;

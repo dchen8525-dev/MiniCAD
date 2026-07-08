@@ -19,7 +19,7 @@ import com.minicad.helper.geometry.SurfaceGeometryHelper;
 import com.minicad.preview.payload.UvPoint;
 import com.minicad.preview.payload.VectorPayload;
 import com.minicad.preview.sampling.CurveEvaluator;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.model.product.StepGeometricReplica;
 import com.minicad.step.model.geometry.StepBezierSurface;

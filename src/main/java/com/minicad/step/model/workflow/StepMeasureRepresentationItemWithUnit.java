@@ -1,6 +1,6 @@
 package com.minicad.step.model.workflow;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Resolved MEASURE_REPRESENTATION_ITEM_WITH_UNIT.

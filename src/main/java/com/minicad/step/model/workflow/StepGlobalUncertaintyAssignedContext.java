@@ -1,9 +1,9 @@
 package com.minicad.step.model.workflow;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.unit.StepUncertaintyMeasureWithUnit;
+import com.minicad.step.model.technical.unit.StepUncertaintyMeasureWithUnit;
 import java.util.Objects;
 
 /**

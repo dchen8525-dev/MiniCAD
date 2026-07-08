@@ -7,7 +7,7 @@ import com.minicad.geometry.*;
 import com.minicad.preview.payload.PayloadConversionHelper;
 import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.payload.SurfacePatch;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.*;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.EdgeLoop;

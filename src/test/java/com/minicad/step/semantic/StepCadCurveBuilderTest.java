@@ -30,7 +30,7 @@ import com.minicad.geometry2d.RationalBSplineCurve2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.geometry.StepDirection;
 

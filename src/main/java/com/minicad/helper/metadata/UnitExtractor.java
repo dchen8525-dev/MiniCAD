@@ -1,10 +1,10 @@
 package com.minicad.helper.metadata;
 
-import com.minicad.step.model.base.StepEntity;
-import com.minicad.step.model.unit.StepConversionBasedUnit;
-import com.minicad.step.model.unit.StepGlobalUnitAssignedContext;
-import com.minicad.step.model.unit.StepNamedUnit;
-import com.minicad.step.model.unit.StepSiUnit;
+import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.technical.unit.StepConversionBasedUnit;
+import com.minicad.step.model.technical.unit.StepGlobalUnitAssignedContext;
+import com.minicad.step.model.technical.unit.StepNamedUnit;
+import com.minicad.step.model.technical.unit.StepSiUnit;
 
 import java.util.Map;
 

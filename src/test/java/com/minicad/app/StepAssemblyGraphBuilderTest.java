@@ -3,7 +3,7 @@ package com.minicad.app;
 import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyNode;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;
 import com.minicad.step.model.geometry.StepCartesianPoint;
 import com.minicad.step.model.geometry.StepDirection;

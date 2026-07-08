@@ -1,9 +1,9 @@
 package com.minicad.step.model.geometry;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.base.StepFaceEntity;
+import com.minicad.step.model.core.base.StepFaceEntity;
 import java.util.Objects;
 
 /**

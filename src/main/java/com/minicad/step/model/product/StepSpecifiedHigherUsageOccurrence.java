@@ -1,6 +1,6 @@
 package com.minicad.step.model.product;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Resolved SPECIFIED_HIGHER_USAGE_OCCURRENCE.

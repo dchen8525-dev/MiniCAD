@@ -5,8 +5,8 @@ import com.minicad.step.model.geometry.*;
 import com.minicad.step.model.topology.*;
 import com.minicad.step.model.product.*;
 import com.minicad.step.model.representation.*;
-import com.minicad.step.model.tolerance.*;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.technical.tolerance.*;
+import com.minicad.step.model.core.base.StepEntity;
 
 /**
  * Validation methods extracted from StepEntityResolver.

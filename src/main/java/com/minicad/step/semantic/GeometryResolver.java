@@ -2,7 +2,7 @@ package com.minicad.step.semantic;
 
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.*;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;

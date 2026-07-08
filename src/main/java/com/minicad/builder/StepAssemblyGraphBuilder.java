@@ -3,7 +3,7 @@ package com.minicad.builder;
 import com.minicad.geometry.Vector3;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;
 import com.minicad.step.model.product.StepContextDependentShapeRepresentation;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.product.StepItemDefinedTransformation;
 import com.minicad.step.model.product.StepNextAssemblyUsageOccurrence;
 import com.minicad.step.model.product.StepProduct;

@@ -1,0 +1,74 @@
+package com.minicad.step.model.organization.org.approval;
+
+import com.minicad.step.model.core.base.StepEntity;
+
+import com.minicad.step.model.technical.date.StepDateAndTime;
+import java.util.Objects;
+/**
+ * Minimal APPROVAL_DATE_TIME assignment.
+ *
+ * @param id STEP instance id
+ * @param dateTime approval date and time
+ * @param datedApproval approval being dated
+ */
+/**
+ * Minimal APPROVAL_DATE_TIME assignment.
+ *
+ * @param id STEP instance id
+ * @param dateTime approval date and time
+ * @param datedApproval approval being dated
+ */
+public final class StepApprovalDateTime implements StepEntity {
+    private final int id;
+    private final StepDateAndTime dateTime;
+    private final StepApproval datedApproval;
+
+    public StepApprovalDateTime(int id, StepDateAndTime dateTime, StepApproval datedApproval) {
+        this.id = id;
+        this.dateTime = dateTime;
+        this.datedApproval = datedApproval;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return "";
+    }
+
+    public StepDateAndTime getDateTime() {
+        return dateTime;
+    }
+
+    public StepApproval getDatedApproval() {
+        return datedApproval;
+    }
+
+    // Record-style accessors
+    public StepDateAndTime dateTime() {
+        return dateTime;
+    }
+
+    public StepApproval datedApproval() {
+        return datedApproval;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepApprovalDateTime that = (StepApprovalDateTime) o;
+        return id == that.id && Objects.equals(dateTime, that.dateTime) && Objects.equals(datedApproval, that.datedApproval);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, dateTime, datedApproval);
+    }
+
+    @Override
+    public String toString() {
+        return "StepApprovalDateTime{" + "id=" + id + "dateTime=" + dateTime + "datedApproval=" + datedApproval + "}";
+    }
+}

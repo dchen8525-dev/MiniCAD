@@ -1,7 +1,7 @@
 package com.minicad.helper.metadata;
 
 import com.minicad.step.model.annotation.StepColourRgb;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.annotation.StepCurveStyle;
 import com.minicad.step.model.annotation.StepCurveStyleRendering;
 import com.minicad.step.model.annotation.StepCurveStyleWithFont;

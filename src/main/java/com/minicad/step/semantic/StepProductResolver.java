@@ -2,10 +2,10 @@ package com.minicad.step.semantic;
 
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedStepEntityException;
-import com.minicad.step.model.base.StepEntity;
-import com.minicad.step.model.misc.StepGenericEntity;
-import com.minicad.step.model.config_mgmt.StepInterpolatedConfigurationSegment;
-import com.minicad.step.model.document.StepApplicationContext;
+import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.core.misc.StepGenericEntity;
+import com.minicad.step.model.management.config.StepInterpolatedConfigurationSegment;
+import com.minicad.step.model.organization.org.document.StepApplicationContext;
 import com.minicad.step.model.geometry.StepAxis2Placement2D;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;
 import com.minicad.step.model.product.StepAlternateProductRelationship;

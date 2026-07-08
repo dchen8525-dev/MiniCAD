@@ -3,7 +3,7 @@ package com.minicad.step.semantic;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry2d.*;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.*;
 
 import java.util.ArrayList;

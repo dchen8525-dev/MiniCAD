@@ -1,6 +1,6 @@
 package com.minicad.step.model.validation;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
 /**
  * Resolved UNCERTAINTY_MEASURE.

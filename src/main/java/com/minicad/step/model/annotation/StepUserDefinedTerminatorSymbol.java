@@ -1,6 +1,6 @@
 package com.minicad.step.model.annotation;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 
 import com.minicad.step.model.product.StepRepresentationMap;
 import java.util.Objects;

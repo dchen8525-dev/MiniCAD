@@ -29,7 +29,7 @@ import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
 import com.minicad.geometry2d.Curve2;
 import com.minicad.geometry2d.Point2;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepAxis1Placement;
 import com.minicad.step.model.geometry.StepAxis2Placement2D;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;

@@ -2,8 +2,8 @@ package com.minicad.step.semantic;
 
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.step.model.base.StepEntity;
-import com.minicad.step.model.base.StepFaceEntity;
+import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.core.base.StepFaceEntity;
 import com.minicad.step.model.fea.StepFiniteElementMesh;
 import com.minicad.step.model.product.StepBlockVolume;
 import com.minicad.step.model.product.StepBooleanClippingResult;

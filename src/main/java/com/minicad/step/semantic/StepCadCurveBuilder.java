@@ -36,7 +36,7 @@ import com.minicad.geometry2d.Polyline2;
 import com.minicad.geometry2d.RationalBSplineCurve2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.geometry2d.Vector2;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.geometry.StepAxis1Placement;
 import com.minicad.step.model.geometry.StepAxis2Placement2D;
 import com.minicad.step.model.geometry.StepAxis2Placement3D;

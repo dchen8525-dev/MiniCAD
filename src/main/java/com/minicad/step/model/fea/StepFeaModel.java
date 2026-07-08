@@ -1,6 +1,6 @@
 package com.minicad.step.model.fea;
 
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import java.util.List;
 import java.util.Objects;
 /**

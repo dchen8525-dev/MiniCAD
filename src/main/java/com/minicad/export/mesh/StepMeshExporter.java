@@ -7,7 +7,7 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
-import com.minicad.step.model.base.StepEntity;
+import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.builder.CompiledStepDocument;
 import com.minicad.topology.*;
@@ -53,7 +53,7 @@ public final class StepMeshExporter {
 
     // --- Semantic face processing methods (used by Triangulator and MeshTriangulatorParametric) ---
     
-    static StepEntity semanticFaceGeometry(com.minicad.step.model.base.StepFaceEntity stepFace) {
+    static StepEntity semanticFaceGeometry(com.minicad.step.model.core.base.StepFaceEntity stepFace) {
         if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace) {
             com.minicad.step.model.topology.StepAdvancedFace advancedFace = (com.minicad.step.model.topology.StepAdvancedFace) stepFace;
             return advancedFace.faceGeometry();
@@ -69,7 +69,7 @@ public final class StepMeshExporter {
         throw new IllegalArgumentException("unsupported face subtype");
     }
     
-    static boolean semanticFaceSameSense(com.minicad.step.model.base.StepFaceEntity stepFace) {
+    static boolean semanticFaceSameSense(com.minicad.step.model.core.base.StepFaceEntity stepFace) {
         if (stepFace instanceof com.minicad.step.model.topology.StepAdvancedFace) {
             com.minicad.step.model.topology.StepAdvancedFace advancedFace = (com.minicad.step.model.topology.StepAdvancedFace) stepFace;
             return advancedFace.sameSense();
@@ -511,12 +511,12 @@ public final class StepMeshExporter {
         StepCadBuilder builder = compiled.builder();
 
         // Collect face entities for deterministic triangulation.
-        List<com.minicad.step.model.base.StepFaceEntity> faceEntities = resolved.values().stream()
-                .filter(e -> e instanceof com.minicad.step.model.base.StepFaceEntity)
-                .map(e -> (com.minicad.step.model.base.StepFaceEntity) e)
+        List<com.minicad.step.model.core.base.StepFaceEntity> faceEntities = resolved.values().stream()
+                .filter(e -> e instanceof com.minicad.step.model.core.base.StepFaceEntity)
+                .map(e -> (com.minicad.step.model.core.base.StepFaceEntity) e)
                 .collect(Collectors.toList());
         Triangulator t = new Triangulator();
-        for (com.minicad.step.model.base.StepFaceEntity faceEntity : faceEntities) {
+        for (com.minicad.step.model.core.base.StepFaceEntity faceEntity : faceEntities) {
             try {
                 t.triangulateSemanticFace(faceEntity, builder);
             } catch (Exception e) {
@@ -550,7 +550,7 @@ public final class StepMeshExporter {
         return t.toMeshData();
     }
     private static boolean isSemanticFaceBackedEntity(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.base.StepFaceEntity
+        return entity instanceof com.minicad.step.model.core.base.StepFaceEntity
                 || entity instanceof com.minicad.step.model.topology.StepOpenShell
                 || entity instanceof com.minicad.step.model.topology.StepClosedShell
                 || entity instanceof com.minicad.step.model.geometry.StepSurfacedOpenShell
@@ -678,7 +678,7 @@ public final class StepMeshExporter {
                 triangulateCurvedFace(face, surface, flipped);
             }
         }
-        void triangulateSemanticFace(com.minicad.step.model.base.StepFaceEntity stepFace, StepCadBuilder builder) {
+        void triangulateSemanticFace(com.minicad.step.model.core.base.StepFaceEntity stepFace, StepCadBuilder builder) {
             StepEntity faceGeometry = semanticFaceGeometry(stepFace);
             boolean flipped = !semanticFaceSameSense(stepFace);
             SurfaceGeometry surface = buildSemanticSurfaceGeometry(faceGeometry, builder);
@@ -753,7 +753,7 @@ public final class StepMeshExporter {
             );
         }
         private boolean triangulateSemanticParametricFace(
-                com.minicad.step.model.base.StepFaceEntity stepFace,
+                com.minicad.step.model.core.base.StepFaceEntity stepFace,
                 StepEntity faceGeometry,
                 SurfaceGeometry surface,
                 StepCadBuilder builder,
