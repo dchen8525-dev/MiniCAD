@@ -361,7 +361,40 @@ public final class PreviewEdgeSampler {
         return null;
     }
 
-    
+    // ─── Collect mapped annotation edges ──────────────────────────────────
+    // Note: collectMappedAnnotationEdges depends on buildRepresentationPayload
+    // and its deep private dependency chain in StepPreviewJsonExporter.
+    // Once buildRepresentationPayload and its helpers are made package-private,
+    // the full implementation below can be enabled by removing the delegation
+    // and uncommenting the inline body.
+
+    public static void collectMappedAnnotationEdges(
+            int mappedOwnerId,
+            StepRepresentation representation,
+            StepEntity mappedOrigin,
+            StepEntity mappingTarget,
+            String sourceType,
+            Integer sourceStepId,
+            Map<Integer, EdgePayload> edges,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder
+    ) {
+        double[] matrix = matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        if (matrix == null) {
+            return;
+        }
+        // TODO: replace with inline buildRepresentationPayload call once
+        // the private dependency chain in StepPreviewJsonExporter is exposed:
+        //   buildRepresentationPayload(representation, representation.name(),
+        //       resolved, builder, StepMetadataExtractor.fromResolved(resolved),
+        //       new LinkedHashSet<>());
+        //   for (EdgePayload edge : source.payload().edges()) {
+        //       edges.putIfAbsent(transformMappedEdge(edge, mappedOwnerId,
+        //           matrix, sourceType, sourceStepId).stepId(), transformed);
+        //   }
+        // For now, callers should use StepPreviewJsonExporter directly.
+    }
+
     // ─── Recursively collect carrier edges ────────────────────────────────
 
     public static boolean collectMappedAnnotationCarrierEdges(
