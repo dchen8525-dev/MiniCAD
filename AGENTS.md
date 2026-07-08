@@ -669,23 +669,42 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 
 **No additional work needed**: TopologyValidator implements complete validation
 
-## E02. Open shell handling ✅ PARTIAL IMPLEMENTATION
+## E02. Open shell handling ✅ IMPLEMENTED
 
 **Problem**: Preview/export open shell separately from solid. Do not label open shell as valid solid.
 
 **Discovery**: ✅ Shell.isClosed() property exists
 
-**Implementation Evidence**:
+**Previous Implementation**:
 - Shell class has `closed` boolean field and `isClosed()` accessor
 - TopologyValidator only validates closed shells (not open shells)
-- Preview/export code does not explicitly check isClosed()
 
-**Assessment**: ⚠️ Partial - open shells are handled but not explicitly distinguished
+**New Implementation** (Session 2026-07-08, commit 08efee9):
+- **StepPreviewJsonExporter.geometryTypeName()** method (line 5210) distinguishes shell types
+- Returns "SHELL" for open shells (StepOpenShell, StepSurfacedOpenShell, StepOrientedOpenShell)
+- Returns "SOLID" for closed shells and solid entities (30+ solid types)
+- Used in PreviewGeometryCollector (line 264) for proper labeling
+- Used in StepPreviewJsonExporter (line 1081) for geometry collection
 
-**Recommendation**: 
-- Add explicit check in preview/export to distinguish open shells
-- Label open shells as "SHELL" not "SOLID" in output
-- Consider warning when open shell is exported as geometry
+**Implementation Evidence** (StepPreviewJsonExporter.java lines 5210-5272):
+```java
+public static String geometryTypeName(StepEntity entity) {
+    if (entity == null) {
+        return "SOLID";
+    }
+    if (entity instanceof StepOpenShell || entity instanceof StepSurfacedOpenShell || entity instanceof StepOrientedOpenShell) {
+        return "SHELL";
+    }
+    if (entity instanceof StepClosedShell || /* 30+ solid types */) {
+        return "SOLID";
+    }
+    return surfaceTypeName(entity);
+}
+```
+
+**Assessment**: ✅ Open shells now properly labeled as "SHELL", solids as "SOLID"
+
+**No additional work needed**: Implementation complete with proper distinction
 
 ## E03. Oriented edge semantics ✅ TESTS PRESENT
 
@@ -1364,18 +1383,50 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 - **MiniCadIssue.warning()**: Reports unsupported entities in issues list
 - **Preview stats**: Reports counts of unsupported geometry
 
-## L05. Add request id MDC logging ⚠️ OPTIONAL ENHANCEMENT
+## L05. Add request id MDC logging ✅ IMPLEMENTED
 
-**Status**: Request ID exists but not using SLF4J MDC
+**Previous Status**: Request ID existed but not using SLF4J MDC
 
-**Current Implementation** (sufficient for debugging):
-- AtomicLong generates unique request IDs in StepViewerApp
-- Error responses include requestId for client-server correlation
-- Server logs include requestId in error messages (line 369)
+**Previous Implementation** (basic):
+- AtomicLong generated unique request IDs in StepViewerApp
+- Error responses included requestId for client-server correlation
+- Server logs included requestId in error messages manually
 
-**Enhancement**: Use SLF4J MDC.put("requestId", ...) for structured logging
+**New Implementation** (Session 2026-07-08, commit dee3302):
+- **SLF4J MDC** structured logging implemented in StepViewerApp.java
+- `MDC.put("requestId", String.valueOf(requestId))` at request start (line 303)
+- `MDC.remove("requestId")` in finally block (line 378)
+- **logback.xml** updated with MDC pattern: `[%X{requestId}]` (line 13)
+- All log statements simplified (removed manual `requestId={}` parameters)
 
-**Recommendation**: Current implementation is sufficient for debugging. MDC would improve log aggregation in production environments.
+**Implementation Evidence** (StepViewerApp.java):
+```java
+import org.slf4j.MDC;
+
+// In PreviewServlet.doPost():
+long requestId = requestIdCounter.incrementAndGet();
+MDC.put("requestId", String.valueOf(requestId));
+try {
+    // ... request handling ...
+} finally {
+    MDC.remove("requestId");
+}
+```
+
+**logback.xml Pattern** (line 13):
+```xml
+<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{requestId}] %-5level [%thread] %logger{36} - %msg%n</pattern>
+```
+
+**Assessment**: ✅ Professional-grade structured logging with automatic request ID inclusion
+
+**Benefits**:
+- Better observability in production environments
+- Automatic request ID in all logs (no manual parameters)
+- Compatible with log aggregation tools (ELK, Splunk, etc.)
+- Clear request correlation across distributed systems
+
+**No additional work needed**: MDC logging fully implemented
 
 ## L06. Thread safety audit ⚠️ PARTIAL IMPLEMENTATION
 
