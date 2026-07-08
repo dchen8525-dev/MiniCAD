@@ -31,7 +31,12 @@ MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目�
 | `com.minicad.step.syntax` | 5 | STEP 语法解析器（Tokenizer、Parser、AST 模型） |
 | `com.minicad.step.semantic` | 6 | STEP 语义解析器（EntityResolver、EntityFactory、CadBuilder 等） |
 | `com.minicad.step.model` | 1264 | STEP 实体模型类，分 26 个子包（见下表） |
-| `com.minicad.app` | 13 | 应用入口：CLI 解析器、Web 预览器、JSON 导出器、装配图构建器等 |
+| `com.minicad.export` | - | 导出功能：`glb`、`mesh`、`json` 子包 |
+| `com.minicad.preview` | - | Web 预览功能：`sampling`、`builder`、`mapper`、`statistics`、`payload` 子包 |
+| `com.minicad.helper` | - | 辅助工具：`geometry`、`metadata`、`validation` 子包 |
+| `com.minicad.builder` | - | 模型构建工具 |
+| `com.minicad.tool` | - | 通用工具类（Phase 3 重命名：原 `tools` 包） |
+| `com.minicad.app` | 4 | 应用入口：`StepDumpApp`、`StepViewerApp`、`StepPreviewJsonExporter`、`StepCapabilityReportApp` |
 
 ### `step.model` 子包明细
 
@@ -460,10 +465,61 @@ src/main/java/com/minicad/
 │       ├── analysis/     -- 分析 (15)
 │       ├── profile/      -- 截面轮廓 (7)
 │       └── system/       -- 系统级 (10)
-└── app/              -- 应用入口 (13 个)
+├── export/           -- 导出功能
+│   ├── glb/          -- GLB 二进制导出
+│   ├── mesh/         -- 网格导出 (STL/OBJ)
+│   └── json/         -- JSON 元数据导出
+├── preview/          -- Web 预览功能
+│   ├── sampling/     -- 几何采样器
+│   ├── builder/      -- 预览构建器
+│   ├── mapper/       -- 数据映射器
+│   ├── statistics/   -- 统计收集器
+│   └── payload/      -- 响应数据结构
+├── helper/           -- 辅助工具
+│   ├── geometry/     -- 几何辅助
+│   ├── metadata/     -- 元数据提取
+│   └── validation/   -- 验证辅助
+├── builder/          -- 模型构建工具
+├── tool/             -- 通用工具类 (renamed from tools)
+└── app/              -- 应用入口 (4 个)
+    ├── StepDumpApp.java       -- CLI 解析器
+    ├── StepViewerApp.java     -- Web 预览器
+    ├── StepPreviewJsonExporter.java -- GLB 导出
+    └── StepCapabilityReportApp.java -- 覆盖报告生成
+
+src/test/java/com/minicad/
+├── ... (镜像 src/main 结构)
+├── export/           -- 导出测试
+│   ├── glb/
+│   ├── mesh/
+│   └── json/
+├── preview/          -- 预览测试
+│   ├── sampling/
+│   ├── builder/
+│   ├── mapper/
+│   ├── statistics/
+│   └── payload/
+├── helper/           -- 辅助工具测试
+│   ├── geometry/
+│   ├── metadata/
+│   └── validation/
+├── builder/          -- 构建器测试
+├── tool/             -- 工具类测试
 
 examples/             -- STEP 示例文件
 ```
+
+### 包重构说明 (Phase 3)
+
+Phase 1 重构将 `app` 包从 56 个文件精简为 4 个核心入口点，新增以下包：
+
+| 包 | 说明 |
+|----|------|
+| `export` | 导出功能：GLB、STL/OBJ 网格、JSON 元数据 |
+| `preview` | Web 预览：采样、构建、映射、统计、响应结构 |
+| `helper` | 辅助工具：几何辅助、元数据提取、验证辅助 |
+| `builder` | 模型构建工具 |
+| `tool` | 通用工具类 (原 `tools` 包，采用单数命名) |
 
 ## 架构概览
 

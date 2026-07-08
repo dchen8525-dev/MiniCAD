@@ -286,7 +286,7 @@ typedParameter
 - AGENTS undercounted by 798 registry entries (+51% error)
 
 **Fix Applied**:
-- ✅ Added capability scanner tool (M01): src/main/java/com/minicad/tools/CapabilityScanner.java
+- ✅ Added capability scanner tool (M01): src/main/java/com/minicad/tool/CapabilityScanner.java (Phase 3: renamed from tools)
 - ✅ Generated accurate report (M02): doc/generated/MINI_CAD_CAPABILITY_REPORT.md
 - ✅ README.md already shows 1264 (line 33) - aligned
 - ✅ README.md shows 2357 registry entries (line 77) - aligned
@@ -1159,7 +1159,7 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 
 **Implementation Details** (from pom.xml):
 - Plugin: `spotless-maven-plugin` version 2.43.0
-- Included: app, common, geometry, geometry2d, topology, tools, test packages
+- Included: app, common, geometry, geometry2d, topology, tool, test packages (Phase 3: tool renamed from tools)
 - **Excluded**: `src/main/java/com/minicad/step/model/**/*.java` ✅
 - Features: trimTrailingWhitespace, endWithNewline
 
@@ -1416,7 +1416,7 @@ throw new StepParseException("duplicate entity id #" + entity.id() + " at positi
 **Discovery**: CapabilityScanner.java exists
 
 **Implementation Evidence**:
-- `src/main/java/com/minicad/tools/CapabilityScanner.java`
+- `src/main/java/com/minicad/tool/CapabilityScanner.java` (Phase 3: renamed from tools)
 - Outputs JSON with model classes, registry names, entity factories
 - Commit: 03710e1 (Session 2026-07-05)
 
