@@ -1,4 +1,4 @@
-package com.minicad.app;
+package com.minicad.export.glb;
 
 import com.minicad.step.model.annotation.*;
 import com.minicad.step.model.base.StepEntity;
