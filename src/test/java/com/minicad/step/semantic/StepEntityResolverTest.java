@@ -353,7 +353,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSupportedEntitiesWithForwardReferences() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#20=EDGE_CURVE('E0',#10,#11,#30,.T.);\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
@@ -374,7 +374,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveForwardReferencesInsideReferenceLists() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#20=EDGE_LOOP('L0',(#10,#11));\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
@@ -399,7 +399,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMinimalSolidSemanticGraph() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -492,7 +492,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectMissingReference() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=VERTEX_POINT('V0',#99);\n"
         + "ENDSEC;";
@@ -507,7 +507,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectMissingReferenceInsideReferenceListWithReferringEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=EDGE_LOOP('',(#99));\n"
         + "ENDSEC;";
@@ -522,7 +522,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectWrongParameterCountWithEntityContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0');\n"
         + "ENDSEC;";
@@ -539,7 +539,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectWrongStringParameterTypeWithEntityContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT(1.0,(0.0,0.0,0.0));\n"
         + "ENDSEC;";
@@ -556,7 +556,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectWrongListParameterTypeWithEntityContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0','not-a-list');\n"
         + "ENDSEC;";
@@ -573,7 +573,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectWrongReferenceParameterTypeWithEntityContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=VECTOR('V0',1.0,2.0);\n"
         + "ENDSEC;";
@@ -590,7 +590,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveStandaloneBSplineCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -608,7 +608,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectUnsupportedAdvancedFaceGeometry() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -633,7 +633,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectUnknownEntityWithEntityContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#42=UNKNOWN_ENTITY('x');\n"
         + "ENDSEC;";
@@ -648,7 +648,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCylindricalSurfaceAdvancedFaceGeometry() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -668,7 +668,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExtrusionAndRevolutionSurfaces() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(2.0,0.0,0.0));\n"
@@ -705,7 +705,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceSurfaceAndOrientedFace() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -730,7 +730,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNestedOrientedFace() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -753,7 +753,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOrientedShells() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -783,7 +783,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNestedOrientedShells() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -813,7 +813,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOrientedEdgeWithExplicitVertices() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -835,7 +835,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfacedOpenShell() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -861,7 +861,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveVertexLoop() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=VERTEX_POINT('V0',#1);\n"
@@ -876,7 +876,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePolyLoop() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -894,7 +894,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveVertexShell() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=VERTEX_POINT('V0',#1);\n"
@@ -911,7 +911,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConnectedFaceSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -934,7 +934,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConnectedFaceSubSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -961,7 +961,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePath() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -985,7 +985,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOpenPath() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1009,7 +1009,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSubpath() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1034,7 +1034,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveWireShell() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1059,7 +1059,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveWireShellWithPolyLoop() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1078,7 +1078,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveWireShellWithMixedLoopFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1106,7 +1106,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOrientedPath() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1139,7 +1139,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOrientedPathAgainstOpenPathSubtype() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1172,7 +1172,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNestedOrientedPath() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1206,7 +1206,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOpenPathUsingOrientedEdgeEndpoints() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1236,7 +1236,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShellBasedWireframeModel() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=VERTEX_POINT('V0',#1);\n"
@@ -1258,7 +1258,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceBasedSurfaceModel() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1284,7 +1284,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceBasedSurfaceModelWithConnectedFaceSubSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1311,7 +1311,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceBasedSurfaceModelWithShellMember() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1335,7 +1335,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConicalSurfaceAndTrimmedCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1358,7 +1358,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEllipseSurfaceCurveAndBSplineCurveWithKnots() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1385,7 +1385,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveParabolaHyperbolaAndConicReferences() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1431,7 +1431,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveComplexBsplineCurveWithoutNameParameter() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#10=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#11=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1452,7 +1452,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBoundedCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(BOUNDED_CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bc'));\n"
         + "ENDSEC;";
@@ -1467,7 +1467,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRationalBsplineCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#10=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#11=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1486,7 +1486,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRationalBsplineCurveWithKnots() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#10=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#11=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1505,7 +1505,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldAllowRationalBsplineCurveAsReferencedCurveGeometry() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1555,7 +1555,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUniformCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(UNIFORM_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('uc'));\n"
         + "ENDSEC;";
@@ -1570,7 +1570,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveQuasiUniformCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(QUASI_UNIFORM_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('quc'));\n"
         + "ENDSEC;";
@@ -1585,7 +1585,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBezierCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(BEZIER_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bc'));\n"
         + "ENDSEC;";
@@ -1600,7 +1600,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePiecewiseBezierCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PIECEWISE_BEZIER_CURVE() BEZIER_CURVE() BOUNDED_CURVE() CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbc'));\n"
         + "ENDSEC;";
@@ -1615,7 +1615,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveImplicitBsplineDataForCurveSubtypeMarkers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1646,7 +1646,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePcurveAndDefinitionalRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1682,7 +1682,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDegeneratePcurveAndSurfaceCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1715,7 +1715,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolve2dAxisPlacementAndCircle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('UV0',(1.0,2.0));\n"
         + "#2=DIRECTION('DUV',(1.0,0.0));\n"
@@ -1734,7 +1734,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSeamCurveWithTwoPcurves() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -1766,7 +1766,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBSplineSurfaceWithKnots() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));\n"
@@ -1787,7 +1787,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveStandaloneBSplineSurface() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));\n"
@@ -1807,7 +1807,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBoundedSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(BOUNDED_SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bs'));\n"
         + "ENDSEC;";
@@ -1822,7 +1822,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRationalBsplineSurface() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));\n"
@@ -1845,7 +1845,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRationalBsplineSurfaceWithKnots() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));\n"
@@ -1868,7 +1868,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRationalBsplineSurfaceAsFaceGeometry() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(2.0,0.0,0.0));\n"
@@ -1896,7 +1896,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUniformSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(UNIFORM_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('us'));\n"
         + "ENDSEC;";
@@ -1911,7 +1911,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveQuasiUniformSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(QUASI_UNIFORM_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('qus'));\n"
         + "ENDSEC;";
@@ -1926,7 +1926,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBezierSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(BEZIER_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('bsz'));\n"
         + "ENDSEC;";
@@ -1941,7 +1941,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePiecewiseBezierSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PIECEWISE_BEZIER_SURFACE() BEZIER_SURFACE() BOUNDED_SURFACE() SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('pbs'));\n"
         + "ENDSEC;";
@@ -1956,7 +1956,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveImplicitBsplineDataForSurfaceSubtypeMarkers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1987,7 +1987,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOffsetCurve3d() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2009,7 +2009,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveOffsetSurface() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2030,7 +2030,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCompositeCurveSegment() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2049,7 +2049,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCompositeCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2072,7 +2072,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCompositeCurveOnSurface() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2101,7 +2101,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveToroidalSurfaceAndSplineTrimmedSurfaceCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2130,7 +2130,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDegenerateToroidalSurfaceAsFaceGeometryAndSetElement() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2158,7 +2158,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSphericalSurfaceAdvancedFaceGeometry() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2180,7 +2180,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePresentationStyleAndLayerAssignments() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2214,7 +2214,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceStyleTransparentWithinSurfaceSideStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Terracotta',0.8,0.4,0.2);\n"
         + "#2=FILL_AREA_STYLE_COLOUR('',#1);\n"
@@ -2240,7 +2240,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceStyleReflectanceAmbientWithinSurfaceSideStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=SURFACE_STYLE_REFLECTANCE_AMBIENT(0.2);\n"
         + "#2=SURFACE_STYLE_TRANSPARENT(0.35);\n"
@@ -2266,7 +2266,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceStyleParameterLineWithinSurfaceSideStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_CURVE_FONT('solid');\n"
         + "#2=PRE_DEFINED_COLOUR('black');\n"
@@ -2292,7 +2292,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalSurfaceCurveStylesWithinSurfaceSideStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_CURVE_FONT('solid');\n"
         + "#2=PRE_DEFINED_COLOUR('black');\n"
@@ -2323,7 +2323,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceReflectanceVariantsWithinSurfaceSideStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE(0.2,0.6);\n"
         + "#2=COLOUR_RGB('Specular',1.0,1.0,1.0);\n"
@@ -2355,7 +2355,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_POINT_MARKER_SYMBOL('dot');\n"
         + "#2=COLOUR_RGB('Red',1.0,0.0,0.0);\n"
@@ -2373,7 +2373,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextStyleForDefinedFontAndTextStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
@@ -2392,7 +2392,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextStyleWithSpacing() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
@@ -2410,7 +2410,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextStyleWithJustification() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
@@ -2428,7 +2428,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextStyleWithMirror() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
@@ -2449,7 +2449,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextStyleWithBoxCharacteristics() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
         + "#2=TEXT_STYLE_FOR_DEFINED_FONT(#1);\n"
@@ -2467,7 +2467,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCharacterGlyphStyles() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DRAUGHTING_PRE_DEFINED_CURVE_FONT('continuous');\n"
         + "#2=COLOUR_RGB('Black',0.0,0.0,0.0);\n"
@@ -2495,7 +2495,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSymbolColourAndSymbolStyle() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_COLOUR('yellow');\n"
         + "#2=SYMBOL_COLOUR(#1);\n"
@@ -2513,7 +2513,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveColourAndColourSpecification() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=COLOUR();\n"
         + "#2=COLOUR_SPECIFICATION('amber');\n"
@@ -2529,7 +2529,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferColourRgbOverColourAndColourSpecification() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(COLOUR_RGB('Amber',1.0,0.75,0.0)\n"
         + "    COLOUR_SPECIFICATION('Amber')\n"
@@ -2543,7 +2543,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCurveStyleWithColourSpecification() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_CURVE_FONT('solid');\n"
         + "#2=COLOUR_SPECIFICATION('amber');\n"
@@ -2561,7 +2561,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePreDefinedColourAndCurveFont() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_COLOUR('black');\n"
         + "#2=PRE_DEFINED_CURVE_FONT('solid');\n"
@@ -2577,7 +2577,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferPreDefinedColourOverColourSpecificationAndColour() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PRE_DEFINED_COLOUR('black')\n"
         + "    COLOUR_SPECIFICATION('black')\n"
@@ -2591,7 +2591,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferDraughtingPreDefinedSubtypeOverGenericBase() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(DRAUGHTING_PRE_DEFINED_COLOUR('black') PRE_DEFINED_COLOUR('black'));\n"
         + "#2=(DRAUGHTING_PRE_DEFINED_CURVE_FONT('solid') PRE_DEFINED_CURVE_FONT('solid'));\n"
@@ -2605,7 +2605,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCurveStyleWithGenericPreDefinedEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_CURVE_FONT('solid');\n"
         + "#2=PRE_DEFINED_COLOUR('black');\n"
@@ -2625,7 +2625,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePreDefinedTextFont() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_TEXT_FONT('iso_3098');\n"
         + "ENDSEC;";
@@ -2638,7 +2638,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferDraughtingPreDefinedTextFontSubtypeOverGenericBase() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(DRAUGHTING_PRE_DEFINED_TEXT_FONT('iso_3098') PRE_DEFINED_TEXT_FONT('iso_3098'));\n"
         + "ENDSEC;";
@@ -2650,7 +2650,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePreDefinedSymbolAndMarkerFamily() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_MARKER('dot');\n"
         + "#2=PRE_DEFINED_SYMBOL('diameter');\n"
@@ -2672,7 +2672,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferPreDefinedPointMarkerSymbolOverBaseMarkerAndSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PRE_DEFINED_POINT_MARKER_SYMBOL('dot')\n"
         + "    PRE_DEFINED_MARKER('dot')\n"
@@ -2688,7 +2688,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePreDefinedItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PRE_DEFINED_ITEM('generic-item');\n"
         + "ENDSEC;";
@@ -2701,7 +2701,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferSpecificPreDefinedSubtypeOverPreDefinedItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PRE_DEFINED_POINT_MARKER_SYMBOL('dot')\n"
         + "    PRE_DEFINED_MARKER('dot')\n"
@@ -2716,7 +2716,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePmiAndMeasureRepresentationItems() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,1.0,0.0));\n"
@@ -2751,7 +2751,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationTextOccurrenceWithPointReplicaPosition() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2772,7 +2772,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPointAndFillAreaOccurrencesWithVertexPointTargets() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2801,7 +2801,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationTextOccurrenceWithVertexPointPosition() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2817,7 +2817,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPointLikeOccurrencesWithContainerCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,0.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2847,7 +2847,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPointLikeOccurrencesWithVertexShellCarrier() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2876,7 +2876,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointContainersWithVertexPointMembers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2897,7 +2897,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSetWithNestedPointAndCurveSets() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2916,7 +2916,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointReplicaWithVertexPointParent() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2937,7 +2937,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectPointReplicaWithPointMarkerParent() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2958,7 +2958,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectPointMarkerInAnnotationPointCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -2986,7 +2986,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectPointMarkerInPointSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -3003,7 +3003,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNestedPointSetAndAnnotationPlaneOccurrenceElements() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -3035,7 +3035,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveItemIdentifiedRepresentationUsageFamily() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PMICTX'));\n"
@@ -3077,7 +3077,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExtendedAnnotationUsageFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PMICTX'));\n"
@@ -3119,7 +3119,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricItemSpecificUsageWithPathAndWireTargets() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3157,7 +3157,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricItemSpecificUsageWithShellModelAndSolidTargets() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3213,7 +3213,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
@@ -3282,7 +3282,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithDirectAnnotationContent() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -3325,7 +3325,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithPointContainersAndPlaneContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3362,7 +3362,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithGeometricSetContent() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3380,7 +3380,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithPathAndWireContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3414,7 +3414,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithDirectGeometryContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3452,7 +3452,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithAdvancedCurveContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3481,7 +3481,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithExtendedContainerContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3528,7 +3528,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithFaceShellAndSurfaceModelContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3611,7 +3611,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithBrepSolidContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -3664,7 +3664,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithBuildableSolidFamilyContents() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -3709,7 +3709,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingCalloutWithOccurrenceWrappers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -3744,7 +3744,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePlacedTarget() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TARGET');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TARGETCTX'));\n"
@@ -3767,7 +3767,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExtendedItemIdentifiedRepresentationUsageFamily() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -3822,7 +3822,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUsageAndAssociationFamilyWithVertexLoopTarget() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -3854,7 +3854,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUsageFamiliesWithDirectAnnotationContentEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
         + "#2=REPRESENTATION('REP_USED',(),#1);\n"
@@ -3910,7 +3910,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalAnnotationOccurrenceFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
         + "#2=REPRESENTATION('SYMREP',(),#1);\n"
@@ -3949,7 +3949,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationWrapperOccurrencesWithAdditionalAnnotationItems() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -3976,7 +3976,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationOccurrenceAssociativityWithTerminatorSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -4014,7 +4014,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRepresentationMapAndAnnotationTextFamily() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','TEXT'));\n"
         + "#2=REPRESENTATION('TXT',(),#1);\n"
@@ -4049,7 +4049,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSymbolRepresentationMapAndAnnotationSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -4078,7 +4078,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationSymbolOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -4105,7 +4105,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTerminatorSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYMBOL'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -4144,7 +4144,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTerminatorSymbolWithWrappedAnnotationItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -4176,7 +4176,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationOccurrenceRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -4211,7 +4211,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationOccurrenceRelationshipWithTerminatorSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -4246,7 +4246,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUserDefinedMarkerAndCurveFont() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));\n"
         + "#2=REPRESENTATION('MAP_REP',(),#1);\n"
@@ -4280,7 +4280,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUserDefinedTerminatorSymbol() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','MAP'));\n"
         + "#2=REPRESENTATION('MAP_REP',(),#1);\n"
@@ -4305,7 +4305,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#9=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4329,7 +4329,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePolyline() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4347,7 +4347,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricCurveSetWithPolyline() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4366,7 +4366,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricCurveSetWithTopologyAndPaths() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4397,7 +4397,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSetWithSurfaceAndTopologyMembers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -4431,7 +4431,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSetsWithWireAndLoopContainers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4469,7 +4469,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricCurveSetWithWireContainersAndWireframeModels() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4507,7 +4507,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSetWithShellModelAndSolidMembers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4539,7 +4539,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricSetsWithNestedSetMembers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4569,7 +4569,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,1.0,0.0));\n"
@@ -4585,7 +4585,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceModelMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(SURFACE_MODEL() REPRESENTATION_ITEM('sm0'));\n"
         + "ENDSEC;";
@@ -4600,7 +4600,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectAxisPlacementWithoutExplicitDirections() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=AXIS2_PLACEMENT_3D('AX',#1,$,$);\n"
@@ -4616,7 +4616,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldTreatOmittedAndNotProvidedOrientedEdgeEndpointsAsInherited() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4642,7 +4642,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectDuplicateIdsAtSyntaxLayer() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#1=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -4656,7 +4656,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCartesianPointCoordinates() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "ENDSEC;";
@@ -4670,7 +4670,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveComplexGeometricRepresentationContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;";
@@ -4687,7 +4687,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferGeometricRepresentationContextOverRepresentationContextForComplexEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
         + "ENDSEC;";
@@ -4703,7 +4703,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShapeRepresentationAgainstGeometricContext() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -4720,7 +4720,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSiUnitComplexEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "ENDSEC;";
@@ -4735,7 +4735,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveStandaloneLengthUnit() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=LENGTH_UNIT();\n"
         + "ENDSEC;";
@@ -4748,7 +4748,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNamedUnitWithDimensionalExponentsReference() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DIMENSIONAL_EXPONENTS(1.0,0.0,0.0,0.0,0.0,0.0,0.0);\n"
         + "#2=(LENGTH_UNIT() NAMED_UNIT(#1) SI_UNIT($,.METRE.));\n"
@@ -4767,7 +4767,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNamedUnitWithOmittedDimensions() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT($) SI_UNIT($,.METRE.));\n"
         + "ENDSEC;";
@@ -4781,7 +4781,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectNamedUnitDimensionsWithWrongType() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT('bad') SI_UNIT($,.METRE.));\n"
         + "ENDSEC;";
@@ -4798,7 +4798,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveStandaloneAdditionalUnits() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=AREA_UNIT();\n"
         + "#2=VOLUME_UNIT();\n"
@@ -4835,7 +4835,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveStandaloneAdditionalDerivedUnits() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=FREQUENCY_UNIT();\n"
         + "#2=FORCE_UNIT();\n"
@@ -4885,7 +4885,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSiForceUnitAsSpecificUnitKind() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(FORCE_UNIT() NAMED_UNIT(*) SI_UNIT($,.NEWTON.));\n"
         + "ENDSEC;";
@@ -4899,7 +4899,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConversionBasedPlaneAngleUnit() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(PLANE_ANGLE_UNIT() NAMED_UNIT(*) SI_UNIT($,.RADIAN.));\n"
         + "#2=MEASURE_WITH_UNIT(PLANE_ANGLE_MEASURE(0.0174532925199433),#1);\n"
@@ -4918,7 +4918,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveContextDependentUnit() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(CONTEXT_DEPENDENT_UNIT('BOX') NAMED_UNIT(*));\n"
         + "ENDSEC;";
@@ -4934,7 +4934,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConversionBasedUnitWithOffset() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(THERMODYNAMIC_TEMPERATURE_UNIT() NAMED_UNIT(*) SI_UNIT($,.KELVIN.));\n"
         + "#2=MEASURE_WITH_UNIT(THERMODYNAMIC_TEMPERATURE_MEASURE(1.0),#1);\n"
@@ -4958,7 +4958,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTypedMeasureWithUnitSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MASS_UNIT();\n"
@@ -4998,7 +4998,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalTypedMeasureWithUnitSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=FREQUENCY_UNIT();\n"
         + "#2=FORCE_UNIT();\n"
@@ -5044,7 +5044,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRemainingTypedMeasureWithUnitSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=AMOUNT_OF_SUBSTANCE_UNIT();\n"
         + "#2=ELECTRIC_CHARGE_UNIT();\n"
@@ -5087,7 +5087,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalPhysicalTypedMeasureWithUnitSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=MASS_DENSITY_UNIT();\n"
         + "#2=DYNAMIC_VISCOSITY_UNIT();\n"
@@ -5159,7 +5159,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSolidModelMarkerWithoutStealingManifoldSolidBrep() {
-        String markerStep = 
+        String markerStep =
         "DATA;\n"
         + "#1=(SOLID_MODEL() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('solid-item'));\n"
         + "ENDSEC;";
@@ -5169,7 +5169,7 @@ class StepEntityResolverTest {
         StepSolidModel solidModel = assertInstanceOf(StepSolidModel.class, resolved.get(1));
         assertEquals("solid-item", solidModel.name());
 
-        String brepStep = 
+        String brepStep =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -5191,7 +5191,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRepresentationItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=REPRESENTATION_ITEM('item-1');\n"
         + "ENDSEC;";
@@ -5204,7 +5204,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveValueRepresentationItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=VALUE_REPRESENTATION_ITEM('roughness',DESCRIPTIVE_MEASURE('Ra 3.2'));\n"
         + "ENDSEC;";
@@ -5220,7 +5220,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPointOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,0.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -5241,7 +5241,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationCurveOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5265,7 +5265,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveLeaderCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5289,7 +5289,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationFillArea() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5311,7 +5311,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationFillAreaOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5340,7 +5340,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationFillAreaOccurrenceWithPointReplicaTarget() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5376,7 +5376,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationFillAreaWithPathAndWireBoundaries() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5410,7 +5410,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationCurveAndFillAreaWithWireframeModelCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5458,7 +5458,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPlaceholderOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=GEOMETRIC_SET('GS0',(#1));\n"
@@ -5482,7 +5482,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPlaceholderOccurrenceWithPointContainers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -5510,7 +5510,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointLikeAnnotationOccurrenceCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -5545,7 +5545,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDirectAnnotationContentPointCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
         + "#2=REPRESENTATION('REP',(),#1);\n"
@@ -5608,7 +5608,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointSetWithPointLikeAnnotationOccurrenceCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -5636,7 +5636,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPlane() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -5664,7 +5664,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPlaneWithNestedPointContainers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -5692,7 +5692,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationPlaneWithNestedGeometricSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -5720,7 +5720,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldRejectPointMarkerInAnnotationPlaneElements() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -5746,7 +5746,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProjectionCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5771,7 +5771,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDimensionCurve() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5796,7 +5796,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAnnotationCurveFamilyWithPathAndWireCarriers() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5851,7 +5851,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferGeometricRepresentationItemOverRepresentationItemForComplexEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('geom-item'));\n"
         + "ENDSEC;";
@@ -5866,7 +5866,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePointMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('p'));\n"
         + "ENDSEC;";
@@ -5881,7 +5881,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreserveRegistryPrecedenceForComplexEntityDefinitionOrder() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(REPRESENTATION_ITEM('p') GEOMETRIC_REPRESENTATION_ITEM() POINT());\n"
         + "ENDSEC;";
@@ -5896,7 +5896,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCurveMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('c'));\n"
         + "ENDSEC;";
@@ -5911,7 +5911,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(SURFACE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('s'));\n"
         + "ENDSEC;";
@@ -5926,7 +5926,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTopologicalRepresentationItem() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=TOPOLOGICAL_REPRESENTATION_ITEM('topo');\n"
         + "ENDSEC;";
@@ -5942,7 +5942,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveVertexMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(VERTEX() TOPOLOGICAL_REPRESENTATION_ITEM('v'));\n"
         + "ENDSEC;";
@@ -5957,7 +5957,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEdgeMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(EDGE() TOPOLOGICAL_REPRESENTATION_ITEM('e'));\n"
         + "ENDSEC;";
@@ -5972,7 +5972,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceMarker() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(FACE() TOPOLOGICAL_REPRESENTATION_ITEM('f'));\n"
         + "ENDSEC;";
@@ -5987,7 +5987,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSubedge() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -6013,7 +6013,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveConnectedEdgeSet() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -6036,7 +6036,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEdgeBasedWireframeModel() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -6062,7 +6062,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferSiUnitOverNamedUnitForComplexEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "ENDSEC;";
@@ -6077,7 +6077,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldPreferFaceOuterBoundOverFaceBoundForComplexEntity() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -6101,7 +6101,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMeasureWithUnitUsingTypedMeasureValue() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#1);\n"
@@ -6116,7 +6116,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProductDefinitionLinkedToShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6153,7 +6153,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEdgeBasedWireframeShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6171,7 +6171,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricallyBoundedWireframeShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6187,7 +6187,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricallyBounded2dWireframeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','PLAN'));\n"
@@ -6203,7 +6203,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShellBasedWireframeShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6219,7 +6219,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveManifoldSurfaceShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6235,7 +6235,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSurfaceShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6251,7 +6251,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGeometricallyBoundedSurfaceShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6267,7 +6267,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6295,7 +6295,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMoreShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6323,7 +6323,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEvenMoreShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6351,7 +6351,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCsg2dAndNgonShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6379,7 +6379,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdvancedShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6409,7 +6409,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveSheetAndParameterizedShapeRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6433,7 +6433,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePathShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6449,7 +6449,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveWireframeShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6465,7 +6465,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFaceShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -6481,7 +6481,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePresentationRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6497,7 +6497,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDraughtingModel() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','DRAWING'));\n"
@@ -6513,7 +6513,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6545,7 +6545,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMorePresentationRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6577,7 +6577,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTextAndSymbolRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6604,7 +6604,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDrawingAndPathRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6636,7 +6636,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveResultingPathAndCharacterGlyphRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6668,7 +6668,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePresentationAreaAndGenericGlyphRepresentationSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6695,7 +6695,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMorePresentationRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6727,7 +6727,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProceduralAndVariationalRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6759,7 +6759,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalCurveAndEvaluatedRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6796,7 +6796,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCharacteristicAndUncertaintyRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6828,7 +6828,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveInterpolatedAndKinematicRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6860,7 +6860,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveKinematicTopologyRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6892,7 +6892,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMechanismAndLinkRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6924,7 +6924,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalMotionAndOrientationRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6956,7 +6956,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDataQualityRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -6988,7 +6988,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExternallyConditionedAndA3mRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PRESENTATION'));\n"
@@ -7020,7 +7020,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveA3mAssemblyAndShapeDataQualityRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','QUALITY');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','QUALITY'));\n"
@@ -7052,7 +7052,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExternallyDefinedAndAccuracyRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','EXT');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','EXTREP'));\n"
@@ -7084,7 +7084,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalGeneralRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','GEN');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','GENERAL'));\n"
@@ -7120,7 +7120,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFoundedPathAndSimplifiedHoleRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','HOLE');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','HOLEDEF'));\n"
@@ -7156,7 +7156,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMachiningRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','MACH');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MACHINING'));\n"
@@ -7188,7 +7188,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalMachiningRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TOOL');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TOOLING'));\n"
@@ -7224,7 +7224,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveToleranceAndTableRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TABLE');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TOL'));\n"
@@ -7260,7 +7260,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCharacterizedAndEvaluatedRepresentationFamilies() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','CHAR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CHARREP'));\n"
@@ -7296,7 +7296,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolvePropertyDefinitionRepresentationFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -7340,7 +7340,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalPropertyDefinitionRepresentationFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR2');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX2'));\n"
@@ -7394,7 +7394,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalRepresentationRelationshipSubtypes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','REL');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','RELCTX'));\n"
@@ -7497,7 +7497,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFacetedBrepShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -7513,7 +7513,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveElementaryBrepShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -7529,7 +7529,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCsgShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -7545,7 +7545,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCsgPrimitiveSolids() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7591,7 +7591,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCsgSolidAndSolidReplica() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7627,7 +7627,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProfileDefsAndSweptAreaSolids() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7676,7 +7676,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalProfileDefsAndHalfSpaceSolids() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7728,7 +7728,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveArbitraryProfileDefWithVoids() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('A',(4.0,0.0));\n"
@@ -7755,7 +7755,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBooleanResult() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7791,7 +7791,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBooleanClippingResult() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7827,7 +7827,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNonManifoldSurfaceShapeRepresentation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -7843,7 +7843,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFacetedBrep() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7872,7 +7872,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShellBasedSurfaceModel() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7905,7 +7905,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBrepWithVoids() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7937,7 +7937,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProductDefinitionShapeLinkedToAssemblyOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -7964,7 +7964,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShapeRepresentationRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7986,7 +7986,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveContextDependentShapeRepresentationForOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8027,7 +8027,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveContextDependentShapeRepresentationForPlainRepresentationRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8064,7 +8064,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveNextAssemblyUsageOccurrenceWithReferenceDesignator() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8089,7 +8089,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveContextDependentShapeRepresentationViaProductDefinitionShape() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8124,7 +8124,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGlobalUnitAndUncertaintyAssignedContexts() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=(PLANE_ANGLE_UNIT() NAMED_UNIT(*) SI_UNIT($,.RADIAN.));\n"
@@ -8158,7 +8158,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProductDefinitionFormationWithSpecifiedSource() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8175,7 +8175,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProductRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8198,7 +8198,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveProductDefinitionRelationshipFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8270,7 +8270,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveGroupAndGroupRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=GROUP('inspection group','group description');\n"
         + "#2=GROUP('child group',$);\n"
@@ -8295,7 +8295,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDocumentPersonAndOrganizationMetadata() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('drawing');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -8344,7 +8344,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveApprovalDateTimeAndSecurityMetadata() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',$,$,$);\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -8411,7 +8411,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAppliedMetadataAssignments() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8529,7 +8529,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveCommonControlDesignAliases() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=MECHANICAL_CONTEXT('part',#1,'mechanical');\n"
@@ -8636,7 +8636,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveEffectivityMetadata() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8661,7 +8661,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveClassificationIdentificationAndExternalMetadata() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8875,7 +8875,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveShapeAspectFamilyEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -8979,7 +8979,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalShapeAspectAliases() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -9080,7 +9080,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveBaseShapeAspectOccurrence() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9105,7 +9105,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFeatureDefinitionAliases() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CHARACTERIZED_OBJECT('CO','base characterized object');\n"
         + "#2=FEATURE_DEFINITION('FD','feature definition');\n"
@@ -9174,7 +9174,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRepresentationRelationshipWithTransformation() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P',(10.0,0.0,0.0));\n"
@@ -9209,7 +9209,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveMappedItemAndCartesianTransformationOperators() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -9252,7 +9252,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveReplicasAndBoundedSurfaceEntities() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P',(1.0,0.0,0.0));\n"
@@ -9349,7 +9349,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveAdditionalShapeRepresentationAliases() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','SHAPE');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','SHAPECTX'));\n"
@@ -9386,7 +9386,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRepresentationRelationship() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -9410,7 +9410,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveRepresentationRelationshipAliases() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','R');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -9436,7 +9436,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveIShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9453,7 +9453,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveTShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9470,7 +9470,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveLShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9487,7 +9487,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveUShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9504,7 +9504,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveZShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9521,7 +9521,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveHatShapeProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9538,7 +9538,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveFlatBarProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -9555,7 +9555,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveDoveTailProfileDef() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"

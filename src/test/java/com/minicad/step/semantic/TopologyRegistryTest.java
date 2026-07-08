@@ -117,7 +117,7 @@ class TopologyRegistryTest {
   @DisplayName("Total entity count should be reasonable")
   void totalEntityCountShouldBeReasonable() {
     // Full registry has many entities from all domains
-    assertTrue(registry.size() >= 1000, 
+    assertTrue(registry.size() >= 1000,
         "Expected at least 1000 entities in full registry, got " + registry.size());
 assertTrue(registry.size() <= 3500,
         "Expected at most 3500 entities in full registry, got " + registry.size());

@@ -3799,7 +3799,7 @@ class StepCadBuilderTest {
     void shouldResolveOrientedCurveWithReversedOrientation() {
         // When StepOrientedCurve has orientation=false, the resolver should store
         // the orientation flag correctly so the builder can handle it.
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"

@@ -9,9 +9,9 @@ public class test_grammar_only {
             "examples/nested-assembly.step",
             "examples/cylindrical-trimmed-bspline-pcurve.step"
         };
-        
+
         System.out.println("=== Grammar解析测试（不resolve） ===\n");
-        
+
         for (String file : files) {
             try {
                 String content = java.nio.file.Files.readString(java.nio.file.Path.of(file));

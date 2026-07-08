@@ -21,7 +21,7 @@ class StepDumpAppTest {
     @Test
     void shouldPrintSummaryForMinimalSolid() throws IOException {
         Path file = Files.createTempFile("minicad-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -76,7 +76,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSolidAndSurfaceModelContainerNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-solid-surface-model-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -128,7 +128,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveWireAndSurfaceContainerNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-wire-surface-container-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -192,7 +192,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportWireShellWithMixedLoopFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-wire-shell-mixed-loops", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -230,7 +230,7 @@ class StepDumpAppTest {
     @Test
     void shouldPrintStepEntityNamesForConicsInSemanticSummary() throws IOException {
         Path file = Files.createTempFile("minicad-parabola-summary", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -248,7 +248,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandaloneFaceEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -298,7 +298,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandaloneEdgeEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-edge", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -327,7 +327,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandaloneLoopAndPathEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-loop-path", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -375,7 +375,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportNestedOrientedAndReversedOpenPathsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-nested-oriented-paths", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -406,7 +406,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandaloneWireAndSurfaceContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -475,7 +475,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportShellBackedFaceBasedSurfaceModelInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-face-based-surface-model-shell", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -525,7 +525,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandalonePointAndGeometricSetsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-geom-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -551,7 +551,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePointAndGeometricSetContainerNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-geometric-set-container-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -578,7 +578,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePointAndGeometricSetContainerEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-geometric-set-container-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -605,7 +605,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationContainerNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-container-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -654,7 +654,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationContainerEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-container-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -703,7 +703,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInPointAndGeometricSetsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-replica-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -726,7 +726,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInGeometricCurveSetInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-replica-curve-set", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -749,7 +749,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetWithNestedPointAndCurveSetsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-nested-geom-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -768,7 +768,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetWithSurfaceAndTopologyMembersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-surface-topology-geom-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -802,7 +802,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetsWithWireAndLoopContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-wire-loop-geom-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -835,7 +835,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricCurveSetWithWireContainersAndWireframeModelsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-wire-model-curve-set", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -873,7 +873,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetWithShellModelAndSolidMembersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shell-model-solid-geom-set", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -905,7 +905,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetsWithNestedSetMembersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-nested-set-geom-sets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -931,7 +931,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaThroughRepresentationWrappersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-replica-repr", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -961,7 +961,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportRepresentationAndWrapperEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-standalone-representation", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -994,7 +994,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationWrapperNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-wrapper-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -1026,7 +1026,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportRepresentationRelationshipEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-relationships", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1062,7 +1062,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicRepresentationRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-representation-relationship-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1096,7 +1096,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationWrapperEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-wrappers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1184,7 +1184,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-relationship-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -1225,7 +1225,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationRelationshipEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -1266,7 +1266,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInAnnotationContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-point-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -1300,7 +1300,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInAnnotationPointOccurrenceAndCalloutInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-point-callout-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -1328,7 +1328,7 @@ class StepDumpAppTest {
     void shouldReportAnnotationOccurrenceRelationshipWithTerminatorSymbolInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-aor-terminator", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -1362,7 +1362,7 @@ class StepDumpAppTest {
     void shouldReportAnnotationOccurrenceAssociativityWithTerminatorSymbolInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-aor-assoc-terminator", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','SYM'));\n"
         + "#2=REPRESENTATION('SYM',(),#1);\n"
@@ -1395,7 +1395,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportTerminatorSymbolWithWrappedAnnotationItemInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-terminator-wrapped-item", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -1427,7 +1427,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointContainersAndPlaneInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-point-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1465,7 +1465,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationPlaceholderOccurrenceWithPointContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-placeholder-point-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -1492,7 +1492,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationCurveFamilyWithPathAndWireCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-curve-path-wire", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1548,7 +1548,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationFillAreaWithPathAndWireBoundariesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-fill-area-path-wire", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1580,7 +1580,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationCurveAndFillAreaWithWireframeModelCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-wireframe-carriers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1626,7 +1626,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDraughtingCalloutPointContainerContentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-point-container-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1665,7 +1665,7 @@ class StepDumpAppTest {
     void shouldPreserveDraughtingCalloutPointContainerContentEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-callout-point-container-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1703,7 +1703,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricSetInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-geometric-set", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1721,7 +1721,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDraughtingCalloutGeometricSetContentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-geometric-set-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1740,7 +1740,7 @@ class StepDumpAppTest {
     void shouldPreserveDraughtingCalloutGeometricSetContentEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-callout-geometric-set-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1758,7 +1758,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPathAndWireContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-path-wire", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1793,7 +1793,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportDirectGeometryContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-direct-geometry", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1825,7 +1825,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAdvancedCurveContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-advanced-curve", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1854,7 +1854,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDraughtingCalloutPathAndWireContentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-path-wire-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1889,7 +1889,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtendedContainerContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-extended-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1937,7 +1937,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportFaceShellAndSurfaceModelContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-shell-face-models", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -2023,7 +2023,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBrepSolidContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-brep-solids", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -2079,7 +2079,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBuildableSolidFamilyContentsInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-solid-family", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -2132,7 +2132,7 @@ class StepDumpAppTest {
     void shouldPreserveDraughtingCalloutPathAndWireContentEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-callout-path-wire-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -2167,7 +2167,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportDirectAnnotationContentInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-annotation-content", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2211,7 +2211,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDirectAnnotationContentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-direct-annotation-content-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2245,7 +2245,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDirectAnnotationContentEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-direct-annotation-content-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2279,7 +2279,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportOccurrenceWrappersInDraughtingCalloutBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-occurrence-wrappers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2315,7 +2315,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationWrapperOccurrencesWithAdditionalItemsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-wrapper-additional-items", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=POINT_SET('PS0',(#1));\n"
@@ -2341,7 +2341,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationOccurrenceWrapperNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-occurrence-wrapper-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2371,7 +2371,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAnnotationOccurrenceWrapperEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-occurrence-wrapper-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0));\n"
@@ -2401,7 +2401,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDraughtingCalloutAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
@@ -2446,7 +2446,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDraughtingCalloutAliasFamilyNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-callout-alias-family-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=ANNOTATION_TEXT_OCCURRENCE('NOTE','A=2.0',#1);\n"
@@ -2491,7 +2491,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationPlaneWithNestedPointContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-plane-nested-points", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -2519,7 +2519,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationPlaneWithNestedGeometricSetInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-plane-nested-geometric-set", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('N',(0.0,0.0,1.0));\n"
@@ -2549,7 +2549,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInAnnotationFillAreaOccurrenceInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-fill-area-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2584,7 +2584,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaInAnnotationTextOccurrenceInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-text-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -2608,7 +2608,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAnnotationPointLikeOccurrencesWithContainerCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-pointlike-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,0.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2639,7 +2639,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportNestedPointSetAndAnnotationPlaneOccurrenceElementsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-plane-point-carriers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2673,7 +2673,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportVertexPointInAnnotationPointAndFillAreaOccurrencesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-vertex-point", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2701,7 +2701,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportVertexPointInAnnotationTextOccurrenceInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-text-vertex-point", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2720,7 +2720,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportVertexShellInAnnotationPointLikeOccurrencesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-vertex-shell", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2751,7 +2751,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointLikeAnnotationOccurrenceCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-annotation-point-like-carriers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -2781,7 +2781,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportDirectAnnotationContentPointCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-direct-annotation-content-point-carriers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
         + "#2=REPRESENTATION('REP',(),#1);\n"
@@ -2839,7 +2839,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointSetWithPointLikeAnnotationOccurrenceCarriersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-set-annotation-point-like-carriers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=PRESENTATION_STYLE_ASSIGNMENT(());\n"
@@ -2868,7 +2868,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportVertexPointInPointAndGeometricCurveContainersInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-vertex-point-containers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2887,7 +2887,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPointReplicaWithVertexPointParentInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-point-replica-vertex-parent", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(1.0,2.0,3.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -2909,7 +2909,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPresentationStyleEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-presentation-styles", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -2970,7 +2970,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePresentationStyleNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-presentation-style-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0));\n"
@@ -3030,7 +3030,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPredefinedAndExternallyDefinedStyleLeavesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-predefined-external-style-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#2=EXTERNALLY_DEFINED_ITEM('item-1',#1);\n"
@@ -3073,7 +3073,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePredefinedAndExternallyDefinedStyleLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-predefined-external-style-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#2=EXTERNALLY_DEFINED_ITEM('item-1',#1);\n"
@@ -3115,7 +3115,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportMetadataRelationshipLeavesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-metadata-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3169,7 +3169,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAssignmentMetadataFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-assignment-metadata", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3228,7 +3228,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPersonDateAndRelationshipMetadataInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-date-relationships", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3289,7 +3289,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAppliedDateTimeAssignmentAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-date-time-assignment-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3315,7 +3315,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAppliedDateTimeAssignmentAliasEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-date-time-assignment-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3341,7 +3341,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicMetadataRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-metadata-relationships", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GROUP('inspection group','group description');\n"
         + "#2=GROUP('child group',$);\n"
@@ -3371,7 +3371,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicMetadataRelationshipEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-metadata-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GROUP('inspection group','group description');\n"
         + "#2=GROUP('child group',$);\n"
@@ -3401,7 +3401,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAdditionalMetadataRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-additional-metadata-relationships", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#2=EXTERNAL_SOURCE('erp');\n"
@@ -3428,7 +3428,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAdditionalMetadataRelationshipEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-additional-metadata-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#2=EXTERNAL_SOURCE('erp');\n"
@@ -3455,7 +3455,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentAndExternalIdentificationNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-external-identification", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3482,7 +3482,7 @@ class StepDumpAppTest {
     void shouldPreserveDocumentAndExternalIdentificationEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-document-external-identification-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3508,7 +3508,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveLanguageAndAttributeNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-language-attributes", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3536,7 +3536,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveLanguageAndAttributeEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-language-attribute-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3564,7 +3564,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveClassificationIdentificationAndNameAssignmentsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-classification-identification-name", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3594,7 +3594,7 @@ class StepDumpAppTest {
     void shouldPreserveClassificationIdentificationAndNameAssignmentEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-classification-identification-name-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3624,7 +3624,7 @@ class StepDumpAppTest {
     void shouldPreserveClassificationAndExternalIdentificationNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-classification-external-identification", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3654,7 +3654,7 @@ class StepDumpAppTest {
     void shouldPreserveClassificationAndExternalIdentificationEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-classification-external-identification-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3680,7 +3680,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveNameAssignmentAndAttributeNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-name-attribute-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3704,7 +3704,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveNameAssignmentAndAttributeEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-name-attribute-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3728,7 +3728,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePropertyCategoryAndEffectivityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-property-category-effectivity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GENERAL_PROPERTY('gp-1','material','material property');\n"
         + "#2=GENERAL_PROPERTY('gp-2','finish','finish property');\n"
@@ -3757,7 +3757,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePropertyCategoryAndEffectivityEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-property-category-effectivity-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GENERAL_PROPERTY('gp-1','material','material property');\n"
         + "#2=GENERAL_PROPERTY('gp-2','finish','finish property');\n"
@@ -3786,7 +3786,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveGroupAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-group-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GROUP('plain group','plain grouping');\n"
         + "#2=CLASS('class group','classified grouping');\n"
@@ -3805,7 +3805,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveGroupAliasEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-group-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=GROUP('plain group','plain grouping');\n"
         + "#2=CLASS('class group','classified grouping');\n"
@@ -3824,7 +3824,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveProductRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-product-relationship-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3843,7 +3843,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveProductRelationshipEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-product-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -3862,7 +3862,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAppliedAssignmentFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-applied-assignment-families", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3912,7 +3912,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAppliedAssignmentFamilyEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-applied-assignment-family-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3962,7 +3962,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonAndDateAssignmentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-date-assignments", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -3999,7 +3999,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonAndDateAssignmentEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-date-assignment-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -4036,7 +4036,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentAndApprovalRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-approval-relationships", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('drawing');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4067,7 +4067,7 @@ class StepDumpAppTest {
     void shouldPreserveDocumentAndApprovalRelationshipEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-document-approval-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('drawing');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4097,7 +4097,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentReferenceAndApprovalAssignmentNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-reference-approval-assignment", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -4125,7 +4125,7 @@ class StepDumpAppTest {
     void shouldPreserveDocumentReferenceAndApprovalAssignmentEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-document-reference-approval-assignment-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -4152,7 +4152,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonOrganizationAndDateLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-organization-date-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4185,7 +4185,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonOrganizationAndDateLeafEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-organization-date-leaf-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4218,7 +4218,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveOrganizationLanguageAndExternalSourceNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-organization-language-external-source", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -4251,7 +4251,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveOrganizationLanguageAndExternalSourceEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-organization-language-external-source-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -4284,7 +4284,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAssignmentRoleAndTypeLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-assignment-role-type-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CLASSIFICATION_ROLE('part family');\n"
         + "#2=IDENTIFICATION_ROLE('erp id');\n"
@@ -4309,7 +4309,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAssignmentRoleAndTypeEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-assignment-role-type-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CLASSIFICATION_ROLE('part family');\n"
         + "#2=IDENTIFICATION_ROLE('erp id');\n"
@@ -4334,7 +4334,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicMetadataLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-metadata-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=EXTERNAL_SOURCE('supplier-catalog');\n"
@@ -4355,7 +4355,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicMetadataLeafEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-metadata-leaf-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=EXTERNAL_SOURCE('supplier-catalog');\n"
@@ -4376,7 +4376,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentApprovalAndClassificationLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-approval-classification-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('drawing');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4402,7 +4402,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentApprovalAndClassificationEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-approval-classification-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('drawing');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4428,7 +4428,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentLeafAndConstraintNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-leaf-constraint-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4445,7 +4445,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDocumentLeafAndConstraintEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-leaf-constraint-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DOCUMENT_TYPE('spec');\n"
         + "#2=DOCUMENT('DOC-1','Spec','primary spec',#1);\n"
@@ -4462,7 +4462,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveApprovalLeafAndRelationshipNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-approval-leaf-relationship-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4490,7 +4490,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveApprovalLeafAndRelationshipEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-approval-leaf-relationship-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4518,7 +4518,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonAndOrganizationNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-organization-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4543,7 +4543,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreservePersonAndOrganizationEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-person-organization-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=PERSON('p-1','Doe','Jane',('Q'),('Dr.'),('PE'));\n"
         + "#2=ORGANIZATION('org-1','Acme','engineering');\n"
@@ -4568,7 +4568,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveApplicationProductAndContextNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-application-product-context", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4591,7 +4591,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveApplicationProductAndContextEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-application-product-context-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4614,7 +4614,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeUsageMetadataNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-usage-metadata", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4642,7 +4642,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeUsageEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-usage-metadata-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4670,7 +4670,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationUsageNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-usage", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4698,7 +4698,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationUsageEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-usage-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -4726,7 +4726,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveGeometricItemSpecificUsageNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-geometric-item-specific-usage", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4759,7 +4759,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveGeometricItemSpecificUsageEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-geometric-item-specific-usage-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4792,7 +4792,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAssociationUsageNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-association-usage", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4827,7 +4827,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAssociationUsageEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-association-usage-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4862,7 +4862,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportUsageAndAssociationFamilyWithVertexLoopTargetInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-association-usage-vertex-loop", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -4896,7 +4896,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAssociationWithPlaceholderNameInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-association-with-placeholder", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PMICTX'));\n"
@@ -4919,7 +4919,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtendedAnnotationUsageFamilyInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-extended-annotation-usage-family", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PMICTX'));\n"
@@ -4953,7 +4953,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportDirectAnnotationContentUsageFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-direct-annotation-content-usage-family", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
         + "#2=REPRESENTATION('REP_USED',(),#1);\n"
@@ -5014,7 +5014,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportGeometricItemSpecificUsageWithPathAndWireTargetsInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-usage-path-wire-targets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5049,7 +5049,7 @@ class StepDumpAppTest {
     void shouldReportGeometricItemSpecificUsageWithShellModelAndSolidTargetsInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-usage-shell-model-solid-targets", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -5098,7 +5098,7 @@ class StepDumpAppTest {
     void shouldPreservePlacedDatumTargetFeatureAndProductDefinitionEffectivityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-placed-datum-effectivity", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5124,7 +5124,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAppliedAssignmentAndReferenceAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-applied-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5168,7 +5168,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCommonControlApprovalAndReferenceAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-approval-reference-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5204,7 +5204,7 @@ class StepDumpAppTest {
     void shouldPreserveCommonControlApprovalAndReferenceAliasEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-approval-reference-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5240,7 +5240,7 @@ class StepDumpAppTest {
     void shouldPreserveCommonControlPersonAndOrganizationAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-person-org-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5265,7 +5265,7 @@ class StepDumpAppTest {
     void shouldPreserveCommonControlPersonAndOrganizationAliasEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-person-org-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5289,7 +5289,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCommonControlDateAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-date-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5314,7 +5314,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCommonControlDateAliasEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-date-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5339,7 +5339,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCommonControlDesignRelationshipAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-relationship-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=MECHANICAL_CONTEXT('part',#1,'mechanical');\n"
@@ -5365,7 +5365,7 @@ class StepDumpAppTest {
     void shouldPreserveCommonControlDesignRelationshipAliasEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-cc-design-relationship-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=MECHANICAL_CONTEXT('part',#1,'mechanical');\n"
@@ -5392,7 +5392,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveContextAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-context-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=MECHANICAL_CONTEXT('part',#1,'mechanical');\n"
@@ -5411,7 +5411,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveContextAliasEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-context-alias-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=MECHANICAL_CONTEXT('part',#1,'mechanical');\n"
@@ -5430,7 +5430,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','GEN');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','GENERAL'));\n"
@@ -5452,7 +5452,7 @@ class StepDumpAppTest {
     void shouldPreserveFoundedHoleAndMachiningRepresentationAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-founded-machining-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','GEN');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','GENERAL'));\n"
@@ -5482,7 +5482,7 @@ class StepDumpAppTest {
     void shouldPreserveToleranceAndTableRepresentationAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-tolerance-table-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','TABLE');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','TOL'));\n"
@@ -5504,7 +5504,7 @@ class StepDumpAppTest {
     void shouldPreserveCharacterizedAndEvaluatedRepresentationAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-characterized-evaluated-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','CHAR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CHARREP'));\n"
@@ -5525,7 +5525,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeRepresentationAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-representation-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','SHAPE');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','SHAPECTX'));\n"
@@ -5550,7 +5550,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationRelationshipAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-relationship-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','R');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
@@ -5574,7 +5574,7 @@ class StepDumpAppTest {
     void shouldPreserveAdditionalRepresentationRelationshipAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-representation-relationship-more-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','REL');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','RELCTX'));\n"
@@ -5597,7 +5597,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveProductDefinitionRelationshipAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-product-definition-relationship-aliases", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -5643,7 +5643,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportDocumentReferenceAndApprovalMetadataInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-document-approval-metadata", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -5694,7 +5694,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportProductShapeAndUsageMetadataInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-product-shape-usage-metadata", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5752,7 +5752,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeAspectRelationshipAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-aspect-relationship-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -5792,7 +5792,7 @@ class StepDumpAppTest {
     void shouldPreserveAdditionalShapeAspectRelationshipAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-shape-aspect-relationship-more-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -5829,7 +5829,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPropertyRepresentationFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-property-representation-families", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -5860,7 +5860,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicPropertyRepresentationNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-property-representation-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -5881,7 +5881,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicPropertyRepresentationEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-property-representation-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -5903,7 +5903,7 @@ class StepDumpAppTest {
     void shouldPreserveKinematicAndResourcePropertyRepresentationNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-kinematic-property-representation-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -5929,7 +5929,7 @@ class StepDumpAppTest {
     void shouldPreserveKinematicAndResourcePropertyRepresentationEntityNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-kinematic-property-representation-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PDR');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','PDRCTX'));\n"
@@ -5954,7 +5954,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportMeasureUnitAndContextFamiliesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-measure-unit-context", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#1);\n"
@@ -6003,7 +6003,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveUnitAndContextNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-unit-context-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#1);\n"
@@ -6033,7 +6033,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveUnitAndContextEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-unit-context-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(12.5),#1);\n"
@@ -6063,7 +6063,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveTypedMeasureWithUnitAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-typed-measure-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=MASS_DENSITY_UNIT();\n"
         + "#2=DYNAMIC_VISCOSITY_UNIT();\n"
@@ -6128,7 +6128,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveTypedMeasureWithUnitEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-typed-measure-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=MASS_DENSITY_UNIT();\n"
         + "#2=DYNAMIC_VISCOSITY_UNIT();\n"
@@ -6193,7 +6193,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDerivedAndOffsetUnitNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-derived-offset-unit-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT($,.METRE.));\n"
         + "#2=(TIME_UNIT() NAMED_UNIT(*) SI_UNIT($,.SECOND.));\n"
@@ -6220,7 +6220,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveDerivedAndOffsetUnitEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-derived-offset-unit-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT($,.METRE.));\n"
         + "#2=(TIME_UNIT() NAMED_UNIT(*) SI_UNIT($,.SECOND.));\n"
@@ -6247,7 +6247,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationItemLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-item-leaf-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=REPRESENTATION_ITEM('REP_ITEM_ONLY');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
@@ -6266,7 +6266,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveRepresentationItemEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-representation-item-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=REPRESENTATION_ITEM('REP_ITEM_ONLY');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('GEOM_ITEM_ONLY'));\n"
@@ -6285,7 +6285,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSpecificRepresentationItemLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-specific-representation-item-leaf-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
@@ -6303,7 +6303,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSpecificRepresentationItemEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-specific-representation-item-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
@@ -6321,7 +6321,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportMarkerBaseEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-marker-base-entities", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('C'));\n"
@@ -6348,7 +6348,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveMarkerBaseEntityNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-marker-base-entity-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(POINT() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('P'));\n"
         + "#2=(CURVE() GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('C'));\n"
@@ -6375,7 +6375,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportStandaloneGeometryAndPlacementLeavesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-geometry-placement-leaves", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6417,7 +6417,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveStandaloneGeometryAndPlacementLeafNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-geometry-placement-leaf-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6459,7 +6459,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportCurveAndSurfaceWrapperEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-curve-surface-wrappers", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -6512,7 +6512,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveReplicaAndTransformationAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-replica-transformation-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -6543,7 +6543,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSweptAreaSolidAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-swept-area-solid-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6568,7 +6568,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCsgPrimitiveAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-csg-primitive-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6590,7 +6590,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAdditionalCsgPrimitiveAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-additional-csg-primitive-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6612,7 +6612,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveHalfSpaceAndBoxDomainAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-halfspace-boxdomain-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6634,7 +6634,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveAdditionalProfileDefinitionAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-additional-profile-def-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P2',(0.0,0.0));\n"
         + "#2=DIRECTION('D2',(1.0,0.0));\n"
@@ -6656,7 +6656,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBasicProfileDefinitionAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-basic-profile-def-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P2',(0.0,0.0));\n"
         + "#2=DIRECTION('D2',(1.0,0.0));\n"
@@ -6685,7 +6685,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSurfaceCurveAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-surface-curve-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -6717,7 +6717,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveConicCurveAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-conic-curve-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6738,7 +6738,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSurfaceAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-surface-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6763,7 +6763,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportSplineSweptSurfaceAndProfileEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-spline-swept-profile", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P10',(1.0,0.0,0.0));\n"
@@ -6813,7 +6813,7 @@ class StepDumpAppTest {
     @Test
     void shouldBuildOffsetSurfaceFaceFamiliesInShellSummary() throws IOException {
         Path file = Files.createTempFile("minicad-offset-surface-face-families", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6885,7 +6885,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportConicSurfaceAndHalfSpaceEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-conic-surface-halfspace", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6923,7 +6923,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportLayerStyleVariableAndDegeneratePcurveEntitiesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-layer-style-variable", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -6974,7 +6974,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportCharacterizedObjectAndCompositeCurveSegmentInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-characterized-segment", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -6993,7 +6993,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveFeatureDefinitionAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-feature-definition-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CHARACTERIZED_OBJECT('CO','base characterized object');\n"
         + "#2=FEATURE_DEFINITION('FD','feature definition');\n"
@@ -7026,7 +7026,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeAspectOccurrenceAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-aspect-occurrence-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -7057,7 +7057,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveShapeAspectAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-shape-aspect-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical');\n"
         + "#2=PRODUCT_CONTEXT('part','',#1);\n"
@@ -7088,7 +7088,7 @@ class StepDumpAppTest {
     void shouldPreserveAdditionalExternallyDefinedItemAliasNamesInBuildSummary()
             throws IOException {
         Path file = Files.createTempFile("minicad-externally-defined-item-more-alias-names", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXTERNAL_SOURCE('supplier-catalog');\n"
         + "#2=EXTERNALLY_DEFINED_CLASS('class-1',#1);\n"
@@ -7114,7 +7114,7 @@ class StepDumpAppTest {
     @Test
     void shouldTreatInvalidTopologyBuildAsUnsupportedFace() throws IOException {
         Path file = Files.createTempFile("minicad-circle-edge", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7145,7 +7145,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportUnsupportedCylindricalFacesWithoutFailingWholeDump() throws IOException {
         Path file = Files.createTempFile("minicad-cylinder-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7171,7 +7171,7 @@ class StepDumpAppTest {
     @Test
     void shouldClassifyWrappedUnsupportedSurfaceByUnderlyingType() throws IOException {
         Path file = Files.createTempFile("minicad-wrapped-surface", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7224,7 +7224,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportUnsupportedToroidalFacesWithoutFailingWholeDump() throws IOException {
         Path file = Files.createTempFile("minicad-toroidal-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7250,7 +7250,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportUnsupportedDegenerateToroidalFacesWithoutFailingWholeDump() throws IOException {
         Path file = Files.createTempFile("minicad-degenerate-toroidal-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7276,7 +7276,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportUnsupportedSphericalFacesWithoutFailingWholeDump() throws IOException {
         Path file = Files.createTempFile("minicad-spherical-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7302,7 +7302,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportZeroScaleSurfaceReplicaFacesWithoutFailingWholeDump() throws IOException {
         Path file = Files.createTempFile("minicad-zero-scale-surface-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7355,7 +7355,7 @@ class StepDumpAppTest {
     @Test
     void shouldTreatSurfaceReplicaNonUniformScaleAsUnsupportedDuringSummary() throws IOException {
         Path file = Files.createTempFile("minicad-surface-replica-non-uniform-scale", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7412,7 +7412,7 @@ class StepDumpAppTest {
     @Test
     void shouldTreatInvalidPlanarFaceAsUnsupportedDuringSummary() throws IOException {
         Path file = Files.createTempFile("minicad-invalid-planar-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7456,7 +7456,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportPolyLoopFaceAsUnsupportedDuringSummary() throws IOException {
         Path file = Files.createTempFile("minicad-poly-loop-face", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7479,7 +7479,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBooleanResultAsUnsupportedBuildItem() throws IOException {
         Path file = Files.createTempFile("minicad-boolean-result", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7513,7 +7513,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtrudedAreaSolidAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-extruded-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7533,7 +7533,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtrudedFaceSolidAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-extruded-face-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7585,7 +7585,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportRevolvedFaceSolidAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-revolved-face-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -7637,7 +7637,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportRevolvedAreaSolidAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-revolved-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7659,7 +7659,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtendedExtrudedAreaSolidShellFaceCounts() throws IOException {
         Path file = Files.createTempFile("minicad-extended-extruded-solids", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7683,7 +7683,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportSolidReplicaAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-solid-replica", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7707,7 +7707,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveSolidReplicaAliasNameInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-solid-replica-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7731,7 +7731,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveCsgSolidAliasNameInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-csg-solid-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7753,7 +7753,7 @@ class StepDumpAppTest {
     @Test
     void shouldPreserveBooleanAliasNamesInBuildSummary() throws IOException {
         Path file = Files.createTempFile("minicad-boolean-alias", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7777,7 +7777,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBooleanClippingResultAsUnsupportedBuildItem() throws IOException {
         Path file = Files.createTempFile("minicad-boolean-clipping-result", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -7811,7 +7811,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportCsgSolidAndBooleanDifferenceAsBuildableItems() throws IOException {
         Path file = Files.createTempFile("minicad-csg-solid", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7836,7 +7836,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBasicCsgPrimitiveShellFaceCounts() throws IOException {
         Path file = Files.createTempFile("minicad-basic-csg-primitives", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7858,7 +7858,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportAdditionalCsgPrimitiveShellFaceCounts() throws IOException {
         Path file = Files.createTempFile("minicad-additional-csg-primitives", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7880,7 +7880,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportBooleanClippingResultAsBuildableItem() throws IOException {
         Path file = Files.createTempFile("minicad-boolean-clipping-supported", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7901,7 +7901,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportExtendedSweptProfilesAndCsgPrimitivesAsBuildableItems() throws IOException {
         Path file = Files.createTempFile("minicad-extended-solid-support", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -7993,7 +7993,7 @@ class StepDumpAppTest {
     @Test
     void shouldReportJsonFailuresWithoutWritingToStderr() throws IOException {
         Path bad = Files.createTempFile("minicad-json-bad", ".step");
-        Files.writeString(bad, 
+        Files.writeString(bad,
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
         + "ENDSEC;"
@@ -8028,7 +8028,7 @@ class StepDumpAppTest {
     @Test
     void shouldContinueMultipleFileProcessingAfterOneFileFails() throws IOException {
         Path bad = Files.createTempFile("minicad-multi-bad", ".step");
-        Files.writeString(bad, 
+        Files.writeString(bad,
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
         + "ENDSEC;"
@@ -8047,7 +8047,7 @@ class StepDumpAppTest {
     @Test
     void shouldReturnNonZeroForParseErrorsWithoutStackTraceByDefault() throws IOException {
         Path file = Files.createTempFile("minicad-bad-step", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
         + "ENDSEC;"
@@ -8065,7 +8065,7 @@ class StepDumpAppTest {
     @Test
     void shouldPrintStackTraceOnlyWhenDebugIsEnabled() throws IOException {
         Path file = Files.createTempFile("minicad-bad-step-debug", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
         + "ENDSEC;"
@@ -8082,7 +8082,7 @@ class StepDumpAppTest {
     @Test
     void shouldReturnNonZeroProcessExitCodeForCliParseErrors() throws Exception {
         Path file = Files.createTempFile("minicad-bad-step-process", ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=EXAMPLE('unterminated);\n"
         + "ENDSEC;"
@@ -8120,7 +8120,7 @@ class StepDumpAppTest {
 
     private static Path writePointFile(String prefix) throws IOException {
         Path file = Files.createTempFile(prefix, ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "ENDSEC;"
@@ -8130,7 +8130,7 @@ class StepDumpAppTest {
 
     private static Path writeInchUnitFile(String prefix) throws IOException {
         Path file = Files.createTempFile(prefix, ".step");
-        Files.writeString(file, 
+        Files.writeString(file,
         "DATA;\n"
         + "#1=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));\n"
         + "#2=MEASURE_WITH_UNIT(LENGTH_MEASURE(25.4),#1);\n"

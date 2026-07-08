@@ -19,7 +19,7 @@ class StepParserTest {
 
     @Test
     void shouldParseMinimalDataSection() {
-        String step = 
+        String step =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "FILE_DESCRIPTION(('mini cad'),'1');\n"
@@ -41,7 +41,7 @@ class StepParserTest {
 
     @Test
     void shouldExposeTypedAp214AndAp242HeaderMetadata() {
-        String step = 
+        String step =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "FILE_DESCRIPTION(('AP214/AP242 metadata'),'2;1');\n"
@@ -71,7 +71,7 @@ class StepParserTest {
 
     @Test
     void shouldKeepForwardReferencesAsRawReferences() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#20=EDGE_CURVE('E0',#30,#31,#40,.T.);\n"
         + "#40=LINE('L0',#50,#60);\n"
@@ -87,7 +87,7 @@ class StepParserTest {
 
     @Test
     void shouldParseStringsEnumsOmittedValuesTypedValuesAndLists() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=EXAMPLE('A''B',$,*,.T.,LENGTH_MEASURE(1.0),(1.0,#2,'X'));\n"
         + "ENDSEC;";
@@ -107,7 +107,7 @@ class StepParserTest {
 
     @Test
     void shouldParseTypedValueParameterLists() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=EXAMPLE(AP242_SELECT(#2,'name',.T.));\n"
         + "ENDSEC;";
@@ -122,7 +122,7 @@ class StepParserTest {
 
     @Test
     void shouldTreatCommentsAsWhitespaceBetweenParameterTokens() {
-        String step = 
+        String step =
         "DATA;\n"
         + "/* before entity */\n"
         + "#1=EXAMPLE(\n"
@@ -148,7 +148,7 @@ class StepParserTest {
 
     @Test
     void shouldDecodeStepStringEscapes() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=EXAMPLE('A''B','\\S\\D','\\P\\A\\S\\|','\\X\\E9','\\X2\\4F60597D\\X0\\','\\X2\\65E5672C\\X0\\','\\X4\\0001F600\\X0\\');\n"
         + "ENDSEC;";
@@ -272,7 +272,7 @@ class StepParserTest {
 
     @Test
     void shouldNotTreatEndsecInsideStringAsSectionTerminator() {
-        String step = 
+        String step =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "FILE_DESCRIPTION(('contains ENDSEC; in header'),'1');\n"
@@ -292,7 +292,7 @@ class StepParserTest {
 
     @Test
     void shouldFindSectionsOutsideStringsAndComments() {
-        String step = 
+        String step =
         "ISO-10303-21;\n"
         + "/* HEADER; DATA; ENDSEC; */\n"
         + "HEADER;\n"
@@ -337,7 +337,7 @@ class StepParserTest {
 
     @Test
     void shouldRejectMissingSemicolon() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0))\n"
         + "ENDSEC;";
@@ -478,7 +478,7 @@ class StepParserTest {
 
     @Test
     void shouldIndexEntitiesById() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=A();\n"
         + "#2=B(#1);\n"
@@ -492,7 +492,7 @@ class StepParserTest {
 
     @Test
     void shouldExposeImmutableEntityIndex() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=A();\n"
         + "ENDSEC;";

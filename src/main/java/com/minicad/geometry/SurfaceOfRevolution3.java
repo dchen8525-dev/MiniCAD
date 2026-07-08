@@ -64,12 +64,12 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
         Vector3 radial = offset.subtract(axial);
         double cosU = Math.cos(v);
         double sinU = Math.sin(v);
-        
+
         // Handle degenerate case: curvePoint on rotation axis
         if (radial.norm() < 1e-12) {
             return axisOrigin.add(axial);
         }
-        
+
         // Rotate radial component around axis using perpendicular directions
         Vector3 perp1 = radial.normalize().asVector();
         Vector3 perp2 = axis.cross(perp1).normalize().asVector();

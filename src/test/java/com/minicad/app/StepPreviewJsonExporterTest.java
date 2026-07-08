@@ -382,7 +382,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedOffsetCurveMetadataInBinaryPreviewAndGlbExtras() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -408,7 +408,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSurfaceCurveAssociationMetadataInBinaryPreviewAndGlbExtras() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -448,7 +448,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSeamCurveAssociationMetadataInBinaryPreviewAndGlbExtras() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));\n"
@@ -498,7 +498,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPropagateSurfaceCurveAssociationMetadataThroughProjectionWrapperInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -544,7 +544,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPropagateSeamCurveAssociationMetadataThroughProjectionWrapperInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('O0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('O1',(0.0,0.0,1.0));\n"
@@ -600,7 +600,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveCurveMetadataForMappedAnnotationSymbolEdgesInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -643,7 +643,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveCurveMetadataForMappedAnnotationTextEdgesInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -682,7 +682,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveMappedAnnotationCarrierMetadataForSymbolAndSubfigureOccurrencesInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -730,7 +730,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveMappedAnnotationCarrierMetadataForDraughtingAnnotationOccurrenceInBinaryAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
@@ -776,7 +776,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiRelationshipMetadataInBinaryPreviewAndGlb() {
-        String calloutStep = 
+        String calloutStep =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -791,7 +791,7 @@ class StepPreviewJsonExporterTest {
         + "#11=PLACED_TARGET('PT','target',#4,#3,#9);\n"
         + "#12=DRAUGHTING_CALLOUT_RELATIONSHIP('REL','carry',#9,#10);\n"
         + "ENDSEC;";
-        String occurrenceStep = 
+        String occurrenceStep =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -844,7 +844,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiAssociativityMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -895,7 +895,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiUsageMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -969,7 +969,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPlaceholderAssociationUsageMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -1020,7 +1020,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationUsageAssociationMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=DESCRIPTIVE_REPRESENTATION_ITEM('LABEL','PMI');\n"
         + "#2=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','CTX'));\n"
@@ -1070,7 +1070,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAnnotationContentUsageMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=(GEOMETRIC_REPRESENTATION_CONTEXT(2) REPRESENTATION_CONTEXT('ID','ANN'));\n"
         + "#2=REPRESENTATION('REP_USED',(),#1);\n"
@@ -1208,7 +1208,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPathAndWireUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1245,7 +1245,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShellModelAndSolidUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -1307,7 +1307,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedVertexLoopUsageTargetMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#8=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#9=VERTEX_POINT('VP0',#8);\n"
@@ -1333,7 +1333,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPmiDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1378,7 +1378,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRequirementAndRelationshipDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1433,7 +1433,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductAndRelationshipFamilyDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1577,7 +1577,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRelationshipCarrierDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1664,7 +1664,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectProductAndMetadataRelationshipCarrierDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1783,7 +1783,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedExternalCategoryAndLayerDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -1869,7 +1869,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedBareAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2140,7 +2140,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAppliedGroupAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2176,7 +2176,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMetadataWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2277,7 +2277,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAppliedAndPlainMetadataAssignmentDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2566,7 +2566,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldPreserveRepresentationSubtypeNameInBinaryPreviewAndGlbDefinitionMetadata() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2595,7 +2595,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationRelationshipDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2678,7 +2678,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShapeRepresentationLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2736,7 +2736,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedTransformedAssemblyShapeDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2790,7 +2790,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductShapeRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -2875,7 +2875,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedContextAndProtocolDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=APPLICATION_PROTOCOL_DEFINITION('draft','AP203',2026,#1);\n"
@@ -3073,7 +3073,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMetadataRolesStatusesAndTypesInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -3270,7 +3270,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMetadataLeafAndEndpointLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -3721,7 +3721,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMetadataWrapperLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -3959,7 +3959,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectDocumentGroupAndExternalSourceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4155,7 +4155,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAssignmentCarrierLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4338,7 +4338,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedApprovalPersonAndDateLeafMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4427,7 +4427,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRepresentationContextAndLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4541,7 +4541,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMeasureAndUnitDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -4979,7 +4979,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedUserDefinedAndRepresentationLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5084,7 +5084,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMeasureRepresentationItemMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5126,7 +5126,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRepresentationItemLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5395,7 +5395,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectMapTransformAndPointReplicaLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5567,7 +5567,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectGenericPointAndCurveLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5671,7 +5671,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectRepresentationAndShapeAspectOccurrenceDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5766,7 +5766,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectGeometricLeafLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -5918,7 +5918,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectCurveAndSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6086,7 +6086,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectConicCurveLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6163,7 +6163,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectSplineCurveAndSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6336,7 +6336,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectWrapperCurveAndPrimitiveSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6477,7 +6477,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectCompositeReplicaAndWrapperSurfaceLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6617,7 +6617,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectTopologyAndSurfaceContainerLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -6942,7 +6942,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectSolidAndProfileLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7182,7 +7182,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAnnotationMapDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7300,7 +7300,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAnnotationWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7476,7 +7476,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPresentationStyleDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7675,7 +7675,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedColourAndSurfaceStyleLeafMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7775,7 +7775,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedStyledAndLayerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7843,7 +7843,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedMappedTransformationAndPlacementCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -7955,7 +7955,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedTopologyAndContainerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8080,7 +8080,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSurfaceContainerCarrierMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8221,7 +8221,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPathAndWireSemanticDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=VERTEX_POINT('VP0',#1);\n"
@@ -8308,7 +8308,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedShellAndModelSemanticDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
@@ -8461,7 +8461,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedSolidDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
@@ -8585,7 +8585,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPrimitiveSurfaceAndProfileDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8745,7 +8745,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedGeometricLeafAndHalfSpaceDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8831,7 +8831,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRationalCurveAndProfileDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -8939,7 +8939,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedWrapperCurveSurfaceAndTopologyLeafMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9057,7 +9057,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedReplicaShellAndCurveWrapperDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9232,7 +9232,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedProductAndAssemblyShapeDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9307,7 +9307,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedAdditionalPropertyRepresentationLinkMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9435,7 +9435,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectAdditionalPropertyRepresentationLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9538,7 +9538,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPlacedDatumTargetFeatureMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9574,7 +9574,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRuleAndDatumPropertyRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9665,7 +9665,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedPropertyDefinitionRepresentationMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9700,7 +9700,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPropertyAndAttributeRepresentationRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9788,7 +9788,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPropertyAndAttributeLinkDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -9877,7 +9877,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectPredefinedAndColourLeafDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -10071,7 +10071,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedDirectProductCategoryAndEffectivityDefinitionMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -10158,7 +10158,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedGeneralPropertyAndShapeAspectRelationshipMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -10212,7 +10212,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedRequirementSemanticDefinitionSubtypeMetadataInBinaryPreviewAndGlb() {
-        String step = 
+        String step =
         "DATA;\n"
         + "#1=APPLICATION_CONTEXT('mechanical design');\n"
         + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
@@ -10298,7 +10298,7 @@ class StepPreviewJsonExporterTest {
     @Test
     void shouldEmbedSurfaceWrapperMetadataInBinaryPreviewForSurfaceReplica() {
         byte[] binary = StepPreviewJsonExporter.exportBinary(surfaceOfRevolutionFaceStep(
-                
+
         "#100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));\n"
         + "#101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);\n"
         + "#102=SURFACE_REPLICA('SR0',#10,#101);",
@@ -10487,7 +10487,7 @@ class StepPreviewJsonExporterTest {
     @Test
     void shouldEmbedSurfaceWrapperMetadataInGlbExtrasForSurfaceReplica() {
         byte[] binary = StepPreviewJsonExporter.exportGlb(surfaceOfRevolutionFaceStep(
-                
+
         "#100=CARTESIAN_POINT('T0',(0.0,0.0,2.0));\n"
         + "#101=CARTESIAN_TRANSFORMATION_OPERATOR_3D('TR',$,$,#100,1.0,$);\n"
         + "#102=SURFACE_REPLICA('SR0',#10,#101);",

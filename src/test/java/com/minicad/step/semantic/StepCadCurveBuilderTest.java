@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for StepCadCurveBuilder.
- * 
+ *
  * Phase 1 tests focus on:
  * - Builder creation and initialization
  * - 2D Point and Direction building
@@ -103,9 +103,9 @@ class StepCadCurveBuilderTest {
                 entitiesById, points, directions, vectors, placements, axis1Placements, buildVertexCallback);
 
         StepCadGeometryOps geometryOps = new StepCadGeometryOps(null); // Will need mock for curve operations
-        
+
         StepTrimResolver trimResolver = new StepTrimResolver(
-                entitiesById, 
+                entitiesById,
                 id -> geometryBuilder.buildPoint(id),
                 id -> new Point2(0, 0)); // Placeholder for buildPoint2
 
@@ -158,25 +158,25 @@ class StepCadCurveBuilderTest {
     @Test
     void testBuilderCreation() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertNotNull(builder, "Builder should be created successfully");
     }
 
     @Test
     void testBuildPoint2WithValidEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         // Add a 2D StepCartesianPoint
         StepCartesianPoint stepPoint = new StepCartesianPoint(1, "origin", Arrays.asList(10.0, 20.0));
         entitiesById.put(1, stepPoint);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         // Build the point
         Point2 result = builder.buildPoint2(1);
-        
+
         assertNotNull(result, "Built point should not be null");
         assertEquals(10.0, result.x(), 0.001, "X coordinate should match");
         assertEquals(20.0, result.y(), 0.001, "Y coordinate should match");
@@ -185,16 +185,16 @@ class StepCadCurveBuilderTest {
     @Test
     void testBuildPoint2Caching() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         StepCartesianPoint stepPoint = new StepCartesianPoint(1, "test", Arrays.asList(5.0, 15.0));
         entitiesById.put(1, stepPoint);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         // Build the point twice
         Point2 first = builder.buildPoint2(1);
         Point2 second = builder.buildPoint2(1);
-        
+
         // Should return the same cached instance
         assertSame(first, second, "Same instance should be returned from cache");
     }
@@ -202,38 +202,38 @@ class StepCadCurveBuilderTest {
     @Test
     void testBuildPoint2WithMissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildPoint2(1));
     }
 
     @Test
     void testBuildPoint2With3DCartesianPoint() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         // Add a 3D StepCartesianPoint (should fail for buildPoint2)
         StepCartesianPoint stepPoint = new StepCartesianPoint(1, "origin", Arrays.asList(10.0, 20.0, 30.0));
         entitiesById.put(1, stepPoint);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildPoint2(1));
     }
 
     @Test
     void testBuildDirection2WithValidEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         // Add a 2D StepDirection
         StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0));
         entitiesById.put(1, stepDirection);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         // Build the direction
         Direction2 result = builder.buildDirection2(1);
-        
+
         assertNotNull(result, "Built direction should not be null");
         assertEquals(1.0, result.x(), 0.001, "X component should be 1.0");
         assertEquals(0.0, result.y(), 0.001, "Y component should be 0.0");
@@ -242,16 +242,16 @@ class StepCadCurveBuilderTest {
     @Test
     void testBuildDirection2Caching() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(0.0, 1.0));
         entitiesById.put(1, stepDirection);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         // Build the direction twice
         Direction2 first = builder.buildDirection2(1);
         Direction2 second = builder.buildDirection2(1);
-        
+
         // Should return the same cached instance
         assertSame(first, second, "Same instance should be returned from cache");
     }
@@ -259,27 +259,27 @@ class StepCadCurveBuilderTest {
     @Test
     void testBuildDirection2WithMissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildDirection2(1));
     }
 
     @Test
     void testBuildDirection2With3DDirection() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         // Add a 3D StepDirection (should fail for buildDirection2)
         StepDirection stepDirection = new StepDirection(1, "dir", Arrays.asList(1.0, 0.0, 0.0));
         entitiesById.put(1, stepDirection);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildDirection2(1));
     }
 
     // ==================== Missing Entity Tests ====================
-    
+
     // All curve methods require entities to be present in entitiesById.
     // These tests verify proper exception handling when entities are missing.
 
@@ -287,7 +287,7 @@ class StepCadCurveBuilderTest {
     void testBuildLine2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildLine2(1));
     }
 
@@ -295,7 +295,7 @@ class StepCadCurveBuilderTest {
     void testBuildCircle2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildCircle2(1));
     }
 
@@ -303,7 +303,7 @@ class StepCadCurveBuilderTest {
     void testBuildEllipse2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildEllipse2(1));
     }
 
@@ -311,7 +311,7 @@ class StepCadCurveBuilderTest {
     void testBuildBSplineCurve2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildBSplineCurve2(1));
     }
 
@@ -319,7 +319,7 @@ class StepCadCurveBuilderTest {
     void testBuildPolyline2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildPolyline2(1));
     }
 
@@ -327,7 +327,7 @@ class StepCadCurveBuilderTest {
     void testBuildTrimmedCurve2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildTrimmedCurve2(1));
     }
 
@@ -335,7 +335,7 @@ class StepCadCurveBuilderTest {
     void testBuildCompositeCurve2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildCompositeCurve2(1));
     }
 
@@ -343,20 +343,20 @@ class StepCadCurveBuilderTest {
     void testBuildOffsetCurve2MissingEntity() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         assertThrows(StepResolutionException.class, () -> builder.buildOffsetCurve2(1));
     }
 
     @Test
     void testBuildCurve2UnsupportedType() {
         Map<Integer, StepEntity> entitiesById = new HashMap<>();
-        
+
         // Add an entity that is not a supported 2D curve type
         StepCartesianPoint fakeEntity = new StepCartesianPoint(1, "fake", Arrays.asList(0.0, 0.0));
         entitiesById.put(1, fakeEntity);
-        
+
         StepCadCurveBuilder builder = createMinimalBuilder(entitiesById);
-        
+
         // Should throw UnsupportedGeometryException for unsupported type
         assertThrows(UnsupportedGeometryException.class, () -> builder.buildCurve2(fakeEntity));
     }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMetadataExtractorTest {
 
-    private static final String STEP_WITH_HEADER = 
+    private static final String STEP_WITH_HEADER =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "FILE_DESCRIPTION(('Test Model Description'),'2;1');\n"
@@ -39,7 +39,7 @@ class ProductMetadataExtractorTest {
 
     @Test
     void shouldHandleEmptyHeader() {
-        String stepText = 
+        String stepText =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -57,7 +57,7 @@ class ProductMetadataExtractorTest {
 
     @Test
     void shouldExtractMultipleSchemas() {
-        String stepText = 
+        String stepText =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "FILE_SCHEMA(('AP203','AP214'));\n"

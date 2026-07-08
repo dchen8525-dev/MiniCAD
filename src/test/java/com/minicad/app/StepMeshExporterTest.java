@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StepMeshExporterTest {
 
-    private static final String MINIMAL_SQUARE = 
+    private static final String MINIMAL_SQUARE =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -130,7 +130,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportObjForCsgBlock() {
-        String stepText = 
+        String stepText =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -172,7 +172,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportObjForTessellated() {
-        String stepText = 
+        String stepText =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"
@@ -199,7 +199,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldPreservePlanarHoleInObjExport() {
-        String stepText = 
+        String stepText =
         "ISO-10303-21;\n"
         + "HEADER;\n"
         + "ENDSEC;\n"

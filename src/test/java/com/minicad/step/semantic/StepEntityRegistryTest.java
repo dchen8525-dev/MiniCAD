@@ -19,7 +19,7 @@ class StepEntityRegistryTest {
     // Registry should be populated with entities from all sub-registries
     // GeometryRegistry provides ~80 entities, TopologyRegistry provides ~40 entities
     assertFalse(registry.isEmpty(), "Registry should not be empty after registration");
-    assertTrue(registry.size() >= 100, 
+    assertTrue(registry.size() >= 100,
         "Expected at least 100 entities (Geometry + Topology), got " + registry.size());
   }
 

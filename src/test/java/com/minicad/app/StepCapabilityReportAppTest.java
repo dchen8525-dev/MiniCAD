@@ -72,7 +72,7 @@ class StepCapabilityReportAppTest {
     @Test
     void scansExpressSchemaEntities() throws Exception {
         Path schema = tempDir.resolve("sample.exp");
-        Files.writeString(schema, 
+        Files.writeString(schema,
         "SCHEMA sample_schema;\n"
         + "  ENTITY cartesian_point;\n"
         + "  END_ENTITY;\n"
@@ -106,7 +106,7 @@ class StepCapabilityReportAppTest {
     @Test
     void rendersSchemaCoverageReports() throws Exception {
         Path schema = tempDir.resolve("sample.exp");
-        Files.writeString(schema, 
+        Files.writeString(schema,
         "SCHEMA sample_schema;\n"
         + "  ENTITY cartesian_point;\n"
         + "  END_ENTITY;\n"
