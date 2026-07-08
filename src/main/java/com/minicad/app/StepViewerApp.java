@@ -20,6 +20,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -299,84 +300,82 @@ public final class StepViewerApp {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
             long requestId = requestIdCounter.incrementAndGet();
-            byte[] requestBody;
+            MDC.put("requestId", String.valueOf(requestId));
             try {
-                requestBody = readPreviewRequestBody(request, config.maxUploadBytes());
-            } catch (PayloadTooLargeException ex) {
-                log.info("requestId={} stage={} reason={}", requestId, "request_rejected", ex.getMessage());
-                sendJsonError(response, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
-                        "request body exceeds maximum allowed size");
-                return;
-            }
-            StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
-            String stepText = decodedStepText.text();
-            if (config.debug() || includeRequestBodyPrefixInLogs()) {
-                log.info("requestId={} stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
-                        requestId, "request_received", request.getRemoteAddr(),
-                        request.getContentType(),
-                        requestBody.length, stepText.length(),
-                        decodedStepText.charset().name(),
-                        hexPrefix(requestBody, 16));
-            } else {
-                log.info("requestId={} stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}",
-                        requestId, "request_received", request.getRemoteAddr(),
-                        request.getContentType(),
-                        requestBody.length, stepText.length(),
-                        decodedStepText.charset().name());
-            }
-            if (stepText.isBlank()) {
-                log.info("requestId={} stage={} reason=blank_body", requestId, "request_rejected");
-                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
-                return;
-            }
-
-            long startedAt = System.nanoTime();
-            long exportStartedAt = System.nanoTime();
-            log.info("requestId={} stage={} textLength={}",
-                    requestId, "export_start", stepText.length());
-            try {
-                byte[] previewBinary;
-                String cacheStatus;
-                if (!config.cacheEnabled()) {
-                    previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
-                    cacheStatus = "disabled";
-                    log.info("requestId={} stage={} binaryLength={}",
-                            requestId, "export_cache_disabled", previewBinary.length);
+                byte[] requestBody;
+                try {
+                    requestBody = readPreviewRequestBody(request, config.maxUploadBytes());
+                } catch (PayloadTooLargeException ex) {
+                    log.info("stage={} reason={}", "request_rejected", ex.getMessage());
+                    sendJsonError(response, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                            "request body exceeds maximum allowed size");
+                    return;
+                }
+                StepTextReader.DecodedStepText decodedStepText = StepTextReader.readDecoded(requestBody);
+                String stepText = decodedStepText.text();
+                if (config.debug() || includeRequestBodyPrefixInLogs()) {
+                    log.info("stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}, bodyPrefixHex={}",
+                            "request_received", request.getRemoteAddr(),
+                            request.getContentType(),
+                            requestBody.length, stepText.length(),
+                            decodedStepText.charset().name(),
+                            hexPrefix(requestBody, 16));
                 } else {
-                    Path cachePath = previewCachePath(stepText, config.cacheDir());
-                    if (Files.exists(cachePath)) {
-                        previewBinary = Files.readAllBytes(cachePath);
-                        Files.setLastModifiedTime(cachePath, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
-                        cacheStatus = "hit";
-                        log.info("requestId={} stage={} binaryLength={}",
-                                requestId, "export_cache_hit", previewBinary.length);
-                    } else {
+                    log.info("stage={} remote={}, contentType={}, bytes={}, textLength={}, charset={}",
+                            "request_received", request.getRemoteAddr(),
+                            request.getContentType(),
+                            requestBody.length, stepText.length(),
+                            decodedStepText.charset().name());
+                }
+                if (stepText.isBlank()) {
+                    log.info("stage={} reason=blank_body", "request_rejected");
+                    sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST, "request body must contain STEP text");
+                    return;
+                }
+
+                long startedAt = System.nanoTime();
+                long exportStartedAt = System.nanoTime();
+                log.info("stage={} textLength={}", "export_start", stepText.length());
+                try {
+                    byte[] previewBinary;
+                    String cacheStatus;
+                    if (!config.cacheEnabled()) {
                         previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
-                        Files.createDirectories(cachePath.getParent());
-                        writeCacheAtomically(cachePath, previewBinary);
-                        cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
-                        cacheStatus = "miss";
-                        log.info("requestId={} stage={} binaryLength={}",
-                                requestId, "export_cache_miss_written", previewBinary.length);
+                        cacheStatus = "disabled";
+                        log.info("stage={} binaryLength={}", "export_cache_disabled", previewBinary.length);
+                    } else {
+                        Path cachePath = previewCachePath(stepText, config.cacheDir());
+                        if (Files.exists(cachePath)) {
+                            previewBinary = Files.readAllBytes(cachePath);
+                            Files.setLastModifiedTime(cachePath, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+                            cacheStatus = "hit";
+                            log.info("stage={} binaryLength={}", "export_cache_hit", previewBinary.length);
+                        } else {
+                            previewBinary = StepPreviewJsonExporter.exportGlb(stepText);
+                            Files.createDirectories(cachePath.getParent());
+                            writeCacheAtomically(cachePath, previewBinary);
+                            cleanPreviewCache(config.cacheDir(), config.maxCacheBytes());
+                            cacheStatus = "miss";
+                            log.info("stage={} binaryLength={}", "export_cache_miss_written", previewBinary.length);
+                        }
                     }
+                    log.info("stage={} elapsedMs={}, binaryLength={}", "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
+                    response.setHeader("X-MiniCAD-Cache", cacheStatus);
+                    response.setHeader("X-MiniCAD-Preview-Format", "glb-v1");
+                    send(response, HttpServletResponse.SC_OK, "model/gltf-binary", previewBinary);
+                    log.info("stage={} status=200, totalElapsedMs={}", "response_sent", elapsedMillis(startedAt));
+                } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
+                    log.info("stage={} elapsedMs={}, errorType={}, message={}", "export_failed", elapsedMillis(startedAt),
+                            ex.getClass().getSimpleName(), ex.getMessage());
+                    if (ex instanceof StepParseException) {
+                StepParseException parseException = (StepParseException) ex;
+                        logDiagnosticContext(stepText, parseException.getMessage(), config.debug());
+                    }
+                    sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
+                            "failed to generate preview", requestId);
                 }
-                log.info("requestId={} stage={} elapsedMs={}, binaryLength={}",
-                        requestId, "export_done", elapsedMillis(exportStartedAt), previewBinary.length);
-                response.setHeader("X-MiniCAD-Cache", cacheStatus);
-                response.setHeader("X-MiniCAD-Preview-Format", "glb-v1");
-                send(response, HttpServletResponse.SC_OK, "model/gltf-binary", previewBinary);
-                log.info("requestId={} stage={} status=200, totalElapsedMs={}",
-                        requestId, "response_sent", elapsedMillis(startedAt));
-            } catch (StepParseException | StepResolutionException | UnsupportedGeometryException | TopologyException | GeometryException ex) {
-                log.info("requestId={} stage={} elapsedMs={}, errorType={}, message={}",
-                        requestId, "export_failed", elapsedMillis(startedAt),
-                        ex.getClass().getSimpleName(), ex.getMessage());
-                if (ex instanceof StepParseException) {
-            StepParseException parseException = (StepParseException) ex;
-                    logDiagnosticContext(requestId, stepText, parseException.getMessage(), config.debug());
-                }
-                sendJsonError(response, HttpServletResponse.SC_BAD_REQUEST,
-                        "failed to generate preview", requestId);
+            } finally {
+                MDC.remove("requestId");
             }
         }
 
@@ -634,13 +633,12 @@ public final class StepViewerApp {
                 "default-src 'self'; script-src 'self' 'sha256-jineBDmjBt81WPjXTP3GlHJ740C7ojpcHhfp2/uAlHw='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
     }
 
-    private static void logDiagnosticContext(long requestId, String stepText, String message, boolean debug) {
+    private static void logDiagnosticContext(String stepText, String message, boolean debug) {
         if (!debug && !Boolean.getBoolean("minicad.preview.debugSourceExcerpt")) {
-            log.info("requestId={} stage={} context=disabled", requestId, "export_failed_context");
+            log.info("stage={} context=disabled", "export_failed_context");
             return;
         }
-        log.info("requestId={} stage={} context={}",
-                requestId, "export_failed_context", diagnosticContext(stepText, message));
+        log.info("stage={} context={}", "export_failed_context", diagnosticContext(stepText, message));
     }
 
     static boolean includeRequestBodyPrefixInLogs() {
