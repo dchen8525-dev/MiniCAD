@@ -1078,7 +1078,7 @@ public final class StepPreviewJsonExporter {
                 unsupportedFaces.add(new UnsupportedFacePayload(
                         solidId,
                         entity == null ? null : entity.name(),
-                        entity == null ? "SOLID" : surfaceTypeName(entity),
+                        geometryTypeName(entity),
                         ex.getMessage()
                 ));
             }
@@ -5197,6 +5197,66 @@ public final class StepPreviewJsonExporter {
         else if (surface instanceof SurfaceOfTranslation3) return "SURFACE_OF_TRANSLATION";
         else if (surface instanceof SurfaceOfProjection3) return "SURFACE_OF_PROJECTION";
         else throw new IllegalArgumentException("Unknown surface type: " + surface.getClass().getSimpleName());
+    }
+
+    /**
+     * Determines the geometry type name for error reporting, distinguishing
+     * between open shells (SHELL) and closed shells/solids (SOLID).
+     *
+     * @param entity the STEP entity, may be null
+     * @return "SHELL" for open shells, "SOLID" for closed shells/solids,
+     *         or surfaceTypeName for other entities
+     */
+    public static String geometryTypeName(StepEntity entity) {
+        if (entity == null) {
+            return "SOLID"; // Default for unknown entities in solid context
+        }
+        // Open shell types -> SHELL (surface, not a closed volume)
+        if (entity instanceof StepOpenShell
+                || entity instanceof StepSurfacedOpenShell
+                || entity instanceof StepOrientedOpenShell) {
+            return "SHELL";
+        }
+        // Closed shell types and solid-like entities -> SOLID
+        if (entity instanceof StepClosedShell
+                || entity instanceof StepOrientedClosedShell
+                || entity instanceof StepManifoldSolidBrep
+                || entity instanceof StepFacettedBrep
+                || entity instanceof StepNonManifoldSolidBrep
+                || entity instanceof StepAdvancedBrep
+                || entity instanceof StepBrepWithVoids
+                || entity instanceof StepSweptAreaSolid
+                || entity instanceof StepSolidReplica
+                || entity instanceof StepCsgSolid
+                || entity instanceof StepCsgPrimitive
+                || entity instanceof StepBooleanClippingResult
+                || entity instanceof StepBooleanResult
+                || entity instanceof StepSweptDiskSolid
+                || entity instanceof StepExtrudedAreaSolidTapered
+                || entity instanceof StepRevolvedAreaSolidTapered
+                || entity instanceof StepSurfaceCurveSweptAreaSolid
+                || entity instanceof StepPolygonalBoundedHalfSpace
+                || entity instanceof StepComplexClippingResult
+                || entity instanceof StepHalfSpaceSolid
+                || entity instanceof StepCsgVolume
+                || entity instanceof StepBlockVolume
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepMappedItem
+                || entity instanceof StepSolidModel
+                || entity instanceof StepSurfacePatch
+                || entity instanceof StepExtrudedFaceSolid
+                || entity instanceof StepRevolvedFaceSolid
+                || entity instanceof StepSweptFaceSolid
+                || entity instanceof StepCylinderVolume
+                || entity instanceof StepSphereVolume
+                || entity instanceof StepTorusVolume
+                || entity instanceof StepPrismVolume
+                || entity instanceof StepRightCircularConeVolume) {
+            return "SOLID";
+        }
+        // For other entities, use the detailed type name from surfaceTypeName
+        return surfaceTypeName(entity);
     }
 
 

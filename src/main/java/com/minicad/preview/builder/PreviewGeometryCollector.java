@@ -261,7 +261,7 @@ public final class PreviewGeometryCollector {
                 unsupportedFaces.add(new UnsupportedFacePayload(
                         solidId,
                         entity == null ? null : entity.name(),
-                        entity == null ? "SOLID" : StepPreviewJsonExporter.surfaceTypeName(entity),
+                        StepPreviewJsonExporter.geometryTypeName(entity),
                         ex.getMessage()
                 ));
             }
