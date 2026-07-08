@@ -1,4 +1,4 @@
-package com.minicad.tools;
+package com.minicad.tool;
 
 import java.io.File;
 import java.io.FileWriter;
