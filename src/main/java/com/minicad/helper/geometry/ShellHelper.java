@@ -1,23 +1,23 @@
 package com.minicad.helper.geometry;
 
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.step.model.annotation.StepPlanarBox;
-import com.minicad.step.model.annotation.StepPlanarExtent;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.core.base.StepFaceEntity;
-import com.minicad.step.model.fea.StepFiniteElementMesh;
-import com.minicad.step.model.geometry.StepSurfacePatch;
-import com.minicad.step.model.geometry.StepSurfacedOpenShell;
-import com.minicad.step.model.manufacturing.StepFlatPattern;
-import com.minicad.step.model.product.StepGeometricSurfaceSet;
-import com.minicad.step.model.product.StepTessellatedFace;
-import com.minicad.step.model.product.StepTessellatedFaceSet;
-import com.minicad.step.model.topology.StepClosedShell;
-import com.minicad.step.model.topology.StepConnectedFaceSet;
-import com.minicad.step.model.topology.StepConnectedFaceSubSet;
-import com.minicad.step.model.topology.StepOpenShell;
-import com.minicad.step.model.topology.StepOrientedClosedShell;
-import com.minicad.step.model.topology.StepOrientedOpenShell;
+import com.minicad.step.model.StepPlanarBox;
+import com.minicad.step.model.StepPlanarExtent;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.StepFiniteElementMesh;
+import com.minicad.step.model.StepSurfacePatch;
+import com.minicad.step.model.StepSurfacedOpenShell;
+import com.minicad.step.model.StepFlatPattern;
+import com.minicad.step.model.StepGeometricSurfaceSet;
+import com.minicad.step.model.StepTessellatedFace;
+import com.minicad.step.model.StepTessellatedFaceSet;
+import com.minicad.step.model.StepClosedShell;
+import com.minicad.step.model.StepConnectedFaceSet;
+import com.minicad.step.model.StepConnectedFaceSubSet;
+import com.minicad.step.model.StepOpenShell;
+import com.minicad.step.model.StepOrientedClosedShell;
+import com.minicad.step.model.StepOrientedOpenShell;
 
 import java.util.List;
 

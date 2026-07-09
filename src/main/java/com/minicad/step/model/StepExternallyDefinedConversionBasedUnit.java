@@ -1,7 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.annotation.StepExternallyDefinedItem;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepExternallyDefinedItem;
 import java.util.Objects;
 
 /**

@@ -8,8 +8,8 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.core.base.StepFaceEntity;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.*;
 import java.util.*;
@@ -522,15 +522,15 @@ final class MeshTriangulatorParametric {
     ) {
         List<ParametricLoop> loops = new ArrayList<>();
         boolean promoteSingleOuter = stepFace.bounds().size() == 1
-                && stepFace.bounds().stream().noneMatch(com.minicad.step.model.topology.StepFaceBound::outer);
-        for (com.minicad.step.model.topology.StepFaceBound bound : stepFace.bounds()) {
-            if (!(bound.loop() instanceof com.minicad.step.model.topology.StepEdgeLoop)) {
+                && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
+        for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
+            if (!(bound.loop() instanceof com.minicad.step.model.StepEdgeLoop)) {
                 return List.of();
             }
-            com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) bound.loop();
+            com.minicad.step.model.StepEdgeLoop edgeLoop = (com.minicad.step.model.StepEdgeLoop) bound.loop();
             List<UvPoint> loopPoints = new ArrayList<>();
             boolean firstEdge = true;
-            for (com.minicad.step.model.topology.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
+            for (com.minicad.step.model.StepOrientedEdge orientedEdge : edgeLoop.edges()) {
                 List<UvPoint> edgePoints = sampleSemanticOrientedEdge(orientedEdge, faceGeometry, mapper, builder);
                 if (edgePoints == null || edgePoints.size() < 2) {
                     return List.of();
@@ -593,7 +593,7 @@ final class MeshTriangulatorParametric {
     }
 
     private static List<UvPoint> sampleSemanticOrientedEdge(
-            com.minicad.step.model.topology.StepOrientedEdge orientedEdge,
+            com.minicad.step.model.StepOrientedEdge orientedEdge,
             StepEntity faceGeometry,
             ParametricMapper mapper,
             StepCadBuilder builder
@@ -663,28 +663,28 @@ final class MeshTriangulatorParametric {
         StepEntity current = faceGeometry;
         CartesianPoint mapped = point;
         for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof com.minicad.step.model.geometry.StepRectangularTrimmedSurface) {
-                com.minicad.step.model.geometry.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.geometry.StepRectangularTrimmedSurface) current;
+            if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface) {
+                com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepCurveBoundedSurface) {
-                com.minicad.step.model.geometry.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.geometry.StepCurveBoundedSurface) current;
+            if (current instanceof com.minicad.step.model.StepCurveBoundedSurface) {
+                com.minicad.step.model.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepOrientedSurface) {
-                com.minicad.step.model.geometry.StepOrientedSurface orientedSurface = (com.minicad.step.model.geometry.StepOrientedSurface) current;
+            if (current instanceof com.minicad.step.model.StepOrientedSurface) {
+                com.minicad.step.model.StepOrientedSurface orientedSurface = (com.minicad.step.model.StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepOffsetSurface) {
-                com.minicad.step.model.geometry.StepOffsetSurface offsetSurface = (com.minicad.step.model.geometry.StepOffsetSurface) current;
+            if (current instanceof com.minicad.step.model.StepOffsetSurface) {
+                com.minicad.step.model.StepOffsetSurface offsetSurface = (com.minicad.step.model.StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.product.StepGeometricReplica) {
-                com.minicad.step.model.product.StepGeometricReplica replica = (com.minicad.step.model.product.StepGeometricReplica) current;
+            if (current instanceof com.minicad.step.model.StepGeometricReplica) {
+                com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) current;
                 if ("SURFACE_REPLICA".equals(replica.entityName())) {
                     mapped = StepMeshExporter.transformPoint3(mapped, replica.transformation(), builder);
                     current = replica.parent();
@@ -699,13 +699,13 @@ final class MeshTriangulatorParametric {
     private static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
         StepEntity current = edgeGeometry;
         for (int depth = 0; depth < 16; depth++) {
-            if (current instanceof com.minicad.step.model.geometry.StepOrientedCurve) {
-                com.minicad.step.model.geometry.StepOrientedCurve orientedCurve = (com.minicad.step.model.geometry.StepOrientedCurve) current;
+            if (current instanceof com.minicad.step.model.StepOrientedCurve) {
+                com.minicad.step.model.StepOrientedCurve orientedCurve = (com.minicad.step.model.StepOrientedCurve) current;
                 current = orientedCurve.curveElement();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.product.StepGeometricReplica) {
-                com.minicad.step.model.product.StepGeometricReplica replica = (com.minicad.step.model.product.StepGeometricReplica) current;
+            if (current instanceof com.minicad.step.model.StepGeometricReplica) {
+                com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) current;
                 if ("CURVE_REPLICA".equals(replica.entityName())) {
                     current = replica.parent();
                     continue;
@@ -717,12 +717,12 @@ final class MeshTriangulatorParametric {
     }
 
     private static List<StepEntity> associatedGeometry(StepEntity edgeGeometry) {
-        if (edgeGeometry instanceof com.minicad.step.model.geometry.StepSurfaceCurve) {
-            com.minicad.step.model.geometry.StepSurfaceCurve surfaceCurve = (com.minicad.step.model.geometry.StepSurfaceCurve) edgeGeometry;
+        if (edgeGeometry instanceof com.minicad.step.model.StepSurfaceCurve) {
+            com.minicad.step.model.StepSurfaceCurve surfaceCurve = (com.minicad.step.model.StepSurfaceCurve) edgeGeometry;
             return surfaceCurve.associatedGeometry();
         }
-        if (edgeGeometry instanceof com.minicad.step.model.geometry.StepSeamCurve) {
-            com.minicad.step.model.geometry.StepSeamCurve seamCurve = (com.minicad.step.model.geometry.StepSeamCurve) edgeGeometry;
+        if (edgeGeometry instanceof com.minicad.step.model.StepSeamCurve) {
+            com.minicad.step.model.StepSeamCurve seamCurve = (com.minicad.step.model.StepSeamCurve) edgeGeometry;
             return seamCurve.associatedGeometry();
         }
         return List.of();
@@ -732,13 +732,13 @@ final class MeshTriangulatorParametric {
         Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
         List<StepEntity> matches = new ArrayList<>();
         for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof com.minicad.step.model.geometry.StepPcurve) {
-                com.minicad.step.model.geometry.StepPcurve pcurve = (com.minicad.step.model.geometry.StepPcurve) associated;
+            if (associated instanceof com.minicad.step.model.StepPcurve) {
+                com.minicad.step.model.StepPcurve pcurve = (com.minicad.step.model.StepPcurve) associated;
                 if (acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
                     matches.add(pcurve);
                 }
-            } else if (associated instanceof com.minicad.step.model.geometry.StepDegeneratePcurve) {
-                com.minicad.step.model.geometry.StepDegeneratePcurve pcurve = (com.minicad.step.model.geometry.StepDegeneratePcurve) associated;
+            } else if (associated instanceof com.minicad.step.model.StepDegeneratePcurve) {
+                com.minicad.step.model.StepDegeneratePcurve pcurve = (com.minicad.step.model.StepDegeneratePcurve) associated;
                 if (acceptableSurfaceIds.contains(pcurve.basisSurface().id())) {
                     matches.add(pcurve);
                 }
@@ -752,28 +752,28 @@ final class MeshTriangulatorParametric {
         StepEntity current = faceGeometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
             ids.add(current.id());
-            if (current instanceof com.minicad.step.model.geometry.StepRectangularTrimmedSurface) {
-                com.minicad.step.model.geometry.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.geometry.StepRectangularTrimmedSurface) current;
+            if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface) {
+                com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.StepRectangularTrimmedSurface) current;
                 current = trimmedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepCurveBoundedSurface) {
-                com.minicad.step.model.geometry.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.geometry.StepCurveBoundedSurface) current;
+            if (current instanceof com.minicad.step.model.StepCurveBoundedSurface) {
+                com.minicad.step.model.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.StepCurveBoundedSurface) current;
                 current = boundedSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepOrientedSurface) {
-                com.minicad.step.model.geometry.StepOrientedSurface orientedSurface = (com.minicad.step.model.geometry.StepOrientedSurface) current;
+            if (current instanceof com.minicad.step.model.StepOrientedSurface) {
+                com.minicad.step.model.StepOrientedSurface orientedSurface = (com.minicad.step.model.StepOrientedSurface) current;
                 current = orientedSurface.surfaceElement();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.geometry.StepOffsetSurface) {
-                com.minicad.step.model.geometry.StepOffsetSurface offsetSurface = (com.minicad.step.model.geometry.StepOffsetSurface) current;
+            if (current instanceof com.minicad.step.model.StepOffsetSurface) {
+                com.minicad.step.model.StepOffsetSurface offsetSurface = (com.minicad.step.model.StepOffsetSurface) current;
                 current = offsetSurface.basisSurface();
                 continue;
             }
-            if (current instanceof com.minicad.step.model.product.StepGeometricReplica) {
-                com.minicad.step.model.product.StepGeometricReplica replica = (com.minicad.step.model.product.StepGeometricReplica) current;
+            if (current instanceof com.minicad.step.model.StepGeometricReplica) {
+                com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) current;
                 if ("SURFACE_REPLICA".equals(replica.entityName())) {
                     current = replica.parent();
                     continue;
@@ -784,7 +784,7 @@ final class MeshTriangulatorParametric {
         return Set.copyOf(ids);
     }
 
-    private static CartesianPoint pointFromStep(com.minicad.step.model.geometry.StepCartesianPoint point) {
+    private static CartesianPoint pointFromStep(com.minicad.step.model.StepCartesianPoint point) {
         return new CartesianPoint(
                 point.coordinates().get(0),
                 point.coordinates().get(1),

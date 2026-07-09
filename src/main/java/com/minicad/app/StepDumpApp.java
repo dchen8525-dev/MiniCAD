@@ -6,24 +6,24 @@ import com.minicad.geometry2d.*;
 import com.minicad.export.json.JsonBuilder;
 import com.minicad.helper.metadata.StepTextReader;
 import com.minicad.helper.metadata.UnitExtractor;
-import com.minicad.step.model.action.*;
-import com.minicad.step.model.annotation.*;
-import com.minicad.step.model.organization.org.approval.*;
-import com.minicad.step.model.core.base.*;
-import com.minicad.step.model.classification.*;
-import com.minicad.step.model.technical.date.*;
-import com.minicad.step.model.organization.org.document.*;
-import com.minicad.step.model.geometry.*;
-import com.minicad.step.model.technical.kinematic.*;
-import com.minicad.step.model.organization.org.org.*;
-import com.minicad.step.model.product.*;
-import com.minicad.step.model.profile_analysis.profile.*;
-import com.minicad.step.model.resource.*;
-import com.minicad.step.model.management.security.*;
-import com.minicad.step.model.technical.tolerance.*;
-import com.minicad.step.model.topology.*;
-import com.minicad.step.model.technical.unit.*;
-import com.minicad.step.model.workflow.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
 import com.minicad.step.semantic.*;
 import com.minicad.step.syntax.*;
 import org.slf4j.Logger;
@@ -259,8 +259,8 @@ public final class StepDumpApp {
     }
 
     private static String stepEntityTypeName(StepEntity entity) {
-        if (entity instanceof com.minicad.step.model.topology.StepFaceBound) {
-            com.minicad.step.model.topology.StepFaceBound faceBound = (com.minicad.step.model.topology.StepFaceBound) entity;
+        if (entity instanceof com.minicad.step.model.StepFaceBound) {
+            com.minicad.step.model.StepFaceBound faceBound = (com.minicad.step.model.StepFaceBound) entity;
             return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
         }
         if (entity instanceof StepAxis2Placement2D) {
@@ -275,8 +275,8 @@ public final class StepDumpApp {
         if (entity instanceof StepOffsetCurve3D) {
             return "OFFSET_CURVE_3D";
         }
-        if (entity instanceof com.minicad.step.model.workflow.StepRepresentation) {
-            com.minicad.step.model.workflow.StepRepresentation representation = (com.minicad.step.model.workflow.StepRepresentation) entity;
+        if (entity instanceof com.minicad.step.model.StepRepresentation) {
+            com.minicad.step.model.StepRepresentation representation = (com.minicad.step.model.StepRepresentation) entity;
             if (representation.entityName() != null
                     && !representation.entityName().isBlank()
                     && !"REPRESENTATION".equals(representation.entityName())
@@ -1110,8 +1110,8 @@ public final class StepDumpApp {
     private static Set<Integer> collectLoopOrientedEdgeIds(Iterable<StepEntity> entities) {
         Set<Integer> ids = new HashSet<>();
         for (StepEntity entity : entities) {
-            if (entity instanceof com.minicad.step.model.topology.StepEdgeLoop) {
-                com.minicad.step.model.topology.StepEdgeLoop edgeLoop = (com.minicad.step.model.topology.StepEdgeLoop) entity;
+            if (entity instanceof com.minicad.step.model.StepEdgeLoop) {
+                com.minicad.step.model.StepEdgeLoop edgeLoop = (com.minicad.step.model.StepEdgeLoop) entity;
                 edgeLoop.edges().forEach(edge -> ids.add(edge.id()));
             }
         }
@@ -1701,12 +1701,12 @@ public final class StepDumpApp {
                 || entity instanceof StepDegeneratePcurve
                 || entity instanceof StepOffsetCurve2D
                 || entity instanceof StepAxis2Placement2D
-                || entity instanceof com.minicad.step.model.geometry.StepCurve2D
-                || entity instanceof com.minicad.step.model.geometry.StepCircle2D
-                || entity instanceof com.minicad.step.model.geometry.StepEllipse2D
-                || entity instanceof com.minicad.step.model.geometry.StepHyperbola2D
-                || entity instanceof com.minicad.step.model.geometry.StepParabola2D
-                || entity instanceof com.minicad.step.model.geometry.StepTrimmedCurve2D
+                || entity instanceof com.minicad.step.model.StepCurve2D
+                || entity instanceof com.minicad.step.model.StepCircle2D
+                || entity instanceof com.minicad.step.model.StepEllipse2D
+                || entity instanceof com.minicad.step.model.StepHyperbola2D
+                || entity instanceof com.minicad.step.model.StepParabola2D
+                || entity instanceof com.minicad.step.model.StepTrimmedCurve2D
                 || entity instanceof StepTrimmedCurve
                 || entity instanceof StepRepresentation
                 || entity instanceof StepDirection

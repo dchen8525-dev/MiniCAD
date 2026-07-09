@@ -5,9 +5,9 @@ import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Curve2;
 import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Point2;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.geometry.StepAxis2Placement2D;
-import com.minicad.step.model.profile_analysis.profile.StepProfileDef;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepAxis2Placement2D;
+import com.minicad.step.model.StepProfileDef;
 
 import java.util.ArrayList;
 import java.util.List;

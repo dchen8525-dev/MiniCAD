@@ -11,33 +11,33 @@ import com.minicad.helper.geometry.MathUtilityHelper;
 import com.minicad.preview.mapper.PreviewUvCoords;
 import com.minicad.preview.sampling.PreviewCurveEvaluator;
 import com.minicad.preview.sampling.PreviewSurfaceSampler;
-import com.minicad.step.model.annotation.StepAnnotationCurveOccurrence;
-import com.minicad.step.model.annotation.StepAnnotationFillArea;
-import com.minicad.step.model.annotation.StepAnnotationFillAreaOccurrence;
-import com.minicad.step.model.annotation.StepAnnotationSymbol;
-import com.minicad.step.model.annotation.StepAnnotationSymbolOccurrence;
-import com.minicad.step.model.annotation.StepAnnotationSubfigureOccurrence;
-import com.minicad.step.model.annotation.StepAnnotationText;
-import com.minicad.step.model.annotation.StepAnnotationTextCharacter;
-import com.minicad.step.model.annotation.StepDraughtingAnnotationOccurrence;
-import com.minicad.step.model.annotation.StepLeaderCurve;
-import com.minicad.step.model.annotation.StepOverRidingStyledItem;
-import com.minicad.step.model.annotation.StepPlanarBox;
-import com.minicad.step.model.annotation.StepPlanarExtent;
-import com.minicad.step.model.annotation.StepStyledItem;
-import com.minicad.step.model.annotation.StepTerminatorSymbol;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.core.base.StepFaceEntity;
-import com.minicad.step.model.fea.StepFiniteElementMesh;
-import com.minicad.step.model.geometry.*;
-import com.minicad.step.model.manufacturing.StepChamferEdge;
-import com.minicad.step.model.manufacturing.StepFilletEdge;
-import com.minicad.step.model.manufacturing.StepFlatPattern;
-import com.minicad.step.model.manufacturing.StepMachinedSurface;
-import com.minicad.step.model.product.*;
-import com.minicad.step.model.technical.tolerance.StepDimensionCurve;
-import com.minicad.step.model.topology.*;
-import com.minicad.step.model.workflow.StepRepresentation;
+import com.minicad.step.model.StepAnnotationCurveOccurrence;
+import com.minicad.step.model.StepAnnotationFillArea;
+import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
+import com.minicad.step.model.StepAnnotationSymbol;
+import com.minicad.step.model.StepAnnotationSymbolOccurrence;
+import com.minicad.step.model.StepAnnotationSubfigureOccurrence;
+import com.minicad.step.model.StepAnnotationText;
+import com.minicad.step.model.StepAnnotationTextCharacter;
+import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
+import com.minicad.step.model.StepLeaderCurve;
+import com.minicad.step.model.StepOverRidingStyledItem;
+import com.minicad.step.model.StepPlanarBox;
+import com.minicad.step.model.StepPlanarExtent;
+import com.minicad.step.model.StepStyledItem;
+import com.minicad.step.model.StepTerminatorSymbol;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.StepFiniteElementMesh;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepChamferEdge;
+import com.minicad.step.model.StepFilletEdge;
+import com.minicad.step.model.StepFlatPattern;
+import com.minicad.step.model.StepMachinedSurface;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepDimensionCurve;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
@@ -271,7 +271,7 @@ public final class PreviewFaceBuilder {
         }
         if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) surface;
-            if (replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator) { com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
+            if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator) { com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
                 double scale = transformation.scale() == null ? 1.0 : transformation.scale();
                 if (Math.abs(scale) <= 1.0e-9) {
                     return "SURFACE_REPLICA zero scale preview is unsupported";
@@ -1432,13 +1432,13 @@ public final class PreviewFaceBuilder {
                 || item instanceof StepPiecewiseBezierCurve
                 || item instanceof StepBSplineCurveWithKnots
                 || item instanceof StepBSplineCurve
-                || item instanceof com.minicad.step.model.geometry.StepRationalBSplineCurve
+                || item instanceof com.minicad.step.model.StepRationalBSplineCurve
                 || item instanceof StepSurfaceCurve
                 || item instanceof StepSeamCurve
                 || item instanceof StepTrimmedCurve
                 || item instanceof StepPolyline
-                || item instanceof com.minicad.step.model.geometry.StepCompositeCurve
-                || item instanceof com.minicad.step.model.geometry.StepCompositeCurveOnSurface
+                || item instanceof com.minicad.step.model.StepCompositeCurve
+                || item instanceof com.minicad.step.model.StepCompositeCurveOnSurface
                 || item instanceof StepCompositeCurveOnSurface3D
                 || item instanceof StepOffsetCurve2D
                 || item instanceof StepOffsetCurve3D

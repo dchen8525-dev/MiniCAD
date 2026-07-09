@@ -2,10 +2,10 @@ package com.minicad.step.model;
 
 import java.util.List;
 
-import com.minicad.step.model.topology.StepOrientedFace;
-import com.minicad.step.model.topology.StepFaceSurface;
-import com.minicad.step.model.topology.StepFaceBound;
-import com.minicad.step.model.topology.StepAdvancedFace;
+import com.minicad.step.model.StepOrientedFace;
+import com.minicad.step.model.StepFaceSurface;
+import com.minicad.step.model.StepFaceBound;
+import com.minicad.step.model.StepAdvancedFace;
 
 /**
  * Marker interface for resolved STEP face subtypes.

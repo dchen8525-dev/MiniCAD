@@ -1,10 +1,10 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.geometry.StepCartesianPoint;
-import com.minicad.step.model.geometry.StepAxis2Placement3D;
+import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepAxis2Placement3D;
 import java.util.Objects;
 
 /**

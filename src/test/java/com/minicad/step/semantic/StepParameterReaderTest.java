@@ -1,9 +1,9 @@
 package com.minicad.step.semantic;
 
 import com.minicad.common.StepResolutionException;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.geometry.StepCartesianPoint;
-import com.minicad.step.model.geometry.StepDirection;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepDirection;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
 import com.minicad.step.syntax.StepValue;

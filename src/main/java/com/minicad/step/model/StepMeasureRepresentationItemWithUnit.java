@@ -1,6 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 /**
  * Resolved MEASURE_REPRESENTATION_ITEM_WITH_UNIT.

@@ -2,7 +2,7 @@ package com.minicad.builder;
 
 import com.minicad.common.StepParseException;
 import com.minicad.common.StepResolutionException;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;

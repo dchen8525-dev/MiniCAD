@@ -6,10 +6,10 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
 import com.minicad.common.StepResolutionException;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.geometry.StepCartesianPoint;
-import com.minicad.step.model.geometry.StepDirection;
-import com.minicad.step.model.geometry.StepVector;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepDirection;
+import com.minicad.step.model.StepVector;
 import com.minicad.topology.Vertex;
 
 import org.junit.jupiter.api.Test;

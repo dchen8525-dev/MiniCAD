@@ -1,7 +1,7 @@
 package com.minicad.app;
 
 import com.minicad.helper.metadata.StepMetadataExtractor;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.api.Test;

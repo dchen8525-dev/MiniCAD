@@ -3,7 +3,7 @@ package com.minicad.geometry;
 import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyGraph;
 import com.minicad.builder.StepAssemblyGraphBuilder.AssemblyNode;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepParser;
 import org.junit.jupiter.api.Test;

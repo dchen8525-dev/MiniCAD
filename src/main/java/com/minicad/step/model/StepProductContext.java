@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.organization.org.document.StepApplicationContext;
+import com.minicad.step.model.StepApplicationContext;
 import java.util.Objects;
 /**
  * Minimal product context.

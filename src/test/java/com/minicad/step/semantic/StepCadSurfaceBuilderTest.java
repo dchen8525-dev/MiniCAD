@@ -18,10 +18,10 @@ import com.minicad.geometry2d.Curve2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.geometry.StepAxis2Placement3D;
-import com.minicad.step.model.geometry.StepCartesianPoint;
-import com.minicad.step.model.geometry.StepDirection;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepAxis2Placement3D;
+import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepDirection;
 
 import org.junit.jupiter.api.Test;
 

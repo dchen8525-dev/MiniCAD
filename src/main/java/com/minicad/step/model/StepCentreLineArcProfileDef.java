@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.geometry.StepAxis2Placement2D;
+import com.minicad.step.model.StepAxis2Placement2D;
 import java.util.Objects;
 /**
  * Resolved CENTRE_LINE_ARC_PROFILE_DEF.

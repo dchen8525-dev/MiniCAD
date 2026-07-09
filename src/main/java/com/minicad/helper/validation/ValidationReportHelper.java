@@ -8,8 +8,8 @@ import com.minicad.preview.builder.PmiPayload;
 import com.minicad.preview.payload.ValidationCheckPayload;
 import com.minicad.preview.payload.ValidationContext;
 import com.minicad.preview.payload.ValidationReportPayload;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.core.base.StepMeasureRepresentationItem;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepMeasureRepresentationItem;
 
 import java.util.ArrayList;
 import java.util.List;

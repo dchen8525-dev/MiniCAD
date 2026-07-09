@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.technical.unit.StepGlobalUnitAssignedContext;
+import com.minicad.step.model.StepGlobalUnitAssignedContext;
 import java.util.Objects;
 /**
  * Minimal geometric representation context.

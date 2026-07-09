@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.technical.date.StepDateAndTime;
+import com.minicad.step.model.StepDateAndTime;
 import java.util.Objects;
 /**
  * Minimal APPROVAL_DATE_TIME assignment.

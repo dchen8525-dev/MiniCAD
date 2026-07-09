@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.geometry.StepAxis1Placement;
+import com.minicad.step.model.StepAxis1Placement;
 import java.util.Objects;
 /**
  * Resolved REVOLVED_AREA_SOLID_TAPERED.

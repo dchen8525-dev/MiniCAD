@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.geometry.StepDirection;
+import com.minicad.step.model.StepDirection;
 import java.util.Objects;
 /**
  * Resolved EXTRUDED_AREA_SOLID_TAPERED.

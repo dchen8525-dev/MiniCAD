@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.organization.org.org.StepPersonAndOrganization;
+import com.minicad.step.model.StepPersonAndOrganization;
 import java.util.Objects;
 /**
  * Minimal APPROVAL_PERSON_ORGANIZATION assignment.

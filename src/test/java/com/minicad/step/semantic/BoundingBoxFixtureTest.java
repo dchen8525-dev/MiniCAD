@@ -1,7 +1,7 @@
 package com.minicad.step.semantic;
 
 import com.minicad.geometry.BoundingBox3;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.Shell;

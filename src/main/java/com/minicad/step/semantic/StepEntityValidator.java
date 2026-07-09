@@ -1,12 +1,12 @@
 package com.minicad.step.semantic;
 
-import com.minicad.step.model.annotation.*;
-import com.minicad.step.model.geometry.*;
-import com.minicad.step.model.topology.*;
-import com.minicad.step.model.product.*;
-import com.minicad.step.model.representation.*;
-import com.minicad.step.model.technical.tolerance.*;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepEntity;
 
 /**
  * Validation methods extracted from StepEntityResolver.

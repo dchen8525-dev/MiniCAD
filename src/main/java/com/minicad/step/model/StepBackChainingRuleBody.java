@@ -1,9 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.workflow.StepRepresentation;
-import com.minicad.step.model.workflow.StepPropertyDefinition;
+import com.minicad.step.model.StepRepresentation;
+import com.minicad.step.model.StepPropertyDefinition;
 import java.util.Objects;
 /**
  * Minimal back chaining rule body link.

@@ -4,7 +4,7 @@ import com.minicad.common.Epsilon;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.helper.geometry.MathUtilityHelper;
-import com.minicad.step.model.geometry.StepConicCurve;
+import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.ArrayList;

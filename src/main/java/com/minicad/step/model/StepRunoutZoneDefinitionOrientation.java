@@ -1,6 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 /**
  * Resolved RUNOUT_ZONE_DEFINITION_ORIENTATION.

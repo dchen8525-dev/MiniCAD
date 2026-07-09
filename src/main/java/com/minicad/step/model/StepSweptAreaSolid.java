@@ -1,9 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.profile_analysis.profile.StepProfileDef;
-import com.minicad.step.model.geometry.StepAxis2Placement3D;
+import com.minicad.step.model.StepProfileDef;
+import com.minicad.step.model.StepAxis2Placement3D;
 import java.util.Objects;
 /**
  * Minimal parse-only swept area solid.

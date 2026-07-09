@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.workflow.StepSymbolRepresentationMap;
+import com.minicad.step.model.StepSymbolRepresentationMap;
 import java.util.Objects;
 /**
  * Minimal ANNOTATION_SYMBOL.

@@ -1,9 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.annotation.StepPresentationStyleAssignment;
+import com.minicad.step.model.StepPresentationStyleAssignment;
 import java.util.Objects;
 
 /**

@@ -20,10 +20,10 @@ import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UvPoint;
 import com.minicad.preview.payload.VectorPayload;
 import com.minicad.preview.sampling.TriangulationHelper;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.core.base.StepFaceEntity;
-import com.minicad.step.model.geometry.*;
-import com.minicad.step.model.product.StepGeometricReplica;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepGeometricReplica;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.*;
 

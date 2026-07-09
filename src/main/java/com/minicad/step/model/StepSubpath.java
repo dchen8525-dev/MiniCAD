@@ -1,9 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.topology.StepOrientedEdge;
+import com.minicad.step.model.StepOrientedEdge;
 import java.util.Objects;
 
 /**

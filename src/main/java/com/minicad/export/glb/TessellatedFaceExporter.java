@@ -7,11 +7,11 @@ import com.minicad.preview.payload.LoopPayload;
 import com.minicad.preview.payload.PayloadConversionHelper;
 import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.payload.VectorPayload;
-import com.minicad.step.model.core.base.StepEntity;
-import com.minicad.step.model.geometry.StepCartesianPoint;
-import com.minicad.step.model.product.StepTessellatedFace;
-import com.minicad.step.model.product.StepTessellatedFaceSet;
-import com.minicad.step.model.product.StepTessellatedTriangle;
+import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepCartesianPoint;
+import com.minicad.step.model.StepTessellatedFace;
+import com.minicad.step.model.StepTessellatedFaceSet;
+import com.minicad.step.model.StepTessellatedTriangle;
 
 import java.util.ArrayList;
 import java.util.List;

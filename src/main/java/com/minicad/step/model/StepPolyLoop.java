@@ -2,7 +2,7 @@ package com.minicad.step.model;
 
 import java.util.List;
 
-import com.minicad.step.model.geometry.StepCartesianPoint;
+import com.minicad.step.model.StepCartesianPoint;
 import java.util.Objects;
 
 /**

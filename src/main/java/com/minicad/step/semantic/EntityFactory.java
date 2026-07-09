@@ -1,6 +1,6 @@
 package com.minicad.step.semantic;
 
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.syntax.StepEntityInstance;
 
 /**

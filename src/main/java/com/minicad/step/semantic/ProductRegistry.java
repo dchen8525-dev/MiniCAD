@@ -1,6 +1,6 @@
 package com.minicad.step.semantic;
 
-import com.minicad.step.model.geometry.StepAxis2Placement3D;
+import com.minicad.step.model.StepAxis2Placement3D;
 
 import java.util.Map;
 

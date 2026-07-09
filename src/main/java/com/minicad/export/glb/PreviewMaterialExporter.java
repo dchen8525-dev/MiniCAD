@@ -1,7 +1,7 @@
 package com.minicad.export.glb;
 
-import com.minicad.step.model.annotation.*;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.*;
+import com.minicad.step.model.StepEntity;
 
 import java.util.LinkedHashSet;
 import java.util.Map;

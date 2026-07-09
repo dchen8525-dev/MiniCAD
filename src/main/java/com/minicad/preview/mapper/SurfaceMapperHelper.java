@@ -19,39 +19,39 @@ import com.minicad.helper.geometry.SurfaceGeometryHelper;
 import com.minicad.preview.payload.UvPoint;
 import com.minicad.preview.payload.VectorPayload;
 import com.minicad.preview.sampling.CurveEvaluator;
-import com.minicad.step.model.core.base.StepEntity;
+import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
-import com.minicad.step.model.product.StepGeometricReplica;
-import com.minicad.step.model.geometry.StepBezierSurface;
-import com.minicad.step.model.geometry.StepBSplineSurface;
-import com.minicad.step.model.geometry.StepBSplineSurfaceWithKnots;
-import com.minicad.step.model.geometry.StepBSplineSurfaceWithKnotsAndBreakpoints;
-import com.minicad.step.model.geometry.StepCylindricalSurface;
-import com.minicad.step.model.geometry.StepConicalSurface;
-import com.minicad.step.model.geometry.StepConicalSurfaceWithEllipticalAxis;
-import com.minicad.step.model.geometry.StepCylindricalSurfaceWithEllipticalAxis;
-import com.minicad.step.model.geometry.StepCurveBoundedSurface;
-import com.minicad.step.model.geometry.StepDegenerateToroidalSurface;
-import com.minicad.step.model.geometry.StepFreeFormSurface;
-import com.minicad.step.model.geometry.StepOrientedSurface;
-import com.minicad.step.model.geometry.StepOffsetSurface;
-import com.minicad.step.model.geometry.StepOffsetSurface2;
-import com.minicad.step.model.geometry.StepPiecewiseBezierSurface;
-import com.minicad.step.model.geometry.StepPlane;
-import com.minicad.step.model.geometry.StepQuasiUniformSurface;
-import com.minicad.step.model.geometry.StepRationalBSplineSurface;
-import com.minicad.step.model.geometry.StepRectangularCompositeSurface;
-import com.minicad.step.model.geometry.StepRectangularTrimmedSurface;
-import com.minicad.step.model.geometry.StepSphericalSurface;
-import com.minicad.step.model.geometry.StepSphericalSurfaceWithEllipticalAxis;
-import com.minicad.step.model.geometry.StepSurfaceOfLinearExtrusion;
-import com.minicad.step.model.geometry.StepSurfaceOfRevolution;
-import com.minicad.step.model.geometry.StepSurfacePatch;
-import com.minicad.step.model.geometry.StepToroidalSurface;
-import com.minicad.step.model.geometry.StepToroidalSurfaceWithCylindricalAxis;
-import com.minicad.step.model.geometry.StepToroidalSurfaceWithEllipticalAxis;
-import com.minicad.step.model.geometry.StepUniformSurface;
-import com.minicad.step.model.geometry.StepBlendedSurface;
+import com.minicad.step.model.StepGeometricReplica;
+import com.minicad.step.model.StepBezierSurface;
+import com.minicad.step.model.StepBSplineSurface;
+import com.minicad.step.model.StepBSplineSurfaceWithKnots;
+import com.minicad.step.model.StepBSplineSurfaceWithKnotsAndBreakpoints;
+import com.minicad.step.model.StepCylindricalSurface;
+import com.minicad.step.model.StepConicalSurface;
+import com.minicad.step.model.StepConicalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepCylindricalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepCurveBoundedSurface;
+import com.minicad.step.model.StepDegenerateToroidalSurface;
+import com.minicad.step.model.StepFreeFormSurface;
+import com.minicad.step.model.StepOrientedSurface;
+import com.minicad.step.model.StepOffsetSurface;
+import com.minicad.step.model.StepOffsetSurface2;
+import com.minicad.step.model.StepPiecewiseBezierSurface;
+import com.minicad.step.model.StepPlane;
+import com.minicad.step.model.StepQuasiUniformSurface;
+import com.minicad.step.model.StepRationalBSplineSurface;
+import com.minicad.step.model.StepRectangularCompositeSurface;
+import com.minicad.step.model.StepRectangularTrimmedSurface;
+import com.minicad.step.model.StepSphericalSurface;
+import com.minicad.step.model.StepSphericalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
+import com.minicad.step.model.StepSurfaceOfRevolution;
+import com.minicad.step.model.StepSurfacePatch;
+import com.minicad.step.model.StepToroidalSurface;
+import com.minicad.step.model.StepToroidalSurfaceWithCylindricalAxis;
+import com.minicad.step.model.StepToroidalSurfaceWithEllipticalAxis;
+import com.minicad.step.model.StepUniformSurface;
+import com.minicad.step.model.StepBlendedSurface;
 
 import java.util.List;
 
@@ -325,10 +325,10 @@ public class SurfaceMapperHelper {
         }
         if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            if (!(replica.transformation() instanceof com.minicad.step.model.geometry.StepCartesianTransformationOperator)) {
+            if (!(replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator)) {
                 return null;
             }
-            com.minicad.step.model.geometry.StepCartesianTransformationOperator transformation = (com.minicad.step.model.geometry.StepCartesianTransformationOperator) replica.transformation();
+            com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
             ParametricSurfaceMapper base = mapperForSurface(replica.parent(), builder);
             if (base == null) {
                 return null;
