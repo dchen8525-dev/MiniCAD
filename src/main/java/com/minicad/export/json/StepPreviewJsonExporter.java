@@ -7686,7 +7686,7 @@ public final class StepPreviewJsonExporter {
                 || entity instanceof StepTerminatorSymbol;
     }
 
-    private static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
+    public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
         if (item instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) item;
             return pointFromStep(point);
@@ -7982,7 +7982,7 @@ public final class StepPreviewJsonExporter {
         return null;
     }
 
-    private static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
+    public static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
         if (replica.parent() instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) replica.parent();
             return transformPoint(pointFromStep(point), replica.transformation(), builder);
@@ -8692,7 +8692,7 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    private static void appendSemanticDefinitionTargets(
+    public static void appendSemanticDefinitionTargets(
             Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
             StepEntity identifiedItem,
             StepEntity definition,

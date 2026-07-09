@@ -46,6 +46,7 @@ class LineCountTest {
         "PreviewCurveEvaluator.java",  // Curve evaluation (1734 lines)
         "PreviewFaceBuilder.java",  // Face building (2829 lines)
         "PreviewPmiBuilder.java",  // PMI building (1673 lines)
+        "PreviewPmiTargetBuilder.java",  // PMI target building extracted from StepPreviewJsonExporter (1243 lines)
         "StepPreviewPayloadTypes.java",  // Payload types (2856 lines)
         "StepEntity.java"  // Base entity class (1123 lines)
     );
