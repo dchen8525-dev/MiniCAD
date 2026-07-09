@@ -129,7 +129,7 @@ mvn test -Dtest="*Resolver*"
 
 ### Adding a New STEP Entity
 
-1. **Model class**: Create `StepXxx` in `com.minicad.step.model.<subpackage>`
+1. **Model class**: Create `StepXxx` in `com.minicad.step.model` (flat package, no subpackages)
 2. **Resolver**: Add `resolveXxx()` method in `StepEntityResolver`
 3. **Registry**: Register in `MiscRegistry.register()`
 4. **Builder**: Add `buildXxx()` method in `StepCadBuilder` (if geometry/topology)
@@ -194,12 +194,25 @@ Brief description of changes
 
 See [README.md](README.md#architecture-overview) for the high-level architecture.
 
-Key packages:
+Key packages (2026-07-09 optimized structure):
 - `step.syntax`: Tokenizer, Parser (ISO 10303-21)
 - `step.semantic`: Resolver, Builder
-- `step.model`: 1264 entity model classes
+- `step.model`: 1264 entity model classes (flat package, no subpackages)
 - `geometry` / `topology`: B-Rep kernel
+- `helper`: 9 utility classes (flat package)
 - `app`: CLI and web viewer
+
+### Package Structure Changes (2026-07-09)
+
+The package structure was optimized on July 9, 2026:
+- `step.model`: 36 subpackages → 1 flat package
+- `helper`: 3 subpackages → 1 flat package
+
+Import statements are now shorter:
+- Old: `import com.minicad.step.model.geometry.StepCartesianPoint;`
+- New: `import com.minicad.step.model.StepCartesianPoint;`
+
+See [docs/package-structure-change.md](docs/package-structure-change.md) for migration guide.
 
 ## Getting Help
 

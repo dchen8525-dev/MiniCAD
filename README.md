@@ -20,54 +20,30 @@ MiniCAD 目前是面向 STEP (ISO 10303) 子集的实验性 CAD 内核。项目�
 - AP214/AP242 的规范级覆盖仍在建设中，跟踪见 [STEP AP214/AP242 support workflow](doc/step-ap214-ap242-workflow.md)。
 - AP214/AP242 的第一批核心实体和验收标准见 [core entity priorities](doc/ap214-ap242-core-entity-priorities.md)。
 
-## 包说明
+## 包说明 (2026-07-09 优化后)
 
 | 包路径 | 文件数 | 说明 |
 |--------|--------|------|
-| `com.minicad.common` | 8 | 公共异常类和工具类（`Epsilon`, `Preconditions`, `GeometryException`, `StepParseException`, `StepResolutionException`, `TopologyException`, `UnsupportedGeometryException`, `UnsupportedStepEntityException`） |
-| `com.minicad.geometry` | 37 | 3D 几何类型：`Curve3` (13 种子类型)、`SurfaceGeometry` (16 种子类型) 及辅助类型 |
+| `com.minicad.app` | 5 | CLI 应用程序 (`StepDumpApp`, `StepViewerApp`, `StepPreviewJsonExporter`, `StepCapabilityReportApp`, `StepFileAnalyzerApp`) |
+| `com.minicad.builder` | 3 | 装配图构建器 |
+| `com.minicad.common` | 9 | 异常类和工具类（`Epsilon`, `Preconditions`, `GeometryException`, `StepParseException`, `StepResolutionException`, `TopologyException`, `UnsupportedGeometryException`, `UnsupportedStepEntityException`, `MiniCadException`) |
+| `com.minicad.geometry` | 38 | 3D 几何类型：`Curve3` (13 种子类型)、`SurfaceGeometry` (16 种子类型) 及辅助类型 |
 | `com.minicad.geometry2d` | 16 | 2D 参数域几何类型（曲线、包围盒等） |
-| `com.minicad.topology` | 11 | B-Rep 拓扑类型（Vertex、Edge、Face、Shell、Solid 等） |
+| `com.minicad.helper` | 9 | 辅助工具（扁平结构，无子包） |
+| `com.minicad.export` | - | 导出功能：`glb`、`mesh`、`json` 子包 |
+| `com.minicad.preview` | - | Web 预览功能：`builder`、`mapper`、`payload`、`sampling`、`statistics` 子包 |
 | `com.minicad.step.syntax` | 5 | STEP 语法解析器（Tokenizer、Parser、AST 模型） |
 | `com.minicad.step.semantic` | 6 | STEP 语义解析器（EntityResolver、EntityFactory、CadBuilder 等） |
-| `com.minicad.step.model` | 1264 | STEP 实体模型类，分 26 个子包（见下表） |
-| `com.minicad.export` | - | 导出功能：`glb`、`mesh`、`json` 子包 |
-| `com.minicad.preview` | - | Web 预览功能：`sampling`、`builder`、`mapper`、`statistics`、`payload` 子包 |
-| `com.minicad.helper` | - | 辅助工具：`geometry`、`metadata`、`validation` 子包 |
-| `com.minicad.builder` | - | 模型构建工具 |
-| `com.minicad.tool` | - | 通用工具类（Phase 3 重命名：原 `tools` 包） |
-| `com.minicad.app` | 4 | 应用入口：`StepDumpApp`、`StepViewerApp`、`StepPreviewJsonExporter`、`StepCapabilityReportApp` |
+| `com.minicad.step.model` | 1264 | **扁平结构**: 所有 STEP 实体模型类直接位于此包（2026-07-09 从 36 子包合并为 1 包） |
+| `com.minicad.tool` | 5 | 能力扫描器和报告工具 |
+| `com.minicad.topology` | 12 | B-Rep 拓扑类型（Vertex、Edge、Face、Shell、Solid 等） |
 
-### `step.model` 子包明细
+**重要变更说明**:
 
-| 子包 | 文件数 | 说明 |
-|------|--------|------|
-| `workflow` | 199 | 工作流与流程管理实体 |
-| `geometry` | 115 | 几何表示实体（曲线、曲面、变换、坐标系等） |
-| `product` | 107 | 产品定义与装配结构 |
-| `annotation` | 117 | 标注与 PMI（Product Manufacturing Information） |
-| `manufacturing` | 117 | 制造工艺与加工特征 |
-| `resource` | 67 | 资源管理实体 |
-| `validation` | 50 | 验证与检查结果表示 |
-| `action` | 49 | 动作与操作链定义 |
-| `classification` | 28 | 分类与编码体系 |
-| `config_mgmt` | 28 | 配置管理与版本控制 |
-| `tolerance` | 32 | GD&T 几何尺寸与公差 |
-| `fea` | 24 | 有限元分析实体 |
-| `security` | 22 | 安全分类与访问控制 |
-| `log_audit` | 23 | 日志与审计追踪 |
-| `document` | 21 | 文档与文件引用 |
-| `organization` | 19 | 组织与人员信息 |
-| `unit` | 19 | 单位定义与转换 |
-| `kinematic` | 26 | 运动学副与机构状态 |
-| `approval` | 13 | 审批流程与状态 |
-| `backup_recovery` | 14 | 备份与恢复管理 |
-| `analysis` | 15 | 分析属性与结果 |
-| `date_time` | 11 | 日期与时间表示 |
-| `system` | 10 | 系统级通用实体 |
-| `profile` | 7 | 截面轮廓定义 |
-| `topology` | 31 | STEP 拓扑实体映射 |
-| `base` | 11 | 基础抽象（`StepRepresentationItem`、`StepGeometricRepresentationItem` 等） |
+- `step.model` 于 2026-07-09 从 36 个子包（workflow、geometry、annotation 等）合并为单一扁平包
+- `helper` 于 2026-07-09 从 3 个子包（geometry、metadata、validation）合并为单一扁平包
+- 导入语句简化：`import com.minicad.step.model.geometry.StepCartesianPoint` → `import com.minicad.step.model.StepCartesianPoint`
+- 详情见 [docs/package-structure-change.md](docs/package-structure-change.md)
 
 ## STEP 支持范围
 
@@ -425,67 +401,36 @@ AP242 Ed2 新增的 3D 模型等效性检测实体（`A3M_*`, `A3MA_*`, `A3MS_*`
 - `DATE_AND_TIME`, `CALENDAR_DATE`, `LOCAL_TIME`
 - `GROUP`, `CLASSIFICATION_ASSIGNMENT`, `IDENTIFICATION_ASSIGNMENT`
 
-## 项目结构
+## 项目结构 (2026-07-09 优化后)
 
 ```
 src/main/java/com/minicad/
-├── common/           -- 公共异常类和工具类 (8 个)
-├── geometry/         -- 3D 几何类型 (37 个)
-│   ├── Curve3        -- 曲线密封接口 (13 种实现)
+├── app/               -- CLI 应用程序 (5 个)
+├── builder/           -- 装配图构建器 (3 个)
+├── common/            -- 异常类和工具类 (9 个)
+├── geometry/          -- 3D 几何类型 (38 个)
+│   ├── Curve3         -- 曲线密封接口 (13 种实现)
 │   └── SurfaceGeometry -- 曲面密封接口 (16 种实现)
-├── geometry2d/       -- 2D 参数域几何类型 (16 个)
-├── topology/         -- B-Rep 拓扑类型 (11 个)
+├── geometry2d/        -- 2D 参数域几何类型 (16 个)
+├── helper/            -- 辅助工具 (9 个，扁平结构)
+├── topology/          -- B-Rep 拓扑类型 (12 个)
 ├── step/
-│   ├── syntax/       -- STEP 语法解析器 (5 个)
-│   ├── semantic/     -- STEP 语义解析器 (6 个)
-│   └── model/        -- STEP 实体模型类 (1264 个, 26 个子包)
-│       ├── base/         -- 基础抽象 (11)
-│       ├── geometry/     -- 几何实体 (115)
-│       ├── topology/     -- 拓扑实体 (31)
-│       ├── product/      -- 产品/装配 (107)
-│       ├── annotation/   -- 标注/PMI (117)
-│       ├── manufacturing/-- 制造工艺 (117)
-│       ├── tolerance/    -- GD&T 公差 (32)
-│       ├── unit/         -- 单位定义 (19)
-│       ├── kinematic/    -- 运动学 (26)
-│       ├── fea/          -- 有限元 (24)
-│       ├── workflow/     -- 工作流 (199)
-│       ├── validation/   -- 验证 (50)
-│       ├── action/       -- 动作 (49)
-│       ├── classification/ -- 分类 (28)
-│       ├── config_mgmt/  -- 配置管理 (28)
-│       ├── security/     -- 安全 (22)
-│       ├── resource/     -- 资源 (67)
-│       ├── organization/ -- 组织 (19)
-│       ├── date_time/    -- 日期时间 (11)
-│       ├── document/     -- 文档 (21)
-│       ├── approval/     -- 审批 (13)
-│       ├── log_audit/    -- 日志审计 (23)
-│       ├── backup_recovery/ -- 备份恢复 (14)
-│       ├── analysis/     -- 分析 (15)
-│       ├── profile/      -- 截面轮廓 (7)
-│       └── system/       -- 系统级 (10)
-├── export/           -- 导出功能
-│   ├── glb/          -- GLB 二进制导出
-│   ├── mesh/         -- 网格导出 (STL/OBJ)
-│   └── json/         -- JSON 元数据导出
-├── preview/          -- Web 预览功能
-│   ├── sampling/     -- 几何采样器
-│   ├── builder/      -- 预览构建器
-│   ├── mapper/       -- 数据映射器
-│   ├── statistics/   -- 统计收集器
-│   └── payload/      -- 响应数据结构
-├── helper/           -- 辅助工具
-│   ├── geometry/     -- 几何辅助
-│   ├── metadata/     -- 元数据提取
-│   └── validation/   -- 验证辅助
-├── builder/          -- 模型构建工具
-├── tool/             -- 通用工具类 (renamed from tools)
-└── app/              -- 应用入口 (4 个)
-    ├── StepDumpApp.java       -- CLI 解析器
-    ├── StepViewerApp.java     -- Web 预览器
-    ├── StepPreviewJsonExporter.java -- GLB 导出
-    └── StepCapabilityReportApp.java -- 覆盖报告生成
+│   ├── syntax/        -- STEP 语法解析器 (5 个)
+│   ├── semantic/      -- STEP 语义解析器 (6 个)
+│   └── model/         -- STEP 实体模型类 (1264 个，扁平结构)
+│       └── (所有实体直接在此包，无子包)
+├── export/            -- 导出功能
+│   ├── glb/           -- GLB 二进制导出
+│   ├── mesh/          -- 网格导出 (STL/OBJ)
+│   └── json/          -- JSON 元数据导出
+├── preview/           -- Web 预览功能
+│   ├── builder/       -- 预览构建器
+│   ├── mapper/        -- 数据映射器
+│   ├── payload/       -- 响应数据结构
+│   ├── sampling/      -- 几何采样器
+│   └── statistics/    -- 统计收集器
+├── tool/              -- 能力扫描器和报告工具 (5 个)
+└── ...
 
 src/test/java/com/minicad/
 ├── ... (镜像 src/main 结构)
@@ -509,9 +454,9 @@ src/test/java/com/minicad/
 examples/             -- STEP 示例文件
 ```
 
-### 包重构说明 (Phase 3)
+### 包重构说明
 
-Phase 1 重构将 `app` 包从 56 个文件精简为 4 个核心入口点，新增以下包：
+**Phase 1** (重构): 将 `app` 包从 56 个文件精简为 4 个核心入口点，新增以下包：
 
 | 包 | 说明 |
 |----|------|
@@ -520,6 +465,15 @@ Phase 1 重构将 `app` 包从 56 个文件精简为 4 个核心入口点，新�
 | `helper` | 辅助工具：几何辅助、元数据提取、验证辅助 |
 | `builder` | 模型构建工具 |
 | `tool` | 通用工具类 (原 `tools` 包，采用单数命名) |
+
+**Phase 4** (2026-07-09 包优化): 将多层包结构扁平化：
+
+| 变化 | 详情 |
+|------|------|
+| `step.model` | 36 子包 → 1 扁平包 (1264 文件直接在 `com.minicad.step.model`) |
+| `helper` | 3 子包 → 1 扁平包 (9 文件直接在 `com.minicad.helper`) |
+
+详见 [docs/package-structure-change.md](docs/package-structure-change.md)。
 
 ## 架构概览
 
@@ -586,7 +540,7 @@ Phase 1 重构将 `app` 包从 56 个文件精简为 4 个核心入口点，新�
 
 添加新 STEP 实体支持的步骤：
 
-1. `step.model.<subpackage>`: 创建 `StepXxx` 模型类
+1. `step.model`: 创建 `StepXxx` 模型类（直接在 `com.minicad.step.model` 包）
 2. `StepEntityResolver`: 添加 `resolveXxx()` 方法
 3. `MiscRegistry`: 注册实体工厂
 4. `StepCadBuilder`: 添加 `buildXxx()` 方法（如果需要几何）
