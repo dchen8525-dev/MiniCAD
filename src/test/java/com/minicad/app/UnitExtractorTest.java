@@ -1,7 +1,7 @@
 package com.minicad.app;
 
 import com.minicad.builder.CompiledStepDocument;
-import com.minicad.helper.metadata.UnitExtractor;
+import com.minicad.helper.UnitExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

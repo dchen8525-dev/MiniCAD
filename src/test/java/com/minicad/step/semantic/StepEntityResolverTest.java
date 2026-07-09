@@ -9160,7 +9160,7 @@ class StepEntityResolverTest {
         for (int id = 1; id <= 46; id++) {
             if (id == 45) {
                 // THREAD has its own specific resolver
-                assertInstanceOf(com.minicad.step.model.class, resolved.get(id));
+                assertInstanceOf(com.minicad.step.model.StepThread.class, resolved.get(id));
                 continue;
             }
             StepCharacterizedObject object =

@@ -3812,7 +3812,7 @@ class StepCadBuilderTest {
 
         StepEntity curveEntity = resolved.get(5);
         assertNotNull(curveEntity);
-        assertInstanceOf(com.minicad.step.model.class, curveEntity);
+        assertInstanceOf(com.minicad.step.model.StepOrientedCurve.class, curveEntity);
         com.minicad.step.model.StepOrientedCurve oc = (com.minicad.step.model.StepOrientedCurve) curveEntity;
         assertEquals(false, oc.orientation());
     }
