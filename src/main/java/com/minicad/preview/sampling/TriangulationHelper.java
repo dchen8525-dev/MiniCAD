@@ -6,7 +6,7 @@ import com.minicad.geometry.ConicalSurface;
 import com.minicad.geometry.CylindricalSurface;
 import com.minicad.geometry.ToroidalSurface;
 import com.minicad.geometry.Vector3;
-import com.minicad.helper.geometry.SurfaceGeometryHelper;
+import com.minicad.helper.SurfaceGeometryHelper;
 import com.minicad.preview.payload.PayloadConversionHelper;
 import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.payload.SurfacePatch;

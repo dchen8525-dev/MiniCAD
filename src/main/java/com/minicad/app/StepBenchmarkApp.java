@@ -3,7 +3,7 @@ package com.minicad.app;
 import com.minicad.builder.CompiledStepDocument;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.export.mesh.StepMeshExporter;
-import com.minicad.helper.metadata.StepTextReader;
+import com.minicad.helper.StepTextReader;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;

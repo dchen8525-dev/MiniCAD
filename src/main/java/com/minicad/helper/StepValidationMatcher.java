@@ -1,4 +1,4 @@
-package com.minicad.helper.validation;
+package com.minicad.helper;
 
 import java.util.Locale;
 

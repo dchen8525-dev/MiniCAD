@@ -1,4 +1,4 @@
-package com.minicad.helper.metadata;
+package com.minicad.helper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

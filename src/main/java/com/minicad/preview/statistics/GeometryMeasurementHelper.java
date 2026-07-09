@@ -1,7 +1,7 @@
 package com.minicad.preview.statistics;
 
 import com.minicad.common.Epsilon;
-import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.helper.MathUtilityHelper;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.FacePayload;
 import com.minicad.preview.payload.LoopPayload;

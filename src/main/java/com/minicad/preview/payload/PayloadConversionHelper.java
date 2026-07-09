@@ -1,7 +1,7 @@
 package com.minicad.preview.payload;
 
 import com.minicad.geometry.CartesianPoint;
-import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.helper.StepMetadataExtractor;
 
 import java.util.List;
 import java.util.stream.Collectors;

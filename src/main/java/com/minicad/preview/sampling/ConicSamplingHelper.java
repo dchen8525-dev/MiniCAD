@@ -3,7 +3,7 @@ package com.minicad.preview.sampling;
 import com.minicad.common.Epsilon;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.CartesianPoint;
-import com.minicad.helper.geometry.MathUtilityHelper;
+import com.minicad.helper.MathUtilityHelper;
 import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.semantic.StepCadBuilder;
 

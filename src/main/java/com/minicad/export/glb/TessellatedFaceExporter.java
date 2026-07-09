@@ -1,7 +1,7 @@
 package com.minicad.export.glb;
 
 import com.minicad.common.GeometryException;
-import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.preview.payload.FacePayload;
 import com.minicad.preview.payload.LoopPayload;
 import com.minicad.preview.payload.PayloadConversionHelper;

@@ -1,4 +1,4 @@
-package com.minicad.helper.metadata;
+package com.minicad.helper;
 
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepProduct;

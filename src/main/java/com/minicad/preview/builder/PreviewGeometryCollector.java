@@ -5,7 +5,7 @@ import com.minicad.export.glb.PreviewMeshExporter;
 import com.minicad.export.glb.TessellatedFaceExporter;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
-import com.minicad.helper.metadata.StepMetadataExtractor;
+import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.FacePayload;
 import com.minicad.preview.payload.GeometryCollection;

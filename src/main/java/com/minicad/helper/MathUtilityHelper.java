@@ -1,4 +1,4 @@
-package com.minicad.helper.geometry;
+package com.minicad.helper;
 
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.preview.payload.PointPayload;

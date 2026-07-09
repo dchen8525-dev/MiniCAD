@@ -2,8 +2,8 @@ package com.minicad.export.json;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.MiniCadIssue;
-import com.minicad.helper.metadata.ProductMetadataExtractor;
-import com.minicad.helper.metadata.UnitExtractor;
+import com.minicad.helper.ProductMetadataExtractor;
+import com.minicad.helper.UnitExtractor;
 import com.minicad.preview.builder.PmiPayload;
 import com.minicad.preview.builder.PmiTargetPayload;
 import com.minicad.preview.payload.BoundsPayload;

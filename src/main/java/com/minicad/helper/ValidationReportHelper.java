@@ -1,4 +1,4 @@
-package com.minicad.helper.validation;
+package com.minicad.helper;
 
 import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
 import com.minicad.preview.payload.BoundsPayload;

@@ -1,8 +1,8 @@
 package com.minicad.preview.payload;
 
 import com.minicad.common.MiniCadIssue;
-import com.minicad.helper.metadata.ProductMetadataExtractor;
-import com.minicad.helper.metadata.UnitExtractor;
+import com.minicad.helper.ProductMetadataExtractor;
+import com.minicad.helper.UnitExtractor;
 import com.minicad.preview.builder.PmiPayload;
 
 import java.util.List;

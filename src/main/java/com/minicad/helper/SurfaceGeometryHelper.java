@@ -1,4 +1,4 @@
-package com.minicad.helper.geometry;
+package com.minicad.helper;
 
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;

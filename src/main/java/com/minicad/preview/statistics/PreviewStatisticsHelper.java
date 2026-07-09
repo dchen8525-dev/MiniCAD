@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import com.minicad.helper.geometry.ShellHelper;
+import com.minicad.helper.ShellHelper;
 import com.minicad.preview.payload.ParametricLoopPayload;
 import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UnsupportedBooleanPayload;

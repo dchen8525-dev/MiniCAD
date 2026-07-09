@@ -1,4 +1,4 @@
-package com.minicad.helper.geometry;
+package com.minicad.helper;
 
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.step.model.StepPlanarBox;
