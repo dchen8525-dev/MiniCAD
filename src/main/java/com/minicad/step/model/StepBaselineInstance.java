@@ -1,4 +1,4 @@
-package com.minicad.step.model.management.config;
+package com.minicad.step.model;
 
 import com.minicad.step.model.core.base.StepEntity;
 import java.util.List;

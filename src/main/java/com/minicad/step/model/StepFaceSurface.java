@@ -1,4 +1,4 @@
-package com.minicad.step.model.topology;
+package com.minicad.step.model;
 
 import java.util.List;
 

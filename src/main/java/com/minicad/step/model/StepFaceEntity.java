@@ -1,4 +1,4 @@
-package com.minicad.step.model.core.base;
+package com.minicad.step.model;
 
 import java.util.List;
 

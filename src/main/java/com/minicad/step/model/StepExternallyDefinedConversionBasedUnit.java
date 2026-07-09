@@ -1,4 +1,4 @@
-package com.minicad.step.model.technical.unit;
+package com.minicad.step.model;
 
 import com.minicad.step.model.core.base.StepEntity;
 import com.minicad.step.model.annotation.StepExternallyDefinedItem;

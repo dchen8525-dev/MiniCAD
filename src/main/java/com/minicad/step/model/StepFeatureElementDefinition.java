@@ -1,4 +1,4 @@
-package com.minicad.step.model.manufacturing;
+package com.minicad.step.model;
 
 import com.minicad.step.model.core.base.StepEntity;
 import java.util.Objects;
