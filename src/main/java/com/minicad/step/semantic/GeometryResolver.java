@@ -6,6 +6,7 @@ import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.*;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
+import com.minicad.step.syntax.StepValue;
 
 import java.util.List;
 
@@ -146,19 +147,7 @@ final class GeometryResolver {
         points);
   }
 
-  // === Basic Surfaces ===
-
-  StepPlane resolvePlane(StepEntityInstance instance) {
-    StepEntityDefinition definition = resolver.definition(instance, "PLANE");
-    StepEntityResolver.requireParameterCount(instance, definition, 2);
-    return new StepPlane(
-        instance.id(),
-        resolver.stringValue(instance, definition, 0),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "PLANE position must reference AXIS2_PLACEMENT_3D"));
-  }
+  // === Basic Curves (Circle and Ellipse kept here) ===
 
   StepCircle resolveCircle(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "CIRCLE");
@@ -191,5 +180,749 @@ final class GeometryResolver {
         position,
         resolver.numberValue(instance, definition, 2),
         resolver.numberValue(instance, definition, 3));
+  }
+
+  // === Offset Curves ===
+
+  StepOffsetCurve3D resolveOffsetCurve3D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_3D");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(basisCurve)) {
+      throw new UnsupportedStepEntityException(
+          "OFFSET_CURVE_3D basis_curve must reference a supported curve");
+    }
+    return new StepOffsetCurve3D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisCurve,
+        resolver.numberValue(instance, definition, 2),
+        resolver.booleanValue(instance, definition, 3),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 4),
+            StepDirection.class,
+            "OFFSET_CURVE_3D ref_direction must reference DIRECTION"));
+  }
+
+  StepOffsetCurve2D resolveOffsetCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_2D");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(basisCurve)) {
+      throw new UnsupportedStepEntityException(
+          "OFFSET_CURVE_2D basis_curve must reference a supported curve");
+    }
+    return new StepOffsetCurve2D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisCurve,
+        resolver.numberValue(instance, definition, 2),
+        resolver.booleanValue(instance, definition, 3));
+  }
+
+  // === Oriented Geometry ===
+
+  StepOrientedCurve resolveOrientedCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ORIENTED_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    int curveElementId = resolver.referenceId(instance, definition, 1);
+    if (curveElementId == instance.id()) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_CURVE curve_element must not self-reference");
+    }
+    StepEntity curveElement = resolver.resolve(curveElementId);
+    if (!resolver.isSupportedCurveReference(curveElement)) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_CURVE curve_element must reference a supported curve");
+    }
+    return new StepOrientedCurve(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        curveElement,
+        resolver.booleanValue(instance, definition, 2));
+  }
+
+  StepOrientedSurface resolveOrientedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ORIENTED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    StepEntity surfaceElement = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(surfaceElement)) {
+      throw new UnsupportedStepEntityException(
+          "ORIENTED_SURFACE surface_element must reference a supported surface");
+    }
+    return new StepOrientedSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        surfaceElement,
+        resolver.booleanValue(instance, definition, 2));
+  }
+
+  StepOffsetSurface resolveOffsetSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "OFFSET_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "OFFSET_SURFACE basis_surface must reference a supported surface");
+    }
+    return new StepOffsetSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisSurface,
+        resolver.numberValue(instance, definition, 2),
+        resolver.booleanValue(instance, definition, 3));
+  }
+
+  // === Composite Curves ===
+
+  StepCompositeCurveSegment resolveCompositeCurveSegment(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "COMPOSITE_CURVE_SEGMENT");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    StepEntity parentCurve = resolver.resolve(resolver.referenceId(instance, definition, 2));
+    if (!resolver.isSupportedCurveReference(parentCurve)) {
+      throw new UnsupportedStepEntityException(
+          "COMPOSITE_CURVE_SEGMENT parent_curve must reference a supported curve");
+    }
+    return new StepCompositeCurveSegment(
+        instance.id(),
+        resolver.enumValue(instance, definition, 0),
+        resolver.booleanValue(instance, definition, 1),
+        parentCurve);
+  }
+
+  StepCompositeCurve resolveCompositeCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "COMPOSITE_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepCompositeCurve(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            1,
+            StepCompositeCurveSegment.class,
+            "COMPOSITE_CURVE segments must contain COMPOSITE_CURVE_SEGMENT references"),
+        resolver.booleanValue(instance, definition, 2));
+  }
+
+  // === 2D Geometry ===
+
+  StepCircle2D resolveCircle2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "CIRCLE_2D");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepCircle2D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "CIRCLE_2D position must reference AXIS2_PLACEMENT_2D"),
+        resolver.numberValue(instance, definition, 2));
+  }
+
+  StepEllipse2D resolveEllipse2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ELLIPSE_2D");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepEllipse2D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement2D.class,
+            "ELLIPSE_2D position must reference AXIS2_PLACEMENT_2D"),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3));
+  }
+
+  StepLine2D resolveLine2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "LINE_2D");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepLine2D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepCartesianPoint.class,
+            "LINE_2D point must reference CARTESIAN_POINT"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepDirection.class,
+            "LINE_2D direction must reference DIRECTION"));
+  }
+
+  StepPolyline2D resolvePolyline2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "POLYLINE_2D");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepPolyline2D(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            1,
+            StepCartesianPoint.class,
+            "POLYLINE_2D points must reference CARTESIAN_POINT"));
+  }
+
+  // === B-Spline Curves ===
+
+  StepBSplineCurveWithKnots resolveBSplineCurveWithKnots(StepEntityInstance instance) {
+    StepEntityDefinition spline = resolver.definition(instance, "B_SPLINE_CURVE_WITH_KNOTS");
+    if (instance.hasDefinition("B_SPLINE_CURVE")) {
+      StepEntityResolver.requireParameterCount(instance, spline, 3);
+      StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE");
+      StepEntityResolver.requireParameterCountIn(instance, base, 5, 6);
+      boolean hasName = base.parameters().size() == 6;
+      return new StepBSplineCurveWithKnots(
+          instance.id(),
+          hasName ? resolver.stringValue(instance, base, 0) : "",
+          resolver.integerValue(instance, base, hasName ? 1 : 0),
+          resolver.referenceList(
+              instance,
+              base,
+              hasName ? 2 : 1,
+              StepCartesianPoint.class,
+              "B_SPLINE_CURVE control points must reference CARTESIAN_POINT"),
+          resolver.enumValue(instance, base, hasName ? 3 : 2),
+          resolver.booleanValue(instance, base, hasName ? 4 : 3),
+          resolver.booleanValue(instance, base, hasName ? 5 : 4),
+          resolver.integerList(instance, spline, 0),
+          resolver.numberList(instance, spline, 1),
+          resolver.enumValue(instance, spline, 2));
+    }
+    StepEntityResolver.requireParameterCount(instance, spline, 9);
+    return new StepBSplineCurveWithKnots(
+        instance.id(),
+        resolver.stringValue(instance, spline, 0),
+        resolver.integerValue(instance, spline, 1),
+        resolver.referenceList(
+            instance,
+            spline,
+            2,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, spline, 3),
+        resolver.booleanValue(instance, spline, 4),
+        resolver.booleanValue(instance, spline, 5),
+        resolver.integerList(instance, spline, 6),
+        resolver.numberList(instance, spline, 7),
+        resolver.enumValue(instance, spline, 8));
+  }
+
+  StepBSplineCurve resolveBSplineCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_CURVE");
+    StepEntityResolver.requireParameterCountIn(instance, definition, 5, 6);
+    boolean hasName = definition.parameters().size() == 6;
+    return new StepBSplineCurve(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, definition, 0) : "",
+        resolver.integerValue(instance, definition, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, definition, hasName ? 3 : 2),
+        resolver.booleanValue(instance, definition, hasName ? 4 : 3),
+        resolver.booleanValue(instance, definition, hasName ? 5 : 4));
+  }
+
+  StepRationalBSplineCurve resolveRationalBSplineCurve(StepEntityInstance instance) {
+    StepEntityDefinition rational = resolver.definition(instance, "RATIONAL_B_SPLINE_CURVE");
+    StepEntityResolver.requireParameterCount(instance, rational, 1);
+    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE");
+    StepEntityResolver.requireParameterCountIn(instance, base, 5, 6);
+    boolean hasName = base.parameters().size() == 6;
+    List<Integer> knotMultiplicities = List.of();
+    List<Double> knots = List.of();
+    String knotSpec = "";
+    if (instance.hasDefinition("B_SPLINE_CURVE_WITH_KNOTS")) {
+      StepEntityDefinition knotDefinition = resolver.definition(instance, "B_SPLINE_CURVE_WITH_KNOTS");
+      StepEntityResolver.requireParameterCount(instance, knotDefinition, 3);
+      knotMultiplicities = resolver.integerList(instance, knotDefinition, 0);
+      knots = resolver.numberList(instance, knotDefinition, 1);
+      knotSpec = resolver.enumValue(instance, knotDefinition, 2);
+    }
+    return new StepRationalBSplineCurve(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, base, 0) : "",
+        resolver.integerValue(instance, base, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            base,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, base, hasName ? 3 : 2),
+        resolver.booleanValue(instance, base, hasName ? 4 : 3),
+        resolver.booleanValue(instance, base, hasName ? 5 : 4),
+        resolver.numberList(instance, rational, 0),
+        knotMultiplicities,
+        knots,
+        knotSpec);
+  }
+
+  // === B-Spline Surfaces ===
+
+  StepBSplineSurfaceWithKnots resolveBSplineSurfaceWithKnots(StepEntityInstance instance) {
+    StepEntityDefinition knots = resolver.definition(instance, "B_SPLINE_SURFACE_WITH_KNOTS");
+    if (instance.hasDefinition("B_SPLINE_SURFACE")) {
+      StepEntityResolver.requireParameterCount(instance, knots, 5);
+      StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_SURFACE");
+      StepEntityResolver.requireParameterCount(instance, base, 7);
+      return new StepBSplineSurfaceWithKnots(
+          instance.id(),
+          "",
+          resolver.integerValue(instance, base, 0),
+          resolver.integerValue(instance, base, 1),
+          resolver.referenceGrid(
+              instance,
+              base,
+              2,
+              StepCartesianPoint.class,
+              "B_SPLINE_SURFACE control points must reference CARTESIAN_POINT"),
+          resolver.enumValue(instance, base, 3),
+          resolver.booleanValue(instance, base, 4),
+          resolver.booleanValue(instance, base, 5),
+          resolver.booleanValue(instance, base, 6),
+          resolver.integerList(instance, knots, 0),
+          resolver.integerList(instance, knots, 1),
+          resolver.numberList(instance, knots, 2),
+          resolver.numberList(instance, knots, 3),
+          resolver.enumValue(instance, knots, 4));
+    }
+    StepEntityResolver.requireParameterCount(instance, knots, 13);
+    return new StepBSplineSurfaceWithKnots(
+        instance.id(),
+        resolver.stringValue(instance, knots, 0),
+        resolver.integerValue(instance, knots, 1),
+        resolver.integerValue(instance, knots, 2),
+        resolver.referenceGrid(
+            instance,
+            knots,
+            3,
+            StepCartesianPoint.class,
+            "B_SPLINE_SURFACE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, knots, 4),
+        resolver.booleanValue(instance, knots, 5),
+        resolver.booleanValue(instance, knots, 6),
+        resolver.booleanValue(instance, knots, 7),
+        resolver.integerList(instance, knots, 8),
+        resolver.integerList(instance, knots, 9),
+        resolver.numberList(instance, knots, 10),
+        resolver.numberList(instance, knots, 11),
+        resolver.enumValue(instance, knots, 12));
+  }
+
+  StepBSplineSurface resolveBSplineSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 7);
+    return new StepBSplineSurface(
+        instance.id(),
+        "",
+        resolver.integerValue(instance, definition, 0),
+        resolver.integerValue(instance, definition, 1),
+        resolver.referenceGrid(
+            instance,
+            definition,
+            2,
+            StepCartesianPoint.class,
+            "B_SPLINE_SURFACE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, definition, 3),
+        resolver.booleanValue(instance, definition, 4),
+        resolver.booleanValue(instance, definition, 5),
+        resolver.booleanValue(instance, definition, 6));
+  }
+
+  StepRationalBSplineSurface resolveRationalBSplineSurface(StepEntityInstance instance) {
+    StepEntityDefinition rational = resolver.definition(instance, "RATIONAL_B_SPLINE_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, rational, 1);
+    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, base, 7);
+    List<Integer> uMultiplicities = List.of();
+    List<Integer> vMultiplicities = List.of();
+    List<Double> uKnots = List.of();
+    List<Double> vKnots = List.of();
+    String knotSpec = "";
+    if (instance.hasDefinition("B_SPLINE_SURFACE_WITH_KNOTS")) {
+      StepEntityDefinition knotDefinition = resolver.definition(instance, "B_SPLINE_SURFACE_WITH_KNOTS");
+      StepEntityResolver.requireParameterCount(instance, knotDefinition, 5);
+      uMultiplicities = resolver.integerList(instance, knotDefinition, 0);
+      vMultiplicities = resolver.integerList(instance, knotDefinition, 1);
+      uKnots = resolver.numberList(instance, knotDefinition, 2);
+      vKnots = resolver.numberList(instance, knotDefinition, 3);
+      knotSpec = resolver.enumValue(instance, knotDefinition, 4);
+    }
+    return new StepRationalBSplineSurface(
+        instance.id(),
+        "",
+        resolver.integerValue(instance, base, 0),
+        resolver.integerValue(instance, base, 1),
+        resolver.referenceGrid(
+            instance,
+            base,
+            2,
+            StepCartesianPoint.class,
+            "B_SPLINE_SURFACE control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, base, 3),
+        resolver.booleanValue(instance, base, 4),
+        resolver.booleanValue(instance, base, 5),
+        resolver.booleanValue(instance, base, 6),
+        resolver.numberGrid(instance, rational, 0),
+        uMultiplicities,
+        vMultiplicities,
+        uKnots,
+        vKnots,
+        knotSpec);
+  }
+
+  StepBSplineCurveWithKnotsAndBreakpoints resolveBSplineCurveWithKnotsAndBreakpoints(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS");
+    if (instance.hasDefinition("B_SPLINE_CURVE_WITH_KNOTS")) {
+      StepEntityResolver.requireParameterCount(instance, definition, 1);
+      StepEntityDefinition knots = resolver.definition(instance, "B_SPLINE_CURVE_WITH_KNOTS");
+      StepEntityResolver.requireParameterCount(instance, knots, 3);
+      StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE");
+      StepEntityResolver.requireParameterCountIn(instance, base, 5, 6);
+      boolean hasName = base.parameters().size() == 6;
+      return new StepBSplineCurveWithKnotsAndBreakpoints(
+          instance.id(),
+          hasName ? resolver.stringValue(instance, base, 0) : "",
+          resolver.integerValue(instance, base, hasName ? 1 : 0),
+          resolver.referenceList(
+              instance,
+              base,
+              hasName ? 2 : 1,
+              StepCartesianPoint.class,
+              "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS control points must reference CARTESIAN_POINT"),
+          resolver.integerList(instance, knots, 0),
+          resolver.numberList(instance, knots, 1),
+          resolver.numberList(instance, definition, 0),
+          resolver.enumValue(instance, base, hasName ? 3 : 2),
+          resolver.booleanValue(instance, base, hasName ? 4 : 3),
+          resolver.booleanValue(instance, base, hasName ? 5 : 4));
+    }
+    // Handle case without B_SPLINE_CURVE_WITH_KNOTS supertype
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE");
+    StepEntityResolver.requireParameterCountIn(instance, base, 5, 6);
+    boolean hasName = base.parameters().size() == 6;
+    return new StepBSplineCurveWithKnotsAndBreakpoints(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, base, 0) : "",
+        resolver.integerValue(instance, base, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            base,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS control points must reference CARTESIAN_POINT"),
+        resolver.integerList(instance, definition, 0),
+        resolver.numberList(instance, definition, 1),
+        resolver.numberList(instance, definition, 2),
+        resolver.enumValue(instance, base, hasName ? 3 : 2),
+        resolver.booleanValue(instance, base, hasName ? 4 : 3),
+        resolver.booleanValue(instance, base, hasName ? 5 : 4));
+  }
+
+  StepBSplineSurfaceWithKnotsAndBreakpoints resolveBSplineSurfaceWithKnotsAndBreakpoints(
+      StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_SURFACE_WITH_KNOTS_AND_BREAKPOINTS");
+    if (instance.hasDefinition("B_SPLINE_SURFACE_WITH_KNOTS")) {
+      StepEntityResolver.requireParameterCount(instance, definition, 2);
+      StepEntityDefinition knots = resolver.definition(instance, "B_SPLINE_SURFACE_WITH_KNOTS");
+      StepEntityResolver.requireParameterCount(instance, knots, 5);
+      StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_SURFACE");
+      StepEntityResolver.requireParameterCount(instance, base, 7);
+      return new StepBSplineSurfaceWithKnotsAndBreakpoints(
+          instance.id(),
+          "",
+          resolver.integerValue(instance, base, 0),
+          resolver.integerValue(instance, base, 1),
+          resolver.referenceGrid(
+              instance,
+              base,
+              2,
+              StepCartesianPoint.class,
+              "B_SPLINE_SURFACE_WITH_KNOTS_AND_BREAKPOINTS control points must reference CARTESIAN_POINT"),
+          resolver.integerList(instance, knots, 0),
+          resolver.integerList(instance, knots, 1),
+          resolver.numberList(instance, knots, 2),
+          resolver.numberList(instance, knots, 3),
+          resolver.numberList(instance, definition, 0),
+          resolver.numberList(instance, definition, 1),
+          resolver.enumValue(instance, base, 3),
+          resolver.booleanValue(instance, base, 4),
+          resolver.booleanValue(instance, base, 5),
+          resolver.booleanValue(instance, base, 6));
+    }
+    // Handle case without B_SPLINE_SURFACE_WITH_KNOTS supertype
+    StepEntityResolver.requireParameterCount(instance, definition, 7);
+    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, base, 7);
+    return new StepBSplineSurfaceWithKnotsAndBreakpoints(
+        instance.id(),
+        "",
+        resolver.integerValue(instance, base, 0),
+        resolver.integerValue(instance, base, 1),
+        resolver.referenceGrid(
+            instance,
+            base,
+            2,
+            StepCartesianPoint.class,
+            "B_SPLINE_SURFACE_WITH_KNOTS_AND_BREAKPOINTS control points must reference CARTESIAN_POINT"),
+        resolver.integerList(instance, definition, 0),
+        resolver.integerList(instance, definition, 1),
+        resolver.numberList(instance, definition, 2),
+        resolver.numberList(instance, definition, 3),
+        resolver.numberList(instance, definition, 4),
+        resolver.numberList(instance, definition, 5),
+        resolver.enumValue(instance, base, 3),
+        resolver.booleanValue(instance, base, 4),
+        resolver.booleanValue(instance, base, 5),
+        resolver.booleanValue(instance, base, 6));
+  }
+
+  // === Bezier Curves and Surfaces ===
+
+  StepBezierCurve resolveBezierCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "BEZIER_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_CURVE")) {
+      return new StepBezierCurve(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
+    }
+    StepEntityResolver.ResolvedBSplineCurveData spline = resolver.resolveInheritedBSplineCurveData(instance);
+    return new StepBezierCurve(
+        instance.id(),
+        spline.name(),
+        spline.getDegree(),
+        spline.getControlPoints(),
+        spline.curveForm(),
+        spline.closedCurve(),
+        spline.selfIntersect());
+  }
+
+  StepPiecewiseBezierCurve resolvePiecewiseBezierCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "PIECEWISE_BEZIER_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_CURVE")) {
+      return new StepPiecewiseBezierCurve(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
+    }
+    StepEntityResolver.ResolvedBSplineCurveData spline = resolver.resolveInheritedBSplineCurveData(instance);
+    return new StepPiecewiseBezierCurve(
+        instance.id(),
+        spline.name(),
+        spline.getDegree(),
+        spline.getControlPoints(),
+        spline.curveForm(),
+        spline.closedCurve(),
+        spline.selfIntersect());
+  }
+
+  StepQuasiUniformCurve resolveQuasiUniformCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "QUASI_UNIFORM_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_CURVE")) {
+      return new StepQuasiUniformCurve(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
+    }
+    StepEntityResolver.ResolvedBSplineCurveData spline = resolver.resolveInheritedBSplineCurveData(instance);
+    return new StepQuasiUniformCurve(
+        instance.id(),
+        spline.name(),
+        spline.getDegree(),
+        spline.getControlPoints(),
+        spline.curveForm(),
+        spline.closedCurve(),
+        spline.selfIntersect());
+  }
+
+  StepUniformCurve resolveUniformCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "UNIFORM_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_CURVE")) {
+      return new StepUniformCurve(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, List.of(), "", false, false);
+    }
+    StepEntityResolver.ResolvedBSplineCurveData spline = resolver.resolveInheritedBSplineCurveData(instance);
+    return new StepUniformCurve(
+        instance.id(),
+        spline.name(),
+        spline.getDegree(),
+        spline.getControlPoints(),
+        spline.curveForm(),
+        spline.closedCurve(),
+        spline.selfIntersect());
+  }
+
+  StepBoundedSurface resolveBoundedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "BOUNDED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    return new StepBoundedSurface(instance.id(), resolver.inheritedRepresentationItemName(instance));
+  }
+
+  StepUniformSurface resolveUniformSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "UNIFORM_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
+      return new StepUniformSurface(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
+    }
+    StepEntityResolver.ResolvedBSplineSurfaceData surface = resolver.resolveInheritedBSplineSurfaceData(instance);
+    return new StepUniformSurface(
+        instance.id(),
+        surface.name(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
+        surface.surfaceForm(),
+        surface.uClosed(),
+        surface.vClosed(),
+        surface.selfIntersect());
+  }
+
+  StepBezierSurface resolveBezierSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "BEZIER_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
+      return new StepBezierSurface(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
+    }
+    StepEntityResolver.ResolvedBSplineSurfaceData surface = resolver.resolveInheritedBSplineSurfaceData(instance);
+    return new StepBezierSurface(
+        instance.id(),
+        surface.name(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
+        surface.surfaceForm(),
+        surface.uClosed(),
+        surface.vClosed(),
+        surface.selfIntersect());
+  }
+
+  StepPiecewiseBezierSurface resolvePiecewiseBezierSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "PIECEWISE_BEZIER_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
+      return new StepPiecewiseBezierSurface(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
+    }
+    StepEntityResolver.ResolvedBSplineSurfaceData surface = resolver.resolveInheritedBSplineSurfaceData(instance);
+    return new StepPiecewiseBezierSurface(
+        instance.id(),
+        surface.name(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
+        surface.surfaceForm(),
+        surface.uClosed(),
+        surface.vClosed(),
+        surface.selfIntersect());
+  }
+
+  StepQuasiUniformSurface resolveQuasiUniformSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "QUASI_UNIFORM_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    if (!instance.hasDefinition("B_SPLINE_SURFACE")) {
+      return new StepQuasiUniformSurface(instance.id(), resolver.inheritedRepresentationItemName(instance), 0, 0, List.of(), "", false, false, false);
+    }
+    StepEntityResolver.ResolvedBSplineSurfaceData surface = resolver.resolveInheritedBSplineSurfaceData(instance);
+    return new StepQuasiUniformSurface(
+        instance.id(),
+        surface.name(),
+        surface.getUDegree(),
+        surface.getVDegree(),
+        surface.getControlPoints(),
+        surface.surfaceForm(),
+        surface.uClosed(),
+        surface.vClosed(),
+        surface.selfIntersect());
+  }
+
+  // === 2D B-Spline Curves ===
+
+  StepBSplineCurve2D resolveBSplineCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_CURVE_2D");
+    StepEntityResolver.requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepBSplineCurve2D(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, definition, 0) : "",
+        resolver.integerValue(instance, definition, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, definition, hasName ? 3 : 2));
+  }
+
+  StepRationalBSplineCurve2D resolveRationalBSplineCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition rational = resolver.definition(instance, "RATIONAL_B_SPLINE_CURVE_2D");
+    StepEntityResolver.requireParameterCount(instance, rational, 1);
+    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE_2D");
+    StepEntityResolver.requireParameterCountIn(instance, base, 4, 5);
+    boolean hasName = base.parameters().size() == 5;
+    return new StepRationalBSplineCurve2D(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, base, 0) : "",
+        resolver.integerValue(instance, base, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            base,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "RATIONAL_B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
+        resolver.numberList(instance, rational, 0),
+        resolver.enumValue(instance, base, hasName ? 3 : 2));
+  }
+
+  StepBezierCurve2D resolveBezierCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "BEZIER_CURVE_2D");
+    StepEntityResolver.requireParameterCountIn(instance, definition, 3, 4);
+    boolean hasName = definition.parameters().size() == 4;
+    return new StepBezierCurve2D(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, definition, 0) : "",
+        resolver.integerValue(instance, definition, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "BEZIER_CURVE_2D control points must reference CARTESIAN_POINT"));
+  }
+
+  StepQuasiUniformCurve2D resolveQuasiUniformCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "QUASI_UNIFORM_CURVE_2D");
+    StepEntityResolver.requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepQuasiUniformCurve2D(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, definition, 0) : "",
+        resolver.integerValue(instance, definition, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "QUASI_UNIFORM_CURVE_2D control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, definition, hasName ? 3 : 2));
+  }
+
+  StepUniformCurve2D resolveUniformCurve2D(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "UNIFORM_CURVE_2D");
+    StepEntityResolver.requireParameterCountIn(instance, definition, 4, 5);
+    boolean hasName = definition.parameters().size() == 5;
+    return new StepUniformCurve2D(
+        instance.id(),
+        hasName ? resolver.stringValue(instance, definition, 0) : "",
+        resolver.integerValue(instance, definition, hasName ? 1 : 0),
+        resolver.referenceList(
+            instance,
+            definition,
+            hasName ? 2 : 1,
+            StepCartesianPoint.class,
+            "UNIFORM_CURVE_2D control points must reference CARTESIAN_POINT"),
+        resolver.enumValue(instance, definition, hasName ? 3 : 2));
   }
 }
