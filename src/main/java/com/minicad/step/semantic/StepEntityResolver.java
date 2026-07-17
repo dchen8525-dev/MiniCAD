@@ -802,6 +802,7 @@ public final class StepEntityResolver {
   private final ProfileResolver profileResolver;
   private final MachiningResolver machiningResolver;
   private final TransformationResolver transformationResolver;
+  private final GenericResolver genericResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -824,6 +825,7 @@ public final class StepEntityResolver {
     this.profileResolver = new ProfileResolver(this);
     this.machiningResolver = new MachiningResolver(this);
     this.transformationResolver = new TransformationResolver(this);
+    this.genericResolver = new GenericResolver(this);
   }
 
   /**
@@ -8024,47 +8026,20 @@ public final class StepEntityResolver {
 
   // Phase 2 Batch 3: Mathematical function and expression resolver methods
 
-  StepUnaryGenericExpression resolveUnaryGenericExpression(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepUnaryGenericExpression(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+  StepUnaryGenericExpression resolveUnaryGenericExpression(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveUnaryGenericExpression(instance, entityName);
   }
 
-  StepBinaryGenericExpression resolveBinaryGenericExpression(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepBinaryGenericExpression(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        literalList(instance, definition, 1),
-        entityName);
+  StepBinaryGenericExpression resolveBinaryGenericExpression(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveBinaryGenericExpression(instance, entityName);
   }
 
-  StepMultipleArityGenericExpression resolveMultipleArityGenericExpression(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepMultipleArityGenericExpression(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        literalList(instance, definition, 1),
-        entityName);
+  StepMultipleArityGenericExpression resolveMultipleArityGenericExpression(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveMultipleArityGenericExpression(instance, entityName);
   }
 
-  StepSimpleGenericExpression resolveSimpleGenericExpression(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 1);
-    return new StepSimpleGenericExpression(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityName);
+  StepSimpleGenericExpression resolveSimpleGenericExpression(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveSimpleGenericExpression(instance, entityName);
   }
 
   static final class ResolvedBSplineCurveData {
@@ -8148,138 +8123,40 @@ public final class StepEntityResolver {
 
   // Phase 2 Batch 4-10: Generic helper resolver methods for alias families
 
-  StepEntity resolveGenericAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    // Support 0-parameter (parent entity in complex instance), 2-parameter, and 3-parameter forms
-    requireParameterCountIn(instance, definition, 0, 2, 3);
-    if (definition.parameters().size() == 0) {
-      // Parent entity in complex instance, no parameters
-      return new StepGenericEntity(instance.id(), "", entityName);
-    } else if (definition.parameters().size() == 2) {
-      return new StepGenericEntity(
-          instance.id(),
-          stringValue(instance, definition, 0),
-          resolve(referenceId(instance, definition, 1)),
-          entityName);
-    } else {
-      // 3-parameter form: name, items list, context reference
-      List<StepEntity> items =
-          entityReferenceList(
-              instance, definition, 1, entityName + " items must contain entity references");
-      StepEntity context = resolve(referenceId(instance, definition, 2));
-      return new StepRepresentation(
-          instance.id(),
-          stringValue(instance, definition, 0),
-          items,
-          context,
-          false,
-          entityName);
-    }
+  StepEntity resolveGenericAssignment(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericAssignment(instance, entityName);
   }
 
-  StepEntity resolveGenericRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    String description = optionalStringValue(instance, definition, 1);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        description,
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        entityName);
+  StepEntity resolveGenericRelationship(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericRelationship(instance, entityName);
   }
 
-  StepEntity resolveGenericRequirement(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+  StepEntity resolveGenericRequirement(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericRequirement(instance, entityName);
   }
 
-  StepEntity resolveGenericStatus(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 1);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityName);
+  StepEntity resolveGenericStatus(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericStatus(instance, entityName);
   }
 
-  StepEntity resolveGenericProperty(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    // Support both 2-parameter (name, ref) and 3-parameter (name, items, context) forms
-    requireParameterCountIn(instance, definition, 2, 3);
-    if (definition.parameters().size() == 2) {
-      return new StepGenericEntity(
-          instance.id(),
-          stringValue(instance, definition, 0),
-          resolve(referenceId(instance, definition, 1)),
-          entityName);
-    } else {
-      // 3-parameter form: name, items list, context reference
-      List<StepEntity> items =
-          entityReferenceList(
-              instance, definition, 1, entityName + " items must contain entity references");
-      StepEntity context = resolve(referenceId(instance, definition, 2));
-      return new StepRepresentation(
-          instance.id(),
-          stringValue(instance, definition, 0),
-          items,
-          context,
-          false,
-          entityName);
-    }
+  StepEntity resolveGenericProperty(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericProperty(instance, entityName);
   }
 
-  StepEntity resolveGenericSetup(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+  StepEntity resolveGenericSetup(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericSetup(instance, entityName);
   }
 
-  StepEntity resolveGenericType(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 1);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityName);
+  StepEntity resolveGenericType(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericType(instance, entityName);
   }
 
-  StepEntity resolveGenericRole(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 1);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityName);
+  StepEntity resolveGenericRole(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericRole(instance, entityName);
   }
 
-  StepEntity resolveGenericActual(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGenericEntity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityName);
+  StepEntity resolveGenericActual(StepEntityInstance instance, String entityName) {
+    return genericResolver.resolveGenericActual(instance, entityName);
   }
 
 }
