@@ -805,6 +805,7 @@ public final class StepEntityResolver {
   private final GenericResolver genericResolver;
   private final AssociationResolver associationResolver;
   private final PropertyResolver propertyResolver;
+  private final DraughtingResolver draughtingResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -830,6 +831,7 @@ public final class StepEntityResolver {
     this.genericResolver = new GenericResolver(this);
     this.associationResolver = new AssociationResolver(this);
     this.propertyResolver = new PropertyResolver(this);
+    this.draughtingResolver = new DraughtingResolver(this);
   }
 
   /**
@@ -2097,14 +2099,7 @@ public final class StepEntityResolver {
   }
 
   StepMarking resolveMarking(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MARKING");
-    requireParameterCount(instance, definition, 5);
-    return new StepMarking(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return draughtingResolver.resolveMarking(instance);
   }
 
   // Pattern resolvers
@@ -3589,44 +3584,19 @@ public final class StepEntityResolver {
   }
 
   StepCharacterGlyph resolveCharacterGlyph(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH");
-    requireParameterCount(instance, definition, 3);
-    return new StepCharacterGlyph(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return draughtingResolver.resolveCharacterGlyph(instance);
   }
 
   StepCharacterGlyphOutline resolveCharacterGlyphOutline(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_OUTLINE");
-    requireParameterCount(instance, definition, 4);
-    return new StepCharacterGlyphOutline(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return draughtingResolver.resolveCharacterGlyphOutline(instance);
   }
 
-  StepCharacterGlyphOutlineWithCharacteristics resolveCharacterGlyphOutlineWithCharacteristics(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_OUTLINE_WITH_CHARACTERISTICS");
-    requireParameterCount(instance, definition, 5);
-    return new StepCharacterGlyphOutlineWithCharacteristics(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+  StepCharacterGlyphOutlineWithCharacteristics resolveCharacterGlyphOutlineWithCharacteristics(StepEntityInstance instance) {
+    return draughtingResolver.resolveCharacterGlyphOutlineWithCharacteristics(instance);
   }
 
   StepCharacterGlyphStroke resolveCharacterGlyphStroke(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_STROKE");
-    requireParameterCount(instance, definition, 4);
-    return new StepCharacterGlyphStroke(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return draughtingResolver.resolveCharacterGlyphStroke(instance);
   }
 
   StepPreDefinedSurfaceStyle resolvePreDefinedSurfaceStyle(StepEntityInstance instance) {
@@ -4642,24 +4612,8 @@ public final class StepEntityResolver {
     return materialResolver.resolveUserDefinedCurveFont(instance);
   }
 
-  StepUserDefinedTerminatorSymbol resolveUserDefinedTerminatorSymbol(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "USER_DEFINED_TERMINATOR_SYMBOL");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "USER_DEFINED_TERMINATOR_SYMBOL mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepUserDefinedTerminatorSymbol(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentationMap.class,
-            "USER_DEFINED_TERMINATOR_SYMBOL mapping_source must reference REPRESENTATION_MAP"),
-        mappingTarget);
+  StepUserDefinedTerminatorSymbol resolveUserDefinedTerminatorSymbol(StepEntityInstance instance) {
+    return draughtingResolver.resolveUserDefinedTerminatorSymbol(instance);
   }
 
   StepItemDefinedTransformation resolveItemDefinedTransformation(StepEntityInstance instance) {
@@ -5056,12 +5010,8 @@ public final class StepEntityResolver {
     return materialResolver.resolveColourSpecification(instance);
   }
 
-  StepDraughtingPreDefinedCurveFont resolveDraughtingPreDefinedCurveFont(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_CURVE_FONT");
-    requireParameterCount(instance, definition, 1);
-    return new StepDraughtingPreDefinedCurveFont(
-        instance.id(), stringValue(instance, definition, 0));
+  StepDraughtingPreDefinedCurveFont resolveDraughtingPreDefinedCurveFont(StepEntityInstance instance) {
+    return draughtingResolver.resolveDraughtingPreDefinedCurveFont(instance);
   }
 
   StepPreDefinedCurveFont resolvePreDefinedCurveFont(StepEntityInstance instance) {
@@ -5107,11 +5057,8 @@ public final class StepEntityResolver {
         instance.id(), stringValue(instance, definition, 0));
   }
 
-  StepPreDefinedTerminatorSymbol resolvePreDefinedTerminatorSymbol(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_TERMINATOR_SYMBOL");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedTerminatorSymbol(instance.id(), stringValue(instance, definition, 0));
+  StepPreDefinedTerminatorSymbol resolvePreDefinedTerminatorSymbol(StepEntityInstance instance) {
+    return draughtingResolver.resolvePreDefinedTerminatorSymbol(instance);
   }
 
   StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(
@@ -5121,22 +5068,16 @@ public final class StepEntityResolver {
     return new StepPreDefinedSurfaceSideStyle(instance.id(), stringValue(instance, definition, 0));
   }
 
-  StepDraughtingPreDefinedTextFont resolveDraughtingPreDefinedTextFont(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_TEXT_FONT");
-    requireParameterCount(instance, definition, 1);
-    return new StepDraughtingPreDefinedTextFont(instance.id(), stringValue(instance, definition, 0));
+  StepDraughtingPreDefinedTextFont resolveDraughtingPreDefinedTextFont(StepEntityInstance instance) {
+    return draughtingResolver.resolveDraughtingPreDefinedTextFont(instance);
   }
 
   StepPreDefinedTextFont resolvePreDefinedTextFont(StepEntityInstance instance) {
     return materialResolver.resolvePreDefinedTextFont(instance);
   }
 
-  StepDraughtingPreDefinedColour resolveDraughtingPreDefinedColour(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_COLOUR");
-    requireParameterCount(instance, definition, 1);
-    return new StepDraughtingPreDefinedColour(instance.id(), stringValue(instance, definition, 0));
+  StepDraughtingPreDefinedColour resolveDraughtingPreDefinedColour(StepEntityInstance instance) {
+    return draughtingResolver.resolveDraughtingPreDefinedColour(instance);
   }
 
   StepPreDefinedColour resolvePreDefinedColour(StepEntityInstance instance) {
@@ -5151,44 +5092,16 @@ public final class StepEntityResolver {
     return materialResolver.resolvePointStyle(instance);
   }
 
-  StepCharacterGlyphStyleStroke resolveCharacterGlyphStyleStroke(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_STYLE_STROKE");
-    requireParameterCount(instance, definition, 1);
-    return new StepCharacterGlyphStyleStroke(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCurveStyle.class,
-            "CHARACTER_GLYPH_STYLE_STROKE stroke_style must reference CURVE_STYLE"));
+  StepCharacterGlyphStyleStroke resolveCharacterGlyphStyleStroke(StepEntityInstance instance) {
+    return draughtingResolver.resolveCharacterGlyphStyleStroke(instance);
   }
 
-  StepCharacterGlyphStyleOutline resolveCharacterGlyphStyleOutline(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHARACTER_GLYPH_STYLE_OUTLINE");
-    requireParameterCount(instance, definition, 1);
-    return new StepCharacterGlyphStyleOutline(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCurveStyle.class,
-            "CHARACTER_GLYPH_STYLE_OUTLINE outline_style must reference CURVE_STYLE"));
+  StepCharacterGlyphStyleOutline resolveCharacterGlyphStyleOutline(StepEntityInstance instance) {
+    return draughtingResolver.resolveCharacterGlyphStyleOutline(instance);
   }
 
   StepCharacterGlyphStyleOutlineWithCharacteristics resolveCharacterGlyphStyleOutlineWithCharacteristics(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS");
-    requireParameterCount(instance, definition, 2);
-    return new StepCharacterGlyphStyleOutlineWithCharacteristics(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCurveStyle.class,
-            "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS outline_style must reference CURVE_STYLE"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepFillAreaStyle.class,
-            "CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS characteristics must reference FILL_AREA_STYLE"));
+    return draughtingResolver.resolveCharacterGlyphStyleOutlineWithCharacteristics(instance);
   }
 
   StepTextStyleForDefinedFont resolveTextStyleForDefinedFont(StepEntityInstance instance) {
@@ -5397,202 +5310,52 @@ public final class StepEntityResolver {
             "PRESENTATION_LAYER_ASSIGNMENT assigned items must contain entity references"));
   }
 
-  StepAnnotationTextOccurrence resolveAnnotationTextOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_TEXT_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity position = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationPointCarrier(position)) {
-      throw new StepResolutionException(
-          "ANNOTATION_TEXT_OCCURRENCE position must reference supported point carriers or point-like annotation content/occurrences");
-    }
-    return new StepAnnotationTextOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        position);
+  StepAnnotationTextOccurrence resolveAnnotationTextOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationTextOccurrence(instance);
   }
 
   StepAnnotationText resolveAnnotationText(StepEntityInstance instance) {
     return annotationResolver.resolveAnnotationText(instance);
   }
 
-  StepAnnotationTextCharacter resolveAnnotationTextCharacter(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_TEXT_CHARACTER");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "ANNOTATION_TEXT_CHARACTER mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepAnnotationTextCharacter(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentationMap.class,
-            "ANNOTATION_TEXT_CHARACTER mapping_source must reference REPRESENTATION_MAP"),
-        mappingTarget);
+  StepAnnotationTextCharacter resolveAnnotationTextCharacter(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationTextCharacter(instance);
   }
 
   StepAnnotationSymbol resolveAnnotationSymbol(StepEntityInstance instance) {
     return annotationResolver.resolveAnnotationSymbol(instance);
   }
 
-  StepAnnotationSymbolOccurrence resolveAnnotationSymbolOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_SYMBOL_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationWrapperItem(item)) {
-      throw new StepResolutionException(
-          "ANNOTATION_SYMBOL_OCCURRENCE item must reference supported annotation content or occurrence");
-    }
-    return new StepAnnotationSymbolOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_SYMBOL_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+  StepAnnotationSymbolOccurrence resolveAnnotationSymbolOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationSymbolOccurrence(instance);
   }
 
-  StepAnnotationSubfigureOccurrence resolveAnnotationSubfigureOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_SUBFIGURE_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationWrapperItem(item)) {
-      throw new StepResolutionException(
-          "ANNOTATION_SUBFIGURE_OCCURRENCE item must reference supported annotation content or occurrence");
-    }
-    return new StepAnnotationSubfigureOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_SUBFIGURE_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+  StepAnnotationSubfigureOccurrence resolveAnnotationSubfigureOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationSubfigureOccurrence(instance);
   }
 
-  StepDraughtingAnnotationOccurrence resolveDraughtingAnnotationOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_ANNOTATION_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    return new StepDraughtingAnnotationOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "DRAUGHTING_ANNOTATION_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        resolve(referenceId(instance, definition, 2)));
+  StepDraughtingAnnotationOccurrence resolveDraughtingAnnotationOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveDraughtingAnnotationOccurrence(instance);
   }
 
-  StepTerminatorSymbol resolveTerminatorSymbol(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TERMINATOR_SYMBOL");
-    requireParameterCount(instance, definition, 4);
-    StepEntity annotatedCurve = resolve(referenceId(instance, definition, 3));
-    if (!(annotatedCurve instanceof StepAnnotationCurveOccurrence)
-        && !(annotatedCurve instanceof StepLeaderCurve)
-        && !(annotatedCurve instanceof StepProjectionCurve)
-        && !(annotatedCurve instanceof StepDimensionCurve)) {
-      throw new StepResolutionException(
-          "TERMINATOR_SYMBOL annotated_curve must reference supported annotation curve occurrence");
-    }
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationWrapperItem(item)) {
-      throw new StepResolutionException(
-          "TERMINATOR_SYMBOL item must reference supported annotation content or occurrence");
-    }
-    return new StepTerminatorSymbol(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "TERMINATOR_SYMBOL styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item,
-        annotatedCurve);
+  StepTerminatorSymbol resolveTerminatorSymbol(StepEntityInstance instance) {
+    return draughtingResolver.resolveTerminatorSymbol(instance);
   }
 
-  StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(
-      StepEntityInstance instance) {
-    return resolveAnnotationOccurrenceRelationship(instance, "ANNOTATION_OCCURRENCE_RELATIONSHIP");
+  StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationOccurrenceRelationship(instance);
   }
 
-  StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    StepEntity relating = resolve(referenceId(instance, definition, 2));
-    StepEntity related = resolve(referenceId(instance, definition, 3));
-    if (!isAnnotationOccurrence(relating) || !isAnnotationOccurrence(related)) {
-      throw new UnsupportedStepEntityException(
-          entityName + " occurrences must reference supported annotation occurrence entities");
-    }
-    return new StepAnnotationOccurrenceRelationship(
-        instance.id(),
-        entityName,
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        relating,
-        related);
+  StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(StepEntityInstance instance, String entityName) {
+    return draughtingResolver.resolveAnnotationOccurrenceRelationship(instance, entityName);
   }
 
-  StepAnnotationPointOccurrence resolveAnnotationPointOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_POINT_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationPointCarrier(item)) {
-      throw new StepResolutionException(
-          "ANNOTATION_POINT_OCCURRENCE item must reference supported point carriers or point-like annotation content/occurrences");
-    }
-    return new StepAnnotationPointOccurrence(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_POINT_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+  StepAnnotationPointOccurrence resolveAnnotationPointOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationPointOccurrence(instance);
   }
 
-  StepAnnotationCurveOccurrence resolveAnnotationCurveOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_CURVE_OCCURRENCE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationCurveCarrier(item)) {
-      throw new StepResolutionException(
-          "ANNOTATION_CURVE_OCCURRENCE item must reference a supported curve, EDGE_CURVE, SUBEDGE, ORIENTED_EDGE, EDGE_LOOP, POLY_LOOP, PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH, CONNECTED_EDGE_SET, WIRE_SHELL, wireframe model or GEOMETRIC_CURVE_SET");
-    }
-    return new StepAnnotationCurveOccurrence(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_CURVE_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+  StepAnnotationCurveOccurrence resolveAnnotationCurveOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationCurveOccurrence(instance);
   }
 
   StepLeaderCurve resolveLeaderCurve(StepEntityInstance instance) {
@@ -5611,52 +5374,12 @@ public final class StepEntityResolver {
     return annotationResolver.resolveAnnotationFillArea(instance);
   }
 
-  StepAnnotationFillAreaOccurrence resolveAnnotationFillAreaOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_FILL_AREA_OCCURRENCE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity fillStyleTarget = resolve(referenceId(instance, definition, 3));
-    if (!isSupportedAnnotationPointCarrier(fillStyleTarget)) {
-      throw new StepResolutionException(
-          "ANNOTATION_FILL_AREA_OCCURRENCE fill_style_target must reference supported point carriers or point-like annotation content/occurrences");
-    }
-    return new StepAnnotationFillAreaOccurrence(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_FILL_AREA_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAnnotationFillArea.class,
-            "ANNOTATION_FILL_AREA_OCCURRENCE item must reference ANNOTATION_FILL_AREA"),
-        fillStyleTarget);
+  StepAnnotationFillAreaOccurrence resolveAnnotationFillAreaOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationFillAreaOccurrence(instance);
   }
 
-  StepAnnotationPlaceholderOccurrence resolveAnnotationPlaceholderOccurrence(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_PLACEHOLDER_OCCURRENCE");
-    requireParameterCount(instance, definition, 5);
-    double lineSpacing = numberValue(instance, definition, 4);
-    if (!(lineSpacing > 0.0)) {
-      throw new StepResolutionException(
-          "ANNOTATION_PLACEHOLDER_OCCURRENCE line_spacing must be positive");
-    }
-    return new StepAnnotationPlaceholderOccurrence(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_PLACEHOLDER_OCCURRENCE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        requireSupportedPlaceholderItem(resolve(referenceId(instance, definition, 2))),
-        enumValue(instance, definition, 3),
-        lineSpacing);
+  StepAnnotationPlaceholderOccurrence resolveAnnotationPlaceholderOccurrence(StepEntityInstance instance) {
+    return draughtingResolver.resolveAnnotationPlaceholderOccurrence(instance);
   }
 
   StepEntity requireSupportedPlaceholderItem(StepEntity item) {
@@ -6363,7 +6086,7 @@ public final class StepEntityResolver {
             && "POINT_REPLICA".equals(((StepGeometricReplica) item).entityName()));
   }
 
-  private boolean isSupportedAnnotationWrapperItem(StepEntity item) {
+  boolean isSupportedAnnotationWrapperItem(StepEntity item) {
     return item instanceof StepAnnotationSymbol
         || item instanceof StepAnnotationText
         || item instanceof StepAnnotationTextCharacter
