@@ -798,6 +798,7 @@ public final class StepEntityResolver {
   private final RepresentationResolver representationResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
+  private final SolidResolver solidResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -816,6 +817,7 @@ public final class StepEntityResolver {
     this.representationResolver = new RepresentationResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
+    this.solidResolver = new SolidResolver(this);
   }
 
   /**
@@ -2143,12 +2145,7 @@ public final class StepEntityResolver {
   }
 
   StepCsgVolume resolveCsgVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CSG_VOLUME");
-    requireParameterCount(instance, definition, 3);
-    return new StepCsgVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return solidResolver.resolveCsgVolume(instance);
   }
 
   StepBlockVolume resolveBlockVolume(StepEntityInstance instance) {
@@ -3366,12 +3363,7 @@ public final class StepEntityResolver {
   }
 
   StepCsgPrimitive3D resolveCsgPrimitive3D(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CSG_PRIMITIVE_3D");
-    requireParameterCount(instance, definition, 3);
-    return new StepCsgPrimitive3D(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return solidResolver.resolveCsgPrimitive3D(instance);
   }
 
   StepCompoundRepresentationItem resolveCompoundRepresentationItem(StepEntityInstance instance, String entityName) {
@@ -4017,26 +4009,11 @@ public final class StepEntityResolver {
   }
 
   StepBooleanResult resolveBooleanResult(StepEntityInstance instance) {
-    return resolveBooleanResult(instance, "BOOLEAN_RESULT");
+    return solidResolver.resolveBooleanResult(instance);
   }
 
-  StepBooleanResult resolveBooleanResult(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    StepEntity firstOperand = resolve(referenceId(instance, definition, 1));
-    StepEntity secondOperand = resolve(referenceId(instance, definition, 2));
-    if (!isBooleanOperandEntity(firstOperand) || !isBooleanOperandEntity(secondOperand)) {
-      throw new StepResolutionException(
-          entityName
-              + " operands must reference a supported solid or CSG operand");
-    }
-    return new StepBooleanResult(
-        instance.id(),
-        inheritedRepresentationItemName(instance),
-        enumValue(instance, definition, 0),
-        firstOperand,
-        secondOperand);
+  StepBooleanResult resolveBooleanResult(StepEntityInstance instance, String entityName) {
+    return solidResolver.resolveBooleanResult(instance, entityName);
   }
 
   StepBooleanClippingResult resolveBooleanClippingResult(StepEntityInstance instance) {
@@ -5348,59 +5325,23 @@ public final class StepEntityResolver {
   }
 
   StepSolidModel resolveSolidModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SOLID_MODEL");
-    requireParameterCount(instance, definition, 0);
-    return new StepSolidModel(instance.id(), inheritedRepresentationItemName(instance));
+    return solidResolver.resolveSolidModel(instance);
   }
 
   StepCsgSolid resolveCsgSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CSG_SOLID");
-    requireParameterCount(instance, definition, 2);
-    StepEntity treeRootExpression = resolve(referenceId(instance, definition, 1));
-    if (!isBooleanOperandEntity(treeRootExpression)) {
-      throw new StepResolutionException(
-          "CSG_SOLID tree_root_expression must reference a supported CSG operand");
-    }
-    return new StepCsgSolid(instance.id(), stringValue(instance, definition, 0), treeRootExpression);
+    return solidResolver.resolveCsgSolid(instance);
   }
 
   StepSolidReplica resolveSolidReplica(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SOLID_REPLICA");
-    requireParameterCount(instance, definition, 3);
-    StepEntity parentSolid = resolve(referenceId(instance, definition, 1));
-    if (!isBooleanOperandEntity(parentSolid) && !(parentSolid instanceof StepSolidModel)) {
-      throw new StepResolutionException(
-          "SOLID_REPLICA parent_solid must reference a supported solid model");
-    }
-    return new StepSolidReplica(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        parentSolid,
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepCartesianTransformationOperator.class,
-            "SOLID_REPLICA transformation must reference CARTESIAN_TRANSFORMATION_OPERATOR"));
+    return solidResolver.resolveSolidReplica(instance);
   }
 
-  StepCsgPrimitive resolveCsgPrimitive(
-      StepEntityInstance instance,
+  StepCsgPrimitive resolveCsgPrimitive(StepEntityInstance instance,
       String entityName,
       Class<? extends StepEntity> positionType,
       String positionTypeName,
       int dimensionCount) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, dimensionCount + 2);
-    StepEntity position = resolve(referenceId(instance, definition, 1));
-    if (!positionType.isInstance(position)) {
-      throw new StepResolutionException(
-          entityName + " position must reference " + positionTypeName);
-    }
-    List<Double> dimensions = new ArrayList<>(dimensionCount);
-    for (int index = 0; index < dimensionCount; index++) {
-      dimensions.add(numberValue(instance, definition, index + 2));
-    }
-    return new StepCsgPrimitive(
-        instance.id(), stringValue(instance, definition, 0), position, dimensions, entityName);
+    return solidResolver.resolveCsgPrimitive(instance, entityName, positionType, positionTypeName, dimensionCount);
   }
 
   StepProfileDef resolveCircleProfileDef(StepEntityInstance instance) {
@@ -5579,47 +5520,11 @@ public final class StepEntityResolver {
   }
 
   StepSweptAreaSolid resolveExtrudedAreaSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTRUDED_AREA_SOLID");
-    requireParameterCount(instance, definition, 5);
-    return new StepSweptAreaSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepProfileDef.class,
-            "EXTRUDED_AREA_SOLID swept_area must reference a profile definition"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement3D.class,
-            "EXTRUDED_AREA_SOLID position must reference AXIS2_PLACEMENT_3D"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepDirection.class,
-            "EXTRUDED_AREA_SOLID extruded_direction must reference DIRECTION"),
-        numberValue(instance, definition, 4),
-        "EXTRUDED_AREA_SOLID");
+    return solidResolver.resolveExtrudedAreaSolid(instance);
   }
 
   StepSweptAreaSolid resolveRevolvedAreaSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REVOLVED_AREA_SOLID");
-    requireParameterCount(instance, definition, 5);
-    return new StepSweptAreaSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepProfileDef.class,
-            "REVOLVED_AREA_SOLID swept_area must reference a profile definition"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement3D.class,
-            "REVOLVED_AREA_SOLID position must reference AXIS2_PLACEMENT_3D"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepAxis1Placement.class,
-            "REVOLVED_AREA_SOLID axis must reference AXIS1_PLACEMENT"),
-        numberValue(instance, definition, 4),
-        "REVOLVED_AREA_SOLID");
+    return solidResolver.resolveRevolvedAreaSolid(instance);
   }
 
   StepBoxDomain resolveBoxDomain(StepEntityInstance instance) {
@@ -5638,27 +5543,11 @@ public final class StepEntityResolver {
   }
 
   StepHalfSpaceSolid resolveHalfSpaceSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "HALF_SPACE_SOLID");
-    requireParameterCount(instance, definition, 3);
-    return new StepHalfSpaceSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireSurfaceReference(instance, definition, 1, "HALF_SPACE_SOLID base_surface"),
-        booleanValue(instance, definition, 2),
-        null,
-        "HALF_SPACE_SOLID");
+    return solidResolver.resolveHalfSpaceSolid(instance);
   }
 
   StepHalfSpaceSolid resolveBoxedHalfSpace(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BOXED_HALF_SPACE");
-    requireParameterCount(instance, definition, 4);
-    return new StepHalfSpaceSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireSurfaceReference(instance, definition, 1, "BOXED_HALF_SPACE base_surface"),
-        booleanValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        "BOXED_HALF_SPACE");
+    return solidResolver.resolveBoxedHalfSpace(instance);
   }
 
   StepEntity requireSurfaceReference(
@@ -6601,23 +6490,7 @@ public final class StepEntityResolver {
   }
 
   StepSweptAreaSolid resolveSweptAreaSolid(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    int sweepRefId = referenceId(instance, definition, 3);
-    return new StepSweptAreaSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepProfileDef.class,
-            entityName + " swept area must reference a profile definition"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement3D.class,
-            entityName + " position must reference AXIS2_PLACEMENT_3D"),
-        resolve(sweepRefId),
-        numberValue(instance, definition, 4),
-        entityName);
+    return solidResolver.resolveSweptAreaSolid(instance, entityName);
   }
 
   StepMachinedSurface resolveMachinedSurface(StepEntityInstance instance) {
@@ -6798,20 +6671,7 @@ public final class StepEntityResolver {
   }
 
   StepSweptDiskSolid resolveSweptDiskSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SWEPT_DISK_SOLID");
-    requireParameterCount(instance, definition, 4);
-    StepEntity sweptCurve = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(sweptCurve)) {
-      throw new UnsupportedStepEntityException(
-          "SWEPT_DISK_SOLID swept_curve must reference a supported curve");
-    }
-    Double innerRadius = optionalNumberValue(instance, definition, 3);
-    return new StepSweptDiskSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        sweptCurve,
-        numberValue(instance, definition, 2),
-        innerRadius);
+    return solidResolver.resolveSweptDiskSolid(instance);
   }
 
   StepRuledSurface resolveRuledSurface(StepEntityInstance instance) {
@@ -6844,46 +6704,15 @@ public final class StepEntityResolver {
   }
 
   StepRevolvedAreaSolidTapered resolveRevolvedAreaSolidTapered(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REVOLVED_AREA_SOLID_TAPERED");
-    requireParameterCount(instance, definition, 5);
-    return new StepRevolvedAreaSolidTapered(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis1Placement.class,
-            "REVOLVED_AREA_SOLID_TAPERED axis must reference AXIS1_PLACEMENT"),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveRevolvedAreaSolidTapered(instance);
   }
 
   StepExtrudedAreaSolidTapered resolveExtrudedAreaSolidTapered(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTRUDED_AREA_SOLID_TAPERED");
-    requireParameterCount(instance, definition, 5);
-    return new StepExtrudedAreaSolidTapered(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepDirection.class,
-            "EXTRUDED_AREA_SOLID_TAPERED direction must reference DIRECTION"),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveExtrudedAreaSolidTapered(instance);
   }
 
   StepSurfaceCurveSweptAreaSolid resolveSurfaceCurveSweptAreaSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_CURVE_SWEPT_AREA_SOLID");
-    requireParameterCount(instance, definition, 6);
-    return new StepSurfaceCurveSweptAreaSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5));
+    return solidResolver.resolveSurfaceCurveSweptAreaSolid(instance);
   }
 
   // Advanced CSG volume resolve methods
@@ -6962,38 +6791,15 @@ public final class StepEntityResolver {
   // Swept face solid resolve methods
 
   StepExtrudedFaceSolid resolveExtrudedFaceSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTRUDED_FACE_SOLID");
-    requireParameterCount(instance, definition, 5);
-    return new StepExtrudedFaceSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveExtrudedFaceSolid(instance);
   }
 
   StepRevolvedFaceSolid resolveRevolvedFaceSolid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REVOLVED_FACE_SOLID");
-    requireParameterCount(instance, definition, 5);
-    return new StepRevolvedFaceSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveRevolvedFaceSolid(instance);
   }
 
   StepSweptFaceSolid resolveSweptFaceSolid(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepSweptFaceSolid(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        entityName);
+    return solidResolver.resolveSweptFaceSolid(instance, entityName);
   }
 
   StepAdvancedBrep resolveAdvancedBrep(StepEntityInstance instance) {
