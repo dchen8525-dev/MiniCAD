@@ -251,4 +251,114 @@ final class AnalysisResolver {
         resolver.stringValue(instance, definition, 0),
         resolver.stringValue(instance, definition, 1));
   }
+  // === Element Property Entities ===
+
+  StepCurve3dElementProperty resolveCurve3dElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "CURVE_3D_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepCurve3dElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepFea2DElementProperty resolveFea2DElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_2D_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFea2DElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "FEA_2D_ELEMENT_PROPERTY properties must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFea3DElementProperty resolveFea3DElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_3D_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFea3DElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "FEA_3D_ELEMENT_PROPERTY properties must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaBeamElementProperty resolveFeaBeamElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_BEAM_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepFeaBeamElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "FEA_BEAM_ELEMENT_PROPERTY properties must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepFeaShellElementProperty resolveFeaShellElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_SHELL_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaShellElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "FEA_SHELL_ELEMENT_PROPERTY properties must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaSpringElementProperty resolveFeaSpringElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_SPRING_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaSpringElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaTrussElementProperty resolveFeaTrussElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_TRUSS_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaTrussElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaVolumeElementProperty resolveFeaVolumeElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_VOLUME_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaVolumeElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "FEA_VOLUME_ELEMENT_PROPERTY properties must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepSurface3dElementProperty resolveSurface3dElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_3D_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepSurface3dElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepVolume3dElementProperty resolveVolume3dElementProperty(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "VOLUME_3D_ELEMENT_PROPERTY");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepVolume3dElementProperty(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
 }

@@ -2998,36 +2998,15 @@ public final class StepEntityResolver {
   }
 
   StepVolume3dElementProperty resolveVolume3dElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VOLUME_3D_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 5);
-    return new StepVolume3dElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return analysisResolver.resolveVolume3dElementProperty(instance);
   }
 
   StepCurve3dElementProperty resolveCurve3dElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_3D_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 5);
-    return new StepCurve3dElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return analysisResolver.resolveCurve3dElementProperty(instance);
   }
 
   StepSurface3dElementProperty resolveSurface3dElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_3D_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 5);
-    return new StepSurface3dElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return analysisResolver.resolveSurface3dElementProperty(instance);
   }
 
   StepFeaMaterialPropertyRepresentation resolveFeaMaterialPropertyRepresentation(StepEntityInstance instance) {
@@ -3134,79 +3113,31 @@ public final class StepEntityResolver {
 
   // New FEA element property resolvers
   StepFeaShellElementProperty resolveFeaShellElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_SHELL_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaShellElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_SHELL_ELEMENT_PROPERTY properties must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFeaShellElementProperty(instance);
   }
 
   StepFeaBeamElementProperty resolveFeaBeamElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_BEAM_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 5);
-    return new StepFeaBeamElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_BEAM_ELEMENT_PROPERTY properties must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return analysisResolver.resolveFeaBeamElementProperty(instance);
   }
 
   StepFea2DElementProperty resolveFea2DElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_2D_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFea2DElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_2D_ELEMENT_PROPERTY properties must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFea2DElementProperty(instance);
   }
 
   StepFea3DElementProperty resolveFea3DElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_3D_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFea3DElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_3D_ELEMENT_PROPERTY properties must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFea3DElementProperty(instance);
   }
 
   StepFeaTrussElementProperty resolveFeaTrussElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_TRUSS_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaTrussElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFeaTrussElementProperty(instance);
   }
 
   StepFeaSpringElementProperty resolveFeaSpringElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_SPRING_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaSpringElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFeaSpringElementProperty(instance);
   }
 
   StepFeaVolumeElementProperty resolveFeaVolumeElementProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_VOLUME_ELEMENT_PROPERTY");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaVolumeElementProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_VOLUME_ELEMENT_PROPERTY properties must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveFeaVolumeElementProperty(instance);
   }
 
   // Unit with unit resolvers
