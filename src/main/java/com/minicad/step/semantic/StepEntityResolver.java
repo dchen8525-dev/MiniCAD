@@ -805,6 +805,7 @@ public final class StepEntityResolver {
   private final GenericResolver genericResolver;
   private final AssociationResolver associationResolver;
   private final PropertyResolver propertyResolver;
+  private final CurveResolver curveResolver;
   private final DraughtingResolver draughtingResolver;
 
   private StepEntityResolver(StepFile file) {
@@ -831,6 +832,7 @@ public final class StepEntityResolver {
     this.genericResolver = new GenericResolver(this);
     this.associationResolver = new AssociationResolver(this);
     this.propertyResolver = new PropertyResolver(this);
+    this.curveResolver = new CurveResolver(this);
     this.draughtingResolver = new DraughtingResolver(this);
   }
 
@@ -954,22 +956,8 @@ public final class StepEntityResolver {
     return geometryResolver.resolveEllipse(instance);
   }
 
-  StepConicCurve resolveConicCurve(
-      StepEntityInstance instance, String entityName, int parameterCount) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, parameterCount + 2);
-    StepEntity position = resolve(referenceId(instance, definition, 1));
-    if (!(position instanceof StepAxis2Placement3D)
-        && !(position instanceof StepAxis2Placement2D)) {
-      throw new StepResolutionException(
-          entityName + " position must reference AXIS2_PLACEMENT_3D or AXIS2_PLACEMENT_2D");
-    }
-    List<Double> parameters = new ArrayList<>(parameterCount);
-    for (int index = 0; index < parameterCount; index++) {
-      parameters.add(numberValue(instance, definition, index + 2));
-    }
-    return new StepConicCurve(
-        instance.id(), stringValue(instance, definition, 0), position, parameters, entityName);
+  StepConicCurve resolveConicCurve(StepEntityInstance instance, String entityName, int parameterCount) {
+    return curveResolver.resolveConicCurve(instance, entityName, parameterCount);
   }
 
   StepCylindricalSurface resolveCylindricalSurface(StepEntityInstance instance) {
@@ -1047,35 +1035,8 @@ public final class StepEntityResolver {
     return geometricFeatureResolver.resolveFreeFormSurface(instance);
   }
 
-  List<List<StepEntity>> resolveFreeFormControlPoints(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a nested list");
-    }
-    StepValue.ListValue outerList = (StepValue.ListValue) value;
-    List<List<StepEntity>> result = new ArrayList<>();
-    for (StepValue outerElement : outerList.elements()) {
-      StepValue unwrappedOuter = unwrapTyped(outerElement);
-      if (!(unwrappedOuter instanceof StepValue.ListValue)) {
-        throw new StepResolutionException(
-            definition.name() + " control_points must contain nested lists");
-      }
-      StepValue.ListValue innerList = (StepValue.ListValue) unwrappedOuter;
-      List<StepEntity> row = new ArrayList<>();
-      for (StepValue innerElement : innerList.elements()) {
-        StepValue unwrappedInner = unwrapTyped(innerElement);
-        if (!(unwrappedInner instanceof StepValue.ReferenceValue)) {
-          throw new StepResolutionException(
-              definition.name() + " control_points inner elements must be references");
-        }
-        StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrappedInner;
-        row.add(resolve(referenceValue.id()));
-      }
-      result.add(List.copyOf(row));
-    }
-    return List.copyOf(result);
+  List<List<StepEntity>> resolveFreeFormControlPoints(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return curveResolver.resolveFreeFormControlPoints(instance, definition, index);
   }
 
   StepCurvedToleranceZone resolveCurvedToleranceZone(StepEntityInstance instance) {
@@ -1209,47 +1170,16 @@ public final class StepEntityResolver {
     return bezierResolver.resolveCompositeCurve(instance);
   }
 
-  StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(
-      StepEntityInstance instance) {
-    return resolveCompositeCurveOnSurface(instance, "COMPOSITE_CURVE_ON_SURFACE");
+  StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(StepEntityInstance instance) {
+    return curveResolver.resolveCompositeCurveOnSurface(instance);
   }
 
-  StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepCompositeCurveOnSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepCompositeCurveSegment.class,
-            entityName + " segments must contain COMPOSITE_CURVE_SEGMENT references"),
-        booleanValue(instance, definition, 2));
+  StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(StepEntityInstance instance, String entityName) {
+    return curveResolver.resolveCompositeCurveOnSurface(instance, entityName);
   }
 
   StepTrimmedCurve resolveTrimmedCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TRIMMED_CURVE");
-    requireParameterCount(instance, definition, 6);
-    StepEntity basisCurve = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(basisCurve)) {
-      throw new UnsupportedStepEntityException(
-          "TRIMMED_CURVE basis curve must reference a supported curve");
-    }
-    // Trims can be entity references (e.g., #5) or parameter values (e.g., 0.0).
-    // Pass through raw StepValues so the builder can handle both.
-    List<StepValue> trim1 = trimValues(instance, definition, 2, "TRIMMED_CURVE trim_1");
-    List<StepValue> trim2 = trimValues(instance, definition, 3, "TRIMMED_CURVE trim_2");
-    return new StepTrimmedCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisCurve,
-        trim1,
-        trim2,
-        booleanValue(instance, definition, 4),
-        enumValue(instance, definition, 5));
+    return curveResolver.resolveTrimmedCurve(instance);
   }
 
   List<StepValue> trimValues(
@@ -1263,120 +1193,23 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceCurve resolveSurfaceCurve(StepEntityInstance instance) {
-    return resolveSurfaceCurve(instance, "SURFACE_CURVE");
+    return curveResolver.resolveSurfaceCurve(instance);
   }
 
   StepSurfaceCurve resolveSurfaceCurve(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    StepEntity curve3d = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(curve3d)) {
-      throw new UnsupportedStepEntityException(
-          entityName + " curve_3d must reference a supported curve");
-    }
-    List<StepEntity> associatedGeometry =
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " associated_geometry must contain entity references");
-    for (StepEntity associated : associatedGeometry) {
-      if (!(associated instanceof StepPcurve) && !(associated instanceof StepDegeneratePcurve)) {
-        throw new UnsupportedStepEntityException(
-            entityName + " associated_geometry currently supports PCURVE or DEGENERATE_PCURVE references");
-      }
-    }
-    return new StepSurfaceCurve(
-        instance.id(),
-        entityName,
-        stringValue(instance, definition, 0),
-        curve3d,
-        associatedGeometry,
-        enumValue(instance, definition, 3));
+    return curveResolver.resolveSurfaceCurve(instance, entityName);
   }
 
   StepSeamCurve resolveSeamCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SEAM_CURVE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity curve3d = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(curve3d)) {
-      throw new UnsupportedStepEntityException(
-          "SEAM_CURVE curve_3d must reference a supported curve");
-    }
-    List<StepEntity> associatedGeometry =
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            "SEAM_CURVE associated_geometry must contain entity references");
-    if (associatedGeometry.size() != 2) {
-      throw new UnsupportedStepEntityException(
-          "SEAM_CURVE associated_geometry must contain exactly two PCURVE references");
-    }
-    for (StepEntity associated : associatedGeometry) {
-      if (!(associated instanceof StepPcurve) && !(associated instanceof StepDegeneratePcurve)) {
-        throw new UnsupportedStepEntityException(
-            "SEAM_CURVE associated_geometry currently supports PCURVE or DEGENERATE_PCURVE references");
-      }
-    }
-    return new StepSeamCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        curve3d,
-        associatedGeometry,
-        enumValue(instance, definition, 3));
+    return curveResolver.resolveSeamCurve(instance);
   }
 
   StepPcurve resolvePcurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PCURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "PCURVE basis surface must reference a supported surface");
-    }
-    StepRepresentation representation =
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepRepresentation.class,
-            "PCURVE reference_to_curve must reference REPRESENTATION");
-    if (representation.items().size() != 1) {
-      throw new UnsupportedStepEntityException(
-          "PCURVE reference_to_curve must contain exactly one 2D curve item");
-    }
-    StepEntity item = representation.items().get(0);
-    if (!isSupportedCurveReference(item)) {
-      throw new UnsupportedStepEntityException(
-          "PCURVE reference_to_curve must contain a supported curve item");
-    }
-    return new StepPcurve(
-        instance.id(), stringValue(instance, definition, 0), basisSurface, representation);
+    return curveResolver.resolvePcurve(instance);
   }
 
   StepDegeneratePcurve resolveDegeneratePcurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DEGENERATE_PCURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "DEGENERATE_PCURVE basis surface must reference a supported surface");
-    }
-    StepRepresentation representation =
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepRepresentation.class,
-            "DEGENERATE_PCURVE reference_to_curve must reference REPRESENTATION");
-    if (representation.items().size() != 1) {
-      throw new UnsupportedStepEntityException(
-          "DEGENERATE_PCURVE reference_to_curve must contain exactly one 2D curve item");
-    }
-    StepEntity item = representation.items().get(0);
-    if (!isSupportedCurveReference(item)) {
-      throw new UnsupportedStepEntityException(
-          "DEGENERATE_PCURVE reference_to_curve must contain a supported curve item");
-    }
-    return new StepDegeneratePcurve(
-        instance.id(), stringValue(instance, definition, 0), basisSurface, representation);
+    return curveResolver.resolveDegeneratePcurve(instance);
   }
 
   StepBSplineCurveWithKnots resolveBSplineCurveWithKnots(StepEntityInstance instance) {
@@ -5199,23 +5032,7 @@ public final class StepEntityResolver {
   }
 
   StepIndexedPolyCurve resolveIndexedPolyCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "INDEXED_POLY_CURVE");
-    requireParameterCount(instance, definition, 4);
-    List<StepCartesianPoint> points =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepCartesianPoint.class,
-            "INDEXED_POLY_CURVE points must reference CARTESIAN_POINT");
-    List<Integer> indices =
-        integerList(instance, definition, 2);
-    return new StepIndexedPolyCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        points,
-        indices,
-        booleanValue(instance, definition, 3));
+    return curveResolver.resolveIndexedPolyCurve(instance);
   }
 
   StepSurfaceOfConstantRadius resolveSurfaceOfConstantRadius(StepEntityInstance instance) {
@@ -5223,17 +5040,7 @@ public final class StepEntityResolver {
   }
 
   StepDegenerateCurve resolveDegenerateCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DEGENERATE_CURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity basisCurve = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(basisCurve)) {
-      throw new UnsupportedStepEntityException(
-          "DEGENERATE_CURVE basis_curve must reference a supported curve");
-    }
-    return new StepDegenerateCurve(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisCurve);
+    return curveResolver.resolveDegenerateCurve(instance);
   }
 
   StepCircle2D resolveCircle2D(StepEntityInstance instance) {
@@ -5346,30 +5153,11 @@ public final class StepEntityResolver {
   }
 
   StepIndexedPolyCurve2D resolveIndexedPolyCurve2D(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "INDEXED_POLY_CURVE_2D");
-    requireParameterCount(instance, definition, 3);
-    return new StepIndexedPolyCurve2D(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepCartesianPoint.class,
-            "INDEXED_POLY_CURVE_2D points must reference CARTESIAN_POINT"),
-        integerList(instance, definition, 2));
+    return curveResolver.resolveIndexedPolyCurve2D(instance);
   }
 
   StepDegenerateCurve2D resolveDegenerateCurve2D(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DEGENERATE_CURVE_2D");
-    requireParameterCount(instance, definition, 2);
-    return new StepDegenerateCurve2D(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepCartesianPoint.class,
-            "DEGENERATE_CURVE_2D point must reference CARTESIAN_POINT"));
+    return curveResolver.resolveDegenerateCurve2D(instance);
   }
 
   StepBoundedCurve2D resolveBoundedCurve2D(StepEntityInstance instance) {
@@ -5385,30 +5173,7 @@ public final class StepEntityResolver {
   }
 
   StepCurve2D resolveCurve2D(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_2D");
-    requireParameterCount(instance, definition, 3);
-    // Equation parameter may be wrapped in nested list: ((a,b,c,d)) -> ListValue containing ListValue
-    StepValue eqParam = unwrapTyped(definition.parameters().get(2));
-    if (eqParam instanceof StepValue.ListValue) {
-      StepValue.ListValue outerList = (StepValue.ListValue) eqParam;
-      if (outerList.elements().size() == 1 && outerList.elements().get(0) instanceof StepValue.ListValue) {
-        StepValue.ListValue innerList = (StepValue.ListValue) outerList.elements().get(0);
-        eqParam = innerList;
-      }
-    }
-    List<Double> eqList = extractNumberList(definition, eqParam, "CURVE_2D");
-    double[] equation = new double[eqList.size()];
-    for (int i = 0; i < eqList.size(); i++) {
-      equation[i] = eqList.get(i);
-    }
-    return new StepCurve2D(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement2D.class,
-            "CURVE_2D position must reference AXIS2_PLACEMENT_2D"),
-        equation);
+    return curveResolver.resolveCurve2D(instance);
   }
 
   StepSweptAreaSolid resolveSweptAreaSolid(StepEntityInstance instance, String entityName) {
@@ -5443,26 +5208,7 @@ public final class StepEntityResolver {
   }
 
   StepCompositeCurveOnSurface3D resolveCompositeCurveOnSurface3D(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOSITE_CURVE_ON_SURFACE_3D");
-    requireParameterCount(instance, definition, 4);
-    List<StepCompositeCurveSegment> segments =
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepCompositeCurveSegment.class,
-            "COMPOSITE_CURVE_ON_SURFACE_3D segments must reference COMPOSITE_CURVE_SEGMENT");
-    StepEntity surface = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedSurfaceReference(surface)) {
-      throw new UnsupportedStepEntityException(
-          "COMPOSITE_CURVE_ON_SURFACE_3D surface must reference a supported surface");
-    }
-    return new StepCompositeCurveOnSurface3D(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        segments,
-        surface,
-        booleanValue(instance, definition, 3));
+    return curveResolver.resolveCompositeCurveOnSurface3D(instance);
   }
 
   StepLineSegment resolveLineSegment(StepEntityInstance instance) {
