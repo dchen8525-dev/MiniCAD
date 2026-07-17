@@ -31,12 +31,12 @@ public class test_real_step {
         int success = 0;
         int total = 0;
 
-        for (String sample : examples) {
+        for (String sample : samples) {
             total++;
             try {
-                Path path = Path.of(example);
+                Path path = Path.of(sample);
                 if (!Files.exists(path)) {
-                    System.out.println("⚠️  File not found: " + example);
+                    System.out.println("⚠️  File not found: " + sample);
                     continue;
                 }
 
@@ -44,7 +44,7 @@ public class test_real_step {
                 StepFile file = StepParser.parse(content);
                 success++;
 
-                System.out.println("✅ " + example);
+                System.out.println("✅ " + sample);
                 System.out.println("   Entities: " + file.entities().size());
                 System.out.println("   Headers: " + file.headerEntries().size());
 
@@ -57,10 +57,10 @@ public class test_real_step {
                             .collect(Collectors.joining(", ")));
                 }
             } catch (StepParseException e) {
-                System.out.println("❌ " + example);
+                System.out.println("❌ " + sample);
                 System.out.println("   Error: " + e.getMessage());
             } catch (Exception e) {
-                System.out.println("❌ " + example);
+                System.out.println("❌ " + sample);
                 System.out.println("   Error: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             }
             System.out.println();
