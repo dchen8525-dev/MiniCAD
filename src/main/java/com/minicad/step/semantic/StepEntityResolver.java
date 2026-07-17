@@ -788,6 +788,7 @@ public final class StepEntityResolver {
   private final GeometryResolver geometryResolver;
   private final SurfaceResolver surfaceResolver;
   private final GeometricFeatureResolver geometricFeatureResolver;
+  private final AnalysisResolver analysisResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -798,6 +799,7 @@ public final class StepEntityResolver {
     this.geometryResolver = new GeometryResolver(this);
     this.surfaceResolver = new SurfaceResolver(this);
     this.geometricFeatureResolver = new GeometricFeatureResolver(this);
+    this.analysisResolver = new AnalysisResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -1185,108 +1187,31 @@ public final class StepEntityResolver {
   }
 
   StepAnalysisResult resolveAnalysisResult(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANALYSIS_RESULT");
-    requireParameterCount(instance, definition, 9);
-    List<Double> resultValues = numberList(instance, definition, 5);
-    List<StepEntity> resultLocations = entityReferenceList(
-        instance, definition, 6, "ANALYSIS_RESULT result_locations must contain entity references");
-    return new StepAnalysisResult(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resultValues,
-        resultLocations,
-        numberValue(instance, definition, 7),
-        numberValue(instance, definition, 8));
+    return analysisResolver.resolveAnalysisResult(instance);
   }
 
   StepAnalysisInstance resolveAnalysisInstance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANALYSIS_INSTANCE");
-    requireParameterCount(instance, definition, 7);
-    List<String> analysisResults = literalList(instance, definition, 4);
-    return new StepAnalysisInstance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        analysisResults,
-        stringValue(instance, definition, 5),
-        stringValue(instance, definition, 6));
+    return analysisResolver.resolveAnalysisInstance(instance);
   }
 
   StepConfigurationInstance resolveConfigurationInstance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONFIGURATION_INSTANCE");
-    requireParameterCount(instance, definition, 7);
-    List<String> configurationValues = literalList(instance, definition, 4);
-    return new StepConfigurationInstance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        configurationValues,
-        booleanValue(instance, definition, 5),
-        stringValue(instance, definition, 6));
+    return analysisResolver.resolveConfigurationInstance(instance);
   }
 
   StepModelDefinition resolveModelDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MODEL_DEFINITION");
-    requireParameterCount(instance, definition, 7);
-    List<String> modelParameters = literalList(instance, definition, 4);
-    List<String> modelConstraints = literalList(instance, definition, 5);
-    return new StepModelDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        modelParameters,
-        modelConstraints,
-        stringValue(instance, definition, 6));
+    return analysisResolver.resolveModelDefinition(instance);
   }
 
   StepModelInstance resolveModelInstance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MODEL_INSTANCE");
-    requireParameterCount(instance, definition, 7);
-    List<String> modelProperties = literalList(instance, definition, 5);
-    return new StepModelInstance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        stringValue(instance, definition, 3),
-        modelProperties,
-        stringValue(instance, definition, 6));
+    return analysisResolver.resolveModelInstance(instance);
   }
 
   StepSimulationDefinition resolveSimulationDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SIMULATION_DEFINITION");
-    requireParameterCount(instance, definition, 7);
-    List<String> simulationParameters = literalList(instance, definition, 4);
-    return new StepSimulationDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        simulationParameters,
-        numberValue(instance, definition, 5),
-        stringValue(instance, definition, 6));
+    return analysisResolver.resolveSimulationDefinition(instance);
   }
 
   StepSimulationInstance resolveSimulationInstance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SIMULATION_INSTANCE");
-    requireParameterCount(instance, definition, 8);
-    List<StepEntity> simulationResults = entityReferenceList(
-        instance, definition, 6, "SIMULATION_INSTANCE simulation_results must contain entity references");
-    return new StepSimulationInstance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        simulationResults,
-        stringValue(instance, definition, 7));
+    return analysisResolver.resolveSimulationInstance(instance);
   }
 
   StepOrientedSurface resolveOrientedSurface(StepEntityInstance instance) {
@@ -1762,14 +1687,7 @@ public final class StepEntityResolver {
   }
 
   StepConfigurationItem resolveConfigurationItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONFIGURATION_ITEM");
-    requireParameterCount(instance, definition, 4);
-    return new StepConfigurationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        enumValue(instance, definition, 3));
+    return analysisResolver.resolveConfigurationItem(instance);
   }
 
   StepDirectedDimensionalSize resolveDirectedDimensionalSize(StepEntityInstance instance) {
@@ -1851,13 +1769,7 @@ public final class StepEntityResolver {
   }
 
   StepConfigurationEffectivity resolveConfigurationEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONFIGURATION_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepConfigurationEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return analysisResolver.resolveConfigurationEffectivity(instance);
   }
 
   StepFeatureControlFrame resolveFeatureControlFrame(StepEntityInstance instance) {
@@ -3304,15 +3216,7 @@ public final class StepEntityResolver {
   }
 
   StepFeaModel resolveFeaModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_MODEL");
-    requireParameterCount(instance, definition, 5);
-    return new StepFeaModel(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2, "FEA_MODEL elements must contain entity references"),
-        entityReferenceList(instance, definition, 3, "FEA_MODEL loads must contain entity references"),
-        entityReferenceList(instance, definition, 4, "FEA_MODEL boundary conditions must contain entity references"));
+    return analysisResolver.resolveFeaModel(instance);
   }
 
   StepMaterial resolveMaterial(StepEntityInstance instance) {
@@ -3445,51 +3349,23 @@ public final class StepEntityResolver {
   }
 
   StepStressAnalysis resolveStressAnalysis(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRESS_ANALYSIS");
-    requireParameterCount(instance, definition, 2);
-    return new StepStressAnalysis(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return analysisResolver.resolveStressAnalysis(instance);
   }
 
   StepBucklingAnalysis resolveBucklingAnalysis(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BUCKLING_ANALYSIS");
-    requireParameterCount(instance, definition, 2);
-    return new StepBucklingAnalysis(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        (int) numberValue(instance, definition, 1));
+    return analysisResolver.resolveBucklingAnalysis(instance);
   }
 
   StepModalAnalysis resolveModalAnalysis(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MODAL_ANALYSIS");
-    requireParameterCount(instance, definition, 2);
-    return new StepModalAnalysis(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        (int) numberValue(instance, definition, 1));
+    return analysisResolver.resolveModalAnalysis(instance);
   }
 
   StepThermalAnalysis resolveThermalAnalysis(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "THERMAL_ANALYSIS");
-    requireParameterCount(instance, definition, 2);
-    return new StepThermalAnalysis(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return analysisResolver.resolveThermalAnalysis(instance);
   }
 
   StepStructuralAnalysisModel resolveStructuralAnalysisModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_MODEL");
-    requireParameterCount(instance, definition, 5);
-    return new StepStructuralAnalysisModel(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2, "STRUCTURAL_ANALYSIS_MODEL elements must contain entity references"),
-        entityReferenceList(instance, definition, 3, "STRUCTURAL_ANALYSIS_MODEL loads must contain entity references"),
-        entityReferenceList(instance, definition, 4, "STRUCTURAL_ANALYSIS_MODEL boundary conditions must contain entity references"));
+    return analysisResolver.resolveStructuralAnalysisModel(instance);
   }
 
   StepRevoluteJoint resolveRevoluteJoint(StepEntityInstance instance) {
@@ -3604,12 +3480,7 @@ public final class StepEntityResolver {
   }
 
   StepKinematicModel resolveKinematicModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_MODEL");
-    requireParameterCount(instance, definition, 3);
-    return new StepKinematicModel(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return analysisResolver.resolveKinematicModel(instance);
   }
 
   StepKinematicProperty resolveKinematicProperty(StepEntityInstance instance) {
@@ -3730,22 +3601,11 @@ public final class StepEntityResolver {
   }
 
   StepStructuralAnalysisRepresentation resolveStructuralAnalysisRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_REPRESENTATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepStructuralAnalysisRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2, "STRUCTURAL_ANALYSIS_REPRESENTATION items must contain entity references"));
+    return analysisResolver.resolveStructuralAnalysisRepresentation(instance);
   }
 
   StepStructuralAnalysisRepresentationParameters resolveStructuralAnalysisRepresentationParameters(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS");
-    requireParameterCount(instance, definition, 2);
-    return new StepStructuralAnalysisRepresentationParameters(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return analysisResolver.resolveStructuralAnalysisRepresentationParameters(instance);
   }
 
   StepValueReasonPair resolveValueReasonPair(StepEntityInstance instance) {
@@ -3808,12 +3668,7 @@ public final class StepEntityResolver {
   }
 
   StepStructAnalysisModel resolveStructAnalysisModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRUCT_ANALYSIS_MODEL");
-    requireParameterCount(instance, definition, 3);
-    return new StepStructAnalysisModel(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return analysisResolver.resolveStructAnalysisModel(instance);
   }
 
   StepElementVolume resolveElementVolume(StepEntityInstance instance) {
