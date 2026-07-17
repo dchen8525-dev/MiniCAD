@@ -768,4 +768,30 @@ final class AnnotationResolver {
         resolver.resolve(resolver.referenceId(instance, definition, 2)));
   }
 
+  // === Datum Reference Entities ===
+
+  StepDatumReferenceModifierWithValue resolveDatumReferenceModifierWithValue(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DATUM_REFERENCE_MODIFIER_WITH_VALUE");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepDatumReferenceModifierWithValue(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.numberValue(instance, definition, 2),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)),
+        resolver.resolve(resolver.referenceId(instance, definition, 4)));
+  }
+
+  StepGeometricToleranceWithDatumReference resolveGeometricToleranceWithDatumReference(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepGeometricToleranceWithDatumReference(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.numberValue(instance, definition, 2),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)),
+        resolver.resolve(resolver.referenceId(instance, definition, 4)),
+        resolver.resolve(resolver.referenceId(instance, definition, 5)));
+  }
 }

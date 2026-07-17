@@ -1728,18 +1728,8 @@ public final class StepEntityResolver {
     return annotationResolver.resolveRunoutToleranceZone(instance);
   }
 
-  StepGeometricToleranceWithDatumReference resolveGeometricToleranceWithDatumReference(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE");
-    requireParameterCount(instance, definition, 6);
-    return new StepGeometricToleranceWithDatumReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)));
+  StepGeometricToleranceWithDatumReference resolveGeometricToleranceWithDatumReference(StepEntityInstance instance) {
+    return annotationResolver.resolveGeometricToleranceWithDatumReference(instance);
   }
 
   StepLinearToleranceZone resolveLinearToleranceZone(StepEntityInstance instance) {
@@ -1815,17 +1805,8 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
-  StepDatumReferenceModifierWithValue resolveDatumReferenceModifierWithValue(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_MODIFIER_WITH_VALUE");
-    requireParameterCount(instance, definition, 6);
-    return new StepDatumReferenceModifierWithValue(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+  StepDatumReferenceModifierWithValue resolveDatumReferenceModifierWithValue(StepEntityInstance instance) {
+    return annotationResolver.resolveDatumReferenceModifierWithValue(instance);
   }
 
   StepRunoutZoneDefinitionOrientation resolveRunoutZoneDefinitionOrientation(
