@@ -448,4 +448,69 @@ final class KinematicResolver {
         resolver.resolve(resolver.referenceId(instance, definition, 5)),
         resolver.resolve(resolver.referenceId(instance, definition, 6)));
   }
+  // === Kinematic Property Representation Entities ===
+
+  StepKinematicPropertyDefinitionRepresentation resolveKinematicPropertyDefinitionRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyDefinitionRepresentation(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  StepKinematicPropertyMechanismRepresentation resolveKinematicPropertyMechanismRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyMechanismRepresentation(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
+
+  StepKinematicPropertyRepresentationRelation resolveKinematicPropertyRepresentationRelation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "KINEMATIC_PROPERTY_REPRESENTATION_RELATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyRepresentationRelation(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION definition must reference PROPERTY_DEFINITION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION used_representation must reference REPRESENTATION"));
+  }
+
+  StepKinematicPropertyTopologyRepresentation resolveKinematicPropertyTopologyRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepKinematicPropertyTopologyRepresentation(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  }
 }

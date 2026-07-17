@@ -4651,67 +4651,19 @@ public final class StepEntityResolver {
   }
 
   StepKinematicPropertyDefinitionRepresentation resolveKinematicPropertyDefinitionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepKinematicPropertyDefinitionRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
+    return kinematicResolver.resolveKinematicPropertyDefinitionRepresentation(instance);
   }
 
   StepKinematicPropertyMechanismRepresentation resolveKinematicPropertyMechanismRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepKinematicPropertyMechanismRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION used_representation must reference REPRESENTATION"));
+    return kinematicResolver.resolveKinematicPropertyMechanismRepresentation(instance);
   }
 
   StepKinematicPropertyRepresentationRelation resolveKinematicPropertyRepresentationRelation(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "KINEMATIC_PROPERTY_REPRESENTATION_RELATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepKinematicPropertyRepresentationRelation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "KINEMATIC_PROPERTY_REPRESENTATION_RELATION used_representation must reference REPRESENTATION"));
+    return kinematicResolver.resolveKinematicPropertyRepresentationRelation(instance);
   }
 
   StepKinematicPropertyTopologyRepresentation resolveKinematicPropertyTopologyRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepKinematicPropertyTopologyRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION used_representation must reference REPRESENTATION"));
+    return kinematicResolver.resolveKinematicPropertyTopologyRepresentation(instance);
   }
 
   StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(
