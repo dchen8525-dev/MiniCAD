@@ -801,6 +801,7 @@ public final class StepEntityResolver {
   private final SolidResolver solidResolver;
   private final ProfileResolver profileResolver;
   private final MachiningResolver machiningResolver;
+  private final TransformationResolver transformationResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -822,6 +823,7 @@ public final class StepEntityResolver {
     this.solidResolver = new SolidResolver(this);
     this.profileResolver = new ProfileResolver(this);
     this.machiningResolver = new MachiningResolver(this);
+    this.transformationResolver = new TransformationResolver(this);
   }
 
   /**
@@ -2168,34 +2170,12 @@ public final class StepEntityResolver {
     return unitResolver.resolveTypedMeasureWithUnit(instance, entityName);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator(
-      StepEntityInstance instance) {
-    // Base type: check for concrete 2D/3D subtype at the same ID
-    StepEntityDefinition concrete = instance.definitions().stream()
-        .filter(d -> !d.name().equals("CARTESIAN_TRANSFORMATION_OPERATOR"))
-        .filter(d -> d.name().startsWith("CARTESIAN_TRANSFORMATION_OPERATOR"))
-        .findFirst()
-        .orElse(null);
-    if (concrete != null) {
-      return resolveCartesianTransformationOperator(instance, concrete.name());
-    }
-    throw new UnsupportedStepEntityException("CARTESIAN_TRANSFORMATION_OPERATOR is an abstract base type with no concrete subtype");
+  StepCartesianTransformationOperator resolveCartesianTransformationOperator(StepEntityInstance instance) {
+    return transformationResolver.resolveCartesianTransformationOperator(instance);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    // 2D has 4-5 params, 3D has 6-7 params
-    int paramCount = definition.parameters().size();
-    return new StepCartesianTransformationOperator(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        paramCount >= 4 ? optionalResolveDirection(referenceId(instance, definition, 1)) : null,
-        paramCount >= 5 ? optionalResolveDirection(referenceId(instance, definition, 2)) : null,
-        optionalResolveCartesianPoint(referenceId(instance, definition, paramCount >= 7 ? 3 : paramCount == 6 ? 2 : 2)),
-        paramCount >= 6 ? optionalNumberValue(instance, definition, paramCount >= 7 ? 4 : 3) : null,
-        paramCount >= 7 ? optionalResolveDirection(referenceId(instance, definition, 5)) : null,
-        entityName);
+  StepCartesianTransformationOperator resolveCartesianTransformationOperator(StepEntityInstance instance, String entityName) {
+    return transformationResolver.resolveCartesianTransformationOperator(instance, entityName);
   }
 
   StepDirection optionalResolveDirection(int id) {
@@ -4901,60 +4881,12 @@ public final class StepEntityResolver {
     return productResolver.resolveMappedItem(instance);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator2D(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CARTESIAN_TRANSFORMATION_OPERATOR_2D");
-    requireParameterCount(instance, definition, 5);
-    return new StepCartesianTransformationOperator(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalDirectionReference(
-            instance,
-            definition,
-            1,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_2D axis1 must reference DIRECTION"),
-        optionalDirectionReference(
-            instance,
-            definition,
-            2,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_2D axis2 must reference DIRECTION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepCartesianPoint.class,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_2D local_origin must reference CARTESIAN_POINT"),
-        optionalNumberValue(instance, definition, 4),
-        null,
-        "CARTESIAN_TRANSFORMATION_OPERATOR_2D");
+  StepCartesianTransformationOperator resolveCartesianTransformationOperator2D(StepEntityInstance instance) {
+    return transformationResolver.resolveCartesianTransformationOperator2D(instance);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator3D(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CARTESIAN_TRANSFORMATION_OPERATOR_3D");
-    requireParameterCount(instance, definition, 6);
-    return new StepCartesianTransformationOperator(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalDirectionReference(
-            instance,
-            definition,
-            1,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis1 must reference DIRECTION"),
-        optionalDirectionReference(
-            instance,
-            definition,
-            2,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis2 must reference DIRECTION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepCartesianPoint.class,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_3D local_origin must reference CARTESIAN_POINT"),
-        optionalNumberValue(instance, definition, 4),
-        optionalDirectionReference(
-            instance,
-            definition,
-            5,
-            "CARTESIAN_TRANSFORMATION_OPERATOR_3D axis3 must reference DIRECTION"),
-        "CARTESIAN_TRANSFORMATION_OPERATOR_3D");
+  StepCartesianTransformationOperator resolveCartesianTransformationOperator3D(StepEntityInstance instance) {
+    return transformationResolver.resolveCartesianTransformationOperator3D(instance);
   }
 
   StepUserDefinedMarker resolveUserDefinedMarker(StepEntityInstance instance) {
@@ -4985,47 +4917,13 @@ public final class StepEntityResolver {
         mappingTarget);
   }
 
-  StepItemDefinedTransformation resolveItemDefinedTransformation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ITEM_DEFINED_TRANSFORMATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepItemDefinedTransformation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement3D.class,
-            "ITEM_DEFINED_TRANSFORMATION transform_item_1 must reference AXIS2_PLACEMENT_3D"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepAxis2Placement3D.class,
-            "ITEM_DEFINED_TRANSFORMATION transform_item_2 must reference AXIS2_PLACEMENT_3D"));
+  StepItemDefinedTransformation resolveItemDefinedTransformation(StepEntityInstance instance) {
+    return transformationResolver.resolveItemDefinedTransformation(instance);
   }
 
   StepRepresentationRelationshipWithTransformation
       resolveRepresentationRelationshipWithTransformation(StepEntityInstance instance) {
-    StepEntityDefinition relationship = definition(instance, "REPRESENTATION_RELATIONSHIP");
-    StepEntityDefinition transformation =
-        definition(instance, "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION");
-    requireParameterCount(instance, relationship, 4);
-    requireParameterCount(instance, transformation, 1);
-    return new StepRepresentationRelationshipWithTransformation(
-        instance.id(),
-        stringValue(instance, relationship, 0),
-        stringValue(instance, relationship, 1),
-        requireEntity(
-            referenceId(instance, relationship, 2),
-            StepRepresentation.class,
-            "REPRESENTATION_RELATIONSHIP rep_1 must reference REPRESENTATION"),
-        requireEntity(
-            referenceId(instance, relationship, 3),
-            StepRepresentation.class,
-            "REPRESENTATION_RELATIONSHIP rep_2 must reference REPRESENTATION"),
-        requireEntity(
-            referenceId(instance, transformation, 0),
-            StepItemDefinedTransformation.class,
-            "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION transformation_operator must reference ITEM_DEFINED_TRANSFORMATION"));
+    return transformationResolver.resolveRepresentationRelationshipWithTransformation(instance);
   }
 
   StepRepresentationRelationship resolveRepresentationRelationship(StepEntityInstance instance) {
