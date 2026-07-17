@@ -799,6 +799,7 @@ public final class StepEntityResolver {
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
   private final SolidResolver solidResolver;
+  private final ProfileResolver profileResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -818,6 +819,7 @@ public final class StepEntityResolver {
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
     this.solidResolver = new SolidResolver(this);
+    this.profileResolver = new ProfileResolver(this);
   }
 
   /**
@@ -3316,12 +3318,7 @@ public final class StepEntityResolver {
   }
 
   StepSweptProfileAreaOutline resolveSweptProfileAreaOutline(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SWEPT_PROFILE_AREA_OUTLINE");
-    requireParameterCount(instance, definition, 3);
-    return new StepSweptProfileAreaOutline(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return profileResolver.resolveSweptProfileAreaOutline(instance);
   }
 
   // Kinematic reference resolvers
@@ -5345,175 +5342,38 @@ public final class StepEntityResolver {
   }
 
   StepProfileDef resolveCircleProfileDef(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CIRCLE_PROFILE_DEF");
-    requireParameterCount(instance, definition, 4);
-    return new StepProfileDef(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement2D.class,
-            "CIRCLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        List.of(),
-        List.of(numberValue(instance, definition, 3)),
-        "CIRCLE_PROFILE_DEF");
+    return profileResolver.resolveCircleProfileDef(instance);
   }
 
   StepProfileDef resolveRectangleProfileDef(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RECTANGLE_PROFILE_DEF");
-    requireParameterCount(instance, definition, 5);
-    return new StepProfileDef(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement2D.class,
-            "RECTANGLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        List.of(),
-        List.of(numberValue(instance, definition, 3), numberValue(instance, definition, 4)),
-        "RECTANGLE_PROFILE_DEF");
+    return profileResolver.resolveRectangleProfileDef(instance);
   }
 
-  StepProfileDef resolveParameterizedProfileDef(
-      StepEntityInstance instance, String entityName, int parameterCount) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, parameterCount + 3);
-    List<Double> parameters = new ArrayList<>(parameterCount);
-    for (int index = 0; index < parameterCount; index++) {
-      parameters.add(numberValue(instance, definition, index + 3));
-    }
-    return new StepProfileDef(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis2Placement2D.class,
-            entityName + " position must reference AXIS2_PLACEMENT_2D"),
-        List.of(),
-        parameters,
-        entityName);
+  StepProfileDef resolveParameterizedProfileDef(StepEntityInstance instance, String entityName, int parameterCount) {
+    return profileResolver.resolveParameterizedProfileDef(instance, entityName, parameterCount);
   }
 
   StepProfileDef resolveArbitraryClosedProfileDef(StepEntityInstance instance) {
-    return resolveArbitraryProfileDef(instance, "ARBITRARY_CLOSED_PROFILE_DEF");
+    return profileResolver.resolveArbitraryClosedProfileDef(instance);
   }
 
   StepProfileDef resolveArbitraryProfileDefWithVoids(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ARBITRARY_PROFILE_DEF_WITH_VOIDS");
-    requireParameterCount(instance, definition, 4);
-    StepEntity outerCurve = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedArbitraryProfileCurve(outerCurve)) {
-      throw new StepResolutionException(
-          "ARBITRARY_PROFILE_DEF_WITH_VOIDS outer_curve must reference a curve entity");
-    }
-    List<StepEntity> innerCurves =
-        entityReferenceList(
-            instance,
-            definition,
-            3,
-            "ARBITRARY_PROFILE_DEF_WITH_VOIDS inner_curves must contain curve references");
-    for (StepEntity innerCurve : innerCurves) {
-      if (!isSupportedArbitraryProfileCurve(innerCurve)) {
-        throw new StepResolutionException(
-            "ARBITRARY_PROFILE_DEF_WITH_VOIDS inner_curves must reference curve entities");
-      }
-    }
-    List<StepEntity> curves = new ArrayList<>(1 + innerCurves.size());
-    curves.add(outerCurve);
-    curves.addAll(innerCurves);
-    return new StepProfileDef(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        null,
-        curves,
-        List.of(),
-        "ARBITRARY_PROFILE_DEF_WITH_VOIDS");
+    return profileResolver.resolveArbitraryProfileDefWithVoids(instance);
   }
 
-  StepProfileDef resolveArbitraryProfileDef(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    StepEntity curve = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedArbitraryProfileCurve(curve)) {
-      throw new StepResolutionException(
-          entityName + " outer_curve must reference a curve entity");
-    }
-    return new StepProfileDef(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        null,
-        List.of(curve),
-        List.of(),
-        entityName);
+  StepProfileDef resolveArbitraryProfileDef(StepEntityInstance instance, String entityName) {
+    return profileResolver.resolveArbitraryProfileDef(instance, entityName);
   }
 
   StepProfileDef resolveProfileDef(StepEntityInstance instance) {
-    // PROFILE_DEF is an abstract base type. Check for concrete subtypes at the same ID.
-    StepEntityDefinition concrete = instance.definitions().stream()
-        .filter(d -> !d.name().equals("PROFILE_DEF"))
-        .filter(d -> d.name().endsWith("_PROFILE_DEF"))
-        .findFirst()
-        .orElse(null);
-    if (concrete != null) {
-      return resolveProfileDefSubtype(instance, concrete);
-    }
-    throw new UnsupportedStepEntityException("PROFILE_DEF is an abstract base type with no concrete subtype");
+    return profileResolver.resolveProfileDef(instance);
   }
 
   StepProfileDef resolveProfileDefSubtype(StepEntityInstance instance, StepEntityDefinition concrete) {
-    String name = concrete.name();
-    if ("CIRCLE_PROFILE_DEF".equals(name)) {
-      return resolveCircleProfileDef(instance);
-    }
-    if ("RECTANGLE_PROFILE_DEF".equals(name)) {
-      return resolveRectangleProfileDef(instance);
-    }
-    if ("ARBITRARY_CLOSED_PROFILE_DEF".equals(name)) {
-      return resolveArbitraryClosedProfileDef(instance);
-    }
-    if ("ARBITRARY_PROFILE_DEF".equals(name)) {
-      return resolveArbitraryProfileDef(instance, name);
-    }
-    if ("ARBITRARY_PROFILE_DEF_WITH_VOIDS".equals(name)) {
-      return resolveArbitraryProfileDefWithVoids(instance);
-    }
-    if ("PARAMETERIZED_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, name, 3);
-    }
-    if ("CENTERED_CIRCLE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "CENTERED_CIRCLE_PROFILE_DEF", 2);
-    }
-    if ("CENTRE_LINE_ARC_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "CENTRE_LINE_ARC_PROFILE_DEF", 2);
-    }
-    if ("ELLIPSE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "ELLIPSE_PROFILE_DEF", 2);
-    }
-    if ("L_SHAPE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "L_SHAPE_PROFILE_DEF", 4);
-    }
-    if ("U_SHAPE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "U_SHAPE_PROFILE_DEF", 5);
-    }
-    if ("Z_SHAPE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "Z_SHAPE_PROFILE_DEF", 5);
-    }
-    if ("CHANNEL_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "CHANNEL_PROFILE_DEF", 5);
-    }
-    if ("T_SHAPE_PROFILE_DEF".equals(name)) {
-      return resolveParameterizedProfileDef(instance, "T_SHAPE_PROFILE_DEF", 5);
-    }
-    throw new UnsupportedStepEntityException("PROFILE_DEF subtype " + name + " is not a StepProfileDef");
+    return profileResolver.resolveProfileDefSubtype(instance, concrete);
   }
 
-  private boolean isSupportedArbitraryProfileCurve(StepEntity curve) {
+  boolean isSupportedArbitraryProfileCurve(StepEntity curve) {
     return curve instanceof StepCurve
         || curve instanceof StepPolyline
         || curve instanceof StepCompositeCurve;
@@ -6640,34 +6500,11 @@ public final class StepEntityResolver {
   }
 
   StepRectangleHollowProfileDef resolveRectangleHollowProfileDef(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RECTANGLE_HOLLOW_PROFILE_DEF");
-    requireParameterCountIn(instance, definition, 6, 7);
-    boolean hasName = definition.parameters().size() == 7;
-    return new StepRectangleHollowProfileDef(
-        instance.id(),
-        hasName ? stringValue(instance, definition, 1) : "",
-        requireEntity(
-            referenceId(instance, definition, hasName ? 2 : 1),
-            StepAxis2Placement2D.class,
-            "RECTANGLE_HOLLOW_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        numberValue(instance, definition, hasName ? 3 : 2),
-        numberValue(instance, definition, hasName ? 4 : 3),
-        numberValue(instance, definition, hasName ? 5 : 4),
-        numberValue(instance, definition, hasName ? 6 : 5));
+    return profileResolver.resolveRectangleHollowProfileDef(instance);
   }
 
   StepCentreLineArcProfileDef resolveCentreLineArcProfileDef(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CENTRE_LINE_ARC_PROFILE_DEF");
-    requireParameterCount(instance, definition, 4);
-    return new StepCentreLineArcProfileDef(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement2D.class,
-            "CENTRE_LINE_ARC_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return profileResolver.resolveCentreLineArcProfileDef(instance);
   }
 
   StepSweptDiskSolid resolveSweptDiskSolid(StepEntityInstance instance) {
@@ -6689,18 +6526,7 @@ public final class StepEntityResolver {
   }
 
   StepCenteredCircleProfileDef resolveCenteredCircleProfileDef(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CENTERED_CIRCLE_PROFILE_DEF");
-    requireParameterCountIn(instance, definition, 4, 5);
-    boolean hasName = definition.parameters().size() == 5;
-    return new StepCenteredCircleProfileDef(
-        instance.id(),
-        hasName ? stringValue(instance, definition, 1) : "",
-        requireEntity(
-            referenceId(instance, definition, hasName ? 2 : 1),
-            StepAxis2Placement2D.class,
-            "CENTERED_CIRCLE_PROFILE_DEF position must reference AXIS2_PLACEMENT_2D"),
-        numberValue(instance, definition, hasName ? 3 : 2),
-        numberValue(instance, definition, hasName ? 4 : 3));
+    return profileResolver.resolveCenteredCircleProfileDef(instance);
   }
 
   StepRevolvedAreaSolidTapered resolveRevolvedAreaSolidTapered(StepEntityInstance instance) {
