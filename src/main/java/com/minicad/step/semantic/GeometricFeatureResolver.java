@@ -162,4 +162,58 @@ final class GeometricFeatureResolver {
         resolver.stringValue(instance, definition, 5),
         resolver.resolve(resolver.referenceId(instance, definition, 6)));
   }
+  // === Feature Definition Entities ===
+
+  StepFeatureElementDefinition resolveFeatureElementDefinition(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEATURE_ELEMENT_DEFINITION");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepFeatureElementDefinition(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1));
+  }
+
+  StepMarkingFeature resolveMarkingFeature(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "MARKING_FEATURE");
+    StepEntityResolver.requireParameterCount(instance, definition, 7);
+    return new StepMarkingFeature(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.stringValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4),
+        resolver.resolve(resolver.referenceId(instance, definition, 5)));
+  }
+
+  StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "PLACED_DATUM_TARGET_FEATURE");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepPlacedDatumTargetFeature(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPropertyDefinition.class,
+            "PLACED_DATUM_TARGET_FEATURE definition must reference PROPERTY_DEFINITION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepRepresentation.class,
+            "PLACED_DATUM_TARGET_FEATURE used_representation must reference REPRESENTATION"));
+  }
+
+  StepStructuralFeature resolveStructuralFeature(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "STRUCTURAL_FEATURE");
+    StepEntityResolver.requireParameterCount(instance, definition, 8);
+    return new StepStructuralFeature(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.numberValue(instance, definition, 3),
+        resolver.resolve(resolver.referenceId(instance, definition, 4)),
+        resolver.entityReferenceList(instance, definition, 5,
+            "STRUCTURAL_FEATURE end conditions must contain entity references"),
+        resolver.entityReferenceList(instance, definition, 6,
+            "STRUCTURAL_FEATURE load points must contain entity references"));
+  }
 }

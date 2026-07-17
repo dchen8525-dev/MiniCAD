@@ -3334,19 +3334,7 @@ public final class StepEntityResolver {
   }
 
   StepStructuralFeature resolveStructuralFeature(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STRUCTURAL_FEATURE");
-    requireParameterCount(instance, definition, 8);
-    return new StepStructuralFeature(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        numberValue(instance, definition, 3),
-        resolve(referenceId(instance, definition, 4)),
-        entityReferenceList(instance, definition, 5,
-            "STRUCTURAL_FEATURE end conditions must contain entity references"),
-        entityReferenceList(instance, definition, 6,
-            "STRUCTURAL_FEATURE load points must contain entity references"));
+    return geometricFeatureResolver.resolveStructuralFeature(instance);
   }
 
   StepFillAreaWithOutline resolveFillAreaWithOutline(StepEntityInstance instance) {
@@ -3381,16 +3369,7 @@ public final class StepEntityResolver {
   }
 
   StepMarkingFeature resolveMarkingFeature(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MARKING_FEATURE");
-    requireParameterCount(instance, definition, 7);
-    return new StepMarkingFeature(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        stringValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)));
+    return geometricFeatureResolver.resolveMarkingFeature(instance);
   }
 
   StepTechnicalNote resolveTechnicalNote(StepEntityInstance instance) {
@@ -3587,12 +3566,7 @@ public final class StepEntityResolver {
 
   // Manufacturing resolvers
   StepFeatureElementDefinition resolveFeatureElementDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEATURE_ELEMENT_DEFINITION");
-    requireParameterCount(instance, definition, 3);
-    return new StepFeatureElementDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return geometricFeatureResolver.resolveFeatureElementDefinition(instance);
   }
 
   StepWebs resolveWebs(StepEntityInstance instance) {
@@ -4494,20 +4468,8 @@ public final class StepEntityResolver {
     return kinematicResolver.resolveKinematicPropertyTopologyRepresentation(instance);
   }
 
-  StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLACED_DATUM_TARGET_FEATURE");
-    requireParameterCount(instance, definition, 2);
-    return new StepPlacedDatumTargetFeature(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "PLACED_DATUM_TARGET_FEATURE definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "PLACED_DATUM_TARGET_FEATURE used_representation must reference REPRESENTATION"));
+  StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(StepEntityInstance instance) {
+    return geometricFeatureResolver.resolvePlacedDatumTargetFeature(instance);
   }
 
   StepResourcePropertyRepresentation resolveResourcePropertyRepresentation(StepEntityInstance instance) {
