@@ -791,6 +791,7 @@ public final class StepEntityResolver {
   private final AnalysisResolver analysisResolver;
   private final AnnotationResolver annotationResolver;
   private final MaterialResolver materialResolver;
+  private final UnitResolver unitResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -804,6 +805,7 @@ public final class StepEntityResolver {
     this.analysisResolver = new AnalysisResolver(this);
     this.annotationResolver = new AnnotationResolver(this);
     this.materialResolver = new MaterialResolver(this);
+    this.unitResolver = new UnitResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -1061,33 +1063,11 @@ public final class StepEntityResolver {
   }
 
   StepMeasurementPoint resolveMeasurementPoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MEASUREMENT_POINT");
-    requireParameterCount(instance, definition, 8);
-    return new StepMeasurementPoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        numberValue(instance, definition, 5),
-        (int) numberValue(instance, definition, 6));
+    return unitResolver.resolveMeasurementPoint(instance);
   }
 
   StepSurfaceMeasurement resolveSurfaceMeasurement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_MEASUREMENT");
-    requireParameterCount(instance, definition, 8);
-    List<String> roughnessParameters = literalList(instance, definition, 3);
-    List<Double> measuredValues = numberList(instance, definition, 4);
-    return new StepSurfaceMeasurement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        roughnessParameters,
-        measuredValues,
-        stringValue(instance, definition, 5),
-        resolve(referenceId(instance, definition, 6)),
-        stringValue(instance, definition, 7));
+    return unitResolver.resolveSurfaceMeasurement(instance);
   }
 
   StepSurfaceTextureRepresentationItem resolveSurfaceTextureRepresentationItem(
@@ -1945,21 +1925,7 @@ public final class StepEntityResolver {
   }
 
   StepGeometricMeasurement resolveGeometricMeasurement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_MEASUREMENT");
-    requireParameterCount(instance, definition, 8);
-    List<StepEntity> measurementPoints =
-        entityReferenceList(
-            instance, definition, 6,
-            "GEOMETRIC_MEASUREMENT measurement_points must contain entity references");
-    return new StepGeometricMeasurement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        measurementPoints,
-        stringValue(instance, definition, 5));
+    return unitResolver.resolveGeometricMeasurement(instance);
   }
 
   StepDimensionalMeasurement resolveDimensionalMeasurement(StepEntityInstance instance) {
@@ -2278,13 +2244,7 @@ public final class StepEntityResolver {
   }
 
   StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepTypedMeasureWithUnit(
-        instance.id(),
-        entityName,
-        numberValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return unitResolver.resolveTypedMeasureWithUnit(instance, entityName);
   }
 
   StepCartesianTransformationOperator resolveCartesianTransformationOperator(
@@ -2355,29 +2315,12 @@ public final class StepEntityResolver {
     return annotationResolver.resolveToleranceValue(instance);
   }
 
-  StepMeasureRepresentationItemWithUnit resolveMeasureRepresentationItemWithUnit(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MEASURE_REPRESENTATION_ITEM_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepMeasureRepresentationItemWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+  StepMeasureRepresentationItemWithUnit resolveMeasureRepresentationItemWithUnit(StepEntityInstance instance) {
+    return unitResolver.resolveMeasureRepresentationItemWithUnit(instance);
   }
 
   StepMeasureQualification resolveMeasureQualification(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MEASURE_QUALIFICATION");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> qualifiers =
-        entityReferenceList(
-            instance, definition, 2,
-            "MEASURE_QUALIFICATION qualifiers must contain entity references");
-    return new StepMeasureQualification(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        qualifiers);
+    return unitResolver.resolveMeasureQualification(instance);
   }
 
   StepMakeFromFeature resolveMakeFromFeature(StepEntityInstance instance) {
@@ -3360,13 +3303,7 @@ public final class StepEntityResolver {
   }
 
   StepUncertaintyMeasure resolveUncertaintyMeasure(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "UNCERTAINTY_MEASURE");
-    requireParameterCount(instance, definition, 3);
-    return new StepUncertaintyMeasure(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        stringValue(instance, definition, 2));
+    return unitResolver.resolveUncertaintyMeasure(instance);
   }
 
   StepStructAnalysisModel resolveStructAnalysisModel(StepEntityInstance instance) {
@@ -3700,63 +3637,27 @@ public final class StepEntityResolver {
 
   // Unit with unit resolvers
   StepLengthUnitWithUnit resolveLengthUnitWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LENGTH_UNIT_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepLengthUnitWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolveLengthUnitWithUnit(instance);
   }
 
   StepPlaneAngleUnitWithUnit resolvePlaneAngleUnitWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLANE_ANGLE_UNIT_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepPlaneAngleUnitWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolvePlaneAngleUnitWithUnit(instance);
   }
 
   StepVolumeUnitWithUnit resolveVolumeUnitWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VOLUME_UNIT_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepVolumeUnitWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolveVolumeUnitWithUnit(instance);
   }
 
   StepAreaUnitWithUnit resolveAreaUnitWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "AREA_UNIT_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepAreaUnitWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolveAreaUnitWithUnit(instance);
   }
 
   StepMassUnitWithUnit resolveMassUnitWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MASS_UNIT_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepMassUnitWithUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolveMassUnitWithUnit(instance);
   }
 
   StepConversionBasedUnitAndUnit resolveConversionBasedUnitAndUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT_AND_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepConversionBasedUnitAndUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return unitResolver.resolveConversionBasedUnitAndUnit(instance);
   }
 
   // Profile resolvers
@@ -6419,16 +6320,8 @@ public final class StepEntityResolver {
             "SHAPE_REPRESENTATION_RELATIONSHIP rep_2 must reference REPRESENTATION"));
   }
 
-  StepUncertaintyMeasureWithUnit resolveUncertaintyMeasureWithUnit(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "UNCERTAINTY_MEASURE_WITH_UNIT");
-    requireParameterCount(instance, definition, 4);
-    return new StepUncertaintyMeasureWithUnit(
-        instance.id(),
-        numberValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        stringValue(instance, definition, 3));
+  StepUncertaintyMeasureWithUnit resolveUncertaintyMeasureWithUnit(StepEntityInstance instance) {
+    return unitResolver.resolveUncertaintyMeasureWithUnit(instance);
   }
 
   StepGlobalUnitAssignedContext resolveGlobalUnitAssignedContext(
@@ -6469,51 +6362,19 @@ public final class StepEntityResolver {
   }
 
   StepMeasureWithUnit resolveMeasureWithUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MEASURE_WITH_UNIT");
-    requireParameterCount(instance, definition, 2);
-    return new StepMeasureWithUnit(
-        instance.id(),
-        numberValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return unitResolver.resolveMeasureWithUnit(instance);
   }
 
-  StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(
-      StepEntityInstance instance, String entityName, String expectedUnitKind) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    StepEntity unitComponent = resolve(referenceId(instance, definition, 1));
-    if (!matchesUnitKind(unitComponent, expectedUnitKind)) {
-      throw new StepResolutionException(
-          entityName + " unit_component must reference " + expectedUnitKind);
-    }
-    return new StepTypedMeasureWithUnit(
-        instance.id(),
-        entityName,
-        numberValue(instance, definition, 0),
-        unitComponent);
+  StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName, String expectedUnitKind) {
+    return unitResolver.resolveTypedMeasureWithUnit(instance, entityName, expectedUnitKind);
   }
 
   StepDerivedUnitElement resolveDerivedUnitElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DERIVED_UNIT_ELEMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepDerivedUnitElement(
-        instance.id(),
-        resolve(referenceId(instance, definition, 0)),
-        numberValue(instance, definition, 1));
+    return unitResolver.resolveDerivedUnitElement(instance);
   }
 
   StepDerivedUnit resolveDerivedUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DERIVED_UNIT");
-    requireParameterCount(instance, definition, 1);
-    return new StepDerivedUnit(
-        instance.id(),
-        referenceList(
-            instance,
-            definition,
-            0,
-            StepDerivedUnitElement.class,
-            "DERIVED_UNIT elements must contain DERIVED_UNIT_ELEMENT references"),
-        "DERIVED_UNIT");
+    return unitResolver.resolveDerivedUnit(instance);
   }
 
   StepGeometricRepresentationContext resolveGeometricRepresentationContext(
@@ -6540,94 +6401,38 @@ public final class StepEntityResolver {
   }
 
   StepNamedUnit resolveNamedUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
-    requireParameterCount(instance, definition, 1);
-    validateNamedUnitDimensions(instance);
-    return new StepNamedUnit(instance.id(), deriveUnitKind(instance));
+    return unitResolver.resolveNamedUnit(instance);
   }
 
   StepDimensionalExponents resolveDimensionalExponents(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_EXPONENTS");
-    requireParameterCount(instance, definition, 7);
-    return new StepDimensionalExponents(
-        instance.id(),
-        numberValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        numberValue(instance, definition, 6));
+    return unitResolver.resolveDimensionalExponents(instance);
   }
 
-  StepNamedUnit resolveStandaloneUnitKind(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 0);
-    return new StepNamedUnit(instance.id(), entityName);
+  StepNamedUnit resolveStandaloneUnitKind(StepEntityInstance instance, String entityName) {
+    return unitResolver.resolveStandaloneUnitKind(instance, entityName);
   }
 
   StepContextDependentUnit resolveContextDependentUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTEXT_DEPENDENT_UNIT");
-    requireParameterCount(instance, definition, 1);
-    validateNamedUnitDimensions(instance);
-    return new StepContextDependentUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        deriveUnitKind(instance));
+    return unitResolver.resolveContextDependentUnit(instance);
   }
 
   StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    validateNamedUnitDimensions(instance);
-    StepEntity conversionFactor = resolve(referenceId(instance, definition, 1));
-    if (!(conversionFactor instanceof StepMeasureWithUnit)) {
-      throw new StepResolutionException(
-          entityName + " conversion_factor must reference MEASURE_WITH_UNIT");
-    }
-    StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) conversionFactor;
-    return new StepConversionBasedUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        deriveUnitKind(instance),
-        measureWithUnit,
-        entityName);
+    return unitResolver.resolveConversionBasedUnit(instance, entityName);
   }
 
-  StepConversionBasedUnitWithOffset resolveConversionBasedUnitWithOffset(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONVERSION_BASED_UNIT_WITH_OFFSET");
-    requireParameterCount(instance, definition, 1);
-    StepConversionBasedUnit base = resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT");
-    return new StepConversionBasedUnitWithOffset(
-        instance.id(),
-        base.name(),
-        base.unitKind(),
-        base.conversionFactor(),
-        numberValue(instance, definition, 0));
+  StepConversionBasedUnitWithOffset resolveConversionBasedUnitWithOffset(StepEntityInstance instance) {
+    return unitResolver.resolveConversionBasedUnitWithOffset(instance);
   }
 
-  StepDerivedUnit resolveStandaloneDerivedUnitKind(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 0);
-    return new StepDerivedUnit(instance.id(), List.of(), entityName);
+  StepDerivedUnit resolveStandaloneDerivedUnitKind(StepEntityInstance instance, String entityName) {
+    return unitResolver.resolveStandaloneDerivedUnitKind(instance, entityName);
   }
 
   StepSiUnit resolveSiUnit(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SI_UNIT");
-    requireParameterCount(instance, definition, 2);
-    validateNamedUnitDimensions(instance);
-    String prefix = null;
-    if (!isUnset(definition.parameters().get(0))) {
-      prefix = enumValue(instance, definition, 0);
-    }
-    return new StepSiUnit(
-        instance.id(), deriveUnitKind(instance), prefix, enumValue(instance, definition, 1));
+    return unitResolver.resolveSiUnit(instance);
   }
 
-  private void validateNamedUnitDimensions(StepEntityInstance instance) {
+  void validateNamedUnitDimensions(StepEntityInstance instance) {
     if (!instance.hasDefinition("NAMED_UNIT")) {
       return;
     }
@@ -8865,30 +8670,8 @@ public final class StepEntityResolver {
     return annotationResolver.resolveDraughtingCalloutRelationship(instance, entityName);
   }
 
-  StepMeasureRepresentationItem resolveMeasureRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MEASURE_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 3);
-
-    // Use enhanced typedSelection with validation
-    StepParameterReader.TypedSelection selection = typedSelection(instance, definition, 1);
-    validateSelectTypeName(instance, definition, 1, selection,
-        SelectTypeRegistry.MEASURE_SELECT_TYPES);
-
-    StepValue unwrapped = selection.value();
-    if (!(unwrapped instanceof StepValue.NumberValue)) {
-      throw new StepResolutionException(
-          "entity #" + instance.id() + " MEASURE_REPRESENTATION_ITEM" +
-          " parameter 1 typed measure must wrap a number, actual: " + 
-          StepParameterReader.valueType(unwrapped));
-    }
-    StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-    return new StepMeasureRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        selection.typeName(),
-        numberValue.value(),
-        resolve(referenceId(instance, definition, 2)));
+  StepMeasureRepresentationItem resolveMeasureRepresentationItem(StepEntityInstance instance) {
+    return unitResolver.resolveMeasureRepresentationItem(instance);
   }
 
   StepDescriptiveRepresentationItem resolveDescriptiveRepresentationItem(
@@ -9924,7 +9707,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  private String deriveUnitKind(StepEntityInstance instance) {
+  String deriveUnitKind(StepEntityInstance instance) {
     for (String candidate : List.of(
         "LENGTH_UNIT",
         "PLANE_ANGLE_UNIT",
@@ -9986,7 +9769,7 @@ public final class StepEntityResolver {
     return "NAMED_UNIT";
   }
 
-  private boolean matchesUnitKind(StepEntity entity, String expectedUnitKind) {
+  boolean matchesUnitKind(StepEntity entity, String expectedUnitKind) {
     if (entity instanceof StepNamedUnit) {
             StepNamedUnit namedUnit = (StepNamedUnit) entity;
       return expectedUnitKind.equals(namedUnit.unitKind());
@@ -10079,34 +9862,15 @@ public final class StepEntityResolver {
   /**
    * Resolve EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT entity.
    */
-  StepExternallyDefinedConversionBasedUnit resolveExternallyDefinedConversionBasedUnit(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT");
-    requireParameterCount(instance, definition, 2);
-    validateNamedUnitDimensions(instance);
-    StepExternallyDefinedItem item = requireEntity(
-        referenceId(instance, definition, 1),
-        StepExternallyDefinedItem.class,
-        "EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT item must reference EXTERNALLY_DEFINED_ITEM");
-    return new StepExternallyDefinedConversionBasedUnit(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        deriveUnitKind(instance),
-        item);
+  StepExternallyDefinedConversionBasedUnit resolveExternallyDefinedConversionBasedUnit(StepEntityInstance instance) {
+    return unitResolver.resolveExternallyDefinedConversionBasedUnit(instance);
   }
 
   /**
    * Resolve NON_AGREED_UNIT_USAGE entity.
    */
   StepNonAgreedUnitUsage resolveNonAgreedUnitUsage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NON_AGREED_UNIT_USAGE");
-    requireParameterCount(instance, definition, 2);
-    StepEntity unit = resolve(referenceId(instance, definition, 1));
-    String unitName = stringValue(instance, definition, 0);
-    return new StepNonAgreedUnitUsage(
-        instance.id(),
-        unitName,
-        unit);
+    return unitResolver.resolveNonAgreedUnitUsage(instance);
   }
 
   // Phase 2 Batch 2: A3M Validation entities resolver methods
