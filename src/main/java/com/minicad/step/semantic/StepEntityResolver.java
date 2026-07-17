@@ -792,6 +792,7 @@ public final class StepEntityResolver {
   private final AnnotationResolver annotationResolver;
   private final MaterialResolver materialResolver;
   private final UnitResolver unitResolver;
+  private final KinematicResolver kinematicResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -806,6 +807,7 @@ public final class StepEntityResolver {
     this.annotationResolver = new AnnotationResolver(this);
     this.materialResolver = new MaterialResolver(this);
     this.unitResolver = new UnitResolver(this);
+    this.kinematicResolver = new KinematicResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -2550,256 +2552,83 @@ public final class StepEntityResolver {
   }
 
   StepKinematicPair resolveKinematicPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_PAIR");
-    requireParameterCount(instance, definition, 5);
-    return new StepKinematicPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return kinematicResolver.resolveKinematicPair(instance);
   }
 
   StepKinematicJoint resolveKinematicJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_JOINT");
-    requireParameterCount(instance, definition, 4);
-    return new StepKinematicJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return kinematicResolver.resolveKinematicJoint(instance);
   }
 
   StepKinematicLink resolveKinematicLink(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_LINK");
-    requireParameterCount(instance, definition, 4);
-    return new StepKinematicLink(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return kinematicResolver.resolveKinematicLink(instance);
   }
 
   StepKinematicStructure resolveKinematicStructure(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_STRUCTURE");
-    requireParameterCount(instance, definition, 4);
-    return new StepKinematicStructure(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return kinematicResolver.resolveKinematicStructure(instance);
   }
 
   StepKinematicPair resolveKinematicPair(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 7);
-    return new StepKinematicPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return kinematicResolver.resolveKinematicPair(instance, entityName);
   }
 
   StepPrismaticPair resolvePrismaticPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRISMATIC_PAIR");
-    requireParameterCount(instance, definition, 7);
-    return new StepPrismaticPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)));
+    return kinematicResolver.resolvePrismaticPair(instance);
   }
 
   StepRevolutePair resolveRevolutePair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REVOLUTE_PAIR");
-    requireParameterCount(instance, definition, 7);
-    return new StepRevolutePair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)));
+    return kinematicResolver.resolveRevolutePair(instance);
   }
 
   StepCylindricalPair resolveCylindricalPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CYLINDRICAL_PAIR");
-    requireParameterCount(instance, definition, 7);
-    return new StepCylindricalPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)));
+    return kinematicResolver.resolveCylindricalPair(instance);
   }
 
   StepSphericalPair resolveSphericalPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SPHERICAL_PAIR");
-    requireParameterCount(instance, definition, 6);
-    return new StepSphericalPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolveSphericalPair(instance);
   }
 
   StepPlanarPair resolvePlanarPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLANAR_PAIR");
-    requireParameterCount(instance, definition, 7);
-    return new StepPlanarPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)));
+    return kinematicResolver.resolvePlanarPair(instance);
   }
 
   StepUniversalPair resolveUniversalPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "UNIVERSAL_PAIR");
-    requireParameterCount(instance, definition, 8);
-    return new StepUniversalPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)),
-        resolve(referenceId(instance, definition, 6)));
+    return kinematicResolver.resolveUniversalPair(instance);
   }
 
   StepScrewPair resolveScrewPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SCREW_PAIR");
-    requireParameterCount(instance, definition, 8);
-    return new StepScrewPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)),
-        resolve(referenceId(instance, definition, 6)));
+    return kinematicResolver.resolveScrewPair(instance);
   }
 
   StepGearPair resolveGearPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEAR_PAIR");
-    requireParameterCount(instance, definition, 8);
-    return new StepGearPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)),
-        resolve(referenceId(instance, definition, 6)));
+    return kinematicResolver.resolveGearPair(instance);
   }
 
   StepGearPairWithRange resolveGearPairWithRange(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEAR_PAIR_WITH_RANGE");
-    requireParameterCount(instance, definition, 11);
-    return new StepGearPairWithRange(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        numberValue(instance, definition, 6),
-        resolve(referenceId(instance, definition, 7)),
-        resolve(referenceId(instance, definition, 8)));
+    return kinematicResolver.resolveGearPairWithRange(instance);
   }
 
   StepRackAndPinionPair resolveRackAndPinionPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RACK_AND_PINION_PAIR");
-    requireParameterCount(instance, definition, 8);
-    return new StepRackAndPinionPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)),
-        resolve(referenceId(instance, definition, 6)));
+    return kinematicResolver.resolveRackAndPinionPair(instance);
   }
 
-  StepLowOrderKinematicPairWithRange resolveLowOrderKinematicPairWithRange(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE");
-    requireParameterCount(instance, definition, 10);
-    return new StepLowOrderKinematicPairWithRange(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        resolve(referenceId(instance, definition, 6)),
-        resolve(referenceId(instance, definition, 7)));
+  StepLowOrderKinematicPairWithRange resolveLowOrderKinematicPairWithRange(StepEntityInstance instance) {
+    return kinematicResolver.resolveLowOrderKinematicPairWithRange(instance);
   }
 
   StepActuatedKinematicPair resolveActuatedKinematicPair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ACTUATED_KINEMATIC_PAIR");
-    requireParameterCount(instance, definition, 6);
-    return new StepActuatedKinematicPair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4));
+    return kinematicResolver.resolveActuatedKinematicPair(instance);
   }
 
-  StepMechanismStateRepresentation resolveMechanismStateRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MECHANISM_STATE_REPRESENTATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepMechanismStateRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "MECHANISM_STATE_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+  StepMechanismStateRepresentation resolveMechanismStateRepresentation(StepEntityInstance instance) {
+    return kinematicResolver.resolveMechanismStateRepresentation(instance);
   }
 
   StepKinematicPath resolveKinematicPath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_PATH");
-    requireParameterCount(instance, definition, 5);
-    return new StepKinematicPath(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        entityReferenceList(instance, definition, 4,
-            "KINEMATIC_PATH pairs must contain entity references"));
+    return kinematicResolver.resolveKinematicPath(instance);
   }
 
-  StepKinematicFrameBasedTransformation resolveKinematicFrameBasedTransformation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_FRAME_BASED_TRANSFORMATION");
-    requireParameterCount(instance, definition, 5);
-    return new StepKinematicFrameBasedTransformation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+  StepKinematicFrameBasedTransformation resolveKinematicFrameBasedTransformation(StepEntityInstance instance) {
+    return kinematicResolver.resolveKinematicFrameBasedTransformation(instance);
   }
 
   StepValidationPropertyRepresentation resolveValidationPropertyRepresentation(
@@ -3006,86 +2835,31 @@ public final class StepEntityResolver {
   }
 
   StepRevoluteJoint resolveRevoluteJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REVOLUTE_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepRevoluteJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolveRevoluteJoint(instance);
   }
 
   StepPrismaticJoint resolvePrismaticJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRISMATIC_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepPrismaticJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolvePrismaticJoint(instance);
   }
 
   StepSphericalJoint resolveSphericalJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SPHERICAL_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepSphericalJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolveSphericalJoint(instance);
   }
 
   StepCylindricalJoint resolveCylindricalJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CYLINDRICAL_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepCylindricalJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolveCylindricalJoint(instance);
   }
 
   StepPlanarJoint resolvePlanarJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLANAR_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepPlanarJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return kinematicResolver.resolvePlanarJoint(instance);
   }
 
   StepScrewJoint resolveScrewJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SCREW_JOINT");
-    requireParameterCount(instance, definition, 5);
-    return new StepScrewJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4));
+    return kinematicResolver.resolveScrewJoint(instance);
   }
 
   StepGeneralJoint resolveGeneralJoint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GENERAL_JOINT");
-    requireParameterCount(instance, definition, 4);
-    return new StepGeneralJoint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return kinematicResolver.resolveGeneralJoint(instance);
   }
 
   StepDirectionSense resolveDirectionSense(StepEntityInstance instance) {
@@ -3098,22 +2872,11 @@ public final class StepEntityResolver {
   }
 
   StepJointValue resolveJointValue(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "JOINT_VALUE");
-    requireParameterCount(instance, definition, 3);
-    return new StepJointValue(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        stringValue(instance, definition, 2));
+    return kinematicResolver.resolveJointValue(instance);
   }
 
   StepKinematicChain resolveKinematicChain(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_CHAIN");
-    requireParameterCount(instance, definition, 3);
-    return new StepKinematicChain(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return kinematicResolver.resolveKinematicChain(instance);
   }
 
   StepKinematicModel resolveKinematicModel(StepEntityInstance instance) {
@@ -3121,24 +2884,11 @@ public final class StepEntityResolver {
   }
 
   StepKinematicProperty resolveKinematicProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_PROPERTY");
-    requireParameterCount(instance, definition, 3);
-    return new StepKinematicProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return kinematicResolver.resolveKinematicProperty(instance);
   }
 
   StepMotionConstraint resolveMotionConstraint(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MOTION_CONSTRAINT");
-    requireParameterCount(instance, definition, 4);
-    return new StepMotionConstraint(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return kinematicResolver.resolveMotionConstraint(instance);
   }
 
   StepChange resolveChange(StepEntityInstance instance) {
@@ -3677,21 +3427,11 @@ public final class StepEntityResolver {
 
   // Kinematic reference resolvers
   StepKinematicLinkReference resolveKinematicLinkReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_LINK_REFERENCE");
-    requireParameterCount(instance, definition, 3);
-    return new StepKinematicLinkReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return kinematicResolver.resolveKinematicLinkReference(instance);
   }
 
   StepKinematicJointReference resolveKinematicJointReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "KINEMATIC_JOINT_REFERENCE");
-    requireParameterCount(instance, definition, 3);
-    return new StepKinematicJointReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return kinematicResolver.resolveKinematicJointReference(instance);
   }
 
   // Product representation resolvers
@@ -3960,20 +3700,7 @@ public final class StepEntityResolver {
   }
 
   StepMechanismDefinition resolveMechanismDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MECHANISM_DEFINITION");
-    requireParameterCount(instance, definition, 8);
-    return new StepMechanismDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2,
-            "MECHANISM_DEFINITION links must contain entity references"),
-        entityReferenceList(instance, definition, 3,
-            "MECHANISM_DEFINITION joints must contain entity references"),
-        (int) numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)),
-        entityReferenceList(instance, definition, 6,
-            "MECHANISM_DEFINITION actuated joints must contain entity references"));
+    return kinematicResolver.resolveMechanismDefinition(instance);
   }
 
   StepModuleDefinition resolveModuleDefinition(StepEntityInstance instance) {
@@ -8515,17 +8242,7 @@ public final class StepEntityResolver {
   }
 
   StepMotionPath resolveMotionPath(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MOTION_PATH");
-    requireParameterCount(instance, definition, 7);
-    return new StepMotionPath(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)),
-        resolve(referenceId(instance, definition, 6)));
+    return kinematicResolver.resolveMotionPath(instance);
   }
 
   StepAngularLocation resolveAngularLocation(StepEntityInstance instance) {
