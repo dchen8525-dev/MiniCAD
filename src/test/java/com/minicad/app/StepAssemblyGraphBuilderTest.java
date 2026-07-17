@@ -26,7 +26,7 @@ class StepAssemblyGraphBuilderTest {
     @Test
     void shouldBuildNestedAssemblyGraphWithAccumulatedTransforms() throws IOException {
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(
-                StepParser.parse(Files.readString(Path.of("examples/nested-assembly.step")))
+                StepParser.parse(Files.readString(Path.of("samples/nested-assembly.step")))
         );
 
         AssemblyGraph graph = StepAssemblyGraphBuilder.build(resolved);

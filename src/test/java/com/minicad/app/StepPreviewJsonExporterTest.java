@@ -250,7 +250,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricCircleMetadataForRoundEdges() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/plate-with-round-hole.step")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/plate-with-round-hole.step")));
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
@@ -263,7 +263,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricCylinderMetadataForCylindricalFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/cylindrical-band.step")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/cylindrical-band.step")));
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
@@ -275,7 +275,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricConeMetadataForConicalFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/conical-band.step")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/conical-band.step")));
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
@@ -287,7 +287,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricTorusMetadataForToroidalFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/toroidal-band.step")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/toroidal-band.step")));
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
@@ -299,7 +299,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricBsplineMetadataForBsplineFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/bspline-patch.step")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/bspline-patch.step")));
         String metadata = metadataFromGlb(binary);
 
         assertMetadataContains(metadata,
@@ -10248,7 +10248,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricSurfaceMetadataInBinaryPreviewForBsplineFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportBinary(Files.readString(Path.of("examples/bspline-patch.step")));
+        byte[] binary = StepPreviewJsonExporter.exportBinary(Files.readString(Path.of("samples/bspline-patch.step")));
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -10263,7 +10263,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldEmbedParametricSurfaceMetadataInBinaryPreviewForCylindricalFaces() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportBinary(Files.readString(Path.of("examples/cylindrical-band.step")));
+        byte[] binary = StepPreviewJsonExporter.exportBinary(Files.readString(Path.of("samples/cylindrical-band.step")));
         String metadata = metadataFromBinary(binary);
 
         assertMetadataContains(metadata,
@@ -10660,7 +10660,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportGlbForEngineStp() throws Exception {
-        byte[] raw = Files.readAllBytes(Path.of("examples/engine.stp"));
+        byte[] raw = Files.readAllBytes(Path.of("samples/engine.stp"));
         String stepText = new String(raw, java.nio.charset.StandardCharsets.ISO_8859_1);
         byte[] binary = StepPreviewJsonExporter.exportGlb(stepText);
         String metadata = metadataFromGlb(binary);
@@ -10671,7 +10671,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportGlbForFanStp() throws Exception {
-        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("examples/fan.stp")));
+        byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/fan.stp")));
         String metadata = metadataFromGlb(binary);
         // fan.stp: 42K entities, 1 solid, 1 unsupported face from assembly representation
         assertTrue(metadata.contains("\"entityCount\":41905"), "fan.stp should have 41905 entities");
@@ -10680,7 +10680,7 @@ class StepPreviewJsonExporterTest {
 
     @Test
     void shouldExportJsonForToroidalSeamWithZeroUnsupportedFaces() throws Exception {
-        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("examples/toroidal-seam-two-holes.step")));
+        String json = StepPreviewJsonExporter.export(Files.readString(Path.of("samples/toroidal-seam-two-holes.step")));
         assertTrue(json.contains("\"unsupportedFaceCount\":0"), "toroidal-seam should have 0 unsupported faces");
         assertTrue(json.contains("\"product\":"), "should include product metadata");
         assertTrue(json.contains("\"units\":"), "should include unit metadata");

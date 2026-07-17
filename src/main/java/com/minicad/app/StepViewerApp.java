@@ -463,7 +463,7 @@ public final class StepViewerApp {
         if (!EXAMPLE_NAME_PATTERN.matcher(normalizedName).matches()) {
             throw new IllegalArgumentException("invalid example name");
         }
-        Path examplesDir = Path.of("examples").toAbsolutePath().normalize();
+        Path examplesDir = Path.of("samples").toAbsolutePath().normalize();
         String     fileName = null;
     switch (normalizedName) {
         case "minimal-square":
@@ -478,7 +478,7 @@ public final class StepViewerApp {
     };
         Path examplePath = examplesDir.resolve(fileName).normalize();
         if (!examplePath.startsWith(examplesDir)) {
-            throw new IllegalArgumentException("example path escapes examples directory");
+            throw new IllegalArgumentException("example path escapes samples directory");
         }
         return examplePath;
     }

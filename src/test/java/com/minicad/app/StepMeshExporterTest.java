@@ -150,8 +150,8 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportObjForRealFile() throws IOException {
-        // Use a small text-based STEP file from examples
-        Path stepPath = Path.of("examples/minimal-square.step");
+        // Use a small text-based STEP file from samples
+        Path stepPath = Path.of("samples/minimal-square.step");
         if (Files.exists(stepPath)) {
             String stepText = Files.readString(stepPath);
             String obj = StepMeshExporter.exportObj(stepText);
@@ -162,7 +162,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldExportStlBinaryForRealFile() throws IOException {
-        Path stepPath = Path.of("examples/minimal-square.step");
+        Path stepPath = Path.of("samples/minimal-square.step");
         if (Files.exists(stepPath)) {
             String stepText = Files.readString(stepPath);
             byte[] stl = StepMeshExporter.exportStlBinary(stepText);
@@ -273,14 +273,14 @@ class StepMeshExporterTest {
 
     @Test
     void shouldTrimCylindricalFaceToFaceBounds() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-band.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/cylindrical-band.step")));
         assertTrue(obj.contains("f "));
         assertEquals(2.0 * Math.PI, planarAreaFromObj(obj), 0.35);
     }
 
     @Test
     void shouldTrimConicalFaceToFaceBounds() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/conical-band.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/conical-band.step")));
         double expectedSlant = Math.sqrt(2.0 * 2.0 + 0.4 * 0.4);
         double expectedArea = Math.PI * (2.0 + 2.4) * expectedSlant / 4.0;
         assertTrue(obj.contains("f "));
@@ -289,7 +289,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldTrimToroidalFaceToFaceBounds() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/toroidal-band.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/toroidal-band.step")));
         // Torus with R=5, r=1, bounds u in [0,pi/2], v in [-pi/4,pi/4]
         // Surface area = r * (u_span) * (R * v_span + r * (sin(v_max) - sin(v_min)))
         // = 1 * (pi/2) * (5 * pi/2 + 1 * sqrt(2)) ≈ 14.56
@@ -300,7 +300,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldPreserveCylindricalPcurveHoleArea() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-hole-ellipse-pcurve.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/cylindrical-hole-ellipse-pcurve.step")));
         double expectedArea = (1.0 + Math.PI / 16.0) - (0.4 * 0.3);
         assertTrue(obj.contains("f "));
         // TODO: Ellipse pcurve bulge on parametric surfaces needs more investigation
@@ -310,7 +310,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldPreserveCylindricalTrimmedLoopsWithHoleArea() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/cylindrical-trimmed-loops-with-hole.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/cylindrical-trimmed-loops-with-hole.step")));
         double outerArea = 0.8 - 0.05 * Math.PI;
         double innerArea = 0.08 - 0.012 * Math.PI;
         assertTrue(obj.contains("f "));
@@ -320,7 +320,7 @@ class StepMeshExporterTest {
 
     @Test
     void shouldPreserveConicalHoleArea() throws IOException {
-        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("examples/conical-hole.step")));
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/conical-hole.step")));
         double slantHeight = Math.sqrt(1.0 + 0.5 * 0.5);
         double outerArea = Math.PI * (1.0 + 1.5) * slantHeight / 2.0;
         double innerArea = (2.0 - 1.0) * (0.7 - 0.3) * slantHeight;

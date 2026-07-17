@@ -26,7 +26,7 @@ class StepExampleRegressionTest {
     }
 
     static Stream<Path> exampleStepFiles() throws IOException {
-        return Files.list(Path.of("examples"))
+        return Files.list(Path.of("samples"))
                 .filter(Files::isRegularFile)
                 .filter(StepExampleRegressionTest::isStepFile)
                 .sorted(Comparator.comparing(path -> path.getFileName().toString()));

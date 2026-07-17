@@ -5,9 +5,9 @@ import com.minicad.common.StepParseException;
 public class test_grammar_only {
     public static void main(String[] args) throws Exception {
         String[] files = {
-            "examples/test.step",
-            "examples/nested-assembly.step",
-            "examples/cylindrical-trimmed-bspline-pcurve.step"
+            "samples/test.step",
+            "samples/nested-assembly.step",
+            "samples/cylindrical-trimmed-bspline-pcurve.step"
         };
 
         System.out.println("=== Grammar解析测试（不resolve） ===\n");

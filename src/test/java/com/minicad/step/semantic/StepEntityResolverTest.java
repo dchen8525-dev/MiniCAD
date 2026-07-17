@@ -452,7 +452,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExamplesTestStepSemanticGraph() throws IOException {
-        String step = Files.readString(Path.of("examples/test.step"));
+        String step = Files.readString(Path.of("samples/test.step"));
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 
@@ -694,7 +694,7 @@ class StepEntityResolverTest {
 
     @Test
     void shouldResolveExamplesFanStepSemanticGraph() throws IOException {
-        String step = Files.readString(Path.of("examples/fan.stp"));
+        String step = Files.readString(Path.of("samples/fan.stp"));
 
         Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
 

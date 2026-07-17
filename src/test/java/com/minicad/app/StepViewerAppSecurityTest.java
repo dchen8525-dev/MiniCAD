@@ -82,7 +82,7 @@ class StepViewerAppSecurityTest {
     @Test
     void previewSmallStepUsesCacheWithoutExposingPath() throws Exception {
         try (RunningViewer viewer = startViewer(1024 * 1024)) {
-            String step = Files.readString(Path.of("examples", "minimal-square.step"));
+            String step = Files.readString(Path.of("samples", "minimal-square.step"));
 
             HttpResponse<byte[]> first = postBytes(viewer.uri("/api/preview"), step);
             assertEquals(200, first.statusCode());
@@ -113,7 +113,7 @@ class StepViewerAppSecurityTest {
         try (RunningViewer viewer = new RunningViewer(
                 server,
                 ((ServerConnector) server.getConnectors()[0]).getLocalPort())) {
-            String step = Files.readString(Path.of("examples", "minimal-square.step"));
+            String step = Files.readString(Path.of("samples", "minimal-square.step"));
 
             HttpResponse<byte[]> response = postBytes(viewer.uri("/api/preview"), step);
 
@@ -127,7 +127,7 @@ class StepViewerAppSecurityTest {
     @Test
     void concurrentPreviewRequestsForSameInputReturnValidGlb() throws Exception {
         try (RunningViewer viewer = startViewer(1024 * 1024)) {
-            String step = Files.readString(Path.of("examples", "minimal-square.step"));
+            String step = Files.readString(Path.of("samples", "minimal-square.step"));
             var executor = Executors.newFixedThreadPool(6);
             try {
                 List<Callable<HttpResponse<byte[]>>> tasks = new ArrayList<>();
@@ -192,7 +192,7 @@ class StepViewerAppSecurityTest {
         assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("../pom"));
         assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("..\\pom"));
         assertThrows(IllegalArgumentException.class, () -> StepViewerApp.resolveExamplePath("/absolute"));
-        assertTrue(StepViewerApp.resolveExamplePath("plate-with-round-hole").endsWith(Path.of("examples", "plate-with-round-hole.step")));
+        assertTrue(StepViewerApp.resolveExamplePath("plate-with-round-hole").endsWith(Path.of("samples", "plate-with-round-hole.step")));
     }
 
     @Test
@@ -320,9 +320,9 @@ class StepViewerAppSecurityTest {
 
     @Test
     void resolveExamplePathDefaultsToMinimalSquareForNullAndBlank() {
-        assertTrue(StepViewerApp.resolveExamplePath(null).endsWith(Path.of("examples", "minimal-square.step")));
-        assertTrue(StepViewerApp.resolveExamplePath("").endsWith(Path.of("examples", "minimal-square.step")));
-        assertTrue(StepViewerApp.resolveExamplePath("   ").endsWith(Path.of("examples", "minimal-square.step")));
+        assertTrue(StepViewerApp.resolveExamplePath(null).endsWith(Path.of("samples", "minimal-square.step")));
+        assertTrue(StepViewerApp.resolveExamplePath("").endsWith(Path.of("samples", "minimal-square.step")));
+        assertTrue(StepViewerApp.resolveExamplePath("   ").endsWith(Path.of("samples", "minimal-square.step")));
     }
 
     @Test

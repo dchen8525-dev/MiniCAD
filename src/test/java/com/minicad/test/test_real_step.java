@@ -11,7 +11,7 @@ public class test_real_step {
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             System.out.println("Usage: test_real_step <file.step>");
-            System.out.println("Testing available examples...");
+            System.out.println("Testing available samples...");
             testExamples();
             return;
         }
@@ -19,11 +19,11 @@ public class test_real_step {
     }
 
     private static void testExamples() throws Exception {
-        String[] examples = {
-            "examples/minimal-square.step",
-            "examples/bspline-patch.step",
-            "examples/conical-band.step",
-            "examples/cylindrical-band.step"
+        String[] samples = {
+            "samples/minimal-square.step",
+            "samples/bspline-patch.step",
+            "samples/conical-band.step",
+            "samples/cylindrical-band.step"
         };
 
         System.out.println("=== Real-world STEP File Parsing Test ===\n");
@@ -31,7 +31,7 @@ public class test_real_step {
         int success = 0;
         int total = 0;
 
-        for (String example : examples) {
+        for (String sample : examples) {
             total++;
             try {
                 Path path = Path.of(example);

@@ -30,7 +30,7 @@ class BoundingBoxFixtureTest {
   // ---------------------------------------------------------------------------
 
   private static StepCadBuilder parseFixture(String name) throws IOException {
-    Path path = Path.of("examples", name);
+    Path path = Path.of("samples", name);
     String stepText = Files.readString(path);
     StepFile stepFile = StepParser.parse(stepText);
     Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(stepFile);
