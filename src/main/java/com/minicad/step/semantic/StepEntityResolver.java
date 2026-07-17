@@ -804,6 +804,7 @@ public final class StepEntityResolver {
   private final TransformationResolver transformationResolver;
   private final GenericResolver genericResolver;
   private final AssociationResolver associationResolver;
+  private final PropertyResolver propertyResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -828,6 +829,7 @@ public final class StepEntityResolver {
     this.transformationResolver = new TransformationResolver(this);
     this.genericResolver = new GenericResolver(this);
     this.associationResolver = new AssociationResolver(this);
+    this.propertyResolver = new PropertyResolver(this);
   }
 
   /**
@@ -2830,13 +2832,7 @@ public final class StepEntityResolver {
   }
 
   StepAppliedAttributeClassification resolveAppliedAttributeClassification(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_ATTRIBUTE_CLASSIFICATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedAttributeClassification(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return propertyResolver.resolveAppliedAttributeClassification(instance);
   }
 
   StepAttributeClassification resolveAttributeClassification(StepEntityInstance instance) {
@@ -3685,13 +3681,7 @@ public final class StepEntityResolver {
   }
 
   StepPmiGroup resolvePmiGroup(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PMI_GROUP");
-    requireParameterCount(instance, definition, 3);
-    return new StepPmiGroup(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "PMI_GROUP members must contain entity references"));
+    return propertyResolver.resolvePmiGroup(instance);
   }
 
   // Manufacturing resolvers
@@ -4015,102 +4005,39 @@ public final class StepEntityResolver {
   }
 
   StepPropertyDefinition resolvePropertyDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PROPERTY_DEFINITION");
-    requireParameterCount(instance, definition, 3);
-    return new StepPropertyDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return propertyResolver.resolvePropertyDefinition(instance);
   }
 
-  StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(
-      StepEntityInstance instance) {
-    return resolvePropertyDefinitionRelationship(instance, "PROPERTY_DEFINITION_RELATIONSHIP");
+  StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(StepEntityInstance instance) {
+    return propertyResolver.resolvePropertyDefinitionRelationship(instance);
   }
 
-  StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepPropertyDefinitionRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepPropertyDefinition.class,
-            entityName + " relating_property_definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepPropertyDefinition.class,
-            entityName + " related_property_definition must reference PROPERTY_DEFINITION"),
-        entityName);
+  StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(StepEntityInstance instance, String entityName) {
+    return propertyResolver.resolvePropertyDefinitionRelationship(instance, entityName);
   }
 
   StepGeneralProperty resolveGeneralProperty(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GENERAL_PROPERTY");
-    requireParameterCount(instance, definition, 3);
-    return new StepGeneralProperty(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2));
+    return propertyResolver.resolveGeneralProperty(instance);
   }
 
-  StepGeneralPropertyRelationship resolveGeneralPropertyRelationship(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GENERAL_PROPERTY_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepGeneralPropertyRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepGeneralProperty.class,
-            "GENERAL_PROPERTY_RELATIONSHIP relating_general_property must reference GENERAL_PROPERTY"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepGeneralProperty.class,
-            "GENERAL_PROPERTY_RELATIONSHIP related_general_property must reference GENERAL_PROPERTY"));
+  StepGeneralPropertyRelationship resolveGeneralPropertyRelationship(StepEntityInstance instance) {
+    return propertyResolver.resolveGeneralPropertyRelationship(instance);
   }
 
   StepGroup resolveGroup(StepEntityInstance instance) {
-    return resolveGroup(instance, "GROUP");
+    return propertyResolver.resolveGroup(instance);
   }
 
   StepGroup resolveGroup(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepGroup(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        entityName);
+    return propertyResolver.resolveGroup(instance, entityName);
   }
 
   StepGroupRelationship resolveGroupRelationship(StepEntityInstance instance) {
-    return resolveGroupRelationship(instance, "GROUP_RELATIONSHIP");
+    return propertyResolver.resolveGroupRelationship(instance);
   }
 
-  StepGroupRelationship resolveGroupRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepGroupRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepGroup.class,
-            entityName + " relating_group must reference GROUP"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepGroup.class,
-            entityName + " related_group must reference GROUP"),
-        entityName);
+  StepGroupRelationship resolveGroupRelationship(StepEntityInstance instance, String entityName) {
+    return propertyResolver.resolveGroupRelationship(instance, entityName);
   }
 
   StepGroupAssignment resolveGroupAssignment(StepEntityInstance instance) {
