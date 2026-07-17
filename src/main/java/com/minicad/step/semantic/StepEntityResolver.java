@@ -787,6 +787,7 @@ public final class StepEntityResolver {
   private final StepProductResolver productResolver;
   private final GeometryResolver geometryResolver;
   private final SurfaceResolver surfaceResolver;
+  private final GeometricFeatureResolver geometricFeatureResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -796,6 +797,7 @@ public final class StepEntityResolver {
     this.productResolver = new StepProductResolver(this);
     this.geometryResolver = new GeometryResolver(this);
     this.surfaceResolver = new SurfaceResolver(this);
+    this.geometricFeatureResolver = new GeometricFeatureResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -998,70 +1000,19 @@ public final class StepEntityResolver {
   }
 
   StepChamferEdge resolveChamferEdge(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHAMFER_EDGE");
-    requireParameterCount(instance, definition, 6);
-    List<StepEntity> adjacentFaces =
-        entityReferenceList(
-            instance,
-            definition,
-            4,
-            "CHAMFER_EDGE adjacent_faces must contain entity references");
-    return new StepChamferEdge(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        adjacentFaces,
-        stringValue(instance, definition, 5));
+    return geometricFeatureResolver.resolveChamferEdge(instance);
   }
 
   StepFilletEdge resolveFilletEdge(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILLET_EDGE");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> adjacentFaces =
-        entityReferenceList(
-            instance,
-            definition,
-            3,
-            "FILLET_EDGE adjacent_faces must contain entity references");
-    return new StepFilletEdge(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        adjacentFaces,
-        stringValue(instance, definition, 4));
+    return geometricFeatureResolver.resolveFilletEdge(instance);
   }
 
   StepBlendedSurface resolveBlendedSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BLENDED_SURFACE");
-    requireParameterCount(instance, definition, 7);
-    return new StepBlendedSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        numberValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)));
+    return geometricFeatureResolver.resolveBlendedSurface(instance);
   }
 
   StepFreeFormSurface resolveFreeFormSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FREE_FORM_SURFACE");
-    requireParameterCount(instance, definition, 8);
-    List<List<StepEntity>> controlPoints = resolveFreeFormControlPoints(instance, definition, 2);
-    List<Double> knotVectors = numberList(instance, definition, 6);
-    List<Double> weights = numberList(instance, definition, 7);
-    return new StepFreeFormSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        controlPoints,
-        (int) numberValue(instance, definition, 3),
-        (int) numberValue(instance, definition, 4),
-        knotVectors,
-        weights);
+    return geometricFeatureResolver.resolveFreeFormSurface(instance);
   }
 
   List<List<StepEntity>> resolveFreeFormControlPoints(
@@ -1096,28 +1047,11 @@ public final class StepEntityResolver {
   }
 
   StepCurvedToleranceZone resolveCurvedToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVED_TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 5);
-    return new StepCurvedToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return geometricFeatureResolver.resolveCurvedToleranceZone(instance);
   }
 
   StepSurfaceQuality resolveSurfaceQuality(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_QUALITY");
-    requireParameterCount(instance, definition, 7);
-    List<Double> roughnessValues = numberList(instance, definition, 3);
-    return new StepSurfaceQuality(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        roughnessValues,
-        stringValue(instance, definition, 4),
-        stringValue(instance, definition, 5),
-        resolve(referenceId(instance, definition, 6)));
+    return geometricFeatureResolver.resolveSurfaceQuality(instance);
   }
 
   StepMeasurementPoint resolveMeasurementPoint(StepEntityInstance instance) {
@@ -2336,47 +2270,15 @@ public final class StepEntityResolver {
 
   // Feature definition resolvers
   StepFilletDefinition resolveFilletDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILLET_DEFINITION");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> edges =
-        entityReferenceList(
-            instance, definition, 2,
-            "FILLET_DEFINITION edges must contain entity references");
-    return new StepFilletDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        edges,
-        optionalNumberValue(instance, definition, 3));
+    return geometricFeatureResolver.resolveFilletDefinition(instance);
   }
 
   StepChamferDefinition resolveChamferDefinition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHAMFER_DEFINITION");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> edges =
-        entityReferenceList(
-            instance, definition, 2,
-            "CHAMFER_DEFINITION edges must contain entity references");
-    return new StepChamferDefinition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        edges,
-        optionalNumberValue(instance, definition, 3),
-        optionalNumberValue(instance, definition, 4));
+    return geometricFeatureResolver.resolveChamferDefinition(instance);
   }
 
   StepChamfer resolveChamfer(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHAMFER");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> edges =
-        entityReferenceList(
-            instance, definition, 2,
-            "CHAMFER edges must contain entity references");
-    return new StepChamfer(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        edges,
-        optionalNumberValue(instance, definition, 3),
-        optionalNumberValue(instance, definition, 4));
+    return geometricFeatureResolver.resolveChamfer(instance);
   }
 
   StepPocket resolvePocket(StepEntityInstance instance) {
