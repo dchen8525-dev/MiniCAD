@@ -4,6 +4,8 @@ import com.minicad.common.StepResolutionException;
 import com.minicad.step.model.*;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
+import com.minicad.common.UnsupportedStepEntityException;
+import java.util.List;
 
 /**
  * Surface resolver - handles surface geometry entities.
@@ -211,37 +213,254 @@ final class SurfaceResolver {
         resolver.numberValue(instance, definition, 3));
   }
 
-  StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(StepEntityInstance instance) {
-    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
-    StepEntityResolver.requireParameterCount(instance, definition, 3);
-    return new StepSurfaceOfLinearExtrusion(
-        instance.id(),
-        resolver.stringValue(instance, definition, 0),
-        resolver.resolve(resolver.referenceId(instance, definition, 1)),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 2),
-            StepVector.class,
-            "SURFACE_OF_LINEAR_EXTRUSION extrusion_axis must reference VECTOR"));
-  }
-
-  StepSurfaceOfRevolution resolveSurfaceOfRevolution(StepEntityInstance instance) {
-    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_REVOLUTION");
-    StepEntityResolver.requireParameterCount(instance, definition, 3);
-    return new StepSurfaceOfRevolution(
-        instance.id(),
-        resolver.stringValue(instance, definition, 0),
-        resolver.resolve(resolver.referenceId(instance, definition, 1)),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 2),
-            StepAxis1Placement.class,
-            "SURFACE_OF_REVOLUTION axis_position must reference AXIS1_PLACEMENT"));
-  }
-
   StepBoundedSurface resolveBoundedSurface(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "BOUNDED_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 2);
     return new StepBoundedSurface(
         instance.id(),
         resolver.stringValue(instance, definition, 0));
+  }
+  // === Swept / Projected Surface Entities ===
+
+  StepOffsetSurface2 resolveOffsetSurface2(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "OFFSET_SURFACE_2");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "OFFSET_SURFACE_2 basis_surface must reference a supported surface");
+    }
+    return new StepOffsetSurface2(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisSurface,
+        resolver.numberValue(instance, definition, 3),
+        resolver.booleanValue(instance, definition, 4));
+  }
+
+  StepRuledSurface resolveRuledSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "RULED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepRuledSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "RULED_SURFACE position must reference AXIS2_PLACEMENT_3D"),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepSurfaceOfConstantRadius resolveSurfaceOfConstantRadius(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_CONSTANT_RADIUS");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity sweptSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(sweptSurface)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_OF_CONSTANT_RADIUS swept_surface must reference a supported surface");
+    }
+    return new StepSurfaceOfConstantRadius(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        sweptSurface,
+        resolver.numberValue(instance, definition, 3));
+  }
+
+  StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    StepEntity sweptCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(sweptCurve)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_OF_LINEAR_EXTRUSION swept_curve must reference a supported curve");
+    }
+    return new StepSurfaceOfLinearExtrusion(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        sweptCurve,
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepVector.class,
+            "SURFACE_OF_LINEAR_EXTRUSION extrusion_axis must reference VECTOR"));
+  }
+
+  StepSurfaceOfProjection resolveSurfaceOfProjection(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_PROJECTION");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    StepEntity profile = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(profile)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_OF_PROJECTION profile must reference a supported curve");
+    }
+    return new StepSurfaceOfProjection(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        profile,
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepSurfaceOfRevolution resolveSurfaceOfRevolution(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_REVOLUTION");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    StepEntity sweptCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(sweptCurve)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_OF_REVOLUTION swept_curve must reference a supported curve");
+    }
+    return new StepSurfaceOfRevolution(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        sweptCurve,
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepAxis1Placement.class,
+            "SURFACE_OF_REVOLUTION axis_position must reference AXIS1_PLACEMENT"));
+  }
+
+  StepSurfaceOfTranslation resolveSurfaceOfTranslation(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_TRANSLATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity profile = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedCurveReference(profile)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_OF_TRANSLATION profile must reference a supported curve");
+    }
+    return new StepSurfaceOfTranslation(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        profile,
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  // === Bounded / Trimmed Surface Entities ===
+
+  StepCurveBoundedSurface resolveCurveBoundedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "CURVE_BOUNDED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "CURVE_BOUNDED_SURFACE basis_surface must reference a supported surface");
+    }
+    List<StepEntity> boundaries =
+        resolver.entityReferenceList(
+            instance,
+            definition,
+            2,
+            "CURVE_BOUNDED_SURFACE boundaries must contain entity references");
+    if (boundaries.isEmpty()) {
+      throw new StepResolutionException("CURVE_BOUNDED_SURFACE boundaries must not be empty");
+    }
+    for (StepEntity boundary : boundaries) {
+      if (!(boundary instanceof StepPcurve)
+          && !(boundary instanceof StepSurfaceCurve)
+          && !(boundary instanceof StepSeamCurve)
+          && !(boundary instanceof StepCompositeCurveOnSurface)
+          && !(boundary instanceof StepCompositeCurve)
+          && !resolver.isSupportedCurveReference(boundary)) {
+        throw new UnsupportedStepEntityException(
+            "CURVE_BOUNDED_SURFACE boundaries must reference supported curve entities");
+      }
+    }
+    return new StepCurveBoundedSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisSurface,
+        boundaries,
+        resolver.booleanValue(instance, definition, 3));
+  }
+
+  StepRectangularCompositeSurface resolveRectangularCompositeSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "RECTANGULAR_COMPOSITE_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 7);
+    StepEntity parentSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(parentSurface)) {
+      throw new UnsupportedStepEntityException(
+          "RECTANGULAR_COMPOSITE_SURFACE parent_surface must reference a supported surface");
+    }
+    return new StepRectangularCompositeSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        parentSurface,
+        resolver.numberValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4),
+        resolver.numberValue(instance, definition, 5),
+        resolver.numberValue(instance, definition, 6));
+  }
+
+  StepRectangularTrimmedSurface resolveRectangularTrimmedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "RECTANGULAR_TRIMMED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 8);
+    StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "RECTANGULAR_TRIMMED_SURFACE basis_surface must reference a supported surface");
+    }
+    return new StepRectangularTrimmedSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisSurface,
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4),
+        resolver.numberValue(instance, definition, 5),
+        resolver.booleanValue(instance, definition, 6),
+        resolver.booleanValue(instance, definition, 7));
+  }
+
+  StepSurfacePatch resolveSurfacePatch(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_PATCH");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
+    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_PATCH basis_surface must reference a supported surface");
+    }
+    return new StepSurfacePatch(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        basisSurface,
+        resolver.booleanValue(instance, definition, 3));
+  }
+
+  // === Surface Model Entities ===
+
+  StepGeometricSurfaceSet resolveGeometricSurfaceSet(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "GEOMETRIC_SURFACE_SET");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    List<StepEntity> elements =
+        resolver.entityReferenceList(
+            instance, definition, 1, "GEOMETRIC_SURFACE_SET elements must contain entity references");
+    for (StepEntity element : elements) {
+      if (!resolver.isSupportedSurfaceReference(element)) {
+        throw new UnsupportedStepEntityException(
+            "GEOMETRIC_SURFACE_SET elements must be supported surfaces");
+      }
+    }
+    return new StepGeometricSurfaceSet(instance.id(), resolver.stringValue(instance, definition, 0), elements);
+  }
+
+  StepMachinedSurface resolveMachinedSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "MACHINED_SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    int faceId = resolver.referenceId(instance, definition, 1);
+    return new StepMachinedSurface(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(faceId));
+  }
+
+  StepSurface resolveSurface(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    return new StepSurface(instance.id(), resolver.inheritedRepresentationItemName(instance));
+  }
+
+  StepSurfaceModel resolveSurfaceModel(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_MODEL");
+    StepEntityResolver.requireParameterCount(instance, definition, 0);
+    return new StepSurfaceModel(instance.id(), resolver.inheritedRepresentationItemName(instance));
   }
 }

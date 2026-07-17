@@ -1129,61 +1129,12 @@ public final class StepEntityResolver {
         entityName);
   }
 
-  StepRectangularTrimmedSurface resolveRectangularTrimmedSurface(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RECTANGULAR_TRIMMED_SURFACE");
-    requireParameterCount(instance, definition, 8);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "RECTANGULAR_TRIMMED_SURFACE basis_surface must reference a supported surface");
-    }
-    return new StepRectangularTrimmedSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisSurface,
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        booleanValue(instance, definition, 6),
-        booleanValue(instance, definition, 7));
+  StepRectangularTrimmedSurface resolveRectangularTrimmedSurface(StepEntityInstance instance) {
+    return surfaceResolver.resolveRectangularTrimmedSurface(instance);
   }
 
   StepCurveBoundedSurface resolveCurveBoundedSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_BOUNDED_SURFACE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "CURVE_BOUNDED_SURFACE basis_surface must reference a supported surface");
-    }
-    List<StepEntity> boundaries =
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            "CURVE_BOUNDED_SURFACE boundaries must contain entity references");
-    if (boundaries.isEmpty()) {
-      throw new StepResolutionException("CURVE_BOUNDED_SURFACE boundaries must not be empty");
-    }
-    for (StepEntity boundary : boundaries) {
-      if (!(boundary instanceof StepPcurve)
-          && !(boundary instanceof StepSurfaceCurve)
-          && !(boundary instanceof StepSeamCurve)
-          && !(boundary instanceof StepCompositeCurveOnSurface)
-          && !(boundary instanceof StepCompositeCurve)
-          && !isSupportedCurveReference(boundary)) {
-        throw new UnsupportedStepEntityException(
-            "CURVE_BOUNDED_SURFACE boundaries must reference supported curve entities");
-      }
-    }
-    return new StepCurveBoundedSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisSurface,
-        boundaries,
-        booleanValue(instance, definition, 3));
+    return surfaceResolver.resolveCurveBoundedSurface(instance);
   }
 
   StepAnalysisResult resolveAnalysisResult(StepEntityInstance instance) {
@@ -1218,72 +1169,20 @@ public final class StepEntityResolver {
     return bezierResolver.resolveOrientedSurface(instance);
   }
 
-  StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
-    requireParameterCount(instance, definition, 3);
-    StepEntity sweptCurve = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(sweptCurve)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_OF_LINEAR_EXTRUSION swept_curve must reference a supported curve");
-    }
-    return new StepSurfaceOfLinearExtrusion(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        sweptCurve,
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepVector.class,
-            "SURFACE_OF_LINEAR_EXTRUSION extrusion_axis must reference VECTOR"));
+  StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(StepEntityInstance instance) {
+    return surfaceResolver.resolveSurfaceOfLinearExtrusion(instance);
   }
 
   StepSurfaceOfRevolution resolveSurfaceOfRevolution(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_OF_REVOLUTION");
-    requireParameterCount(instance, definition, 3);
-    StepEntity sweptCurve = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(sweptCurve)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_OF_REVOLUTION swept_curve must reference a supported curve");
-    }
-    return new StepSurfaceOfRevolution(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        sweptCurve,
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepAxis1Placement.class,
-            "SURFACE_OF_REVOLUTION axis_position must reference AXIS1_PLACEMENT"));
+    return surfaceResolver.resolveSurfaceOfRevolution(instance);
   }
 
   StepSurfaceOfTranslation resolveSurfaceOfTranslation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_OF_TRANSLATION");
-    requireParameterCount(instance, definition, 4);
-    StepEntity profile = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(profile)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_OF_TRANSLATION profile must reference a supported curve");
-    }
-    return new StepSurfaceOfTranslation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        profile,
-        resolve(referenceId(instance, definition, 2)));
+    return surfaceResolver.resolveSurfaceOfTranslation(instance);
   }
 
   StepSurfaceOfProjection resolveSurfaceOfProjection(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_OF_PROJECTION");
-    requireParameterCount(instance, definition, 5);
-    StepEntity profile = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedCurveReference(profile)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_OF_PROJECTION profile must reference a supported curve");
-    }
-    return new StepSurfaceOfProjection(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        profile,
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return surfaceResolver.resolveSurfaceOfProjection(instance);
   }
 
   StepOffsetCurve3D resolveOffsetCurve3D(StepEntityInstance instance) {
@@ -4653,9 +4552,7 @@ public final class StepEntityResolver {
   }
 
   StepSurface resolveSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE");
-    requireParameterCount(instance, definition, 0);
-    return new StepSurface(instance.id(), inheritedRepresentationItemName(instance));
+    return surfaceResolver.resolveSurface(instance);
   }
 
   StepBoundedCurve resolveBoundedCurve(StepEntityInstance instance) {
@@ -4738,9 +4635,7 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceModel resolveSurfaceModel(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_MODEL");
-    requireParameterCount(instance, definition, 0);
-    return new StepSurfaceModel(instance.id(), inheritedRepresentationItemName(instance));
+    return surfaceResolver.resolveSurfaceModel(instance);
   }
 
   StepSolidModel resolveSolidModel(StepEntityInstance instance) {
@@ -5284,18 +5179,7 @@ public final class StepEntityResolver {
   }
 
   StepGeometricSurfaceSet resolveGeometricSurfaceSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_SURFACE_SET");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> elements =
-        entityReferenceList(
-            instance, definition, 1, "GEOMETRIC_SURFACE_SET elements must contain entity references");
-    for (StepEntity element : elements) {
-      if (!isSupportedSurfaceReference(element)) {
-        throw new UnsupportedStepEntityException(
-            "GEOMETRIC_SURFACE_SET elements must be supported surfaces");
-      }
-    }
-    return new StepGeometricSurfaceSet(instance.id(), stringValue(instance, definition, 0), elements);
+    return surfaceResolver.resolveGeometricSurfaceSet(instance);
   }
 
   StepClothoid resolveClothoid(StepEntityInstance instance) {
@@ -5335,18 +5219,7 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceOfConstantRadius resolveSurfaceOfConstantRadius(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_OF_CONSTANT_RADIUS");
-    requireParameterCount(instance, definition, 4);
-    StepEntity sweptSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(sweptSurface)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_OF_CONSTANT_RADIUS swept_surface must reference a supported surface");
-    }
-    return new StepSurfaceOfConstantRadius(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        sweptSurface,
-        numberValue(instance, definition, 3));
+    return surfaceResolver.resolveSurfaceOfConstantRadius(instance);
   }
 
   StepDegenerateCurve resolveDegenerateCurve(StepEntityInstance instance) {
@@ -5543,13 +5416,7 @@ public final class StepEntityResolver {
   }
 
   StepMachinedSurface resolveMachinedSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MACHINED_SURFACE");
-    requireParameterCount(instance, definition, 2);
-    int faceId = referenceId(instance, definition, 1);
-    return new StepMachinedSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(faceId));
+    return surfaceResolver.resolveMachinedSurface(instance);
   }
 
   StepEdgeWire resolveEdgeWire(StepEntityInstance instance) {
@@ -5568,36 +5435,11 @@ public final class StepEntityResolver {
   }
 
   StepRectangularCompositeSurface resolveRectangularCompositeSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RECTANGULAR_COMPOSITE_SURFACE");
-    requireParameterCount(instance, definition, 7);
-    StepEntity parentSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(parentSurface)) {
-      throw new UnsupportedStepEntityException(
-          "RECTANGULAR_COMPOSITE_SURFACE parent_surface must reference a supported surface");
-    }
-    return new StepRectangularCompositeSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        parentSurface,
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        numberValue(instance, definition, 6));
+    return surfaceResolver.resolveRectangularCompositeSurface(instance);
   }
 
   StepSurfacePatch resolveSurfacePatch(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_PATCH");
-    requireParameterCount(instance, definition, 4);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_PATCH basis_surface must reference a supported surface");
-    }
-    return new StepSurfacePatch(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisSurface,
-        booleanValue(instance, definition, 3));
+    return surfaceResolver.resolveSurfacePatch(instance);
   }
 
   StepCompositeCurveOnSurface3D resolveCompositeCurveOnSurface3D(StepEntityInstance instance) {
@@ -5640,19 +5482,7 @@ public final class StepEntityResolver {
   }
 
   StepOffsetSurface2 resolveOffsetSurface2(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "OFFSET_SURFACE_2");
-    requireParameterCount(instance, definition, 5);
-    StepEntity basisSurface = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(basisSurface)) {
-      throw new UnsupportedStepEntityException(
-          "OFFSET_SURFACE_2 basis_surface must reference a supported surface");
-    }
-    return new StepOffsetSurface2(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        basisSurface,
-        numberValue(instance, definition, 3),
-        booleanValue(instance, definition, 4));
+    return surfaceResolver.resolveOffsetSurface2(instance);
   }
 
   StepPolygonalBoundedHalfSpace resolvePolygonalBoundedHalfSpace(StepEntityInstance instance) {
@@ -5701,17 +5531,7 @@ public final class StepEntityResolver {
   }
 
   StepRuledSurface resolveRuledSurface(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RULED_SURFACE");
-    requireParameterCount(instance, definition, 5);
-    return new StepRuledSurface(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "RULED_SURFACE position must reference AXIS2_PLACEMENT_3D"),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return surfaceResolver.resolveRuledSurface(instance);
   }
 
   StepCenteredCircleProfileDef resolveCenteredCircleProfileDef(StepEntityInstance instance) {
