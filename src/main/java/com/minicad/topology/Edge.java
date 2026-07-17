@@ -45,14 +45,79 @@ public final class Edge {
         if (start == null || end == null || curve == null) {
             throw new TopologyException("edge vertices and curve are required");
         }
-        if (start.point().distanceTo(end.point()) <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE
-                && !(curve instanceof Circle) && !(curve instanceof com.minicad.geometry.Ellipse3)) {
-            throw new TopologyException("edge must have distinct vertices");
+        // Check if this is a degenerate edge (start == end within tolerance)
+        double vertexDistance = start.point().distanceTo(end.point());
+        boolean isDegenerateEdge = vertexDistance <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE;
+        
+        if (isDegenerateEdge && !isClosedCurve(curve)) {
+            // Degenerate edges are only allowed on closed curves (circle, ellipse, closed B-spline)
+            throw new TopologyException("edge must have distinct vertices unless on a closed curve");
         }
         this.start = start;
         this.end = end;
         this.curve = curve;
         this.sameSense = sameSense;
+    }
+    
+    /**
+     * Checks if a curve is closed (start and end points coincide by construction).
+     * Closed curves include Circle, Ellipse, and closed B-Splines.
+     */
+    public static boolean isClosedCurve(Curve3 curve) {
+        if (curve instanceof Circle || curve instanceof Ellipse3) {
+            return true;  // Circles and ellipses are always closed
+        }
+        if (curve instanceof BSplineCurve3) {
+            BSplineCurve3 bspline = (BSplineCurve3) curve;
+            // A B-Spline is closed if first and last control points coincide
+            if (bspline.getControlPoints().size() >= 2) {
+                CartesianPoint first = bspline.getControlPoints().get(0);
+                CartesianPoint last = bspline.getControlPoints().get(bspline.getControlPoints().size() - 1);
+                return first.distanceTo(last) <= Epsilon.EPS;
+            }
+        }
+        if (curve instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
+            // A rational B-Spline is closed if first and last control points coincide
+            if (rational.getControlPoints().size() >= 2) {
+                CartesianPoint first = rational.getControlPoints().get(0);
+                CartesianPoint last = rational.getControlPoints().get(rational.getControlPoints().size() - 1);
+                return first.distanceTo(last) <= Epsilon.EPS;
+            }
+        }
+        if (curve instanceof CompositeCurve3) {
+            // Composite curve is closed if its segments form a closed loop
+            CompositeCurve3 composite = (CompositeCurve3) curve;
+            if (composite.getSegments().size() > 0) {
+                // Check if the composite curve forms a closed loop
+                return isClosedCompositeCurve(composite);
+            }
+        }
+        if (curve instanceof TrimmedCurve3) {
+            // Trimmed curve is closed if its basis curve is closed and trim spans full circle
+            TrimmedCurve3 trimmed = (TrimmedCurve3) curve;
+            return isClosedCurve(trimmed.getBasisCurve());
+        }
+        return false;  // Line3, Polyline3, SurfaceCurve3 are not closed
+    }
+    
+    /**
+     * Checks if a composite curve forms a closed loop.
+     */
+    private static boolean isClosedCompositeCurve(CompositeCurve3 composite) {
+        java.util.List<Curve3> segments = composite.getSegments();
+        if (segments.isEmpty()) {
+            return false;
+        }
+        // Sample start of first segment and end of last segment
+        try {
+            CartesianPoint firstStart = segments.get(0).sample(2).get(0);
+            java.util.List<CartesianPoint> lastSamples = segments.get(segments.size() - 1).sample(2);
+            CartesianPoint lastEnd = lastSamples.get(lastSamples.size() - 1);
+            return firstStart.distanceTo(lastEnd) <= Epsilon.EPS;
+        } catch (Exception e) {
+            return false;  // Conservative: assume not closed if we can't determine
+        }
     }
 
     public Vertex getStart() {

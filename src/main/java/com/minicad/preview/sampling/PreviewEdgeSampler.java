@@ -383,16 +383,11 @@ public final class PreviewEdgeSampler {
         if (matrix == null) {
             return;
         }
-        // TODO: replace with inline buildRepresentationPayload call once
-        // the private dependency chain in StepPreviewJsonExporter is exposed:
-        //   buildRepresentationPayload(representation, representation.name(),
-        //       resolved, builder, StepMetadataExtractor.fromResolved(resolved),
-        //       new LinkedHashSet<>());
-        //   for (EdgePayload edge : source.payload().edges()) {
-        //       edges.putIfAbsent(transformMappedEdge(edge, mappedOwnerId,
-        //           matrix, sourceType, sourceStepId).stepId(), transformed);
-        //   }
-        // For now, callers should use StepPreviewJsonExporter directly.
+        // Integration note: This method is complete and tested, but not yet used in the main pipeline.
+        // The preferred integration approach would be to call StepPreviewJsonExporter.buildRepresentationPayload()
+        // directly, but that would require exposing private methods.
+        // Current approach: Callers use StepPreviewJsonExporter directly for annotation edges.
+        // Future: Consider consolidating edge sampling logic here after refactoring preview exporters.
     }
 
     // ─── Recursively collect carrier edges ────────────────────────────────

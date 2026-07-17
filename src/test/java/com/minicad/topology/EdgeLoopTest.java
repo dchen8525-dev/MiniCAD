@@ -104,7 +104,7 @@ class EdgeLoopTest {
                 () -> new Edge(v0, v0, line, true)
         );
 
-        assertEquals("edge must have distinct vertices", exception.getMessage());
+        assertEquals("edge must have distinct vertices unless on a closed curve", exception.getMessage());
     }
 
     @Test

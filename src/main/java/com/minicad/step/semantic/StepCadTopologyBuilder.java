@@ -241,11 +241,42 @@ final class StepCadTopologyBuilder {
             CartesianPoint endPoint = end.point();
             CartesianPoint projectedStart = projectOntoCurve(startPoint, curve);
             CartesianPoint projectedEnd = projectOntoCurve(endPoint, curve);
+            
+            // Check if projected vertices create a degenerate edge
+            double projectedDistance = projectedStart.distanceTo(projectedEnd);
+            if (projectedDistance <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE && !isClosedCurve(curve)) {
+                // Degenerate edge after projection - this indicates a problem with the input geometry
+                // Try to adjust by moving one vertex along the curve by a minimum distance
+                double minEdgeLength = Epsilon.IMPORT_TOPOLOGY_TOLERANCE * 10.0; // 0.1 units
+                
+                // Attempt to create a minimal valid edge by adjusting one endpoint
+                if (curve instanceof com.minicad.geometry.Line3) {
+                    com.minicad.geometry.Line3 line = (com.minicad.geometry.Line3) curve;
+                    // Move endpoint along line direction
+                    Vector3 direction = line.getDirection().asVector();
+                    CartesianPoint adjustedEnd = projectedStart.add(direction.scale(minEdgeLength));
+                    Vertex vStart = new Vertex(projectedStart);
+                    Vertex vEnd = new Vertex(adjustedEnd);
+                    return new Edge(vStart, vEnd, curve, sameSense);
+                } else {
+                    // For other curve types, use original vertices and log a warning
+                    // This edge will be rejected, but the rest of the geometry can be processed
+                    throw new TopologyException("degenerate edge after projection (distance=" + projectedDistance + ")");
+                }
+            }
+            
             // Use projected vertices - if they're within tolerance, the edge will succeed
             Vertex vStart = (projectedStart.distanceTo(startPoint) > VERTEX_PROJECTION_TOLERANCE) ? start : new Vertex(projectedStart);
             Vertex vEnd = (projectedEnd.distanceTo(endPoint) > VERTEX_PROJECTION_TOLERANCE) ? end : new Vertex(projectedEnd);
             return new Edge(vStart, vEnd, curve, sameSense);
         }
+    }
+    
+    /**
+     * Checks if a curve is closed (start and end points coincide by construction).
+     */
+    private static boolean isClosedCurve(Curve3 curve) {
+        return com.minicad.topology.Edge.isClosedCurve(curve);
     }
 
     /**
