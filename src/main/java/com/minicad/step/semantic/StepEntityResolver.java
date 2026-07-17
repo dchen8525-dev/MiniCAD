@@ -789,6 +789,7 @@ public final class StepEntityResolver {
   private final SurfaceResolver surfaceResolver;
   private final GeometricFeatureResolver geometricFeatureResolver;
   private final AnalysisResolver analysisResolver;
+  private final AnnotationResolver annotationResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -800,6 +801,7 @@ public final class StepEntityResolver {
     this.surfaceResolver = new SurfaceResolver(this);
     this.geometricFeatureResolver = new GeometricFeatureResolver(this);
     this.analysisResolver = new AnalysisResolver(this);
+    this.annotationResolver = new AnnotationResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -1659,31 +1661,15 @@ public final class StepEntityResolver {
   }
 
   StepGeometricTolerance resolveGeometricTolerance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_TOLERANCE");
-    requireParameterCount(instance, definition, 3);
-    return new StepGeometricTolerance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveGeometricTolerance(instance);
   }
 
   StepToleranceZoneForm resolveToleranceZoneForm(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_ZONE_FORM");
-    requireParameterCount(instance, definition, 2);
-    return new StepToleranceZoneForm(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        enumValue(instance, definition, 1));
+    return annotationResolver.resolveToleranceZoneForm(instance);
   }
 
   StepToleranceZone resolveToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 2);
-    return new StepToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return annotationResolver.resolveToleranceZone(instance);
   }
 
   StepConfigurationItem resolveConfigurationItem(StepEntityInstance instance) {
@@ -1691,24 +1677,11 @@ public final class StepEntityResolver {
   }
 
   StepDirectedDimensionalSize resolveDirectedDimensionalSize(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIRECTED_DIMENSIONAL_SIZE");
-    requireParameterCount(instance, definition, 3);
-    return new StepDirectedDimensionalSize(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDirectedDimensionalSize(instance);
   }
 
-  StepGeometricTolerance resolveGeometricTolerance(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepGeometricTolerance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+  StepGeometricTolerance resolveGeometricTolerance(StepEntityInstance instance, String entityName) {
+    return annotationResolver.resolveGeometricTolerance(instance, entityName);
   }
 
   StepModifier resolveModifier(StepEntityInstance instance) {
@@ -1721,23 +1694,11 @@ public final class StepEntityResolver {
   }
 
   StepCompositeGroupTolerance resolveCompositeGroupTolerance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOSITE_GROUP_TOLERANCE");
-    requireParameterCount(instance, definition, 3);
-    return new StepCompositeGroupTolerance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveCompositeGroupTolerance(instance);
   }
 
   StepGeometricToleranceTarget resolveGeometricToleranceTarget(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_TOLERANCE_TARGET");
-    requireParameterCount(instance, definition, 3);
-    return new StepGeometricToleranceTarget(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2));
+    return annotationResolver.resolveGeometricToleranceTarget(instance);
   }
 
   StepQualifiedRepresentationItem resolveQualifiedRepresentationItem(StepEntityInstance instance) {
@@ -1750,13 +1711,7 @@ public final class StepEntityResolver {
   }
 
   StepDatumReferenceModifierWithSign resolveDatumReferenceModifierWithSign(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_MODIFIER_WITH_SIGN");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumReferenceModifierWithSign(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2));
+    return annotationResolver.resolveDatumReferenceModifierWithSign(instance);
   }
 
   StepRunoutZoneDefinition resolveRunoutZoneDefinition(StepEntityInstance instance) {
@@ -1787,12 +1742,7 @@ public final class StepEntityResolver {
   }
 
   StepRunoutToleranceZone resolveRunoutToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RUNOUT_TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 2);
-    return new StepRunoutToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return annotationResolver.resolveRunoutToleranceZone(instance);
   }
 
   StepGeometricToleranceWithDatumReference resolveGeometricToleranceWithDatumReference(
@@ -1810,25 +1760,11 @@ public final class StepEntityResolver {
   }
 
   StepLinearToleranceZone resolveLinearToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LINEAR_TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 4);
-    return new StepLinearToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        numberValue(instance, definition, 3));
+    return annotationResolver.resolveLinearToleranceZone(instance);
   }
 
   StepRadialToleranceZone resolveRadialToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RADIAL_TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 4);
-    return new StepRadialToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        numberValue(instance, definition, 3));
+    return annotationResolver.resolveRadialToleranceZone(instance);
   }
 
   StepProjectedZoneDefinition resolveProjectedZoneDefinition(StepEntityInstance instance) {
@@ -1922,13 +1858,7 @@ public final class StepEntityResolver {
   }
 
   StepDatumReferenceModifier resolveDatumReferenceModifier(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_MODIFIER");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumReferenceModifier(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDatumReferenceModifier(instance);
   }
 
   // Phase 4: Tessellated triangulated resolve methods
@@ -1991,131 +1921,39 @@ public final class StepEntityResolver {
   }
 
   StepDatum resolveDatum(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatum(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        booleanValue(instance, definition, 3));
+    return annotationResolver.resolveDatum(instance);
   }
 
   StepDatumFeature resolveDatumFeature(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_FEATURE");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumFeature(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDatumFeature(instance);
   }
 
   StepDatumReference resolveDatumReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        integerValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDatumReference(instance);
   }
 
   StepDatumReferenceCompartment resolveDatumReferenceCompartment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_REFERENCE_COMPARTMENT");
-    requireParameterCount(instance, definition, 6);
-    return new StepDatumReferenceCompartment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        integerValue(instance, definition, 3),
-        resolve(referenceId(instance, definition, 4)));
+    return annotationResolver.resolveDatumReferenceCompartment(instance);
   }
 
   StepDatumTarget resolveDatumTarget(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_TARGET");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumTarget(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDatumTarget(instance);
   }
 
   StepDatumSystem resolveDatumSystem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_SYSTEM");
-    requireParameterCount(instance, definition, 4);
-    StepValue datumValue = unwrapTyped(definition.parameters().get(2));
-    List<StepEntity> datums;
-    if (datumValue instanceof StepValue.ListValue) {
-      StepValue.ListValue listValue = (StepValue.ListValue) datumValue;
-      datums = new ArrayList<>(listValue.elements().size());
-      for (StepValue element : listValue.elements()) {
-        StepValue unwrapped = unwrapTyped(element);
-        if (unwrapped instanceof StepValue.ReferenceValue) {
-          StepValue.ReferenceValue ref = (StepValue.ReferenceValue) unwrapped;
-          datums.add(resolve(ref.id()));
-        }
-      }
-    } else if (datumValue instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue ref = (StepValue.ReferenceValue) datumValue;
-      datums = List.of(resolve(ref.id()));
-    } else {
-      throw new StepResolutionException(
-          "DATUM_SYSTEM datums must contain entity references");
-    }
-    StepValue lastValue = unwrapTyped(definition.parameters().get(3));
-    StepEntity tolerance;
-    if (lastValue instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue ref = (StepValue.ReferenceValue) lastValue;
-      tolerance = resolve(ref.id());
-    } else {
-      tolerance = null;
-    }
-    return new StepDatumSystem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        datums,
-        stringValue(instance, definition, 1),
-        tolerance);
+    return annotationResolver.resolveDatumSystem(instance);
   }
 
   StepDatumSystemReference resolveDatumSystemReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATUM_SYSTEM_REFERENCE");
-    requireParameterCount(instance, definition, 4);
-    return new StepDatumSystemReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        integerValue(instance, definition, 2));
+    return annotationResolver.resolveDatumSystemReference(instance);
   }
 
   StepTolerancePair resolveTolerancePair(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_PAIR");
-    requireParameterCount(instance, definition, 6);
-    return new StepTolerancePair(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalNumberValue(instance, definition, 1),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        stringValue(instance, definition, 4));
+    return annotationResolver.resolveTolerancePair(instance);
   }
 
   StepToleranceSet resolveToleranceSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_SET");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> tolerances =
-        entityReferenceList(
-            instance, definition, 1,
-            "TOLERANCE_SET tolerances must contain entity references");
-    return new StepToleranceSet(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        tolerances,
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return annotationResolver.resolveToleranceSet(instance);
   }
 
   StepGeometricMeasurement resolveGeometricMeasurement(StepEntityInstance instance) {
@@ -2137,18 +1975,7 @@ public final class StepEntityResolver {
   }
 
   StepDimensionalMeasurement resolveDimensionalMeasurement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_MEASUREMENT");
-    requireParameterCount(instance, definition, 9);
-    return new StepDimensionalMeasurement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5),
-        numberValue(instance, definition, 6),
-        resolve(referenceId(instance, definition, 7)));
+    return annotationResolver.resolveDimensionalMeasurement(instance);
   }
 
   // Manufacturing operation resolvers
@@ -2388,17 +2215,7 @@ public final class StepEntityResolver {
   }
 
   StepCompositeDatumReference resolveCompositeDatumReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOSITE_DATUM_REFERENCE");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> datums =
-        entityReferenceList(
-            instance, definition, 2,
-            "COMPOSITE_DATUM_REFERENCE datums must contain entity references");
-    return new StepCompositeDatumReference(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        datums,
-        stringValue(instance, definition, 3));
+    return annotationResolver.resolveCompositeDatumReference(instance);
   }
 
   StepCsgVolume resolveCsgVolume(StepEntityInstance instance) {
@@ -2465,26 +2282,11 @@ public final class StepEntityResolver {
   }
 
   StepRectangularToleranceZone resolveRectangularToleranceZone(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RECTANGULAR_TOLERANCE_ZONE");
-    requireParameterCount(instance, definition, 6);
-    return new StepRectangularToleranceZone(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        optionalNumberValue(instance, definition, 3),
-        optionalNumberValue(instance, definition, 4));
+    return annotationResolver.resolveRectangularToleranceZone(instance);
   }
 
   StepToleranceModifier resolveToleranceModifier(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_MODIFIER");
-    requireParameterCount(instance, definition, 5);
-    return new StepToleranceModifier(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return annotationResolver.resolveToleranceModifier(instance);
   }
 
   StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName) {
@@ -2546,57 +2348,23 @@ public final class StepEntityResolver {
   }
 
   StepDimensionalSize resolveDimensionalSize(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_SIZE");
-    requireParameterCount(instance, definition, 4);
-    return new StepDimensionalSize(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDimensionalSize(instance);
   }
 
   StepDimensionalLocation resolveDimensionalLocation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIMENSIONAL_LOCATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepDimensionalLocation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveDimensionalLocation(instance);
   }
 
   StepShapeDimensionRepresentation resolveShapeDimensionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_DIMENSION_REPRESENTATION");
-    requireParameterCount(instance, definition, 3);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 1,
-            "SHAPE_DIMENSION_REPRESENTATION items must contain entity references");
-    return new StepShapeDimensionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        items,
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveShapeDimensionRepresentation(instance);
   }
 
   StepPlusMinusTolerance resolvePlusMinusTolerance(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLUS_MINUS_TOLERANCE");
-    requireParameterCount(instance, definition, 4);
-    return new StepPlusMinusTolerance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolvePlusMinusTolerance(instance);
   }
 
   StepToleranceValue resolveToleranceValue(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOLERANCE_VALUE");
-    requireParameterCount(instance, definition, 4);
-    return new StepToleranceValue(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2));
+    return annotationResolver.resolveToleranceValue(instance);
   }
 
   StepMeasureRepresentationItemWithUnit resolveMeasureRepresentationItemWithUnit(
@@ -2688,14 +2456,7 @@ public final class StepEntityResolver {
   }
 
   StepRangeDimensionalSize resolveRangeDimensionalSize(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RANGE_DIMENSIONAL_SIZE");
-    requireParameterCount(instance, definition, 5);
-    return new StepRangeDimensionalSize(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return annotationResolver.resolveRangeDimensionalSize(instance);
   }
 
   StepDesignedPartDesignVersion resolveDesignedPartDesignVersion(StepEntityInstance instance) {
@@ -3165,7 +2926,6 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         resolve(referenceId(instance, definition, 1)));
   }
-
 
   // Phase 5: FEA resolve methods
 
@@ -4308,13 +4068,7 @@ public final class StepEntityResolver {
 
   // Annotation resolvers
   StepAnnotationFillAreaRegion resolveAnnotationFillAreaRegion(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_FILL_AREA_REGION");
-    requireParameterCount(instance, definition, 3);
-    return new StepAnnotationFillAreaRegion(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ANNOTATION_FILL_AREA_REGION regions must contain entity references"));
+    return annotationResolver.resolveAnnotationFillAreaRegion(instance);
   }
 
   // Product resolvers
@@ -4501,17 +4255,7 @@ public final class StepEntityResolver {
 
   // Annotation resolvers
   StepAnnotationRecord resolveAnnotationRecord(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_RECORD");
-    requireParameterCount(instance, definition, 8);
-    return new StepAnnotationRecord(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        stringValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)),
-        stringValue(instance, definition, 6));
+    return annotationResolver.resolveAnnotationRecord(instance);
   }
 
   StepDrawingReference resolveDrawingReference(StepEntityInstance instance) {
@@ -4575,54 +4319,19 @@ public final class StepEntityResolver {
 
   // Tolerance/dimension representation resolvers
   StepAngularDimensionRepresentation resolveAngularDimensionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANGULAR_DIMENSION_REPRESENTATION");
-    requireParameterCount(instance, definition, 6);
-    return new StepAngularDimensionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ANGULAR_DIMENSION_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        optionalNumberValue(instance, definition, 3),
-        resolve(referenceId(instance, definition, 4)));
+    return annotationResolver.resolveAngularDimensionRepresentation(instance);
   }
 
   StepChainDimensionRepresentation resolveChainDimensionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CHAIN_DIMENSION_REPRESENTATION");
-    requireParameterCount(instance, definition, 5);
-    return new StepChainDimensionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "CHAIN_DIMENSION_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return annotationResolver.resolveChainDimensionRepresentation(instance);
   }
 
   StepLinearDimensionRepresentation resolveLinearDimensionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LINEAR_DIMENSION_REPRESENTATION");
-    requireParameterCount(instance, definition, 6);
-    return new StepLinearDimensionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "LINEAR_DIMENSION_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        optionalNumberValue(instance, definition, 3),
-        resolve(referenceId(instance, definition, 4)));
+    return annotationResolver.resolveLinearDimensionRepresentation(instance);
   }
 
   StepOrdinateDimensionRepresentation resolveOrdinateDimensionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORDINATE_DIMENSION_REPRESENTATION");
-    requireParameterCount(instance, definition, 6);
-    return new StepOrdinateDimensionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ORDINATE_DIMENSION_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)));
+    return annotationResolver.resolveOrdinateDimensionRepresentation(instance);
   }
 
   StepShapeDimensionRepresentationWithTolerance resolveShapeDimensionRepresentationWithTolerance(
@@ -4734,13 +4443,7 @@ public final class StepEntityResolver {
   }
 
   StepTextLiteralWithDraughtingCallout resolveTextLiteralWithDraughtingCallout(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_LITERAL_WITH_DRAUGHTING_CALLOUT");
-    requireParameterCount(instance, definition, 4);
-    return new StepTextLiteralWithDraughtingCallout(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveTextLiteralWithDraughtingCallout(instance);
   }
 
   StepComposedTextLiteral resolveComposedTextLiteral(StepEntityInstance instance) {
@@ -4888,12 +4591,7 @@ public final class StepEntityResolver {
   }
 
   StepDraughtingPreDefinedTerminatorSymbol resolveDraughtingPreDefinedTerminatorSymbol(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAUGHTING_PRE_DEFINED_TERMINATOR_SYMBOL");
-    requireParameterCount(instance, definition, 3);
-    return new StepDraughtingPreDefinedTerminatorSymbol(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return annotationResolver.resolveDraughtingPreDefinedTerminatorSymbol(instance);
   }
 
   // Tolerance/PMI resolvers
@@ -4956,7 +4654,6 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 1));
   }
 
-
   StepPersonAndOrganizationAddress resolvePersonAndOrganizationAddress(
       StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ADDRESS");
@@ -4999,13 +4696,7 @@ public final class StepEntityResolver {
   }
 
   StepGeneralizedDatum resolveGeneralizedDatum(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GENERALIZED_DATUM");
-    requireParameterCount(instance, definition, 4);
-    return new StepGeneralizedDatum(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveGeneralizedDatum(instance);
   }
 
   StepActionDirective resolveActionDirective(StepEntityInstance instance) {
@@ -5084,7 +4775,6 @@ public final class StepEntityResolver {
         items,
         resolve(referenceId(instance, definition, 3)));
   }
-
 
   boolean isOpenShellEntity(StepEntity entity) {
     return topologyResolver.isOpenShellEntity(entity);
@@ -8256,22 +7946,7 @@ public final class StepEntityResolver {
   }
 
   StepAnnotationText resolveAnnotationText(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_TEXT");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "ANNOTATION_TEXT mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepAnnotationText(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentationMap.class,
-            "ANNOTATION_TEXT mapping_source must reference REPRESENTATION_MAP"),
-        mappingTarget);
+    return annotationResolver.resolveAnnotationText(instance);
   }
 
   StepAnnotationTextCharacter resolveAnnotationTextCharacter(
@@ -8295,22 +7970,7 @@ public final class StepEntityResolver {
   }
 
   StepAnnotationSymbol resolveAnnotationSymbol(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_SYMBOL");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "ANNOTATION_SYMBOL mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepAnnotationSymbol(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepSymbolRepresentationMap.class,
-            "ANNOTATION_SYMBOL mapping_source must reference SYMBOL_REPRESENTATION_MAP"),
-        mappingTarget);
+    return annotationResolver.resolveAnnotationSymbol(instance);
   }
 
   StepAnnotationSymbolOccurrence resolveAnnotationSymbolOccurrence(
@@ -8468,82 +8128,19 @@ public final class StepEntityResolver {
   }
 
   StepLeaderCurve resolveLeaderCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LEADER_CURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationCurveCarrier(item)) {
-      throw new StepResolutionException(
-          "LEADER_CURVE item must reference a supported curve, EDGE_CURVE, SUBEDGE, ORIENTED_EDGE, EDGE_LOOP, POLY_LOOP, PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH, CONNECTED_EDGE_SET, WIRE_SHELL, wireframe model or GEOMETRIC_CURVE_SET");
-    }
-    return new StepLeaderCurve(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "LEADER_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+    return annotationResolver.resolveLeaderCurve(instance);
   }
 
   StepProjectionCurve resolveProjectionCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PROJECTION_CURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationCurveCarrier(item)) {
-      throw new StepResolutionException(
-          "PROJECTION_CURVE item must reference a supported curve, EDGE_CURVE, SUBEDGE, ORIENTED_EDGE, EDGE_LOOP, POLY_LOOP, PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH, CONNECTED_EDGE_SET, WIRE_SHELL, wireframe model or GEOMETRIC_CURVE_SET");
-    }
-    return new StepProjectionCurve(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "PROJECTION_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+    return annotationResolver.resolveProjectionCurve(instance);
   }
 
   StepDimensionCurve resolveDimensionCurve(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DIMENSION_CURVE");
-    requireParameterCount(instance, definition, 3);
-    StepEntity item = resolve(referenceId(instance, definition, 2));
-    if (!isSupportedAnnotationCurveCarrier(item)) {
-      throw new StepResolutionException(
-          "DIMENSION_CURVE item must reference a supported curve, EDGE_CURVE, SUBEDGE, ORIENTED_EDGE, EDGE_LOOP, POLY_LOOP, PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH, CONNECTED_EDGE_SET, WIRE_SHELL, wireframe model or GEOMETRIC_CURVE_SET");
-    }
-    return new StepDimensionCurve(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "DIMENSION_CURVE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        item);
+    return annotationResolver.resolveDimensionCurve(instance);
   }
 
   StepAnnotationFillArea resolveAnnotationFillArea(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_FILL_AREA");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> boundaries =
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "ANNOTATION_FILL_AREA boundaries must contain curve references");
-    for (StepEntity boundary : boundaries) {
-      if (!isSupportedAnnotationCurveCarrier(boundary)) {
-        throw new StepResolutionException(
-            "ANNOTATION_FILL_AREA boundaries must reference supported curves, EDGE_CURVE, SUBEDGE, ORIENTED_EDGE, EDGE_LOOP, POLY_LOOP, PATH, OPEN_PATH, SUBPATH, ORIENTED_PATH, CONNECTED_EDGE_SET, WIRE_SHELL, wireframe model or GEOMETRIC_CURVE_SET");
-      }
-    }
-    return new StepAnnotationFillArea(
-        instance.id(), stringValue(instance, definition, 0), boundaries);
+    return annotationResolver.resolveAnnotationFillArea(instance);
   }
 
   StepAnnotationFillAreaOccurrence resolveAnnotationFillAreaOccurrence(
@@ -8603,37 +8200,7 @@ public final class StepEntityResolver {
   }
 
   StepAnnotationPlane resolveAnnotationPlane(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ANNOTATION_PLANE");
-    requireParameterCount(instance, definition, 1);
-    List<StepEntity> elements = List.of();
-    if (!isUnset(definition.parameters().get(0))) {
-      elements =
-          entityReferenceList(
-              instance,
-              definition,
-              0,
-              "ANNOTATION_PLANE elements must contain entity references");
-      for (StepEntity element : elements) {
-        if (!isSupportedAnnotationPlaneElement(element)) {
-          throw new UnsupportedStepEntityException(
-              "ANNOTATION_PLANE elements must reference supported point carriers or point-like annotation content/occurrences");
-        }
-      }
-    }
-    return new StepAnnotationPlane(
-        instance.id(),
-        inheritedRepresentationItemName(instance),
-        referenceList(
-            instance,
-            definition(instance, "STYLED_ITEM"),
-            1,
-            StepPresentationStyleAssignment.class,
-            "ANNOTATION_PLANE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        requireEntity(
-            inheritedStyledItemTargetId(instance),
-            StepPlane.class,
-            "ANNOTATION_PLANE item must reference PLANE"),
-        elements);
+    return annotationResolver.resolveAnnotationPlane(instance);
   }
 
   StepGeometricCurveSet resolveGeometricCurveSet(StepEntityInstance instance) {
@@ -9519,7 +9086,7 @@ public final class StepEntityResolver {
         meshDensity);
   }
 
-  private boolean isSupportedAnnotationCurveCarrier(StepEntity item) {
+  boolean isSupportedAnnotationCurveCarrier(StepEntity item) {
     return isSupportedCurveReference(item)
         || item instanceof StepEdgeCurve
         || item instanceof StepSubedge
@@ -9537,7 +9104,19 @@ public final class StepEntityResolver {
         || item instanceof StepGeometricCurveSet;
   }
 
-  private boolean isSupportedAnnotationPointCarrier(StepEntity item) {
+  boolean isSupportedAnnotationPlaneElement(StepEntity item) {
+    return isSupportedAnnotationPointCarrier(item)
+        || item instanceof StepAnnotationPointOccurrence
+        || item instanceof StepAnnotationFillAreaOccurrence
+        || item instanceof StepAnnotationTextOccurrence
+        || item instanceof StepAnnotationPlaceholderOccurrence
+        || item instanceof StepAnnotationSymbolOccurrence
+        || item instanceof StepAnnotationSubfigureOccurrence
+        || item instanceof StepDraughtingAnnotationOccurrence
+        || item instanceof StepAnnotationPlane;
+  }
+
+  boolean isSupportedAnnotationPointCarrier(StepEntity item) {
     return item instanceof StepCartesianPoint
         || item instanceof StepVertexPoint
         || item instanceof StepVertexShell
@@ -9555,18 +9134,6 @@ public final class StepEntityResolver {
         || item instanceof StepAnnotationPlane
         || (item instanceof StepGeometricReplica
             && "POINT_REPLICA".equals(((StepGeometricReplica) item).entityName()));
-  }
-
-  private boolean isSupportedAnnotationPlaneElement(StepEntity item) {
-    return isSupportedAnnotationPointCarrier(item)
-        || item instanceof StepAnnotationPointOccurrence
-        || item instanceof StepAnnotationFillAreaOccurrence
-        || item instanceof StepAnnotationTextOccurrence
-        || item instanceof StepAnnotationPlaceholderOccurrence
-        || item instanceof StepAnnotationSymbolOccurrence
-        || item instanceof StepAnnotationSubfigureOccurrence
-        || item instanceof StepDraughtingAnnotationOccurrence
-        || item instanceof StepAnnotationPlane;
   }
 
   private boolean isSupportedAnnotationWrapperItem(StepEntity item) {
@@ -9692,109 +9259,19 @@ public final class StepEntityResolver {
   }
 
   StepDraughtingCallout resolveDraughtingCallout(StepEntityInstance instance) {
-    return resolveDraughtingCallout(instance, "DRAUGHTING_CALLOUT");
+    return annotationResolver.resolveDraughtingCallout(instance);
   }
 
-  StepDraughtingCallout resolveDraughtingCallout(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> contents =
-        entityReferenceList(
-            instance, definition, 1, entityName + " contents must contain entity references");
-    for (StepEntity content : contents) {
-      if (!(content instanceof StepAnnotationTextOccurrence)
-          && !(content instanceof StepCartesianPoint)
-          && !(content instanceof StepVertexPoint)
-          && !isSupportedCurveReference(content)
-          && !(content instanceof StepGeometricReplica
-              && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName()))
-          && !(content instanceof StepEdgeCurve)
-          && !(content instanceof StepSubedge)
-          && !(content instanceof StepOrientedEdge)
-          && !(content instanceof StepManifoldSolidBrep)
-          && !(content instanceof StepBrepWithVoids)
-          && !(content instanceof StepSweptAreaSolid)
-          && !(content instanceof StepSolidReplica)
-          && !(content instanceof StepCsgSolid)
-          && !(content instanceof StepCsgPrimitive)
-          && !(content instanceof StepBooleanResult)
-          && !(content instanceof StepBooleanClippingResult)
-          && !(content instanceof StepAdvancedFace)
-          && !(content instanceof StepFaceSurface)
-          && !(content instanceof StepOrientedFace)
-          && !(content instanceof StepOpenShell)
-          && !(content instanceof StepSurfacedOpenShell)
-          && !(content instanceof StepOrientedOpenShell)
-          && !(content instanceof StepClosedShell)
-          && !(content instanceof StepOrientedClosedShell)
-          && !(content instanceof StepConnectedFaceSet)
-          && !(content instanceof StepConnectedFaceSubSet)
-          && !(content instanceof StepFaceBasedSurfaceModel)
-          && !(content instanceof StepShellBasedSurfaceModel)
-          && !(content instanceof StepGeometricSet)
-          && !(content instanceof StepGeometricCurveSet)
-          && !(content instanceof StepPointSet)
-          && !(content instanceof StepPath)
-          && !(content instanceof StepOpenPath)
-          && !(content instanceof StepSubpath)
-          && !(content instanceof StepOrientedPath)
-          && !(content instanceof StepConnectedEdgeSet)
-          && !(content instanceof StepPolyLoop)
-          && !(content instanceof StepVertexLoop)
-          && !(content instanceof StepVertexShell)
-          && !(content instanceof StepWireShell)
-          && !(content instanceof StepEdgeLoop)
-          && !(content instanceof StepEdgeBasedWireframeModel)
-          && !(content instanceof StepShellBasedWireframeModel)
-          && !(content instanceof StepFaceBasedSurfaceModel)
-          && !(content instanceof StepShellBasedSurfaceModel)
-          && !(content instanceof StepAnnotationSymbol)
-          && !(content instanceof StepAnnotationText)
-          && !(content instanceof StepAnnotationTextCharacter)
-          && !(content instanceof StepAnnotationFillArea)
-          && !(content instanceof StepAnnotationSymbolOccurrence)
-          && !(content instanceof StepAnnotationSubfigureOccurrence)
-          && !(content instanceof StepAnnotationFillAreaOccurrence)
-          && !(content instanceof StepAnnotationPlaceholderOccurrence)
-          && !(content instanceof StepAnnotationPlane)
-          && !(content instanceof StepAnnotationCurveOccurrence)
-          && !(content instanceof StepAnnotationPointOccurrence)
-          && !(content instanceof StepDraughtingAnnotationOccurrence)
-          && !(content instanceof StepTerminatorSymbol)) {
-        throw new UnsupportedStepEntityException(
-            entityName
-                + " contents must reference supported annotation content, direct point carriers, supported curves/edge carriers, TERMINATOR_SYMBOL, supported face/shell/path/wire/model containers, GEOMETRIC_SET, POINT_SET or GEOMETRIC_CURVE_SET");
-      }
-    }
-    return new StepDraughtingCallout(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        contents,
-        entityName);
+  StepDraughtingCallout resolveDraughtingCallout(StepEntityInstance instance, String entityName) {
+    return annotationResolver.resolveDraughtingCallout(instance, entityName);
   }
 
-  StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(
-      StepEntityInstance instance) {
-    return resolveDraughtingCalloutRelationship(instance, "DRAUGHTING_CALLOUT_RELATIONSHIP");
+  StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(StepEntityInstance instance) {
+    return annotationResolver.resolveDraughtingCalloutRelationship(instance);
   }
 
-  StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepDraughtingCalloutRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepDraughtingCallout.class,
-            entityName + " relating_callout must reference DRAUGHTING_CALLOUT"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepDraughtingCallout.class,
-            entityName + " related_callout must reference DRAUGHTING_CALLOUT"));
+  StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(StepEntityInstance instance, String entityName) {
+    return annotationResolver.resolveDraughtingCalloutRelationship(instance, entityName);
   }
 
   StepMeasureRepresentationItem resolveMeasureRepresentationItem(
@@ -10967,10 +10444,6 @@ public final class StepEntityResolver {
     return referenceId(instance, definition, 2);
   }
 
-
-
-
-
   static void registerProductDefinitionRelationshipAliases(
       Map<String, EntityFactory> registry, String... entityNames) {
     for (String entityName : entityNames) {
@@ -10990,11 +10463,6 @@ public final class StepEntityResolver {
               resolver.resolveProductDefinitionRelationshipRelationship(instance, entityName));
     }
   }
-
-
-
-
-
 
   static void registerRepresentationAliases(
       Map<String, EntityFactory> registry, boolean shapeRepresentation, String... entityNames) {
