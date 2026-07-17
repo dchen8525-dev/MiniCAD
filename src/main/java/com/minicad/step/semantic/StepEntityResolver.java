@@ -2000,18 +2000,8 @@ public final class StepEntityResolver {
     return materialResolver.resolveSurfaceStyleRendering(instance);
   }
 
-  StepSurfaceStyleRenderingWithProperties resolveSurfaceStyleRenderingWithProperties(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_RENDERING_WITH_PROPERTIES");
-    requireParameterCount(instance, definition, 3);
-    List<StepEntity> props =
-        entityReferenceList(
-            instance, definition, 1,
-            "SURFACE_STYLE_RENDERING_WITH_PROPERTIES properties must contain entity references");
-    return new StepSurfaceStyleRenderingWithProperties(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        props);
+  StepSurfaceStyleRenderingWithProperties resolveSurfaceStyleRenderingWithProperties(StepEntityInstance instance) {
+    return materialResolver.resolveSurfaceStyleRenderingWithProperties(instance);
   }
 
   StepRenderingProperties resolveRenderingProperties(StepEntityInstance instance) {
@@ -4663,11 +4653,8 @@ public final class StepEntityResolver {
     return draughtingResolver.resolvePreDefinedTerminatorSymbol(instance);
   }
 
-  StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_SURFACE_SIDE_STYLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedSurfaceSideStyle(instance.id(), stringValue(instance, definition, 0));
+  StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(StepEntityInstance instance) {
+    return materialResolver.resolvePreDefinedSurfaceSideStyle(instance);
   }
 
   StepDraughtingPreDefinedTextFont resolveDraughtingPreDefinedTextFont(StepEntityInstance instance) {
@@ -4799,13 +4786,8 @@ public final class StepEntityResolver {
     return materialResolver.resolveSurfaceStyleControlGrid(instance);
   }
 
-  StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_SEGMENTATION_CURVE");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleSegmentationCurve(
-        instance.id(),
-        requireCurveStyleReference(instance, definition, "SURFACE_STYLE_SEGMENTATION_CURVE"));
+  StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(StepEntityInstance instance) {
+    return materialResolver.resolveSurfaceStyleSegmentationCurve(instance);
   }
 
   StepSurfaceStyleSilhouette resolveSurfaceStyleSilhouette(StepEntityInstance instance) {
@@ -4816,56 +4798,20 @@ public final class StepEntityResolver {
     return materialResolver.resolveSurfaceStyleTransparent(instance);
   }
 
-  StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleReflectanceAmbient(instance.id(), numberValue(instance, definition, 0));
+  StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(StepEntityInstance instance) {
+    return materialResolver.resolveSurfaceStyleReflectanceAmbient(instance);
   }
 
-  StepSurfaceStyleReflectanceAmbientDiffuse resolveSurfaceStyleReflectanceAmbientDiffuse(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE");
-    requireParameterCount(instance, definition, 2);
-    return new StepSurfaceStyleReflectanceAmbientDiffuse(
-        instance.id(),
-        numberValue(instance, definition, 0),
-        numberValue(instance, definition, 1));
+  StepSurfaceStyleReflectanceAmbientDiffuse resolveSurfaceStyleReflectanceAmbientDiffuse(StepEntityInstance instance) {
+    return materialResolver.resolveSurfaceStyleReflectanceAmbientDiffuse(instance);
   }
 
   StepSurfaceStyleReflectanceAmbientDiffuseSpecular resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR");
-    requireParameterCount(instance, definition, 5);
-    StepEntity specularColour = resolve(referenceId(instance, definition, 4));
-    if (!(specularColour instanceof StepColour)
-        && !(specularColour instanceof StepColourSpecification)
-        && !(specularColour instanceof StepColourRgb)
-        && !(specularColour instanceof StepDraughtingPreDefinedColour)
-        && !(specularColour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR specular_colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepSurfaceStyleReflectanceAmbientDiffuseSpecular(
-        instance.id(),
-        numberValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        specularColour);
+    return materialResolver.resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(instance);
   }
 
-  StepSurfaceStyleParameterLine resolveSurfaceStyleParameterLine(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_PARAMETER_LINE");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleParameterLine(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCurveStyle.class,
-            "SURFACE_STYLE_PARAMETER_LINE style must reference CURVE_STYLE"));
+  StepSurfaceStyleParameterLine resolveSurfaceStyleParameterLine(StepEntityInstance instance) {
+    return materialResolver.resolveSurfaceStyleParameterLine(instance);
   }
 
   StepSurfaceSideStyle resolveSurfaceSideStyle(StepEntityInstance instance) {

@@ -653,4 +653,81 @@ final class MaterialResolver {
     }
     return new StepSymbolStyle(instance.id(), resolver.stringValue(instance, definition, 0), styleOfSymbol);
   }
+  // === Surface Style Entities ===
+
+  StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "PRE_DEFINED_SURFACE_SIDE_STYLE");
+    StepEntityResolver.requireParameterCount(instance, definition, 1);
+    return new StepPreDefinedSurfaceSideStyle(instance.id(), resolver.stringValue(instance, definition, 0));
+  }
+
+  StepSurfaceStyleParameterLine resolveSurfaceStyleParameterLine(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_STYLE_PARAMETER_LINE");
+    StepEntityResolver.requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleParameterLine(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepCurveStyle.class,
+            "SURFACE_STYLE_PARAMETER_LINE style must reference CURVE_STYLE"));
+  }
+
+  StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT");
+    StepEntityResolver.requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleReflectanceAmbient(instance.id(), resolver.numberValue(instance, definition, 0));
+  }
+
+  StepSurfaceStyleReflectanceAmbientDiffuse resolveSurfaceStyleReflectanceAmbientDiffuse(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepSurfaceStyleReflectanceAmbientDiffuse(
+        instance.id(),
+        resolver.numberValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1));
+  }
+
+  StepSurfaceStyleReflectanceAmbientDiffuseSpecular resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    StepEntity specularColour = resolver.resolve(resolver.referenceId(instance, definition, 4));
+    if (!(specularColour instanceof StepColour)
+        && !(specularColour instanceof StepColourSpecification)
+        && !(specularColour instanceof StepColourRgb)
+        && !(specularColour instanceof StepDraughtingPreDefinedColour)
+        && !(specularColour instanceof StepPreDefinedColour)) {
+      throw new UnsupportedStepEntityException(
+          "SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR specular_colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
+    }
+    return new StepSurfaceStyleReflectanceAmbientDiffuseSpecular(
+        instance.id(),
+        resolver.numberValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3),
+        specularColour);
+  }
+
+  StepSurfaceStyleRenderingWithProperties resolveSurfaceStyleRenderingWithProperties(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_STYLE_RENDERING_WITH_PROPERTIES");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    List<StepEntity> props =
+        resolver.entityReferenceList(
+            instance, definition, 1,
+            "SURFACE_STYLE_RENDERING_WITH_PROPERTIES properties must contain entity references");
+    return new StepSurfaceStyleRenderingWithProperties(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        props);
+  }
+
+  StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SURFACE_STYLE_SEGMENTATION_CURVE");
+    StepEntityResolver.requireParameterCount(instance, definition, 1);
+    return new StepSurfaceStyleSegmentationCurve(
+        instance.id(),
+        resolver.requireCurveStyleReference(instance, definition, "SURFACE_STYLE_SEGMENTATION_CURVE"));
+  }
 }
