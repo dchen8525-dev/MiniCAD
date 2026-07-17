@@ -800,6 +800,7 @@ public final class StepEntityResolver {
   private final BezierResolver bezierResolver;
   private final SolidResolver solidResolver;
   private final ProfileResolver profileResolver;
+  private final MachiningResolver machiningResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -820,6 +821,7 @@ public final class StepEntityResolver {
     this.bezierResolver = new BezierResolver(this);
     this.solidResolver = new SolidResolver(this);
     this.profileResolver = new ProfileResolver(this);
+    this.machiningResolver = new MachiningResolver(this);
   }
 
   /**
@@ -1908,31 +1910,11 @@ public final class StepEntityResolver {
 
   // Manufacturing operation resolvers
   StepMachiningOperation resolveMachiningOperation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MACHINING_OPERATION");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> features =
-        entityReferenceList(
-            instance, definition, 3,
-            "MACHINING_OPERATION features must contain entity references");
-    return new StepMachiningOperation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        features);
+    return machiningResolver.resolveMachiningOperation(instance);
   }
 
   StepMachiningOperationSequence resolveMachiningOperationSequence(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MACHINING_OPERATION_SEQUENCE");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> operations =
-        entityReferenceList(
-            instance, definition, 2,
-            "MACHINING_OPERATION_SEQUENCE operations must contain entity references");
-    return new StepMachiningOperationSequence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        operations,
-        stringValue(instance, definition, 3));
+    return machiningResolver.resolveMachiningOperationSequence(instance);
   }
 
   // Feature definition resolvers
@@ -2167,41 +2149,11 @@ public final class StepEntityResolver {
   }
 
   StepMachiningProcessPlan resolveMachiningProcessPlan(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MACHINING_PROCESS_PLAN");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 2,
-            "MACHINING_PROCESS_PLAN items must contain entity references");
-    List<StepEntity> operations =
-        entityReferenceList(
-            instance, definition, 4,
-            "MACHINING_PROCESS_PLAN operations must contain entity references");
-    return new StepMachiningProcessPlan(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        items,
-        resolve(referenceId(instance, definition, 3)),
-        operations);
+    return machiningResolver.resolveMachiningProcessPlan(instance);
   }
 
   StepMachiningWorkPlan resolveMachiningWorkPlan(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MACHINING_WORK_PLAN");
-    requireParameterCount(instance, definition, 5);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 2,
-            "MACHINING_WORK_PLAN items must contain entity references");
-    List<StepEntity> machiningSetup =
-        entityReferenceList(
-            instance, definition, 4,
-            "MACHINING_WORK_PLAN machining_setup must contain entity references");
-    return new StepMachiningWorkPlan(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        items,
-        resolve(referenceId(instance, definition, 3)),
-        machiningSetup);
+    return machiningResolver.resolveMachiningWorkPlan(instance);
   }
 
   StepRectangularToleranceZone resolveRectangularToleranceZone(StepEntityInstance instance) {
@@ -7157,23 +7109,7 @@ public final class StepEntityResolver {
   }
 
   StepThread resolveThread(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "THREAD");
-    requireParameterCountIn(instance, definition, 2, 5, 6);
-    int paramCount = definition.parameters().size();
-    if (paramCount == 2) {
-      // Minimal form: name, description
-      return new StepThread(
-          instance.id(),
-          stringValue(instance, definition, 0),
-          null, null, null, null);
-    }
-    return new StepThread(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        paramCount > 1 ? optionalNumberValue(instance, definition, 1) : null,
-        paramCount > 2 ? optionalNumberValue(instance, definition, 2) : null,
-        paramCount > 3 ? stringValue(instance, definition, 3) : null,
-        paramCount > 4 ? optionalNumberValue(instance, definition, 4) : null);
+    return machiningResolver.resolveThread(instance);
   }
 
   StepShapeAspectOccurrence resolveShapeAspectOccurrence(StepEntityInstance instance) {
