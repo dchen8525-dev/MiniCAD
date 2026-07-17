@@ -472,6 +472,20 @@ final class AnnotationResolver {
 
   // === Tolerance Entities ===
 
+  StepFeatureControlFrame resolveFeatureControlFrame(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEATURE_CONTROL_FRAME");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    List<StepEntity> datumSystem =
+        resolver.entityReferenceList(
+            instance, definition, 1,
+            "FEATURE_CONTROL_FRAME datum_system must contain entity references");
+    return new StepFeatureControlFrame(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        datumSystem,
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
   StepCompositeGroupTolerance resolveCompositeGroupTolerance(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "COMPOSITE_GROUP_TOLERANCE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);

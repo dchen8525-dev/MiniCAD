@@ -1712,17 +1712,7 @@ public final class StepEntityResolver {
   }
 
   StepFeatureControlFrame resolveFeatureControlFrame(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEATURE_CONTROL_FRAME");
-    requireParameterCount(instance, definition, 3);
-    List<StepEntity> datumSystem =
-        entityReferenceList(
-            instance, definition, 1,
-            "FEATURE_CONTROL_FRAME datum_system must contain entity references");
-    return new StepFeatureControlFrame(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        datumSystem,
-        resolve(referenceId(instance, definition, 2)));
+    return annotationResolver.resolveFeatureControlFrame(instance);
   }
 
   StepRunoutToleranceZone resolveRunoutToleranceZone(StepEntityInstance instance) {
