@@ -794,6 +794,7 @@ public final class StepEntityResolver {
   private final UnitResolver unitResolver;
   private final KinematicResolver kinematicResolver;
   private final TessellationResolver tessellationResolver;
+  private final AssignmentResolver assignmentResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -810,6 +811,7 @@ public final class StepEntityResolver {
     this.unitResolver = new UnitResolver(this);
     this.kinematicResolver = new KinematicResolver(this);
     this.tessellationResolver = new TessellationResolver(this);
+    this.assignmentResolver = new AssignmentResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -3537,50 +3539,23 @@ public final class StepEntityResolver {
 
   // Config management resolvers
   StepExclusionAssignment resolveExclusionAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXCLUSION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepExclusionAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "EXCLUSION_ASSIGNMENT assigned items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+    return assignmentResolver.resolveExclusionAssignment(instance);
   }
 
   StepDateTimeEffectivity resolveDateTimeEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_TIME_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepDateTimeEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return assignmentResolver.resolveDateTimeEffectivity(instance);
   }
 
   StepDateEffectivity resolveDateEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepDateEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return assignmentResolver.resolveDateEffectivity(instance);
   }
 
   StepLotEffectivity resolveLotEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LOT_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepLotEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return assignmentResolver.resolveLotEffectivity(instance);
   }
 
   StepSerialNumberEffectivity resolveSerialNumberEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SERIAL_NUMBER_EFFECTIVITY");
-    requireParameterCount(instance, definition, 3);
-    return new StepSerialNumberEffectivity(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return assignmentResolver.resolveSerialNumberEffectivity(instance);
   }
 
   // Geometry resolvers
@@ -4060,35 +4035,16 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 1));
   }
 
-  StepPersonAndOrganizationAddress resolvePersonAndOrganizationAddress(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ADDRESS");
-    requireParameterCount(instance, definition, 4);
-    return new StepPersonAndOrganizationAddress(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+  StepPersonAndOrganizationAddress resolvePersonAndOrganizationAddress(StepEntityInstance instance) {
+    return assignmentResolver.resolvePersonAndOrganizationAddress(instance);
   }
 
   StepOrganizationAddress resolveOrganizationAddress(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORGANIZATION_ADDRESS");
-    requireParameterCount(instance, definition, 4);
-    return new StepOrganizationAddress(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return assignmentResolver.resolveOrganizationAddress(instance);
   }
 
   StepPersonAddress resolvePersonAddress(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON_ADDRESS");
-    requireParameterCount(instance, definition, 4);
-    return new StepPersonAddress(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return assignmentResolver.resolvePersonAddress(instance);
   }
 
   StepAngularSize resolveAngularSize(StepEntityInstance instance) {
@@ -4497,50 +4453,15 @@ public final class StepEntityResolver {
   }
 
   StepGroupAssignment resolveGroupAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GROUP_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepGroupAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepGroup.class,
-            "GROUP_ASSIGNMENT assigned_group must reference GROUP"));
+    return assignmentResolver.resolveGroupAssignment(instance);
   }
 
-  StepAppliedGroupAssignment resolveAppliedGroupAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_GROUP_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedGroupAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepGroup.class,
-            "APPLIED_GROUP_ASSIGNMENT assigned_group must reference GROUP"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "APPLIED_GROUP_ASSIGNMENT items must contain entity references"));
+  StepAppliedGroupAssignment resolveAppliedGroupAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedGroupAssignment(instance);
   }
 
   StepAddress resolveAddress(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ADDRESS");
-    requireParameterCount(instance, definition, 12);
-    return new StepAddress(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        optionalStringValue(instance, definition, 3),
-        optionalStringValue(instance, definition, 4),
-        optionalStringValue(instance, definition, 5),
-        optionalStringValue(instance, definition, 6),
-        optionalStringValue(instance, definition, 7),
-        optionalStringValue(instance, definition, 8),
-        optionalStringValue(instance, definition, 9),
-        optionalStringValue(instance, definition, 10),
-        optionalStringValue(instance, definition, 11));
+    return assignmentResolver.resolveAddress(instance);
   }
 
   StepDocumentType resolveDocumentType(StepEntityInstance instance) {
@@ -4572,107 +4493,35 @@ public final class StepEntityResolver {
   }
 
   StepPerson resolvePerson(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON");
-    requireParameterCount(instance, definition, 6);
-    return new StepPerson(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        optionalStringListValue(instance, definition, 3),
-        optionalStringListValue(instance, definition, 4),
-        optionalStringListValue(instance, definition, 5));
+    return assignmentResolver.resolvePerson(instance);
   }
 
   StepOrganization resolveOrganization(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORGANIZATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepOrganization(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2));
+    return assignmentResolver.resolveOrganization(instance);
   }
 
   StepPersonAndOrganization resolvePersonAndOrganization(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepPersonAndOrganization(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPerson.class,
-            "PERSON_AND_ORGANIZATION person must reference PERSON"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepOrganization.class,
-            "PERSON_AND_ORGANIZATION organization must reference ORGANIZATION"));
+    return assignmentResolver.resolvePersonAndOrganization(instance);
   }
 
-  StepOrganizationRelationship resolveOrganizationRelationship(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORGANIZATION_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepOrganizationRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepOrganization.class,
-            "ORGANIZATION_RELATIONSHIP relating_organization must reference ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepOrganization.class,
-            "ORGANIZATION_RELATIONSHIP related_organization must reference ORGANIZATION"));
+  StepOrganizationRelationship resolveOrganizationRelationship(StepEntityInstance instance) {
+    return assignmentResolver.resolveOrganizationRelationship(instance);
   }
 
   StepOrganizationRole resolveOrganizationRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORGANIZATION_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepOrganizationRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveOrganizationRole(instance);
   }
 
   StepOrganizationAssignment resolveOrganizationAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ORGANIZATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepOrganizationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepOrganization.class,
-            "ORGANIZATION_ASSIGNMENT assigned_organization must reference ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepOrganizationRole.class,
-            "ORGANIZATION_ASSIGNMENT role must reference ORGANIZATION_ROLE"));
+    return assignmentResolver.resolveOrganizationAssignment(instance);
   }
 
-  StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(
-      StepEntityInstance instance) {
-    return resolveAppliedOrganizationAssignment(instance, "APPLIED_ORGANIZATION_ASSIGNMENT");
+  StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedOrganizationAssignment(instance);
   }
 
-  StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedOrganizationAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepOrganization.class,
-            entityName + " assigned_organization must reference ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepOrganizationRole.class,
-            entityName + " role must reference ORGANIZATION_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " items must contain entity references"));
+  StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedOrganizationAssignment(instance, entityName);
   }
 
   StepLanguage resolveLanguage(StepEntityInstance instance) {
@@ -4682,57 +4531,19 @@ public final class StepEntityResolver {
   }
 
   StepEntity resolveLanguageAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LANGUAGE_ASSIGNMENT");
-    if (definition.parameters().size() == 3) {
-      return resolveRepresentation(instance, "LANGUAGE_ASSIGNMENT", false);
-    }
-    requireParameterCount(instance, definition, 1);
-    return new StepLanguageAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepLanguage.class,
-            "LANGUAGE_ASSIGNMENT assigned_language must reference LANGUAGE"));
+    return assignmentResolver.resolveLanguageAssignment(instance);
   }
 
-  StepAppliedLanguageAssignment resolveAppliedLanguageAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_LANGUAGE_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedLanguageAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepLanguage.class,
-            "APPLIED_LANGUAGE_ASSIGNMENT assigned_language must reference LANGUAGE"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "APPLIED_LANGUAGE_ASSIGNMENT items must contain entity references"));
+  StepAppliedLanguageAssignment resolveAppliedLanguageAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedLanguageAssignment(instance);
   }
 
-  StepPersonAndOrganizationRole resolvePersonAndOrganizationRole(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepPersonAndOrganizationRole(instance.id(), stringValue(instance, definition, 0));
+  StepPersonAndOrganizationRole resolvePersonAndOrganizationRole(StepEntityInstance instance) {
+    return assignmentResolver.resolvePersonAndOrganizationRole(instance);
   }
 
-  StepPersonAndOrganizationAssignment resolvePersonAndOrganizationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PERSON_AND_ORGANIZATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepPersonAndOrganizationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPersonAndOrganization.class,
-            "PERSON_AND_ORGANIZATION_ASSIGNMENT assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepPersonAndOrganizationRole.class,
-            "PERSON_AND_ORGANIZATION_ASSIGNMENT role must reference PERSON_AND_ORGANIZATION_ROLE"));
+  StepPersonAndOrganizationAssignment resolvePersonAndOrganizationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolvePersonAndOrganizationAssignment(instance);
   }
 
   StepAppliedPersonAndOrganizationAssignment
@@ -4815,224 +4626,79 @@ public final class StepEntityResolver {
   }
 
   StepDateRole resolveDateRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepDateRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveDateRole(instance);
   }
 
   StepDateAssignment resolveDateAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepDateAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCalendarDate.class,
-            "DATE_ASSIGNMENT assigned_date must reference CALENDAR_DATE"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepDateRole.class,
-            "DATE_ASSIGNMENT role must reference DATE_ROLE"));
+    return assignmentResolver.resolveDateAssignment(instance);
   }
 
   StepAppliedDateAssignment resolveAppliedDateAssignment(StepEntityInstance instance) {
-    return resolveAppliedDateAssignment(instance, "APPLIED_DATE_ASSIGNMENT");
+    return assignmentResolver.resolveAppliedDateAssignment(instance);
   }
 
-  StepAppliedDateAssignment resolveAppliedDateAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedDateAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCalendarDate.class,
-            entityName + " assigned_date must reference CALENDAR_DATE"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepDateRole.class,
-            entityName + " role must reference DATE_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " items must contain entity references"));
+  StepAppliedDateAssignment resolveAppliedDateAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedDateAssignment(instance, entityName);
   }
 
   StepDateTimeRole resolveDateTimeRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_TIME_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepDateTimeRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveDateTimeRole(instance);
   }
 
   StepDateTimeAssignment resolveDateTimeAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DATE_TIME_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepDateTimeAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDateAndTime.class,
-            "DATE_TIME_ASSIGNMENT assigned_date_and_time must reference DATE_AND_TIME"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepDateTimeRole.class,
-            "DATE_TIME_ASSIGNMENT role must reference DATE_TIME_ROLE"));
+    return assignmentResolver.resolveDateTimeAssignment(instance);
   }
 
-  StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(
-      StepEntityInstance instance) {
-    return resolveAppliedDateTimeAssignment(instance, "APPLIED_DATE_AND_TIME_ASSIGNMENT");
+  StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedDateTimeAssignment(instance);
   }
 
-  StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedDateTimeAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDateAndTime.class,
-            entityName + " assigned_date_and_time must reference DATE_AND_TIME"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepDateTimeRole.class,
-            entityName + " role must reference DATE_TIME_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " items must contain entity references"));
+  StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedDateTimeAssignment(instance, entityName);
   }
 
   StepApprovalStatus resolveApprovalStatus(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL_STATUS");
-    requireParameterCount(instance, definition, 1);
-    return new StepApprovalStatus(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveApprovalStatus(instance);
   }
 
   StepApproval resolveApproval(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL");
-    requireParameterCount(instance, definition, 2);
-    return new StepApproval(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepApprovalStatus.class,
-            "APPROVAL status must reference APPROVAL_STATUS"),
-        optionalStringValue(instance, definition, 1));
+    return assignmentResolver.resolveApproval(instance);
   }
 
   StepApprovalRole resolveApprovalRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepApprovalRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveApprovalRole(instance);
   }
 
   StepApprovalAssignment resolveApprovalAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepApprovalAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepApproval.class,
-            "APPROVAL_ASSIGNMENT assigned_approval must reference APPROVAL"));
+    return assignmentResolver.resolveApprovalAssignment(instance);
   }
 
-  StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(
-      StepEntityInstance instance) {
-    return resolveAppliedApprovalAssignment(instance, "APPLIED_APPROVAL_ASSIGNMENT");
+  StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedApprovalAssignment(instance);
   }
 
-  StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedApprovalAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepApproval.class,
-            entityName + " assigned_approval must reference APPROVAL"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            entityName + " items must contain entity references"));
+  StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedApprovalAssignment(instance, entityName);
   }
 
-  StepApprovalPersonOrganization resolveApprovalPersonOrganization(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL_PERSON_ORGANIZATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepApprovalPersonOrganization(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPersonAndOrganization.class,
-            "APPROVAL_PERSON_ORGANIZATION person_organization must reference PERSON_AND_ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepApproval.class,
-            "APPROVAL_PERSON_ORGANIZATION authorized_approval must reference APPROVAL"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepApprovalRole.class,
-            "APPROVAL_PERSON_ORGANIZATION role must reference APPROVAL_ROLE"));
+  StepApprovalPersonOrganization resolveApprovalPersonOrganization(StepEntityInstance instance) {
+    return assignmentResolver.resolveApprovalPersonOrganization(instance);
   }
 
   StepApprovalDateTime resolveApprovalDateTime(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPROVAL_DATE_TIME");
-    requireParameterCount(instance, definition, 2);
-    return new StepApprovalDateTime(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDateAndTime.class,
-            "APPROVAL_DATE_TIME date_time must reference DATE_AND_TIME"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepApproval.class,
-            "APPROVAL_DATE_TIME dated_approval must reference APPROVAL"));
+    return assignmentResolver.resolveApprovalDateTime(instance);
   }
 
-  StepSecurityClassificationLevel resolveSecurityClassificationLevel(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION_LEVEL");
-    requireParameterCount(instance, definition, 1);
-    return new StepSecurityClassificationLevel(instance.id(), stringValue(instance, definition, 0));
+  StepSecurityClassificationLevel resolveSecurityClassificationLevel(StepEntityInstance instance) {
+    return assignmentResolver.resolveSecurityClassificationLevel(instance);
   }
 
-  StepSecurityClassification resolveSecurityClassification(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepSecurityClassification(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepSecurityClassificationLevel.class,
-            "SECURITY_CLASSIFICATION security_level must reference SECURITY_CLASSIFICATION_LEVEL"));
+  StepSecurityClassification resolveSecurityClassification(StepEntityInstance instance) {
+    return assignmentResolver.resolveSecurityClassification(instance);
   }
 
-  StepSecurityClassificationAssignment resolveSecurityClassificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SECURITY_CLASSIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepSecurityClassificationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepSecurityClassification.class,
-            "SECURITY_CLASSIFICATION_ASSIGNMENT assigned_security_classification must reference SECURITY_CLASSIFICATION"));
+  StepSecurityClassificationAssignment resolveSecurityClassificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveSecurityClassificationAssignment(instance);
   }
 
   StepAppliedSecurityClassificationAssignment
@@ -5061,116 +4727,47 @@ public final class StepEntityResolver {
   }
 
   StepContractType resolveContractType(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTRACT_TYPE");
-    requireParameterCount(instance, definition, 1);
-    return new StepContractType(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveContractType(instance);
   }
 
   StepContract resolveContract(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTRACT");
-    requireParameterCount(instance, definition, 3);
-    return new StepContract(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepContractType.class,
-            "CONTRACT kind must reference CONTRACT_TYPE"));
+    return assignmentResolver.resolveContract(instance);
   }
 
   StepContractAssignment resolveContractAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTRACT_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepContractAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepContract.class,
-            "CONTRACT_ASSIGNMENT assigned_contract must reference CONTRACT"));
+    return assignmentResolver.resolveContractAssignment(instance);
   }
 
-  StepAppliedContractAssignment resolveAppliedContractAssignment(
-      StepEntityInstance instance) {
-    return resolveAppliedContractAssignment(instance, "APPLIED_CONTRACT_ASSIGNMENT");
+  StepAppliedContractAssignment resolveAppliedContractAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedContractAssignment(instance);
   }
 
-  StepAppliedContractAssignment resolveAppliedContractAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedContractAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepContract.class,
-            entityName + " assigned_contract must reference CONTRACT"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            entityName + " items must contain entity references"));
+  StepAppliedContractAssignment resolveAppliedContractAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedContractAssignment(instance, entityName);
   }
 
   StepCertificationType resolveCertificationType(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CERTIFICATION_TYPE");
-    requireParameterCount(instance, definition, 1);
-    return new StepCertificationType(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveCertificationType(instance);
   }
 
   StepCertification resolveCertification(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CERTIFICATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepCertification(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepCertificationType.class,
-            "CERTIFICATION kind must reference CERTIFICATION_TYPE"));
+    return assignmentResolver.resolveCertification(instance);
   }
 
-  StepCertificationAssignment resolveCertificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CERTIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepCertificationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCertification.class,
-            "CERTIFICATION_ASSIGNMENT assigned_certification must reference CERTIFICATION"));
+  StepCertificationAssignment resolveCertificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveCertificationAssignment(instance);
   }
 
-  StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(
-      StepEntityInstance instance) {
-    return resolveAppliedCertificationAssignment(instance, "APPLIED_CERTIFICATION_ASSIGNMENT");
+  StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedCertificationAssignment(instance);
   }
 
-  StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedCertificationAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepCertification.class,
-            entityName + " assigned_certification must reference CERTIFICATION"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            entityName + " items must contain entity references"));
+  StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedCertificationAssignment(instance, entityName);
   }
 
   StepEffectivity resolveEffectivity(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EFFECTIVITY");
-    requireParameterCount(instance, definition, 1);
-    return new StepEffectivity(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveEffectivity(instance);
   }
 
   StepProductDefinitionEffectivity resolveProductDefinitionEffectivity(
@@ -5178,119 +4775,36 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionEffectivity(instance);
   }
 
-  StepEffectivityRelationship resolveEffectivityRelationship(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EFFECTIVITY_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepEffectivityRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepEffectivity.class,
-            "EFFECTIVITY_RELATIONSHIP relating_effectivity must reference EFFECTIVITY"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepEffectivity.class,
-            "EFFECTIVITY_RELATIONSHIP related_effectivity must reference EFFECTIVITY"));
+  StepEffectivityRelationship resolveEffectivityRelationship(StepEntityInstance instance) {
+    return assignmentResolver.resolveEffectivityRelationship(instance);
   }
 
   StepClassificationRole resolveClassificationRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CLASSIFICATION_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepClassificationRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveClassificationRole(instance);
   }
 
-  StepClassificationAssignment resolveClassificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CLASSIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepClassificationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepGroup.class,
-            "CLASSIFICATION_ASSIGNMENT assigned_class must reference GROUP"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepClassificationRole.class,
-            "CLASSIFICATION_ASSIGNMENT role must reference CLASSIFICATION_ROLE"));
+  StepClassificationAssignment resolveClassificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveClassificationAssignment(instance);
   }
 
-  StepAppliedClassificationAssignment resolveAppliedClassificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_CLASSIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedClassificationAssignment(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepGroup.class,
-            "APPLIED_CLASSIFICATION_ASSIGNMENT assigned_class must reference GROUP"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepClassificationRole.class,
-            "APPLIED_CLASSIFICATION_ASSIGNMENT role must reference CLASSIFICATION_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            "APPLIED_CLASSIFICATION_ASSIGNMENT items must contain entity references"));
+  StepAppliedClassificationAssignment resolveAppliedClassificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedClassificationAssignment(instance);
   }
 
   StepIdentificationRole resolveIdentificationRole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "IDENTIFICATION_ROLE");
-    requireParameterCount(instance, definition, 1);
-    return new StepIdentificationRole(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveIdentificationRole(instance);
   }
 
-  StepIdentificationAssignment resolveIdentificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "IDENTIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepIdentificationAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepIdentificationRole.class,
-            "IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"));
+  StepIdentificationAssignment resolveIdentificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveIdentificationAssignment(instance);
   }
 
-  StepAppliedIdentificationAssignment resolveAppliedIdentificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_IDENTIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedIdentificationAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepIdentificationRole.class,
-            "APPLIED_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            "APPLIED_IDENTIFICATION_ASSIGNMENT items must contain entity references"));
+  StepAppliedIdentificationAssignment resolveAppliedIdentificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveAppliedIdentificationAssignment(instance);
   }
 
-  StepExternalIdentificationAssignment resolveExternalIdentificationAssignment(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTERNAL_IDENTIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 3);
-    return new StepExternalIdentificationAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepIdentificationRole.class,
-            "EXTERNAL_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepExternalSource.class,
-            "EXTERNAL_IDENTIFICATION_ASSIGNMENT source must reference EXTERNAL_SOURCE"));
+  StepExternalIdentificationAssignment resolveExternalIdentificationAssignment(StepEntityInstance instance) {
+    return assignmentResolver.resolveExternalIdentificationAssignment(instance);
   }
 
   StepAppliedExternalIdentificationAssignment
@@ -5317,22 +4831,11 @@ public final class StepEntityResolver {
   }
 
   StepNameAssignment resolveNameAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NAME_ASSIGNMENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepNameAssignment(instance.id(), stringValue(instance, definition, 0));
+    return assignmentResolver.resolveNameAssignment(instance);
   }
 
   StepAppliedNameAssignment resolveAppliedNameAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "APPLIED_NAME_ASSIGNMENT");
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedNameAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            "APPLIED_NAME_ASSIGNMENT items must contain entity references"));
+    return assignmentResolver.resolveAppliedNameAssignment(instance);
   }
 
   StepDescriptionAttribute resolveDescriptionAttribute(StepEntityInstance instance) {
