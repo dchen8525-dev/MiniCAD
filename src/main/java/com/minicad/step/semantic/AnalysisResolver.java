@@ -361,4 +361,120 @@ final class AnalysisResolver {
         resolver.resolve(resolver.referenceId(instance, definition, 2)),
         resolver.resolve(resolver.referenceId(instance, definition, 3)));
   }
+  // === FEA Node / Element / Load Entities ===
+
+  StepFeaElement resolveFeaElement(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ELEMENT");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    StepEntity elementProperty = resolver.tryResolveReference(definition.parameters().get(3));
+    return new StepFeaElement(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.entityReferenceList(instance, definition, 2, "ELEMENT nodes must contain entity references"),
+        elementProperty);
+  }
+
+  StepFeaLoad resolveFeaLoad(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "LOAD");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaLoad(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.numberValue(instance, definition, 3));
+  }
+
+  StepFeaNode resolveFeaNode(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "NODE");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaNode(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3));
+  }
+
+  // === FEA Material / Variable Entities ===
+
+  StepFeaAxis2Placement3d resolveFeaAxis2Placement3d(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_AXIS_2_PLACEMENT_3D");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepFeaAxis2Placement3d(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepFeaConstantFunction3d resolveFeaConstantFunction3d(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_CONSTANT_FUNCTION_3D");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaConstantFunction3d(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaLinearAlgebraicMatrix resolveFeaLinearAlgebraicMatrix(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_LINEAR_ALGEBRAIC_MATRIX");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepFeaLinearAlgebraicMatrix(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        (int) resolver.numberValue(instance, definition, 1),
+        (int) resolver.numberValue(instance, definition, 2),
+        resolver.numberList(instance, definition, 3));
+  }
+
+  StepFeaLinearAlgebraicVector resolveFeaLinearAlgebraicVector(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_LINEAR_ALGEBRAIC_VECTOR");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaLinearAlgebraicVector(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        (int) resolver.numberValue(instance, definition, 1),
+        resolver.numberList(instance, definition, 2));
+  }
+
+  StepFeaMassDensity resolveFeaMassDensity(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_MASS_DENSITY");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepFeaMassDensity(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1));
+  }
+
+  StepFeaSecuredVariable resolveFeaSecuredVariable(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_SECURED_VARIABLE");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepFeaSecuredVariable(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  StepFeaUltimateStress resolveFeaUltimateStress(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_ULTIMATE_STRESS");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepFeaUltimateStress(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1));
+  }
+
+  StepFeaYieldStress resolveFeaYieldStress(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "FEA_YIELD_STRESS");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepFeaYieldStress(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.numberValue(instance, definition, 1));
+  }
 }
