@@ -306,4 +306,88 @@ final class SolidResolver {
         resolver.resolve(resolver.referenceId(instance, definition, 2)),
         entityName);
   }
+  // === Volume Entities ===
+
+  StepBlockVolume resolveBlockVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "BLOCK_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepBlockVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4));
+  }
+
+  StepCylinderVolume resolveCylinderVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "CYLINDER_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepCylinderVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "CYLINDER_VOLUME position must reference AXIS2_PLACEMENT_3D"),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3));
+  }
+
+  StepPrismVolume resolvePrismVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "PRISM_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepPrismVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "PRISM_VOLUME position must reference AXIS2_PLACEMENT_3D"),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4));
+  }
+
+  StepRightCircularConeVolume resolveRightCircularConeVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "RIGHT_CIRCULAR_CONE_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepRightCircularConeVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "RIGHT_CIRCULAR_CONE_VOLUME position must reference AXIS2_PLACEMENT_3D"),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3),
+        resolver.numberValue(instance, definition, 4));
+  }
+
+  StepSphereVolume resolveSphereVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "SPHERE_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepSphereVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepCartesianPoint.class,
+            "SPHERE_VOLUME center must reference CARTESIAN_POINT"),
+        resolver.numberValue(instance, definition, 2));
+  }
+
+  StepTorusVolume resolveTorusVolume(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "TORUS_VOLUME");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepTorusVolume(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepAxis2Placement3D.class,
+            "TORUS_VOLUME position must reference AXIS2_PLACEMENT_3D"),
+        resolver.numberValue(instance, definition, 2),
+        resolver.numberValue(instance, definition, 3));
+  }
 }

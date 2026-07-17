@@ -1849,15 +1849,7 @@ public final class StepEntityResolver {
   }
 
   StepBlockVolume resolveBlockVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BLOCK_VOLUME");
-    requireParameterCount(instance, definition, 6);
-    return new StepBlockVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveBlockVolume(instance);
   }
 
   StepAssemblyProcessPlan resolveAssemblyProcessPlan(StepEntityInstance instance) {
@@ -5245,74 +5237,23 @@ public final class StepEntityResolver {
   // Advanced CSG volume resolve methods
 
   StepCylinderVolume resolveCylinderVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CYLINDER_VOLUME");
-    requireParameterCount(instance, definition, 5);
-    return new StepCylinderVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "CYLINDER_VOLUME position must reference AXIS2_PLACEMENT_3D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return solidResolver.resolveCylinderVolume(instance);
   }
 
   StepRightCircularConeVolume resolveRightCircularConeVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RIGHT_CIRCULAR_CONE_VOLUME");
-    requireParameterCount(instance, definition, 6);
-    return new StepRightCircularConeVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "RIGHT_CIRCULAR_CONE_VOLUME position must reference AXIS2_PLACEMENT_3D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolveRightCircularConeVolume(instance);
   }
 
   StepSphereVolume resolveSphereVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SPHERE_VOLUME");
-    requireParameterCount(instance, definition, 4);
-    return new StepSphereVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepCartesianPoint.class,
-            "SPHERE_VOLUME center must reference CARTESIAN_POINT"),
-        numberValue(instance, definition, 2));
+    return solidResolver.resolveSphereVolume(instance);
   }
 
   StepTorusVolume resolveTorusVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TORUS_VOLUME");
-    requireParameterCount(instance, definition, 5);
-    return new StepTorusVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "TORUS_VOLUME position must reference AXIS2_PLACEMENT_3D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return solidResolver.resolveTorusVolume(instance);
   }
 
   StepPrismVolume resolvePrismVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRISM_VOLUME");
-    requireParameterCount(instance, definition, 6);
-    return new StepPrismVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepAxis2Placement3D.class,
-            "PRISM_VOLUME position must reference AXIS2_PLACEMENT_3D"),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return solidResolver.resolvePrismVolume(instance);
   }
 
   // Swept face solid resolve methods
