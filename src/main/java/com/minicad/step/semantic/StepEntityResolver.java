@@ -4208,30 +4208,11 @@ public final class StepEntityResolver {
   }
 
   StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance) {
-    return resolveAppliedPersonAndOrganizationAssignment(
-        instance, "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT");
+    return assignmentResolver.resolveAppliedPersonAndOrganizationAssignment(instance);
   }
 
-  StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(
-          StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedPersonAndOrganizationAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPersonAndOrganization.class,
-            entityName + " assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepPersonAndOrganizationRole.class,
-            entityName + " role must reference PERSON_AND_ORGANIZATION_ROLE"),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " items must contain entity references"));
+  StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedPersonAndOrganizationAssignment(instance, entityName);
   }
 
   StepCalendarDate resolveCalendarDate(StepEntityInstance instance) {
@@ -4361,26 +4342,11 @@ public final class StepEntityResolver {
   }
 
   StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance) {
-    return resolveAppliedSecurityClassificationAssignment(
-        instance, "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT");
+    return assignmentResolver.resolveAppliedSecurityClassificationAssignment(instance);
   }
 
-  StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(
-          StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 2);
-    return new StepAppliedSecurityClassificationAssignment(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepSecurityClassification.class,
-            entityName + " assigned_security_classification must reference SECURITY_CLASSIFICATION"),
-        entityReferenceList(
-            instance,
-            definition,
-            1,
-            entityName + " items must contain entity references"));
+  StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance, String entityName) {
+    return assignmentResolver.resolveAppliedSecurityClassificationAssignment(instance, entityName);
   }
 
   StepContractType resolveContractType(StepEntityInstance instance) {
@@ -4465,25 +4431,7 @@ public final class StepEntityResolver {
   }
 
   StepAppliedExternalIdentificationAssignment resolveAppliedExternalIdentificationAssignment(StepEntityInstance instance) {
-    StepEntityDefinition definition =
-        definition(instance, "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepAppliedExternalIdentificationAssignment(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepIdentificationRole.class,
-            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepExternalSource.class,
-            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT source must reference EXTERNAL_SOURCE"),
-        entityReferenceList(
-            instance,
-            definition,
-            3,
-            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT items must contain entity references"));
+    return assignmentResolver.resolveAppliedExternalIdentificationAssignment(instance);
   }
 
   StepNameAssignment resolveNameAssignment(StepEntityInstance instance) {

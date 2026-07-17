@@ -755,4 +755,75 @@ final class AssignmentResolver {
         resolver.stringValue(instance, definition, 0),
         resolver.stringValue(instance, definition, 1));
   }
+  // === Applied Assignment Entities ===
+
+  StepAppliedExternalIdentificationAssignment resolveAppliedExternalIdentificationAssignment(StepEntityInstance instance) {
+    StepEntityDefinition definition =
+        resolver.definition(instance, "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepAppliedExternalIdentificationAssignment(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepIdentificationRole.class,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT role must reference IDENTIFICATION_ROLE"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepExternalSource.class,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT source must reference EXTERNAL_SOURCE"),
+        resolver.entityReferenceList(
+            instance,
+            definition,
+            3,
+            "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT items must contain entity references"));
+  }
+
+  StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance) {
+    return resolveAppliedPersonAndOrganizationAssignment(
+        instance, "APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT");
+  }
+
+  StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = resolver.definition(instance, entityName);
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepAppliedPersonAndOrganizationAssignment(
+        instance.id(),
+        entityName,
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepPersonAndOrganization.class,
+            entityName + " assigned_person_and_organization must reference PERSON_AND_ORGANIZATION"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 1),
+            StepPersonAndOrganizationRole.class,
+            entityName + " role must reference PERSON_AND_ORGANIZATION_ROLE"),
+        resolver.entityReferenceList(
+            instance,
+            definition,
+            2,
+            entityName + " items must contain entity references"));
+  }
+
+  StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance) {
+    return resolveAppliedSecurityClassificationAssignment(
+        instance, "APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT");
+  }
+
+  StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = resolver.definition(instance, entityName);
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepAppliedSecurityClassificationAssignment(
+        instance.id(),
+        entityName,
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepSecurityClassification.class,
+            entityName + " assigned_security_classification must reference SECURITY_CLASSIFICATION"),
+        resolver.entityReferenceList(
+            instance,
+            definition,
+            1,
+            entityName + " items must contain entity references"));
+  }
 }
