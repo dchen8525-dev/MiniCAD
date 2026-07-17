@@ -795,6 +795,7 @@ public final class StepEntityResolver {
   private final KinematicResolver kinematicResolver;
   private final TessellationResolver tessellationResolver;
   private final AssignmentResolver assignmentResolver;
+  private final RepresentationResolver representationResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -812,6 +813,7 @@ public final class StepEntityResolver {
     this.kinematicResolver = new KinematicResolver(this);
     this.tessellationResolver = new TessellationResolver(this);
     this.assignmentResolver = new AssignmentResolver(this);
+    this.representationResolver = new RepresentationResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -1076,16 +1078,8 @@ public final class StepEntityResolver {
     return unitResolver.resolveSurfaceMeasurement(instance);
   }
 
-  StepSurfaceTextureRepresentationItem resolveSurfaceTextureRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_TEXTURE_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 5);
-    return new StepSurfaceTextureRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalNumberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        stringValue(instance, definition, 3));
+  StepSurfaceTextureRepresentationItem resolveSurfaceTextureRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveSurfaceTextureRepresentationItem(instance);
   }
 
   StepGeometricReplica resolveGeometricReplica(
@@ -1690,12 +1684,7 @@ public final class StepEntityResolver {
   }
 
   StepQualifiedRepresentationItem resolveQualifiedRepresentationItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "QUALIFIED_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 2);
-    return new StepQualifiedRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return representationResolver.resolveQualifiedRepresentationItem(instance);
   }
 
   StepDatumReferenceModifierWithSign resolveDatumReferenceModifierWithSign(StepEntityInstance instance) {
@@ -2332,14 +2321,8 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionWithAssociatedDocuments(instance);
   }
 
-  StepShapeAspectShapeRepresentation resolveShapeAspectShapeRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_ASPECT_SHAPE_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepShapeAspectShapeRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+  StepShapeAspectShapeRepresentation resolveShapeAspectShapeRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveShapeAspectShapeRepresentation(instance);
   }
 
   StepMakeFromBuildAssembly resolveMakeFromBuildAssembly(StepEntityInstance instance) {
@@ -2610,41 +2593,18 @@ public final class StepEntityResolver {
     return kinematicResolver.resolveKinematicFrameBasedTransformation(instance);
   }
 
-  StepValidationPropertyRepresentation resolveValidationPropertyRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VALIDATION_PROPERTY_REPRESENTATION");
-    requireParameterCount(instance, definition, 5);
-    return new StepValidationPropertyRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2,
-            "VALIDATION_PROPERTY_REPRESENTATION items must contain entity references"),
-        resolve(referenceId(instance, definition, 3)));
+  StepValidationPropertyRepresentation resolveValidationPropertyRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveValidationPropertyRepresentation(instance);
   }
 
-  StepCalculatedGeometricRepresentationItem resolveCalculatedGeometricRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CALCULATED_GEOMETRIC_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 3);
-    return new StepCalculatedGeometricRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+  StepCalculatedGeometricRepresentationItem resolveCalculatedGeometricRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveCalculatedGeometricRepresentationItem(instance);
   }
 
   // Phase 5: FEA resolve methods
 
-  StepVolume3dElementRepresentation resolveVolume3dElementRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VOLUME_3D_ELEMENT_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepVolume3dElementRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "VOLUME_3D_ELEMENT_REPRESENTATION elements must contain entity references"),
-        resolve(referenceId(instance, definition, 2)));
+  StepVolume3dElementRepresentation resolveVolume3dElementRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveVolume3dElementRepresentation(instance);
   }
 
   StepFeaNode resolveFeaNode(StepEntityInstance instance) {
@@ -2927,23 +2887,11 @@ public final class StepEntityResolver {
   }
 
   StepShapeRepresentationTransformation resolveShapeRepresentationTransformation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_REPRESENTATION_TRANSFORMATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepShapeRepresentationTransformation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return representationResolver.resolveShapeRepresentationTransformation(instance);
   }
 
   StepRepresentationContext3d resolveRepresentationContext3d(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REPRESENTATION_CONTEXT_3D");
-    requireParameterCount(instance, definition, 3);
-    return new StepRepresentationContext3d(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        doubleList(instance, definition, 2));
+    return representationResolver.resolveRepresentationContext3d(instance);
   }
 
   StepAppliedAttributeClassification resolveAppliedAttributeClassification(StepEntityInstance instance) {
@@ -3111,12 +3059,7 @@ public final class StepEntityResolver {
   }
 
   StepNodeRepresentation resolveNodeRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NODE_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepNodeRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "NODE_REPRESENTATION representedNodes must contain entity references"));
+    return representationResolver.resolveNodeRepresentation(instance);
   }
 
   StepVolume3dElementProperty resolveVolume3dElementProperty(StepEntityInstance instance) {
@@ -3152,16 +3095,8 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 3)));
   }
 
-  StepFeaMaterialPropertyRepresentation resolveFeaMaterialPropertyRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_MATERIAL_PROPERTY_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaMaterialPropertyRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "FEA_MATERIAL_PROPERTY_REPRESENTATION properties must contain entity references"));
+  StepFeaMaterialPropertyRepresentation resolveFeaMaterialPropertyRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveFeaMaterialPropertyRepresentation(instance);
   }
 
   StepElementVolume2d resolveElementVolume2d(StepEntityInstance instance) {
@@ -3259,14 +3194,7 @@ public final class StepEntityResolver {
   }
 
   StepFeaGroupRepresentation resolveFeaGroupRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_GROUP_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaGroupRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FEA_GROUP_REPRESENTATION representations must contain entity references"),
-        stringValue(instance, definition, 2));
+    return representationResolver.resolveFeaGroupRepresentation(instance);
   }
 
   // New FEA element property resolvers
@@ -3410,80 +3338,31 @@ public final class StepEntityResolver {
 
   // Product representation resolvers
   StepHybridShapeRepresentation resolveHybridShapeRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "HYBRID_SHAPE_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepHybridShapeRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "HYBRID_SHAPE_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveHybridShapeRepresentation(instance);
   }
 
   StepDrawingRepresentation resolveDrawingRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DRAWING_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepDrawingRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "DRAWING_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveDrawingRepresentation(instance);
   }
 
   StepSchematicRepresentation resolveSchematicRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SCHEMATIC_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepSchematicRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "SCHEMATIC_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveSchematicRepresentation(instance);
   }
 
   StepSketchRepresentation resolveSketchRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SKETCH_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepSketchRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "SKETCH_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveSketchRepresentation(instance);
   }
 
   StepSectionRepresentation resolveSectionRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SECTION_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepSectionRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "SECTION_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveSectionRepresentation(instance);
   }
 
   StepTabulationRepresentation resolveTabulationRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TABULATION_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepTabulationRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "TABULATION_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveTabulationRepresentation(instance);
   }
 
   StepZoneRepresentation resolveZoneRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ZONE_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepZoneRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "ZONE_REPRESENTATION items must contain entity references"));
+    return representationResolver.resolveZoneRepresentation(instance);
   }
 
   StepCsgPrimitive3D resolveCsgPrimitive3D(StepEntityInstance instance) {
@@ -3496,26 +3375,11 @@ public final class StepEntityResolver {
   }
 
   StepCompoundRepresentationItem resolveCompoundRepresentationItem(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepCompoundRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            entityName + " items must contain entity references"),
-        entityName);
+    return representationResolver.resolveCompoundRepresentationItem(instance, entityName);
   }
 
-  StepContextDependentGeometricShapeRepresentation resolveContextDependentGeometricShapeRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepContextDependentGeometricShapeRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION items must contain entity references"));
+  StepContextDependentGeometricShapeRepresentation resolveContextDependentGeometricShapeRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveContextDependentGeometricShapeRepresentation(instance);
   }
 
   StepUsageAssociation resolveUsageAssociation(StepEntityInstance instance) {
@@ -3788,17 +3652,8 @@ public final class StepEntityResolver {
     return annotationResolver.resolveOrdinateDimensionRepresentation(instance);
   }
 
-  StepShapeDimensionRepresentationWithTolerance resolveShapeDimensionRepresentationWithTolerance(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE");
-    requireParameterCount(instance, definition, 5);
-    return new StepShapeDimensionRepresentationWithTolerance(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE items must contain entity references"),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+  StepShapeDimensionRepresentationWithTolerance resolveShapeDimensionRepresentationWithTolerance(StepEntityInstance instance) {
+    return representationResolver.resolveShapeDimensionRepresentationWithTolerance(instance);
   }
 
   // FEA resolvers
@@ -3853,14 +3708,7 @@ public final class StepEntityResolver {
   }
 
   StepCompositeShapeAspect resolveCompositeShapeAspect(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COMPOSITE_SHAPE_ASPECT");
-    requireParameterCount(instance, definition, 4);
-    return new StepCompositeShapeAspect(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        booleanValue(instance, definition, 3));
+    return representationResolver.resolveCompositeShapeAspect(instance);
   }
 
   // Product resolvers
@@ -4027,12 +3875,7 @@ public final class StepEntityResolver {
 
   // Document resolver
   StepTextFileRepresentation resolveTextFileRepresentation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_FILE_REPRESENTATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepTextFileRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return representationResolver.resolveTextFileRepresentation(instance);
   }
 
   StepPersonAndOrganizationAddress resolvePersonAndOrganizationAddress(StepEntityInstance instance) {
@@ -4115,20 +3958,8 @@ public final class StepEntityResolver {
     return materialResolver.resolveColorSpecification(instance);
   }
 
-  StepWithDescriptiveRepresentationItem resolveWithDescriptiveRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "WITH_DESCRIPTIVE_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 2,
-            "WITH_DESCRIPTIVE_REPRESENTATION_ITEM items must contain entity references");
-    return new StepWithDescriptiveRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        items,
-        resolve(referenceId(instance, definition, 3)));
+  StepWithDescriptiveRepresentationItem resolveWithDescriptiveRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveWithDescriptiveRepresentationItem(instance);
   }
 
   boolean isOpenShellEntity(StepEntity entity) {
@@ -4235,10 +4066,7 @@ public final class StepEntityResolver {
   }
 
   StepRepresentationContext resolveRepresentationContext(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REPRESENTATION_CONTEXT");
-    requireParameterCount(instance, definition, 2);
-    return new StepRepresentationContext(
-        instance.id(), stringValue(instance, definition, 0), stringValue(instance, definition, 1));
+    return representationResolver.resolveRepresentationContext(instance);
   }
 
   StepApplicationContext resolveApplicationContext(StepEntityInstance instance) {
@@ -4919,66 +4747,23 @@ public final class StepEntityResolver {
   }
 
   StepShapeAspect resolveShapeAspect(StepEntityInstance instance) {
-    return resolveShapeAspect(instance, "SHAPE_ASPECT");
+    return representationResolver.resolveShapeAspect(instance);
   }
 
   StepShapeAspect resolveShapeAspect(StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    String productDefinitional = enumValue(instance, definition, 3);
-    if (!List.of("T", "F", "U").contains(productDefinitional)) {
-      throw new StepResolutionException(
-          entityName + " product_definitional must be .T., .F. or .U.");
-    }
-    return new StepShapeAspect(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProductDefinitionShape.class,
-            entityName + " of_shape must reference PRODUCT_DEFINITION_SHAPE"),
-        productDefinitional,
-        entityName);
+    return representationResolver.resolveShapeAspect(instance, entityName);
   }
 
-  StepShapeAspectOccurrence resolveShapeAspectOccurrence(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    String productDefinitional = enumValue(instance, definition, 3);
-    if (!List.of("T", "F", "U").contains(productDefinitional)) {
-      throw new StepResolutionException(
-          entityName + " product_definitional must be .T., .F. or .U.");
-    }
-    return new StepShapeAspectOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepProductDefinitionShape.class,
-            entityName + " of_shape must reference PRODUCT_DEFINITION_SHAPE"),
-        productDefinitional,
-        resolve(referenceId(instance, definition, 4)),
-        entityName);
+  StepShapeAspectOccurrence resolveShapeAspectOccurrence(StepEntityInstance instance, String entityName) {
+    return representationResolver.resolveShapeAspectOccurrence(instance, entityName);
   }
 
   StepShapeAspectRelationship resolveShapeAspectRelationship(StepEntityInstance instance) {
-    return resolveShapeAspectRelationship(instance, "SHAPE_ASPECT_RELATIONSHIP");
+    return representationResolver.resolveShapeAspectRelationship(instance);
   }
 
-  StepShapeAspectRelationship resolveShapeAspectRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepShapeAspectRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        entityName);
+  StepShapeAspectRelationship resolveShapeAspectRelationship(StepEntityInstance instance, String entityName) {
+    return representationResolver.resolveShapeAspectRelationship(instance, entityName);
   }
 
   StepShapeDefinitionRepresentation resolveShapeDefinitionRepresentation(
@@ -4986,20 +4771,8 @@ public final class StepEntityResolver {
     return productResolver.resolveShapeDefinitionRepresentation(instance);
   }
 
-  StepPropertyDefinitionRepresentation resolvePropertyDefinitionRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PROPERTY_DEFINITION_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepPropertyDefinitionRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "PROPERTY_DEFINITION_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "PROPERTY_DEFINITION_REPRESENTATION used_representation must reference REPRESENTATION"));
+  StepPropertyDefinitionRepresentation resolvePropertyDefinitionRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolvePropertyDefinitionRepresentation(instance);
   }
 
   StepAbstractVariable resolveAbstractVariable(StepEntityInstance instance) {
@@ -5093,36 +4866,12 @@ public final class StepEntityResolver {
             "BACK_CHAINING_RULE_BODY used_representation must reference REPRESENTATION"));
   }
 
-  StepActionPropertyRepresentation resolveActionPropertyRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ACTION_PROPERTY_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepActionPropertyRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "ACTION_PROPERTY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "ACTION_PROPERTY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  StepActionPropertyRepresentation resolveActionPropertyRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveActionPropertyRepresentation(instance);
   }
 
-  StepContactRatioRepresentation resolveContactRatioRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONTACT_RATIO_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepContactRatioRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "CONTACT_RATIO_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "CONTACT_RATIO_REPRESENTATION used_representation must reference REPRESENTATION"));
+  StepContactRatioRepresentation resolveContactRatioRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveContactRatioRepresentation(instance);
   }
 
   StepKinematicPropertyDefinitionRepresentation
@@ -5209,20 +4958,8 @@ public final class StepEntityResolver {
             "PLACED_DATUM_TARGET_FEATURE used_representation must reference REPRESENTATION"));
   }
 
-  StepResourcePropertyRepresentation resolveResourcePropertyRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RESOURCE_PROPERTY_REPRESENTATION");
-    requireParameterCount(instance, definition, 2);
-    return new StepResourcePropertyRepresentation(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepPropertyDefinition.class,
-            "RESOURCE_PROPERTY_REPRESENTATION definition must reference PROPERTY_DEFINITION"),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentation.class,
-            "RESOURCE_PROPERTY_REPRESENTATION used_representation must reference REPRESENTATION"));
+  StepResourcePropertyRepresentation resolveResourcePropertyRepresentation(StepEntityInstance instance) {
+    return representationResolver.resolveResourcePropertyRepresentation(instance);
   }
 
   StepRepresentationMap resolveRepresentationMap(StepEntityInstance instance) {
@@ -5365,46 +5102,16 @@ public final class StepEntityResolver {
             "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION transformation_operator must reference ITEM_DEFINED_TRANSFORMATION"));
   }
 
-  StepRepresentationRelationship resolveRepresentationRelationship(
-      StepEntityInstance instance) {
-    return resolveRepresentationRelationship(instance, "REPRESENTATION_RELATIONSHIP");
+  StepRepresentationRelationship resolveRepresentationRelationship(StepEntityInstance instance) {
+    return representationResolver.resolveRepresentationRelationship(instance);
   }
 
-  StepRepresentationRelationship resolveRepresentationRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    return new StepRepresentationRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepRepresentation.class,
-            entityName + " rep_1 must reference REPRESENTATION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepRepresentation.class,
-            entityName + " rep_2 must reference REPRESENTATION"),
-        entityName);
+  StepRepresentationRelationship resolveRepresentationRelationship(StepEntityInstance instance, String entityName) {
+    return representationResolver.resolveRepresentationRelationship(instance, entityName);
   }
 
-  StepShapeRepresentationRelationship resolveShapeRepresentationRelationship(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SHAPE_REPRESENTATION_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepShapeRepresentationRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepRepresentation.class,
-            "SHAPE_REPRESENTATION_RELATIONSHIP rep_1 must reference REPRESENTATION"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepRepresentation.class,
-            "SHAPE_REPRESENTATION_RELATIONSHIP rep_2 must reference REPRESENTATION"));
+  StepShapeRepresentationRelationship resolveShapeRepresentationRelationship(StepEntityInstance instance) {
+    return representationResolver.resolveShapeRepresentationRelationship(instance);
   }
 
   StepUncertaintyMeasureWithUnit resolveUncertaintyMeasureWithUnit(StepEntityInstance instance) {
@@ -5464,27 +5171,8 @@ public final class StepEntityResolver {
     return unitResolver.resolveDerivedUnit(instance);
   }
 
-  StepGeometricRepresentationContext resolveGeometricRepresentationContext(
-      StepEntityInstance instance) {
-    StepEntityDefinition geometric = definition(instance, "GEOMETRIC_REPRESENTATION_CONTEXT");
-    StepEntityDefinition representation = definition(instance, "REPRESENTATION_CONTEXT");
-    requireParameterCount(instance, geometric, 1);
-    requireParameterCount(instance, representation, 2);
-    StepGlobalUnitAssignedContext globalUnits =
-        instance.hasDefinition("GLOBAL_UNIT_ASSIGNED_CONTEXT")
-            ? resolveGlobalUnitAssignedContext(instance)
-            : null;
-    StepGlobalUncertaintyAssignedContext globalUncertainty =
-        instance.hasDefinition("GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT")
-            ? resolveGlobalUncertaintyAssignedContext(instance)
-            : null;
-    return new StepGeometricRepresentationContext(
-        instance.id(),
-        integerValue(instance, geometric, 0),
-        stringValue(instance, representation, 0),
-        stringValue(instance, representation, 1),
-        globalUnits,
-        globalUncertainty);
+  StepGeometricRepresentationContext resolveGeometricRepresentationContext(StepEntityInstance instance) {
+    return representationResolver.resolveGeometricRepresentationContext(instance);
   }
 
   StepNamedUnit resolveNamedUnit(StepEntityInstance instance) {
@@ -5540,60 +5228,20 @@ public final class StepEntityResolver {
         "NAMED_UNIT dimensions must reference DIMENSIONAL_EXPONENTS");
   }
 
-  StepRepresentation resolveRepresentation(
-      StepEntityInstance instance, boolean shapeRepresentation) {
-    String entityName = shapeRepresentation ? "SHAPE_REPRESENTATION" : "REPRESENTATION";
-    return resolveRepresentation(instance, entityName, shapeRepresentation);
+  StepRepresentation resolveRepresentation(StepEntityInstance instance, boolean shapeRepresentation) {
+    return representationResolver.resolveRepresentation(instance, shapeRepresentation);
   }
 
-  StepRepresentation resolveRepresentation(
-      StepEntityInstance instance, String entityName, boolean shapeRepresentation) {
-    // Try to find the specific entity definition first, fall back to parent definitions
-    StepEntityDefinition definition = null;
-    try {
-      definition = definition(instance, entityName);
-    } catch (StepParseException e) {
-      // Try parent definitions for representation subtypes
-      if (entityName.endsWith("_REPRESENTATION") && !entityName.equals("REPRESENTATION") && !entityName.equals("SHAPE_REPRESENTATION")) {
-        try {
-          definition = definition(instance, "SHAPE_REPRESENTATION");
-        } catch (StepParseException e2) {
-          definition = definition(instance, "REPRESENTATION");
-        }
-      } else {
-        throw e;
-      }
-    }
-    requireParameterCount(instance, definition, 3);
-    List<StepEntity> items =
-        entityReferenceList(
-            instance, definition, 1, entityName + " items must contain entity references");
-    StepEntity context = resolve(referenceId(instance, definition, 2));
-    if (!(context instanceof StepRepresentationContext)
-        && !(context instanceof StepGeometricRepresentationContext)) {
-      throw new StepResolutionException(
-          entityName + " context must reference a representation context");
-    }
-    return new StepRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        items,
-        context,
-        shapeRepresentation,
-        entityName);
+  StepRepresentation resolveRepresentation(StepEntityInstance instance, String entityName, boolean shapeRepresentation) {
+    return representationResolver.resolveRepresentation(instance, entityName, shapeRepresentation);
   }
 
   StepRepresentationItem resolveRepresentationItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 1);
-    return new StepRepresentationItem(instance.id(), stringValue(instance, definition, 0));
+    return representationResolver.resolveRepresentationItem(instance);
   }
 
-  StepGeometricRepresentationItem resolveGeometricRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GEOMETRIC_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 0);
-    return new StepGeometricRepresentationItem(instance.id(), inheritedRepresentationItemName(instance));
+  StepGeometricRepresentationItem resolveGeometricRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveGeometricRepresentationItem(instance);
   }
 
   StepPoint resolvePoint(StepEntityInstance instance) {
@@ -6031,12 +5679,8 @@ public final class StepEntityResolver {
     return surface;
   }
 
-  StepTopologicalRepresentationItem resolveTopologicalRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TOPOLOGICAL_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 1);
-    return new StepTopologicalRepresentationItem(
-        instance.id(), stringValue(instance, definition, 0));
+  StepTopologicalRepresentationItem resolveTopologicalRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveTopologicalRepresentationItem(instance);
   }
 
   StepVertex resolveVertex(StepEntityInstance instance) {
@@ -7627,49 +7271,16 @@ public final class StepEntityResolver {
     return unitResolver.resolveMeasureRepresentationItem(instance);
   }
 
-  StepDescriptiveRepresentationItem resolveDescriptiveRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DESCRIPTIVE_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 2);
-    return new StepDescriptiveRepresentationItem(
-        instance.id(), stringValue(instance, definition, 0), stringValue(instance, definition, 1));
+  StepDescriptiveRepresentationItem resolveDescriptiveRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveDescriptiveRepresentationItem(instance);
   }
 
-  StepValueRepresentationItem resolveValueRepresentationItem(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VALUE_REPRESENTATION_ITEM");
-    requireParameterCount(instance, definition, 2);
-
-    // Use enhanced typedSelection with validation
-    StepParameterReader.TypedSelection selection = typedSelection(instance, definition, 1);
-    validateSelectTypeKnown(instance, definition, 1, selection);
-
-    return new StepValueRepresentationItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        selection.typeName(),
-        literalText(selection.value()));
+  StepValueRepresentationItem resolveValueRepresentationItem(StepEntityInstance instance) {
+    return representationResolver.resolveValueRepresentationItem(instance);
   }
 
-  StepItemIdentifiedRepresentationUsage resolveItemIdentifiedRepresentationUsage(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ITEM_IDENTIFIED_REPRESENTATION_USAGE");
-    requireParameterCount(instance, definition, 5);
-    StepEntity identifiedItem = resolve(referenceId(instance, definition, 4));
-    if (!isSupportedAssociationUsageIdentifiedItem(identifiedItem)) {
-      throw new UnsupportedStepEntityException(
-          "ITEM_IDENTIFIED_REPRESENTATION_USAGE identified item must reference supported point/geometric set, face, edge, path, loop, shell, model, solid, wire container or REPRESENTATION");
-    }
-    return new StepItemIdentifiedRepresentationUsage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepRepresentation.class,
-            "ITEM_IDENTIFIED_REPRESENTATION_USAGE used_representation must reference REPRESENTATION"),
-        identifiedItem);
+  StepItemIdentifiedRepresentationUsage resolveItemIdentifiedRepresentationUsage(StepEntityInstance instance) {
+    return representationResolver.resolveItemIdentifiedRepresentationUsage(instance);
   }
 
   StepChainBasedItemIdentifiedRepresentationUsage
@@ -7934,18 +7545,7 @@ public final class StepEntityResolver {
   }
 
   StepShapeAspectOccurrence resolveShapeAspectOccurrence(StepEntityInstance instance) {
-    String entityName = instance.name();
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 5);
-    return new StepShapeAspectOccurrence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        requireEntity(referenceId(instance, definition, 2), com.minicad.step.model.StepProductDefinitionShape.class,
-            "SHAPE_ASPECT_OCCURRENCE ofShape must reference PRODUCT_DEFINITION_SHAPE"),
-        logicalValue(instance, definition, 3),
-        resolve(referenceId(instance, definition, 4)),
-        entityName);
+    return representationResolver.resolveShapeAspectOccurrence(instance);
   }
 
   StepEntityDefinition definition(StepEntityInstance instance, String name) {
@@ -8521,7 +8121,7 @@ public final class StepEntityResolver {
         || entity instanceof StepRepresentation;
   }
 
-  private boolean isSupportedAssociationUsageIdentifiedItem(StepEntity entity) {
+  boolean isSupportedAssociationUsageIdentifiedItem(StepEntity entity) {
     return isSupportedGeometricUsageIdentifiedItem(entity)
         || isSupportedAnnotationUsageItem(entity)
         || entity instanceof StepPropertyDefinition
@@ -8894,18 +8494,8 @@ public final class StepEntityResolver {
 
   // Phase 2 Batch 2: Helper resolver methods for A3M validation entities
 
-  StepRepresentationItemRelationship resolveRepresentationItemRelationship(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 4);
-    String description = optionalStringValue(instance, definition, 1);
-    return new StepRepresentationItemRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        description,
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)),
-        entityName);
+  StepRepresentationItemRelationship resolveRepresentationItemRelationship(StepEntityInstance instance, String entityName) {
+    return representationResolver.resolveRepresentationItemRelationship(instance, entityName);
   }
 
   StepDataEquivalenceAssessmentSpecification resolveDataEquivalenceAssessmentSpecification(
