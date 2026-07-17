@@ -790,6 +790,7 @@ public final class StepEntityResolver {
   private final GeometricFeatureResolver geometricFeatureResolver;
   private final AnalysisResolver analysisResolver;
   private final AnnotationResolver annotationResolver;
+  private final MaterialResolver materialResolver;
   private final BSplineResolver bSplineResolver;
   private final BezierResolver bezierResolver;
 
@@ -802,6 +803,7 @@ public final class StepEntityResolver {
     this.geometricFeatureResolver = new GeometricFeatureResolver(this);
     this.analysisResolver = new AnalysisResolver(this);
     this.annotationResolver = new AnnotationResolver(this);
+    this.materialResolver = new MaterialResolver(this);
     this.bSplineResolver = new BSplineResolver(this);
     this.bezierResolver = new BezierResolver(this);
   }
@@ -1899,25 +1901,11 @@ public final class StepEntityResolver {
   }
 
   StepMaterialDesignation resolveMaterialDesignation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MATERIAL_DESIGNATION");
-    requireParameterCount(instance, definition, 2);
-    List<StepEntity> defs =
-        entityReferenceList(
-            instance, definition, 1,
-            "MATERIAL_DESIGNATION definitions must contain entity references");
-    return new StepMaterialDesignation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        defs);
+    return materialResolver.resolveMaterialDesignation(instance);
   }
 
   StepLayeredItem resolveLayeredItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LAYERED_ITEM");
-    requireParameterCount(instance, definition, 2);
-    return new StepLayeredItem(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveLayeredItem(instance);
   }
 
   StepDatum resolveDatum(StepEntityInstance instance) {
@@ -2464,15 +2452,7 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceStyleRendering resolveSurfaceStyleRendering(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_RENDERING");
-    requireParameterCount(instance, definition, 6);
-    return new StepSurfaceStyleRendering(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return materialResolver.resolveSurfaceStyleRendering(instance);
   }
 
   StepSurfaceStyleRenderingWithProperties resolveSurfaceStyleRenderingWithProperties(
@@ -2490,13 +2470,7 @@ public final class StepEntityResolver {
   }
 
   StepRenderingProperties resolveRenderingProperties(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "RENDERING_PROPERTIES");
-    requireParameterCount(instance, definition, 4);
-    return new StepRenderingProperties(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2));
+    return materialResolver.resolveRenderingProperties(instance);
   }
 
   StepLightSource resolveLightSource(StepEntityInstance instance) {
@@ -2556,13 +2530,7 @@ public final class StepEntityResolver {
   }
 
   StepPresentationLayerUsage resolvePresentationLayerUsage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRESENTATION_LAYER_USAGE");
-    requireParameterCount(instance, definition, 4);
-    return new StepPresentationLayerUsage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return materialResolver.resolvePresentationLayerUsage(instance);
   }
 
   StepCameraModelD2 resolveCameraModelD2(StepEntityInstance instance) {
@@ -2980,36 +2948,15 @@ public final class StepEntityResolver {
   }
 
   StepMaterial resolveMaterial(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MATERIAL");
-    requireParameterCount(instance, definition, 5);
-    return new StepMaterial(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return materialResolver.resolveMaterial(instance);
   }
 
   StepFeaLinearMaterial resolveFeaLinearMaterial(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_LINEAR_MATERIAL");
-    requireParameterCount(instance, definition, 4);
-    return new StepFeaLinearMaterial(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return materialResolver.resolveFeaLinearMaterial(instance);
   }
 
   StepFeaNonLinearMaterial resolveFeaNonLinearMaterial(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FEA_NON_LINEAR_MATERIAL");
-    requireParameterCount(instance, definition, 3);
-    return new StepFeaNonLinearMaterial(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        stringValue(instance, definition, 2));
+    return materialResolver.resolveFeaNonLinearMaterial(instance);
   }
 
   StepFeaMassDensity resolveFeaMassDensity(StepEntityInstance instance) {
@@ -3389,12 +3336,7 @@ public final class StepEntityResolver {
   }
 
   StepFillAreaShapeUse resolveFillAreaShapeUse(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_SHAPE_USE");
-    requireParameterCount(instance, definition, 2);
-    return new StepFillAreaShapeUse(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveFillAreaShapeUse(instance);
   }
 
   StepPointOnFace resolvePointOnFace(StepEntityInstance instance) {
@@ -4244,13 +4186,7 @@ public final class StepEntityResolver {
   }
 
   StepFillAreaWithOutline resolveFillAreaWithOutline(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_WITH_OUTLINE");
-    requireParameterCount(instance, definition, 3);
-    return new StepFillAreaWithOutline(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "FILL_AREA_WITH_OUTLINE outlines must contain entity references"));
+    return materialResolver.resolveFillAreaWithOutline(instance);
   }
 
   // Annotation resolvers
@@ -4273,21 +4209,11 @@ public final class StepEntityResolver {
   }
 
   StepExternallyDefinedHatchStyle resolveExternallyDefinedHatchStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTERNALLY_DEFINED_HATCH_STYLE");
-    requireParameterCount(instance, definition, 2);
-    return new StepExternallyDefinedHatchStyle(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveExternallyDefinedHatchStyle(instance);
   }
 
   StepExternallyDefinedTileStyle resolveExternallyDefinedTileStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "EXTERNALLY_DEFINED_TILE_STYLE");
-    requireParameterCount(instance, definition, 2);
-    return new StepExternallyDefinedTileStyle(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveExternallyDefinedTileStyle(instance);
   }
 
   StepMarkingFeature resolveMarkingFeature(StepEntityInstance instance) {
@@ -4424,18 +4350,7 @@ public final class StepEntityResolver {
   }
 
   StepBillOfMaterials resolveBillOfMaterials(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BILL_OF_MATERIALS");
-    requireParameterCount(instance, definition, 8);
-    return new StepBillOfMaterials(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        entityReferenceList(instance, definition, 2,
-            "BILL_OF_MATERIALS items must contain entity references"),
-        intList(instance, definition, 3),
-        stringValue(instance, definition, 4),
-        (int) numberValue(instance, definition, 5),
-        stringValue(instance, definition, 6));
+    return materialResolver.resolveBillOfMaterials(instance);
   }
 
   StepMakeFromRelationship resolveMakeFromRelationship(StepEntityInstance instance) {
@@ -4457,12 +4372,7 @@ public final class StepEntityResolver {
   }
 
   StepTextFont resolveTextFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_FONT");
-    requireParameterCount(instance, definition, 3);
-    return new StepTextFont(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return materialResolver.resolveTextFont(instance);
   }
 
   StepCharacterGlyph resolveCharacterGlyph(StepEntityInstance instance) {
@@ -4507,87 +4417,39 @@ public final class StepEntityResolver {
   }
 
   StepPreDefinedSurfaceStyle resolvePreDefinedSurfaceStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_SURFACE_STYLE");
-    requireParameterCount(instance, definition, 3);
-    return new StepPreDefinedSurfaceStyle(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1));
+    return materialResolver.resolvePreDefinedSurfaceStyle(instance);
   }
 
   StepSurfaceStyleParameterLines resolveSurfaceStyleParameterLines(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_PARAMETER_LINES");
-    requireParameterCount(instance, definition, 3);
-    return new StepSurfaceStyleParameterLines(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveSurfaceStyleParameterLines(instance);
   }
 
   StepFillAreaStyleOutline resolveFillAreaStyleOutline(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_OUTLINE");
-    requireParameterCount(instance, definition, 3);
-    return new StepFillAreaStyleOutline(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveFillAreaStyleOutline(instance);
   }
 
   StepFillAreaStyleTransparent resolveFillAreaStyleTransparent(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_TRANSPARENT");
-    requireParameterCount(instance, definition, 3);
-    return new StepFillAreaStyleTransparent(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1));
+    return materialResolver.resolveFillAreaStyleTransparent(instance);
   }
 
   StepFillAreaStyleHatching resolveFillAreaStyleHatching(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_HATCHING");
-    requireParameterCount(instance, definition, 4);
-    return new StepFillAreaStyleHatching(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2));
+    return materialResolver.resolveFillAreaStyleHatching(instance);
   }
 
   StepFillAreaStyleTiling resolveFillAreaStyleTiling(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_TILING");
-    requireParameterCount(instance, definition, 3);
-    return new StepFillAreaStyleTiling(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveFillAreaStyleTiling(instance);
   }
 
   StepCurveStyleFont resolveCurveStyleFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_STYLE_FONT");
-    requireParameterCount(instance, definition, 3);
-    return new StepCurveStyleFont(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+    return materialResolver.resolveCurveStyleFont(instance);
   }
 
   StepCurveStyleRendering resolveCurveStyleRendering(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_STYLE_RENDERING");
-    requireParameterCount(instance, definition, 4);
-    return new StepCurveStyleRendering(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return materialResolver.resolveCurveStyleRendering(instance);
   }
 
   StepCurveStyleWithFont resolveCurveStyleWithFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_STYLE_WITH_FONT");
-    requireParameterCount(instance, definition, 4);
-    return new StepCurveStyleWithFont(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2));
+    return materialResolver.resolveCurveStyleWithFont(instance);
   }
 
   StepDraughtingPreDefinedTerminatorSymbol resolveDraughtingPreDefinedTerminatorSymbol(StepEntityInstance instance) {
@@ -4750,14 +4612,7 @@ public final class StepEntityResolver {
   }
 
   StepColorSpecification resolveColorSpecification(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COLOR_SPECIFICATION");
-    requireParameterCount(instance, definition, 4);
-    return new StepColorSpecification(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return materialResolver.resolveColorSpecification(instance);
   }
 
   StepWithDescriptiveRepresentationItem resolveWithDescriptiveRepresentationItem(
@@ -6452,41 +6307,11 @@ public final class StepEntityResolver {
   }
 
   StepUserDefinedMarker resolveUserDefinedMarker(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "USER_DEFINED_MARKER");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "USER_DEFINED_MARKER mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepUserDefinedMarker(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentationMap.class,
-            "USER_DEFINED_MARKER mapping_source must reference REPRESENTATION_MAP"),
-        mappingTarget);
+    return materialResolver.resolveUserDefinedMarker(instance);
   }
 
   StepUserDefinedCurveFont resolveUserDefinedCurveFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "USER_DEFINED_CURVE_FONT");
-    requireParameterCount(instance, definition, 3);
-    StepEntity mappingTarget = resolve(referenceId(instance, definition, 2));
-    if (!(mappingTarget instanceof StepAxis2Placement2D)
-        && !(mappingTarget instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "USER_DEFINED_CURVE_FONT mapping_target must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepUserDefinedCurveFont(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepRepresentationMap.class,
-            "USER_DEFINED_CURVE_FONT mapping_source must reference REPRESENTATION_MAP"),
-        mappingTarget);
+    return materialResolver.resolveUserDefinedCurveFont(instance);
   }
 
   StepUserDefinedTerminatorSymbol resolveUserDefinedTerminatorSymbol(
@@ -7341,26 +7166,15 @@ public final class StepEntityResolver {
   }
 
   StepColourRgb resolveColourRgb(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COLOUR_RGB");
-    requireParameterCount(instance, definition, 4);
-    return new StepColourRgb(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return materialResolver.resolveColourRgb(instance);
   }
 
   StepColour resolveColour(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COLOUR");
-    requireParameterCount(instance, definition, 0);
-    return new StepColour(instance.id());
+    return materialResolver.resolveColour(instance);
   }
 
   StepColourSpecification resolveColourSpecification(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COLOUR_SPECIFICATION");
-    requireParameterCount(instance, definition, 1);
-    return new StepColourSpecification(instance.id(), stringValue(instance, definition, 0));
+    return materialResolver.resolveColourSpecification(instance);
   }
 
   StepDraughtingPreDefinedCurveFont resolveDraughtingPreDefinedCurveFont(
@@ -7372,9 +7186,7 @@ public final class StepEntityResolver {
   }
 
   StepPreDefinedCurveFont resolvePreDefinedCurveFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_CURVE_FONT");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedCurveFont(instance.id(), stringValue(instance, definition, 0));
+    return materialResolver.resolvePreDefinedCurveFont(instance);
   }
 
   StepPreDefinedItem resolvePreDefinedItem(StepEntityInstance instance) {
@@ -7384,9 +7196,7 @@ public final class StepEntityResolver {
   }
 
   StepPreDefinedMarker resolvePreDefinedMarker(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_MARKER");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedMarker(instance.id(), stringValue(instance, definition, 0));
+    return materialResolver.resolvePreDefinedMarker(instance);
   }
 
   StepPreDefinedSymbol resolvePreDefinedSymbol(StepEntityInstance instance) {
@@ -7440,9 +7250,7 @@ public final class StepEntityResolver {
   }
 
   StepPreDefinedTextFont resolvePreDefinedTextFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_TEXT_FONT");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedTextFont(instance.id(), stringValue(instance, definition, 0));
+    return materialResolver.resolvePreDefinedTextFont(instance);
   }
 
   StepDraughtingPreDefinedColour resolveDraughtingPreDefinedColour(
@@ -7453,63 +7261,15 @@ public final class StepEntityResolver {
   }
 
   StepPreDefinedColour resolvePreDefinedColour(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRE_DEFINED_COLOUR");
-    requireParameterCount(instance, definition, 1);
-    return new StepPreDefinedColour(instance.id(), stringValue(instance, definition, 0));
+    return materialResolver.resolvePreDefinedColour(instance);
   }
 
   StepCurveStyle resolveCurveStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CURVE_STYLE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity font = resolve(referenceId(instance, definition, 1));
-    if (!(font instanceof StepDraughtingPreDefinedCurveFont)
-        && !(font instanceof StepPreDefinedCurveFont)
-        && !(font instanceof StepUserDefinedCurveFont)) {
-      throw new UnsupportedStepEntityException(
-          "CURVE_STYLE font must reference PRE_DEFINED_CURVE_FONT, DRAUGHTING_PRE_DEFINED_CURVE_FONT or USER_DEFINED_CURVE_FONT");
-    }
-    StepEntity colour = resolve(referenceId(instance, definition, 3));
-    if (!(colour instanceof StepColourRgb)
-        && !(colour instanceof StepColourSpecification)
-        && !(colour instanceof StepColour)
-        && !(colour instanceof StepDraughtingPreDefinedColour)
-        && !(colour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "CURVE_STYLE colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepCurveStyle(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        font,
-        numberValue(instance, definition, 2),
-        colour);
+    return materialResolver.resolveCurveStyle(instance);
   }
 
   StepPointStyle resolvePointStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "POINT_STYLE");
-    requireParameterCount(instance, definition, 4);
-    StepEntity marker = resolve(referenceId(instance, definition, 1));
-    if (!(marker instanceof StepPreDefinedPointMarkerSymbol)
-        && !(marker instanceof StepPreDefinedMarker)
-        && !(marker instanceof StepUserDefinedMarker)) {
-      throw new UnsupportedStepEntityException(
-          "POINT_STYLE marker must reference PRE_DEFINED_POINT_MARKER_SYMBOL, PRE_DEFINED_MARKER or USER_DEFINED_MARKER");
-    }
-    StepEntity colour = resolve(referenceId(instance, definition, 3));
-    if (!(colour instanceof StepColourRgb)
-        && !(colour instanceof StepColourSpecification)
-        && !(colour instanceof StepColour)
-        && !(colour instanceof StepDraughtingPreDefinedColour)
-        && !(colour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "POINT_STYLE colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepPointStyle(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        marker,
-        numberValue(instance, definition, 2),
-        colour);
+    return materialResolver.resolvePointStyle(instance);
   }
 
   StepCharacterGlyphStyleStroke resolveCharacterGlyphStyleStroke(
@@ -7554,45 +7314,15 @@ public final class StepEntityResolver {
   }
 
   StepTextStyleForDefinedFont resolveTextStyleForDefinedFont(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_FOR_DEFINED_FONT");
-    requireParameterCount(instance, definition, 1);
-    StepEntity colour = resolve(referenceId(instance, definition, 0));
-    if (!(colour instanceof StepColourRgb)
-        && !(colour instanceof StepColourSpecification)
-        && !(colour instanceof StepColour)
-        && !(colour instanceof StepDraughtingPreDefinedColour)
-        && !(colour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "TEXT_STYLE_FOR_DEFINED_FONT colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepTextStyleForDefinedFont(instance.id(), colour);
+    return materialResolver.resolveTextStyleForDefinedFont(instance);
   }
 
   StepTextStyle resolveTextStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_STYLE");
-    requireParameterCount(instance, definition, 2);
-    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
-    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
-      throw new UnsupportedStepEntityException(
-          "TEXT_STYLE character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
-    }
-    return new StepTextStyle(
-        instance.id(), stringValue(instance, definition, 0), characterAppearance);
+    return materialResolver.resolveTextStyle(instance);
   }
 
   StepTextStyleWithSpacing resolveTextStyleWithSpacing(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_SPACING");
-    requireParameterCount(instance, definition, 3);
-    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
-    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
-      throw new UnsupportedStepEntityException(
-          "TEXT_STYLE_WITH_SPACING character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
-    }
-    return new StepTextStyleWithSpacing(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        characterAppearance,
-        numberValue(instance, definition, 2));
+    return materialResolver.resolveTextStyleWithSpacing(instance);
   }
 
   StepTextStyleWithJustification resolveTextStyleWithJustification(
@@ -7612,24 +7342,7 @@ public final class StepEntityResolver {
   }
 
   StepTextStyleWithMirror resolveTextStyleWithMirror(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "TEXT_STYLE_WITH_MIRROR");
-    requireParameterCount(instance, definition, 3);
-    StepEntity characterAppearance = resolve(referenceId(instance, definition, 1));
-    if (!(characterAppearance instanceof StepTextStyleForDefinedFont)) {
-      throw new UnsupportedStepEntityException(
-          "TEXT_STYLE_WITH_MIRROR character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
-    }
-    StepEntity mirrorPlacement = resolve(referenceId(instance, definition, 2));
-    if (!(mirrorPlacement instanceof StepAxis2Placement2D)
-        && !(mirrorPlacement instanceof StepAxis2Placement3D)) {
-      throw new UnsupportedStepEntityException(
-          "TEXT_STYLE_WITH_MIRROR mirror_placement must reference AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-    }
-    return new StepTextStyleWithMirror(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        characterAppearance,
-        mirrorPlacement);
+    return materialResolver.resolveTextStyleWithMirror(instance);
   }
 
   StepTextStyleWithBoxCharacteristics resolveTextStyleWithBoxCharacteristics(
@@ -7658,70 +7371,23 @@ public final class StepEntityResolver {
   }
 
   StepSymbolColour resolveSymbolColour(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SYMBOL_COLOUR");
-    requireParameterCount(instance, definition, 1);
-    StepEntity colour = resolve(referenceId(instance, definition, 0));
-    if (!(colour instanceof StepColourRgb)
-        && !(colour instanceof StepColourSpecification)
-        && !(colour instanceof StepColour)
-        && !(colour instanceof StepDraughtingPreDefinedColour)
-        && !(colour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "SYMBOL_COLOUR colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepSymbolColour(instance.id(), colour);
+    return materialResolver.resolveSymbolColour(instance);
   }
 
   StepSymbolStyle resolveSymbolStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SYMBOL_STYLE");
-    requireParameterCount(instance, definition, 2);
-    StepEntity styleOfSymbol = resolve(referenceId(instance, definition, 1));
-    if (!(styleOfSymbol instanceof StepSymbolColour)) {
-      throw new UnsupportedStepEntityException(
-          "SYMBOL_STYLE style_of_symbol must reference SYMBOL_COLOUR");
-    }
-    return new StepSymbolStyle(instance.id(), stringValue(instance, definition, 0), styleOfSymbol);
+    return materialResolver.resolveSymbolStyle(instance);
   }
 
   StepFillAreaStyleColour resolveFillAreaStyleColour(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE_COLOUR");
-    requireParameterCount(instance, definition, 2);
-    StepEntity colour = resolve(referenceId(instance, definition, 1));
-    if (!(colour instanceof StepColourRgb)
-        && !(colour instanceof StepColourSpecification)
-        && !(colour instanceof StepColour)
-        && !(colour instanceof StepDraughtingPreDefinedColour)
-        && !(colour instanceof StepPreDefinedColour)) {
-      throw new UnsupportedStepEntityException(
-          "FILL_AREA_STYLE_COLOUR colour must reference COLOUR, COLOUR_SPECIFICATION, COLOUR_RGB, PRE_DEFINED_COLOUR or DRAUGHTING_PRE_DEFINED_COLOUR");
-    }
-    return new StepFillAreaStyleColour(
-        instance.id(), optionalStringValue(instance, definition, 0), colour);
+    return materialResolver.resolveFillAreaStyleColour(instance);
   }
 
   StepFillAreaStyle resolveFillAreaStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FILL_AREA_STYLE");
-    requireParameterCount(instance, definition, 2);
-    return new StepFillAreaStyle(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepFillAreaStyleColour.class,
-            "FILL_AREA_STYLE styles must contain FILL_AREA_STYLE_COLOUR references"));
+    return materialResolver.resolveFillAreaStyle(instance);
   }
 
   StepSurfaceStyleFillArea resolveSurfaceStyleFillArea(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_FILL_AREA");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleFillArea(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepFillAreaStyle.class,
-            "SURFACE_STYLE_FILL_AREA fill style must reference FILL_AREA_STYLE"));
+    return materialResolver.resolveSurfaceStyleFillArea(instance);
   }
 
   StepCurveStyle requireCurveStyleReference(
@@ -7733,18 +7399,11 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceStyleBoundary resolveSurfaceStyleBoundary(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_BOUNDARY");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleBoundary(
-        instance.id(), requireCurveStyleReference(instance, definition, "SURFACE_STYLE_BOUNDARY"));
+    return materialResolver.resolveSurfaceStyleBoundary(instance);
   }
 
   StepSurfaceStyleControlGrid resolveSurfaceStyleControlGrid(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_CONTROL_GRID");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleControlGrid(
-        instance.id(),
-        requireCurveStyleReference(instance, definition, "SURFACE_STYLE_CONTROL_GRID"));
+    return materialResolver.resolveSurfaceStyleControlGrid(instance);
   }
 
   StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(
@@ -7757,16 +7416,11 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceStyleSilhouette resolveSurfaceStyleSilhouette(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_SILHOUETTE");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleSilhouette(
-        instance.id(), requireCurveStyleReference(instance, definition, "SURFACE_STYLE_SILHOUETTE"));
+    return materialResolver.resolveSurfaceStyleSilhouette(instance);
   }
 
   StepSurfaceStyleTransparent resolveSurfaceStyleTransparent(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_TRANSPARENT");
-    requireParameterCount(instance, definition, 1);
-    return new StepSurfaceStyleTransparent(instance.id(), numberValue(instance, definition, 0));
+    return materialResolver.resolveSurfaceStyleTransparent(instance);
   }
 
   StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(
@@ -7823,48 +7477,11 @@ public final class StepEntityResolver {
   }
 
   StepSurfaceSideStyle resolveSurfaceSideStyle(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_SIDE_STYLE");
-    requireParameterCount(instance, definition, 2);
-    return new StepSurfaceSideStyle(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        entityReferenceList(
-                instance,
-                definition,
-                1,
-                "SURFACE_SIDE_STYLE styles must contain SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR or SURFACE_STYLE_PARAMETER_LINE references")
-                .stream()
-                .map(
-                        style -> {
-                            if (!(style instanceof StepSurfaceStyleFillArea)
-                                    && !(style instanceof StepSurfaceStyleBoundary)
-                                    && !(style instanceof StepSurfaceStyleControlGrid)
-                                    && !(style instanceof StepSurfaceStyleSegmentationCurve)
-                                    && !(style instanceof StepSurfaceStyleSilhouette)
-                                    && !(style instanceof StepSurfaceStyleTransparent)
-                                    && !(style instanceof StepSurfaceStyleReflectanceAmbient)
-                                    && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuse)
-                                    && !(style instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular)
-                                    && !(style instanceof StepSurfaceStyleRendering)
-                                    && !(style instanceof StepSurfaceStyleParameterLine)) {
-                                throw new StepResolutionException(
-                                        "SURFACE_SIDE_STYLE styles must reference SURFACE_STYLE_FILL_AREA, SURFACE_STYLE_BOUNDARY, SURFACE_STYLE_CONTROL_GRID, SURFACE_STYLE_SEGMENTATION_CURVE, SURFACE_STYLE_SILHOUETTE, SURFACE_STYLE_TRANSPARENT, SURFACE_STYLE_REFLECTANCE_AMBIENT, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE, SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR, SURFACE_STYLE_RENDERING or SURFACE_STYLE_PARAMETER_LINE");
-                            }
-                            return style;
-                        })
-                .collect(Collectors.toList()));
+    return materialResolver.resolveSurfaceSideStyle(instance);
   }
 
   StepSurfaceStyleUsage resolveSurfaceStyleUsage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_STYLE_USAGE");
-    requireParameterCount(instance, definition, 2);
-    return new StepSurfaceStyleUsage(
-        instance.id(),
-        enumValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepSurfaceSideStyle.class,
-            "SURFACE_STYLE_USAGE style must reference SURFACE_SIDE_STYLE"));
+    return materialResolver.resolveSurfaceStyleUsage(instance);
   }
 
   StepPresentationStyleAssignment resolvePresentationStyleAssignment(
@@ -7881,37 +7498,11 @@ public final class StepEntityResolver {
   }
 
   StepStyledItem resolveStyledItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STYLED_ITEM");
-    requireParameterCount(instance, definition, 3);
-    return new StepStyledItem(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "STYLED_ITEM styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        resolve(referenceId(instance, definition, 2)));
+    return materialResolver.resolveStyledItem(instance);
   }
 
   StepOverRidingStyledItem resolveOverRidingStyledItem(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "OVER_RIDING_STYLED_ITEM");
-    requireParameterCount(instance, definition, 4);
-    return new StepOverRidingStyledItem(
-        instance.id(),
-        optionalStringValue(instance, definition, 0),
-        referenceList(
-            instance,
-            definition,
-            1,
-            StepPresentationStyleAssignment.class,
-            "OVER_RIDING_STYLED_ITEM styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
-        resolve(referenceId(instance, definition, 2)),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepStyledItem.class,
-            "OVER_RIDING_STYLED_ITEM over_ridden_style must reference STYLED_ITEM"));
+    return materialResolver.resolveOverRidingStyledItem(instance);
   }
 
   StepPresentationLayerAssignment resolvePresentationLayerAssignment(
