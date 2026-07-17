@@ -2371,14 +2371,7 @@ public final class StepEntityResolver {
   }
 
   StepDesignMakeFrom resolveDesignMakeFrom(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DESIGN_MAKE_FROM");
-    requireParameterCount(instance, definition, 5);
-    return new StepDesignMakeFrom(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)),
-        resolve(referenceId(instance, definition, 3)));
+    return productResolver.resolveDesignMakeFrom(instance);
   }
 
   StepInterpolatedConfigurationSegment resolveInterpolatedConfigurationSegment(
@@ -2552,14 +2545,8 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 5));
   }
 
-  StepMechanicalDesignShapeRepresentation resolveMechanicalDesignShapeRepresentation(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MECHANICAL_DESIGN_SHAPE_REPRESENTATION");
-    requireParameterCount(instance, definition, 3);
-    return new StepMechanicalDesignShapeRepresentation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)));
+  StepMechanicalDesignShapeRepresentation resolveMechanicalDesignShapeRepresentation(StepEntityInstance instance) {
+    return productResolver.resolveMechanicalDesignShapeRepresentation(instance);
   }
 
   StepKinematicPair resolveKinematicPair(StepEntityInstance instance) {
@@ -3916,49 +3903,15 @@ public final class StepEntityResolver {
 
   // Product resolvers
   StepAssemblyOperation resolveAssemblyOperation(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_OPERATION");
-    requireParameterCount(instance, definition, 8);
-    return new StepAssemblyOperation(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        numberList(instance, definition, 2),
-        entityReferenceList(instance, definition, 3,
-            "ASSEMBLY_OPERATION components must contain entity references"),
-        resolve(referenceId(instance, definition, 4)),
-        resolve(referenceId(instance, definition, 5)),
-        numberValue(instance, definition, 6));
+    return productResolver.resolveAssemblyOperation(instance);
   }
 
   StepAssemblySequence resolveAssemblySequence(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_SEQUENCE");
-    requireParameterCount(instance, definition, 8);
-    return new StepAssemblySequence(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ASSEMBLY_SEQUENCE operations must contain entity references"),
-        intList(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        entityReferenceList(instance, definition, 4,
-            "ASSEMBLY_SEQUENCE tools must contain entity references"),
-        numberValue(instance, definition, 5),
-        entityReferenceList(instance, definition, 6,
-            "ASSEMBLY_SEQUENCE dependencies must contain entity references"));
+    return productResolver.resolveAssemblySequence(instance);
   }
 
   StepAssemblyStructure resolveAssemblyStructure(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_STRUCTURE");
-    requireParameterCount(instance, definition, 6);
-    return new StepAssemblyStructure(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        entityReferenceList(instance, definition, 2,
-            "ASSEMBLY_STRUCTURE components must contain entity references"),
-        entityReferenceList(instance, definition, 3,
-            "ASSEMBLY_STRUCTURE relationships must contain entity references"),
-        stringValue(instance, definition, 4));
+    return productResolver.resolveAssemblyStructure(instance);
   }
 
   StepCadModelReference resolveCadModelReference(StepEntityInstance instance) {
@@ -4238,16 +4191,7 @@ public final class StepEntityResolver {
 
   // Product resolvers
   StepAssemblyComponentUsage resolveAssemblyComponentUsage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ASSEMBLY_COMPONENT_USAGE");
-    requireParameterCount(instance, definition, 7);
-    return new StepAssemblyComponentUsage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        (int) numberValue(instance, definition, 3),
-        stringValue(instance, definition, 4),
-        resolve(referenceId(instance, definition, 5)));
+    return productResolver.resolveAssemblyComponentUsage(instance);
   }
 
   StepBillOfMaterials resolveBillOfMaterials(StepEntityInstance instance) {
@@ -4901,90 +4845,31 @@ public final class StepEntityResolver {
   }
 
   StepDocumentType resolveDocumentType(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DOCUMENT_TYPE");
-    requireParameterCount(instance, definition, 1);
-    return new StepDocumentType(instance.id(), stringValue(instance, definition, 0));
+    return productResolver.resolveDocumentType(instance);
   }
 
   StepDocument resolveDocument(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DOCUMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepDocument(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        optionalStringValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepDocumentType.class,
-            "DOCUMENT kind must reference DOCUMENT_TYPE"));
+    return productResolver.resolveDocument(instance);
   }
 
   StepDocumentRelationship resolveDocumentRelationship(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DOCUMENT_RELATIONSHIP");
-    requireParameterCount(instance, definition, 4);
-    return new StepDocumentRelationship(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        optionalStringValue(instance, definition, 1),
-        requireEntity(
-            referenceId(instance, definition, 2),
-            StepDocument.class,
-            "DOCUMENT_RELATIONSHIP relating_document must reference DOCUMENT"),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepDocument.class,
-            "DOCUMENT_RELATIONSHIP related_document must reference DOCUMENT"));
+    return productResolver.resolveDocumentRelationship(instance);
   }
 
-  StepDocumentUsageConstraint resolveDocumentUsageConstraint(
-      StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DOCUMENT_USAGE_CONSTRAINT");
-    requireParameterCount(instance, definition, 3);
-    return new StepDocumentUsageConstraint(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDocument.class,
-            "DOCUMENT_USAGE_CONSTRAINT source must reference DOCUMENT"),
-        stringValue(instance, definition, 1),
-        stringValue(instance, definition, 2));
+  StepDocumentUsageConstraint resolveDocumentUsageConstraint(StepEntityInstance instance) {
+    return productResolver.resolveDocumentUsageConstraint(instance);
   }
 
   StepDocumentReference resolveDocumentReference(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DOCUMENT_REFERENCE");
-    requireParameterCount(instance, definition, 2);
-    return new StepDocumentReference(
-        instance.id(),
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDocument.class,
-            "DOCUMENT_REFERENCE assigned_document must reference DOCUMENT"),
-        optionalStringValue(instance, definition, 1));
+    return productResolver.resolveDocumentReference(instance);
   }
 
-  StepAppliedDocumentReference resolveAppliedDocumentReference(
-      StepEntityInstance instance) {
-    return resolveAppliedDocumentReference(instance, "APPLIED_DOCUMENT_REFERENCE");
+  StepAppliedDocumentReference resolveAppliedDocumentReference(StepEntityInstance instance) {
+    return productResolver.resolveAppliedDocumentReference(instance);
   }
 
-  StepAppliedDocumentReference resolveAppliedDocumentReference(
-      StepEntityInstance instance, String entityName) {
-    StepEntityDefinition definition = definition(instance, entityName);
-    requireParameterCount(instance, definition, 3);
-    return new StepAppliedDocumentReference(
-        instance.id(),
-        entityName,
-        requireEntity(
-            referenceId(instance, definition, 0),
-            StepDocument.class,
-            entityName + " assigned_document must reference DOCUMENT"),
-        optionalStringValue(instance, definition, 1),
-        entityReferenceList(
-            instance,
-            definition,
-            2,
-            entityName + " items must contain entity references"));
+  StepAppliedDocumentReference resolveAppliedDocumentReference(StepEntityInstance instance, String entityName) {
+    return productResolver.resolveAppliedDocumentReference(instance, entityName);
   }
 
   StepPerson resolvePerson(StepEntityInstance instance) {

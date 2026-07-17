@@ -48,6 +48,18 @@ import com.minicad.step.model.StepRepresentationMap;
 import com.minicad.step.model.StepRepresentationRelationship;
 import com.minicad.step.model.StepRepresentationRelationshipWithTransformation;
 import com.minicad.step.model.StepShapeRepresentationRelationship;
+import com.minicad.step.model.StepAppliedDocumentReference;
+import com.minicad.step.model.StepAssemblyComponentUsage;
+import com.minicad.step.model.StepAssemblyOperation;
+import com.minicad.step.model.StepAssemblySequence;
+import com.minicad.step.model.StepAssemblyStructure;
+import com.minicad.step.model.StepDesignMakeFrom;
+import com.minicad.step.model.StepDocument;
+import com.minicad.step.model.StepDocumentReference;
+import com.minicad.step.model.StepDocumentRelationship;
+import com.minicad.step.model.StepDocumentType;
+import com.minicad.step.model.StepDocumentUsageConstraint;
+import com.minicad.step.model.StepMechanicalDesignShapeRepresentation;
 import com.minicad.step.syntax.StepEntityDefinition;
 import com.minicad.step.syntax.StepEntityInstance;
 
@@ -629,5 +641,172 @@ final class StepProductResolver {
         resolver.stringValue(instance, definition, 0),
         resolver.stringValue(instance, definition, 1),
         resolver.resolve(resolver.referenceId(instance, definition, 2)));
+  }
+
+  // === Assembly / Design ===
+
+  StepAssemblyComponentUsage resolveAssemblyComponentUsage(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ASSEMBLY_COMPONENT_USAGE");
+    StepEntityResolver.requireParameterCount(instance, definition, 7);
+    return new StepAssemblyComponentUsage(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        (int) resolver.numberValue(instance, definition, 3),
+        resolver.stringValue(instance, definition, 4),
+        resolver.resolve(resolver.referenceId(instance, definition, 5)));
+  }
+
+  StepAssemblyOperation resolveAssemblyOperation(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ASSEMBLY_OPERATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 8);
+    return new StepAssemblyOperation(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.numberList(instance, definition, 2),
+        resolver.entityReferenceList(instance, definition, 3,
+            "ASSEMBLY_OPERATION components must contain entity references"),
+        resolver.resolve(resolver.referenceId(instance, definition, 4)),
+        resolver.resolve(resolver.referenceId(instance, definition, 5)),
+        resolver.numberValue(instance, definition, 6));
+  }
+
+  StepAssemblySequence resolveAssemblySequence(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ASSEMBLY_SEQUENCE");
+    StepEntityResolver.requireParameterCount(instance, definition, 8);
+    return new StepAssemblySequence(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.entityReferenceList(instance, definition, 1,
+            "ASSEMBLY_SEQUENCE operations must contain entity references"),
+        resolver.intList(instance, definition, 2),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)),
+        resolver.entityReferenceList(instance, definition, 4,
+            "ASSEMBLY_SEQUENCE tools must contain entity references"),
+        resolver.numberValue(instance, definition, 5),
+        resolver.entityReferenceList(instance, definition, 6,
+            "ASSEMBLY_SEQUENCE dependencies must contain entity references"));
+  }
+
+  StepAssemblyStructure resolveAssemblyStructure(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "ASSEMBLY_STRUCTURE");
+    StepEntityResolver.requireParameterCount(instance, definition, 6);
+    return new StepAssemblyStructure(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)),
+        resolver.entityReferenceList(instance, definition, 2,
+            "ASSEMBLY_STRUCTURE components must contain entity references"),
+        resolver.entityReferenceList(instance, definition, 3,
+            "ASSEMBLY_STRUCTURE relationships must contain entity references"),
+        resolver.stringValue(instance, definition, 4));
+  }
+
+  StepDesignMakeFrom resolveDesignMakeFrom(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DESIGN_MAKE_FROM");
+    StepEntityResolver.requireParameterCount(instance, definition, 5);
+    return new StepDesignMakeFrom(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.resolve(resolver.referenceId(instance, definition, 2)),
+        resolver.resolve(resolver.referenceId(instance, definition, 3)));
+  }
+
+  StepMechanicalDesignShapeRepresentation resolveMechanicalDesignShapeRepresentation(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "MECHANICAL_DESIGN_SHAPE_REPRESENTATION");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepMechanicalDesignShapeRepresentation(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.resolve(resolver.referenceId(instance, definition, 1)));
+  }
+
+  // === Document Entities ===
+
+  StepAppliedDocumentReference resolveAppliedDocumentReference(StepEntityInstance instance) {
+    return resolveAppliedDocumentReference(instance, "APPLIED_DOCUMENT_REFERENCE");
+  }
+
+  StepAppliedDocumentReference resolveAppliedDocumentReference(StepEntityInstance instance, String entityName) {
+    StepEntityDefinition definition = resolver.definition(instance, entityName);
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepAppliedDocumentReference(
+        instance.id(),
+        entityName,
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepDocument.class,
+            entityName + " assigned_document must reference DOCUMENT"),
+        resolver.optionalStringValue(instance, definition, 1),
+        resolver.entityReferenceList(
+            instance,
+            definition,
+            2,
+            entityName + " items must contain entity references"));
+  }
+
+  StepDocument resolveDocument(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DOCUMENT");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepDocument(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.stringValue(instance, definition, 1),
+        resolver.optionalStringValue(instance, definition, 2),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 3),
+            StepDocumentType.class,
+            "DOCUMENT kind must reference DOCUMENT_TYPE"));
+  }
+
+  StepDocumentReference resolveDocumentReference(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DOCUMENT_REFERENCE");
+    StepEntityResolver.requireParameterCount(instance, definition, 2);
+    return new StepDocumentReference(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepDocument.class,
+            "DOCUMENT_REFERENCE assigned_document must reference DOCUMENT"),
+        resolver.optionalStringValue(instance, definition, 1));
+  }
+
+  StepDocumentRelationship resolveDocumentRelationship(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DOCUMENT_RELATIONSHIP");
+    StepEntityResolver.requireParameterCount(instance, definition, 4);
+    return new StepDocumentRelationship(
+        instance.id(),
+        resolver.stringValue(instance, definition, 0),
+        resolver.optionalStringValue(instance, definition, 1),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepDocument.class,
+            "DOCUMENT_RELATIONSHIP relating_document must reference DOCUMENT"),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 3),
+            StepDocument.class,
+            "DOCUMENT_RELATIONSHIP related_document must reference DOCUMENT"));
+  }
+
+  StepDocumentType resolveDocumentType(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DOCUMENT_TYPE");
+    StepEntityResolver.requireParameterCount(instance, definition, 1);
+    return new StepDocumentType(instance.id(), resolver.stringValue(instance, definition, 0));
+  }
+
+  StepDocumentUsageConstraint resolveDocumentUsageConstraint(StepEntityInstance instance) {
+    StepEntityDefinition definition = resolver.definition(instance, "DOCUMENT_USAGE_CONSTRAINT");
+    StepEntityResolver.requireParameterCount(instance, definition, 3);
+    return new StepDocumentUsageConstraint(
+        instance.id(),
+        resolver.requireEntity(
+            resolver.referenceId(instance, definition, 0),
+            StepDocument.class,
+            "DOCUMENT_USAGE_CONSTRAINT source must reference DOCUMENT"),
+        resolver.stringValue(instance, definition, 1),
+        resolver.stringValue(instance, definition, 2));
   }
 }
