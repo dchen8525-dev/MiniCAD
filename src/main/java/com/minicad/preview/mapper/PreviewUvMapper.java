@@ -4,6 +4,7 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
+import com.minicad.helper.MathUtilityHelper;
 import com.minicad.preview.payload.FaceSurfacePayload;
 import com.minicad.preview.payload.ParametricLoopPayload;
 import com.minicad.preview.payload.UvBounds;
