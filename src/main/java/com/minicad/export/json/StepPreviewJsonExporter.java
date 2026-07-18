@@ -4689,10 +4689,9 @@ public final class StepPreviewJsonExporter {
         return left.distanceTo(right) <= 1.0e-6;
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
     private static List<CartesianPoint> reversed(List<CartesianPoint> points) {
-        List<CartesianPoint> copy = new ArrayList<>(points);
-        java.util.Collections.reverse(copy);
-        return List.copyOf(copy);
+        return StepGeometryHelper.reversed(points);
     }
 
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
@@ -4845,29 +4844,9 @@ public final class StepPreviewJsonExporter {
         return StepValidationHelper.faceSameSense(stepFace);
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static FacePayload reverseFacePayload(FacePayload base) {
-        List<PointPayload> reversedTriangles = new ArrayList<>(base.triangles().size());
-        for (int index = 0; index + 2 < base.triangles().size(); index += 3) {
-            reversedTriangles.add(base.triangles().get(index));
-            reversedTriangles.add(base.triangles().get(index + 2));
-            reversedTriangles.add(base.triangles().get(index + 1));
-        }
-        return new FacePayload(
-                base.stepId(),
-                base.name(),
-                base.surfaceType(),
-                base.origin(),
-                new VectorPayload(-base.normal().x(), -base.normal().y(), -base.normal().z()),
-                !base.sameSense(),
-                base.color(),
-                base.transparency(),
-                base.pbr(),
-                base.layers(),
-                base.loops(),
-                List.copyOf(reversedTriangles),
-                base.surface(),
-                base.uvLoops()
-        );
+        return StepPayloadBuilder.reverseFacePayload(base);
     }
 
     private static List<CartesianPoint> sampleLoop(FaceBound bound) {
@@ -4914,21 +4893,9 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static <T> List<T> reverseClosedLoop(List<T> points) {
-        if (points.size() < 2) {
-            return points;
-        }
-        List<T> reversed = new ArrayList<>(points);
-        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.remove(reversed.size() - 1);
-            java.util.Collections.reverse(reversed);
-            reversed.add(reversed.get(0));
-            reversed.set(0, start);
-            reversed.set(reversed.size() - 1, start);
-            return reversed;
-        }
-        java.util.Collections.reverse(reversed);
-        return reversed;
+        return StepPayloadBuilder.reverseClosedLoop(points);
     }
 
     public static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
