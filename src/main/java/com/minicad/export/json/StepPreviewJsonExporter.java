@@ -4882,15 +4882,9 @@ public final class StepPreviewJsonExporter {
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static void collectTopologyEdges(Face face, Set<Edge> edges) {
-        for (FaceBound bound : face.bounds()) {
-            if (bound.loop() instanceof EdgeLoop) {
-                EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-                for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-                    edges.add(orientedEdge.edge());
-                }
-            }
-        }
+        StepPayloadBuilder.collectTopologyEdges(face, edges);
     }
 
     // Delegate to StepPayloadBuilder - extracted utility class
