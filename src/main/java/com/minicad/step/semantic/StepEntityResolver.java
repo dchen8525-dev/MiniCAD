@@ -810,6 +810,7 @@ public final class StepEntityResolver {
   private final ManufacturingFeatureResolver manufacturingFeatureResolver;
   private final VisualizationResolver visualizationResolver;
   private final BoundaryConditionResolver boundaryConditionResolver;
+  private final FeaElementResolver feaElementResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -840,6 +841,7 @@ public final class StepEntityResolver {
     this.manufacturingFeatureResolver = new ManufacturingFeatureResolver(this);
     this.visualizationResolver = new VisualizationResolver(this);
     this.boundaryConditionResolver = new BoundaryConditionResolver(this);
+    this.feaElementResolver = new FeaElementResolver(this);
   }
 
   /**
@@ -2305,92 +2307,39 @@ public final class StepEntityResolver {
   }
 
   StepElementVolume resolveElementVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ELEMENT_VOLUME");
-    requireParameterCount(instance, definition, 2);
-    return new StepElementVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1));
+    return feaElementResolver.resolveElementVolume(instance);
   }
 
   StepVolumeElement resolveVolumeElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VOLUME_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepVolumeElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "VOLUME_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveVolumeElement(instance);
   }
 
   StepSurfaceElement resolveSurfaceElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SURFACE_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepSurfaceElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "SURFACE_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveSurfaceElement(instance);
   }
 
   StepLineElement resolveLineElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LINE_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepLineElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "LINE_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveLineElement(instance);
   }
 
   StepMassElement resolveMassElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "MASS_ELEMENT");
-    requireParameterCount(instance, definition, 3);
-    return new StepMassElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "MASS_ELEMENT nodes must contain entity references"),
-        numberValue(instance, definition, 2));
+    return feaElementResolver.resolveMassElement(instance);
   }
 
   StepConnectivityElement resolveConnectivityElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CONNECTIVITY_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepConnectivityElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "CONNECTIVITY_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveConnectivityElement(instance);
   }
 
   StepElementGeometricDescription resolveElementGeometricDescription(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ELEMENT_GEOMETRIC_DESCRIPTION");
-    requireParameterCount(instance, definition, 3);
-    return new StepElementGeometricDescription(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return feaElementResolver.resolveElementGeometricDescription(instance);
   }
 
   StepUniformSurfaceElement resolveUniformSurfaceElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "UNIFORM_SURFACE_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepUniformSurfaceElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "UNIFORM_SURFACE_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveUniformSurfaceElement(instance);
   }
 
   StepUniformVolumeElement resolveUniformVolumeElement(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "UNIFORM_VOLUME_ELEMENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepUniformVolumeElement(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1, "UNIFORM_VOLUME_ELEMENT nodes must contain entity references"),
-        tryResolveReference(definition.parameters().get(2)));
+    return feaElementResolver.resolveUniformVolumeElement(instance);
   }
 
   StepNodeRepresentation resolveNodeRepresentation(StepEntityInstance instance) {
@@ -2414,45 +2363,19 @@ public final class StepEntityResolver {
   }
 
   StepElementVolume2d resolveElementVolume2d(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ELEMENT_VOLUME_2D");
-    requireParameterCount(instance, definition, 4);
-    return new StepElementVolume2d(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ELEMENT_VOLUME_2D nodes must contain entity references"),
-        stringValue(instance, definition, 2));
+    return feaElementResolver.resolveElementVolume2d(instance);
   }
 
   StepElementVolume3d resolveElementVolume3d(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ELEMENT_VOLUME_3D");
-    requireParameterCount(instance, definition, 4);
-    return new StepElementVolume3d(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ELEMENT_VOLUME_3D nodes must contain entity references"),
-        stringValue(instance, definition, 2));
+    return feaElementResolver.resolveElementVolume3d(instance);
   }
 
   StepNodeSet resolveNodeSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "NODE_SET");
-    requireParameterCount(instance, definition, 3);
-    return new StepNodeSet(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "NODE_SET nodes must contain entity references"));
+    return feaElementResolver.resolveNodeSet(instance);
   }
 
   StepElementSet resolveElementSet(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ELEMENT_SET");
-    requireParameterCount(instance, definition, 3);
-    return new StepElementSet(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        entityReferenceList(instance, definition, 1,
-            "ELEMENT_SET elements must contain entity references"));
+    return feaElementResolver.resolveElementSet(instance);
   }
 
   StepFeaSecuredVariable resolveFeaSecuredVariable(StepEntityInstance instance) {
