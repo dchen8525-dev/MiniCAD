@@ -590,7 +590,7 @@ public final class PreviewCurveEvaluator {
     // ─── Conic curve sampling ────────────────────────────────────────────
 
     public static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
-        double[] matrix = matrixForPlacementEntity(curve.position(), builder);
+        double[] matrix = MatrixTransformHelper.matrixForPlacementEntity(curve.position(), builder);
         if (matrix == null) {
             return null;
         }
@@ -604,7 +604,7 @@ public final class PreviewCurveEvaluator {
         } else if (entityName.equals("HYPERBOLA")) {
             return sampleHyperbolaPoints(curve, matrix);
         } else if (entityName.equals("DEGENERATE_CONIC")) {
-            CartesianPoint point = transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
+            CartesianPoint point = MatrixTransformHelper.transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
             return List.of(point, point);
         } else {
             return null;
@@ -632,7 +632,7 @@ public final class PreviewCurveEvaluator {
         for (int i = 0; i <= segments; i++) {
             double angle = 2.0 * Math.PI * i / segments;
             CartesianPoint local = new CartesianPoint(rx * Math.cos(angle), ry * Math.sin(angle), 0.0);
-            points.add(transformCartesian(local, matrix));
+            points.add(MatrixTransformHelper.transformCartesian(local, matrix));
         }
         return List.copyOf(points);
     }
@@ -647,7 +647,7 @@ public final class PreviewCurveEvaluator {
         for (int index = 0; index <= segments; index++) {
             double t = -yExtent + (2.0 * yExtent * index) / segments;
             double x = (t * t) / (4.0 * focalDistance);
-            points.add(transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
+            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
         }
         return List.copyOf(points);
     }
@@ -665,7 +665,7 @@ public final class PreviewCurveEvaluator {
             double t = -extent + (2.0 * extent * index) / segments;
             double x = semiAxis * Math.cosh(t);
             double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
+            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
         }
         return List.copyOf(points);
     }
@@ -1625,13 +1625,13 @@ public final class PreviewCurveEvaluator {
 
     private static List<CartesianPoint> sampleMappedAnnotationPoints(
             StepRepresentation representation, StepEntity mappedOrigin, StepEntity mappingTarget, StepCadBuilder builder) {
-        double[] matrix = matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        double[] matrix = MatrixTransformHelper.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
         if (matrix == null) return null;
         List<CartesianPoint> points = new ArrayList<>();
         for (StepEntity content : representation.items()) {
             List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
             if (sampled == null) continue;
-            for (CartesianPoint point : sampled) points.add(transformCartesian(point, matrix));
+            for (CartesianPoint point : sampled) points.add(MatrixTransformHelper.transformCartesian(point, matrix));
         }
         return points.isEmpty() ? null : List.copyOf(points);
     }
