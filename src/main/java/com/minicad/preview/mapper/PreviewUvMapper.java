@@ -1147,10 +1147,10 @@ public final class PreviewUvMapper {
                 ? orientedEdge.edgeElement().end()
                 : orientedEdge.edgeElement().start();
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
-        StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
+        StepEntity associatedSource = PcurveMatcher.unwrapAssociatedCurveGeometry(edgeGeometry);
         List<StepEntity> pcurves = List.of();  // Default: no pcurves
         if (pcurves.isEmpty()) {
-            if (shouldFallbackToProjectedEdge(edgeGeometry)) {
+            if (PcurveMatcher.shouldFallbackToProjectedEdge(edgeGeometry)) {
                 List<UvPoint> fallback = projectSampledEdge(orientedEdge, mapper, builder);
                 if (fallback != null) {
                     return fallback;
