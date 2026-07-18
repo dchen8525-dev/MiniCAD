@@ -454,18 +454,22 @@ public final class StepTypeNameResolver {
      * Converts a camelCase name to STEP-LIKE name format.
      * For example: "ProductDefinition" -> "PRODUCT_DEFINITION"
      *
-     * @param camelName the camelCase name
+     * @param value the camelCase name
      * @return the STEP-like name
      */
-    private static String camelToStepLike(String camelName) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < camelName.length(); i++) {
-            char c = camelName.charAt(i);
-            if (Character.isUpperCase(c) && i > 0) {
-                result.append('_');
+    private static String camelToStepLike(String value) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char current = value.charAt(i);
+            if (i > 0 && Character.isUpperCase(current)
+                    && (Character.isLowerCase(value.charAt(i - 1))
+                    || (i + 1 < value.length() && Character.isLowerCase(value.charAt(i + 1))))) {
+                builder.append('_');
+            } else if (i > 0 && Character.isDigit(current) && Character.isLetter(value.charAt(i - 1))) {
+                builder.append('_');
             }
-            result.append(Character.toUpperCase(c));
+            builder.append(Character.toUpperCase(current));
         }
-        return result.toString();
+        return builder.toString();
     }
 }
