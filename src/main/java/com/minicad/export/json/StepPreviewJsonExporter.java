@@ -4160,20 +4160,9 @@ public final class StepPreviewJsonExporter {
         return current;
     }
 
+    // Delegate to StepSummaryBuilder - extracted utility class
     private static String pcurveBasisSurfaceSummary(List<StepEntity> pcurves) {
-        return pcurves.stream()
-                .map(pcurve -> {
-                    if (pcurve instanceof StepPcurve) {
-            StepPcurve exact = (StepPcurve) pcurve;
-                        return "#" + exact.id() + "->#" + exact.basisSurface().id();
-                    }
-                    if (pcurve instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve degenerate = (StepDegeneratePcurve) pcurve;
-                        return "#" + degenerate.id() + "->#" + degenerate.basisSurface().id();
-                    }
-                    return "#" + pcurve.id();
-                })
-                .collect(Collectors.joining("|"));
+        return StepSummaryBuilder.pcurveBasisSurfaceSummary(pcurves);
     }
 
     private static List<StepEntity> matchingPcurves(List<StepEntity> associatedGeometry, StepEntity faceGeometry) {

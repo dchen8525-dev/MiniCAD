@@ -63,7 +63,7 @@ public final class StepSummaryBuilder {
                     }
                     return "#" + pcurve.id();
                 })
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining("|"));
     }
 
     /**
