@@ -2113,7 +2113,7 @@ public final class StepCadBuilder {
             center = new CartesianPoint(0, 0, 0);
         }
         // Tessellate sphere centered at the specified center point
-        List<Face> faces = tessellateSphereAt(center, radius, 24, 48);
+        List<Face> faces = StepPrimitiveTessellator.tessellateSphereAt(center, radius, 24, 48);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2131,8 +2131,8 @@ public final class StepCadBuilder {
             placement = null;
         }
         List<Face> faces = placement != null
-                ? tessellateTorusAt(placement, majorR, minorR, 36, 24)
-                : tessellateTorus(majorR, minorR, 36, 24);
+                ? StepPrimitiveTessellator.tessellateTorusAt(placement, majorR, minorR, 36, 24)
+                : StepPrimitiveTessellator.tessellateTorus(majorR, minorR, 36, 24);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2163,7 +2163,7 @@ public final class StepCadBuilder {
         List<CartesianPoint> top = bottom.stream()
                 .map(p -> p.add(zDir.scale(h)))
                 .collect(Collectors.toList());
-        List<Face> faces = buildBoxFaces(bottom, top);
+        List<Face> faces = StepPrimitiveTessellator.buildBoxFaces(bottom, top);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2247,164 +2247,7 @@ public final class StepCadBuilder {
         return Direction3.from(ab.cross(ac));
     }
 
-    private List<Face> tessellateSphere(double radius, int latSteps, int lonSteps) {
-        List<Face> faces = new ArrayList<>();
-        for (int i = 0; i < latSteps; i++) {
-            double phi1 = Math.PI * i / latSteps;
-            double phi2 = Math.PI * (i + 1) / latSteps;
-            for (int j = 0; j < lonSteps; j++) {
-                double theta1 = 2 * Math.PI * j / lonSteps;
-                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
-                CartesianPoint p00 = spherePoint(radius, phi1, theta1);
-                CartesianPoint p10 = spherePoint(radius, phi2, theta1);
-                CartesianPoint p11 = spherePoint(radius, phi2, theta2);
-                CartesianPoint p01 = spherePoint(radius, phi1, theta2);
-                CartesianPoint midPoint = spherePoint(radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
-                Vector3 normal = new Vector3(midPoint.getX(), midPoint.getY(), midPoint.getZ());
-                if (i == 0) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
-                } else if (i == latSteps - 1) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
-                } else {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-                }
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint spherePoint(double radius, double phi, double theta) {
-        return new CartesianPoint(
-                radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.sin(phi) * Math.sin(theta),
-                radius * Math.cos(phi));
-    }
-
-    private List<Face> tessellateTorus(double majorR, double minorR, int majorSteps, int minorSteps) {
-        List<Face> faces = new ArrayList<>();
-        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
-        for (int i = 0; i <= majorSteps; i++) {
-            double theta = 2 * Math.PI * i / majorSteps;
-            for (int j = 0; j <= minorSteps; j++) {
-                double phi = 2 * Math.PI * j / minorSteps;
-                points[i][j] = new double[]{
-                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
-                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
-                        minorR * Math.sin(phi)
-                };
-            }
-        }
-        for (int i = 0; i < majorSteps; i++) {
-            for (int j = 0; j < minorSteps; j++) {
-                CartesianPoint p00 = pt(points[i][j]);
-                CartesianPoint p10 = pt(points[i + 1][j]);
-                CartesianPoint p11 = pt(points[i + 1][j + 1]);
-                CartesianPoint p01 = pt(points[i][j + 1]);
-                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
-            }
-        }
-        return faces;
-    }
-
-    private List<Face> tessellateSphereAt(CartesianPoint center, double radius, int latSteps, int lonSteps) {
-        List<Face> faces = new ArrayList<>();
-        for (int i = 0; i < latSteps; i++) {
-            double phi1 = Math.PI * i / latSteps;
-            double phi2 = Math.PI * (i + 1) / latSteps;
-            for (int j = 0; j < lonSteps; j++) {
-                double theta1 = 2 * Math.PI * j / lonSteps;
-                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
-                CartesianPoint p00 = spherePointAt(center, radius, phi1, theta1);
-                CartesianPoint p10 = spherePointAt(center, radius, phi2, theta1);
-                CartesianPoint p11 = spherePointAt(center, radius, phi2, theta2);
-                CartesianPoint p01 = spherePointAt(center, radius, phi1, theta2);
-                CartesianPoint midPoint = spherePointAt(center, radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
-                Vector3 normal = new Vector3(midPoint.getX() - center.getX(), midPoint.getY() - center.getY(), midPoint.getZ() - center.getZ());
-                if (i == 0) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
-                } else if (i == latSteps - 1) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
-                } else {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-                }
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint spherePointAt(CartesianPoint center, double radius, double phi, double theta) {
-        return new CartesianPoint(
-                center.getX() + radius * Math.sin(phi) * Math.cos(theta),
-                center.getY() + radius * Math.sin(phi) * Math.sin(theta),
-                center.getZ() + radius * Math.cos(phi));
-    }
-
-    private List<Face> tessellateTorusAt(Axis2Placement3D placement, double majorR, double minorR, int majorSteps, int minorSteps) {
-        List<Face> faces = new ArrayList<>();
-        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
-        for (int i = 0; i <= majorSteps; i++) {
-            double theta = 2 * Math.PI * i / majorSteps;
-            for (int j = 0; j <= minorSteps; j++) {
-                double phi = 2 * Math.PI * j / minorSteps;
-                points[i][j] = new double[]{
-                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
-                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
-                        minorR * Math.sin(phi)
-                };
-            }
-        }
-        for (int i = 0; i < majorSteps; i++) {
-            for (int j = 0; j < minorSteps; j++) {
-                CartesianPoint p00 = placement.transformToWorld(pt(points[i][j]));
-                CartesianPoint p10 = placement.transformToWorld(pt(points[i + 1][j]));
-                CartesianPoint p11 = placement.transformToWorld(pt(points[i + 1][j + 1]));
-                CartesianPoint p01 = placement.transformToWorld(pt(points[i][j + 1]));
-                CartesianPoint mid = placement.transformToWorld(new CartesianPoint(
-                        (points[i][j][0] + points[i + 1][j][0] + points[i + 1][j + 1][0] + points[i][j + 1][0]) / 4,
-                        (points[i][j][1] + points[i + 1][j][1] + points[i + 1][j + 1][1] + points[i][j + 1][1]) / 4,
-                        (points[i][j][2] + points[i + 1][j][2] + points[i + 1][j + 1][2] + points[i][j + 1][2]) / 4));
-                Vector3 normal = new Vector3(mid.getX() - placement.getLocation().getX(), mid.getY() - placement.getLocation().getY(), mid.getZ() - placement.getLocation().getZ());
-                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint pt(double[] coords) {
-        return new CartesianPoint(coords[0], coords[1], coords[2]);
-    }
-
-    private List<Face> buildBoxFaces(List<CartesianPoint> bottom, List<CartesianPoint> top) {
-        List<Face> faces = new ArrayList<>();
-        Direction3 up = Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom), up.reverse()));
-        faces.add(faceFromPolyLoop(top, up));
-        Direction3 right = Direction3.from(new com.minicad.geometry.Vector3(1, 0, 0));
-        Direction3 forward = Direction3.from(new com.minicad.geometry.Vector3(0, 1, 0));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), top.get(0), top.get(3), bottom.get(3))), right));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(1), bottom.get(2), top.get(2), top.get(1))), forward));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(2), bottom.get(3), top.get(3), top.get(2))), right.reverse()));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), bottom.get(1), top.get(1), top.get(0))), forward.reverse()));
-        return faces;
-    }
-
-    private CartesianPoint rotatePointAroundAxis(CartesianPoint p, CartesianPoint origin,
-                                                  Vector3 axis, double angle) {
-        // Rodrigues' rotation formula
-        double dx = p.getX() - origin.getX();
-        double dy = p.getY() - origin.getY();
-        double dz = p.getZ() - origin.getZ();
-        com.minicad.geometry.Vector3 v = new com.minicad.geometry.Vector3(dx, dy, dz);
-        com.minicad.geometry.Vector3 k = axis.normalize().asVector();
-        com.minicad.geometry.Vector3 rotated = v.scale(Math.cos(angle))
-                .add(k.cross(v).scale(Math.sin(angle)))
-                .add(k.scale(k.dot(v) * (1 - Math.cos(angle))));
-        return new CartesianPoint(
-                rotated.getX() + origin.getX(),
-                rotated.getY() + origin.getY(),
-                rotated.getZ() + origin.getZ());
-    }
-
+    
     /**
      *
      * @param id STEP entity id
