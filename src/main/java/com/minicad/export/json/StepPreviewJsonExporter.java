@@ -1480,99 +1480,14 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean isStandaloneEdgeSource(StepEntity item) {
-        return item instanceof StepPolyline
-                || item instanceof StepGeometricCurveSet
-                || item instanceof StepGeometricSet
-                || item instanceof StepShellBasedWireframeModel
-                || item instanceof StepEdgeBasedWireframeModel
-                || item instanceof StepConnectedEdgeSet
-                || item instanceof StepEdgeWire
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepWireShell
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepAnnotationFillArea
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepFilletEdge
-                || item instanceof StepChamferEdge
-                || item instanceof StepSubedge
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepGeometricSurfaceSet;
+        return StepValidationHelper.isStandaloneEdgeSource(item);
     }
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean isSampledCurveSource(StepEntity item) {
-        return item instanceof StepLine
-                || item instanceof StepCircle
-                || item instanceof StepEllipse
-                || item instanceof StepConicCurve
-                || item instanceof StepBezierCurve
-                || item instanceof StepUniformCurve
-                || item instanceof StepQuasiUniformCurve
-                || item instanceof StepPiecewiseBezierCurve
-                || item instanceof StepBSplineCurveWithKnots
-                || item instanceof StepBSplineCurve
-                || item instanceof com.minicad.step.model.StepRationalBSplineCurve
-                || item instanceof StepSurfaceCurve
-                || item instanceof StepSeamCurve
-                || item instanceof StepTrimmedCurve
-                || item instanceof StepPolyline
-                || item instanceof com.minicad.step.model.StepCompositeCurve
-                || item instanceof com.minicad.step.model.StepCompositeCurveOnSurface
-                || item instanceof StepCompositeCurveOnSurface3D
-                || item instanceof StepOffsetCurve2D
-                || item instanceof StepOffsetCurve3D
-                || item instanceof StepPcurve
-                || item instanceof StepDegeneratePcurve
-                || item instanceof StepOrientedCurve
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepClothoid
-                || item instanceof StepIndexedPolyCurve
-                || item instanceof StepDegenerateCurve
-                || item instanceof StepBSplineCurveWithKnotsAndBreakpoints
-                || item instanceof StepLineSegment
-                || item instanceof StepEdgeCurve
-                || item instanceof StepSurfacedEdgeCurve
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepCurve
-                || item instanceof StepBoundedCurve
-                || item instanceof StepCircle2D
-                || item instanceof StepEllipse2D
-                || item instanceof StepPolyline2D
-                || item instanceof StepTrimmedCurve2D
-                || item instanceof StepCompositeCurve2D
-                || item instanceof StepBezierCurve2D
-                || item instanceof StepQuasiUniformCurve2D
-                || item instanceof StepUniformCurve2D
-                || item instanceof StepPiecewiseBezierCurve2D
-                || item instanceof StepIndexedPolyCurve2D
-                || item instanceof StepDegenerateCurve2D
-                || item instanceof StepBSplineCurve2D
-                || item instanceof StepRationalBSplineCurve2D
-                || item instanceof StepLine2D
-                || item instanceof StepCurve2D
-                || item instanceof StepHyperbola2D
-                || item instanceof StepParabola2D
-                || (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()));
+        return StepValidationHelper.isSampledCurveSource(item);
     }
 
     private static StepEntity unwrapStyledItem(StepEntity item) {
@@ -4948,21 +4863,9 @@ public final class StepPreviewJsonExporter {
     }
 
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean faceSameSense(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.sameSense();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.sameSense();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            boolean base = faceSameSense(orientedFace.faceElement());
-            return orientedFace.orientation() ? base : !base;
-        }
-        return true;
+        return StepValidationHelper.faceSameSense(stepFace);
     }
 
     private static FacePayload reverseFacePayload(FacePayload base) {
