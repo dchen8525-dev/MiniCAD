@@ -6312,62 +6312,24 @@ public final class StepPreviewJsonExporter {
 
 
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeGeometry(BoundsAccumulator bounds, GeometryCollection geometry) {
-        for (FacePayload face : geometry.faces()) {
-            for (LoopPayload loop : face.loops()) {
-                for (PointPayload point : loop.points()) {
-                    bounds.include(point);
-                }
-            }
-        }
-        for (EdgePayload edge : geometry.edges()) {
-            for (PointPayload point : edge.points()) {
-                bounds.include(point);
-            }
-        }
+        StepBoundsAccumulator.includeGeometry(bounds, geometry);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeAssembly(BoundsAccumulator bounds, AssemblyData assembly) {
-        Map<Integer, RepresentationPayload> byId = assembly.representations().stream()
-                .collect(Collectors.toMap(RepresentationPayload::id, representation -> representation, (left, right) -> left, LinkedHashMap::new));
-        for (InstancePayload instance : assembly.instances()) {
-            for (Integer representationId : instance.representationIds()) {
-                RepresentationPayload representation = byId.get(representationId);
-                if (representation == null) {
-                    continue;
-                }
-                for (FacePayload face : representation.faces()) {
-                    for (LoopPayload loop : face.loops()) {
-                        for (PointPayload point : loop.points()) {
-                            bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
-                        }
-                    }
-                }
-                for (EdgePayload edge : representation.edges()) {
-                    for (PointPayload point : edge.points()) {
-                        bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
-                    }
-                }
-            }
-        }
+        StepBoundsAccumulator.includeAssembly(bounds, assembly);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeBounds(BoundsAccumulator target, BoundsPayload bounds) {
-        target.include(bounds.min());
-        target.include(bounds.max());
+        StepBoundsAccumulator.includeBounds(target, bounds);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static BoundsAccumulator copyBounds(BoundsAccumulator source) {
-        BoundsAccumulator copy = new BoundsAccumulator();
-        if (!source.isEmpty()) {
-            copy.minX = source.minX;
-            copy.minY = source.minY;
-            copy.minZ = source.minZ;
-            copy.maxX = source.maxX;
-            copy.maxY = source.maxY;
-            copy.maxZ = source.maxZ;
-        }
-        return copy;
+        return StepBoundsAccumulator.copyBounds(source);
     }
 
     private static ValidationPayload buildValidationPayload(
@@ -6451,23 +6413,13 @@ public final class StepPreviewJsonExporter {
         );
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeRepresentationBounds(
             BoundsAccumulator bounds,
             RepresentationPayload representation,
             double[] matrix
     ) {
-        for (FacePayload face : representation.faces()) {
-            for (LoopPayload loop : face.loops()) {
-                for (PointPayload point : loop.points()) {
-                    bounds.include(MathUtilityHelper.transform(point, matrix));
-                }
-            }
-        }
-        for (EdgePayload edge : representation.edges()) {
-            for (PointPayload point : edge.points()) {
-                bounds.include(MathUtilityHelper.transform(point, matrix));
-            }
-        }
+        StepBoundsAccumulator.includeRepresentationBounds(bounds, representation, matrix);
     }
 
 
