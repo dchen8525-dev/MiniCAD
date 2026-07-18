@@ -1490,21 +1490,9 @@ public final class StepPreviewJsonExporter {
         return StepValidationHelper.isSampledCurveSource(item);
     }
 
+    // Delegate to StepEntityUnwrapper - extracted utility class
     private static StepEntity unwrapStyledItem(StepEntity item) {
-        StepEntity current = item;
-        while (true) {
-            if (current instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            if (current instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            return current;
-        }
+        return StepEntityUnwrapper.unwrapStyledItem(item);
     }
 
     private static void collectMappedAnnotationEdges(
@@ -4761,20 +4749,9 @@ public final class StepPreviewJsonExporter {
         return bounds;
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.faceGeometry();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.faceGeometry();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            return faceGeometry(orientedFace.faceElement());
-        }
-        return null;
+        return StepGeometryHelper.faceGeometry(stepFace);
     }
 
     // Delegate to StepTypeNameResolver - extracted utility class
