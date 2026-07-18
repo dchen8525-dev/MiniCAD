@@ -4675,54 +4675,15 @@ public final class StepPreviewJsonExporter {
     }
 
     // Delegate to StepGeometryHelper - extracted utility class
+    // Delegate to StepGeometryHelper - extracted utility class
     private static List<CartesianPoint> reversed(List<CartesianPoint> points) {
         return StepGeometryHelper.reversed(points);
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
-        if (points.size() < 2) {
-            return List.of(points.get(0));
-        }
-        List<Double> lengths = new ArrayList<>(points.size());
-        lengths.add(0.0);
-        for (int i = 1; i < points.size(); i++) {
-            lengths.add(lengths.get(i - 1) + points.get(i - 1).distanceTo(points.get(i)));
-        }
-        double total = lengths.get(lengths.size() - 1);
-        if (total <= Epsilon.EPS) {
-            return java.util.Collections.nCopies(segments + 1, points.get(0));
-        }
-        List<CartesianPoint> result = new ArrayList<>(segments + 1);
-        for (int i = 0; i <= segments; i++) {
-            double target = total * i / segments;
-            result.add(pointAtDistance(points, lengths, target));
-        }
-        result.set(0, points.get(0));
-        result.set(result.size() - 1, points.get(points.size() - 1));
-        return List.copyOf(result);
+        return StepGeometryHelper.resamplePolyline(points, segments);
     }
-
-    private static CartesianPoint pointAtDistance(List<CartesianPoint> points, List<Double> lengths, double target) {
-        for (int i = 1; i < lengths.size(); i++) {
-            if (target <= lengths.get(i)) {
-                double start = lengths.get(i - 1);
-                double segment = lengths.get(i) - start;
-                double alpha = segment <= Epsilon.EPS ? 0.0 : (target - start) / segment;
-                return interpolate(points.get(i - 1), points.get(i), alpha);
-            }
-        }
-        return points.get(points.size() - 1);
-    }
-
-    private static CartesianPoint interpolate(CartesianPoint a, CartesianPoint b, double alpha) {
-        return new CartesianPoint(
-                a.x() * (1.0 - alpha) + b.x() * alpha,
-                a.y() * (1.0 - alpha) + b.y() * alpha,
-                a.z() * (1.0 - alpha) + b.z() * alpha
-        );
-    }
-
-    
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
