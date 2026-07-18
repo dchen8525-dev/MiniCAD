@@ -808,6 +808,7 @@ public final class StepEntityResolver {
   private final CurveResolver curveResolver;
   private final DraughtingResolver draughtingResolver;
   private final ManufacturingFeatureResolver manufacturingFeatureResolver;
+  private final VisualizationResolver visualizationResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -836,6 +837,7 @@ public final class StepEntityResolver {
     this.curveResolver = new CurveResolver(this);
     this.draughtingResolver = new DraughtingResolver(this);
     this.manufacturingFeatureResolver = new ManufacturingFeatureResolver(this);
+    this.visualizationResolver = new VisualizationResolver(this);
   }
 
   /**
@@ -1877,59 +1879,23 @@ public final class StepEntityResolver {
   }
 
   StepLightSource resolveLightSource(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LIGHT_SOURCE");
-    requireParameterCount(instance, definition, 4);
-    return new StepLightSource(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2));
+    return visualizationResolver.resolveLightSource(instance);
   }
 
   StepLightSourceAmbient resolveLightSourceAmbient(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LIGHT_SOURCE_AMBIENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepLightSourceAmbient(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2));
+    return visualizationResolver.resolveLightSourceAmbient(instance);
   }
 
   StepLightSourceDirectional resolveLightSourceDirectional(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LIGHT_SOURCE_DIRECTIONAL");
-    requireParameterCount(instance, definition, 5);
-    return new StepLightSourceDirectional(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return visualizationResolver.resolveLightSourceDirectional(instance);
   }
 
   StepLightSourcePositional resolveLightSourcePositional(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LIGHT_SOURCE_POSITIONAL");
-    requireParameterCount(instance, definition, 5);
-    return new StepLightSourcePositional(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return visualizationResolver.resolveLightSourcePositional(instance);
   }
 
   StepLightSourceSpot resolveLightSourceSpot(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LIGHT_SOURCE_SPOT");
-    requireParameterCount(instance, definition, 8);
-    return new StepLightSourceSpot(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        resolve(referenceId(instance, definition, 4)),
-        numberValue(instance, definition, 5),
-        numberValue(instance, definition, 6));
+    return visualizationResolver.resolveLightSourceSpot(instance);
   }
 
   StepPresentationLayerUsage resolvePresentationLayerUsage(StepEntityInstance instance) {
@@ -1937,79 +1903,31 @@ public final class StepEntityResolver {
   }
 
   StepCameraModelD2 resolveCameraModelD2(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CAMERA_MODEL_D2");
-    requireParameterCount(instance, definition, 4);
-    return new StepCameraModelD2(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
+    return visualizationResolver.resolveCameraModelD2(instance);
   }
 
   StepCameraModelD3 resolveCameraModelD3(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CAMERA_MODEL_D3");
-    requireParameterCount(instance, definition, 5);
-    return new StepCameraModelD3(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        numberValue(instance, definition, 3));
+    return visualizationResolver.resolveCameraModelD3(instance);
   }
 
   StepCameraUsage resolveCameraUsage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CAMERA_USAGE");
-    requireParameterCount(instance, definition, 4);
-    return new StepCameraUsage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        resolve(referenceId(instance, definition, 2)));
+    return visualizationResolver.resolveCameraUsage(instance);
   }
 
   StepCameraImage resolveCameraImage(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CAMERA_IMAGE");
-    requireParameterCount(instance, definition, 5);
-    return new StepCameraImage(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        stringValue(instance, definition, 1),
-        integerValue(instance, definition, 2),
-        integerValue(instance, definition, 3));
+    return visualizationResolver.resolveCameraImage(instance);
   }
 
   StepPlanarBox resolvePlanarBox(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLANAR_BOX");
-    requireParameterCount(instance, definition, 5);
-    return new StepPlanarBox(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return visualizationResolver.resolvePlanarBox(instance);
   }
 
   StepPlanarExtent resolvePlanarExtent(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PLANAR_EXTENT");
-    requireParameterCount(instance, definition, 4);
-    return new StepPlanarExtent(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2));
+    return visualizationResolver.resolvePlanarExtent(instance);
   }
 
   StepViewVolume resolveViewVolume(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VIEW_VOLUME");
-    requireParameterCount(instance, definition, 7);
-    return new StepViewVolume(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        numberValue(instance, definition, 1),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4),
-        numberValue(instance, definition, 5));
+    return visualizationResolver.resolveViewVolume(instance);
   }
 
   StepMechanicalDesignShapeRepresentation resolveMechanicalDesignShapeRepresentation(StepEntityInstance instance) {
