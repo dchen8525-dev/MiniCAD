@@ -809,6 +809,7 @@ public final class StepEntityResolver {
   private final DraughtingResolver draughtingResolver;
   private final ManufacturingFeatureResolver manufacturingFeatureResolver;
   private final VisualizationResolver visualizationResolver;
+  private final BoundaryConditionResolver boundaryConditionResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -838,6 +839,7 @@ public final class StepEntityResolver {
     this.draughtingResolver = new DraughtingResolver(this);
     this.manufacturingFeatureResolver = new ManufacturingFeatureResolver(this);
     this.visualizationResolver = new VisualizationResolver(this);
+    this.boundaryConditionResolver = new BoundaryConditionResolver(this);
   }
 
   /**
@@ -2069,72 +2071,27 @@ public final class StepEntityResolver {
   }
 
   StepDisplacementBoundaryCondition resolveDisplacementBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DISPLACEMENT_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 5);
-    return new StepDisplacementBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return boundaryConditionResolver.resolveDisplacementBoundaryCondition(instance);
   }
 
   StepVelocityBoundaryCondition resolveVelocityBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "VELOCITY_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 5);
-    return new StepVelocityBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return boundaryConditionResolver.resolveVelocityBoundaryCondition(instance);
   }
 
   StepAccelerationBoundaryCondition resolveAccelerationBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ACCELERATION_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 5);
-    return new StepAccelerationBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return boundaryConditionResolver.resolveAccelerationBoundaryCondition(instance);
   }
 
   StepForceBoundaryCondition resolveForceBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "FORCE_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 5);
-    return new StepForceBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3),
-        numberValue(instance, definition, 4));
+    return boundaryConditionResolver.resolveForceBoundaryCondition(instance);
   }
 
   StepPressureBoundaryCondition resolvePressureBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PRESSURE_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 3);
-    return new StepPressureBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2));
+    return boundaryConditionResolver.resolvePressureBoundaryCondition(instance);
   }
 
   StepThermalBoundaryCondition resolveThermalBoundaryCondition(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "THERMAL_BOUNDARY_CONDITION");
-    requireParameterCount(instance, definition, 4);
-    return new StepThermalBoundaryCondition(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
+    return boundaryConditionResolver.resolveThermalBoundaryCondition(instance);
   }
 
   StepStressAnalysis resolveStressAnalysis(StepEntityInstance instance) {
