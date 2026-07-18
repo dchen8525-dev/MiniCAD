@@ -807,6 +807,7 @@ public final class StepEntityResolver {
   private final PropertyResolver propertyResolver;
   private final CurveResolver curveResolver;
   private final DraughtingResolver draughtingResolver;
+  private final ManufacturingFeatureResolver manufacturingFeatureResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -834,6 +835,7 @@ public final class StepEntityResolver {
     this.propertyResolver = new PropertyResolver(this);
     this.curveResolver = new CurveResolver(this);
     this.draughtingResolver = new DraughtingResolver(this);
+    this.manufacturingFeatureResolver = new ManufacturingFeatureResolver(this);
   }
 
   /**
@@ -1654,161 +1656,51 @@ public final class StepEntityResolver {
   }
 
   StepPocket resolvePocket(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "POCKET");
-    requireParameterCount(instance, definition, 6);
-    return new StepPocket(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepEntity.class,
-            "POCKET profile must reference a profile"),
-        optionalNumberValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepEntity.class,
-            "POCKET direction must reference a direction"),
-        stringValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolvePocket(instance);
   }
 
   StepBore resolveBore(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BORE");
-    requireParameterCount(instance, definition, 5);
-    return new StepBore(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepEntity.class,
-            "BORE profile must reference a profile"),
-        optionalNumberValue(instance, definition, 2),
-        requireEntity(
-            referenceId(instance, definition, 3),
-            StepEntity.class,
-            "BORE direction must reference a direction"));
+    return manufacturingFeatureResolver.resolveBore(instance);
   }
 
   StepCounterboreHole resolveCounterboreHole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COUNTERBORE_HOLE");
-    requireParameterCount(instance, definition, 5);
-    return new StepCounterboreHole(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepEntity.class,
-            "COUNTERBORE_HOLE through_hole must reference a hole"),
-        optionalNumberValue(instance, definition, 2),
-        optionalNumberValue(instance, definition, 3));
+    return manufacturingFeatureResolver.resolveCounterboreHole(instance);
   }
 
   StepCountersinkHole resolveCountersinkHole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "COUNTERSINK_HOLE");
-    requireParameterCount(instance, definition, 5);
-    return new StepCountersinkHole(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        requireEntity(
-            referenceId(instance, definition, 1),
-            StepEntity.class,
-            "COUNTERSINK_HOLE through_hole must reference a hole"),
-        optionalNumberValue(instance, definition, 2),
-        optionalNumberValue(instance, definition, 3));
+    return manufacturingFeatureResolver.resolveCountersinkHole(instance);
   }
 
   StepRound resolveRound(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "ROUND");
-    requireParameterCount(instance, definition, 4);
-    List<StepEntity> edges =
-        entityReferenceList(
-            instance, definition, 2,
-            "ROUND edges must contain entity references");
-    return new StepRound(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        edges,
-        optionalNumberValue(instance, definition, 3));
+    return manufacturingFeatureResolver.resolveRound(instance);
   }
 
   StepGroove resolveGroove(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "GROOVE");
-    requireParameterCount(instance, definition, 5);
-    return new StepGroove(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return manufacturingFeatureResolver.resolveGroove(instance);
   }
 
   StepHole resolveHole(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "HOLE");
-    requireParameterCount(instance, definition, 6);
-    return new StepHole(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        stringValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveHole(instance);
   }
 
   StepSlot resolveSlot(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "SLOT");
-    requireParameterCount(instance, definition, 6);
-    return new StepSlot(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        optionalNumberValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveSlot(instance);
   }
 
   StepStud resolveStud(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "STUD");
-    requireParameterCount(instance, definition, 5);
-    return new StepStud(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return manufacturingFeatureResolver.resolveStud(instance);
   }
 
   StepProtrusion resolveProtrusion(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "PROTRUSION");
-    requireParameterCount(instance, definition, 6);
-    return new StepProtrusion(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        optionalNumberValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveProtrusion(instance);
   }
 
   StepCutout resolveCutout(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CUTOUT");
-    requireParameterCount(instance, definition, 5);
-    return new StepCutout(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)));
+    return manufacturingFeatureResolver.resolveCutout(instance);
   }
 
   StepDepression resolveDepression(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "DEPRESSION");
-    requireParameterCount(instance, definition, 6);
-    return new StepDepression(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        optionalNumberValue(instance, definition, 2),
-        resolve(referenceId(instance, definition, 3)),
-        optionalNumberValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveDepression(instance);
   }
 
   StepMarking resolveMarking(StepEntityInstance instance) {
@@ -1817,27 +1709,11 @@ public final class StepEntityResolver {
 
   // Pattern resolvers
   StepCircularPattern resolveCircularPattern(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "CIRCULAR_PATTERN");
-    requireParameterCount(instance, definition, 6);
-    return new StepCircularPattern(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        optionalNumberValue(instance, definition, 3),
-        optionalIntegerValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveCircularPattern(instance);
   }
 
   StepLinearPattern resolveLinearPattern(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "LINEAR_PATTERN");
-    requireParameterCount(instance, definition, 6);
-    return new StepLinearPattern(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)),
-        optionalNumberValue(instance, definition, 3),
-        optionalIntegerValue(instance, definition, 4));
+    return manufacturingFeatureResolver.resolveLinearPattern(instance);
   }
 
   StepCompositeDatumReference resolveCompositeDatumReference(StepEntityInstance instance) {
