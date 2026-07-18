@@ -332,10 +332,10 @@ public final class StepDumpApp {
         int skipped2DEntities = 0;
         Map<String, Integer> unsupportedReasons = new LinkedHashMap<>();
         Map<String, Integer> unsupportedReasonCodes = new LinkedHashMap<>();
-        Set<Integer> shellFaceIds = collectShellFaceIds(resolved.values());
-        Set<Integer> loopOrientedEdgeIds = collectLoopOrientedEdgeIds(resolved.values());
-        Set<Integer> orientedEdgeElementIds = collectOrientedEdgeElementIds(resolved.values());
-        Set<Integer> faceBoundLoopIds = collectFaceBoundLoopIds(resolved.values());
+        Set<Integer> shellFaceIds = StepEntityIdCollector.collectShellFaceIds(resolved.values());
+        Set<Integer> loopOrientedEdgeIds = StepEntityIdCollector.collectLoopOrientedEdgeIds(resolved.values());
+        Set<Integer> orientedEdgeElementIds = StepEntityIdCollector.collectOrientedEdgeElementIds(resolved.values());
+        Set<Integer> faceBoundLoopIds = StepEntityIdCollector.collectFaceBoundLoopIds(resolved.values());
 
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepOpenShell) {
@@ -1082,62 +1082,6 @@ public final class StepDumpApp {
                 + ", unsupportedFaces=" + unsupportedFaces);
         appendUnsupportedReasons(lines, unsupportedReasons);
         appendUnsupportedReasonCodes(lines, unsupportedReasonCodes);
-    }
-
-    private static Set<Integer> collectShellFaceIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepOpenShell) {
-                StepOpenShell openShell = (StepOpenShell) entity;
-                openShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepSurfacedOpenShell) {
-                StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-                surfacedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedOpenShell) {
-                StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-                orientedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepClosedShell) {
-                StepClosedShell closedShell = (StepClosedShell) entity;
-                closedShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedClosedShell) {
-                StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-                orientedClosedShell.faces().forEach(face -> ids.add(face.id()));
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectLoopOrientedEdgeIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof com.minicad.step.model.StepEdgeLoop) {
-                com.minicad.step.model.StepEdgeLoop edgeLoop = (com.minicad.step.model.StepEdgeLoop) entity;
-                edgeLoop.edges().forEach(edge -> ids.add(edge.id()));
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectOrientedEdgeElementIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepOrientedEdge) {
-                StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
-                ids.add(orientedEdge.edgeElement().id());
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectFaceBoundLoopIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepFaceBound) {
-                StepFaceBound faceBound = (StepFaceBound) entity;
-                ids.add(faceBound.loop().id());
-            }
-        }
-        return ids;
     }
 
     private static void validatePolyLoop(StepPolyLoop polyLoop, StepCadBuilder builder) {
