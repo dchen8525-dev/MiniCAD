@@ -1702,50 +1702,18 @@ public final class StepPreviewJsonExporter {
         return false;
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForMappedPlacement(
             StepEntity mappedOrigin,
             StepEntity mappingTarget,
             StepCadBuilder builder
     ) {
-        double[] sourceMatrix = matrixForPlacementEntity(mappedOrigin, builder);
-        double[] targetMatrix = matrixForPlacementEntity(mappingTarget, builder);
-        if (sourceMatrix == null || targetMatrix == null) {
-            return null;
-        }
-        return StepAssemblyGraphBuilder.multiplyMatrices(
-                targetMatrix,
-                StepAssemblyGraphBuilder.inverseRigidTransform(sourceMatrix)
-        );
+        return StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        if (placement instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
-        }
-        if (placement instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
-            CartesianPoint origin = pointFromPlacement(placement2D);
-            if (origin == null) {
-                return null;
-            }
-            Vector3 x;
-            if (placement2D.refDirection() == null) {
-                x = new Vector3(1.0, 0.0, 0.0);
-            } else {
-                List<Double> ratios = placement2D.refDirection().directionRatios();
-                x = new Vector3(ratios.get(0), ratios.get(1), 0.0).normalize().asVector();
-            }
-            Vector3 z = new Vector3(0.0, 0.0, 1.0);
-            Vector3 y = z.cross(x).normalize().asVector();
-            return new double[]{
-                    x.x(), y.x(), z.x(), origin.x(),
-                    x.y(), y.y(), z.y(), origin.y(),
-                    x.z(), y.z(), z.z(), origin.z(),
-                    0.0, 0.0, 0.0, 1.0
-            };
-        }
-        return null;
+        return StepPlacementTransformer.matrixForPlacementEntity(placement, builder);
     }
 
     public static PreviewFaceResult buildPreviewFaceResult(
@@ -6700,35 +6668,12 @@ public final class StepPreviewJsonExporter {
         );
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForTransformationOperator(
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 axis1 = transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-        Vector3 axis2;
-        if (transformation.axis2() != null) {
-            axis2 = builder.buildDirection(transformation.axis2().id()).asVector();
-        } else {
-            Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-            axis2 = axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-        }
-        Vector3 axis3;
-        if (transformation.axis3() != null) {
-            axis3 = builder.buildDirection(transformation.axis3().id()).asVector();
-        } else {
-            Vector3 cross = axis1.cross(axis2);
-            axis3 = cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
-        }
-        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
-        CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
-        return new double[]{
-                axis1.x() * scale, axis2.x() * scale, axis3.x() * scale, origin.x(),
-                axis1.y() * scale, axis2.y() * scale, axis3.y() * scale, origin.y(),
-                axis1.z() * scale, axis2.z() * scale, axis3.z() * scale, origin.z(),
-                0.0, 0.0, 0.0, 1.0
-        };
+        return StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
     }
 
     public static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
@@ -14348,11 +14293,9 @@ public final class StepPreviewJsonExporter {
         return Set.copyOf(targets);
     }
 
+    // Delegate to StepPointExtractor - extracted utility class
     public static CartesianPoint pointFromStep(StepCartesianPoint point) {
-        double x = point.coordinates().get(0);
-        double y = point.coordinates().size() > 1 ? point.coordinates().get(1) : 0.0;
-        double z = point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0;
-        return new CartesianPoint(x, y, z);
+        return StepPointExtractor.pointFromStep(point);
     }
 
 
