@@ -4107,24 +4107,9 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    // Delegate to StepSummaryBuilder - extracted utility class
     private static String associatedGeometrySummary(StepEntity edgeGeometry) {
-        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity> associated;
-        if (unwrapped instanceof StepSurfaceCurve) {
-            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
-            associated = surfaceCurve.associatedGeometry();
-        } else if (unwrapped instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
-            associated = seamCurve.associatedGeometry();
-        } else {
-            associated = List.of();
-        }
-        if (associated.isEmpty()) {
-            return "[]";
-        }
-        return associated.stream()
-                .map(entity -> surfaceTypeName(entity) + "#" + entity.id())
-                .collect(Collectors.joining("|"));
+        return StepSummaryBuilder.associatedGeometrySummary(edgeGeometry);
     }
 
     private static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
