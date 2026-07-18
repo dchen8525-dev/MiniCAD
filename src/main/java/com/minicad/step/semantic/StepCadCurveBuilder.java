@@ -429,7 +429,7 @@ final class StepCadCurveBuilder {
         if (existing != null) {
             return existing;
         }
-        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
         List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
         for (StepCartesianPoint point : spline.getControlPoints()) {
             if (point.coordinates().size() != 2) {
@@ -1193,91 +1193,24 @@ final class StepCadCurveBuilder {
 
     // ==================== Implicit B-Spline Curve Data ====================
 
-    private ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
+    private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
         if (entity instanceof StepBezierCurve) {
             StepBezierCurve curve = (StepBezierCurve) entity;
-            return implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepUniformCurve) {
             StepUniformCurve curve = (StepUniformCurve) entity;
-            return implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepQuasiUniformCurve) {
             StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
-            return implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepPiecewiseBezierCurve) {
             StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
-            return implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
-    }
-
-    private ImplicitBSplineCurveData implicitBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        if (controlPoints.size() != degree + 1) {
-            throw new UnsupportedGeometryException(typeName + " requires controlPointCount = degree + 1");
-        }
-        return new ImplicitBSplineCurveData(
-                degree,
-                controlPoints,
-                List.of(degree + 1, degree + 1),
-                List.of(0.0, 1.0)
-        );
-    }
-
-    private ImplicitBSplineCurveData implicitUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int knotCount = controlPoints.size() + degree + 1;
-        List<Integer> multiplicities = new ArrayList<>(knotCount);
-        List<Double> knots = new ArrayList<>(knotCount);
-        for (int index = 0; index < knotCount; index++) {
-            multiplicities.add(1);
-            knots.add((double) index);
-        }
-        return new ImplicitBSplineCurveData(degree, controlPoints, multiplicities, knots);
-    }
-
-    private ImplicitBSplineCurveData implicitQuasiUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int interiorCount = controlPoints.size() - degree - 1;
-        List<Integer> multiplicities = new ArrayList<>();
-        List<Double> knots = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        knots.add(0.0);
-        for (int index = 1; index <= interiorCount; index++) {
-            multiplicities.add(1);
-            knots.add((double) index);
-        }
-        multiplicities.add(degree + 1);
-        knots.add((double) (interiorCount + 1));
-        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
-    }
-
-    private ImplicitBSplineCurveData implicitPiecewiseBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int segmentCount = controlPoints.size() - 1;
-        if (segmentCount % degree != 0) {
-            throw new UnsupportedGeometryException(typeName + " requires (controlPointCount - 1) to be divisible by degree");
-        }
-        int pieceCount = segmentCount / degree;
-        List<Integer> multiplicities = new ArrayList<>();
-        List<Double> knots = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        knots.add(0.0);
-        for (int index = 1; index < pieceCount; index++) {
-            multiplicities.add(degree);
-            knots.add((double) index);
-        }
-        multiplicities.add(degree + 1);
-        knots.add((double) pieceCount);
-        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
-    }
-
-    private void validateImplicitCurveData(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        if (degree < 1 || controlPoints.isEmpty()) {
-            throw new UnsupportedGeometryException(typeName + " marker does not carry inherited B-spline geometry");
-        }
     }
 
     // ==================== 3D Curve Builders ====================
@@ -1700,7 +1633,7 @@ final class StepCadCurveBuilder {
         if (existing != null) {
             return existing;
         }
-        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
         List<CartesianPoint> controlPoints = spline.getControlPoints().stream()
                 .map(point -> geometryBuilder.buildPoint(point.id()))
                 .collect(Collectors.toList());
@@ -1901,32 +1834,5 @@ final class StepCadCurveBuilder {
 
     private Curve3 approximateOffsetCurve3(Curve3 basisCurve, double distance, Direction3 refDirection) {
         return geometryOps.approximateOffsetCurve3(basisCurve, distance, refDirection);
-    }
-
-    // ==================== Data Classes ====================
-
-    private static class ImplicitBSplineCurveData {
-        private final int degree;
-        private final List<StepCartesianPoint> controlPoints;
-        private final List<Integer> knotMultiplicities;
-        private final List<Double> knots;
-
-        ImplicitBSplineCurveData(int degree, List<StepCartesianPoint> controlPoints,
-                                  List<Integer> knotMultiplicities, List<Double> knots) {
-            this.degree = degree;
-            this.controlPoints = controlPoints;
-            this.knotMultiplicities = knotMultiplicities;
-            this.knots = knots;
-        }
-
-        int degree() { return degree; }
-        List<StepCartesianPoint> controlPoints() { return controlPoints; }
-        List<Integer> knotMultiplicities() { return knotMultiplicities; }
-        List<Double> knots() { return knots; }
-
-        int getDegree() { return degree; }
-        List<StepCartesianPoint> getControlPoints() { return controlPoints; }
-        List<Integer> getKnotMultiplicities() { return knotMultiplicities; }
-        List<Double> getKnots() { return knots; }
     }
 }
