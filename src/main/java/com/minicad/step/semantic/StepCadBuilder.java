@@ -1334,7 +1334,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        ImplicitBSplineSurfaceData surface = implicitBSplineSurfaceData(entity);
+        StepBSplineKnotGenerator.ImplicitBSplineSurfaceData surface = implicitBSplineSurfaceData(entity);
         List<List<CartesianPoint>> controlPoints = surface.getControlPoints().stream()
                 .map(row -> row.stream().map(point -> buildPoint(point.id())).collect(Collectors.toList()))
                 .collect(Collectors.toList());
@@ -2113,7 +2113,7 @@ public final class StepCadBuilder {
             center = new CartesianPoint(0, 0, 0);
         }
         // Tessellate sphere centered at the specified center point
-        List<Face> faces = tessellateSphereAt(center, radius, 24, 48);
+        List<Face> faces = StepPrimitiveTessellator.tessellateSphereAt(center, radius, 24, 48);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2131,8 +2131,8 @@ public final class StepCadBuilder {
             placement = null;
         }
         List<Face> faces = placement != null
-                ? tessellateTorusAt(placement, majorR, minorR, 36, 24)
-                : tessellateTorus(majorR, minorR, 36, 24);
+                ? StepPrimitiveTessellator.tessellateTorusAt(placement, majorR, minorR, 36, 24)
+                : StepPrimitiveTessellator.tessellateTorus(majorR, minorR, 36, 24);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2163,7 +2163,7 @@ public final class StepCadBuilder {
         List<CartesianPoint> top = bottom.stream()
                 .map(p -> p.add(zDir.scale(h)))
                 .collect(Collectors.toList());
-        List<Face> faces = buildBoxFaces(bottom, top);
+        List<Face> faces = StepPrimitiveTessellator.buildBoxFaces(bottom, top);
         return new Solid(new Shell(faces, true));
     }
 
@@ -2247,164 +2247,7 @@ public final class StepCadBuilder {
         return Direction3.from(ab.cross(ac));
     }
 
-    private List<Face> tessellateSphere(double radius, int latSteps, int lonSteps) {
-        List<Face> faces = new ArrayList<>();
-        for (int i = 0; i < latSteps; i++) {
-            double phi1 = Math.PI * i / latSteps;
-            double phi2 = Math.PI * (i + 1) / latSteps;
-            for (int j = 0; j < lonSteps; j++) {
-                double theta1 = 2 * Math.PI * j / lonSteps;
-                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
-                CartesianPoint p00 = spherePoint(radius, phi1, theta1);
-                CartesianPoint p10 = spherePoint(radius, phi2, theta1);
-                CartesianPoint p11 = spherePoint(radius, phi2, theta2);
-                CartesianPoint p01 = spherePoint(radius, phi1, theta2);
-                CartesianPoint midPoint = spherePoint(radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
-                Vector3 normal = new Vector3(midPoint.getX(), midPoint.getY(), midPoint.getZ());
-                if (i == 0) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
-                } else if (i == latSteps - 1) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
-                } else {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-                }
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint spherePoint(double radius, double phi, double theta) {
-        return new CartesianPoint(
-                radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.sin(phi) * Math.sin(theta),
-                radius * Math.cos(phi));
-    }
-
-    private List<Face> tessellateTorus(double majorR, double minorR, int majorSteps, int minorSteps) {
-        List<Face> faces = new ArrayList<>();
-        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
-        for (int i = 0; i <= majorSteps; i++) {
-            double theta = 2 * Math.PI * i / majorSteps;
-            for (int j = 0; j <= minorSteps; j++) {
-                double phi = 2 * Math.PI * j / minorSteps;
-                points[i][j] = new double[]{
-                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
-                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
-                        minorR * Math.sin(phi)
-                };
-            }
-        }
-        for (int i = 0; i < majorSteps; i++) {
-            for (int j = 0; j < minorSteps; j++) {
-                CartesianPoint p00 = pt(points[i][j]);
-                CartesianPoint p10 = pt(points[i + 1][j]);
-                CartesianPoint p11 = pt(points[i + 1][j + 1]);
-                CartesianPoint p01 = pt(points[i][j + 1]);
-                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1))));
-            }
-        }
-        return faces;
-    }
-
-    private List<Face> tessellateSphereAt(CartesianPoint center, double radius, int latSteps, int lonSteps) {
-        List<Face> faces = new ArrayList<>();
-        for (int i = 0; i < latSteps; i++) {
-            double phi1 = Math.PI * i / latSteps;
-            double phi2 = Math.PI * (i + 1) / latSteps;
-            for (int j = 0; j < lonSteps; j++) {
-                double theta1 = 2 * Math.PI * j / lonSteps;
-                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
-                CartesianPoint p00 = spherePointAt(center, radius, phi1, theta1);
-                CartesianPoint p10 = spherePointAt(center, radius, phi2, theta1);
-                CartesianPoint p11 = spherePointAt(center, radius, phi2, theta2);
-                CartesianPoint p01 = spherePointAt(center, radius, phi1, theta2);
-                CartesianPoint midPoint = spherePointAt(center, radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
-                Vector3 normal = new Vector3(midPoint.getX() - center.getX(), midPoint.getY() - center.getY(), midPoint.getZ() - center.getZ());
-                if (i == 0) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
-                } else if (i == latSteps - 1) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
-                } else {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-                }
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint spherePointAt(CartesianPoint center, double radius, double phi, double theta) {
-        return new CartesianPoint(
-                center.getX() + radius * Math.sin(phi) * Math.cos(theta),
-                center.getY() + radius * Math.sin(phi) * Math.sin(theta),
-                center.getZ() + radius * Math.cos(phi));
-    }
-
-    private List<Face> tessellateTorusAt(Axis2Placement3D placement, double majorR, double minorR, int majorSteps, int minorSteps) {
-        List<Face> faces = new ArrayList<>();
-        double[][][] points = new double[majorSteps + 1][minorSteps + 1][];
-        for (int i = 0; i <= majorSteps; i++) {
-            double theta = 2 * Math.PI * i / majorSteps;
-            for (int j = 0; j <= minorSteps; j++) {
-                double phi = 2 * Math.PI * j / minorSteps;
-                points[i][j] = new double[]{
-                        (majorR + minorR * Math.cos(phi)) * Math.cos(theta),
-                        (majorR + minorR * Math.cos(phi)) * Math.sin(theta),
-                        minorR * Math.sin(phi)
-                };
-            }
-        }
-        for (int i = 0; i < majorSteps; i++) {
-            for (int j = 0; j < minorSteps; j++) {
-                CartesianPoint p00 = placement.transformToWorld(pt(points[i][j]));
-                CartesianPoint p10 = placement.transformToWorld(pt(points[i + 1][j]));
-                CartesianPoint p11 = placement.transformToWorld(pt(points[i + 1][j + 1]));
-                CartesianPoint p01 = placement.transformToWorld(pt(points[i][j + 1]));
-                CartesianPoint mid = placement.transformToWorld(new CartesianPoint(
-                        (points[i][j][0] + points[i + 1][j][0] + points[i + 1][j + 1][0] + points[i][j + 1][0]) / 4,
-                        (points[i][j][1] + points[i + 1][j][1] + points[i + 1][j + 1][1] + points[i][j + 1][1]) / 4,
-                        (points[i][j][2] + points[i + 1][j][2] + points[i + 1][j + 1][2] + points[i][j + 1][2]) / 4));
-                Vector3 normal = new Vector3(mid.getX() - placement.getLocation().getX(), mid.getY() - placement.getLocation().getY(), mid.getZ() - placement.getLocation().getZ());
-                faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-            }
-        }
-        return faces;
-    }
-
-    private CartesianPoint pt(double[] coords) {
-        return new CartesianPoint(coords[0], coords[1], coords[2]);
-    }
-
-    private List<Face> buildBoxFaces(List<CartesianPoint> bottom, List<CartesianPoint> top) {
-        List<Face> faces = new ArrayList<>();
-        Direction3 up = Direction3.from(new com.minicad.geometry.Vector3(0, 0, 1));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(bottom), up.reverse()));
-        faces.add(faceFromPolyLoop(top, up));
-        Direction3 right = Direction3.from(new com.minicad.geometry.Vector3(1, 0, 0));
-        Direction3 forward = Direction3.from(new com.minicad.geometry.Vector3(0, 1, 0));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), top.get(0), top.get(3), bottom.get(3))), right));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(1), bottom.get(2), top.get(2), top.get(1))), forward));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(2), bottom.get(3), top.get(3), top.get(2))), right.reverse()));
-        faces.add(faceFromPolyLoop(reverseClosedLoop3(List.of(bottom.get(0), bottom.get(1), top.get(1), top.get(0))), forward.reverse()));
-        return faces;
-    }
-
-    private CartesianPoint rotatePointAroundAxis(CartesianPoint p, CartesianPoint origin,
-                                                  Vector3 axis, double angle) {
-        // Rodrigues' rotation formula
-        double dx = p.getX() - origin.getX();
-        double dy = p.getY() - origin.getY();
-        double dz = p.getZ() - origin.getZ();
-        com.minicad.geometry.Vector3 v = new com.minicad.geometry.Vector3(dx, dy, dz);
-        com.minicad.geometry.Vector3 k = axis.normalize().asVector();
-        com.minicad.geometry.Vector3 rotated = v.scale(Math.cos(angle))
-                .add(k.cross(v).scale(Math.sin(angle)))
-                .add(k.scale(k.dot(v) * (1 - Math.cos(angle))));
-        return new CartesianPoint(
-                rotated.getX() + origin.getX(),
-                rotated.getY() + origin.getY(),
-                rotated.getZ() + origin.getZ());
-    }
-
+    
     /**
      *
      * @param id STEP entity id
@@ -2728,7 +2571,7 @@ public final class StepCadBuilder {
         if (existing != null) {
             return existing;
         }
-        ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
         List<CartesianPoint> controlPoints = spline.getControlPoints().stream().map(point -> buildPoint(point.id())).collect(Collectors.toList());
         BSplineCurve3 built = new BSplineCurve3(
                 spline.getDegree(),
@@ -3201,42 +3044,42 @@ public final class StepCadBuilder {
         return new DegenerateCurve3(point);
     }
 
-    private ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
+    private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
         if (entity instanceof StepBezierCurve) {
             StepBezierCurve curve = (StepBezierCurve) entity;
-            return implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepUniformCurve) {
             StepUniformCurve curve = (StepUniformCurve) entity;
-            return implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepQuasiUniformCurve) {
             StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
-            return implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepPiecewiseBezierCurve) {
             StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
-            return implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
         }
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
     }
 
-    private ImplicitBSplineSurfaceData implicitBSplineSurfaceData(StepEntity entity) {
+    private StepBSplineKnotGenerator.ImplicitBSplineSurfaceData implicitBSplineSurfaceData(StepEntity entity) {
         if (entity instanceof StepBezierSurface) {
             StepBezierSurface surface = (StepBezierSurface) entity;
-            return implicitBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepUniformSurface) {
             StepUniformSurface surface = (StepUniformSurface) entity;
-            return implicitUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepQuasiUniformSurface) {
             StepQuasiUniformSurface surface = (StepQuasiUniformSurface) entity;
-            return implicitQuasiUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitQuasiUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
         }
         if (entity instanceof StepPiecewiseBezierSurface) {
             StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) entity;
-            return implicitPiecewiseBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            return StepBSplineKnotGenerator.implicitPiecewiseBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
         }
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
     }
@@ -4356,225 +4199,6 @@ public final class StepCadBuilder {
         return null;
     }
 
-    private ImplicitBSplineCurveData implicitBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        if (controlPoints.size() != degree + 1) {
-            throw new UnsupportedGeometryException(typeName + " requires controlPointCount = degree + 1");
-        }
-        return new ImplicitBSplineCurveData(
-                degree,
-                controlPoints,
-                List.of(degree + 1, degree + 1),
-                List.of(0.0, 1.0)
-        );
-    }
-
-    private ImplicitBSplineCurveData implicitUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int knotCount = controlPoints.size() + degree + 1;
-        List<Integer> multiplicities = new ArrayList<>(knotCount);
-        List<Double> knots = new ArrayList<>(knotCount);
-        for (int index = 0; index < knotCount; index++) {
-            multiplicities.add(1);
-            knots.add((double) index);
-        }
-        return new ImplicitBSplineCurveData(degree, controlPoints, multiplicities, knots);
-    }
-
-    private ImplicitBSplineCurveData implicitQuasiUniformCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int interiorCount = controlPoints.size() - degree - 1;
-        List<Integer> multiplicities = new ArrayList<>();
-        List<Double> knots = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        knots.add(0.0);
-        for (int index = 1; index <= interiorCount; index++) {
-            multiplicities.add(1);
-            knots.add((double) index);
-        }
-        multiplicities.add(degree + 1);
-        knots.add((double) (interiorCount + 1));
-        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
-    }
-
-    private ImplicitBSplineCurveData implicitPiecewiseBezierCurve(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        validateImplicitCurveData(degree, controlPoints, typeName);
-        int segmentCount = controlPoints.size() - 1;
-        if (segmentCount % degree != 0) {
-            throw new UnsupportedGeometryException(typeName + " requires (controlPointCount - 1) to be divisible by degree");
-        }
-        int pieceCount = segmentCount / degree;
-        List<Integer> multiplicities = new ArrayList<>();
-        List<Double> knots = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        knots.add(0.0);
-        for (int index = 1; index < pieceCount; index++) {
-            multiplicities.add(degree);
-            knots.add((double) index);
-        }
-        multiplicities.add(degree + 1);
-        knots.add((double) pieceCount);
-        return new ImplicitBSplineCurveData(degree, controlPoints, List.copyOf(multiplicities), List.copyOf(knots));
-    }
-
-    private ImplicitBSplineSurfaceData implicitBezierSurface(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            String typeName
-    ) {
-        validateImplicitSurfaceData(uDegree, vDegree, controlPoints, typeName);
-        if (controlPoints.size() != uDegree + 1 || controlPoints.get(0).size() != vDegree + 1) {
-            throw new UnsupportedGeometryException(typeName + " requires controlPointCount = degree + 1 in both directions");
-        }
-        return new ImplicitBSplineSurfaceData(
-                uDegree,
-                vDegree,
-                controlPoints,
-                List.of(uDegree + 1, uDegree + 1),
-                List.of(vDegree + 1, vDegree + 1),
-                List.of(0.0, 1.0),
-                List.of(0.0, 1.0)
-        );
-    }
-
-    private ImplicitBSplineSurfaceData implicitUniformSurface(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            String typeName
-    ) {
-        validateImplicitSurfaceData(uDegree, vDegree, controlPoints, typeName);
-        return new ImplicitBSplineSurfaceData(
-                uDegree,
-                vDegree,
-                controlPoints,
-                uniformMultiplicities(controlPoints.size(), uDegree),
-                uniformMultiplicities(controlPoints.get(0).size(), vDegree),
-                uniformKnots(controlPoints.size(), uDegree),
-                uniformKnots(controlPoints.get(0).size(), vDegree)
-        );
-    }
-
-    private ImplicitBSplineSurfaceData implicitQuasiUniformSurface(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            String typeName
-    ) {
-        validateImplicitSurfaceData(uDegree, vDegree, controlPoints, typeName);
-        return new ImplicitBSplineSurfaceData(
-                uDegree,
-                vDegree,
-                controlPoints,
-                quasiUniformMultiplicities(controlPoints.size(), uDegree),
-                quasiUniformMultiplicities(controlPoints.get(0).size(), vDegree),
-                quasiUniformKnots(controlPoints.size(), uDegree),
-                quasiUniformKnots(controlPoints.get(0).size(), vDegree)
-        );
-    }
-
-    private ImplicitBSplineSurfaceData implicitPiecewiseBezierSurface(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            String typeName
-    ) {
-        validateImplicitSurfaceData(uDegree, vDegree, controlPoints, typeName);
-        return new ImplicitBSplineSurfaceData(
-                uDegree,
-                vDegree,
-                controlPoints,
-                piecewiseBezierMultiplicities(controlPoints.size(), uDegree, typeName + " U"),
-                piecewiseBezierMultiplicities(controlPoints.get(0).size(), vDegree, typeName + " V"),
-                piecewiseBezierKnots(controlPoints.size(), uDegree, typeName + " U"),
-                piecewiseBezierKnots(controlPoints.get(0).size(), vDegree, typeName + " V")
-        );
-    }
-
-    private void validateImplicitCurveData(int degree, List<StepCartesianPoint> controlPoints, String typeName) {
-        if (degree < 1 || controlPoints.isEmpty()) {
-            throw new UnsupportedGeometryException(typeName + " marker does not carry inherited B-spline geometry");
-        }
-    }
-
-    private void validateImplicitSurfaceData(
-            int uDegree,
-            int vDegree,
-            List<List<StepCartesianPoint>> controlPoints,
-            String typeName
-    ) {
-        if (uDegree < 1 || vDegree < 1 || controlPoints.isEmpty() || controlPoints.get(0).isEmpty()) {
-            throw new UnsupportedGeometryException(typeName + " marker does not carry inherited B-spline geometry");
-        }
-    }
-
-    private List<Integer> uniformMultiplicities(int controlPointCount, int degree) {
-        int knotCount = controlPointCount + degree + 1;
-        List<Integer> multiplicities = new ArrayList<>(knotCount);
-        for (int index = 0; index < knotCount; index++) {
-            multiplicities.add(1);
-        }
-        return List.copyOf(multiplicities);
-    }
-
-    private List<Double> uniformKnots(int controlPointCount, int degree) {
-        int knotCount = controlPointCount + degree + 1;
-        List<Double> knots = new ArrayList<>(knotCount);
-        for (int index = 0; index < knotCount; index++) {
-            knots.add((double) index);
-        }
-        return List.copyOf(knots);
-    }
-
-    private List<Integer> quasiUniformMultiplicities(int controlPointCount, int degree) {
-        int interiorCount = controlPointCount - degree - 1;
-        List<Integer> multiplicities = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        for (int index = 0; index < interiorCount; index++) {
-            multiplicities.add(1);
-        }
-        multiplicities.add(degree + 1);
-        return List.copyOf(multiplicities);
-    }
-
-    private List<Double> quasiUniformKnots(int controlPointCount, int degree) {
-        int interiorCount = controlPointCount - degree - 1;
-        List<Double> knots = new ArrayList<>();
-        for (int index = 0; index <= interiorCount + 1; index++) {
-            knots.add((double) index);
-        }
-        return List.copyOf(knots);
-    }
-
-    private List<Integer> piecewiseBezierMultiplicities(int controlPointCount, int degree, String axisLabel) {
-        int segmentCount = controlPointCount - 1;
-        if (segmentCount % degree != 0) {
-            throw new UnsupportedGeometryException(axisLabel + " requires (controlPointCount - 1) to be divisible by degree");
-        }
-        int pieceCount = segmentCount / degree;
-        List<Integer> multiplicities = new ArrayList<>();
-        multiplicities.add(degree + 1);
-        for (int index = 1; index < pieceCount; index++) {
-            multiplicities.add(degree);
-        }
-        multiplicities.add(degree + 1);
-        return List.copyOf(multiplicities);
-    }
-
-    private List<Double> piecewiseBezierKnots(int controlPointCount, int degree, String axisLabel) {
-        int segmentCount = controlPointCount - 1;
-        if (segmentCount % degree != 0) {
-            throw new UnsupportedGeometryException(axisLabel + " requires (controlPointCount - 1) to be divisible by degree");
-        }
-        int pieceCount = segmentCount / degree;
-        List<Double> knots = new ArrayList<>();
-        for (int index = 0; index <= pieceCount; index++) {
-            knots.add((double) index);
-        }
-        return List.copyOf(knots);
-    }
-
     public Curve3 buildCurve3From2D(int id) {
         StepEntity entity = requireExistingEntity(id);
         Curve2 curve2 = (Curve2) buildCurve2(entity);
@@ -4614,160 +4238,8 @@ public final class StepCadBuilder {
         return geometryOps.transformCurve2(curve, transformation);
     }
 
-    private static class ImplicitBSplineCurveData {
-        private final int degree;
-        private final List<StepCartesianPoint> controlPoints;
-        private final List<Integer> knotMultiplicities;
-        private final List<Double> knots;
-
-        ImplicitBSplineCurveData(int degree, List<StepCartesianPoint> controlPoints,
-                                  List<Integer> knotMultiplicities, List<Double> knots) {
-            this.degree = degree;
-            this.controlPoints = controlPoints;
-            this.knotMultiplicities = knotMultiplicities;
-            this.knots = knots;
-        }
-
-        int degree() { return degree; }
-        List<StepCartesianPoint> controlPoints() { return controlPoints; }
-        List<Integer> knotMultiplicities() { return knotMultiplicities; }
-        List<Double> knots() { return knots; }
-
-        int getDegree() { return degree; }
-        List<StepCartesianPoint> getControlPoints() { return controlPoints; }
-        List<Integer> getKnotMultiplicities() { return knotMultiplicities; }
-        List<Double> getKnots() { return knots; }
-    }
-
-    private static class ImplicitBSplineSurfaceData {
-        private final int uDegree;
-        private final int vDegree;
-        private final List<List<StepCartesianPoint>> controlPoints;
-        private final List<Integer> uMultiplicities;
-        private final List<Integer> vMultiplicities;
-        private final List<Double> uKnots;
-        private final List<Double> vKnots;
-
-        ImplicitBSplineSurfaceData(int uDegree, int vDegree,
-                                    List<List<StepCartesianPoint>> controlPoints,
-                                    List<Integer> uMultiplicities, List<Integer> vMultiplicities,
-                                    List<Double> uKnots, List<Double> vKnots) {
-            this.uDegree = uDegree;
-            this.vDegree = vDegree;
-            this.controlPoints = controlPoints;
-            this.uMultiplicities = uMultiplicities;
-            this.vMultiplicities = vMultiplicities;
-            this.uKnots = uKnots;
-            this.vKnots = vKnots;
-        }
-
-        int uDegree() { return uDegree; }
-        int vDegree() { return vDegree; }
-        List<List<StepCartesianPoint>> controlPoints() { return controlPoints; }
-        List<Integer> uMultiplicities() { return uMultiplicities; }
-        List<Integer> vMultiplicities() { return vMultiplicities; }
-        List<Double> uKnots() { return uKnots; }
-        List<Double> vKnots() { return vKnots; }
-
-        int getUDegree() { return uDegree; }
-        int getVDegree() { return vDegree; }
-        List<List<StepCartesianPoint>> getControlPoints() { return controlPoints; }
-        List<Integer> getUMultiplicities() { return uMultiplicities; }
-        List<Integer> getVMultiplicities() { return vMultiplicities; }
-        List<Double> getUKnots() { return uKnots; }
-        List<Double> getVKnots() { return vKnots; }
-    }
-
     static String stepEntityTypeName(StepEntity entity) {
-        if (entity instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) entity;
-            return replica.entityName();
-        }
-        if (entity instanceof StepCsgPrimitive) {
-            StepCsgPrimitive primitive = (StepCsgPrimitive) entity;
-            return primitive.entityName();
-        }
-        if (entity instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
-            return sweptAreaSolid.entityName();
-        }
-        if (entity instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) entity;
-            return conic.entityName();
-        }
-        if (entity instanceof StepFaceBound) {
-            StepFaceBound faceBound = (StepFaceBound) entity;
-            return faceBound.isOuter() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
-        }
-        if (entity instanceof StepProfileDef) {
-            StepProfileDef profile = (StepProfileDef) entity;
-            return profile.entityName();
-        }
-        if (entity instanceof StepBooleanClippingResult) {
-            return "BOOLEAN_CLIPPING_RESULT";
-        }
-        if (entity instanceof StepBooleanResult) {
-            return "BOOLEAN_RESULT";
-        }
-        if (entity instanceof StepManifoldSolidBrep) {
-            return "MANIFOLD_SOLID_BREP";
-        }
-        if (entity instanceof StepBrepWithVoids) {
-            return "BREP_WITH_VOIDS";
-        }
-        if (entity instanceof StepCsgSolid) {
-            return "CSG_SOLID";
-        }
-        if (entity instanceof StepSolidReplica) {
-            return "SOLID_REPLICA";
-        }
-        if (entity instanceof StepLine) {
-            return "LINE";
-        }
-        if (entity instanceof StepCircle) {
-            return "CIRCLE";
-        }
-        if (entity instanceof StepEllipse) {
-            return "ELLIPSE";
-        }
-        if (entity instanceof StepPolyline) {
-            return "POLYLINE";
-        }
-        if (entity instanceof StepBSplineCurveWithKnots) {
-            return "B_SPLINE_CURVE_WITH_KNOTS";
-        }
-        if (entity instanceof StepRationalBSplineCurve) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (entity instanceof StepTrimmedCurve) {
-            return "TRIMMED_CURVE";
-        }
-        if (entity instanceof StepSurfaceCurve) {
-            return "SURFACE_CURVE";
-        }
-        if (entity instanceof StepSeamCurve) {
-            return "SEAM_CURVE";
-        }
-        if (entity instanceof StepCompositeCurve) {
-            return "COMPOSITE_CURVE";
-        }
-        if (entity instanceof StepCompositeCurveOnSurface) {
-            return "COMPOSITE_CURVE_ON_SURFACE";
-        }
-        if (entity instanceof StepOffsetCurve2D) {
-            return "OFFSET_CURVE_2D";
-        }
-        if (entity instanceof StepOffsetCurve3D) {
-            return "OFFSET_CURVE_3D";
-        }
-        if (entity instanceof StepOrientedCurve) {
-            return "ORIENTED_CURVE";
-        }
-        String simpleName = entity.getClass().getSimpleName();
-        if (simpleName.startsWith("Step")) {
-            simpleName = simpleName.substring(4);
-        }
-        return camelToUpperSnake(simpleName);
+        return StepEntityNamingUtils.stepEntityTypeName(entity);
     }
 
     StepEntity resolvedEntity(int id) {
@@ -4775,34 +4247,19 @@ public final class StepCadBuilder {
     }
 
     private static String camelToUpperSnake(String value) {
-        if (value.isEmpty()) {
-            return value;
-        }
-        String normalized = value
-                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
-                .replaceAll("([a-z0-9])([A-Z])", "$1_$2");
-        return normalized.toUpperCase(java.util.Locale.ROOT);
+        return StepEntityNamingUtils.camelToUpperSnake(value);
     }
 
     private static String loopTypeName(Loop loop) {
-        if (loop instanceof EdgeLoop) {
-            return "EDGE_LOOP";
-        }
-        if (loop instanceof VertexLoop) {
-            return "VERTEX_LOOP";
-        }
-        if (loop instanceof PolyLoop) {
-            return "POLY_LOOP";
-        }
-        return loop.getClass().getSimpleName();
+        return StepEntityNamingUtils.loopTypeName(loop);
     }
 
     private static String curveTypeName(Curve3 curve) {
-        return StepCadGeometryOps.curveTypeName(curve);
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     private static String curveTypeName(Curve2 curve) {
-        return StepCadGeometryOps.curveTypeName(curve);
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     private Plane transformPlane(Plane plane, StepCartesianTransformationOperator transformation) {

@@ -332,10 +332,10 @@ public final class StepDumpApp {
         int skipped2DEntities = 0;
         Map<String, Integer> unsupportedReasons = new LinkedHashMap<>();
         Map<String, Integer> unsupportedReasonCodes = new LinkedHashMap<>();
-        Set<Integer> shellFaceIds = collectShellFaceIds(resolved.values());
-        Set<Integer> loopOrientedEdgeIds = collectLoopOrientedEdgeIds(resolved.values());
-        Set<Integer> orientedEdgeElementIds = collectOrientedEdgeElementIds(resolved.values());
-        Set<Integer> faceBoundLoopIds = collectFaceBoundLoopIds(resolved.values());
+        Set<Integer> shellFaceIds = StepEntityIdCollector.collectShellFaceIds(resolved.values());
+        Set<Integer> loopOrientedEdgeIds = StepEntityIdCollector.collectLoopOrientedEdgeIds(resolved.values());
+        Set<Integer> orientedEdgeElementIds = StepEntityIdCollector.collectOrientedEdgeElementIds(resolved.values());
+        Set<Integer> faceBoundLoopIds = StepEntityIdCollector.collectFaceBoundLoopIds(resolved.values());
 
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepOpenShell) {
@@ -1082,62 +1082,6 @@ public final class StepDumpApp {
                 + ", unsupportedFaces=" + unsupportedFaces);
         appendUnsupportedReasons(lines, unsupportedReasons);
         appendUnsupportedReasonCodes(lines, unsupportedReasonCodes);
-    }
-
-    private static Set<Integer> collectShellFaceIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepOpenShell) {
-                StepOpenShell openShell = (StepOpenShell) entity;
-                openShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepSurfacedOpenShell) {
-                StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-                surfacedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedOpenShell) {
-                StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-                orientedOpenShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepClosedShell) {
-                StepClosedShell closedShell = (StepClosedShell) entity;
-                closedShell.faces().forEach(face -> ids.add(face.id()));
-            } else if (entity instanceof StepOrientedClosedShell) {
-                StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-                orientedClosedShell.faces().forEach(face -> ids.add(face.id()));
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectLoopOrientedEdgeIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof com.minicad.step.model.StepEdgeLoop) {
-                com.minicad.step.model.StepEdgeLoop edgeLoop = (com.minicad.step.model.StepEdgeLoop) entity;
-                edgeLoop.edges().forEach(edge -> ids.add(edge.id()));
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectOrientedEdgeElementIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepOrientedEdge) {
-                StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
-                ids.add(orientedEdge.edgeElement().id());
-            }
-        }
-        return ids;
-    }
-
-    private static Set<Integer> collectFaceBoundLoopIds(Iterable<StepEntity> entities) {
-        Set<Integer> ids = new HashSet<>();
-        for (StepEntity entity : entities) {
-            if (entity instanceof StepFaceBound) {
-                StepFaceBound faceBound = (StepFaceBound) entity;
-                ids.add(faceBound.loop().id());
-            }
-        }
-        return ids;
     }
 
     private static void validatePolyLoop(StepPolyLoop polyLoop, StepCadBuilder builder) {
@@ -3088,119 +3032,14 @@ public final class StepDumpApp {
                 .collect(Collectors.joining("|"));
     }
 
+    // Delegate to StepReasonCodeClassifier - extracted utility class
     private static String normalizeReason(String message) {
-        if (message == null || message.isBlank()) {
-            return "unknown";
-        }
-        return message.replace(System.lineSeparator(), " ").trim();
+        return StepReasonCodeClassifier.normalizeReason(message);
     }
 
+    // Delegate to StepReasonCodeClassifier - extracted utility class
     private static String classifyReasonCode(Exception ex, String reason) {
-        if (reason.contains("construction for CYLINDRICAL_SURFACE is unsupported")) {
-            return "unsupported_surface.cylindrical";
-        }
-        if (reason.contains("construction for CONICAL_SURFACE is unsupported")) {
-            return "unsupported_surface.conical";
-        }
-        if (reason.contains("construction for TOROIDAL_SURFACE is unsupported")) {
-            return "unsupported_surface.toroidal";
-        }
-        if (reason.contains("construction for DEGENERATE_TOROIDAL_SURFACE is unsupported")) {
-            return "unsupported_surface.degenerate_toroidal";
-        }
-        if (reason.contains("construction for B_SPLINE_SURFACE_WITH_KNOTS is unsupported")) {
-            return "unsupported_surface.bspline";
-        }
-        if (reason.contains("construction for RATIONAL_B_SPLINE_SURFACE is unsupported")) {
-            return "unsupported_surface.rational_bspline";
-        }
-        if (reason.contains("construction for RECTANGULAR_TRIMMED_SURFACE is unsupported")) {
-            return "unsupported_surface.rectangular_trimmed";
-        }
-        if (reason.contains("construction for CURVE_BOUNDED_SURFACE is unsupported")) {
-            return "unsupported_surface.curve_bounded";
-        }
-        if (reason.contains("construction for ORIENTED_SURFACE is unsupported")) {
-            return "unsupported_surface.oriented";
-        }
-        if (reason.contains("SURFACE_REPLICA zero scale is unsupported")) {
-            return "unsupported_surface.replica_zero_scale";
-        }
-        if (reason.contains("SURFACE_REPLICA non-uniform scale is unsupported")) {
-            return "unsupported_surface.replica_non_uniform_scale";
-        }
-        if (reason.contains("construction for SURFACE_REPLICA zero scale is unsupported")) {
-            return "unsupported_surface.replica_zero_scale";
-        }
-        if (reason.contains("construction for SURFACE_REPLICA non-uniform scale is unsupported")) {
-            return "unsupported_surface.replica_non_uniform_scale";
-        }
-        if (reason.contains("construction for SURFACE_REPLICA")) {
-            return "unsupported_surface.replica";
-        }
-        if (reason.contains("RATIONAL_B_SPLINE_CURVE is unsupported")) {
-            return "unsupported_curve.rational_bspline";
-        }
-        if (reason.contains("for CURVE_REPLICA is unsupported")) {
-            return "unsupported_curve.replica";
-        }
-        if (reason.contains("OFFSET_CURVE_2D is unsupported")) {
-            return "unsupported_curve.offset_2d";
-        }
-        if (reason.contains("ORIENTED_CURVE is unsupported")) {
-            return "unsupported_curve.oriented";
-        }
-        if (reason.contains("for PARABOLA is unsupported")
-                || reason.contains("for HYPERBOLA is unsupported")
-                || reason.contains("for DEGENERATE_CONIC is unsupported")) {
-            return "unsupported_curve.conic";
-        }
-        if (reason.contains("construction for SURFACE_OF_LINEAR_EXTRUSION is unsupported")) {
-            return "unsupported_surface.linear_extrusion";
-        }
-        if (reason.contains("construction for SURFACE_OF_REVOLUTION is unsupported")) {
-            return "unsupported_surface.revolution";
-        }
-        if (reason.contains("construction for SPHERICAL_SURFACE is unsupported")) {
-            return "unsupported_surface.spherical";
-        }
-        if (reason.contains("BOOLEAN_RESULT construction is unsupported")) {
-            return "unsupported_boolean.result";
-        }
-        if (reason.contains("BOOLEAN_CLIPPING_RESULT construction is unsupported")) {
-            return "unsupported_boolean.clipping_result";
-        }
-        if (reason.contains("FACE_BOUND construction for POLY_LOOP is unsupported")) {
-            return "unsupported_loop.poly";
-        }
-        if (reason.contains("must lie on edge curve")) {
-            return "topology.edge_vertex_off_curve";
-        }
-        if (reason.contains("edge loop must be connected and closed")) {
-            return "topology.edge_loop_not_closed";
-        }
-        if (reason.contains("all face vertices must lie on the plane")) {
-            return "topology.face_vertex_off_plane";
-        }
-        if (reason.contains("face must contain an outer bound")) {
-            return "topology.face_missing_outer_bound";
-        }
-        if (reason.contains("requires PLANE geometry")) {
-            return "unsupported_surface.non_planar_for_builder";
-        }
-        if (ex instanceof UnsupportedGeometryException) {
-            return "unsupported_geometry.other";
-        }
-        if (ex instanceof TopologyException) {
-            return "topology.other";
-        }
-        if (ex instanceof StepResolutionException) {
-            return "resolution.other";
-        }
-        if (ex instanceof GeometryException) {
-            return "geometry.other";
-        }
-        return "unknown";
+        return StepReasonCodeClassifier.classifyReasonCode(ex, reason);
     }
 
     private static final class FaceBuildCounts {

@@ -6,6 +6,7 @@ import com.minicad.common.StepResolutionException;
 import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.export.json.StepValidationHelper;
 import com.minicad.geometry.*;
 import com.minicad.helper.MathUtilityHelper;
 import com.minicad.preview.mapper.PreviewUvCoords;
@@ -1422,98 +1423,11 @@ public final class PreviewFaceBuilder {
     }
 
     public static boolean isSampledCurveSource(StepEntity item) {
-        return item instanceof StepLine
-                || item instanceof StepCircle
-                || item instanceof StepEllipse
-                || item instanceof StepConicCurve
-                || item instanceof StepBezierCurve
-                || item instanceof StepUniformCurve
-                || item instanceof StepQuasiUniformCurve
-                || item instanceof StepPiecewiseBezierCurve
-                || item instanceof StepBSplineCurveWithKnots
-                || item instanceof StepBSplineCurve
-                || item instanceof com.minicad.step.model.StepRationalBSplineCurve
-                || item instanceof StepSurfaceCurve
-                || item instanceof StepSeamCurve
-                || item instanceof StepTrimmedCurve
-                || item instanceof StepPolyline
-                || item instanceof com.minicad.step.model.StepCompositeCurve
-                || item instanceof com.minicad.step.model.StepCompositeCurveOnSurface
-                || item instanceof StepCompositeCurveOnSurface3D
-                || item instanceof StepOffsetCurve2D
-                || item instanceof StepOffsetCurve3D
-                || item instanceof StepPcurve
-                || item instanceof StepDegeneratePcurve
-                || item instanceof StepOrientedCurve
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepClothoid
-                || item instanceof StepIndexedPolyCurve
-                || item instanceof StepDegenerateCurve
-                || item instanceof StepBSplineCurveWithKnotsAndBreakpoints
-                || item instanceof StepLineSegment
-                || item instanceof StepEdgeCurve
-                || item instanceof StepSurfacedEdgeCurve
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepCurve
-                || item instanceof StepBoundedCurve
-                || item instanceof StepCircle2D
-                || item instanceof StepEllipse2D
-                || item instanceof StepPolyline2D
-                || item instanceof StepTrimmedCurve2D
-                || item instanceof StepCompositeCurve2D
-                || item instanceof StepBezierCurve2D
-                || item instanceof StepQuasiUniformCurve2D
-                || item instanceof StepUniformCurve2D
-                || item instanceof StepPiecewiseBezierCurve2D
-                || item instanceof StepIndexedPolyCurve2D
-                || item instanceof StepDegenerateCurve2D
-                || item instanceof StepBSplineCurve2D
-                || item instanceof StepRationalBSplineCurve2D
-                || item instanceof StepLine2D
-                || item instanceof StepCurve2D
-                || item instanceof StepHyperbola2D
-                || item instanceof StepParabola2D
-|| (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()));
+        return StepValidationHelper.isSampledCurveSource(item);
     }
 
     public static boolean isStandaloneEdgeSource(StepEntity item) {
-        return item instanceof StepPolyline
-                || item instanceof StepGeometricCurveSet
-                || item instanceof StepGeometricSet
-                || item instanceof StepShellBasedWireframeModel
-                || item instanceof StepEdgeBasedWireframeModel
-                || item instanceof StepConnectedEdgeSet
-                || item instanceof StepEdgeWire
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepWireShell
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepAnnotationFillArea
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepFilletEdge
-                || item instanceof StepChamferEdge
-                || item instanceof StepSubedge
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepGeometricSurfaceSet;
+        return StepValidationHelper.isStandaloneEdgeSource(item);
     }
 
     public static StepEntity unwrapStyledItem(StepEntity item) {
@@ -1534,47 +1448,15 @@ public final class PreviewFaceBuilder {
     }
 
     public static boolean isRepresentationSolidItem(StepEntity entity) {
-        return entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepFacettedBrep
-                || entity instanceof StepNonManifoldSolidBrep
-                || entity instanceof StepAdvancedBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepExtrudedAreaSolidTapered
-                || entity instanceof StepRevolvedAreaSolidTapered
-                || entity instanceof StepSurfaceCurveSweptAreaSolid
-                || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepComplexClippingResult
-                || entity instanceof StepHalfSpaceSolid
-                || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepMappedItem
-                || entity instanceof StepSolidModel
-                || entity instanceof StepSurfacePatch;
+        return StepValidationHelper.isRepresentationSolidItem(entity);
     }
 
     public static ColorPayload toColorPayload(int[] rgb) {
-        if (rgb == null) {
-            return null;
-        }
-        return new ColorPayload(rgb[0], rgb[1], rgb[2]);
+        return PayloadConversionHelper.toColorPayload(rgb);
     }
 
     public static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
-        if (metadata == null) {
-            return null;
-        }
-        return new PbrPayload(metadata.diffuse(), metadata.specular(), metadata.specularExponent(), metadata.specularColor());
+        return PayloadConversionHelper.toPbrPayload(metadata);
     }
 
     public static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {

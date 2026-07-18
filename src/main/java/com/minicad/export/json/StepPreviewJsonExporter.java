@@ -1480,116 +1480,19 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean isStandaloneEdgeSource(StepEntity item) {
-        return item instanceof StepPolyline
-                || item instanceof StepGeometricCurveSet
-                || item instanceof StepGeometricSet
-                || item instanceof StepShellBasedWireframeModel
-                || item instanceof StepEdgeBasedWireframeModel
-                || item instanceof StepConnectedEdgeSet
-                || item instanceof StepEdgeWire
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepWireShell
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepAnnotationFillArea
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepFilletEdge
-                || item instanceof StepChamferEdge
-                || item instanceof StepSubedge
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepGeometricSurfaceSet;
+        return StepValidationHelper.isStandaloneEdgeSource(item);
     }
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean isSampledCurveSource(StepEntity item) {
-        return item instanceof StepLine
-                || item instanceof StepCircle
-                || item instanceof StepEllipse
-                || item instanceof StepConicCurve
-                || item instanceof StepBezierCurve
-                || item instanceof StepUniformCurve
-                || item instanceof StepQuasiUniformCurve
-                || item instanceof StepPiecewiseBezierCurve
-                || item instanceof StepBSplineCurveWithKnots
-                || item instanceof StepBSplineCurve
-                || item instanceof com.minicad.step.model.StepRationalBSplineCurve
-                || item instanceof StepSurfaceCurve
-                || item instanceof StepSeamCurve
-                || item instanceof StepTrimmedCurve
-                || item instanceof StepPolyline
-                || item instanceof com.minicad.step.model.StepCompositeCurve
-                || item instanceof com.minicad.step.model.StepCompositeCurveOnSurface
-                || item instanceof StepCompositeCurveOnSurface3D
-                || item instanceof StepOffsetCurve2D
-                || item instanceof StepOffsetCurve3D
-                || item instanceof StepPcurve
-                || item instanceof StepDegeneratePcurve
-                || item instanceof StepOrientedCurve
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepClothoid
-                || item instanceof StepIndexedPolyCurve
-                || item instanceof StepDegenerateCurve
-                || item instanceof StepBSplineCurveWithKnotsAndBreakpoints
-                || item instanceof StepLineSegment
-                || item instanceof StepEdgeCurve
-                || item instanceof StepSurfacedEdgeCurve
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepCurve
-                || item instanceof StepBoundedCurve
-                || item instanceof StepCircle2D
-                || item instanceof StepEllipse2D
-                || item instanceof StepPolyline2D
-                || item instanceof StepTrimmedCurve2D
-                || item instanceof StepCompositeCurve2D
-                || item instanceof StepBezierCurve2D
-                || item instanceof StepQuasiUniformCurve2D
-                || item instanceof StepUniformCurve2D
-                || item instanceof StepPiecewiseBezierCurve2D
-                || item instanceof StepIndexedPolyCurve2D
-                || item instanceof StepDegenerateCurve2D
-                || item instanceof StepBSplineCurve2D
-                || item instanceof StepRationalBSplineCurve2D
-                || item instanceof StepLine2D
-                || item instanceof StepCurve2D
-                || item instanceof StepHyperbola2D
-                || item instanceof StepParabola2D
-                || (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()));
+        return StepValidationHelper.isSampledCurveSource(item);
     }
 
+    // Delegate to StepEntityUnwrapper - extracted utility class
     private static StepEntity unwrapStyledItem(StepEntity item) {
-        StepEntity current = item;
-        while (true) {
-            if (current instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            if (current instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            return current;
-        }
+        return StepEntityUnwrapper.unwrapStyledItem(item);
     }
 
     private static void collectMappedAnnotationEdges(
@@ -1702,50 +1605,18 @@ public final class StepPreviewJsonExporter {
         return false;
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForMappedPlacement(
             StepEntity mappedOrigin,
             StepEntity mappingTarget,
             StepCadBuilder builder
     ) {
-        double[] sourceMatrix = matrixForPlacementEntity(mappedOrigin, builder);
-        double[] targetMatrix = matrixForPlacementEntity(mappingTarget, builder);
-        if (sourceMatrix == null || targetMatrix == null) {
-            return null;
-        }
-        return StepAssemblyGraphBuilder.multiplyMatrices(
-                targetMatrix,
-                StepAssemblyGraphBuilder.inverseRigidTransform(sourceMatrix)
-        );
+        return StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        if (placement instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
-        }
-        if (placement instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
-            CartesianPoint origin = pointFromPlacement(placement2D);
-            if (origin == null) {
-                return null;
-            }
-            Vector3 x;
-            if (placement2D.refDirection() == null) {
-                x = new Vector3(1.0, 0.0, 0.0);
-            } else {
-                List<Double> ratios = placement2D.refDirection().directionRatios();
-                x = new Vector3(ratios.get(0), ratios.get(1), 0.0).normalize().asVector();
-            }
-            Vector3 z = new Vector3(0.0, 0.0, 1.0);
-            Vector3 y = z.cross(x).normalize().asVector();
-            return new double[]{
-                    x.x(), y.x(), z.x(), origin.x(),
-                    x.y(), y.y(), z.y(), origin.y(),
-                    x.z(), y.z(), z.z(), origin.z(),
-                    0.0, 0.0, 0.0, 1.0
-            };
-        }
-        return null;
+        return StepPlacementTransformer.matrixForPlacementEntity(placement, builder);
     }
 
     public static PreviewFaceResult buildPreviewFaceResult(
@@ -4236,24 +4107,9 @@ public final class StepPreviewJsonExporter {
         }
     }
 
+    // Delegate to StepSummaryBuilder - extracted utility class
     private static String associatedGeometrySummary(StepEntity edgeGeometry) {
-        StepEntity unwrapped = unwrapAssociatedCurveGeometry(edgeGeometry);
-        List<StepEntity> associated;
-        if (unwrapped instanceof StepSurfaceCurve) {
-            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) unwrapped;
-            associated = surfaceCurve.associatedGeometry();
-        } else if (unwrapped instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) unwrapped;
-            associated = seamCurve.associatedGeometry();
-        } else {
-            associated = List.of();
-        }
-        if (associated.isEmpty()) {
-            return "[]";
-        }
-        return associated.stream()
-                .map(entity -> surfaceTypeName(entity) + "#" + entity.id())
-                .collect(Collectors.joining("|"));
+        return StepSummaryBuilder.associatedGeometrySummary(edgeGeometry);
     }
 
     private static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
@@ -4818,56 +4674,16 @@ public final class StepPreviewJsonExporter {
         return left.distanceTo(right) <= 1.0e-6;
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
+    // Delegate to StepGeometryHelper - extracted utility class
     private static List<CartesianPoint> reversed(List<CartesianPoint> points) {
-        List<CartesianPoint> copy = new ArrayList<>(points);
-        java.util.Collections.reverse(copy);
-        return List.copyOf(copy);
+        return StepGeometryHelper.reversed(points);
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
-        if (points.size() < 2) {
-            return List.of(points.get(0));
-        }
-        List<Double> lengths = new ArrayList<>(points.size());
-        lengths.add(0.0);
-        for (int i = 1; i < points.size(); i++) {
-            lengths.add(lengths.get(i - 1) + points.get(i - 1).distanceTo(points.get(i)));
-        }
-        double total = lengths.get(lengths.size() - 1);
-        if (total <= Epsilon.EPS) {
-            return java.util.Collections.nCopies(segments + 1, points.get(0));
-        }
-        List<CartesianPoint> result = new ArrayList<>(segments + 1);
-        for (int i = 0; i <= segments; i++) {
-            double target = total * i / segments;
-            result.add(pointAtDistance(points, lengths, target));
-        }
-        result.set(0, points.get(0));
-        result.set(result.size() - 1, points.get(points.size() - 1));
-        return List.copyOf(result);
+        return StepGeometryHelper.resamplePolyline(points, segments);
     }
-
-    private static CartesianPoint pointAtDistance(List<CartesianPoint> points, List<Double> lengths, double target) {
-        for (int i = 1; i < lengths.size(); i++) {
-            if (target <= lengths.get(i)) {
-                double start = lengths.get(i - 1);
-                double segment = lengths.get(i) - start;
-                double alpha = segment <= Epsilon.EPS ? 0.0 : (target - start) / segment;
-                return interpolate(points.get(i - 1), points.get(i), alpha);
-            }
-        }
-        return points.get(points.size() - 1);
-    }
-
-    private static CartesianPoint interpolate(CartesianPoint a, CartesianPoint b, double alpha) {
-        return new CartesianPoint(
-                a.x() * (1.0 - alpha) + b.x() * alpha,
-                a.y() * (1.0 - alpha) + b.y() * alpha,
-                a.z() * (1.0 - alpha) + b.z() * alpha
-        );
-    }
-
-    
 
     private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
@@ -4878,305 +4694,14 @@ public final class StepPreviewJsonExporter {
         return bounds;
     }
 
+    // Delegate to StepGeometryHelper - extracted utility class
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.faceGeometry();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.faceGeometry();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            return faceGeometry(orientedFace.faceElement());
-        }
-        return null;
+        return StepGeometryHelper.faceGeometry(stepFace);
     }
 
+    // Delegate to StepTypeNameResolver - extracted utility class
     public static String surfaceTypeName(StepEntity geometry) {
-        if (geometry instanceof StepLine) {
-            return "LINE";
-        }
-        if (geometry instanceof StepCircle) {
-            return "CIRCLE";
-        }
-        if (geometry instanceof StepEllipse) {
-            return "ELLIPSE";
-        }
-        if (geometry instanceof StepPolyline) {
-            return "POLYLINE";
-        }
-        if (geometry instanceof StepBSplineCurve) {
-            return "B_SPLINE_CURVE";
-        }
-        if (geometry instanceof StepBSplineCurveWithKnots) {
-            return "B_SPLINE_CURVE_WITH_KNOTS";
-        }
-        if (geometry instanceof StepBezierCurve) {
-            return "BEZIER_CURVE";
-        }
-        if (geometry instanceof StepUniformCurve) {
-            return "UNIFORM_CURVE";
-        }
-        if (geometry instanceof StepQuasiUniformCurve) {
-            return "QUASI_UNIFORM_CURVE";
-        }
-        if (geometry instanceof StepPiecewiseBezierCurve) {
-            return "PIECEWISE_BEZIER_CURVE";
-        }
-        if (geometry instanceof StepRationalBSplineCurve) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (geometry instanceof StepOffsetCurve2D) {
-            return "OFFSET_CURVE_2D";
-        }
-        if (geometry instanceof StepOffsetCurve3D) {
-            return "OFFSET_CURVE_3D";
-        }
-        if (geometry instanceof StepTrimmedCurve) {
-            return "TRIMMED_CURVE";
-        }
-        if (geometry instanceof StepSurfaceCurve) {
-            return "SURFACE_CURVE";
-        }
-        if (geometry instanceof StepSeamCurve) {
-            return "SEAM_CURVE";
-        }
-        if (geometry instanceof StepPcurve) {
-            return "PCURVE";
-        }
-        if (geometry instanceof StepCompositeCurve) {
-            return "COMPOSITE_CURVE";
-        }
-        if (geometry instanceof StepCompositeCurveOnSurface) {
-            return "COMPOSITE_CURVE_ON_SURFACE";
-        }
-        if (geometry instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) geometry;
-            return conic.entityName();
-        }
-        if (geometry instanceof StepOrientedCurve) {
-            return "ORIENTED_CURVE";
-        }
-        if (geometry instanceof StepPath) {
-            return "PATH";
-        }
-        if (geometry instanceof StepOpenPath) {
-            return "OPEN_PATH";
-        }
-        if (geometry instanceof StepSubpath) {
-            return "SUBPATH";
-        }
-        if (geometry instanceof StepOrientedPath) {
-            return "ORIENTED_PATH";
-        }
-        if (geometry instanceof StepVertex) {
-            return "VERTEX";
-        }
-        if (geometry instanceof StepVertexPoint) {
-            return "VERTEX_POINT";
-        }
-        if (geometry instanceof StepEdgeCurve) {
-            return "EDGE_CURVE";
-        }
-        if (geometry instanceof StepSubedge) {
-            return "SUBEDGE";
-        }
-        if (geometry instanceof StepEdge) {
-            return "EDGE";
-        }
-        if (geometry instanceof StepLoop) {
-            return "LOOP";
-        }
-        if (geometry instanceof StepPolyLoop) {
-            return "POLY_LOOP";
-        }
-        if (geometry instanceof StepEdgeLoop) {
-            return "EDGE_LOOP";
-        }
-        if (geometry instanceof StepVertexLoop) {
-            return "VERTEX_LOOP";
-        }
-        if (geometry instanceof StepFaceBound) {
-            StepFaceBound faceBound = (StepFaceBound) geometry;
-            return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
-        }
-        if (geometry instanceof StepOrientedEdge) {
-            return "ORIENTED_EDGE";
-        }
-        if (geometry instanceof StepOrientedFace) {
-            return "ORIENTED_FACE";
-        }
-        if (geometry instanceof StepConnectedEdgeSet) {
-            return "CONNECTED_EDGE_SET";
-        }
-        if (geometry instanceof StepConnectedFaceSubSet) {
-            return "CONNECTED_FACE_SUB_SET";
-        }
-        if (geometry instanceof StepConnectedFaceSet) {
-            return "CONNECTED_FACE_SET";
-        }
-        if (geometry instanceof StepOpenShell) {
-            return "OPEN_SHELL";
-        }
-        if (geometry instanceof StepSurfacedOpenShell) {
-            return "SURFACED_OPEN_SHELL";
-        }
-        if (geometry instanceof StepOrientedOpenShell) {
-            return "ORIENTED_OPEN_SHELL";
-        }
-        if (geometry instanceof StepClosedShell) {
-            return "CLOSED_SHELL";
-        }
-        if (geometry instanceof StepOrientedClosedShell) {
-            return "ORIENTED_CLOSED_SHELL";
-        }
-        if (geometry instanceof StepWireShell) {
-            return "WIRE_SHELL";
-        }
-        if (geometry instanceof StepVertexShell) {
-            return "VERTEX_SHELL";
-        }
-        if (geometry instanceof StepShellBasedSurfaceModel) {
-            return "SHELL_BASED_SURFACE_MODEL";
-        }
-        if (geometry instanceof StepFaceBasedSurfaceModel) {
-            return "FACE_BASED_SURFACE_MODEL";
-        }
-        if (geometry instanceof StepEdgeBasedWireframeModel) {
-            return "EDGE_BASED_WIREFRAME_MODEL";
-        }
-        if (geometry instanceof StepShellBasedWireframeModel) {
-            return "SHELL_BASED_WIREFRAME_MODEL";
-        }
-        if (geometry instanceof StepGeometricCurveSet) {
-            return "GEOMETRIC_CURVE_SET";
-        }
-        if (geometry instanceof StepGeometricSet) {
-            return "GEOMETRIC_SET";
-        }
-        if (geometry instanceof StepRepresentation) {
-            return "REPRESENTATION";
-        }
-        if (geometry instanceof StepRepresentationMap) {
-            return "REPRESENTATION_MAP";
-        }
-        if (geometry instanceof StepRepresentationRelationshipWithTransformation) {
-            return "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION";
-        }
-        if (geometry instanceof StepRepresentationRelationship) {
-            return "REPRESENTATION_RELATIONSHIP";
-        }
-        if (geometry instanceof StepMappedItem) {
-            return "MAPPED_ITEM";
-        }
-        if (geometry instanceof StepStyledItem) {
-            return "STYLED_ITEM";
-        }
-        if (geometry instanceof StepOverRidingStyledItem) {
-            return "OVER_RIDING_STYLED_ITEM";
-        }
-        if (geometry instanceof StepSurface) {
-            return "SURFACE";
-        }
-        if (geometry instanceof StepBoundedSurface) {
-            return "BOUNDED_SURFACE";
-        }
-        if (geometry instanceof StepBSplineSurface) {
-            return "B_SPLINE_SURFACE";
-        }
-        if (geometry instanceof StepBezierSurface) {
-            return "BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepUniformSurface) {
-            return "UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            return "QUASI_UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            return "PIECEWISE_BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepPlane) {
-            return "PLANE";
-        }
-        if (geometry instanceof StepCylindricalSurface) {
-            return "CYLINDRICAL_SURFACE";
-        }
-        if (geometry instanceof StepConicalSurface) {
-            return "CONICAL_SURFACE";
-        }
-        if (geometry instanceof StepToroidalSurface) {
-            return "TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepSphericalSurface) {
-            return "SPHERICAL_SURFACE";
-        }
-        if (geometry instanceof StepDegenerateToroidalSurface) {
-            return "DEGENERATE_TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
-            return "SURFACE_OF_LINEAR_EXTRUSION";
-        }
-        if (geometry instanceof StepSurfaceOfRevolution) {
-            return "SURFACE_OF_REVOLUTION";
-        }
-        if (geometry instanceof StepRationalBSplineSurface) {
-            return "RATIONAL_B_SPLINE_SURFACE";
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            return "B_SPLINE_SURFACE_WITH_KNOTS";
-        }
-        if (geometry instanceof StepRectangularTrimmedSurface) {
-            return "RECTANGULAR_TRIMMED_SURFACE";
-        }
-        if (geometry instanceof StepCurveBoundedSurface) {
-            return "CURVE_BOUNDED_SURFACE";
-        }
-        if (geometry instanceof StepOrientedSurface) {
-            return "ORIENTED_SURFACE";
-        }
-        if (geometry instanceof StepOffsetSurface) {
-            return "OFFSET_SURFACE";
-        }
-        if (geometry instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) geometry;
-            return sweptAreaSolid.entityName();
-        }
-        if (geometry instanceof StepSolidReplica) {
-            return "SOLID_REPLICA";
-        }
-        if (geometry instanceof StepManifoldSolidBrep) {
-            return "MANIFOLD_SOLID_BREP";
-        }
-        if (geometry instanceof StepBrepWithVoids) {
-            return "BREP_WITH_VOIDS";
-        }
-        if (geometry instanceof StepCsgSolid) {
-            return "CSG_SOLID";
-        }
-        if (geometry instanceof StepCsgPrimitive) {
-            StepCsgPrimitive primitive = (StepCsgPrimitive) geometry;
-            return primitive.entityName();
-        }
-        if (geometry instanceof StepBooleanClippingResult) {
-            return "BOOLEAN_CLIPPING_RESULT";
-        }
-        if (geometry instanceof StepBooleanResult) {
-            return "BOOLEAN_RESULT";
-        }
-        if (geometry instanceof StepSweptDiskSolid) {
-            return "SWEPT_DISK_SOLID";
-        }
-        if (geometry instanceof StepComplexClippingResult) {
-            return "COMPLEX_CLIPPING_RESULT";
-        }
-        if (geometry instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            return replica.entityName();
-        }
-        return geometry.getClass().getSimpleName();
+        return StepTypeNameResolver.surfaceTypeName(geometry);
     }
 
     private static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
@@ -5260,46 +4785,14 @@ public final class StepPreviewJsonExporter {
     }
 
 
+    // Delegate to StepValidationHelper - extracted utility class
     private static boolean faceSameSense(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.sameSense();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.sameSense();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            boolean base = faceSameSense(orientedFace.faceElement());
-            return orientedFace.orientation() ? base : !base;
-        }
-        return true;
+        return StepValidationHelper.faceSameSense(stepFace);
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static FacePayload reverseFacePayload(FacePayload base) {
-        List<PointPayload> reversedTriangles = new ArrayList<>(base.triangles().size());
-        for (int index = 0; index + 2 < base.triangles().size(); index += 3) {
-            reversedTriangles.add(base.triangles().get(index));
-            reversedTriangles.add(base.triangles().get(index + 2));
-            reversedTriangles.add(base.triangles().get(index + 1));
-        }
-        return new FacePayload(
-                base.stepId(),
-                base.name(),
-                base.surfaceType(),
-                base.origin(),
-                new VectorPayload(-base.normal().x(), -base.normal().y(), -base.normal().z()),
-                !base.sameSense(),
-                base.color(),
-                base.transparency(),
-                base.pbr(),
-                base.layers(),
-                base.loops(),
-                List.copyOf(reversedTriangles),
-                base.surface(),
-                base.uvLoops()
-        );
+        return StepPayloadBuilder.reverseFacePayload(base);
     }
 
     private static List<CartesianPoint> sampleLoop(FaceBound bound) {
@@ -5335,32 +4828,14 @@ public final class StepPreviewJsonExporter {
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static void collectTopologyEdges(Face face, Set<Edge> edges) {
-        for (FaceBound bound : face.bounds()) {
-            if (bound.loop() instanceof EdgeLoop) {
-                EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-                for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-                    edges.add(orientedEdge.edge());
-                }
-            }
-        }
+        StepPayloadBuilder.collectTopologyEdges(face, edges);
     }
 
+    // Delegate to StepPayloadBuilder - extracted utility class
     private static <T> List<T> reverseClosedLoop(List<T> points) {
-        if (points.size() < 2) {
-            return points;
-        }
-        List<T> reversed = new ArrayList<>(points);
-        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.remove(reversed.size() - 1);
-            java.util.Collections.reverse(reversed);
-            reversed.add(reversed.get(0));
-            reversed.set(0, start);
-            reversed.set(reversed.size() - 1, start);
-            return reversed;
-        }
-        java.util.Collections.reverse(reversed);
-        return reversed;
+        return StepPayloadBuilder.reverseClosedLoop(points);
     }
 
     public static List<CartesianPoint> sampleOrientedEdge(OrientedEdge orientedEdge) {
@@ -6798,62 +6273,24 @@ public final class StepPreviewJsonExporter {
 
 
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeGeometry(BoundsAccumulator bounds, GeometryCollection geometry) {
-        for (FacePayload face : geometry.faces()) {
-            for (LoopPayload loop : face.loops()) {
-                for (PointPayload point : loop.points()) {
-                    bounds.include(point);
-                }
-            }
-        }
-        for (EdgePayload edge : geometry.edges()) {
-            for (PointPayload point : edge.points()) {
-                bounds.include(point);
-            }
-        }
+        StepBoundsAccumulator.includeGeometry(bounds, geometry);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeAssembly(BoundsAccumulator bounds, AssemblyData assembly) {
-        Map<Integer, RepresentationPayload> byId = assembly.representations().stream()
-                .collect(Collectors.toMap(RepresentationPayload::id, representation -> representation, (left, right) -> left, LinkedHashMap::new));
-        for (InstancePayload instance : assembly.instances()) {
-            for (Integer representationId : instance.representationIds()) {
-                RepresentationPayload representation = byId.get(representationId);
-                if (representation == null) {
-                    continue;
-                }
-                for (FacePayload face : representation.faces()) {
-                    for (LoopPayload loop : face.loops()) {
-                        for (PointPayload point : loop.points()) {
-                            bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
-                        }
-                    }
-                }
-                for (EdgePayload edge : representation.edges()) {
-                    for (PointPayload point : edge.points()) {
-                        bounds.include(MathUtilityHelper.transform(point, instance.worldMatrix()));
-                    }
-                }
-            }
-        }
+        StepBoundsAccumulator.includeAssembly(bounds, assembly);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeBounds(BoundsAccumulator target, BoundsPayload bounds) {
-        target.include(bounds.min());
-        target.include(bounds.max());
+        StepBoundsAccumulator.includeBounds(target, bounds);
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static BoundsAccumulator copyBounds(BoundsAccumulator source) {
-        BoundsAccumulator copy = new BoundsAccumulator();
-        if (!source.isEmpty()) {
-            copy.minX = source.minX;
-            copy.minY = source.minY;
-            copy.minZ = source.minZ;
-            copy.maxX = source.maxX;
-            copy.maxY = source.maxY;
-            copy.maxZ = source.maxZ;
-        }
-        return copy;
+        return StepBoundsAccumulator.copyBounds(source);
     }
 
     private static ValidationPayload buildValidationPayload(
@@ -6937,84 +6374,35 @@ public final class StepPreviewJsonExporter {
         );
     }
 
+    // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeRepresentationBounds(
             BoundsAccumulator bounds,
             RepresentationPayload representation,
             double[] matrix
     ) {
-        for (FacePayload face : representation.faces()) {
-            for (LoopPayload loop : face.loops()) {
-                for (PointPayload point : loop.points()) {
-                    bounds.include(MathUtilityHelper.transform(point, matrix));
-                }
-            }
-        }
-        for (EdgePayload edge : representation.edges()) {
-            for (PointPayload point : edge.points()) {
-                bounds.include(MathUtilityHelper.transform(point, matrix));
-            }
-        }
+        StepBoundsAccumulator.includeRepresentationBounds(bounds, representation, matrix);
     }
 
 
+    // Delegate to StepMappedItemTransformer - extracted utility class
     public static double[] mappedItemMatrix(StepMappedItem mappedItem, StepCadBuilder builder) {
-        StepRepresentationMap mappingSource = mappedItem.mappingSource();
-        if (!(mappingSource.mappedOrigin() instanceof com.minicad.step.model.StepAxis2Placement3D)) {
-            return null;
-        }
-        com.minicad.step.model.StepAxis2Placement3D originPlacement = (com.minicad.step.model.StepAxis2Placement3D) mappingSource.mappedOrigin();
-        double[] sourceMatrix = StepAssemblyGraphBuilder.matrixForPlacement(originPlacement);
-        double[] targetMatrix;
-        if (mappedItem.mappingTarget() instanceof com.minicad.step.model.StepCartesianTransformationOperator) {
-            com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) mappedItem.mappingTarget();
-            targetMatrix = matrixForTransformationOperator(transformation, builder);
-        } else if (mappedItem.mappingTarget() instanceof com.minicad.step.model.StepAxis2Placement3D) {
-            com.minicad.step.model.StepAxis2Placement3D targetPlacement = (com.minicad.step.model.StepAxis2Placement3D) mappedItem.mappingTarget();
-            targetMatrix = StepAssemblyGraphBuilder.matrixForPlacement(targetPlacement);
-        } else {
-            return null;
-        }
-        return StepAssemblyGraphBuilder.multiplyMatrices(
-                targetMatrix,
-                StepAssemblyGraphBuilder.inverseRigidTransform(sourceMatrix)
-        );
+        return StepMappedItemTransformer.mappedItemMatrix(mappedItem, builder);
     }
 
+    // Delegate to StepPlacementTransformer - extracted utility class
     public static double[] matrixForTransformationOperator(
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 axis1 = transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-        Vector3 axis2;
-        if (transformation.axis2() != null) {
-            axis2 = builder.buildDirection(transformation.axis2().id()).asVector();
-        } else {
-            Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-            axis2 = axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-        }
-        Vector3 axis3;
-        if (transformation.axis3() != null) {
-            axis3 = builder.buildDirection(transformation.axis3().id()).asVector();
-        } else {
-            Vector3 cross = axis1.cross(axis2);
-            axis3 = cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
-        }
-        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
-        CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
-        return new double[]{
-                axis1.x() * scale, axis2.x() * scale, axis3.x() * scale, origin.x(),
-                axis1.y() * scale, axis2.y() * scale, axis3.y() * scale, origin.y(),
-                axis1.z() * scale, axis2.z() * scale, axis3.z() * scale, origin.z(),
-                0.0, 0.0, 0.0, 1.0
-        };
+        return StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
     }
 
+    // Delegate to StepMappedItemTransformer - extracted utility class
     public static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
-        return transformMappedEdge(edge, mappedItemId, matrix, null, null);
+        return StepMappedItemTransformer.transformMappedEdge(edge, mappedItemId, matrix);
     }
 
+    // Delegate to StepMappedItemTransformer - extracted utility class
     public static EdgePayload transformMappedEdge(
             EdgePayload edge,
             int mappedItemId,
@@ -7022,105 +6410,17 @@ public final class StepPreviewJsonExporter {
             String sourceType,
             Integer sourceStepId
     ) {
-        List<PointPayload> points = edge.points().stream()
-                .map(point -> MathUtilityHelper.transform(point, matrix))
-                .collect(Collectors.toList());
-        return new EdgePayload(
-                mappedPayloadId(mappedItemId, edge.stepId(), 1),
-                points,
-                transformMappedCurve(edge.curve(), matrix, sourceType, sourceStepId),
-                edge.color()
-        );
+        return StepMappedItemTransformer.transformMappedEdge(edge, mappedItemId, matrix, sourceType, sourceStepId);
     }
 
-    private static EdgeCurvePayload transformMappedCurve(
-            EdgeCurvePayload curve,
-            double[] matrix,
-            String sourceType,
-            Integer sourceStepId
-    ) {
-        if (curve == null) {
-            return null;
-        }
-        List<Double> center = curve.center() == null
-                ? null
-                : PreviewSerializers.pointList(MathUtilityHelper.transform(new PointPayload(curve.center().get(0), curve.center().get(1), curve.center().get(2)), matrix));
-        List<Double> axis = curve.axis() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.axis().get(0), curve.axis().get(1), curve.axis().get(2)), matrix));
-        List<Double> xDirection = curve.xDirection() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.xDirection().get(0), curve.xDirection().get(1), curve.xDirection().get(2)), matrix));
-        List<Double> refDirection = curve.refDirection() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.refDirection().get(0), curve.refDirection().get(1), curve.refDirection().get(2)), matrix));
-        return new EdgeCurvePayload(
-                curve.stepId(),
-                curve.type(),
-                curve.basisType(),
-                curve.basisStepId(),
-                center,
-                axis,
-                xDirection,
-                curve.radius(),
-                curve.semiAxis1(),
-                curve.semiAxis2(),
-                curve.orientation(),
-                curve.senseAgreement(),
-                curve.offsetDistance(),
-                curve.selfIntersect(),
-                refDirection,
-                curve.transformScale(),
-                curve.masterRepresentation(),
-                curve.associatedSurfaceTypes(),
-                curve.associatedSurfaceStepIds(),
-                sourceType != null ? sourceType : curve.sourceType(),
-                sourceStepId != null ? sourceStepId : curve.sourceStepId(),
-                curve.startAngle(),
-                curve.sweepAngle()
-        );
-    }
-
+    // Delegate to StepMappedItemTransformer - extracted utility class
     public static FacePayload transformMappedFace(
             FacePayload face,
             int mappedItemId,
             double[] matrix,
             StepMetadataExtractor.DisplayMetadata metadata
     ) {
-        List<LoopPayload> loops = face.loops().stream()
-                .map(loop -> new LoopPayload(
-                        loop.outer(),
-                        loop.points().stream().map(point -> MathUtilityHelper.transform(point, matrix)).collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
-        List<PointPayload> triangles = face.triangles().stream()
-                .map(point -> MathUtilityHelper.transform(point, matrix))
-                .collect(Collectors.toList());
-        int[] rgb = metadata.rgb() != null ? metadata.rgb() : null;
-        ColorPayload color = rgb == null ? face.color() : PayloadConversionHelper.toColorPayload(rgb);
-        double transparency = metadata.transparency() > 0 ? metadata.transparency() : face.transparency();
-        PbrPayload pbr = metadata.pbr() != null ? PayloadConversionHelper.toPbrPayload(metadata.pbr()) : face.pbr();
-        List<String> layers = metadata.layers().isEmpty() ? face.layers() : metadata.layers();
-        return new FacePayload(
-                mappedPayloadId(mappedItemId, face.stepId(), 2),
-                face.name(),
-                face.surfaceType(),
-                MathUtilityHelper.transform(face.origin(), matrix),
-                MathUtilityHelper.transform(face.normal(), matrix),
-                face.sameSense(),
-                color,
-                transparency,
-                pbr,
-                layers,
-                loops,
-                triangles,
-                null,
-                List.of()
-        );
-    }
-
-    private static int mappedPayloadId(int mappedItemId, int sourceId, int salt) {
-        return -Math.abs(mappedItemId * 10_000 + sourceId * 10 + salt);
+        return StepMappedItemTransformer.transformMappedFace(face, mappedItemId, matrix, metadata);
     }
 
     private static List<PmiPayload> buildPmiPayloads(
@@ -12465,55 +11765,14 @@ public final class StepPreviewJsonExporter {
         }
     }
 
-    private static String camelToStepLike(String value) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
-            char current = value.charAt(i);
-            if (i > 0 && Character.isUpperCase(current)
-                    && (Character.isLowerCase(value.charAt(i - 1))
-                    || (i + 1 < value.length() && Character.isLowerCase(value.charAt(i + 1))))) {
-                builder.append('_');
-            } else if (i > 0 && Character.isDigit(current) && Character.isLetter(value.charAt(i - 1))) {
-                builder.append('_');
-            }
-            builder.append(Character.toUpperCase(current));
-        }
-        return builder.toString();
-    }
-
+    // Delegate to StepTypeNameResolver - extracted utility class
     public static String definitionTypeName(StepEntity definition) {
-        String entityName = tryEntityName(definition);
-        if (entityName != null) {
-            return entityName;
-        }
-        if (definition instanceof StepAxis1Placement) {
-            return "AXIS1_PLACEMENT";
-        }
-        if (definition instanceof StepAxis2Placement2D) {
-            return "AXIS2_PLACEMENT_2D";
-        }
-        if (definition instanceof StepAxis2Placement3D) {
-            return "AXIS2_PLACEMENT_3D";
-        }
-        return definition.getClass().getSimpleName().startsWith("Step")
-                ? camelToStepLike(definition.getClass().getSimpleName().substring(4))
-                : definition.getClass().getSimpleName();
+        return StepTypeNameResolver.definitionTypeName(definition);
     }
 
-    private static String tryEntityName(StepEntity definition) {
-        try {
-            Object value = definition.getClass().getMethod("entityName").invoke(definition);
-            if (value instanceof String) { String name = (String) value;
-                return name;
-            }
-        } catch (ReflectiveOperationException ignored) {
-            // Not every semantic record exposes entityName; fall back to explicit naming below.
-        }
-        return null;
-    }
-
+    // Delegate to StepTypeNameResolver - extracted utility class
     private static String relationshipTypeName(StepEntity relationship) {
-        return definitionTypeName(relationship);
+        return StepTypeNameResolver.relationshipTypeName(relationship);
     }
 
     private static void appendRelationshipSemanticTargets(
@@ -14669,11 +13928,9 @@ public final class StepPreviewJsonExporter {
         return Set.copyOf(targets);
     }
 
+    // Delegate to StepPointExtractor - extracted utility class
     public static CartesianPoint pointFromStep(StepCartesianPoint point) {
-        double x = point.coordinates().get(0);
-        double y = point.coordinates().size() > 1 ? point.coordinates().get(1) : 0.0;
-        double z = point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0;
-        return new CartesianPoint(x, y, z);
+        return StepPointExtractor.pointFromStep(point);
     }
 
 

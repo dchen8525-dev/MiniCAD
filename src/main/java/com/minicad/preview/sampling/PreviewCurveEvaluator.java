@@ -590,7 +590,7 @@ public final class PreviewCurveEvaluator {
     // ─── Conic curve sampling ────────────────────────────────────────────
 
     public static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
-        double[] matrix = matrixForPlacementEntity(curve.position(), builder);
+        double[] matrix = MatrixTransformHelper.matrixForPlacementEntity(curve.position(), builder);
         if (matrix == null) {
             return null;
         }
@@ -604,7 +604,7 @@ public final class PreviewCurveEvaluator {
         } else if (entityName.equals("HYPERBOLA")) {
             return sampleHyperbolaPoints(curve, matrix);
         } else if (entityName.equals("DEGENERATE_CONIC")) {
-            CartesianPoint point = transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
+            CartesianPoint point = MatrixTransformHelper.transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
             return List.of(point, point);
         } else {
             return null;
@@ -632,7 +632,7 @@ public final class PreviewCurveEvaluator {
         for (int i = 0; i <= segments; i++) {
             double angle = 2.0 * Math.PI * i / segments;
             CartesianPoint local = new CartesianPoint(rx * Math.cos(angle), ry * Math.sin(angle), 0.0);
-            points.add(transformCartesian(local, matrix));
+            points.add(MatrixTransformHelper.transformCartesian(local, matrix));
         }
         return List.copyOf(points);
     }
@@ -647,7 +647,7 @@ public final class PreviewCurveEvaluator {
         for (int index = 0; index <= segments; index++) {
             double t = -yExtent + (2.0 * yExtent * index) / segments;
             double x = (t * t) / (4.0 * focalDistance);
-            points.add(transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
+            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
         }
         return List.copyOf(points);
     }
@@ -665,55 +665,9 @@ public final class PreviewCurveEvaluator {
             double t = -extent + (2.0 * extent * index) / segments;
             double x = semiAxis * Math.cosh(t);
             double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
+            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
         }
         return List.copyOf(points);
-    }
-
-    // ─── Conic sampling helpers (copied from StepPreviewJsonExporter) ─────
-
-    private static CartesianPoint transformCartesian(CartesianPoint point, double[] matrix) {
-        double x = point.x();
-        double y = point.y();
-        double z = point.z();
-        return new CartesianPoint(
-                matrix[0] * x + matrix[1] * y + matrix[2] * z + matrix[3],
-                matrix[4] * x + matrix[5] * y + matrix[6] * z + matrix[7],
-                matrix[8] * x + matrix[9] * y + matrix[10] * z + matrix[11]
-        );
-    }
-
-    private static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        if (placement instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return com.minicad.builder.StepAssemblyGraphBuilder.matrixForPlacement(placement3D);
-        }
-        if (placement instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
-            CartesianPoint origin = pointFromPlacement(placement2D);
-            if (origin == null) return null;
-            Vector3 x;
-            if (placement2D.refDirection() == null) {
-                x = new Vector3(1.0, 0.0, 0.0);
-            } else {
-                List<Double> ratios = placement2D.refDirection().directionRatios();
-                x = new Vector3(ratios.get(0), ratios.get(1), 0.0).normalize().asVector();
-            }
-            Vector3 z = new Vector3(0.0, 0.0, 1.0);
-            Vector3 y = z.cross(x).normalize().asVector();
-            return new double[]{
-                    x.x(), y.x(), z.x(), origin.x(),
-                    x.y(), y.y(), z.y(), origin.y(),
-                    x.z(), y.z(), z.z(), origin.z(),
-                    0.0, 0.0, 0.0, 1.0
-            };
-        }
-        return null;
-    }
-
-    private static CartesianPoint pointFromPlacement(StepAxis2Placement2D placement2D) {
-        StepCartesianPoint point = placement2D.location();
-        return new CartesianPoint(point.coordinates().get(0), point.coordinates().get(1), 0.0);
     }
 
     // ─── Edge sampling ───────────────────────────────────────────────────
@@ -1625,13 +1579,13 @@ public final class PreviewCurveEvaluator {
 
     private static List<CartesianPoint> sampleMappedAnnotationPoints(
             StepRepresentation representation, StepEntity mappedOrigin, StepEntity mappingTarget, StepCadBuilder builder) {
-        double[] matrix = matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        double[] matrix = MatrixTransformHelper.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
         if (matrix == null) return null;
         List<CartesianPoint> points = new ArrayList<>();
         for (StepEntity content : representation.items()) {
             List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
             if (sampled == null) continue;
-            for (CartesianPoint point : sampled) points.add(transformCartesian(point, matrix));
+            for (CartesianPoint point : sampled) points.add(MatrixTransformHelper.transformCartesian(point, matrix));
         }
         return points.isEmpty() ? null : List.copyOf(points);
     }
@@ -1655,8 +1609,8 @@ public final class PreviewCurveEvaluator {
                 }
             }
         }
-        double[] originMatrix = originPlacement == null ? null : matrixForPlacementEntity(originPlacement, builder);
-        double[] targetMatrix = targetPlacement == null ? null : matrixForPlacementEntity(targetPlacement, builder);
+        double[] originMatrix = originPlacement == null ? null : MatrixTransformHelper.matrixForPlacementEntity(originPlacement, builder);
+        double[] targetMatrix = targetPlacement == null ? null : MatrixTransformHelper.matrixForPlacementEntity(targetPlacement, builder);
         if (originMatrix == null || targetMatrix == null) return null;
         return composeMatrices(invertMatrix(targetMatrix), originMatrix);
     }
