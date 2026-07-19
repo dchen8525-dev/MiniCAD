@@ -5083,52 +5083,24 @@ public final class StepPreviewJsonExporter {
         return StepCurveTypeNameResolver.previewCurveBasisStepId(item);
     }
 
+    // Delegate to StepCurveTypeNameResolver - extracted utility class
     private static Boolean previewCurveOrientation(StepEntity item) {
-        if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            return orientedCurve.orientation();
-        }
-        return null;
+        return StepCurveTypeNameResolver.previewCurveOrientation(item);
     }
 
+    // Delegate to StepCurveTypeNameResolver - extracted utility class
     private static Boolean previewCurveSenseAgreement(StepEntity item) {
-        if (item instanceof StepTrimmedCurve) {
-            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-            return trimmedCurve.senseAgreement();
-        }
-        if (item instanceof StepTrimmedCurve2D) {
-            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
-            return trimmedCurve2D.senseAgreement();
-        }
-        return null;
+        return StepCurveTypeNameResolver.previewCurveSenseAgreement(item);
     }
 
+    // Delegate to StepCurveTypeNameResolver - extracted utility class
     private static Double previewCurveOffsetDistance(StepEntity item) {
-        if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return offsetCurve2D.distance();
-        }
-        if (item instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
-            return offsetCurve3D.distance();
-        }
-        return null;
+        return StepCurveTypeNameResolver.previewCurveOffsetDistance(item);
     }
 
+    // Delegate to StepCurveTypeNameResolver - extracted utility class
     private static Boolean previewCurveSelfIntersect(StepEntity item) {
-        if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return offsetCurve2D.selfIntersect();
-        }
-        if (item instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
-            return offsetCurve3D.selfIntersect();
-        }
-        if (item instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
-            return compositeOnSurface.selfIntersect();
-        }
-        return null;
+        return StepCurveTypeNameResolver.previewCurveSelfIntersect(item);
     }
 
     private static List<Double> previewCurveRefDirection(StepEntity item) {

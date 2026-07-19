@@ -340,4 +340,76 @@ public final class StepCurveTypeNameResolver {
         }
         return null;
     }
+
+    /**
+     * Returns the orientation of an oriented curve.
+     *
+     * @param item the STEP curve entity
+     * @return the orientation flag, or null if not an oriented curve
+     */
+    public static Boolean previewCurveOrientation(StepEntity item) {
+        if (item instanceof StepOrientedCurve) {
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
+            return orientedCurve.orientation();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the sense agreement flag for trimmed curves.
+     *
+     * @param item the STEP curve entity
+     * @return the sense agreement flag, or null if not a trimmed curve
+     */
+    public static Boolean previewCurveSenseAgreement(StepEntity item) {
+        if (item instanceof StepTrimmedCurve) {
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
+            return trimmedCurve.senseAgreement();
+        }
+        if (item instanceof StepTrimmedCurve2D) {
+            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
+            return trimmedCurve2D.senseAgreement();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the offset distance for offset curves.
+     *
+     * @param item the STEP curve entity
+     * @return the offset distance, or null if not an offset curve
+     */
+    public static Double previewCurveOffsetDistance(StepEntity item) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
+            return offsetCurve2D.distance();
+        }
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
+            return offsetCurve3D.distance();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the self-intersect flag for offset and composite curves.
+     *
+     * @param item the STEP curve entity
+     * @return the self-intersect flag, or null if not applicable
+     */
+    public static Boolean previewCurveSelfIntersect(StepEntity item) {
+        if (item instanceof StepOffsetCurve2D) {
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
+            return offsetCurve2D.selfIntersect();
+        }
+        if (item instanceof StepOffsetCurve3D) {
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
+            return offsetCurve3D.selfIntersect();
+        }
+        if (item instanceof StepCompositeCurveOnSurface) {
+            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
+            return compositeOnSurface.selfIntersect();
+        }
+        return null;
+    }
 }
