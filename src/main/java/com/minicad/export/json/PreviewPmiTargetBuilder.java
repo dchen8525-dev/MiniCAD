@@ -1101,7 +1101,7 @@ public final class PreviewPmiTargetBuilder {
         // This method has a large if-else chain handling many definition types
         // The full implementation would be hundreds of lines
         // For now, delegating to the original implementation in StepPreviewJsonExporter
-        StepPreviewJsonExporter.appendSemanticDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+        StepPmiPayloadBuilder.appendSemanticDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
     }
 
     // ========================================================================
