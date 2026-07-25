@@ -987,7 +987,7 @@ public final class StepPreviewJsonExporter {
             List<StepFaceEntity> shellFaces = ShellHelper.shellFaces(shellEntity);
             log.debug("stage={} shellId={}, shellFaceCount={}", "geometry_shell_start", shellId, shellFaces.size());
             for (StepFaceEntity stepFace : shellFaces) {
-                PreviewFaceResult previewFace = buildPreviewFaceResult(
+                PreviewFaceResult previewFace = StepFacePayloadBuilder.buildPreviewFaceResult(
                         stepFace,
                         builder,
                         mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
@@ -1619,490 +1619,6 @@ public final class StepPreviewJsonExporter {
         return StepPlacementTransformer.matrixForPlacementEntity(placement, builder);
     }
 
-    public static PreviewFaceResult buildPreviewFaceResult(
-            StepFaceEntity stepFace,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            PreviewFaceResult base = buildPreviewFaceResult(orientedFace.faceElement(), builder, metadata);
-            if (base.face() == null) {
-                return new PreviewFaceResult(
-                        null,
-                        toUnsupportedFacePayload(stepFace, base.unsupportedFace() == null ? null : base.unsupportedFace().reason())
-                );
-            }
-            if (orientedFace.orientation()) {
-                return new PreviewFaceResult(base.face(), null);
-            }
-            FacePayload reversed = reverseFacePayload(base.face());
-            logPreviewFacePayload("face_payload_built", reversed);
-            return new PreviewFaceResult(reversed, null);
-        }
-
-        StepEntity geometry = faceGeometry(stepFace);
-        StepEntity previewGeometry = unwrapParametricPreviewSurface(geometry);
-        if (previewGeometry instanceof StepPlane) {
-            try {
-                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-                if (trimmed.face() != null) {
-                    logPreviewFacePayload("face_payload_built", trimmed.face());
-                    return trimmed;
-                }
-                if (geometry instanceof StepPlane) {
-                    FacePayload payload = PreviewMeshExporter.facePayloadFromTopologyFace(stepFace.id(), builder.buildFace(stepFace.id()), faceDisplayName(stepFace), metadata);
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-                return trimmed;
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                String reason = ex.getMessage();
-                if (reason != null && !reason.isBlank() && reason.contains("POLY_LOOP")) {
-                    return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, reason));
-                }
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "planar face build failed"));
-            }
-        }
-        if (previewGeometry instanceof StepCylindricalSurface) {
-            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) previewGeometry;
-            try {
-                if (geometry instanceof StepCylindricalSurface) {
-                    FacePayload payload = toCylindricalFacePayload(stepFace, cylindricalSurface, builder, metadata);
-                    if (payload != null) {
-                        logPreviewFacePayload("face_payload_built", payload);
-                        return new PreviewFaceResult(payload, null);
-                    }
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "cylindrical face build failed: " + ex.getMessage()));
-            }
-        }
-        if (previewGeometry instanceof StepConicalSurface) {
-            StepConicalSurface conicalSurface = (StepConicalSurface) previewGeometry;
-            try {
-                if (geometry instanceof StepConicalSurface) {
-                    FacePayload payload = toConicalFacePayload(stepFace, conicalSurface, builder, metadata);
-                    if (payload != null) {
-                        logPreviewFacePayload("face_payload_built", payload);
-                        return new PreviewFaceResult(payload, null);
-                    }
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "conical face build failed: " + ex.getMessage()));
-            }
-        }
-        if (previewGeometry instanceof StepSphericalSurface) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepRationalBSplineSurface) {
-            StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) previewGeometry;
-            try {
-                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-                if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
-                    if (trimmed.face() != null) {
-                        logPreviewFacePayload("face_payload_built", trimmed.face());
-                    }
-                    return trimmed;
-                }
-                FacePayload payload = toRationalBSplineSurfaceFacePayload(stepFace, splineSurface, builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "rational b-spline surface patch preview failed"));
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                log.debug("stage={} faceId={}, surfaceId={}, reason={}", "rational_bspline_surface_preview_exception",
-                        stepFace.id(), splineSurface.id(), ex.getMessage());
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "rational b-spline surface preview failed"));
-            }
-        }
-        if (previewGeometry instanceof StepBSplineSurfaceWithKnots
-                || previewGeometry instanceof StepBSplineSurface
-                || previewGeometry instanceof StepBezierSurface
-                || previewGeometry instanceof StepUniformSurface
-                || previewGeometry instanceof StepQuasiUniformSurface
-                || previewGeometry instanceof StepPiecewiseBezierSurface) {
-            try {
-                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-                if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
-                    if (trimmed.face() != null) {
-                        logPreviewFacePayload("face_payload_built", trimmed.face());
-                    }
-                    return trimmed;
-                }
-                FacePayload payload = toBSplineSurfaceFacePayload(stepFace, previewGeometry, builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                log.debug("stage={} faceId={}, surfaceId={}, reason={}", "bspline_surface_preview_exception",
-                        stepFace.id(), previewGeometry.id(), ex.getMessage());
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
-            }
-        }
-        if (previewGeometry instanceof StepSurfaceOfLinearExtrusion || previewGeometry instanceof StepSurfaceOfRevolution) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepDegenerateToroidalSurface) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
-            StepToroidalSurfaceWithSpecifiedBends toroidalSurfaceWithBends = (StepToroidalSurfaceWithSpecifiedBends) previewGeometry;
-            try {
-                if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
-                    FacePayload payload = toToroidalWithSpecifiedBendsFacePayload(stepFace, toroidalSurfaceWithBends, builder, metadata);
-                    if (payload != null) {
-                        logPreviewFacePayload("face_payload_built", payload);
-                        return new PreviewFaceResult(payload, null);
-                    }
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "toroidal surface with specified bends face build failed: " + ex.getMessage()));
-            }
-        }
-        if (previewGeometry instanceof StepToroidalSurface) {
-            StepToroidalSurface toroidalSurface = (StepToroidalSurface) previewGeometry;
-            try {
-                if (geometry instanceof StepToroidalSurface) {
-                    FacePayload payload = toToroidalFacePayload(stepFace, toroidalSurface, builder, metadata);
-                    if (payload != null) {
-                        logPreviewFacePayload("face_payload_built", payload);
-                        return new PreviewFaceResult(payload, null);
-                    }
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "toroidal face build failed: " + ex.getMessage()));
-            }
-        }
-        if (previewGeometry instanceof StepCylindricalSurface
-                || previewGeometry instanceof StepConicalSurface
-                || previewGeometry instanceof StepDegenerateToroidalSurface
-                || previewGeometry instanceof StepToroidalSurface
-                || previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepCylindricalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepConicalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepSphericalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepToroidalSurfaceWithCylindricalAxis
-                || previewGeometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepFreeFormSurface) {
-            PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-            if (trimmed.face() != null) {
-                logPreviewFacePayload("face_payload_built", trimmed.face());
-            }
-            return trimmed;
-        }
-        if (previewGeometry instanceof StepRuledSurface) {
-            StepRuledSurface ruledSurface = (StepRuledSurface) previewGeometry;
-            try {
-                FacePayload payload = toRuledSurfaceFacePayload(stepFace, ruledSurface, builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "ruled surface preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfConstantRadius) {
-            StepSurfaceOfConstantRadius surfaceOfConstantRadius = (StepSurfaceOfConstantRadius) previewGeometry;
-            try {
-                FacePayload payload = toSurfaceOfConstantRadiusFacePayload(stepFace, surfaceOfConstantRadius, builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
-        }
-        if (previewGeometry instanceof StepParaboloidSurface) {
-            StepParaboloidSurface paraboloidSurface = (StepParaboloidSurface) previewGeometry;
-            try {
-                FacePayload payload = toParametricSurfaceFacePayload(stepFace, paraboloidSurface, "PARABOLOID_SURFACE", builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "paraboloid surface preview failed"));
-        }
-        if (previewGeometry instanceof StepHyperboloidSurface) {
-            StepHyperboloidSurface hyperboloidSurface = (StepHyperboloidSurface) previewGeometry;
-            try {
-                FacePayload payload = toParametricSurfaceFacePayload(stepFace, hyperboloidSurface, "HYPERBOLOID_SURFACE", builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "hyperboloid surface preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfTranslation) {
-            StepSurfaceOfTranslation translationSurface = (StepSurfaceOfTranslation) previewGeometry;
-            try {
-                FacePayload payload = toParametricSurfaceFacePayload(stepFace, translationSurface, "SURFACE_OF_TRANSLATION", builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of translation preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfProjection) {
-            StepSurfaceOfProjection projectionSurface = (StepSurfaceOfProjection) previewGeometry;
-            try {
-                FacePayload payload = toParametricSurfaceFacePayload(stepFace, projectionSurface, "SURFACE_OF_PROJECTION", builder, metadata);
-                if (payload != null) {
-                    logPreviewFacePayload("face_payload_built", payload);
-                    return new PreviewFaceResult(payload, null);
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "surface of projection preview failed"));
-        }
-        if (previewGeometry instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) previewGeometry;
-            // Blended surface: approximate by rendering the primary surface with blend radius as metadata
-            try {
-                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, blended.primarySurface(), metadata, builder);
-                if (trimmed.face() != null) {
-                    logPreviewFacePayload("face_payload_built", trimmed.face());
-                    return trimmed;
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - continue to fallback
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
-        }
-        // Free-form surfaces: try parametric mapping, fall back to sampled tessellation
-        if (previewGeometry instanceof StepFreeFormSurface) {
-            StepFreeFormSurface freeForm = (StepFreeFormSurface) previewGeometry;
-            try {
-                PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
-                if (trimmed.face() != null) {
-                    logPreviewFacePayload("face_payload_built", trimmed.face());
-                    return trimmed;
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - continue to fallback tessellation
-            }
-            // Fallback: tessellate via sampled grid if parametric mapping fails
-            try {
-                List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-                if (!bounds.isEmpty()) {
-                    BSplineSurface3 surface = PreviewMeshExporter.buildFreeFormSurface(freeForm, builder);
-                    FacePayload payload = toSampledSurfaceFacePayload(stepFace, surface, "FREE_FORM_SURFACE", bounds, metadata);
-                    if (payload != null) {
-                        logPreviewFacePayload("face_payload_built", payload);
-                        return new PreviewFaceResult(payload, null);
-                    }
-                }
-            } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - continue to unsupported face payload
-            } catch (Exception ex) {
-                // C03: Catch unexpected errors - log and return unsupported face payload
-                return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed: unexpected error - " + ex.getMessage()));
-            }
-            return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
-        }
-        // Machined surface: delegate to the underlying face geometry
-        if (previewGeometry instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) previewGeometry;
-            return buildPreviewFaceResult((StepFaceEntity) machinedSurface.face(), builder, metadata);
-        }
-        String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
-        String reason = unsupportedSurface == null
-                ? "surface type not previewable"
-                : unsupportedSurface + " preview is unsupported";
-        return new PreviewFaceResult(null, toUnsupportedFacePayload(stepFace, reason));
-    }
-
-    private static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
-        StepEntity current = geometry;
-        for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
-                current = offsetSurface2.basisSurface();
-                continue;
-            }
-            if (current instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
-                current = surfacePatch.basisSurface();
-                continue;
-            }
-            if (current instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
-                current = compositeSurface.parentSurface();
-                continue;
-            }
-            if (current instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
-                current = machinedSurface.face();
-                continue;
-            }
-            if (current instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) current;
-                current = blended.primarySurface();
-                continue;
-            }
-            if (current instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) current;
-                current = mappedItem.mappingTarget();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            return current;
-        }
-        return current;
-    }
-
-    private static String describeUnsupportedPreviewSurface(StepEntity surface) {
-        return describeUnsupportedPreviewSurface(surface, null);
-    }
-
-    private static String describeUnsupportedPreviewSurface(StepEntity surface, StepCadBuilder builder) {
-        if (surface == null) {
-            return null;
-        }
-        if (surface instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
-            return describeUnsupportedPreviewSurface(trimmedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface curveBoundedSurface = (StepCurveBoundedSurface) surface;
-            return describeUnsupportedPreviewSurface(curveBoundedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
-            return describeUnsupportedPreviewSurface(orientedSurface.surfaceElement(), builder);
-        }
-        if (surface instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
-        }
-        if (surface instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) surface;
-            return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
-        }
-        if (surface instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) surface;
-            return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
-        }
-        if (surface instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) surface;
-            return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
-        }
-        if (surface instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) surface;
-            return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
-        }
-        if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) surface;
-            if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator) {
-                com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
-                double scale = transformation.scale() == null ? 1.0 : transformation.scale();
-                if (Math.abs(scale) <= 1.0e-9) {
-                    return "SURFACE_REPLICA zero scale preview is unsupported";
-                }
-                if (builder != null) {
-                    double[] matrix = matrixForTransformationOperator(transformation, builder);
-                    if (MathUtilityHelper.inverseUniformScaleTransform(matrix) == null) {
-                        return "SURFACE_REPLICA non-uniform scale preview is unsupported";
-                    }
-                }
-            }
-            return describeUnsupportedPreviewSurface(replica.parent(), builder);
-        }
-        return surfaceTypeName(surface);
-    }
-
-    private static void logPreviewFacePayload(String stage, FacePayload face) {
-        int loopCount = face.loops() == null ? 0 : face.loops().size();
-        int innerLoopCount = face.loops() == null ? 0 : (int) face.loops().stream().filter(loop -> !loop.outer()).count();
-        int triangleCount = face.triangles() == null ? 0 : face.triangles().size() / 3;
-        int uvLoopCount = face.uvLoops() == null ? 0 : face.uvLoops().size();
-        String parametricType = face.surface() == null ? "none" : face.surface().type();
-        log.info("stage={} faceId={}, surfaceType={}, parametricType={}, loopCount={}, innerLoopCount={}, triangleCount={}, uvLoopCount={}, sameSense={}",
-                stage,
-                face.stepId(),
-                face.surfaceType(),
-                parametricType,
-                loopCount,
-                innerLoopCount,
-                triangleCount,
-                uvLoopCount,
-                face.sameSense());
-    }
-
     private static AssemblyData buildAssemblyData(
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder,
@@ -2539,7 +2055,7 @@ public final class StepPreviewJsonExporter {
         return stepFace.name();
     }
 
-    private static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
+    static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
         StepEntity geometry = faceGeometry(stepFace);
         return new UnsupportedFacePayload(
                 stepFace.id(),
@@ -2557,7 +2073,7 @@ public final class StepPreviewJsonExporter {
         int processed = 0;
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepFaceEntity
-                    && buildPreviewFaceResult((StepFaceEntity) entity, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
+                    && StepFacePayloadBuilder.buildPreviewFaceResult((StepFaceEntity) entity, builder, StepMetadataExtractor.DisplayMetadata.EMPTY).face() == null) {
                 unsupported++;
             }
             if (entity instanceof StepFaceEntity) {
@@ -2575,48 +2091,7 @@ public final class StepPreviewJsonExporter {
 
 
 
-    // facePayloadFromTopologyFace, newFacePayloadFromGrid, and sampleTopologySurfaceGrid
-    // have been extracted to PreviewMeshExporter.java
-
-    private static FacePayload toCylindricalFacePayload(
-            StepFaceEntity stepFace,
-            StepCylindricalSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-
-        if (!(bounds.get(0).loop() instanceof EdgeLoop)) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-        if (outerLoop.edges().size() != 4) {
-            return null;
-        }
-
-        List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Circle)
-                .collect(Collectors.toList());
-        List<OrientedEdge> lineEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Line3)
-                .collect(Collectors.toList());
-        if (circleEdges.size() != 2 || lineEdges.size() != 2) {
-            return null;
-        }
-
-        CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.get(0);
-        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageAxialHeight(surface, sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface, sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.get(circleEdges.size() - 1);
-            upperArc = circleEdges.get(0);
-        }
-
-        List<CartesianPoint> lowerArcPoints = sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = sampleOrientedEdge(upperArc);
+    public static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
         double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface, lowerArcPoints);
         double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface, upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
@@ -4108,7 +3583,7 @@ public final class StepPreviewJsonExporter {
     }
 
     // Delegate to StepSummaryBuilder - extracted utility class
-    private static String associatedGeometrySummary(StepEntity edgeGeometry) {
+    static String associatedGeometrySummary(StepEntity edgeGeometry) {
         return StepSummaryBuilder.associatedGeometrySummary(edgeGeometry);
     }
 
@@ -4626,7 +4101,7 @@ public final class StepPreviewJsonExporter {
 
 
     
-    private static SurfacePatch buildFourSidedPatch(EdgeLoop outerLoop) {
+    static SurfacePatch buildFourSidedPatch(EdgeLoop outerLoop) {
         if (outerLoop.edges().size() != 4) {
             return null;
         }
@@ -4674,7 +4149,7 @@ public final class StepPreviewJsonExporter {
         return StepGeometryHelper.resamplePolyline(points, segments);
     }
 
-    private static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
+    static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
         List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
         if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
             FaceBound bound = bounds.get(0);
@@ -4775,7 +4250,7 @@ public final class StepPreviewJsonExporter {
 
 
     // Delegate to StepValidationHelper - extracted utility class
-    private static boolean faceSameSense(StepFaceEntity stepFace) {
+    static boolean faceSameSense(StepFaceEntity stepFace) {
         return StepValidationHelper.faceSameSense(stepFace);
     }
 
@@ -4823,7 +4298,7 @@ public final class StepPreviewJsonExporter {
     }
 
     // Delegate to StepPayloadBuilder - extracted utility class
-    private static <T> List<T> reverseClosedLoop(List<T> points) {
+    static <T> List<T> reverseClosedLoop(List<T> points) {
         return StepPayloadBuilder.reverseClosedLoop(points);
     }
 
@@ -5415,7 +4890,7 @@ public final class StepPreviewJsonExporter {
         return points.isEmpty() ? null : List.copyOf(points);
     }
 
-    private static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
+    static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
         try {
             if (item instanceof StepLine) {
             StepLine line = (StepLine) item;
@@ -5814,7 +5289,7 @@ public final class StepPreviewJsonExporter {
     }
 
 
-    private static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
+    static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
         if (curve instanceof TrimmedCurve3) {
             TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(Curve3SamplingHelper.sampleTrimmedCurve3(trimmedCurve, 72));
