@@ -9,6 +9,7 @@ import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.minicad.export.json.StepPlacementTransformer;
 
 /**
  * Helper class for sampling conic curve points.
@@ -21,7 +22,7 @@ public final class ConicSamplingHelper {
     }
 
     public static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
-        double[] matrix = StepPreviewJsonExporter.matrixForPlacementEntity(curve.position(), builder);
+        double[] matrix = StepPlacementTransformer.matrixForPlacementEntity(curve.position(), builder);
         if (matrix == null) {
             return null;
         }

@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.export.glb.PreviewMeshExporter;
 import com.minicad.export.glb.TessellatedFaceExporter;
@@ -40,6 +41,9 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import com.minicad.export.json.StepEdgePayloadBuilder;
 import com.minicad.export.json.StepFacePayloadBuilder;
+import com.minicad.export.json.StepMappedItemTransformer;
+import com.minicad.export.json.StepPlacementTransformer;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /**
  * Geometry collection orchestration for STEP preview export.
@@ -175,7 +179,7 @@ public final class PreviewGeometryCollector {
                 PreviewFaceResult previewFace = StepFacePayloadBuilder.buildPreviewFaceResult(
                         stepFace,
                         builder,
-                        StepPreviewJsonExporter.mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
+                        StepMetadataHelper.mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
                 );
                 processedFaces++;
                 if (previewFace.face() == null) {
@@ -231,7 +235,7 @@ public final class PreviewGeometryCollector {
 
         for (Integer solidId : solidIds) {
             StepEntity entity = resolved.get(solidId);
-            StepMetadataExtractor.DisplayMetadata itemMetadata = StepPreviewJsonExporter.mergeMetadata(
+            StepMetadataExtractor.DisplayMetadata itemMetadata = StepMetadataHelper.mergeMetadata(
                     inheritedSolidMetadata.get(solidId),
                     metadata.forItem(solidId)
             );
@@ -263,7 +267,7 @@ public final class PreviewGeometryCollector {
                 unsupportedFaces.add(new UnsupportedFacePayload(
                         solidId,
                         entity == null ? null : entity.name(),
-                        StepPreviewJsonExporter.geometryTypeName(entity),
+                        StepTypeNameResolver.geometryTypeName(entity),
                         ex.getMessage()
                 ));
             }
@@ -716,10 +720,10 @@ public final class PreviewGeometryCollector {
             );
             StepMetadataExtractor.DisplayMetadata relationshipMetadata = metadata.forItem(relationship.id());
             List<EdgePayload> edges = source.payload().edges().stream()
-                    .map(edge -> StepPreviewJsonExporter.transformMappedEdge(edge, relationship.id(), matrix))
+                    .map(edge -> StepMappedItemTransformer.transformMappedEdge(edge, relationship.id(), matrix))
                     .collect(Collectors.toList());
             List<FacePayload> faces = source.payload().faces().stream()
-                    .map(face -> StepPreviewJsonExporter.transformMappedFace(face, relationship.id(), matrix, relationshipMetadata))
+                    .map(face -> StepMappedItemTransformer.transformMappedFace(face, relationship.id(), matrix, relationshipMetadata))
                     .collect(Collectors.toList());
             geometry = mergeGeometry(geometry, new GeometryCollection(edges, faces, source.unsupportedFaces()));
         }
@@ -733,7 +737,7 @@ public final class PreviewGeometryCollector {
             StepMetadataExtractor metadata,
             Set<Integer> visitingRepresentations
     ) {
-        double[] matrix = StepPreviewJsonExporter.mappedItemMatrix(mappedItem, builder);
+        double[] matrix = StepMappedItemTransformer.mappedItemMatrix(mappedItem, builder);
         if (matrix == null) {
             return new GeometryCollection(List.of(), List.of(), List.of());
         }
@@ -748,10 +752,10 @@ public final class PreviewGeometryCollector {
         );
         StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(mappedItem.id());
         List<EdgePayload> edges = source.payload().edges().stream()
-                .map(edge -> StepPreviewJsonExporter.transformMappedEdge(edge, mappedItem.id(), matrix))
+                .map(edge -> StepMappedItemTransformer.transformMappedEdge(edge, mappedItem.id(), matrix))
                 .collect(Collectors.toList());
         List<FacePayload> faces = source.payload().faces().stream()
-                .map(face -> StepPreviewJsonExporter.transformMappedFace(face, mappedItem.id(), matrix, itemMetadata))
+                .map(face -> StepMappedItemTransformer.transformMappedFace(face, mappedItem.id(), matrix, itemMetadata))
                 .collect(Collectors.toList());
         return new GeometryCollection(edges, faces, source.unsupportedFaces());
     }
@@ -865,7 +869,7 @@ public final class PreviewGeometryCollector {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        double[] matrix = StepPreviewJsonExporter.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        double[] matrix = StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
         if (matrix == null) {
             return;
         }
@@ -878,7 +882,7 @@ public final class PreviewGeometryCollector {
                 new LinkedHashSet<>()
         );
         for (EdgePayload edge : source.payload().edges()) {
-            EdgePayload transformed = StepPreviewJsonExporter.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
+            EdgePayload transformed = StepMappedItemTransformer.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
             edges.putIfAbsent(transformed.stepId(), transformed);
         }
     }

@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.StepResolutionException;
@@ -72,6 +73,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepPlacementTransformer;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /**
  * Face building and geometry collection orchestration for STEP preview export.
@@ -156,8 +159,8 @@ public final class PreviewFaceBuilder {
         StepEntity geometry = faceGeometry(stepFace);
         return new UnsupportedFacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
-                StepPreviewJsonExporter.surfaceTypeName(geometry),
+                StepMetadataHelper.faceDisplayName(stepFace),
+                StepTypeNameResolver.surfaceTypeName(geometry),
                 reason == null ? "preview export returned no mesh" : reason
         );
     }
@@ -279,7 +282,7 @@ public final class PreviewFaceBuilder {
                     return "SURFACE_REPLICA zero scale preview is unsupported";
                 }
                 if (builder != null) {
-                    double[] matrix = StepPreviewJsonExporter.matrixForTransformationOperator(transformation, builder);
+                    double[] matrix = StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
                     if (MathUtilityHelper.inverseUniformScaleTransform(matrix) == null) {
                         return "SURFACE_REPLICA non-uniform scale preview is unsupported";
                     }
@@ -287,7 +290,7 @@ public final class PreviewFaceBuilder {
             }
             return describeUnsupportedPreviewSurface(replica.parent(), builder);
         }
-        return StepPreviewJsonExporter.surfaceTypeName(surface);
+        return StepTypeNameResolver.surfaceTypeName(surface);
     }
 
     // ─── Surface-specific face payload builders ──────────────────────────
@@ -351,7 +354,7 @@ public final class PreviewFaceBuilder {
         Vector3 startNormal = PreviewUvCoords.cylindricalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "CYLINDRICAL_SURFACE",
                 PayloadConversionHelper.toPointPayload(PreviewUvCoords.surfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
@@ -440,7 +443,7 @@ public final class PreviewFaceBuilder {
         Vector3 startNormal = PreviewUvCoords.conicalNormal(surface, angles.get(0), sameSense);
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "CONICAL_SURFACE",
                 PayloadConversionHelper.toPointPayload(PreviewUvCoords.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
@@ -510,7 +513,7 @@ public final class PreviewFaceBuilder {
         Vector3 startNormal = PreviewUvCoords.sphericalNormal(surface.position(), lowerU.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "SPHERICAL_SURFACE",
                 PayloadConversionHelper.toPointPayload(PreviewUvCoords.sphericalSurfacePoint(surface.position(), surface.radius(), lowerU.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
@@ -609,7 +612,7 @@ public final class PreviewFaceBuilder {
         Vector3 startNormal = PreviewUvCoords.toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "TOROIDAL_SURFACE",
                 PayloadConversionHelper.toPointPayload(PreviewUvCoords.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
                 new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
@@ -667,7 +670,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "RATIONAL_B_SPLINE_SURFACE",
                 PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -708,7 +711,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "RULED_SURFACE",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -756,8 +759,8 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
-                StepPreviewJsonExporter.surfaceTypeName(geometry),
+                StepMetadataHelper.faceDisplayName(stepFace),
+                StepTypeNameResolver.surfaceTypeName(geometry),
                 PayloadConversionHelper.toPointPayload(patch.pointAt(0.0, 0.0)),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
                 faceSameSense(stepFace),
@@ -797,7 +800,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "SURFACE_OF_LINEAR_EXTRUSION",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -842,7 +845,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "SURFACE_OF_REVOLUTION",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -889,7 +892,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "OFFSET_SURFACE",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -935,7 +938,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "FREE_FORM_SURFACE",
                 PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -991,7 +994,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "PARABOLOID_SURFACE",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -1032,7 +1035,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "HYPERBOLOID_SURFACE",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -1073,7 +1076,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "SURFACE_OF_TRANSLATION",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -1114,7 +1117,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 "SURFACE_OF_PROJECTION",
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -1798,7 +1801,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 surfaceTypeName,
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),
@@ -1837,7 +1840,7 @@ public final class PreviewFaceBuilder {
         }
         return new FacePayload(
                 stepFace.id(),
-                StepPreviewJsonExporter.faceDisplayName(stepFace),
+                StepMetadataHelper.faceDisplayName(stepFace),
                 surfaceType,
                 triangles.get(0),
                 new VectorPayload(normal.x(), normal.y(), normal.z()),

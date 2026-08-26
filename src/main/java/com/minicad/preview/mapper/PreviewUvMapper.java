@@ -32,6 +32,8 @@ import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.*;
 import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepPointExtractor;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /** UV mapping, parametric surface projection, and pcurve sampling.
  *  Extracted from StepPreviewJsonExporter to isolate UV mapping logic. */
@@ -240,7 +242,7 @@ public final class PreviewUvMapper {
 
         if (geometry instanceof StepRectangularTrimmedSurface) {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(trimmedSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(trimmedSurface.basisSurface());
             basisStepId = trimmedSurface.basisSurface().id();
             trimU1 = trimmedSurface.u1();
             trimU2 = trimmedSurface.u2();
@@ -248,22 +250,22 @@ public final class PreviewUvMapper {
             trimV2 = trimmedSurface.v2();
         } else if (geometry instanceof StepCurveBoundedSurface) {
             StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(boundedSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(boundedSurface.basisSurface());
             basisStepId = boundedSurface.basisSurface().id();
             implicitOuter = boundedSurface.implicitOuter();
         } else if (geometry instanceof StepOrientedSurface) {
             StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(orientedSurface.surfaceElement());
+            basisType = StepTypeNameResolver.surfaceTypeName(orientedSurface.surfaceElement());
             basisStepId = orientedSurface.surfaceElement().id();
             orientation = orientedSurface.orientation();
         } else if (geometry instanceof StepOffsetSurface) {
             StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(offsetSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(offsetSurface.basisSurface());
             basisStepId = offsetSurface.basisSurface().id();
             offsetDistance = offsetSurface.distance();
         } else if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(replica.parent());
+            basisType = StepTypeNameResolver.surfaceTypeName(replica.parent());
             basisStepId = replica.parent().id();
             transformScale = replica.transformation().scale();
         }
@@ -287,7 +289,7 @@ public final class PreviewUvMapper {
                 base.vMultiplicities(),
                 base.uKnots(),
                 base.vKnots(),
-                StepPreviewJsonExporter.surfaceTypeName(geometry),
+                StepTypeNameResolver.surfaceTypeName(geometry),
                 geometry.id(),
                 basisType,
                 basisStepId,
@@ -497,7 +499,7 @@ public final class PreviewUvMapper {
             return "[]";
         }
         return associated.stream()
-                .map(entity -> StepPreviewJsonExporter.surfaceTypeName(entity) + "#" + entity.id())
+                .map(entity -> StepTypeNameResolver.surfaceTypeName(entity) + "#" + entity.id())
                 .collect(java.util.stream.Collectors.joining("|"));
     }
 
@@ -688,7 +690,7 @@ public final class PreviewUvMapper {
     }
 
     private static CartesianPoint pointFromStep(StepCartesianPoint point) {
-        return StepPreviewJsonExporter.pointFromStep(point);
+        return StepPointExtractor.pointFromStep(point);
     }
 
     private static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {

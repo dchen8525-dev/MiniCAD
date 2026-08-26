@@ -130,8 +130,8 @@ public final class StepEdgePayloadBuilder {
         ColorPayload color = resolveEdgeColor(edgeId, metadata);
         if (entity instanceof StepEdgeCurve) {
             StepEdgeCurve edge = (StepEdgeCurve) entity;
-            CartesianPoint start = StepPreviewJsonExporter.pointFromStep(edge.start().point());
-            CartesianPoint end = StepPreviewJsonExporter.pointFromStep(edge.end().point());
+            CartesianPoint start = StepPointExtractor.pointFromStep(edge.start().point());
+            CartesianPoint end = StepPointExtractor.pointFromStep(edge.end().point());
             return new EdgePayload(
                     edgeId,
                     PayloadConversionHelper.toPointPayloads(polyline),
@@ -252,7 +252,7 @@ public final class StepEdgePayloadBuilder {
             }
             List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
             for (CartesianPoint point : parentPoints) {
-                transformed.add(StepPreviewJsonExporter.transformPoint(point, replica.transformation(), builder));
+                transformed.add(StepPointExtractor.transformPoint(point, replica.transformation(), builder));
             }
             return List.copyOf(transformed);
         }
@@ -381,8 +381,8 @@ public final class StepEdgePayloadBuilder {
                 throw ex;
             }
             StepEdgeCurve edge = (StepEdgeCurve) entity;
-            CartesianPoint start = StepPreviewJsonExporter.pointFromStep(edge.start().point());
-            CartesianPoint end = StepPreviewJsonExporter.pointFromStep(edge.end().point());
+            CartesianPoint start = StepPointExtractor.pointFromStep(edge.start().point());
+            CartesianPoint end = StepPointExtractor.pointFromStep(edge.end().point());
             StepEntity edgeGeometry = edge.edgeGeometry();
             Curve3 curve = curveForLooseEdge(edgeGeometry, builder);
             if (curve == null) {
@@ -1367,7 +1367,7 @@ public final class StepEdgePayloadBuilder {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        double[] matrix = StepPreviewJsonExporter.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        double[] matrix = StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
         if (matrix == null) {
             return;
         }
@@ -1380,7 +1380,7 @@ public final class StepEdgePayloadBuilder {
                 new LinkedHashSet<>()
         );
         for (EdgePayload edge : source.payload().edges()) {
-            EdgePayload transformed = StepPreviewJsonExporter.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
+            EdgePayload transformed = StepMappedItemTransformer.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
             edges.putIfAbsent(transformed.stepId(), transformed);
         }
     }
@@ -1423,7 +1423,7 @@ public final class StepEdgePayloadBuilder {
             StepEntity mappingTarget,
             StepCadBuilder builder
     ) {
-        double[] matrix = StepPreviewJsonExporter.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
+        double[] matrix = StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
         if (matrix == null) {
             return null;
         }
@@ -1638,10 +1638,10 @@ public final class StepEdgePayloadBuilder {
         for (StepEntity associated : associatedGeometry) {
             if (associated instanceof StepPcurve) {
                 StepPcurve pcurve = (StepPcurve) associated;
-                surfaceTypes.add(StepPreviewJsonExporter.surfaceTypeName(pcurve.basisSurface()));
+                surfaceTypes.add(StepTypeNameResolver.surfaceTypeName(pcurve.basisSurface()));
             } else if (associated instanceof StepDegeneratePcurve) {
                 StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
-                surfaceTypes.add(StepPreviewJsonExporter.surfaceTypeName(pcurve.basisSurface()));
+                surfaceTypes.add(StepTypeNameResolver.surfaceTypeName(pcurve.basisSurface()));
             }
         }
         return surfaceTypes.isEmpty() ? null : List.copyOf(surfaceTypes);

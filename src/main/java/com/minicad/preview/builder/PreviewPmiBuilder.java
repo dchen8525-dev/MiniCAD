@@ -66,6 +66,8 @@ import com.minicad.preview.payload.PointPayload;
 import java.util.*;
 import java.util.stream.Collectors;
 import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepPointExtractor;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /**
  * PMI/Annotation extraction methods extracted from StepPreviewJsonExporter.
@@ -678,19 +680,19 @@ public final class PreviewPmiBuilder {
         }
         if (content instanceof StepVertexLoop) {
             StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
         if (content instanceof StepPolyLoop) {
             StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+                leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             }
             return;
         }
         if (content instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
         if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
@@ -703,12 +705,12 @@ public final class PreviewPmiBuilder {
         }
         if (content instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             return;
         }
         if (content instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexPoint.point())));
             return;
         }
         List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(content, builder);
@@ -938,7 +940,7 @@ public final class PreviewPmiBuilder {
                 null,
                 null,
                 null,
-                StepPreviewJsonExporter.definitionTypeName(definition),
+                StepTypeNameResolver.definitionTypeName(definition),
                 definition.id()
         );
     }
@@ -966,7 +968,7 @@ public final class PreviewPmiBuilder {
                     null,
                     null,
                     null,
-                    StepPreviewJsonExporter.definitionTypeName(definition),
+                    StepTypeNameResolver.definitionTypeName(definition),
                     definition.id()
             );
             List<PmiTargetPayload> targets = targetsByUsageId.computeIfAbsent(identifiedItem.id(), ignored -> new ArrayList<>());
@@ -1016,15 +1018,15 @@ public final class PreviewPmiBuilder {
     public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
         if (item instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) item;
-            return StepPreviewJsonExporter.pointFromStep(point);
+            return StepPointExtractor.pointFromStep(point);
         }
         if (item instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) item;
-            return StepPreviewJsonExporter.pointFromStep(vertexPoint.point());
+            return StepPointExtractor.pointFromStep(vertexPoint.point());
         }
         if (item instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) item;
-            return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
+            return StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point());
         }
         if (item instanceof StepPointSet) {
             StepPointSet pointSet = (StepPointSet) item;
@@ -1157,7 +1159,7 @@ public final class PreviewPmiBuilder {
         }
         if (occurrence instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) occurrence;
-            return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
+            return StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point());
         }
         throw new IllegalArgumentException("Unknown value type: " + occurrence);
     }
@@ -1306,7 +1308,7 @@ public final class PreviewPmiBuilder {
     public static CartesianPoint pointFromPlacement(StepEntity placement) {
         if (placement instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return StepPreviewJsonExporter.pointFromStep(placement3D.location());
+            return StepPointExtractor.pointFromStep(placement3D.location());
         }
         if (placement instanceof StepAxis2Placement2D) {
             StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
@@ -1319,11 +1321,11 @@ public final class PreviewPmiBuilder {
     public static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
         if (replica.parent() instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) replica.parent();
-            return transformPoint(StepPreviewJsonExporter.pointFromStep(point), replica.transformation(), builder);
+            return transformPoint(StepPointExtractor.pointFromStep(point), replica.transformation(), builder);
         }
         if (replica.parent() instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) replica.parent();
-            return transformPoint(StepPreviewJsonExporter.pointFromStep(vertexPoint.point()), replica.transformation(), builder);
+            return transformPoint(StepPointExtractor.pointFromStep(vertexPoint.point()), replica.transformation(), builder);
         }
         return null;
     }

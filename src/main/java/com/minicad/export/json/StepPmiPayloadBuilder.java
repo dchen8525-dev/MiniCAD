@@ -191,7 +191,7 @@ public final class StepPmiPayloadBuilder {
                 }
             } else if (entity instanceof StepAnnotationTextOccurrence) {
             StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
-                CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(textOccurrence.position(), builder);
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(textOccurrence.position(), builder);
                 if (position == null) {
                     continue;
                 }
@@ -206,14 +206,14 @@ public final class StepPmiPayloadBuilder {
                 ));
             } else if (entity instanceof StepAnnotationPointOccurrence) {
             StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
-                CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(pointOccurrence.item(), builder);
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(pointOccurrence.item(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(pointOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(pointOccurrence.id(), pointOccurrence.name(), position, targets));
                 }
             } else if (entity instanceof StepAnnotationFillAreaOccurrence) {
             StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
-                CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
                 if (position != null) {
                     List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillAreaOccurrence.id(), List.of());
                     pmi.add(toStandalonePointPmi(fillAreaOccurrence.id(), fillAreaOccurrence.name(), position, targets));
@@ -295,11 +295,11 @@ public final class StepPmiPayloadBuilder {
                 pmi.add(toStandalonePointPmi(
                         vertexShell.id(),
                         vertexShell.name(),
-                        StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())
+                        StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())
                 ));
             } else if (entity instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) entity).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) entity;
-                CartesianPoint position = StepPreviewJsonExporter.pointFromReplica(replica, builder);
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
                 if (position != null) {
                     pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
                 }
@@ -379,7 +379,7 @@ public final class StepPmiPayloadBuilder {
                 position = pointFromAnnotationOccurrence(element, builder);
             }
             if (position == null) {
-                position = StepPreviewJsonExporter.pointFromAnnotationPoint(element, builder);
+                position = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             }
             if (position == null) {
                 continue;
@@ -425,7 +425,7 @@ public final class StepPmiPayloadBuilder {
     private static void appendPointSetPmi(StepPointSet pointSet, List<PmiPayload> pmi, StepCadBuilder builder) {
         int pointIndex = 0;
         for (StepEntity item : pointSet.points()) {
-            CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(item, builder);
+            CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
             if (position == null) {
                 continue;
             }
@@ -442,7 +442,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(measurement.measurementGeometry(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(measurement.measurementGeometry(), builder);
         if (position != null) {
             String label = measurement.name() + " (" + measurement.geometricType() + ")";
             if (measurement.measuredValue() != 0.0) {
@@ -451,7 +451,7 @@ public final class StepPmiPayloadBuilder {
             pmi.add(toStandalonePointPmi(measurement.id(), label, position));
         }
         for (StepEntity pt : measurement.measurementPoints()) {
-            CartesianPoint mp = StepPreviewJsonExporter.pointFromAnnotationPoint(pt, builder);
+            CartesianPoint mp = StepPmiPayloadBuilder.pointFromAnnotationPoint(pt, builder);
             if (mp != null) {
                 pmi.add(toStandalonePointPmi(measurement.id() * 1000 + measurement.measurementPoints().indexOf(pt),
                         measurement.name() + " point", mp));
@@ -482,7 +482,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(tolerance.toleratedShape(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.toleratedShape(), builder);
         if (position != null) {
             String label = tolerance.name() != null ? tolerance.name() : "GEOMETRIC_TOLERANCE";
             if (tolerance.magnitude() != 0.0) {
@@ -497,7 +497,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
         if (position != null) {
             String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
             if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
@@ -512,7 +512,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
         if (position != null) {
             String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
             if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
@@ -527,7 +527,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
         if (position != null) {
             String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
             if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
@@ -545,7 +545,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(location.relatedShape(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(location.relatedShape(), builder);
         if (position != null) {
             String label = location.name() != null ? location.name() : "DIMENSIONAL_LOCATION";
             pmi.add(toStandalonePointPmi(location.id(), label, position));
@@ -562,7 +562,7 @@ public final class StepPmiPayloadBuilder {
             StepToleranceZoneForm form = (StepToleranceZoneForm) zone.form();
             zoneShape = form.zoneShape();
         }
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(zone.form(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(zone.form(), builder);
         if (position != null) {
             String label = zone.name() != null ? zone.name() : "TOLERANCE_ZONE";
             if (zoneShape != null) {
@@ -577,7 +577,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(datum.target(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(datum.target(), builder);
         if (position != null) {
             String label = datum.name() != null ? datum.name() : "DATUM";
             pmi.add(toStandalonePointPmi(datum.id(), label, position));
@@ -589,7 +589,7 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(datumTarget.targetShape(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(datumTarget.targetShape(), builder);
         if (position != null) {
             String label = datumTarget.name() != null ? datumTarget.name() : "DATUM_TARGET";
             pmi.add(toStandalonePointPmi(datumTarget.id(), label, position));
@@ -677,7 +677,7 @@ public final class StepPmiPayloadBuilder {
         if (text == null) {
             return null;
         }
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(text.position(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(text.position(), builder);
         if (position == null) {
             return null;
         }
@@ -989,24 +989,24 @@ public final class StepPmiPayloadBuilder {
         }
         if (content instanceof StepVertexLoop) {
             StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
         if (content instanceof StepPolyLoop) {
             StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+                leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             }
             return;
         }
         if (content instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
         if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) content;
-            CartesianPoint point = StepPreviewJsonExporter.pointFromReplica(replica, builder);
+            CartesianPoint point = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
             if (point != null) {
                 leader.add(PayloadConversionHelper.toPointPayload(point));
             }
@@ -1014,12 +1014,12 @@ public final class StepPmiPayloadBuilder {
         }
         if (content instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             return;
         }
         if (content instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexPoint.point())));
             return;
         }
         List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
@@ -3963,7 +3963,7 @@ public final class StepPmiPayloadBuilder {
     private static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
         if (occurrence instanceof StepAnnotationPointOccurrence) {
             StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) occurrence;
-            return StepPreviewJsonExporter.pointFromAnnotationPoint(pointOccurrence.item(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(pointOccurrence.item(), builder);
         } else if (occurrence instanceof StepAnnotationCurveOccurrence) {
             StepAnnotationCurveOccurrence curveOccurrence = (StepAnnotationCurveOccurrence) occurrence;
             return pointFromCurveCarrier(curveOccurrence.item(), builder);
@@ -3978,7 +3978,7 @@ public final class StepPmiPayloadBuilder {
             return pointFromCurveCarrier(projectionCurve.item(), builder);
         } else if (occurrence instanceof StepAnnotationFillAreaOccurrence) {
             StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) occurrence;
-            return StepPreviewJsonExporter.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
         } else if (occurrence instanceof StepAnnotationFillArea) {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) occurrence;
             return pointFromAnnotationFillArea(fillArea, builder);
@@ -4005,7 +4005,7 @@ public final class StepPmiPayloadBuilder {
             return pointFromPlacement(annotationTextCharacter.mappingTarget());
         } else if (occurrence instanceof StepAnnotationTextOccurrence) {
             StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) occurrence;
-            return StepPreviewJsonExporter.pointFromAnnotationPoint(textOccurrence.position(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(textOccurrence.position(), builder);
         } else if (occurrence instanceof StepDraughtingAnnotationOccurrence) {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) occurrence;
             return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
@@ -4027,11 +4027,11 @@ public final class StepPmiPayloadBuilder {
             return pointFromGeometricCurveSet(curveSet, builder);
         } else if (occurrence instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) occurrence;
-            return StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point());
+            return StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point());
         } else if (occurrence instanceof StepGeometricReplica
                 && "POINT_REPLICA".equals(((StepGeometricReplica) occurrence).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) occurrence;
-            return builder == null ? null : StepPreviewJsonExporter.pointFromReplica(replica, builder);
+            return builder == null ? null : StepPmiPayloadBuilder.pointFromReplica(replica, builder);
         } else {
             return null;
         }
@@ -4051,7 +4051,7 @@ public final class StepPmiPayloadBuilder {
             if (point != null) {
                 return point;
             }
-            point = StepPreviewJsonExporter.pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -4069,7 +4069,7 @@ public final class StepPmiPayloadBuilder {
             if (point != null) {
                 return point;
             }
-            point = StepPreviewJsonExporter.pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -4094,7 +4094,7 @@ public final class StepPmiPayloadBuilder {
             if (point != null) {
                 return point;
             }
-            point = StepPreviewJsonExporter.pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -4104,7 +4104,7 @@ public final class StepPmiPayloadBuilder {
 
     private static CartesianPoint pointFromPointSet(StepPointSet pointSet, StepCadBuilder builder) {
         for (StepEntity item : pointSet.points()) {
-            CartesianPoint point = StepPreviewJsonExporter.pointFromAnnotationPoint(item, builder);
+            CartesianPoint point = StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
             if (point != null) {
                 return point;
             }
@@ -4133,7 +4133,7 @@ public final class StepPmiPayloadBuilder {
         if (point != null) {
             return point;
         }
-        return StepPreviewJsonExporter.pointFromAnnotationPoint(item, builder);
+        return StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
     }
 
     private static void collectPlaceholderPositions(
@@ -4171,7 +4171,7 @@ public final class StepPmiPayloadBuilder {
         }
         CartesianPoint point = pointFromAnnotationOccurrence(item, builder);
         if (point == null) {
-            point = StepPreviewJsonExporter.pointFromAnnotationPoint(item, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
         }
         if (point != null) {
             positions.add(point);
@@ -4181,7 +4181,7 @@ public final class StepPmiPayloadBuilder {
     private static CartesianPoint pointFromPlacement(StepEntity placement) {
         if (placement instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement3D = (StepAxis2Placement3D) placement;
-            return StepPreviewJsonExporter.pointFromStep(placement3D.location());
+            return StepPointExtractor.pointFromStep(placement3D.location());
         }
         if (placement instanceof StepAxis2Placement2D) {
             StepAxis2Placement2D placement2D = (StepAxis2Placement2D) placement;
@@ -7522,4 +7522,68 @@ public final class StepPmiPayloadBuilder {
                 instanceIdsByTargetId
         );
     }
+
+    public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
+        if (item instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) item;
+            return StepPointExtractor.pointFromStep(point);
+        }
+        if (item instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) item;
+            return StepPointExtractor.pointFromStep(vertexPoint.point());
+        }
+        if (item instanceof StepVertexShell) {
+            StepVertexShell vertexShell = (StepVertexShell) item;
+            return StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point());
+        }
+        if (item instanceof StepPointSet) {
+            StepPointSet pointSet = (StepPointSet) item;
+            return StepPmiPayloadBuilder.pointFromPointSet(pointSet, builder);
+        }
+        if (item instanceof StepGeometricSet) {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
+            return StepPmiPayloadBuilder.pointFromGeometricSet(geometricSet, builder);
+        }
+        if (item instanceof StepGeometricCurveSet) {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
+            return StepPmiPayloadBuilder.pointFromGeometricCurveSet(curveSet, builder);
+        }
+        if (item instanceof StepAnnotationSymbol
+                || item instanceof StepAnnotationText
+                || item instanceof StepAnnotationTextCharacter
+                || item instanceof StepAnnotationFillArea) {
+            return StepPmiPayloadBuilder.pointFromAnnotationOccurrence(item, builder);
+        }
+        if (item instanceof StepAnnotationPointOccurrence
+                || item instanceof StepAnnotationFillAreaOccurrence
+                || item instanceof StepAnnotationTextOccurrence
+                || item instanceof StepAnnotationPlaceholderOccurrence
+                || item instanceof StepAnnotationSymbolOccurrence
+                || item instanceof StepAnnotationSubfigureOccurrence
+                || item instanceof StepDraughtingAnnotationOccurrence
+                || item instanceof StepAnnotationPlane) {
+            return StepPmiPayloadBuilder.pointFromAnnotationOccurrence(item, builder);
+        }
+        if (builder != null && item instanceof StepGeometricReplica) {
+            StepGeometricReplica replica = (StepGeometricReplica) item;
+            if ("POINT_REPLICA".equals(replica.entityName())) {
+                return pointFromReplica(replica, builder);
+            }
+        }
+        return null;
+    }
+
+
+    public static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
+        if (replica.parent() instanceof StepCartesianPoint) {
+            StepCartesianPoint point = (StepCartesianPoint) replica.parent();
+            return StepPointExtractor.transformPoint(StepPointExtractor.pointFromStep(point), replica.transformation(), builder);
+        }
+        if (replica.parent() instanceof StepVertexPoint) {
+            StepVertexPoint vertexPoint = (StepVertexPoint) replica.parent();
+            return StepPointExtractor.transformPoint(StepPointExtractor.pointFromStep(vertexPoint.point()), replica.transformation(), builder);
+        }
+        return null;
+    }
+
 }

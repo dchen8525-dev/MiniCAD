@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /**
  * Utility class for matching pcurve (parametric curve) geometry with face surfaces.
@@ -59,7 +60,7 @@ public final class PcurveMatcher {
             return "[]";
         }
         return associated.stream()
-                .map(entity -> StepPreviewJsonExporter.surfaceTypeName(entity) + "#" + entity.id())
+                .map(entity -> StepTypeNameResolver.surfaceTypeName(entity) + "#" + entity.id())
                 .collect(Collectors.joining("|"));
     }
 

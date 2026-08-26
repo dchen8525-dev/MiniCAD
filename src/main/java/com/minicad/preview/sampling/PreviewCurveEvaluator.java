@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /** Curve evaluation, sampling, and preview payload construction.
  *  Extracted from StepPreviewJsonExporter to isolate curve logic. */
@@ -1296,10 +1297,10 @@ public final class PreviewCurveEvaluator {
         for (StepEntity associated : associatedGeometry) {
             if (associated instanceof StepPcurve) {
             StepPcurve pcurve = (StepPcurve) associated;
-                surfaceTypes.add(StepPreviewJsonExporter.surfaceTypeName(pcurve.basisSurface()));
+                surfaceTypes.add(StepTypeNameResolver.surfaceTypeName(pcurve.basisSurface()));
             } else if (associated instanceof StepDegeneratePcurve) {
             StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
-                surfaceTypes.add(StepPreviewJsonExporter.surfaceTypeName(pcurve.basisSurface()));
+                surfaceTypes.add(StepTypeNameResolver.surfaceTypeName(pcurve.basisSurface()));
             }
         }
         return surfaceTypes.isEmpty() ? null : List.copyOf(surfaceTypes);

@@ -422,7 +422,7 @@ public final class PreviewPmiTargetBuilder {
         if (text == null) {
             return null;
         }
-        CartesianPoint position = StepPreviewJsonExporter.pointFromAnnotationPoint(text.position(), builder);
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(text.position(), builder);
         if (position == null) {
             return null;
         }
@@ -740,24 +740,24 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepVertexLoop) {
             StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexLoop.loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexLoop.loopVertex().point())));
             return;
         }
         if (content instanceof StepPolyLoop) {
             StepPolyLoop polyLoop = (StepPolyLoop) content;
             for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+                leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             }
             return;
         }
         if (content instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexShell.extent().loopVertex().point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())));
             return;
         }
         if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) content;
-            CartesianPoint point = StepPreviewJsonExporter.pointFromReplica(replica, builder);
+            CartesianPoint point = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
             if (point != null) {
                 leader.add(PayloadConversionHelper.toPointPayload(point));
             }
@@ -765,12 +765,12 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(point)));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
             return;
         }
         if (content instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
+            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexPoint.point())));
             return;
         }
         List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(content, builder);

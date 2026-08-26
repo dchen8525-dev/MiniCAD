@@ -30,6 +30,7 @@ import com.minicad.topology.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.minicad.export.json.StepTypeNameResolver;
 
 /**
  * Mesh export utilities for preview generation.
@@ -793,7 +794,7 @@ public final class PreviewMeshExporter {
 
         if (geometry instanceof StepRectangularTrimmedSurface) {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(trimmedSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(trimmedSurface.basisSurface());
             basisStepId = trimmedSurface.basisSurface().id();
             trimU1 = trimmedSurface.u1();
             trimU2 = trimmedSurface.u2();
@@ -801,23 +802,23 @@ public final class PreviewMeshExporter {
             trimV2 = trimmedSurface.v2();
         } else if (geometry instanceof StepCurveBoundedSurface) {
             StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(boundedSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(boundedSurface.basisSurface());
             basisStepId = boundedSurface.basisSurface().id();
             implicitOuter = boundedSurface.implicitOuter();
         } else if (geometry instanceof StepOrientedSurface) {
             StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(orientedSurface.surfaceElement());
+            basisType = StepTypeNameResolver.surfaceTypeName(orientedSurface.surfaceElement());
             basisStepId = orientedSurface.surfaceElement().id();
             orientation = orientedSurface.orientation();
         } else if (geometry instanceof StepOffsetSurface) {
             StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(offsetSurface.basisSurface());
+            basisType = StepTypeNameResolver.surfaceTypeName(offsetSurface.basisSurface());
             basisStepId = offsetSurface.basisSurface().id();
             offsetDistance = offsetSurface.distance();
         } else if (geometry instanceof StepGeometricReplica
                 && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            basisType = StepPreviewJsonExporter.surfaceTypeName(replica.parent());
+            basisType = StepTypeNameResolver.surfaceTypeName(replica.parent());
             basisStepId = replica.parent().id();
             if (replica.transformation() instanceof StepCartesianTransformationOperator) {
                 StepCartesianTransformationOperator transformation =
@@ -845,7 +846,7 @@ public final class PreviewMeshExporter {
                 base.vMultiplicities(),
                 base.uKnots(),
                 base.vKnots(),
-                StepPreviewJsonExporter.surfaceTypeName(geometry),
+                StepTypeNameResolver.surfaceTypeName(geometry),
                 geometry.id(),
                 basisType,
                 basisStepId,
@@ -890,7 +891,7 @@ public final class PreviewMeshExporter {
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
         }
         throw new UnsupportedGeometryException(
-                StepPreviewJsonExporter.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
+                StepTypeNameResolver.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
     }
 
     public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {

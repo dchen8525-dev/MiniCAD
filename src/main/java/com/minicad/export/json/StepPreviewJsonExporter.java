@@ -990,7 +990,7 @@ public final class StepPreviewJsonExporter {
                 PreviewFaceResult previewFace = StepFacePayloadBuilder.buildPreviewFaceResult(
                         stepFace,
                         builder,
-                        mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
+                        StepMetadataHelper.mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
                 );
                 processedFaces++;
                 if (previewFace.face() == null) {
@@ -1046,7 +1046,7 @@ public final class StepPreviewJsonExporter {
 
         for (Integer solidId : solidIds) {
             StepEntity entity = resolved.get(solidId);
-            StepMetadataExtractor.DisplayMetadata itemMetadata = mergeMetadata(
+            StepMetadataExtractor.DisplayMetadata itemMetadata = StepMetadataHelper.mergeMetadata(
                     inheritedSolidMetadata.get(solidId),
                     metadata.forItem(solidId)
             );
@@ -1497,7 +1497,7 @@ public final class StepPreviewJsonExporter {
                 Set<Integer> itemShellIds = new LinkedHashSet<>();
                 collectShellLikeIds(item, itemShellIds);
                 for (Integer shellId : itemShellIds) {
-                    metadataByShellId.put(shellId, mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
+                    metadataByShellId.put(shellId, StepMetadataHelper.mergeMetadata(metadataByShellId.get(shellId), itemMetadata));
                 }
             }
         }
@@ -1515,7 +1515,7 @@ public final class StepPreviewJsonExporter {
                 StepEntity unwrapped = unwrapStyledItem(item);
                 if (isRepresentationSolidItem(unwrapped)) {
                     StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
-                    metadataBySolidId.put(unwrapped.id(), mergeMetadata(metadataBySolidId.get(unwrapped.id()), itemMetadata));
+                    metadataBySolidId.put(unwrapped.id(), StepMetadataHelper.mergeMetadata(metadataBySolidId.get(unwrapped.id()), itemMetadata));
                 }
             }
         }
@@ -1597,38 +1597,6 @@ public final class StepPreviewJsonExporter {
                 }
             }
         }
-    }
-
-    public static StepMetadataExtractor.DisplayMetadata mergeMetadata(
-            StepMetadataExtractor.DisplayMetadata inherited,
-            StepMetadataExtractor.DisplayMetadata direct
-    ) {
-        StepMetadataExtractor.DisplayMetadata left = inherited == null ? StepMetadataExtractor.DisplayMetadata.EMPTY : inherited;
-        StepMetadataExtractor.DisplayMetadata right = direct == null ? StepMetadataExtractor.DisplayMetadata.EMPTY : direct;
-        int[] rgb = right.rgb() != null ? right.rgb() : left.rgb();
-        Set<String> layers = new LinkedHashSet<>(left.layers());
-        layers.addAll(right.layers());
-        double transparency = right.transparency() > 0 ? right.transparency() : left.transparency();
-        StepMetadataExtractor.PbrMetadata pbr = right.pbr() != null ? right.pbr() : left.pbr();
-        return new StepMetadataExtractor.DisplayMetadata(rgb, List.copyOf(layers), transparency, pbr);
-    }
-
-    public static String faceDisplayName(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            return faceDisplayName(orientedFace.faceElement());
-        }
-        return stepFace.name();
-    }
-
-    static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
-        StepEntity geometry = faceGeometry(stepFace);
-        return new UnsupportedFacePayload(
-                stepFace.id(),
-                faceDisplayName(stepFace),
-                surfaceTypeName(geometry),
-                reason == null ? "preview export returned no mesh" : reason
-        );
     }
 
     public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
@@ -1998,15 +1966,6 @@ public final class StepPreviewJsonExporter {
 
     // Delegate to StepGeometryHelper - extracted utility class
 
-    static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
-        if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
-            FaceBound bound = bounds.get(0);
-            return List.of(FaceBound.outer(bound.loop(), bound.orientation()));
-        }
-        return bounds;
-    }
-
     // Delegate to StepGeometryHelper - extracted utility class
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {
         return StepGeometryHelper.faceGeometry(stepFace);
@@ -2279,56 +2238,6 @@ public final class StepPreviewJsonExporter {
         return StepMappedItemTransformer.transformMappedFace(face, mappedItemId, matrix, metadata);
     }
 
-    public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) item;
-            return pointFromStep(point);
-        }
-        if (item instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) item;
-            return pointFromStep(vertexPoint.point());
-        }
-        if (item instanceof StepVertexShell) {
-            StepVertexShell vertexShell = (StepVertexShell) item;
-            return pointFromStep(vertexShell.extent().loopVertex().point());
-        }
-        if (item instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) item;
-            return pointFromPointSet(pointSet, builder);
-        }
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            return pointFromGeometricSet(geometricSet, builder);
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            return pointFromGeometricCurveSet(curveSet, builder);
-        }
-        if (item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepAnnotationFillArea) {
-            return pointFromAnnotationOccurrence(item, builder);
-        }
-        if (item instanceof StepAnnotationPointOccurrence
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationTextOccurrence
-                || item instanceof StepAnnotationPlaceholderOccurrence
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepAnnotationPlane) {
-            return pointFromAnnotationOccurrence(item, builder);
-        }
-        if (builder != null && item instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            if ("POINT_REPLICA".equals(replica.entityName())) {
-                return pointFromReplica(replica, builder);
-            }
-        }
-        return null;
-    }
-
     private static CartesianPoint pointFromAnnotationSymbol(StepAnnotationSymbol annotationSymbol) {
         return pointFromPlacement(annotationSymbol.mappingTarget());
     }
@@ -2347,7 +2256,7 @@ public final class StepPreviewJsonExporter {
     private static CartesianPoint pointFromAnnotationOccurrence(StepEntity occurrence, StepCadBuilder builder) {
         if (occurrence instanceof StepAnnotationPointOccurrence) {
             StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) occurrence;
-            return pointFromAnnotationPoint(pointOccurrence.item(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(pointOccurrence.item(), builder);
         } else if (occurrence instanceof StepAnnotationCurveOccurrence) {
             StepAnnotationCurveOccurrence curveOccurrence = (StepAnnotationCurveOccurrence) occurrence;
             return pointFromCurveCarrier(curveOccurrence.item(), builder);
@@ -2362,7 +2271,7 @@ public final class StepPreviewJsonExporter {
             return pointFromCurveCarrier(projectionCurve.item(), builder);
         } else if (occurrence instanceof StepAnnotationFillAreaOccurrence) {
             StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) occurrence;
-            return pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
         } else if (occurrence instanceof StepAnnotationFillArea) {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) occurrence;
             return pointFromAnnotationFillArea(fillArea, builder);
@@ -2389,7 +2298,7 @@ public final class StepPreviewJsonExporter {
             return pointFromPlacement(annotationTextCharacter.mappingTarget());
         } else if (occurrence instanceof StepAnnotationTextOccurrence) {
             StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) occurrence;
-            return pointFromAnnotationPoint(textOccurrence.position(), builder);
+            return StepPmiPayloadBuilder.pointFromAnnotationPoint(textOccurrence.position(), builder);
         } else if (occurrence instanceof StepDraughtingAnnotationOccurrence) {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) occurrence;
             return pointFromAnnotationOccurrence(annotationOccurrence.item(), builder);
@@ -2415,7 +2324,7 @@ public final class StepPreviewJsonExporter {
         } else if (occurrence instanceof StepGeometricReplica
                 && "POINT_REPLICA".equals(((StepGeometricReplica) occurrence).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) occurrence;
-            return builder == null ? null : pointFromReplica(replica, builder);
+            return builder == null ? null : StepPmiPayloadBuilder.pointFromReplica(replica, builder);
         } else {
             return null;
         }
@@ -2435,7 +2344,7 @@ public final class StepPreviewJsonExporter {
             if (point != null) {
                 return point;
             }
-            point = pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -2453,7 +2362,7 @@ public final class StepPreviewJsonExporter {
             if (point != null) {
                 return point;
             }
-            point = pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -2478,7 +2387,7 @@ public final class StepPreviewJsonExporter {
             if (point != null) {
                 return point;
             }
-            point = pointFromAnnotationPoint(element, builder);
+            point = StepPmiPayloadBuilder.pointFromAnnotationPoint(element, builder);
             if (point != null) {
                 return point;
             }
@@ -2488,7 +2397,7 @@ public final class StepPreviewJsonExporter {
 
     private static CartesianPoint pointFromPointSet(StepPointSet pointSet, StepCadBuilder builder) {
         for (StepEntity item : pointSet.points()) {
-            CartesianPoint point = pointFromAnnotationPoint(item, builder);
+            CartesianPoint point = StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
             if (point != null) {
                 return point;
             }
@@ -2517,7 +2426,7 @@ public final class StepPreviewJsonExporter {
         if (point != null) {
             return point;
         }
-        return pointFromAnnotationPoint(item, builder);
+        return StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
     }
 
     private static CartesianPoint pointFromPlacement(StepEntity placement) {
@@ -2531,48 +2440,6 @@ public final class StepPreviewJsonExporter {
             return new CartesianPoint(point.coordinates().get(0), point.coordinates().get(1), 0.0);
         }
         return null;
-    }
-
-    public static CartesianPoint pointFromReplica(StepGeometricReplica replica, StepCadBuilder builder) {
-        if (replica.parent() instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) replica.parent();
-            return transformPoint(pointFromStep(point), replica.transformation(), builder);
-        }
-        if (replica.parent() instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) replica.parent();
-            return transformPoint(pointFromStep(vertexPoint.point()), replica.transformation(), builder);
-        }
-        return null;
-    }
-
-    static CartesianPoint transformPoint(
-            CartesianPoint point,
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            StepCadBuilder builder
-    ) {
-        Vector3 axis1 = transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-        Vector3 axis2;
-        if (transformation.axis2() != null) {
-            axis2 = builder.buildDirection(transformation.axis2().id()).asVector();
-        } else {
-            Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-            axis2 = axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-        }
-        Vector3 axis3;
-        if (transformation.axis3() != null) {
-            axis3 = builder.buildDirection(transformation.axis3().id()).asVector();
-        } else {
-            Vector3 cross = axis1.cross(axis2);
-            axis3 = cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
-        }
-        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
-        CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
-        Vector3 offset = axis1.scale(point.x() * scale)
-                .add(axis2.scale(point.y() * scale))
-                .add(axis3.scale(point.z() * scale));
-        return origin.add(offset);
     }
 
     // Delegate to StepTypeNameResolver - extracted utility class

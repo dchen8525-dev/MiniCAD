@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAnnotationFillArea;
@@ -149,7 +150,7 @@ public final class PmiTargetHelper {
     public static String pmiTargetName(StepEntity target) {
         if (target instanceof StepFaceEntity) {
             StepFaceEntity face = (StepFaceEntity) target;
-            return StepPreviewJsonExporter.faceDisplayName(face);
+            return StepMetadataHelper.faceDisplayName(face);
         }
         if (target instanceof StepEdgeCurve) {
             StepEdgeCurve edge = (StepEdgeCurve) target;

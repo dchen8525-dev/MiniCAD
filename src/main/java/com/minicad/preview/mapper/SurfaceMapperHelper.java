@@ -54,6 +54,7 @@ import com.minicad.step.model.StepUniformSurface;
 import com.minicad.step.model.StepBlendedSurface;
 
 import java.util.List;
+import com.minicad.export.json.StepPlacementTransformer;
 
 /**
  * Helper class for parametric surface mapping operations.
@@ -333,7 +334,7 @@ public class SurfaceMapperHelper {
             if (base == null) {
                 return null;
             }
-            double[] matrix = StepPreviewJsonExporter.matrixForTransformationOperator(transformation, builder);
+            double[] matrix = StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
             double[] inverse = MathUtilityHelper.inverseUniformScaleTransform(matrix);
             if (inverse == null) {
                 return null;
