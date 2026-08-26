@@ -766,14 +766,14 @@ public final class StepEdgePayloadBuilder {
 
     private static EdgePayload toPolylineEdgePayload(StepPolyline polyline) {
         List<CartesianPoint> points = polyline.points().stream()
-                .map(StepPreviewJsonExporter::pointFromStep)
+                .map(StepPointExtractor::pointFromStep)
                 .collect(Collectors.toList());
         return new EdgePayload(polyline.id(), PayloadConversionHelper.toPointPayloads(points), null, null);
     }
 
     private static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
         List<CartesianPoint> points = polyLoop.polygon().stream()
-                .map(StepPreviewJsonExporter::pointFromStep)
+                .map(StepPointExtractor::pointFromStep)
                 .collect(Collectors.toList());
         List<CartesianPoint> closed = new ArrayList<>(points);
         if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
