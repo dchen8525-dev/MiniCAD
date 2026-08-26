@@ -134,20 +134,48 @@ public final class TrimmedCurve3 implements Curve3 {
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Search only within the trimmed segment. sample(int) distributes parameters
-        // in [0,1] and pointAt maps them onto the trim interval on the basis curve,
-        // guaranteeing the returned point lies on the trimmed portion.
-        List<CartesianPoint> samples = sample(256);
-        CartesianPoint closest = samples.get(0);
-        double minDist = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
-            double dist = point.distanceTo(samples.get(i));
-            if (dist < minDist) {
-                minDist = dist;
-                closest = samples.get(i);
+        // Search only within the trimmed segment. pointAt maps the [0,1] parameter
+        // range onto the trim interval on the basis curve, so the returned point is
+        // always on the trimmed portion. A uniform sample of a curved curve has a
+        // fixed resolution: a point midway between two samples can sit farther away
+        // from every sample than the tolerance, so `contains` would wrongly report
+        // it as off-curve. Instead, coarse-scan the parameter range and then refine
+        // locally around the best parameter, converging toward the true closest point.
+        final int coarseSegments = 64;
+        double bestT = 0.0;
+        double bestDist = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= coarseSegments; i++) {
+            double t = (double) i / coarseSegments;
+            double d = point.distanceTo(pointAt(t));
+            if (d < bestDist) {
+                bestDist = d;
+                bestT = t;
             }
         }
-        return closest;
+        // Binary bracket refinement around the best parameter: keep the best of the
+        // left/center/right samples in a shrinking window until the window width is
+        // negligible relative to the parameter range.
+        double halfWidth = 1.0 / coarseSegments;
+        while (halfWidth > 1.0e-12) {
+            double tLeft = Math.max(0.0, bestT - halfWidth);
+            double tRight = Math.min(1.0, bestT + halfWidth);
+            double tMid = (tLeft + tRight) * 0.5;
+            double dLeft = point.distanceTo(pointAt(tLeft));
+            double dMid = point.distanceTo(pointAt(tMid));
+            double dRight = point.distanceTo(pointAt(tRight));
+            if (dLeft <= dMid && dLeft <= dRight) {
+                bestT = tLeft;
+                bestDist = dLeft;
+            } else if (dRight <= dMid && dRight <= dLeft) {
+                bestT = tRight;
+                bestDist = dRight;
+            } else {
+                bestT = tMid;
+                bestDist = dMid;
+            }
+            halfWidth *= 0.5;
+        }
+        return pointAt(bestT);
     }
 
     @Override
