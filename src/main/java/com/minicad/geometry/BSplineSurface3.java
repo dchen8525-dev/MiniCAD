@@ -123,16 +123,16 @@ public final class BSplineSurface3 implements SurfaceGeometry {
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
 
-        int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
+        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
 
         Vector3 sum = new Vector3(0.0, 0.0, 0.0);
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = basisValue(ui, uDegree, clampedU, uExp);
+            double nu = BSplineMath.basisValue(ui, uDegree, clampedU, uExp);
             for (int j = 0; j <= vDegree; j++) {
                 int vj = vSpan - vDegree + j;
-                double nv = basisValue(vj, vDegree, clampedV, vExp);
+                double nv = BSplineMath.basisValue(vj, vDegree, clampedV, vExp);
                 CartesianPoint control = controlPoints.get(ui).get(vj);
                 sum = sum.add(new Vector3(control.getX() * nu * nv, control.getY() * nu * nv, control.getZ() * nu * nv));
             }
@@ -149,19 +149,19 @@ public final class BSplineSurface3 implements SurfaceGeometry {
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
 
-        int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
+        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
 
         Vector3 dSdu = new Vector3(0.0, 0.0, 0.0);
         Vector3 dSdv = new Vector3(0.0, 0.0, 0.0);
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = basisValue(ui, uDegree, clampedU, uExp);
-            double dNu = derivativeBasisValue(ui, uDegree, clampedU, uExp);
+            double nu = BSplineMath.basisValue(ui, uDegree, clampedU, uExp);
+            double dNu = BSplineMath.derivativeBasisValue(ui, uDegree, clampedU, uExp);
             for (int j = 0; j <= vDegree; j++) {
                 int vj = vSpan - vDegree + j;
-                double nv = basisValue(vj, vDegree, clampedV, vExp);
-                double dNv = derivativeBasisValue(vj, vDegree, clampedV, vExp);
+                double nv = BSplineMath.basisValue(vj, vDegree, clampedV, vExp);
+                double dNv = BSplineMath.derivativeBasisValue(vj, vDegree, clampedV, vExp);
                 CartesianPoint cp = controlPoints.get(ui).get(vj);
                 Vector3 cpVec = new Vector3(cp.getX(), cp.getY(), cp.getZ());
                 dSdu = dSdu.add(cpVec.scale(dNu * nv));
@@ -176,19 +176,6 @@ public final class BSplineSurface3 implements SurfaceGeometry {
         return normal.normalize().asVector();
     }
 
-    private static double derivativeBasisValue(int i, int degree, double parameter, List<Double> knots) {
-        double left = 0.0;
-        double right = 0.0;
-        double leftDenom = knots.get(i + degree) - knots.get(i);
-        if (!Epsilon.isZero(leftDenom)) {
-            left = degree / leftDenom * basisValue(i, degree - 1, parameter, knots);
-        }
-        double rightDenom = knots.get(i + degree + 1) - knots.get(i + 1);
-        if (!Epsilon.isZero(rightDenom)) {
-            right = degree / rightDenom * basisValue(i + 1, degree - 1, parameter, knots);
-        }
-        return left - right;
-    }
 
     public List<List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
         int uCount = Math.max(uSegments, 1);
@@ -274,42 +261,6 @@ public final class BSplineSurface3 implements SurfaceGeometry {
         }
     }
 
-    private static int findSpan(int n, int degree, double parameter, List<Double> knots) {
-        if (parameter >= knots.get(n + 1)) {
-            return n;
-        }
-        int low = degree;
-        int high = n + 1;
-        int mid = (low + high) / 2;
-        while (parameter < knots.get(mid) || parameter >= knots.get(mid + 1)) {
-            if (parameter < knots.get(mid)) {
-                high = mid;
-            } else {
-                low = mid;
-            }
-            mid = (low + high) / 2;
-        }
-        return mid;
-    }
-
-    private static double basisValue(int i, int degree, double parameter, List<Double> knots) {
-        if (degree == 0) {
-            if ((parameter >= knots.get(i) && parameter < knots.get(i + 1))
-                    || (Epsilon.equals(parameter, knots.get(knots.size() - 1)) && Epsilon.equals(parameter, knots.get(i + 1)))) {
-                return 1.0;
-            }
-            return 0.0;
-        }
-        double leftDenominator = knots.get(i + degree) - knots.get(i);
-        double rightDenominator = knots.get(i + degree + 1) - knots.get(i + 1);
-        double left = Epsilon.isZero(leftDenominator)
-                ? 0.0
-                : (parameter - knots.get(i)) / leftDenominator * basisValue(i, degree - 1, parameter, knots);
-        double right = Epsilon.isZero(rightDenominator)
-                ? 0.0
-                : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
-        return left + right;
-    }
 
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");

@@ -1,5 +1,8 @@
 package com.minicad.step.semantic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
@@ -260,6 +263,8 @@ import java.util.Objects;
  * Builds internal geometry and topology objects from resolved STEP semantic entities.
  */
 public final class StepCadBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(StepCadBuilder.class);
 
     private final Map<Integer, StepEntity> entitiesById;
     private final StepCadGeometryBuilder geometryBuilder;
@@ -771,7 +776,8 @@ public final class StepCadBuilder {
                 return new Polyline2(List.of(pt, pt));
             }
         } catch (Exception e) {
-            // Ignore and use default
+            // Recoverable degradation: fall back to a degenerate default polyline.
+            log.warn("2D curve projection failed; using degenerate default polyline", e);
         }
         return new Polyline2(List.of(new Point2(0, 0), new Point2(0, 0)));
     }
@@ -3849,6 +3855,8 @@ public final class StepCadBuilder {
             List<Integer> multV = generateUniformMultiplicities(knotV.size());
             return new BSplineSurface3(degreeU, degreeV, grid, multU, multV, knotU, knotV);
         } catch (Exception e) {
+            // Recoverable degradation: surface build failed, signal and return null.
+            log.warn("BSplineSurface3 construction failed; returning null", e);
             return null;
         }
     }

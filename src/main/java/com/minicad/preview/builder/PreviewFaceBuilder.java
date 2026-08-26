@@ -1,5 +1,8 @@
 package com.minicad.preview.builder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.minicad.export.json.StepPointExtractor;
 import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.common.Epsilon;
@@ -82,6 +85,8 @@ import com.minicad.export.json.StepTypeNameResolver;
  * Extracted from StepPreviewJsonExporter to isolate face and geometry logic.
  */
 public final class PreviewFaceBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(PreviewFaceBuilder.class);
 
     private static final int TOPOLOGY_SURFACE_GRID_SEGMENTS = 16;
 
@@ -966,6 +971,8 @@ public final class PreviewFaceBuilder {
             return toSampledSurfaceFacePayload(stepFace, surface, "CONICAL_SURFACE_WITH_ELLIPTICAL_AXIS",
                     buildFaceBounds(stepFace, builder), metadata);
         } catch (Exception ex) {
+            // Recoverable degradation: conical-elliptical face build failed, signal and return null.
+            log.warn("PreviewFaceBuilder conical-elliptical face build failed; returning null", ex);
             return null;
         }
     }

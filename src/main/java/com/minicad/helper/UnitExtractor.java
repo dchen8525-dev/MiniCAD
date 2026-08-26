@@ -60,6 +60,7 @@ public final class UnitExtractor {
     // Base unit names to their meter equivalents
     private static final Map<String, Double> BASE_UNITS_TO_METERS = Map.ofEntries(
             Map.entry("METRE", 1.0),
+            Map.entry("MILLIMETRE", 1e-3),
             Map.entry("INCH", 0.0254),
             Map.entry("FOOT", 0.3048),
             Map.entry("YARD", 0.9144),
@@ -155,20 +156,17 @@ public final class UnitExtractor {
     }
 
     private static Double computeScaleToMeters(StepSiUnit si) {
-        if (!"METRE".equals(si.unitName()) && !"MILLIMETRE".equals(si.unitName())) {
-            Double base = BASE_UNITS_TO_METERS.get(si.unitName());
-            if (base != null) {
-                double prefixMult = si.prefix() != null
-                        ? SI_PREFIXES.getOrDefault(si.prefix(), 1.0)
-                        : 1.0;
-                return base * prefixMult;
-            }
+        // Every SI length unit (including METRE and MILLIMETRE) resolves to a
+        // base scale in metres, then multiplied by its prefix multiplier.
+        // Previously MILLIMETRE was handled in a separate branch that silently
+        // dropped the 1e-3 base factor, so millimetres were treated as metres.
+        Double base = BASE_UNITS_TO_METERS.get(si.unitName());
+        if (base == null) {
             return null;
         }
-        // METRE with prefix
         double prefixMult = si.prefix() != null
                 ? SI_PREFIXES.getOrDefault(si.prefix(), 1.0)
                 : 1.0;
-        return prefixMult;
+        return base * prefixMult;
     }
 }

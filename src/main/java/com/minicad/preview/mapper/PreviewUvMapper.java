@@ -1,5 +1,8 @@
 package com.minicad.preview.mapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.*;
@@ -38,6 +41,8 @@ import com.minicad.export.json.StepTypeNameResolver;
 /** UV mapping, parametric surface projection, and pcurve sampling.
  *  Extracted from StepPreviewJsonExporter to isolate UV mapping logic. */
 public final class PreviewUvMapper {
+
+    private static final Logger log = LoggerFactory.getLogger(PreviewUvMapper.class);
 
     private PreviewUvMapper() {}
 
@@ -725,6 +730,8 @@ public final class PreviewUvMapper {
             }
             return null;
         } catch (Exception ex) {
+            // Recoverable degradation: edge build failed, signal and return null.
+            log.warn("PreviewUvMapper edge build failed; returning null", ex);
             return null;
         }
     }

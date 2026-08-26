@@ -183,27 +183,14 @@ public final class BSplineCurve3 implements Curve3 {
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        // Simple approximation using control points for now
         if (controlPoints == null || controlPoints.isEmpty()) {
             return CartesianPoint.origin();
         }
-        // Linear interpolation between control points as fallback
-        double t = (parameter - startParameter()) / (endParameter() - startParameter());
-        t = Math.max(0.0, Math.min(1.0, t));
-        int n = controlPoints.size();
-        if (n == 1) {
-            return controlPoints.get(0);
+        List<Double> expanded = expandedKnots();
+        if (expanded.size() <= degree + 1) {
+            return CartesianPoint.origin();
         }
-        int i = (int) (t * (n - 1));
-        i = Math.max(0, Math.min(i, n - 2));
-        double localT = t * (n - 1) - i;
-        CartesianPoint p0 = controlPoints.get(i);
-        CartesianPoint p1 = controlPoints.get(i + 1);
-        return new CartesianPoint(
-            p0.getX() + localT * (p1.getX() - p0.getX()),
-            p0.getY() + localT * (p1.getY() - p0.getY()),
-            p0.getZ() + localT * (p1.getZ() - p0.getZ())
-        );
+        return BSplineMath.evaluate(controlPoints, degree, parameter, expanded);
     }
 
     @Override

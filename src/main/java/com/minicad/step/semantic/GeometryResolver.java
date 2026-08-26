@@ -64,25 +64,33 @@ final class GeometryResolver {
   StepAxis2Placement3D resolveAxis2Placement3D(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "AXIS2_PLACEMENT_3D");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
-    if (resolver.isUnset(definition.parameters().get(2)) || resolver.isUnset(definition.parameters().get(3))) {
-      throw new UnsupportedStepEntityException(
-          "AXIS2_PLACEMENT_3D requires explicit axis and ref direction");
-    }
+    // Per ISO 10303-42, axis and ref_direction are OPTIONAL. When omitted they
+    // default to (0,0,1) and the projection of (1,0,0) onto the plane normal to
+    // axis. Applying the defaults keeps valid STEP files parseable instead of
+    // being rejected, and guarantees non-null axis/refDirection downstream
+    // (so matrixForPlacement / convert2DPlacementTo3D can never NPE on them).
+    StepCartesianPoint location = resolver.requireEntity(
+        resolver.referenceId(instance, definition, 1),
+        StepCartesianPoint.class,
+        "AXIS2_PLACEMENT_3D location must reference CARTESIAN_POINT");
+    StepDirection axis = resolver.isUnset(definition.parameters().get(2))
+        ? defaultAxis()
+        : resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepDirection.class,
+            "AXIS2_PLACEMENT_3D axis must reference DIRECTION");
+    StepDirection refDirection = resolver.isUnset(definition.parameters().get(3))
+        ? defaultRefDirection(axis)
+        : resolver.requireEntity(
+            resolver.referenceId(instance, definition, 3),
+            StepDirection.class,
+            "AXIS2_PLACEMENT_3D ref direction must reference DIRECTION");
     return new StepAxis2Placement3D(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 1),
-            StepCartesianPoint.class,
-            "AXIS2_PLACEMENT_3D location must reference CARTESIAN_POINT"),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 2),
-            StepDirection.class,
-            "AXIS2_PLACEMENT_3D axis must reference DIRECTION"),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 3),
-            StepDirection.class,
-            "AXIS2_PLACEMENT_3D ref direction must reference DIRECTION"));
+        location,
+        axis,
+        refDirection);
   }
 
   StepAxis1Placement resolveAxis1Placement(StepEntityInstance instance) {
@@ -104,17 +112,55 @@ final class GeometryResolver {
   StepAxis2Placement2D resolveAxis2Placement2D(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "AXIS2_PLACEMENT_2D");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
+    // Per ISO 10303-42, ref_direction is OPTIONAL and defaults to (1,0).
+    StepCartesianPoint location = resolver.requireEntity(
+        resolver.referenceId(instance, definition, 1),
+        StepCartesianPoint.class,
+        "AXIS2_PLACEMENT_2D location must reference CARTESIAN_POINT");
+    StepDirection refDirection = resolver.isUnset(definition.parameters().get(2))
+        ? new StepDirection(0, "", List.of(1.0, 0.0))
+        : resolver.requireEntity(
+            resolver.referenceId(instance, definition, 2),
+            StepDirection.class,
+            "AXIS2_PLACEMENT_2D ref direction must reference DIRECTION");
     return new StepAxis2Placement2D(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 1),
-            StepCartesianPoint.class,
-            "AXIS2_PLACEMENT_2D location must reference CARTESIAN_POINT"),
-        resolver.requireEntity(
-            resolver.referenceId(instance, definition, 2),
-            StepDirection.class,
-            "AXIS2_PLACEMENT_2D ref direction must reference DIRECTION"));
+        location,
+        refDirection);
+  }
+
+  private static StepDirection defaultAxis() {
+    return new StepDirection(0, "", List.of(0.0, 0.0, 1.0));
+  }
+
+  private static StepDirection defaultRefDirection(StepDirection axis) {
+    List<Double> r = axis != null ? axis.directionRatios() : null;
+    double ax = 0.0, ay = 0.0, az = 1.0;
+    if (r != null && r.size() >= 3) {
+      ax = r.get(0); ay = r.get(1); az = r.get(2);
+      double len = Math.sqrt(ax * ax + ay * ay + az * az);
+      if (len > 1e-12) {
+        ax /= len; ay /= len; az /= len;
+      } else {
+        ax = 0.0; ay = 0.0; az = 1.0;
+      }
+    }
+    // Seed = X axis; if axis is parallel to X, fall back to Y axis.
+    double sx = 1.0, sy = 0.0, sz = 0.0;
+    double dot = ax * sx + ay * sy + az * sz;
+    if (Math.abs(dot) > 0.999) {
+      sx = 0.0; sy = 1.0; sz = 0.0;
+      dot = ax * sx + ay * sy + az * sz;
+    }
+    double rx = sx - dot * ax, ry = sy - dot * ay, rz = sz - dot * az;
+    double rlen = Math.sqrt(rx * rx + ry * ry + rz * rz);
+    if (rlen < 1e-12) {
+      rx = 1.0; ry = 0.0; rz = 0.0;
+    } else {
+      rx /= rlen; ry /= rlen; rz /= rlen;
+    }
+    return new StepDirection(0, "", List.of(rx, ry, rz));
   }
 
   // === Basic Curves ===

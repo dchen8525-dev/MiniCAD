@@ -106,8 +106,11 @@ public final class TrimmedCurve3 implements Curve3 {
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Check if point lies on the trimmed portion of the basis curve
-        return basisCurve.contains(point);
+        // Restrict the membership test to the trimmed portion of the basis curve.
+        // closestPointTo already samples this trimmed curve (its pointAt maps the
+        // [0,1] parameter range onto the trim interval), so a point outside the
+        // trim can no longer be reported as lying on the curve.
+        return point.distanceTo(closestPointTo(point)) < Epsilon.get();
     }
 
     @Override
@@ -131,8 +134,20 @@ public final class TrimmedCurve3 implements Curve3 {
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Delegate to basis curve
-        return basisCurve.closestPointTo(point);
+        // Search only within the trimmed segment. sample(int) distributes parameters
+        // in [0,1] and pointAt maps them onto the trim interval on the basis curve,
+        // guaranteeing the returned point lies on the trimmed portion.
+        List<CartesianPoint> samples = sample(256);
+        CartesianPoint closest = samples.get(0);
+        double minDist = point.distanceTo(closest);
+        for (int i = 1; i < samples.size(); i++) {
+            double dist = point.distanceTo(samples.get(i));
+            if (dist < minDist) {
+                minDist = dist;
+                closest = samples.get(i);
+            }
+        }
+        return closest;
     }
 
     @Override

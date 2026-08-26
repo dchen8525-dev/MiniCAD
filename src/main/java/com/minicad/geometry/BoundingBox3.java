@@ -262,6 +262,12 @@ public final class BoundingBox3 {
      */
     public boolean contains(BoundingBox3 other) {
         Preconditions.requireNonNull(other, "other");
+        // An empty box contains nothing (and is contained by nothing). Without this
+        // guard an empty 'other' (min=+Inf, max=-Inf) would satisfy every bound
+        // comparison via +/-Infinity and be wrongly reported as contained.
+        if (this.isEmpty() || other.isEmpty()) {
+            return false;
+        }
         return minX <= other.minX && minY <= other.minY && minZ <= other.minZ
             && maxX >= other.maxX && maxY >= other.maxY && maxZ >= other.maxZ;
     }

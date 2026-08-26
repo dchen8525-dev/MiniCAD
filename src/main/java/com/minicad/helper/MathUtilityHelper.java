@@ -13,6 +13,12 @@ public final class MathUtilityHelper {
         if (previous == null) {
             return value;
         }
+        // A non-positive or non-finite period makes the loop below either spin
+        // forever (period == 0) or diverge (period < 0). No meaningful unwrapping
+        // is possible, so return the input unchanged instead of hanging.
+        if (!Double.isFinite(period) || period <= 0.0) {
+            return value;
+        }
         while (value - previous > period * 0.5) {
             value -= period;
         }

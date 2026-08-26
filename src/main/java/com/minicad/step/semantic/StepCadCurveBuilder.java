@@ -1,5 +1,8 @@
 package com.minicad.step.semantic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
@@ -112,6 +115,8 @@ import java.util.stream.Collectors;
  * Caching is provided to avoid rebuilding the same geometry multiple times.
  */
 final class StepCadCurveBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(StepCadCurveBuilder.class);
 
     // Entity lookup
     private final Map<Integer, StepEntity> entitiesById;
@@ -906,7 +911,8 @@ final class StepCadCurveBuilder {
                 return new Polyline2(List.of(pt, pt));
             }
         } catch (Exception e) {
-            // Ignore and use default
+            // Recoverable degradation: fall back to a degenerate default polyline.
+            log.warn("2D curve projection failed; using degenerate default polyline", e);
         }
         return new Polyline2(List.of(new Point2(0, 0), new Point2(0, 0)));
     }

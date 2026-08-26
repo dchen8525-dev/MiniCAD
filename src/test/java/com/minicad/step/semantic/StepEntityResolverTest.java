@@ -36,6 +36,8 @@ import com.minicad.step.model.StepEdgeLoop;
 import com.minicad.step.model.StepEdgeBasedWireframeModel;
 import com.minicad.step.model.StepEffectivity;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepAxis2Placement3D;
+import com.minicad.step.model.StepDirection;
 import com.minicad.step.model.StepEffectivityRelationship;
 import com.minicad.step.model.StepExternalSource;
 import com.minicad.step.model.StepExternalIdentificationAssignment;
@@ -4599,19 +4601,23 @@ class StepEntityResolverTest {
     }
 
     @Test
-    void shouldRejectAxisPlacementWithoutExplicitDirections() {
+    void shouldDefaultAxisPlacementWhenDirectionsOmitted() {
         String step =
         "DATA;\n"
         + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
         + "#2=AXIS2_PLACEMENT_3D('AX',#1,$,$);\n"
         + "ENDSEC;";
 
-        UnsupportedStepEntityException exception = assertThrows(
-                UnsupportedStepEntityException.class,
-                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
-        );
-
-        assertEquals("AXIS2_PLACEMENT_3D requires explicit axis and ref direction", exception.getMessage());
+        // Per ISO 10303-42, axis and ref_direction are OPTIONAL. The resolver must
+        // accept the placement and supply the spec defaults (axis = (0,0,1),
+        // ref_direction = projection of (1,0,0) onto the axis normal plane) instead
+        // of rejecting a valid STEP file (see GeometryResolver default* helpers).
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+        StepAxis2Placement3D placement = assertInstanceOf(StepAxis2Placement3D.class, resolved.get(2));
+        assertTrue(placement.getAxis() != null);
+        assertTrue(placement.getRefDirection() != null);
+        assertEquals(List.of(0.0, 0.0, 1.0), placement.getAxis().getDirectionRatios());
+        assertEquals(List.of(1.0, 0.0, 0.0), placement.getRefDirection().getDirectionRatios());
     }
 
     @Test

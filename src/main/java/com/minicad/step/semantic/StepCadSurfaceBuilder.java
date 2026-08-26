@@ -1,5 +1,8 @@
 package com.minicad.step.semantic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.minicad.common.Epsilon;
 import com.minicad.common.StepResolutionException;
 import com.minicad.common.UnsupportedGeometryException;
@@ -105,6 +108,8 @@ import java.util.stream.Collectors;
  * Caching is provided to avoid rebuilding the same geometry multiple times.
  */
 final class StepCadSurfaceBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(StepCadSurfaceBuilder.class);
 
     // Entity lookup
     private final Map<Integer, StepEntity> entitiesById;
@@ -1421,6 +1426,8 @@ final class StepCadSurfaceBuilder {
             List<Integer> multV = generateUniformMultiplicities(knotV.size());
             return new BSplineSurface3(degreeU, degreeV, grid, multU, multV, knotU, knotV);
         } catch (Exception e) {
+            // Recoverable degradation: surface build failed, signal and return null.
+            log.warn("BSplineSurface3 construction failed; returning null", e);
             return null;
         }
     }
