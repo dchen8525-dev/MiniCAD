@@ -55,6 +55,7 @@ import com.minicad.step.model.StepBlendedSurface;
 
 import java.util.List;
 import com.minicad.export.json.StepPlacementTransformer;
+import com.minicad.export.json.StepRepresentationPayloadBuilder;
 
 /**
  * Helper class for parametric surface mapping operations.
@@ -572,7 +573,7 @@ public class SurfaceMapperHelper {
                 || geometry instanceof StepUniformSurface
                 || geometry instanceof StepQuasiUniformSurface
                 || geometry instanceof StepPiecewiseBezierSurface) {
-            BSplineSurface3 surface = StepPreviewJsonExporter.buildBsplineSurface(geometry, builder);
+            BSplineSurface3 surface = StepRepresentationPayloadBuilder.buildBsplineSurface(geometry, builder);
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
@@ -616,7 +617,7 @@ public class SurfaceMapperHelper {
         // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
         if (geometry instanceof StepFreeFormSurface) {
             StepFreeFormSurface freeForm = (StepFreeFormSurface) geometry;
-            BSplineSurface3 surface = StepPreviewJsonExporter.buildFreeFormSurface(freeForm, builder);
+            BSplineSurface3 surface = StepRepresentationPayloadBuilder.buildFreeFormSurface(freeForm, builder);
             double uSpan = surface.uEnd() - surface.uStart();
             double vSpan = surface.vEnd() - surface.vStart();
             return new ParametricSurfaceMapper() {
@@ -761,7 +762,7 @@ public class SurfaceMapperHelper {
             StepSurfaceOfLinearExtrusion extrusionSurface,
             StepCadBuilder builder
     ) {
-        CurveEvaluator directrix = StepPreviewJsonExporter.curveEvaluator(extrusionSurface.sweptCurve(), builder);
+        CurveEvaluator directrix = StepRepresentationPayloadBuilder.curveEvaluator(extrusionSurface.sweptCurve(), builder);
         if (directrix == null) {
             return null;
         }
@@ -796,7 +797,7 @@ public class SurfaceMapperHelper {
             StepSurfaceOfRevolution revolutionSurface,
             StepCadBuilder builder
     ) {
-        CurveEvaluator directrix = StepPreviewJsonExporter.curveEvaluator(revolutionSurface.sweptCurve(), builder);
+        CurveEvaluator directrix = StepRepresentationPayloadBuilder.curveEvaluator(revolutionSurface.sweptCurve(), builder);
         if (directrix == null) {
             return null;
         }

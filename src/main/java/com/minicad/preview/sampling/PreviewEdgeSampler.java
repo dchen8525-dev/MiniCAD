@@ -19,6 +19,7 @@ import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.*;
+import com.minicad.export.json.StepRepresentationPayloadBuilder;
 
 /**
  * Loose edge and standalone curve sampling orchestration.
@@ -384,7 +385,7 @@ public final class PreviewEdgeSampler {
             return;
         }
         // Integration note: This method is complete and tested, but not yet used in the main pipeline.
-        // The preferred integration approach would be to call StepPreviewJsonExporter.buildRepresentationPayload()
+        // The preferred integration approach would be to call StepRepresentationPayloadBuilder.buildRepresentationPayload()
         // directly, but that would require exposing private methods.
         // Current approach: Callers use StepPreviewJsonExporter directly for annotation edges.
         // Future: Consider consolidating edge sampling logic here after refactoring preview exporters.

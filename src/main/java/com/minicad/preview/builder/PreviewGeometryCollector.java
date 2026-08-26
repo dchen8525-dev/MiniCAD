@@ -44,6 +44,7 @@ import com.minicad.export.json.StepFacePayloadBuilder;
 import com.minicad.export.json.StepMappedItemTransformer;
 import com.minicad.export.json.StepPlacementTransformer;
 import com.minicad.export.json.StepTypeNameResolver;
+import com.minicad.export.json.StepRepresentationPayloadBuilder;
 
 /**
  * Geometry collection orchestration for STEP preview export.
@@ -677,7 +678,7 @@ public final class PreviewGeometryCollector {
             Set<Integer> visitingRepresentations
     ) {
         GeometryCollection geometry = new GeometryCollection(List.of(), List.of(), List.of());
-        for (StepRepresentation candidate : StepPreviewJsonExporter.linkedShapeRepresentations(representation, resolved)) {
+        for (StepRepresentation candidate : StepRepresentationPayloadBuilder.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 if (item instanceof StepMappedItem) {
                     StepMappedItem mappedItem = (StepMappedItem) item;
@@ -710,7 +711,7 @@ public final class PreviewGeometryCollector {
                 continue;
             }
             double[] matrix = StepAssemblyGraphBuilder.matrixFor(relationship.transformationOperator());
-            RepresentationBuildResult source = StepPreviewJsonExporter.buildRepresentationPayload(
+            RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
                     relationship.rep1(),
                     relationship.rep1().name(),
                     resolved,
@@ -742,7 +743,7 @@ public final class PreviewGeometryCollector {
             return new GeometryCollection(List.of(), List.of(), List.of());
         }
         StepRepresentationMap mappingSource = mappedItem.mappingSource();
-        RepresentationBuildResult source = StepPreviewJsonExporter.buildRepresentationPayload(
+        RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
                 mappingSource.mappedRepresentation(),
                 mappingSource.mappedRepresentation().name(),
                 resolved,
@@ -765,7 +766,7 @@ public final class PreviewGeometryCollector {
             Map<Integer, StepEntity> resolved
     ) {
         Set<Integer> shellIds = new TreeSet<>();
-        for (StepRepresentation candidate : StepPreviewJsonExporter.linkedShapeRepresentations(representation, resolved)) {
+        for (StepRepresentation candidate : StepRepresentationPayloadBuilder.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = PreviewFaceBuilder.unwrapStyledItem(item);
                 if (!isRepresentationSolidItem(unwrapped)) {
@@ -781,7 +782,7 @@ public final class PreviewGeometryCollector {
             Map<Integer, StepEntity> resolved
     ) {
         Set<Integer> solidIds = new TreeSet<>();
-        for (StepRepresentation candidate : StepPreviewJsonExporter.linkedShapeRepresentations(representation, resolved)) {
+        for (StepRepresentation candidate : StepRepresentationPayloadBuilder.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = PreviewFaceBuilder.unwrapStyledItem(item);
                 if (isRepresentationSolidItem(unwrapped)) {
@@ -873,7 +874,7 @@ public final class PreviewGeometryCollector {
         if (matrix == null) {
             return;
         }
-        RepresentationBuildResult source = StepPreviewJsonExporter.buildRepresentationPayload(
+        RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
                 representation,
                 representation.name(),
                 resolved,

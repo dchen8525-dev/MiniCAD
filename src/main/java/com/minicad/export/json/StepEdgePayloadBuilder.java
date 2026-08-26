@@ -1371,7 +1371,7 @@ public final class StepEdgePayloadBuilder {
         if (matrix == null) {
             return;
         }
-        RepresentationBuildResult source = StepPreviewJsonExporter.buildRepresentationPayload(
+        RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
                 representation,
                 representation.name(),
                 resolved,
