@@ -50,6 +50,7 @@ class LineCountTest {
         "StepEdgePayloadBuilder.java",  // Extracted edge payload builder, being decomposed further
         "StepFacePayloadBuilder.java",  // Extracted face payload builder, being decomposed further
         "StepPmiPayloadBuilder.java",  // Extracted PMI payload builder, being decomposed further
+        "StepPmiTargetBuilder.java",  // PMI semantic-target graph accumulator (single responsibility, large entity-type dispatch)
         "StepPreviewPayloadTypes.java",  // Payload types (2856 lines)
         "StepEntity.java"  // Base entity class (1123 lines)
     );
