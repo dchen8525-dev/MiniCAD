@@ -45,8 +45,6 @@ class LineCountTest {
         "PreviewUvMapper.java",  // UV mapping (2286 lines)
         "PreviewCurveEvaluator.java",  // Curve evaluation (1734 lines)
         "PreviewFaceBuilder.java",  // Face building (2829 lines)
-        "PreviewPmiBuilder.java",  // PMI building (1673 lines)
-        "PreviewPmiTargetBuilder.java",  // PMI target building extracted from StepPreviewJsonExporter (1243 lines)
         "StepEdgePayloadBuilder.java",  // Extracted edge payload builder, being decomposed further
         "StepFacePayloadBuilder.java",  // Extracted face payload builder, being decomposed further
         "StepPmiPayloadBuilder.java",  // Extracted PMI payload builder, being decomposed further
