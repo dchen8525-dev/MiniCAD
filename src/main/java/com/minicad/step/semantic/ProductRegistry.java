@@ -108,6 +108,10 @@ public final class ProductRegistry {
 // Entity: BREP_WITH_VOIDS
       registry.put("BREP_WITH_VOIDS", StepEntityResolver::resolveBrepWithVoids);
 
+// Entity: FACETED_BREP_AND_BREP_WITH_VOIDS (and single-T alias FACETTED_BREP_AND_BREP_WITH_VOIDS)
+      registry.put("FACETED_BREP_AND_BREP_WITH_VOIDS", StepEntityResolver::resolveFacetedBrepAndBrepWithVoids);
+      registry.put("FACETTED_BREP_AND_BREP_WITH_VOIDS", StepEntityResolver::resolveFacetedBrepAndBrepWithVoids);
+
 // Entity: ADVANCED_BREP
       registry.put("ADVANCED_BREP", StepEntityResolver::resolveAdvancedBrep);
 

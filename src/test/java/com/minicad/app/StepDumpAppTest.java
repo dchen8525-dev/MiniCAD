@@ -7505,7 +7505,7 @@ class StepDumpAppTest {
 
         assertDumpContains(file,
                 "BOOLEAN_RESULT #19: faces=0, unsupportedFaces=1",
-                "unsupportedReasons: BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported:1",
+                "unsupportedReasons: BOOLEAN_RESULT union requires one operand to be a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE; solid-solid union is not supported:1",
                 "unsupportedReasonCodes: unsupported_boolean.result:1",
                 "booleanResults=1");
     }
@@ -7803,7 +7803,7 @@ class StepDumpAppTest {
 
         assertDumpContains(file,
                 "BOOLEAN_CLIPPING_RESULT #19: faces=0, unsupportedFaces=1",
-                "unsupportedReasons: BOOLEAN_RESULT difference requires HALF_SPACE_SOLID or BOXED_HALF_SPACE second operand:1",
+                "unsupportedReasons: BOOLEAN_RESULT difference requires a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE as second operand:1",
                 "unsupportedReasonCodes: unsupported_boolean.clipping_result:1",
                 "booleanResults=1");
     }

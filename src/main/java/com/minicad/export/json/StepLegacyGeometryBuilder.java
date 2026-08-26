@@ -59,6 +59,7 @@ public final class StepLegacyGeometryBuilder {
                     || entity instanceof StepFiniteElementMesh
                     || entity instanceof StepFlatPattern
                     || entity instanceof StepBrepWithVoids
+                    || entity instanceof StepFacetedBrepAndBrepWithVoids
                     || entity instanceof StepManifoldSolidBrep
                     || entity instanceof StepFacettedBrep
                     || entity instanceof StepNonManifoldSolidBrep
@@ -105,6 +106,12 @@ public final class StepLegacyGeometryBuilder {
                 }
             } else if (solidEntity instanceof StepBrepWithVoids) {
             StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
+                shellIds.remove(brep.outer().id());
+                for (StepEntity voidShell : brep.voids()) {
+                    shellIds.remove(voidShell.id());
+                }
+            } else if (solidEntity instanceof StepFacetedBrepAndBrepWithVoids) {
+            StepFacetedBrepAndBrepWithVoids brep = (StepFacetedBrepAndBrepWithVoids) solidEntity;
                 shellIds.remove(brep.outer().id());
                 for (StepEntity voidShell : brep.voids()) {
                     shellIds.remove(voidShell.id());
@@ -292,6 +299,7 @@ public final class StepLegacyGeometryBuilder {
                 || item instanceof StepNonManifoldSolidBrep
                 || item instanceof StepAdvancedBrep
                 || item instanceof StepBrepWithVoids
+                || item instanceof StepFacetedBrepAndBrepWithVoids
                 || item instanceof StepMappedItem
                 || item instanceof StepSolidModel
                 || item instanceof StepSurfacePatch) {

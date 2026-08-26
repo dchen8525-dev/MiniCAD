@@ -37,6 +37,7 @@ class LineCountTest {
         "StepCadCurveBuilder.java",  // Curve building logic (1932 lines)
         "StepCadSurfaceBuilder.java",  // Surface building logic (1840 lines)
         "StepCadGeometryOps.java",  // Geometry operations (1023 lines)
+        "StepCadBooleanBuilder.java",  // Boolean/CSG operation builder (single responsibility)
         "StepPreviewJsonExporter.java",  // Export logic (18094 lines)
         "StepDumpApp.java",  // CLI app (3632 lines)
         "StepMeshExporter.java",  // Mesh export (2857 lines)

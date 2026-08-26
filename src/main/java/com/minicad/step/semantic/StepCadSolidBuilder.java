@@ -9,6 +9,7 @@ import com.minicad.step.model.StepBlockVolume;
 import com.minicad.step.model.StepBooleanClippingResult;
 import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
+import com.minicad.step.model.StepFacetedBrepAndBrepWithVoids;
 import com.minicad.step.model.StepComplexClippingResult;
 import com.minicad.step.model.StepContextDependentShapeRepresentation;
 import com.minicad.step.model.StepCsgPrimitive;
@@ -72,6 +73,14 @@ final class StepCadSolidBuilder {
             StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) entity;
             Shell outerShell = builder.buildShell(brepWithVoids.outer().id());
             List<Shell> voidShells = brepWithVoids.voids().stream()
+                    .map(voidShell -> builder.buildShell(voidShell.id()))
+                    .collect(Collectors.toList());
+            return new Solid(outerShell, voidShells);
+        }
+        if (entity instanceof StepFacetedBrepAndBrepWithVoids) {
+            StepFacetedBrepAndBrepWithVoids facetedBrepWithVoids = (StepFacetedBrepAndBrepWithVoids) entity;
+            Shell outerShell = builder.buildShell(facetedBrepWithVoids.outer().id());
+            List<Shell> voidShells = facetedBrepWithVoids.voids().stream()
                     .map(voidShell -> builder.buildShell(voidShell.id()))
                     .collect(Collectors.toList());
             return new Solid(outerShell, voidShells);

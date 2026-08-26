@@ -1,4 +1,5 @@
 package com.minicad.step.semantic;
+import com.minicad.step.model.StepBlockVolume;
 
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis1Placement;
@@ -15,6 +16,7 @@ import com.minicad.step.model.StepAdvancedBrep;
 import com.minicad.step.model.StepBooleanClippingResult;
 import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
+import com.minicad.step.model.StepFacetedBrepAndBrepWithVoids;
 import com.minicad.step.model.StepCsgPrimitive;
 import com.minicad.step.model.StepCsgPrimitive3D;
 import com.minicad.step.model.StepCsgSolid;
@@ -341,48 +343,72 @@ final class StepCadBooleanBuilder {
         String normalizedOperator = operator == null ? "" : operator.replace(".", "").trim().toUpperCase();
         switch (normalizedOperator) {
             case "DIFFERENCE": {
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, false);
+                HalfSpaceOperand halfSpace = asHalfSpaceOperand(second);
+                if (halfSpace != null) {
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpace, false);
                 }
                 throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT difference requires HALF_SPACE_SOLID or BOXED_HALF_SPACE second operand");
+                        "BOOLEAN_RESULT difference requires a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE as second operand");
             }
             case "INTERSECTION": {
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid, true);
+                HalfSpaceOperand halfSpace = asHalfSpaceOperand(second);
+                if (halfSpace != null) {
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(first), halfSpace, true);
                 }
-                halfSpaceSolid = asHalfSpaceOperand(first);
-                if (halfSpaceSolid != null) {
-                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid, true);
+                halfSpace = asHalfSpaceOperand(first);
+                if (halfSpace != null) {
+                    return clipSolidWithHalfSpace(buildBooleanOperandSolid(second), halfSpace, true);
                 }
                 throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT intersection requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand");
+                        "BOOLEAN_RESULT intersection requires one operand to be a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE");
             }
             case "UNION": {
                 // UNION with half-space: extend solid into half-space region
                 // This is the inverse of DIFFERENCE with half-space
-                StepHalfSpaceSolid halfSpaceSolid = asHalfSpaceOperand(second);
-                if (halfSpaceSolid != null) {
-                    return unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpaceSolid);
+                HalfSpaceOperand halfSpace = asHalfSpaceOperand(second);
+                if (halfSpace != null) {
+                    return unionWithHalfSpace(buildBooleanOperandSolid(first), halfSpace);
                 }
-                halfSpaceSolid = asHalfSpaceOperand(first);
-                if (halfSpaceSolid != null) {
-                    return unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpaceSolid);
+                halfSpace = asHalfSpaceOperand(first);
+                if (halfSpace != null) {
+                    return unionWithHalfSpace(buildBooleanOperandSolid(second), halfSpace);
                 }
                 throw new UnsupportedGeometryException(
-                        "BOOLEAN_RESULT union requires one HALF_SPACE_SOLID or BOXED_HALF_SPACE operand; general solid union is not supported");
+                        "BOOLEAN_RESULT union requires one operand to be a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE; solid-solid union is not supported");
             }
             default:
                 throw new UnsupportedGeometryException("BOOLEAN_RESULT operator " + normalizedOperator + " is unsupported");
         }
     }
 
-    private StepHalfSpaceSolid asHalfSpaceOperand(StepEntity operand) {
+    /** Extracted half-space parameters shared by StepHalfSpaceSolid and StepPolygonalBoundedHalfSpace. */
+    private static final class HalfSpaceOperand {
+        private final StepEntity surface;
+        private final boolean agreementFlag;
+        private final StepEntity enclosure;
+        private final String entityName;
+
+        HalfSpaceOperand(StepEntity surface, boolean agreementFlag, StepEntity enclosure, String entityName) {
+            this.surface = surface;
+            this.agreementFlag = agreementFlag;
+            this.enclosure = enclosure;
+            this.entityName = entityName;
+        }
+
+        StepEntity surface() { return surface; }
+        boolean agreementFlag() { return agreementFlag; }
+        StepEntity enclosure() { return enclosure; }
+        String entityName() { return entityName; }
+    }
+
+    private HalfSpaceOperand asHalfSpaceOperand(StepEntity operand) {
         if (operand instanceof StepHalfSpaceSolid) {
-            StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) operand;
-            return halfSpaceSolid;
+            StepHalfSpaceSolid hs = (StepHalfSpaceSolid) operand;
+            return new HalfSpaceOperand(hs.baseSurface(), hs.agreementFlag(), hs.enclosure(), hs.entityName());
+        }
+        if (operand instanceof StepPolygonalBoundedHalfSpace) {
+            StepPolygonalBoundedHalfSpace hs = (StepPolygonalBoundedHalfSpace) operand;
+            return new HalfSpaceOperand(hs.basisSurface(), hs.sameSense(), null, "POLYGONAL_BOUNDED_HALF_SPACE");
         }
         return null;
     }
@@ -405,6 +431,13 @@ final class StepCadBooleanBuilder {
         if (operand instanceof StepBrepWithVoids) {
             StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) operand;
             return builder.buildSolid(brepWithVoids.id());
+        }
+        if (operand instanceof StepFacetedBrepAndBrepWithVoids) {
+            StepFacetedBrepAndBrepWithVoids facetedBrepWithVoids = (StepFacetedBrepAndBrepWithVoids) operand;
+            return builder.buildSolid(facetedBrepWithVoids.id());
+        }
+        if (operand instanceof StepBlockVolume) {
+            return builder.buildSolid(operand.id());
         }
         if (operand instanceof StepNonManifoldSolidBrep) {
             StepNonManifoldSolidBrep nonManifold = (StepNonManifoldSolidBrep) operand;
@@ -492,48 +525,48 @@ final class StepCadBooleanBuilder {
         throw new UnsupportedGeometryException("boolean operand " + StepCadBuilder.stepEntityTypeName(operand) + " is unsupported");
     }
 
-    private Solid clipSolidWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid, boolean keepAgreementSide) {
-        Plane plane = builder.buildSupportedPlaneGeometry(halfSpaceSolid.baseSurface(), halfSpaceSolid.entityName());
+    private Solid clipSolidWithHalfSpace(Solid solid, HalfSpaceOperand halfSpace, boolean keepAgreementSide) {
+        Plane plane = builder.buildSupportedPlaneGeometry(halfSpace.surface(), halfSpace.entityName());
         if (plane == null) {
-            throw new UnsupportedGeometryException(halfSpaceSolid.entityName() + " requires PLANE geometry");
+            throw new UnsupportedGeometryException(halfSpace.entityName() + " requires PLANE geometry");
         }
-        boolean keepPositive = keepAgreementSide ? halfSpaceSolid.agreementFlag() : !halfSpaceSolid.agreementFlag();
+        boolean keepPositive = keepAgreementSide ? halfSpace.agreementFlag() : !halfSpace.agreementFlag();
         Solid clipped = clipSolidWithPlane(solid, plane, keepPositive, "BOOLEAN_RESULT clipping");
-        if (halfSpaceSolid.enclosure() == null) {
+        if (halfSpace.enclosure() == null) {
             return clipped;
         }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
+        if (!(halfSpace.enclosure() instanceof StepBoxDomain)) {
             throw new UnsupportedGeometryException(
-                    halfSpaceSolid.entityName() + " construction with "
-                            + StepCadBuilder.stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
+                    halfSpace.entityName() + " construction with "
+                            + StepCadBuilder.stepEntityTypeName(halfSpace.enclosure()) + " enclosure is unsupported");
         }
-        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
+        StepBoxDomain boxDomain = (StepBoxDomain) halfSpace.enclosure();
         return clipSolidWithBoxDomain(clipped, boxDomain, "BOOLEAN_RESULT clipping");
     }
 
-    private Solid unionWithHalfSpace(Solid solid, StepHalfSpaceSolid halfSpaceSolid) {
-        Plane plane = builder.buildSupportedPlaneGeometry(halfSpaceSolid.baseSurface(), halfSpaceSolid.entityName());
+    private Solid unionWithHalfSpace(Solid solid, HalfSpaceOperand halfSpace) {
+        Plane plane = builder.buildSupportedPlaneGeometry(halfSpace.surface(), halfSpace.entityName());
         if (plane == null) {
-            throw new UnsupportedGeometryException(halfSpaceSolid.entityName() + " requires PLANE geometry");
+            throw new UnsupportedGeometryException(halfSpace.entityName() + " requires PLANE geometry");
         }
         // Union with half-space: extend solid into half-space agreement side
         // This creates a new solid that includes both the original solid and the half-space region
         // For bounded half-space (BOXED_HALF_SPACE), union creates solid + box portion on agreement side
-        if (halfSpaceSolid.enclosure() == null) {
+        if (halfSpace.enclosure() == null) {
             // Unbounded half-space union would create infinite geometry - not supported
             throw new UnsupportedGeometryException(
-                    "BOOLEAN_RESULT union with unbounded HALF_SPACE_SOLID is not supported");
+                    "BOOLEAN_RESULT union with unbounded " + halfSpace.entityName() + " is not supported: would create infinite geometry");
         }
-        if (!(halfSpaceSolid.enclosure() instanceof StepBoxDomain)) {
+        if (!(halfSpace.enclosure() instanceof StepBoxDomain)) {
             throw new UnsupportedGeometryException(
-                    halfSpaceSolid.entityName() + " union with "
-                            + StepCadBuilder.stepEntityTypeName(halfSpaceSolid.enclosure()) + " enclosure is unsupported");
+                    halfSpace.entityName() + " union with "
+                            + StepCadBuilder.stepEntityTypeName(halfSpace.enclosure()) + " enclosure is unsupported");
         }
+        StepBoxDomain boxDomain = (StepBoxDomain) halfSpace.enclosure();
         // Build box domain geometry and merge with solid
-        StepBoxDomain boxDomain = (StepBoxDomain) halfSpaceSolid.enclosure();
         Solid boxSolid = buildBoxDomainSolid(boxDomain);
         // Clip box to half-space agreement side
-        boolean keepAgreementSide = halfSpaceSolid.agreementFlag();
+        boolean keepAgreementSide = halfSpace.agreementFlag();
         Solid halfSpaceBox = clipSolidWithPlane(boxSolid, plane, keepAgreementSide, "UNION half-space box");
         // Merge solids: union of solid and halfSpaceBox
         return mergeSolids(solid, halfSpaceBox);

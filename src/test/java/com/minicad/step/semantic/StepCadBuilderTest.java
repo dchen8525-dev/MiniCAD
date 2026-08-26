@@ -1,4 +1,6 @@
 package com.minicad.step.semantic;
+import com.minicad.step.model.StepFacetedBrepAndBrepWithVoids;
+import com.minicad.step.semantic.StepEntityResolver;
 
 import com.minicad.common.GeometryException;
 import com.minicad.common.StepResolutionException;
@@ -4192,5 +4194,95 @@ class StepCadBuilderTest {
         assertEquals(5.0, bbox.maxX(), 1e-9);
         assertEquals(5.0, bbox.maxY(), 1e-9);
         assertEquals(1.0, bbox.maxZ(), 1e-9);
+    }
+
+    @Test
+    void shouldBuildBooleanDifferenceAgainstPolygonalBoundedHalfSpace() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX3',#1,#2,#3);\n"
+        + "#5=BLOCK('BLK',#4,20.0,20.0,20.0);\n"
+        + "#6=AXIS2_PLACEMENT_3D('HSPOS',#1,#2,#3);\n"
+        + "#7=PLANE('PL',#6);\n"
+        + "#8=CARTESIAN_POINT('PP1',(-5.0,-5.0,10.0));\n"
+        + "#9=CARTESIAN_POINT('PP2',(5.0,-5.0,10.0));\n"
+        + "#10=CARTESIAN_POINT('PP3',(5.0,5.0,10.0));\n"
+        + "#11=CARTESIAN_POINT('PP4',(-5.0,5.0,10.0));\n"
+        + "#12=POLYGONAL_BOUNDED_HALF_SPACE('PHS',#7,#6,(#8,#9,#10,#11),.T.);\n"
+        + "#13=(BOOLEAN_RESULT(.DIFFERENCE.,#5,#12) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL'));\n"
+        + "ENDSEC;\n");
+
+        Solid solid = builder.buildSolid(13);
+        assertTrue(solid.outerShell().faces().size() >= 1);
+    }
+
+    @Test
+    void shouldRejectBooleanSolidSolidDifference() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);\n"
+        + "#5=PLANE('PL0',#4);\n"
+        + "#6=FACE_SURFACE('FS',(),#5,.T.);\n"
+        + "#7=CLOSED_SHELL('CS1',(#6));\n"
+        + "#8=CLOSED_SHELL('CS2',(#6));\n"
+        + "#9=FACETED_BREP('FB1',#7);\n"
+        + "#10=FACETED_BREP('FB2',#8);\n"
+        + "#11=(BOOLEAN_RESULT(.DIFFERENCE.,#9,#10) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL'));\n"
+        + "ENDSEC;\n");
+
+        UnsupportedGeometryException ex = assertThrows(UnsupportedGeometryException.class,
+                () -> builder.buildSolid(11));
+        assertTrue(ex.getMessage().contains("requires a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE"));
+    }
+
+    @Test
+    void shouldRejectBooleanSolidSolidIntersection() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);\n"
+        + "#5=PLANE('PL0',#4);\n"
+        + "#6=FACE_SURFACE('FS',(),#5,.T.);\n"
+        + "#7=CLOSED_SHELL('CS1',(#6));\n"
+        + "#8=CLOSED_SHELL('CS2',(#6));\n"
+        + "#9=FACETED_BREP('FB1',#7);\n"
+        + "#10=FACETED_BREP('FB2',#8);\n"
+        + "#11=(BOOLEAN_RESULT(.INTERSECTION.,#9,#10) GEOMETRIC_REPRESENTATION_ITEM() REPRESENTATION_ITEM('BOOL'));\n"
+        + "ENDSEC;\n");
+
+        UnsupportedGeometryException ex = assertThrows(UnsupportedGeometryException.class,
+                () -> builder.buildSolid(11));
+        assertTrue(ex.getMessage().contains("requires one operand to be a HALF_SPACE_SOLID, BOXED_HALF_SPACE, or POLYGONAL_BOUNDED_HALF_SPACE"));
+    }
+
+    @Test
+    void shouldBuildSolidFromFacetedBrepAndBrepWithVoids() {
+        String step = "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#3,#2);\n"
+        + "#5=PLANE('PL0',#4);\n"
+        + "#6=FACE_SURFACE('FS',(),#5,.T.);\n"
+        + "#7=CLOSED_SHELL('CS1',(#6));\n"
+        + "#8=CLOSED_SHELL('CS2',(#6));\n"
+        + "#9=FACETED_BREP_AND_BREP_WITH_VOIDS('FB',#7,(#8));\n"
+        + "ENDSEC;\n";
+
+        Map<Integer, StepEntity> resolved = StepEntityResolver.resolveAll(StepParser.parse(step));
+        StepEntity entity = resolved.get(9);
+        assertTrue(entity instanceof StepFacetedBrepAndBrepWithVoids);
+        StepFacetedBrepAndBrepWithVoids facetedBrep = (StepFacetedBrepAndBrepWithVoids) entity;
+        assertEquals(7, facetedBrep.outer().id());
+        assertEquals(1, facetedBrep.voids().size());
+        assertEquals(8, facetedBrep.voids().get(0).id());
     }
 }

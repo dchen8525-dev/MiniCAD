@@ -54,6 +54,7 @@ import com.minicad.step.model.StepBlendedSurface;
 import com.minicad.step.model.StepBooleanClippingResult;
 import com.minicad.step.model.StepBooleanResult;
 import com.minicad.step.model.StepBrepWithVoids;
+import com.minicad.step.model.StepFacetedBrepAndBrepWithVoids;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepBSplineCurveWithKnotsAndBreakpoints;
 import com.minicad.step.model.StepBSplineCurveWithKnots;
@@ -3061,9 +3062,11 @@ public final class StepEntityResolver {
   boolean isBooleanOperandEntity(StepEntity entity) {
     return entity instanceof StepManifoldSolidBrep
         || entity instanceof StepBrepWithVoids
+        || entity instanceof StepFacetedBrepAndBrepWithVoids
         || entity instanceof StepCsgPrimitive
         || entity instanceof StepCsgSolid
         || entity instanceof StepHalfSpaceSolid
+        || entity instanceof StepPolygonalBoundedHalfSpace
         || entity instanceof StepSolidReplica
         || entity instanceof StepSweptAreaSolid
         || entity instanceof StepBooleanResult
@@ -3098,6 +3101,16 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         requireClosedShellEntity(instance, definition, 1, "BREP_WITH_VOIDS outer must reference CLOSED_SHELL"),
         requireClosedShellEntities(instance, definition, 2, "BREP_WITH_VOIDS voids must contain CLOSED_SHELL references"));
+  }
+
+  StepFacetedBrepAndBrepWithVoids resolveFacetedBrepAndBrepWithVoids(StepEntityInstance instance) {
+    StepEntityDefinition definition = definition(instance, "FACETED_BREP_AND_BREP_WITH_VOIDS");
+    requireParameterCount(instance, definition, 3);
+    return new StepFacetedBrepAndBrepWithVoids(
+        instance.id(),
+        stringValue(instance, definition, 0),
+        requireClosedShellEntity(instance, definition, 1, "FACETED_BREP_AND_BREP_WITH_VOIDS outer must reference CLOSED_SHELL"),
+        requireClosedShellEntities(instance, definition, 2, "FACETED_BREP_AND_BREP_WITH_VOIDS voids must contain CLOSED_SHELL references"));
   }
 
   StepBooleanResult resolveBooleanResult(StepEntityInstance instance) {
