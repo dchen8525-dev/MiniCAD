@@ -31,6 +31,7 @@ import com.minicad.topology.VertexLoop;
 import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.*;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 
 /** UV mapping, parametric surface projection, and pcurve sampling.
  *  Extracted from StepPreviewJsonExporter to isolate UV mapping logic. */
@@ -656,7 +657,7 @@ public final class PreviewUvMapper {
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-            List<CartesianPoint> edgePoints = StepPreviewJsonExporter.sampleOrientedEdge(orientedEdge);
+            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
             int startIndex = firstEdge ? 0 : 1;
             for (int i = startIndex; i < edgePoints.size(); i++) {
                 sampled.add(edgePoints.get(i));

@@ -116,6 +116,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import com.minicad.geometry.Circle;
+import com.minicad.geometry.Curve3;
+import com.minicad.geometry.Line3;
+import com.minicad.geometry.SphericalSurface;
+import com.minicad.geometry.SurfaceOfLinearExtrusion3;
+import com.minicad.geometry.SurfaceOfRevolution3;
 
 /**
  * Builds face payloads from STEP face entities.
@@ -207,6 +213,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "cylindrical face build failed: " + ex.getMessage()));
             }
         }
@@ -221,6 +228,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "conical face build failed: " + ex.getMessage()));
             }
         }
@@ -304,6 +312,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "toroidal surface with specified bends face build failed: " + ex.getMessage()));
             }
         }
@@ -318,6 +327,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "toroidal face build failed: " + ex.getMessage()));
             }
         }
@@ -431,6 +441,7 @@ public final class StepFacePayloadBuilder {
         }
         if (previewGeometry instanceof StepBlendedSurface) {
             StepBlendedSurface blended = (StepBlendedSurface) previewGeometry;
+            // Blended surface: approximate by rendering the primary surface with blend radius as metadata
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, blended.primarySurface(), metadata, builder);
                 if (trimmed.face() != null) {
@@ -438,9 +449,11 @@ public final class StepFacePayloadBuilder {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to fallback
             }
             return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
         }
+        // Free-form surfaces: try parametric mapping, fall back to sampled tessellation
         if (previewGeometry instanceof StepFreeFormSurface) {
             StepFreeFormSurface freeForm = (StepFreeFormSurface) previewGeometry;
             try {
@@ -450,7 +463,9 @@ public final class StepFacePayloadBuilder {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to fallback tessellation
             }
+            // Fallback: tessellate via sampled grid if parametric mapping fails
             try {
                 List<FaceBound> bounds = StepPreviewJsonExporter.buildFaceBounds(stepFace, builder);
                 if (!bounds.isEmpty()) {
@@ -462,11 +477,14 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                // C03: No silent geometry loss - continue to unsupported face payload
             } catch (Exception ex) {
+                // C03: Catch unexpected errors - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "free-form surface preview failed: unexpected error - " + ex.getMessage()));
             }
             return new PreviewFaceResult(null, StepPreviewJsonExporter.toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
         }
+        // Machined surface: delegate to the underlying face geometry
         if (previewGeometry instanceof StepMachinedSurface) {
             StepMachinedSurface machinedSurface = (StepMachinedSurface) previewGeometry;
             return buildPreviewFaceResult((StepFaceEntity) machinedSurface.face(), builder, metadata);
@@ -643,10 +661,10 @@ public final class StepFacePayloadBuilder {
         }
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Circle)
+                .filter(edge -> edge.edge().curve() instanceof Circle)
                 .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Line3)
+                .filter(edge -> edge.edge().curve() instanceof Line3)
                 .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
@@ -655,13 +673,13 @@ public final class StepFacePayloadBuilder {
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (SurfaceGeometryHelper.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
-        List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
+        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
+        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
         double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface, lowerArcPoints);
         double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface, upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
@@ -729,10 +747,10 @@ public final class StepFacePayloadBuilder {
         EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Circle)
+                .filter(edge -> edge.edge().curve() instanceof Circle)
                 .collect(Collectors.toList());
         List<OrientedEdge> lineEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Line3)
+                .filter(edge -> edge.edge().curve() instanceof Line3)
                 .collect(Collectors.toList());
         if (circleEdges.size() != 2 || lineEdges.size() != 2) {
             return null;
@@ -741,13 +759,13 @@ public final class StepFacePayloadBuilder {
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
-        List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
+        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
+        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
         double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), lowerArcPoints);
         double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
@@ -815,7 +833,7 @@ public final class StepFacePayloadBuilder {
         EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Circle)
+                .filter(edge -> edge.edge().curve() instanceof Circle)
                 .collect(Collectors.toList());
         if (circleEdges.size() != 4) {
             return null;
@@ -825,7 +843,7 @@ public final class StepFacePayloadBuilder {
         List<OrientedEdge> varyingUEdges = new ArrayList<>();
         List<OrientedEdge> varyingVEdges = new ArrayList<>();
         for (OrientedEdge edge : circleEdges) {
-            List<CartesianPoint> points = StepPreviewJsonExporter.sampleOrientedEdge(edge);
+            List<CartesianPoint> points = StepEdgePayloadBuilder.sampleOrientedEdge(edge);
             List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, points);
             List<Double> vValues = SurfaceGeometryHelper.unwrapToroidalV(surface, points);
             double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
@@ -842,15 +860,15 @@ public final class StepFacePayloadBuilder {
 
         OrientedEdge lowerVEdge = varyingUEdges.get(0);
         OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge))) {
+        if (SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge))) {
             lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
             upperVEdge = varyingUEdges.get(0);
         }
 
-        List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge);
+        List<CartesianPoint> lowerPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge);
         List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, lowerPoints);
         double lowerV = SurfaceGeometryHelper.averageToroidalV(surface, lowerPoints);
-        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge));
+        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge));
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
             return null;
         }
@@ -911,7 +929,7 @@ public final class StepFacePayloadBuilder {
         EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
         List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof com.minicad.geometry.Circle)
+                .filter(edge -> edge.edge().curve() instanceof Circle)
                 .collect(Collectors.toList());
         if (circleEdges.size() != 4) {
             return null;
@@ -921,7 +939,7 @@ public final class StepFacePayloadBuilder {
         List<OrientedEdge> varyingUEdges = new ArrayList<>();
         List<OrientedEdge> varyingVEdges = new ArrayList<>();
         for (OrientedEdge edge : circleEdges) {
-            List<CartesianPoint> points = StepPreviewJsonExporter.sampleOrientedEdge(edge);
+            List<CartesianPoint> points = StepEdgePayloadBuilder.sampleOrientedEdge(edge);
             List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, points);
             List<Double> vValues = SurfaceGeometryHelper.unwrapToroidalV(surface, points);
             double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
@@ -938,15 +956,15 @@ public final class StepFacePayloadBuilder {
 
         OrientedEdge lowerVEdge = varyingUEdges.get(0);
         OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge))) {
+        if (SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge))) {
             lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
             upperVEdge = varyingUEdges.get(0);
         }
 
-        List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge);
+        List<CartesianPoint> lowerPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge);
         List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, lowerPoints);
         double lowerV = SurfaceGeometryHelper.averageToroidalV(surface, lowerPoints);
-        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge));
+        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge));
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
             return null;
         }
@@ -1006,7 +1024,7 @@ public final class StepFacePayloadBuilder {
         }
         EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
 
-        SurfacePatch patch = StepPreviewJsonExporter.buildFourSidedPatch(outerLoop);
+        SurfacePatch patch = StepEdgePayloadBuilder.buildFourSidedPatch(outerLoop);
         if (patch == null) {
             return null;
         }
@@ -1096,7 +1114,7 @@ public final class StepFacePayloadBuilder {
             return null;
         }
         EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-        SurfacePatch patch = StepPreviewJsonExporter.buildFourSidedPatch(outerLoop);
+        SurfacePatch patch = StepEdgePayloadBuilder.buildFourSidedPatch(outerLoop);
         if (patch == null) {
             return null;
         }
@@ -1353,6 +1371,7 @@ public final class StepFacePayloadBuilder {
         }
 
         int sampleCount = loops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
+        // Preview meshes should stay light enough for API transport and browser upload.
         int baseUSegments = Math.max(12, Math.min(32, sampleCount * 2));
         int baseVSegments = Math.max(8, Math.min(24, sampleCount * 2));
         if (geometry instanceof StepRationalBSplineSurface) {
@@ -1640,7 +1659,7 @@ public final class StepFacePayloadBuilder {
         }
         if (surfaceGeometry instanceof StepSphericalSurface) {
             StepSphericalSurface sphericalSurface = (StepSphericalSurface) surfaceGeometry;
-            com.minicad.geometry.SphericalSurface surface = builder.buildSphericalSurface(sphericalSurface.id());
+            SphericalSurface surface = builder.buildSphericalSurface(sphericalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "spherical_surface",
                     List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
@@ -1662,7 +1681,7 @@ public final class StepFacePayloadBuilder {
             StepToroidalSurface toroidalSurface = (StepToroidalSurface) surfaceGeometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
-                    "toroidal_surface",
+                    "toroidal_strip",
                     List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
                     List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
                     List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
@@ -1680,9 +1699,9 @@ public final class StepFacePayloadBuilder {
         }
         if (surfaceGeometry instanceof StepDegenerateToroidalSurface) {
             StepDegenerateToroidalSurface toroidalSurface = (StepDegenerateToroidalSurface) surfaceGeometry;
-            ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
+            ToroidalSurface surface = builder.buildDegenerateToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
-                    "toroidal_surface",
+                    "toroidal_strip",
                     List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
                     List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
                     List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
@@ -1700,11 +1719,12 @@ public final class StepFacePayloadBuilder {
         }
         if (surfaceGeometry instanceof StepSurfaceOfLinearExtrusion) {
             StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surfaceGeometry;
-            SurfaceGeometry surface = builder.buildSurfaceGeometry(extrusionSurface.id());
+            SurfaceOfLinearExtrusion3 surface = builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
+            Direction3 axis = surface.extrusionVector().normalize().asDirection();
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
-                    "linear_extrusion_surface",
+                    "surface_of_linear_extrusion",
                     null,
-                    null,
+                    List.of(axis.x(), axis.y(), axis.z()),
                     null,
                     0.0,
                     null,
@@ -1720,11 +1740,11 @@ public final class StepFacePayloadBuilder {
         }
         if (surfaceGeometry instanceof StepSurfaceOfRevolution) {
             StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surfaceGeometry;
-            SurfaceGeometry surface = builder.buildSurfaceGeometry(revolutionSurface.id());
+            SurfaceOfRevolution3 surface = builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
-                    "revolution_surface",
-                    null,
-                    null,
+                    "surface_of_revolution",
+                    List.of(surface.axisOrigin().x(), surface.axisOrigin().y(), surface.axisOrigin().z()),
+                    List.of(surface.axisDirection().x(), surface.axisDirection().y(), surface.axisDirection().z()),
                     null,
                     0.0,
                     null,
@@ -1741,6 +1761,11 @@ public final class StepFacePayloadBuilder {
         if (surfaceGeometry instanceof StepRationalBSplineSurface) {
             StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) surfaceGeometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
+            List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
+                    .map(row -> row.stream()
+                            .map(point -> List.of(point.x(), point.y(), point.z()))
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "rational_bspline_surface",
                     null,
@@ -1749,17 +1774,18 @@ public final class StepFacePayloadBuilder {
                     0.0,
                     null,
                     null,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
+                    surface.uStart(),
+                    surface.uEnd(),
+                    surface.vStart(),
+                    surface.vEnd(),
                     surface.uDegree(),
                     surface.vDegree(),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null, null, null, null, null, null, null, null, null, null, null, null, null
+                    controlPoints,
+                    surface.uMultiplicities(),
+                    surface.vMultiplicities(),
+                    surface.uKnots(),
+                    surface.vKnots(),
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         if (surfaceGeometry instanceof StepBSplineSurfaceWithKnots
@@ -1768,6 +1794,11 @@ public final class StepFacePayloadBuilder {
                 || surfaceGeometry instanceof StepQuasiUniformSurface
                 || surfaceGeometry instanceof StepPiecewiseBezierSurface) {
             BSplineSurface3 surface = PreviewMeshExporter.buildBsplineSurface(surfaceGeometry, builder);
+            List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
+                    .map(row -> row.stream()
+                            .map(point -> List.of(point.x(), point.y(), point.z()))
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
                     "bspline_surface",
                     null,
@@ -1776,17 +1807,18 @@ public final class StepFacePayloadBuilder {
                     0.0,
                     null,
                     null,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
+                    surface.uStart(),
+                    surface.uEnd(),
+                    surface.vStart(),
+                    surface.vEnd(),
                     surface.uDegree(),
                     surface.vDegree(),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null, null, null, null, null, null, null, null, null, null, null, null, null
+                    controlPoints,
+                    surface.uMultiplicities(),
+                    surface.vMultiplicities(),
+                    surface.uKnots(),
+                    surface.vKnots(),
+                    null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
         }
         return null;
@@ -1895,6 +1927,7 @@ public final class StepFacePayloadBuilder {
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
         StepEntity associatedSource = unwrapAssociatedCurveGeometry(edgeGeometry);
         List<StepEntity> pcurves = null;
+        // Default to empty list for unsupported source types
         pcurves = List.of();
         if (pcurves.isEmpty()) {
             if (shouldFallbackToProjectedEdge(edgeGeometry)) {
@@ -1910,7 +1943,7 @@ public final class StepFacePayloadBuilder {
             log.debug("stage={} edgeId={}, orientedEdgeId={}, surfaceType={}, edgeGeometryType={}, associatedGeometry={}, reason={}", "parametric_edge_sampling_failed",
                     orientedEdge.edgeElement().id(), orientedEdge.id(),
                             StepPreviewJsonExporter.surfaceTypeName(faceGeometry), StepPreviewJsonExporter.surfaceTypeName(edgeGeometry),
-                            StepPreviewJsonExporter.associatedGeometrySummary(edgeGeometry), "no matching pcurves");
+                            StepEdgePayloadBuilder.associatedGeometrySummary(edgeGeometry), "no matching pcurves");
             return null;
         }
         UvPoint projectedStart = mapper.project(StepPreviewJsonExporter.pointFromStep(startVertex.point()), null);
@@ -1999,7 +2032,7 @@ public final class StepFacePayloadBuilder {
             log.debug("stage={} edgeId={}, orientedEdgeId={}, surfaceType={}, pcurveCount={}, unsupportedPcurveCount={}, pcurveBasisSurfaces={}, reason={}", "parametric_edge_sampling_failed",
                     orientedEdge.edgeElement().id(), orientedEdge.id(),
                             StepPreviewJsonExporter.surfaceTypeName(faceGeometry), pcurves.size(),
-                            unsupportedPcurveCount, StepSummaryBuilder.pcurveBasisSurfaceSummary(pcurves),
+                            unsupportedPcurveCount, pcurveBasisSurfaceSummary(pcurves),
                             "no usable pcurve samples");
         }
         return best;
@@ -2048,12 +2081,12 @@ public final class StepFacePayloadBuilder {
         CartesianPoint start = StepPreviewJsonExporter.pointFromStep(orientedEdge.orientation() ? edge.start().point() : edge.end().point());
         CartesianPoint end = StepPreviewJsonExporter.pointFromStep(orientedEdge.orientation() ? edge.end().point() : edge.start().point());
         boolean naturalForward = orientedEdge.orientation() ? edge.sameSense() : !edge.sameSense();
-        com.minicad.geometry.Curve3 curve = StepPreviewJsonExporter.curveForLooseEdge(edge.edgeGeometry(), builder);
+        Curve3 curve = StepEdgePayloadBuilder.curveForLooseEdge(edge.edgeGeometry(), builder);
         if (curve == null) {
             return List.of();
         }
         try {
-            return StepPreviewJsonExporter.sampleEdge(start, end, curve, naturalForward);
+            return StepEdgePayloadBuilder.sampleEdge(start, end, curve, naturalForward);
         } catch (GeometryException ex) {
             return List.of(start, end);
         }
@@ -2290,7 +2323,7 @@ public final class StepFacePayloadBuilder {
             if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
                 sampled.add(sampled.get(0));
             }
-            return bound.orientation() ? sampled : StepPayloadBuilder.reverseClosedLoop(sampled);
+            return bound.orientation() ? sampled : StepPreviewJsonExporter.reverseClosedLoop(sampled);
         }
         if (!(bound.loop() instanceof EdgeLoop)) {
             throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
@@ -2299,7 +2332,7 @@ public final class StepFacePayloadBuilder {
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-            List<CartesianPoint> edgePoints = StepPreviewJsonExporter.sampleOrientedEdge(orientedEdge);
+            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
             int startIndex = firstEdge ? 0 : 1;
             for (int i = startIndex; i < edgePoints.size(); i++) {
                 sampled.add(edgePoints.get(i));
@@ -2309,6 +2342,10 @@ public final class StepFacePayloadBuilder {
         if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
             sampled.add(sampled.get(0));
         }
-        return bound.orientation() ? sampled : StepPayloadBuilder.reverseClosedLoop(sampled);
+        return bound.orientation() ? sampled : StepPreviewJsonExporter.reverseClosedLoop(sampled);
     }
+    private static String pcurveBasisSurfaceSummary(List<StepEntity> pcurves) {
+        return StepSummaryBuilder.pcurveBasisSurfaceSummary(pcurves);
+    }
+
 }

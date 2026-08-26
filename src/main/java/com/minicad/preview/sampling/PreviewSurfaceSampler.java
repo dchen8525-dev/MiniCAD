@@ -14,6 +14,7 @@ import com.minicad.topology.EdgeLoop;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 
 /** Surface parameterization, grid sampling, and triangulation.
  *  Extracted from StepPreviewJsonExporter to isolate sampling logic. */
@@ -273,7 +274,7 @@ public final class PreviewSurfaceSampler {
 
     private static List<CartesianPoint> sampleOrientedEdge(com.minicad.topology.OrientedEdge edge) {
         // Temporary: delegate to StepPreviewJsonExporter
-        return StepPreviewJsonExporter.sampleOrientedEdge(edge);
+        return StepEdgePayloadBuilder.sampleOrientedEdge(edge);
     }
 
     private static PointPayload toPointPayload(CartesianPoint point) {

@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepFacePayloadBuilder;
 
 /**
  * Geometry collection orchestration for STEP preview export.
@@ -170,7 +172,7 @@ public final class PreviewGeometryCollector {
             List<StepFaceEntity> shellFaces = PreviewFaceBuilder.shellFaces(shellEntity);
             log.debug("stage={} shellId={}, shellFaceCount={}", "geometry_shell_start", shellId, shellFaces.size());
             for (StepFaceEntity stepFace : shellFaces) {
-                PreviewFaceResult previewFace = StepPreviewJsonExporter.buildPreviewFaceResult(
+                PreviewFaceResult previewFace = StepFacePayloadBuilder.buildPreviewFaceResult(
                         stepFace,
                         builder,
                         StepPreviewJsonExporter.mergeMetadata(inheritedShellMetadata.get(shellId), metadata.forItem(stepFace.id()))
@@ -203,7 +205,7 @@ public final class PreviewGeometryCollector {
         List<EdgePayload> edges = new ArrayList<>();
         int processedEdges = 0;
         for (Integer edgeId : uniqueEdgeIds) {
-            edges.add(StepPreviewJsonExporter.buildEdgePayload(edgeId, resolved, builder, metadata));
+            edges.add(StepEdgePayloadBuilder.buildEdgePayload(edgeId, resolved, builder, metadata));
             processedEdges++;
             if (processedEdges % 100 == 0) {
                 log.debug("stage={} processedEdges={}, totalUniqueEdges={}", "geometry_edge_progress",
@@ -399,44 +401,44 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepEdgeCurve) {
             StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
-            edges.putIfAbsent(edgeCurve.id(), StepPreviewJsonExporter.buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
+            edges.putIfAbsent(edgeCurve.id(), StepEdgePayloadBuilder.buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
             return;
         }
         if (item instanceof StepFilletEdge) {
             StepFilletEdge filletEdge = (StepFilletEdge) item;
-            edges.putIfAbsent(filletEdge.id(), StepPreviewJsonExporter.buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
+            edges.putIfAbsent(filletEdge.id(), StepEdgePayloadBuilder.buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
             return;
         }
         if (item instanceof StepChamferEdge) {
             StepChamferEdge chamferEdge = (StepChamferEdge) item;
-            edges.putIfAbsent(chamferEdge.id(), StepPreviewJsonExporter.buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
+            edges.putIfAbsent(chamferEdge.id(), StepEdgePayloadBuilder.buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
             return;
         }
         if (item instanceof StepPath) {
             StepPath path = (StepPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepEdgePayloadBuilder.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
         if (item instanceof StepOpenPath) {
             StepOpenPath path = (StepOpenPath) item;
             for (StepOrientedEdge orientedEdge : path.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepEdgePayloadBuilder.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
         if (item instanceof StepSubpath) {
             StepSubpath subpath = (StepSubpath) item;
             for (StepOrientedEdge orientedEdge : subpath.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepEdgePayloadBuilder.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
         if (item instanceof StepOrientedPath) {
             StepOrientedPath orientedPath = (StepOrientedPath) item;
             for (StepOrientedEdge orientedEdge : orientedPath.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepEdgePayloadBuilder.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
@@ -464,7 +466,7 @@ public final class PreviewGeometryCollector {
         if (item instanceof StepEdgeLoop) {
             StepEdgeLoop edgeLoop = (StepEdgeLoop) item;
             for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepPreviewJsonExporter.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+                edges.putIfAbsent(orientedEdge.edgeElement().id(), StepEdgePayloadBuilder.buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
             }
             return;
         }
@@ -570,7 +572,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepDimensionCurve) {
             StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else {
@@ -580,7 +582,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepLeaderCurve) {
             StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else {
@@ -590,7 +592,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepProjectionCurve) {
             StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else {
@@ -600,7 +602,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepDraughtingAnnotationOccurrence) {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else if (collectMappedAnnotationCarrierEdges(
@@ -620,7 +622,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepTerminatorSymbol) {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else {
@@ -630,7 +632,7 @@ public final class PreviewGeometryCollector {
         }
         if (item instanceof StepAnnotationCurveOccurrence) {
             StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             } else {
@@ -654,7 +656,7 @@ public final class PreviewGeometryCollector {
             return;
         }
         if (PreviewFaceBuilder.isSampledCurveSource(item)) {
-            EdgePayload sampled = StepPreviewJsonExporter.sampledCurveEdgePayload(item, builder);
+            EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
             }

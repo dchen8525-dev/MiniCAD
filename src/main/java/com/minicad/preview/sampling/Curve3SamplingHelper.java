@@ -9,6 +9,7 @@ import com.minicad.geometry.TrimmedCurve3;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 
 /**
  * Helper class for 3D curve sampling utilities.
@@ -32,7 +33,7 @@ public final class Curve3SamplingHelper {
     }
 
     public static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
-        List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseCurve(trimmedCurve.basisCurve());
+        List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseCurve(trimmedCurve.basisCurve());
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }

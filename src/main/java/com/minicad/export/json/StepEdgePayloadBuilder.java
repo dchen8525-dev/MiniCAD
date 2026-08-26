@@ -71,6 +71,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import com.minicad.geometry.Clothoid3;
+import com.minicad.geometry.DegenerateCurve3;
+import com.minicad.geometry.Hyperbola3;
+import com.minicad.geometry.Parabola3;
+import com.minicad.preview.payload.RepresentationBuildResult;
 
 /**
  * Builds edge payloads from STEP edge entities.
@@ -245,13 +250,9 @@ public final class StepEdgePayloadBuilder {
             if (parentPoints == null) {
                 return null;
             }
-            double[] matrix = StepPlacementTransformer.matrixForTransformationOperator(replica.transformation(), builder);
-            if (matrix == null) {
-                return null;
-            }
             List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
             for (CartesianPoint point : parentPoints) {
-                transformed.add(MathUtilityHelper.transformCartesian(point, matrix));
+                transformed.add(StepPreviewJsonExporter.transformPoint(point, replica.transformation(), builder));
             }
             return List.copyOf(transformed);
         }
@@ -469,7 +470,48 @@ public final class StepEdgePayloadBuilder {
             }
             return List.copyOf(points);
         }
-        throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, SURFACE_CURVE, SEAM_CURVE or TRIMMED_CURVE topology");
+        if (curve instanceof Parabola3) {
+            Parabola3 parabola = (Parabola3) curve;
+            List<CartesianPoint> points = new ArrayList<>(parabola.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof Hyperbola3) {
+            Hyperbola3 hyperbola = (Hyperbola3) curve;
+            List<CartesianPoint> points = new ArrayList<>(hyperbola.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof Clothoid3) {
+            Clothoid3 clothoid = (Clothoid3) curve;
+            List<CartesianPoint> points = new ArrayList<>(clothoid.sample(72));
+            if (!naturalForward) {
+                java.util.Collections.reverse(points);
+            }
+            if (points.size() >= 2) {
+                points.set(0, start);
+                points.set(points.size() - 1, end);
+            }
+            return List.copyOf(points);
+        }
+        if (curve instanceof DegenerateCurve3) {
+            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
+            // Degenerate curve: a single collapsed point; return start-end as a degenerate edge
+            return List.of(start, end);
+        }
+        throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, PARABOLA, HYPERBOLA, CLOTHOID, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, OFFSET_CURVE_2D/3D, SURFACE_CURVE, SEAM_CURVE, DEGENERATE_CURVE or TRIMMED_CURVE topology");
     }
 
     // ================================================================================
@@ -479,56 +521,56 @@ public final class StepEdgePayloadBuilder {
     static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
         try {
             if (item instanceof StepLine) {
-                StepLine line = (StepLine) item;
+            StepLine line = (StepLine) item;
                 return builder.buildLine(line.id());
             }
             if (item instanceof StepCircle) {
-                StepCircle circle = (StepCircle) item;
+            StepCircle circle = (StepCircle) item;
                 return builder.buildCircle(circle.id());
             }
             if (item instanceof StepEllipse) {
-                StepEllipse ellipse = (StepEllipse) item;
+            StepEllipse ellipse = (StepEllipse) item;
                 return builder.buildEllipse(ellipse.id());
             }
             if (item instanceof StepConicCurve) {
-                StepConicCurve conic = (StepConicCurve) item;
+            StepConicCurve conic = (StepConicCurve) item;
                 List<CartesianPoint> points = ConicSamplingHelper.sampleConicCurvePoints(conic, builder);
                 return points == null ? null : new Polyline3(points);
             }
             if (item instanceof StepBezierCurve) {
-                StepBezierCurve curve = (StepBezierCurve) item;
+            StepBezierCurve curve = (StepBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
             if (item instanceof StepUniformCurve) {
-                StepUniformCurve curve = (StepUniformCurve) item;
+            StepUniformCurve curve = (StepUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
             if (item instanceof StepQuasiUniformCurve) {
-                StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
             if (item instanceof StepPiecewiseBezierCurve) {
-                StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
                 return builder.buildCurveReference3(curve.id());
             }
             if (item instanceof StepBSplineCurveWithKnots) {
-                StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
+            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
                 return builder.buildBSplineCurve(spline.id());
             }
             if (item instanceof StepSurfaceCurve) {
-                StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
+            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
                 return builder.buildSurfaceCurve(surfaceCurve.id());
             }
             if (item instanceof StepSeamCurve) {
-                StepSeamCurve seamCurve = (StepSeamCurve) item;
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id());
             }
             if (item instanceof StepTrimmedCurve) {
-                StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
+            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
                 return builder.buildTrimmedCurve(trimmedCurve.id());
             }
             if (item instanceof StepPolyline) {
-                StepPolyline polyline = (StepPolyline) item;
+            StepPolyline polyline = (StepPolyline) item;
                 return builder.buildPolyline(polyline.id());
             }
             if (item instanceof com.minicad.step.model.StepCompositeCurve) {
@@ -544,15 +586,15 @@ public final class StepEdgePayloadBuilder {
                 return builder.buildRationalBSplineCurve(spline.id());
             }
             if (item instanceof StepOffsetCurve2D) {
-                StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
+            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
                 return liftCurve2(builder.buildOffsetCurve2(offsetCurve2D.id()));
             }
             if (item instanceof StepOffsetCurve3D) {
-                StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
+            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
                 return builder.buildOffsetCurve3(offsetCurve3D.id());
             }
             if (item instanceof StepPcurve) {
-                StepPcurve pcurve = (StepPcurve) item;
+            StepPcurve pcurve = (StepPcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
                 if (built instanceof Curve2) {
                     Curve2 curve2 = (Curve2) built;
@@ -561,7 +603,7 @@ public final class StepEdgePayloadBuilder {
                 return null;
             }
             if (item instanceof StepDegeneratePcurve) {
-                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
+            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
                 Object built = builder.buildPcurve2(pcurve.id());
                 if (built instanceof Curve2) {
                     Curve2 curve2 = (Curve2) built;
@@ -570,95 +612,95 @@ public final class StepEdgePayloadBuilder {
                 return null;
             }
             if (item instanceof StepOrientedCurve) {
-                StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
                 return curveForLooseEdge(orientedCurve.curveElement(), builder);
             }
             if (item instanceof StepAnnotationCurveOccurrence) {
-                StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
                 return curveForLooseEdge(occurrence.item(), builder);
             }
             if (item instanceof StepDimensionCurve) {
-                StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
                 return curveForLooseEdge(dimensionCurve.item(), builder);
             }
             if (item instanceof StepLeaderCurve) {
-                StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
                 return curveForLooseEdge(leaderCurve.item(), builder);
             }
             if (item instanceof StepProjectionCurve) {
-                StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
                 return curveForLooseEdge(projectionCurve.item(), builder);
             }
             if (item instanceof StepDraughtingAnnotationOccurrence) {
-                StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
                 return curveForLooseEdge(annotationOccurrence.item(), builder);
             }
             if (item instanceof StepTerminatorSymbol) {
-                StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
                 return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
             }
             if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) item;
+            StepGeometricReplica replica = (StepGeometricReplica) item;
                 List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
                 return points == null ? null : new Polyline3(points);
             }
             if (item instanceof StepIndexedPolyCurve) {
-                StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
+            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
                 return builder.buildCurveReference3(polyCurve.id());
             }
             if (item instanceof StepClothoid) {
-                StepClothoid clothoid = (StepClothoid) item;
+            StepClothoid clothoid = (StepClothoid) item;
                 return builder.buildCurveReference3(clothoid.id());
             }
             if (item instanceof StepDegenerateCurve) {
-                StepDegenerateCurve degenerate = (StepDegenerateCurve) item;
+            StepDegenerateCurve degenerate = (StepDegenerateCurve) item;
                 return builder.buildCurveReference3(degenerate.id());
             }
             if (item instanceof StepBSplineCurve) {
-                StepBSplineCurve bspline = (StepBSplineCurve) item;
+            StepBSplineCurve bspline = (StepBSplineCurve) item;
                 return builder.buildCurveReference3(bspline.id());
             }
             if (item instanceof StepCompositeCurveOnSurface) {
-                StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
+            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
                 return builder.buildCurveReference3(compositeOnSurface.id());
             }
             if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
-                StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) item;
+            StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) item;
                 return builder.buildBSplineCurveWithBreakpoints(splineBreak.id());
             }
             if (item instanceof StepLineSegment) {
-                StepLineSegment lineSeg = (StepLineSegment) item;
+            StepLineSegment lineSeg = (StepLineSegment) item;
                 return new Polyline3(List.of(
                         builder.buildPoint(lineSeg.startPoint().id()),
                         builder.buildPoint(lineSeg.endPoint().id())
                 ));
             }
             if (item instanceof StepEdgeCurve) {
-                StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
                 return builder.buildCurveReference3(edgeCurve.id());
             }
             if (item instanceof StepSurfacedEdgeCurve) {
-                StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) item;
+            StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) item;
                 return builder.buildCurveReference3(surfacedEdge.id());
             }
             if (item instanceof StepCompositeCurveOnSurface3D) {
-                StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) item;
+            StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) item;
                 return builder.buildCurveReference3(compositeOnSurface3D.id());
             }
             if (item instanceof StepPath) {
-                StepPath path = (StepPath) item;
+            StepPath path = (StepPath) item;
                 return builder.buildPath(path.id());
             }
             if (item instanceof StepOpenPath) {
-                StepOpenPath openPath = (StepOpenPath) item;
+            StepOpenPath openPath = (StepOpenPath) item;
                 return builder.buildPath(openPath.id());
             }
             if (item instanceof StepSubpath) {
-                StepSubpath subpath = (StepSubpath) item;
+            StepSubpath subpath = (StepSubpath) item;
                 return builder.buildPath(subpath.id());
             }
             if (item instanceof StepSeamCurve) {
-                StepSeamCurve seamCurve = (StepSeamCurve) item;
+            StepSeamCurve seamCurve = (StepSeamCurve) item;
                 return builder.buildSeamCurve(seamCurve.id()).curve3d();
             }
             if (item instanceof StepCircle2D
@@ -713,7 +755,7 @@ public final class StepEdgePayloadBuilder {
         return meta.rgb() != null ? PayloadConversionHelper.toColorPayload(meta.rgb()) : null;
     }
 
-    private static EdgePayload buildTopologyEdgePayload(int edgeId, Edge edge) {
+    static EdgePayload buildTopologyEdgePayload(int edgeId, Edge edge) {
         return new EdgePayload(
                 edgeId,
                 PayloadConversionHelper.toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
@@ -740,7 +782,7 @@ public final class StepEdgePayloadBuilder {
         return new EdgePayload(polyLoop.id(), PayloadConversionHelper.toPointPayloads(List.copyOf(closed)), null, null);
     }
 
-    private static EdgeCurvePayload sampledCurvePayload(StepEntity item, StepCadBuilder builder) {
+    static EdgeCurvePayload sampledCurvePayload(StepEntity item, StepCadBuilder builder) {
         String type = previewCurveTypeName(item);
         if (type == null) {
             return null;
@@ -758,7 +800,7 @@ public final class StepEdgePayloadBuilder {
         List<Integer> associatedSurfaceStepIds = previewCurveAssociatedSurfaceStepIds(item);
         try {
             if (item instanceof StepCircle) {
-                StepCircle circle = (StepCircle) item;
+            StepCircle circle = (StepCircle) item;
                 Circle geometry = builder.buildCircle(circle.id());
                 Axis2Placement3D placement = geometry.position();
                 return new EdgeCurvePayload(
@@ -788,7 +830,7 @@ public final class StepEdgePayloadBuilder {
                 );
             }
             if (item instanceof StepEllipse) {
-                StepEllipse ellipse = (StepEllipse) item;
+            StepEllipse ellipse = (StepEllipse) item;
                 Ellipse3 geometry = builder.buildEllipse(ellipse.id());
                 Axis2Placement3D placement = geometry.position();
                 return new EdgeCurvePayload(
@@ -817,12 +859,34 @@ public final class StepEdgePayloadBuilder {
                         Math.PI * 2.0
                 );
             }
-            // Add more curve types as needed - this is a partial extraction
-            // Full implementation would include LINE, BSPLINE, etc.
-        } catch (GeometryException ex) {
-            log.debug("stage={} itemId={}, reason={}", "sampled_curve_payload_failed", item.id(), ex.getMessage());
+        } catch (GeometryException | StepResolutionException ex) {
+            log.debug("stage={} curveId={}, reason={}", "sampled_curve_payload_fallback", item.id(), ex.getMessage());
         }
-        return null;
+        return new EdgeCurvePayload(
+                item.id(),
+                type,
+                basisType,
+                basisStepId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                orientation,
+                senseAgreement,
+                offsetDistance,
+                selfIntersect,
+                refDirection,
+                transformScale,
+                masterRepresentation,
+                associatedSurfaceTypes,
+                associatedSurfaceStepIds,
+                null,
+                null,
+                0.0,
+                0.0
+        );
     }
 
     private static EdgeCurvePayload edgeCurvePayload(
@@ -971,7 +1035,7 @@ public final class StepEdgePayloadBuilder {
      * @param builder the CAD builder
      * @param metadata the metadata extractor
      */
-    public static void collectStandaloneEdges(
+    static void collectStandaloneEdges(
             StepEntity item,
             Map<Integer, EdgePayload> edges,
             Map<Integer, StepEntity> resolved,
@@ -1139,9 +1203,160 @@ public final class StepEdgePayloadBuilder {
             );
             return;
         }
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
+            if (!collectMappedAnnotationCarrierEdges(
+                    symbolOccurrence.id(),
+                    "ANNOTATION_SYMBOL_OCCURRENCE",
+                    symbolOccurrence.id(),
+                    symbolOccurrence.item(),
+                    edges,
+                    resolved,
+                    builder
+            )) {
+                collectStandaloneEdges(symbolOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
+            if (!collectMappedAnnotationCarrierEdges(
+                    subfigureOccurrence.id(),
+                    "ANNOTATION_SUBFIGURE_OCCURRENCE",
+                    subfigureOccurrence.id(),
+                    subfigureOccurrence.item(),
+                    edges,
+                    resolved,
+                    builder
+            )) {
+                collectStandaloneEdges(subfigureOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
+            collectMappedAnnotationEdges(
+                    annotationText.id(),
+                    annotationText.mappingSource().mappedRepresentation(),
+                    annotationText.mappingSource().mappedOrigin(),
+                    annotationText.mappingTarget(),
+                    null,
+                    null,
+                    edges,
+                    resolved,
+                    builder
+            );
+            return;
+        }
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
+            collectMappedAnnotationEdges(
+                    annotationTextCharacter.id(),
+                    annotationTextCharacter.mappingSource().mappedRepresentation(),
+                    annotationTextCharacter.mappingSource().mappedOrigin(),
+                    annotationTextCharacter.mappingTarget(),
+                    null,
+                    null,
+                    edges,
+                    resolved,
+                    builder
+            );
+            return;
+        }
+        if (item instanceof StepDimensionCurve) {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+                collectStandaloneEdges(dimensionCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepLeaderCurve) {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+                collectStandaloneEdges(leaderCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepProjectionCurve) {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+                collectStandaloneEdges(projectionCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepDraughtingAnnotationOccurrence) {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else if (collectMappedAnnotationCarrierEdges(
+                    annotationOccurrence.id(),
+                    "DRAUGHTING_ANNOTATION_OCCURRENCE",
+                    annotationOccurrence.id(),
+                    annotationOccurrence.item(),
+                    edges,
+                    resolved,
+                    builder
+            )) {
+                return;
+            } else {
+                collectStandaloneEdges(annotationOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepTerminatorSymbol) {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+                collectStandaloneEdges(terminatorSymbol.annotatedCurve(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepAnnotationCurveOccurrence) {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+                collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }
+        if (item instanceof StepFilletEdge) {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
+            collectStandaloneEdges(filletEdge.originalEdge(), edges, resolved, builder, metadata);
+            return;
+        }
+        if (item instanceof StepChamferEdge) {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
+            collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder, metadata);
+            return;
+        }
+        if (item instanceof StepSubedge) {
+            StepSubedge subedge = (StepSubedge) item;
+            collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder, metadata);
+            return;
+        }
+        if (isSampledCurveSource(item)) {
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+                edges.putIfAbsent(sampled.stepId(), sampled);
+            }
+        }
     }
 
-    private static void collectMappedAnnotationEdges(
+    static void collectMappedAnnotationEdges(
             int mappedOwnerId,
             StepRepresentation representation,
             StepEntity mappedOrigin,
@@ -1156,8 +1371,18 @@ public final class StepEdgePayloadBuilder {
         if (matrix == null) {
             return;
         }
-        // Note: This requires access to buildRepresentationPayload which is in StepPreviewJsonExporter
-        // For now, delegate back to StepPreviewJsonExporter for complex representation building
+        RepresentationBuildResult source = StepPreviewJsonExporter.buildRepresentationPayload(
+                representation,
+                representation.name(),
+                resolved,
+                builder,
+                StepMetadataExtractor.fromResolved(resolved),
+                new LinkedHashSet<>()
+        );
+        for (EdgePayload edge : source.payload().edges()) {
+            EdgePayload transformed = StepPreviewJsonExporter.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
+            edges.putIfAbsent(transformed.stepId(), transformed);
+        }
     }
 
     // ================================================================================
@@ -1192,7 +1417,7 @@ public final class StepEdgePayloadBuilder {
         return points.isEmpty() ? null : List.copyOf(points);
     }
 
-    private static List<CartesianPoint> sampleMappedAnnotationPoints(
+    static List<CartesianPoint> sampleMappedAnnotationPoints(
             StepRepresentation representation,
             StepEntity mappedOrigin,
             StepEntity mappingTarget,
@@ -1209,7 +1434,7 @@ public final class StepEdgePayloadBuilder {
                 continue;
             }
             for (CartesianPoint point : sampled) {
-                points.add(com.minicad.helper.MathUtilityHelper.transformCartesian(point, matrix));
+                points.add(MathUtilityHelper.transformCartesian(point, matrix));
             }
         }
         return points.isEmpty() ? null : List.copyOf(points);
@@ -1288,7 +1513,7 @@ public final class StepEdgePayloadBuilder {
     }
 
     // Delegate to StepSummaryBuilder - extracted utility class
-    private static String associatedGeometrySummary(StepEntity edgeGeometry) {
+    static String associatedGeometrySummary(StepEntity edgeGeometry) {
         return StepSummaryBuilder.associatedGeometrySummary(edgeGeometry);
     }
 
@@ -1457,41 +1682,131 @@ public final class StepEdgePayloadBuilder {
         StepEntity current = item;
         while (true) {
             if (current instanceof StepOrientedCurve) {
-                StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
+            StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
                 current = orientedCurve.curveElement();
                 continue;
             }
             if (current instanceof StepAnnotationCurveOccurrence) {
-                StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
                 current = occurrence.item();
                 continue;
             }
             if (current instanceof StepDimensionCurve) {
-                StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
                 current = dimensionCurve.item();
                 continue;
             }
             if (current instanceof StepLeaderCurve) {
-                StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
                 current = leaderCurve.item();
                 continue;
             }
             if (current instanceof StepProjectionCurve) {
-                StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
                 current = projectionCurve.item();
                 continue;
             }
             if (current instanceof StepDraughtingAnnotationOccurrence) {
-                StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
                 current = annotationOccurrence.item();
                 continue;
             }
             if (current instanceof StepTerminatorSymbol) {
-                StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
                 current = terminatorSymbol.annotatedCurve();
+                continue;
+            }
+            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
+                StepGeometricReplica replica = (StepGeometricReplica) current;
+                current = replica.parent();
                 continue;
             }
             return current;
         }
     }
+    static boolean collectMappedAnnotationCarrierEdges(
+            int mappedOwnerId,
+            String sourceType,
+            Integer sourceStepId,
+            StepEntity item,
+            Map<Integer, EdgePayload> edges,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder
+    ) {
+        if (item instanceof StepAnnotationSymbol) {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
+            collectMappedAnnotationEdges(
+                    mappedOwnerId,
+                    annotationSymbol.mappingSource().mappedRepresentation(),
+                    annotationSymbol.mappingSource().mappedOrigin(),
+                    annotationSymbol.mappingTarget(),
+                    sourceType,
+                    sourceStepId,
+                    edges,
+                    resolved,
+                    builder
+            );
+            return true;
+        }
+        if (item instanceof StepAnnotationText) {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
+            collectMappedAnnotationEdges(
+                    mappedOwnerId,
+                    annotationText.mappingSource().mappedRepresentation(),
+                    annotationText.mappingSource().mappedOrigin(),
+                    annotationText.mappingTarget(),
+                    sourceType,
+                    sourceStepId,
+                    edges,
+                    resolved,
+                    builder
+            );
+            return true;
+        }
+        if (item instanceof StepAnnotationTextCharacter) {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
+            collectMappedAnnotationEdges(
+                    mappedOwnerId,
+                    annotationTextCharacter.mappingSource().mappedRepresentation(),
+                    annotationTextCharacter.mappingSource().mappedOrigin(),
+                    annotationTextCharacter.mappingTarget(),
+                    sourceType,
+                    sourceStepId,
+                    edges,
+                    resolved,
+                    builder
+            );
+            return true;
+        }
+        if (item instanceof StepAnnotationSymbolOccurrence) {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
+            return collectMappedAnnotationCarrierEdges(
+                    mappedOwnerId,
+                    sourceType,
+                    sourceStepId,
+                    symbolOccurrence.item(),
+                    edges,
+                    resolved,
+                    builder
+            );
+        }
+        if (item instanceof StepAnnotationSubfigureOccurrence) {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
+            return collectMappedAnnotationCarrierEdges(
+                    mappedOwnerId,
+                    sourceType,
+                    sourceStepId,
+                    subfigureOccurrence.item(),
+                    edges,
+                    resolved,
+                    builder
+            );
+        }
+        return false;
+    }
+
+    private static boolean isSampledCurveSource(StepEntity item) {
+        return StepValidationHelper.isSampledCurveSource(item);
+    }
+
 }

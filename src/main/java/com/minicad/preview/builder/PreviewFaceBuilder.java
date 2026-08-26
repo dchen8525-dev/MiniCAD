@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 
 /**
  * Face building and geometry collection orchestration for STEP preview export.
@@ -323,13 +324,13 @@ public final class PreviewFaceBuilder {
         CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (PreviewUvCoords.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (PreviewUvCoords.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
-        List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
+        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
+        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
         double lowerHeight = PreviewUvCoords.averageAxialHeight(surface, lowerArcPoints);
         double upperHeight = PreviewUvCoords.averageAxialHeight(surface, upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
@@ -412,13 +413,13 @@ public final class PreviewFaceBuilder {
         ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
         OrientedEdge lowerArc = circleEdges.get(0);
         OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (PreviewUvCoords.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc))) {
+        if (PreviewUvCoords.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > PreviewUvCoords.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
             lowerArc = circleEdges.get(circleEdges.size() - 1);
             upperArc = circleEdges.get(0);
         }
 
-        List<CartesianPoint> lowerArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepPreviewJsonExporter.sampleOrientedEdge(upperArc);
+        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
+        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
         double lowerHeight = PreviewUvCoords.averageAxialHeight(surface.position(), lowerArcPoints);
         double upperHeight = PreviewUvCoords.averageAxialHeight(surface.position(), upperArcPoints);
         if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
@@ -492,10 +493,10 @@ public final class PreviewFaceBuilder {
         OrientedEdge lowerArc = outerLoop.edges().get(0);
         OrientedEdge upperArc = outerLoop.edges().get(2);
 
-        List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerArc);
+        List<CartesianPoint> lowerPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
         List<Double> lowerU = PreviewUvCoords.unwrapAngles(surface.position(), lowerPoints);
         double lowerV = PreviewUvCoords.sphericalV(surface.position(), lowerPoints.get(0), surface.radius());
-        double upperV = PreviewUvCoords.sphericalV(surface.position(), StepPreviewJsonExporter.sampleOrientedEdge(upperArc).get(0), surface.radius());
+        double upperV = PreviewUvCoords.sphericalV(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(upperArc).get(0), surface.radius());
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || lowerU.size() < 2) {
             return null;
         }
@@ -569,7 +570,7 @@ public final class PreviewFaceBuilder {
         List<OrientedEdge> varyingUEdges = new ArrayList<>();
         List<OrientedEdge> varyingVEdges = new ArrayList<>();
         for (OrientedEdge edge : circleEdges) {
-            List<CartesianPoint> points = StepPreviewJsonExporter.sampleOrientedEdge(edge);
+            List<CartesianPoint> points = StepEdgePayloadBuilder.sampleOrientedEdge(edge);
             List<Double> uValues = unwrapToroidalU(surface, points);
             List<Double> vValues = unwrapToroidalV(surface, points);
             double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
@@ -586,15 +587,15 @@ public final class PreviewFaceBuilder {
 
         OrientedEdge lowerVEdge = varyingUEdges.get(0);
         OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge))) {
+        if (averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge)) > averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge))) {
             lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
             upperVEdge = varyingUEdges.get(0);
         }
 
-        List<CartesianPoint> lowerPoints = StepPreviewJsonExporter.sampleOrientedEdge(lowerVEdge);
+        List<CartesianPoint> lowerPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge);
         List<Double> uValues = unwrapToroidalU(surface, lowerPoints);
         double lowerV = averageToroidalV(surface, lowerPoints);
-        double upperV = averageToroidalV(surface, StepPreviewJsonExporter.sampleOrientedEdge(upperVEdge));
+        double upperV = averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge));
         if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
             return null;
         }
@@ -1272,7 +1273,7 @@ public final class PreviewFaceBuilder {
         List<CartesianPoint> sampled = new ArrayList<>();
         boolean firstEdge = true;
         for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-            List<CartesianPoint> edgePoints = StepPreviewJsonExporter.sampleOrientedEdge(orientedEdge);
+            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
             int startIndex = firstEdge ? 0 : 1;
             for (int i = startIndex; i < edgePoints.size(); i++) {
                 sampled.add(edgePoints.get(i));

@@ -607,7 +607,7 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepAnnotationFillArea) {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) content;
-            List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleAnnotationFillAreaPoints(fillArea, builder);
+            List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleAnnotationFillAreaPoints(fillArea, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
                     leader.add(PayloadConversionHelper.toPointPayload(point));
@@ -622,7 +622,7 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepAnnotationSymbol) {
             StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) content;
-            List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationSymbol, builder);
+            List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(annotationSymbol, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
                     leader.add(PayloadConversionHelper.toPointPayload(point));
@@ -642,7 +642,7 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepAnnotationText) {
             StepAnnotationText annotationText = (StepAnnotationText) content;
-            List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationText, builder);
+            List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(annotationText, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
                     leader.add(PayloadConversionHelper.toPointPayload(point));
@@ -652,7 +652,7 @@ public final class PreviewPmiTargetBuilder {
         }
         if (content instanceof StepAnnotationTextCharacter) {
             StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) content;
-            List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(annotationTextCharacter, builder);
+            List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(annotationTextCharacter, builder);
             if (sampled != null) {
                 for (CartesianPoint point : sampled) {
                     leader.add(PayloadConversionHelper.toPointPayload(point));
@@ -773,7 +773,7 @@ public final class PreviewPmiTargetBuilder {
             leader.add(PayloadConversionHelper.toPointPayload(StepPreviewJsonExporter.pointFromStep(vertexPoint.point())));
             return;
         }
-        List<CartesianPoint> sampled = StepPreviewJsonExporter.sampleLooseEdgePoints(content, builder);
+        List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseEdgePoints(content, builder);
         if (sampled == null) {
             return;
         }
@@ -857,7 +857,7 @@ public final class PreviewPmiTargetBuilder {
             OrientedEdge orientedEdge,
             List<PointPayload> leader
     ) {
-        List<CartesianPoint> points = StepPreviewJsonExporter.sampleLooseCurve(orientedEdge.edge().curve());
+        List<CartesianPoint> points = StepEdgePayloadBuilder.sampleLooseCurve(orientedEdge.edge().curve());
         if (!orientedEdge.orientation()) {
             List<CartesianPoint> reversed = new ArrayList<>(points);
             Collections.reverse(reversed);
@@ -879,7 +879,7 @@ public final class PreviewPmiTargetBuilder {
             StepCadBuilder builder
     ) {
         for (StepOrientedEdge edge : edges) {
-            List<CartesianPoint> points = StepPreviewJsonExporter.sampleLooseEdgePoints(edge.edgeElement(), builder);
+            List<CartesianPoint> points = StepEdgePayloadBuilder.sampleLooseEdgePoints(edge.edgeElement(), builder);
             if (points == null) {
                 continue;
             }
