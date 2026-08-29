@@ -376,6 +376,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Ruled surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "ruled surface preview failed"));
         }
@@ -388,6 +389,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Surface of constant radius preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
         }
@@ -400,6 +402,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Paraboloid surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "paraboloid surface preview failed"));
         }
@@ -412,6 +415,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Hyperboloid surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "hyperboloid surface preview failed"));
         }
@@ -424,6 +428,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Surface of translation preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of translation preview failed"));
         }
@@ -436,6 +441,7 @@ public final class StepFacePayloadBuilder {
                     return new PreviewFaceResult(payload, null);
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Surface of projection preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of projection preview failed"));
         }
