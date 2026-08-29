@@ -33,6 +33,8 @@ public final class RationalBSplineCurve3 implements Curve3 {
     private final List<Integer> knotMultiplicities;
     private final List<Double> knots;
 
+    private volatile List<Double> expandedKnotsCache;
+
     public RationalBSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Double> weights, List<Integer> knotMultiplicities, List<Double> knots) {
         BSplineCurve3.validateDefinition(degree, controlPoints, knotMultiplicities, knots);
         if (weights == null || weights.size() != controlPoints.size()) {
@@ -121,10 +123,20 @@ public final class RationalBSplineCurve3 implements Curve3 {
 
     /**
      * Returns the expanded knot vector (with multiplicities expanded).
+     * Cached after first use to avoid repeated allocation on evaluation hot paths.
      *
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
+        List<Double> local = expandedKnotsCache;
+        if (local == null) {
+            local = computeExpandedKnots();
+            expandedKnotsCache = local;
+        }
+        return local;
+    }
+
+    private List<Double> computeExpandedKnots() {
         if (knots == null || knotMultiplicities == null) {
             return java.util.List.of();
         }

@@ -30,6 +30,8 @@ public final class BSplineCurve3 implements Curve3 {
     private final List<Integer> knotMultiplicities;
     private final List<Double> knots;
 
+    private volatile List<Double> expandedKnotsCache;
+
     public BSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
         validateDefinition(degree, controlPoints, knotMultiplicities, knots);
         this.degree = degree;
@@ -134,10 +136,20 @@ public final class BSplineCurve3 implements Curve3 {
 
     /**
      * Returns the expanded knot vector (with multiplicities expanded).
+     * Cached after first use to avoid repeated allocation on evaluation hot paths.
      *
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
+        List<Double> local = expandedKnotsCache;
+        if (local == null) {
+            local = computeExpandedKnots();
+            expandedKnotsCache = local;
+        }
+        return local;
+    }
+
+    private List<Double> computeExpandedKnots() {
         if (knots == null || knotMultiplicities == null) {
             return java.util.List.of();
         }
