@@ -43,7 +43,6 @@ class LineCountTest {
         "StepMeshExporter.java",  // Mesh export (2857 lines)
         "MeshTriangulatorParametric.java",  // Parametric surface triangulation (1407 lines)
         "PreviewSerializers.java",  // Preview serialization (2171 lines)
-        "PreviewUvMapper.java",  // UV mapping (2286 lines)
         "PreviewCurveEvaluator.java",  // Curve evaluation (1734 lines)
         "PreviewFaceBuilder.java",  // Face building (2829 lines)
         "StepEdgePayloadBuilder.java",  // Extracted edge payload builder, being decomposed further
