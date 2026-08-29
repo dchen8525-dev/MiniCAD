@@ -557,37 +557,6 @@ public final class StepAntlrBridge {
     }
 
     /**
-     * Validate reference IDs exist in the entity set.
-     */
-    private static void validateReferences(List<StepEntityInstance> entities) {
-        Set<Integer> validIds = new HashSet<>();
-        for (StepEntityInstance entity : entities) {
-            validIds.add(entity.id());
-        }
-
-        for (StepEntityInstance entity : entities) {
-            for (StepValue param : entity.parameters()) {
-                validateReferenceInValue(param, validIds, entity.id());
-            }
-        }
-    }
-
-    private static void validateReferenceInValue(StepValue value, Set<Integer> validIds, int sourceEntityId) {
-        if (value instanceof StepValue.ReferenceValue) {
-            int refId = ((StepValue.ReferenceValue) value).id();
-            if (!validIds.contains(refId)) {
-                throw new StepParseException("entity #" + sourceEntityId + " references undefined entity #" + refId);
-            }
-        } else if (value instanceof StepValue.ListValue) {
-            for (StepValue elem : ((StepValue.ListValue) value).elements()) {
-                validateReferenceInValue(elem, validIds, sourceEntityId);
-            }
-        } else if (value instanceof StepValue.TypedValue) {
-            validateReferenceInValue(((StepValue.TypedValue) value).value(), validIds, sourceEntityId);
-        }
-    }
-
-    /**
      * Custom error listener with position tracking.
      */
     private static final class StepPositionErrorListener extends BaseErrorListener {
