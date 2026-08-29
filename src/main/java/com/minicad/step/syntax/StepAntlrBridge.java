@@ -2,6 +2,8 @@ package com.minicad.step.syntax;
 
 import com.minicad.common.StepParseException;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
@@ -38,25 +40,29 @@ public final class StepAntlrBridge {
         // Pre-parse validation for unterminated constructs (Phase 5)
         validateUnterminatedConstructs(stepText);
 
-        // Create ANTLR4 lexer and parser
+        // Fast path: SLL prediction with a bail-out error strategy. Any file the
+        // fast path cannot prove valid (prediction bail or lexer error) is re-parsed
+        // with the full LL configuration, so error reporting for malformed files
+        // is unchanged; valid files skip the more expensive LL prediction entirely.
         CharStream input = CharStreams.fromString(stepText);
         StepAntlrLexer lexer = new StepAntlrLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         StepAntlrParser parser = new StepAntlrParser(tokens);
-
-        // Add custom error listener with position tracking
         lexer.removeErrorListeners();
         parser.removeErrorListeners();
-        StepPositionErrorListener errorListener = new StepPositionErrorListener(stepText);
-        lexer.addErrorListener(errorListener);
-        parser.addErrorListener(errorListener);
+        ErrorFlagListener lexerErrorFlag = new ErrorFlagListener();
+        lexer.addErrorListener(lexerErrorFlag);
+        parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+        parser.setErrorHandler(new BailErrorStrategy());
 
-        // Parse STEP file
-        StepAntlrParser.StepFileContext tree = parser.stepFile();
-
-        // Check for errors
-        if (errorListener.hasErrors()) {
-            throw new StepParseException(errorListener.getFirstError());
+        StepAntlrParser.StepFileContext tree;
+        try {
+            tree = parser.stepFile();
+        } catch (ParseCancellationException ex) {
+            tree = null;
+        }
+        if (tree == null || lexerErrorFlag.failed) {
+            tree = parseWithFullErrorReporting(stepText);
         }
 
         // Convert ParseTree to StepFile model
@@ -70,6 +76,28 @@ public final class StepAntlrBridge {
     }
 
     /**
+     * Full LL parse with position-tracking error listeners. Only reached for
+     * files the SLL fast path rejected, so its cost is paid on error paths.
+     */
+    private static StepAntlrParser.StepFileContext parseWithFullErrorReporting(String stepText) {
+        CharStream input = CharStreams.fromString(stepText);
+        StepAntlrLexer lexer = new StepAntlrLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        StepAntlrParser parser = new StepAntlrParser(tokens);
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+        StepPositionErrorListener errorListener = new StepPositionErrorListener(stepText);
+        lexer.addErrorListener(errorListener);
+        parser.addErrorListener(errorListener);
+
+        StepAntlrParser.StepFileContext tree = parser.stepFile();
+        if (errorListener.hasErrors()) {
+            throw new StepParseException(errorListener.getFirstError());
+        }
+        return tree;
+    }
+
+    /**
      * Phase 5: Pre-parse validation for unterminated constructs.
      * ANTLR4 lexer is more tolerant, so we check manually.
      */
@@ -77,11 +105,12 @@ public final class StepAntlrBridge {
         // Check for unterminated strings
         boolean inString = false;
         boolean inComment = false;
-        for (int i = 0; i < text.length(); i++) {
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
             char ch = text.charAt(i);
 
             if (!inComment && ch == '\'') {
-                if (i + 1 < text.length() && text.charAt(i + 1) == '\'') {
+                if (i + 1 < length && text.charAt(i + 1) == '\'') {
                     // Doubled quote, skip both
                     i += 1;
                 } else {
@@ -89,28 +118,28 @@ public final class StepAntlrBridge {
                 }
             }
 
-            if (!inString && text.startsWith("/*", i)) {
+            if (!inString && ch == '/' && i + 1 < length && text.charAt(i + 1) == '*') {
                 inComment = true;
                 i += 1; // Skip /*
             }
 
-            if (inComment && text.startsWith("*/", i)) {
+            if (inComment && ch == '*' && i + 1 < length && text.charAt(i + 1) == '/') {
                 inComment = false;
                 i += 1; // Skip */
             }
 
             // Check for lone backslash at end of string
-            if (inString && ch == '\\' && i == text.length() - 1) {
+            if (inString && ch == '\\' && i == length - 1) {
                 throw new StepParseException("lone backslash at end of string");
             }
         }
 
         if (inString) {
-            throw new StepParseException("unterminated string at position " + (text.length() - 1));
+            throw new StepParseException("unterminated string at position " + (length - 1));
         }
 
         if (inComment) {
-            throw new StepParseException("unterminated comment at position " + (text.length() - 1));
+            throw new StepParseException("unterminated comment at position " + (length - 1));
         }
     }
 
@@ -557,10 +586,23 @@ public final class StepAntlrBridge {
     }
 
     /**
+     * Minimal listener for the SLL fast path that only records whether the
+     * lexer reported any error; those files are re-parsed with full reporting.
+     */
+    private static final class ErrorFlagListener extends BaseErrorListener {
+        private boolean failed;
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine, String msg, RecognitionException e) {
+            failed = true;
+        }
+    }
+
+    /**
      * Custom error listener with position tracking.
      */
-    private static final class StepPositionErrorListener extends BaseErrorListener {
-        private final String sourceText;
+    private static final class StepPositionErrorListener extends BaseErrorListener {        private final String sourceText;
         private final List<Integer> lineStartPositions;
         private final List<String> errors = new ArrayList<>();
 
