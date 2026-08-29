@@ -1,6 +1,5 @@
 target/
 .worktrees/
 .idea/
-.github/
 .claude/
 .workbuddy/
