@@ -59,18 +59,19 @@ public final class StepBenchmarkApp {
         long resolveElapsedNanos = System.nanoTime() - resolveStartedAt;
 
         long buildStartedAt = System.nanoTime();
-        BuildSummary buildSummary = benchmarkBuild(resolved);
+        BuildOutcome buildOutcome = benchmarkBuild(resolved);
         long buildElapsedNanos = System.nanoTime() - buildStartedAt;
 
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
-        CompiledStepDocument compiled = new CompiledStepDocument(stepText, stepFile, resolved, builder);
+        // Compile once and reuse across exporters instead of letting each
+        // exporter re-parse and re-resolve the same text.
+        CompiledStepDocument compiled = new CompiledStepDocument(stepText, stepFile, resolved, buildOutcome.builder);
 
         long previewExportStartedAt = System.nanoTime();
-        String previewJson = StepPreviewJsonExporter.export(stepText);
+        String previewJson = StepPreviewJsonExporter.export(compiled);
         long previewExportElapsedNanos = System.nanoTime() - previewExportStartedAt;
 
         long meshExportStartedAt = System.nanoTime();
-        String meshObj = StepMeshExporter.exportObj(stepText);
+        String meshObj = StepMeshExporter.exportObj(compiled);
         long meshExportElapsedNanos = System.nanoTime() - meshExportStartedAt;
 
         return new BenchmarkResult(
@@ -86,7 +87,7 @@ public final class StepBenchmarkApp {
                 previewExportElapsedNanos,
                 meshExportElapsedNanos,
                 usedMemoryBytes(),
-                buildSummary,
+                buildOutcome.summary,
                 previewJson.length(),
                 meshObj.length()
         );
@@ -130,7 +131,7 @@ public final class StepBenchmarkApp {
         }
     }
 
-    private static BuildSummary benchmarkBuild(Map<Integer, StepEntity> resolved) {
+    private static BuildOutcome benchmarkBuild(Map<Integer, StepEntity> resolved) {
         StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
         int facesBuilt = 0;
         int faceBuildFailures = 0;
@@ -182,17 +183,19 @@ public final class StepBenchmarkApp {
             }
         }
 
-        return new BuildSummary(
-                facesBuilt,
-                faceBuildFailures,
-                shellsBuilt,
-                shellBuildFailures,
-                solidsBuilt,
-                solidBuildFailures,
-                firstFaceBuildFailure,
-                firstShellBuildFailure,
-                firstSolidBuildFailure
-        );
+        return new BuildOutcome(
+                new BuildSummary(
+                        facesBuilt,
+                        faceBuildFailures,
+                        shellsBuilt,
+                        shellBuildFailures,
+                        solidsBuilt,
+                        solidBuildFailures,
+                        firstFaceBuildFailure,
+                        firstShellBuildFailure,
+                        firstSolidBuildFailure
+                ),
+                builder);
     }
 
     private static String buildFailureMessage(int id, StepEntity entity, Exception ex) {
@@ -222,6 +225,16 @@ public final class StepBenchmarkApp {
     private static long usedMemoryBytes() {
         Runtime runtime = Runtime.getRuntime();
         return runtime.totalMemory() - runtime.freeMemory();
+    }
+
+    static final class BuildOutcome {
+        final BuildSummary summary;
+        final StepCadBuilder builder;
+
+        BuildOutcome(BuildSummary summary, StepCadBuilder builder) {
+            this.summary = summary;
+            this.builder = builder;
+        }
     }
 
     static final class BuildSummary {
