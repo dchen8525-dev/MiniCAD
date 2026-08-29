@@ -290,7 +290,9 @@ public final class PreviewGlbBuilder {
         accessor.put("componentType", 5126);
         accessor.put("count", data.count());
         accessor.put("type", "VEC3");
-        if (includeBounds && data.min() != null && data.max() != null) {
+        // Bounds of an empty mesh accumulate to +/-Infinity, which is not valid
+        // JSON and is rejected by GLTFLoader; glTF allows omitting min/max.
+        if (includeBounds && data.count() > 0 && data.min() != null && data.max() != null) {
             accessor.put("min", List.of((double) data.min()[0], (double) data.min()[1], (double) data.min()[2]));
             accessor.put("max", List.of((double) data.max()[0], (double) data.max()[1], (double) data.max()[2]));
         }
