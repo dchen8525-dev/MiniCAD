@@ -8,6 +8,7 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Vector3;
 import com.minicad.preview.builder.PmiPayload;
+import com.minicad.preview.sampling.Curve3SamplingHelper;
 import com.minicad.preview.builder.PmiTargetHelper;
 import com.minicad.preview.builder.PmiTargetPayload;
 import com.minicad.preview.payload.AssemblyData;
@@ -1354,7 +1355,7 @@ public final class StepPmiPayloadBuilder {
     }
 
     private static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        return StepEdgePayloadBuilder.sampleLooseCurve(curve);
+        return Curve3SamplingHelper.sampleLooseCurve(curve);
     }
 
     private static List<CartesianPoint> sampleAnnotationFillAreaPoints(

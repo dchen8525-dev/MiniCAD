@@ -1,15 +1,18 @@
 package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
-import com.minicad.export.json.StepPreviewJsonExporter;
+import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
+import com.minicad.geometry.CompositeCurve3;
+import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Ellipse3;
+import com.minicad.geometry.Polyline3;
+import com.minicad.geometry.SurfaceCurve3;
 import com.minicad.geometry.TrimmedCurve3;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.minicad.export.json.StepEdgePayloadBuilder;
 
 /**
  * Helper class for 3D curve sampling utilities.
@@ -19,6 +22,44 @@ public final class Curve3SamplingHelper {
 
     private Curve3SamplingHelper() {
         // Utility class
+    }
+
+    /**
+     * Samples any loose 3D curve without requiring edge context. The single
+     * shared implementation — the export/preview copies delegate here.
+     */
+    public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
+        if (curve instanceof TrimmedCurve3) {
+            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
+            return sampleTrimmedCurve3(trimmedCurve, 72);
+        }
+        if (curve instanceof SurfaceCurve3) {
+            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
+            return sampleLooseCurve(surfaceCurve.curve3d());
+        }
+        if (curve instanceof Polyline3) {
+            Polyline3 polyline = (Polyline3) curve;
+            return polyline.points();
+        }
+        if (curve instanceof CompositeCurve3) {
+            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
+            List<CartesianPoint> points = new ArrayList<>();
+            boolean first = true;
+            for (Curve3 segment : compositeCurve.segments()) {
+                List<CartesianPoint> segmentPoints = sampleLooseCurve(segment);
+                int start = first ? 0 : 1;
+                for (int i = start; i < segmentPoints.size(); i++) {
+                    points.add(segmentPoints.get(i));
+                }
+                first = false;
+            }
+            return List.copyOf(points);
+        }
+        List<CartesianPoint> points = curve.sample(72);
+        if (points.isEmpty()) {
+            throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
+        }
+        return points;
     }
 
     public static double arcSweep(double startAngle, double endAngle, boolean closed, boolean naturalForward) {
@@ -33,7 +74,7 @@ public final class Curve3SamplingHelper {
     }
 
     public static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
-        List<CartesianPoint> sampled = StepEdgePayloadBuilder.sampleLooseCurve(trimmedCurve.basisCurve());
+        List<CartesianPoint> sampled = sampleLooseCurve(trimmedCurve.basisCurve());
         if (sampled.size() < 2) {
             return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
         }

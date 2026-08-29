@@ -303,37 +303,7 @@ public final class StepEdgePayloadBuilder {
      * @return list of sampled points
      */
     public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
-            return Curve3SamplingHelper.sampleTrimmedCurve3(trimmedCurve, 72);
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleLooseCurve(surfaceCurve.curve3d());
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            return polyline.points();
-        }
-        if (curve instanceof CompositeCurve3) {
-            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve3 segment : compositeCurve.segments()) {
-                List<CartesianPoint> segmentPoints = sampleLooseCurve(segment);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
-                }
-                first = false;
-            }
-            return List.copyOf(points);
-        }
-        List<CartesianPoint> points = curve.sample(72);
-        if (points.isEmpty()) {
-            throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
-        }
-        return points;
+        return Curve3SamplingHelper.sampleLooseCurve(curve);
     }
 
     /**

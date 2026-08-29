@@ -10,6 +10,7 @@ import com.minicad.geometry.DegenerateCurve3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.Polyline3;
 import com.minicad.geometry.CompositeCurve3;
+import com.minicad.step.semantic.StepEntityNamingUtils;
 import com.minicad.geometry.BSplineCurve3;
 import com.minicad.geometry.RationalBSplineCurve3;
 import com.minicad.geometry.TrimmedCurve3;
@@ -173,83 +174,11 @@ public final class Curve2SamplingHelper {
     }
 
     public static String curveTypeName(Curve3 curve) {
-        if (curve instanceof Line3) {
-            return "LINE";
-        }
-        if (curve instanceof Circle) {
-            return "CIRCLE";
-        }
-        if (curve instanceof Ellipse3) {
-            return "ELLIPSE";
-        }
-        if (curve instanceof Parabola3) {
-            return "PARABOLA";
-        }
-        if (curve instanceof Hyperbola3) {
-            return "HYPERBOLA";
-        }
-        if (curve instanceof Clothoid3) {
-            return "CLOTHOID";
-        }
-        if (curve instanceof DegenerateCurve3) {
-            return "DEGENERATE_CURVE";
-        }
-        if (curve instanceof BSplineCurve3) {
-            return "B_SPLINE_CURVE";
-        }
-        if (curve instanceof RationalBSplineCurve3) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (curve instanceof TrimmedCurve3) {
-            return "TRIMMED_CURVE";
-        }
-        if (curve instanceof SurfaceCurve3) {
-            return "SURFACE_CURVE";
-        }
-        if (curve instanceof Polyline3) {
-            return "POLYLINE";
-        }
-        if (curve instanceof CompositeCurve3) {
-            return "COMPOSITE_CURVE";
-        }
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     public static String curveTypeName(Curve2 curve) {
-        if (curve instanceof Line2) {
-            return "LINE";
-        }
-        if (curve instanceof Circle2) {
-            return "CIRCLE";
-        }
-        if (curve instanceof Ellipse2) {
-            return "ELLIPSE";
-        }
-        if (curve instanceof Parabola2) {
-            return "PARABOLA";
-        }
-        if (curve instanceof Hyperbola2) {
-            return "HYPERBOLA";
-        }
-        if (curve instanceof DegenerateCurve2) {
-            return "DEGENERATE_CURVE";
-        }
-        if (curve instanceof BSplineCurve2) {
-            return "B_SPLINE_CURVE";
-        }
-        if (curve instanceof RationalBSplineCurve2) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (curve instanceof TrimmedCurve2) {
-            return "TRIMMED_CURVE";
-        }
-        if (curve instanceof Polyline2) {
-            return "POLYLINE";
-        }
-        if (curve instanceof CompositeCurve2) {
-            return "COMPOSITE_CURVE";
-        }
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     public static List<Point2> sampleCircle2Points(Circle2 circle, int segments) {

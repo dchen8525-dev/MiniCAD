@@ -25,6 +25,7 @@ import com.minicad.step.model.StepLoop;
 import com.minicad.step.model.StepWireShell;
 import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
+import com.minicad.step.semantic.StepEntityNamingUtils;
 import com.minicad.preview.payload.EdgeCurvePayload;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.PointPayload;
@@ -413,37 +414,7 @@ public final class PreviewCurveEvaluator {
     // ─── Loose curve sampling (3D) ───────────────────────────────────────
 
     public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
-            return sampleTrimmedCurve3(trimmedCurve, 72);
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleLooseCurve(surfaceCurve.curve3d());
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            return polyline.points();
-        }
-        if (curve instanceof CompositeCurve3) {
-            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve3 segment : compositeCurve.segments()) {
-                List<CartesianPoint> segmentPoints = sampleLooseCurve(segment);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
-                }
-                first = false;
-            }
-            return List.copyOf(points);
-        }
-        List<CartesianPoint> points = curve.sample(72);
-        if (points.isEmpty()) {
-            throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
-        }
-        return points;
+        return Curve3SamplingHelper.sampleLooseCurve(curve);
     }
 
     // ─── Loose curve sampling (2D) ───────────────────────────────────────
@@ -458,61 +429,7 @@ public final class PreviewCurveEvaluator {
     }
 
     public static List<Point2> sampleLooseCurve2(Curve2 curve) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return List.of(line.pointAt(0.0), line.pointAt(1.0));
-        }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
-            return sampleCircle2Points(circle, 72);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
-            return sampleEllipse2Points(ellipse, 72);
-        }
-        if (curve instanceof Parabola2) {
-            Parabola2 parabola = (Parabola2) curve;
-            return parabola.sample(72);
-        }
-        if (curve instanceof Hyperbola2) {
-            Hyperbola2 hyperbola = (Hyperbola2) curve;
-            return hyperbola.sample(72);
-        }
-        if (curve instanceof DegenerateCurve2) {
-            DegenerateCurve2 degenerate = (DegenerateCurve2) curve;
-            return List.of(degenerate.point());
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            return spline.sample(72);
-        }
-        if (curve instanceof RationalBSplineCurve2) {
-            RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
-            return spline.sample(72);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
-            return sampleTrimmedCurve2(trimmedCurve, 72);
-        }
-        if (curve instanceof Polyline2) {
-            Polyline2 polyline = (Polyline2) curve;
-            return polyline.points();
-        }
-        if (curve instanceof CompositeCurve2) {
-            CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
-            List<Point2> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve2 segment : compositeCurve.segments()) {
-                List<Point2> segmentPoints = sampleLooseCurve2(segment);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
-                }
-                first = false;
-            }
-            return List.copyOf(points);
-        }
-        throw new UnsupportedGeometryException("2D curve sampling for " + curveTypeName(curve) + " is unsupported");
+        return Curve2SamplingHelper.sampleLooseCurve2(curve);
     }
 
     public static List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {
@@ -557,35 +474,11 @@ public final class PreviewCurveEvaluator {
     // ─── Curve type names ────────────────────────────────────────────────
 
     public static String curveTypeName(Curve3 curve) {
-        if (curve instanceof Line3) return "LINE";
-        if (curve instanceof Circle) return "CIRCLE";
-        if (curve instanceof Ellipse3) return "ELLIPSE";
-        if (curve instanceof Parabola3) return "PARABOLA";
-        if (curve instanceof Hyperbola3) return "HYPERBOLA";
-        if (curve instanceof Clothoid3) return "CLOTHOID";
-        if (curve instanceof DegenerateCurve3) return "DEGENERATE_CURVE";
-        if (curve instanceof BSplineCurve3) return "B_SPLINE_CURVE";
-        if (curve instanceof RationalBSplineCurve3) return "RATIONAL_B_SPLINE_CURVE";
-        if (curve instanceof TrimmedCurve3) return "TRIMMED_CURVE";
-        if (curve instanceof SurfaceCurve3) return "SURFACE_CURVE";
-        if (curve instanceof Polyline3) return "POLYLINE";
-        if (curve instanceof CompositeCurve3) return "COMPOSITE_CURVE";
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     public static String curveTypeName(Curve2 curve) {
-        if (curve instanceof Line2) return "LINE";
-        if (curve instanceof Circle2) return "CIRCLE";
-        if (curve instanceof Ellipse2) return "ELLIPSE";
-        if (curve instanceof Parabola2) return "PARABOLA";
-        if (curve instanceof Hyperbola2) return "HYPERBOLA";
-        if (curve instanceof DegenerateCurve2) return "DEGENERATE_CURVE";
-        if (curve instanceof BSplineCurve2) return "B_SPLINE_CURVE";
-        if (curve instanceof RationalBSplineCurve2) return "RATIONAL_B_SPLINE_CURVE";
-        if (curve instanceof TrimmedCurve2) return "TRIMMED_CURVE";
-        if (curve instanceof Polyline2) return "POLYLINE";
-        if (curve instanceof CompositeCurve2) return "COMPOSITE_CURVE";
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     // ─── Conic curve sampling ────────────────────────────────────────────

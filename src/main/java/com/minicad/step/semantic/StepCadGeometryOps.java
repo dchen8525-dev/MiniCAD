@@ -581,62 +581,11 @@ final class StepCadGeometryOps {
     }
 
     static String curveTypeName(Curve3 curve) {
-        if (curve instanceof Line3) {
-            return "LINE";
-        }
-        if (curve instanceof Circle) {
-            return "CIRCLE";
-        }
-        if (curve instanceof Ellipse3) {
-            return "ELLIPSE";
-        }
-        if (curve instanceof Polyline3) {
-            return "POLYLINE";
-        }
-        if (curve instanceof BSplineCurve3) {
-            return "B_SPLINE_CURVE";
-        }
-        if (curve instanceof RationalBSplineCurve3) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (curve instanceof TrimmedCurve3) {
-            return "TRIMMED_CURVE";
-        }
-        if (curve instanceof SurfaceCurve3) {
-            return "SURFACE_CURVE";
-        }
-        if (curve instanceof CompositeCurve3) {
-            return "COMPOSITE_CURVE";
-        }
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     static String curveTypeName(Curve2 curve) {
-        if (curve instanceof Line2) {
-            return "LINE";
-        }
-        if (curve instanceof Circle2) {
-            return "CIRCLE";
-        }
-        if (curve instanceof Ellipse2) {
-            return "ELLIPSE";
-        }
-        if (curve instanceof Polyline2) {
-            return "POLYLINE";
-        }
-        if (curve instanceof BSplineCurve2) {
-            return "B_SPLINE_CURVE";
-        }
-        if (curve instanceof RationalBSplineCurve2) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (curve instanceof TrimmedCurve2) {
-            return "TRIMMED_CURVE";
-        }
-        if (curve instanceof CompositeCurve2) {
-            return "COMPOSITE_CURVE";
-        }
-        return curve.getClass().getSimpleName();
+        return StepEntityNamingUtils.curveTypeName(curve);
     }
 
     static String surfaceTypeName(SurfaceGeometry surface) {
