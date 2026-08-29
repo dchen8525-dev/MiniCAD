@@ -148,134 +148,22 @@ public final class StepPmiTargetBuilder {
             return;
         }
         if (definition instanceof StepAnnotationOccurrenceRelationship) {
-            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendRelationshipSemanticTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.entityName(),
-                    relationship.id(),
-                    relationship.relatingAnnotationOccurrence(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendRelationshipSemanticTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.entityName(),
-                    relationship.id(),
-                    relationship.relatedAnnotationOccurrence(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendAnnotationOccurrenceRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
             return;
         }
         if (definition instanceof StepDraughtingCalloutRelationship) {
-            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendRelationshipSemanticTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    "DRAUGHTING_CALLOUT_RELATIONSHIP",
-                    relationship.id(),
-                    relationship.relatingCallout(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendRelationshipSemanticTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    "DRAUGHTING_CALLOUT_RELATIONSHIP",
-                    relationship.id(),
-                    relationship.relatedCallout(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendDraughtingCalloutRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
             return;
         }
         if (definition instanceof StepPropertyDefinitionRelationship) {
-            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendPropertyRepresentationLinkTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    relationship.relatingPropertyDefinition(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendPropertyRepresentationLinkTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    relationship.relatedPropertyDefinition(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendPropertyDefinitionRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         }
         if (definition instanceof StepPropertyDefinition) {
-            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) definition;
-            appendPropertyDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    propertyDefinition,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendPropertyRepresentationLinkTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    propertyDefinition,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    propertyDefinition.definition(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendPropertyDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeneralPropertyRelationship) {
-            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingGeneralProperty(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedGeneralProperty(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendGeneralPropertyRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepShapeAspectRelationship) {
-            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingShapeAspect(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedShapeAspect(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendShapeAspectRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeneralProperty) {
             StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
             appendGeneralPropertyRelationshipTargets(
@@ -304,385 +192,69 @@ public final class StepPmiTargetBuilder {
             StepProductDefinition productDefinition = (StepProductDefinition) definition;
             appendProductDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), productDefinition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductRelationship) {
-            StepProductRelationship relationship = (StepProductRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingProduct(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedProduct(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendProductRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductDefinitionFormationRelationship) {
-            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingFormation(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedFormation(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendProductDefinitionFormationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGroupRelationship) {
-            StepGroupRelationship relationship = (StepGroupRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingGroup(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedGroup(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendGroupRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDocumentRelationship) {
-            StepDocumentRelationship relationship = (StepDocumentRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingDocument(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedDocument(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendDocumentRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrganizationRelationship) {
-            StepOrganizationRelationship relationship = (StepOrganizationRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingOrganization(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedOrganization(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendOrganizationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEffectivityRelationship) {
-            StepEffectivityRelationship relationship = (StepEffectivityRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatingEffectivity(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relatedEffectivity(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendEffectivityRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductCategoryRelationship) {
-            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.category(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.subCategory(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendProductCategoryRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGroup) {
-            StepGroup group = (StepGroup) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, group, resolved, instanceIdsByTargetId);
-            appendGroupRelationshipTargets(targetsByUsageId, identifiedItem.id(), group, resolved, instanceIdsByTargetId);
+            appendGroupTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDocument) {
-            StepDocument document = (StepDocument) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, document, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, document, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    document.kind(),
-                    instanceIdsByTargetId
-            );
-            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), document, resolved, instanceIdsByTargetId);
+            appendDocumentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDocumentReference) {
-            StepDocumentReference reference = (StepDocumentReference) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    reference.assignedDocument(),
-                    instanceIdsByTargetId
-            );
-            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), reference.assignedDocument(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    reference.assignedDocument().kind(),
-                    instanceIdsByTargetId
-            );
+            appendDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedDocumentReference) {
-            StepAppliedDocumentReference reference = (StepAppliedDocumentReference) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
-            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), reference.assignedDocument(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    reference.assignedDocument(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    reference.assignedDocument().kind(),
-                    definitionTypeName(reference.assignedDocument().kind()),
-                    reference.assignedDocument().kind().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    reference.assignedDocument().kind(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApprovalAssignment) {
-            StepApprovalAssignment assignment = (StepApprovalAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedApproval(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval().status(), instanceIdsByTargetId);
-            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
+            appendApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSecurityClassificationAssignment) {
-            StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedSecurityClassification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification().securityLevel(), instanceIdsByTargetId);
+            appendSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepContractAssignment) {
-            StepContractAssignment assignment = (StepContractAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedContract(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract().kind(), instanceIdsByTargetId);
+            appendContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCertificationAssignment) {
-            StepCertificationAssignment assignment = (StepCertificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedCertification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification().kind(), instanceIdsByTargetId);
+            appendCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPersonAndOrganizationAssignment) {
-            StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedPersonAndOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().person(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().organization(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+            appendPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrganizationAssignment) {
-            StepOrganizationAssignment assignment = (StepOrganizationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedOrganization(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+            appendOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepLanguageAssignment) {
-            StepLanguageAssignment assignment = (StepLanguageAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedLanguage(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedLanguage(), instanceIdsByTargetId);
+            appendLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGroupAssignment) {
-            StepGroupAssignment assignment = (StepGroupAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedGroup(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedGroup(), instanceIdsByTargetId);
+            appendGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepClassificationAssignment) {
-            StepClassificationAssignment assignment = (StepClassificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedClass(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedClass(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+            appendClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDateAssignment) {
-            StepDateAssignment assignment = (StepDateAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDate(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDate(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+            appendDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDateTimeAssignment) {
-            StepDateTimeAssignment assignment = (StepDateTimeAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDateAndTime(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().dateComponent(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent().zone(), instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+            appendDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepIdentificationAssignment) {
-            StepIdentificationAssignment assignment = (StepIdentificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
+            appendIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepExternalIdentificationAssignment) {
-            StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
-            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
-            appendExternallyDefinedItemTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
+            appendExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrganization) {
             StepOrganization organization = (StepOrganization) definition;
             appendOrganizationRelationshipTargets(targetsByUsageId, identifiedItem.id(), organization, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEffectivity) {
-            StepEffectivity effectivity = (StepEffectivity) definition;
-            appendProductDefinitionEffectivityTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    effectivity,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendEffectivityRelationshipTargets(targetsByUsageId, identifiedItem.id(), effectivity, resolved, instanceIdsByTargetId);
+            appendEffectivityTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductCategory) {
             StepProductCategory category = (StepProductCategory) definition;
             appendProductCategoryRelationshipTargets(targetsByUsageId, identifiedItem.id(), category, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepExternalSource) {
-            StepExternalSource source = (StepExternalSource) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, source, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-            appendExternallyDefinedItemTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    source,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
+            appendExternalSourceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepExternallyDefinedItem) {
-            StepExternallyDefinedItem item = (StepExternallyDefinedItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, item.source(), instanceIdsByTargetId);
-            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
+            appendExternallyDefinedItemDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDocumentUsageConstraint) {
-            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    documentUsageConstraint.source(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    documentUsageConstraint.source().kind(),
-                    instanceIdsByTargetId
-            );
-            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), documentUsageConstraint.source(), resolved, instanceIdsByTargetId);
+            appendDocumentUsageConstraintTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRepresentation) {
-            StepRepresentation representation = (StepRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representation, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    representation,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            if (representation.context() != null) {
-                appendNestedDefinitionTargets(
-                        targetsByUsageId,
-                        identifiedItem,
-                        representation.context(),
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            }
-            for (StepEntity item : representation.items()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
+            appendRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductDefinitionShape) {
             StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
             appendProductDefinitionShapeRepresentationTargets(
@@ -711,697 +283,163 @@ public final class StepPmiTargetBuilder {
                     instanceIdsByTargetId
             );
         } else if (definition instanceof StepShapeAspectOccurrence) {
-            StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    occurrence.definition(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendShapeAspectOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductDefinitionRelationshipRelationship) {
-            StepProductDefinitionRelationshipRelationship relationship = (StepProductDefinitionRelationshipRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.relating(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    relationship.related(),
-                    relationshipTypeName(relationship),
-                    relationship.id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendProductDefinitionRelationshipRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApprovalPersonOrganization) {
-            StepApprovalPersonOrganization assignment = (StepApprovalPersonOrganization) definition;
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.personOrganization(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.personOrganization().person(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.personOrganization().organization(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.authorizedApproval(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.authorizedApproval().status(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.role(),
-                    instanceIdsByTargetId
-            );
+            appendApprovalPersonOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApprovalDateTime) {
-            StepApprovalDateTime assignment = (StepApprovalDateTime) definition;
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.dateTime(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.dateTime().dateComponent(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.dateTime().timeComponent(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.dateTime().timeComponent().zone(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.datedApproval(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.datedApproval().status(),
-                    instanceIdsByTargetId
-            );
+            appendApprovalDateTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCalendarDate) {
-            StepCalendarDate calendarDate = (StepCalendarDate) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, calendarDate, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, calendarDate, resolved, instanceIdsByTargetId);
+            appendCalendarDateTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepNameAttribute) {
-            StepNameAttribute attribute = (StepNameAttribute) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.namedItem(), resolved, instanceIdsByTargetId);
+            appendNameAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDescriptionAttribute) {
-            StepDescriptionAttribute attribute = (StepDescriptionAttribute) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.describedItem(), resolved, instanceIdsByTargetId);
+            appendDescriptionAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepIdAttribute) {
-            StepIdAttribute attribute = (StepIdAttribute) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.identifiedItem(), resolved, instanceIdsByTargetId);
+            appendIdAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepNameAssignment) {
-            StepNameAssignment assignment = (StepNameAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedNameAssignment) {
-            StepAppliedNameAssignment assignment = (StepAppliedNameAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            for (StepEntity item : assignment.items()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
+            appendAppliedNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDateAndTime) {
-            StepDateAndTime dateAndTime = (StepDateAndTime) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, dateAndTime, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.dateComponent(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.timeComponent(), resolved, instanceIdsByTargetId);
+            appendDateAndTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepLocalTime) {
-            StepLocalTime localTime = (StepLocalTime) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, localTime, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, localTime, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, localTime.zone(), resolved, instanceIdsByTargetId);
+            appendLocalTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCoordinatedUniversalTimeOffset) {
-            StepCoordinatedUniversalTimeOffset zone = (StepCoordinatedUniversalTimeOffset) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, zone, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, zone, resolved, instanceIdsByTargetId);
+            appendCoordinatedUniversalTimeOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApprovalStatus) {
-            StepApprovalStatus status = (StepApprovalStatus) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, status, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, status, resolved, instanceIdsByTargetId);
+            appendApprovalStatusTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSecurityClassificationLevel) {
-            StepSecurityClassificationLevel level = (StepSecurityClassificationLevel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, level, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, level, resolved, instanceIdsByTargetId);
+            appendSecurityClassificationLevelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepContractType) {
-            StepContractType kind = (StepContractType) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+            appendContractTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCertificationType) {
-            StepCertificationType kind = (StepCertificationType) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+            appendCertificationTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApprovalRole) {
-            StepApprovalRole role = (StepApprovalRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendApprovalRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrganizationRole) {
-            StepOrganizationRole role = (StepOrganizationRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPersonAndOrganizationRole) {
-            StepPersonAndOrganizationRole role = (StepPersonAndOrganizationRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendPersonAndOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepClassificationRole) {
-            StepClassificationRole role = (StepClassificationRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendClassificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDateRole) {
-            StepDateRole role = (StepDateRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendDateRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDateTimeRole) {
-            StepDateTimeRole role = (StepDateTimeRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendDateTimeRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepIdentificationRole) {
-            StepIdentificationRole role = (StepIdentificationRole) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+            appendIdentificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDocumentType) {
-            StepDocumentType kind = (StepDocumentType) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+            appendDocumentTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApproval) {
-            StepApproval approval = (StepApproval) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, approval, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, approval.status(), resolved, instanceIdsByTargetId);
-            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
+            appendApprovalTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSecurityClassification) {
-            StepSecurityClassification classification = (StepSecurityClassification) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, classification, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, classification, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, classification.securityLevel(), resolved, instanceIdsByTargetId);
+            appendSecurityClassificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepContract) {
-            StepContract contract = (StepContract) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, contract, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, contract, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, contract.kind(), resolved, instanceIdsByTargetId);
+            appendContractTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCertification) {
-            StepCertification certification = (StepCertification) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, certification, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, certification, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, certification.kind(), resolved, instanceIdsByTargetId);
+            appendCertificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPerson) {
-            StepPerson person = (StepPerson) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, person, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, person, resolved, instanceIdsByTargetId);
+            appendPersonTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPersonAndOrganization) {
-            StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, personAndOrganization, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.person(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.organization(), resolved, instanceIdsByTargetId);
+            appendPersonAndOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepLanguage) {
-            StepLanguage language = (StepLanguage) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, language, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, language, resolved, instanceIdsByTargetId);
+            appendLanguageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedClassificationAssignment) {
-            StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendAppliedClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedDateAssignment) {
-            StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedDate(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.role(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedDateTimeAssignment) {
-            StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedDateAndTime(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedDateAndTime().timeComponent(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedDateAndTime().timeComponent().zone(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.role(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedApprovalAssignment) {
-            StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedApproval(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.assignedApproval().status(),
-                    definitionTypeName(assignment.assignedApproval().status()),
-                    assignment.assignedApproval().status().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedApproval().status(),
-                    instanceIdsByTargetId
-            );
-            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
+            appendAppliedApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedSecurityClassificationAssignment) {
-            StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedSecurityClassification(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.assignedSecurityClassification().securityLevel(),
-                    definitionTypeName(assignment.assignedSecurityClassification().securityLevel()),
-                    assignment.assignedSecurityClassification().securityLevel().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedSecurityClassification().securityLevel(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedContractAssignment) {
-            StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedContract(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.assignedContract().kind(),
-                    definitionTypeName(assignment.assignedContract().kind()),
-                    assignment.assignedContract().kind().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedContract().kind(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedCertificationAssignment) {
-            StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedCertification(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.assignedCertification().kind(),
-                    definitionTypeName(assignment.assignedCertification().kind()),
-                    assignment.assignedCertification().kind().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedCertification().kind(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedPersonAndOrganizationAssignment) {
-            StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedPersonAndOrganization(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedPersonAndOrganization().person(),
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedPersonAndOrganization().organization(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.role(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedOrganizationAssignment) {
-            StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedOrganization(),
-                    instanceIdsByTargetId
-            );
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.role(),
-                    definitionTypeName(assignment.role()),
-                    assignment.role().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.role(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedLanguageAssignment) {
-            StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendDefinitionRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    assignment.assignedLanguage(),
-                    definitionTypeName(assignment.assignedLanguage()),
-                    assignment.assignedLanguage().id(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedLanguage(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedGroupAssignment) {
-            StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendExistingRepresentationDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.assignedGroup(),
-                    instanceIdsByTargetId
-            );
+            appendAppliedGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedIdentificationAssignment) {
-            StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
-            for (StepEntity item : assignment.items()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
+            appendAppliedIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAppliedExternalIdentificationAssignment) {
-            StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
-            appendExternalSourceRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.source(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendExternallyDefinedItemTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assignment.source(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            for (StepEntity item : assignment.items()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
+            appendAppliedExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendAnnotationCurveOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationFillArea) {
-            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, fillArea, instanceIdsByTargetId);
-            for (StepEntity boundary : fillArea.boundaries()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
-            }
+            appendAnnotationFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationFillAreaOccurrence) {
-            StepAnnotationFillAreaOccurrence occurrence = (StepAnnotationFillAreaOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.fillStyleTarget(), resolved, instanceIdsByTargetId);
+            appendAnnotationFillAreaOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationPlaceholderOccurrence) {
-            StepAnnotationPlaceholderOccurrence occurrence = (StepAnnotationPlaceholderOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendAnnotationPlaceholderOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationPointOccurrence) {
-            StepAnnotationPointOccurrence occurrence = (StepAnnotationPointOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendAnnotationPointOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationSymbolOccurrence) {
-            StepAnnotationSymbolOccurrence occurrence = (StepAnnotationSymbolOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendAnnotationSymbolOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationSubfigureOccurrence) {
-            StepAnnotationSubfigureOccurrence occurrence = (StepAnnotationSubfigureOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendAnnotationSubfigureOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationTextOccurrence) {
-            StepAnnotationTextOccurrence occurrence = (StepAnnotationTextOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.position(), resolved, instanceIdsByTargetId);
+            appendAnnotationTextOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence occurrence = (StepDraughtingAnnotationOccurrence) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendDraughtingAnnotationOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol symbol = (StepTerminatorSymbol) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.item(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.annotatedCurve(), resolved, instanceIdsByTargetId);
+            appendTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPresentationStyleAssignment) {
-            StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            for (StepEntity style : assignment.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
-            }
+            appendPresentationStyleAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleUsage) {
-            StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, usage, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, usage.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleUsageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceSideStyle) {
-            StepSurfaceSideStyle style = (StepSurfaceSideStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            for (StepEntity component : style.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
-            }
+            appendSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleFillArea) {
-            StepSurfaceStyleFillArea style = (StepSurfaceStyleFillArea) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.fillStyle(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepFillAreaStyle) {
-            StepFillAreaStyle style = (StepFillAreaStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            for (StepFillAreaStyleColour component : style.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
-            }
+            appendFillAreaStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepFillAreaStyleColour) {
-            StepFillAreaStyleColour style = (StepFillAreaStyleColour) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+            appendFillAreaStyleColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCurveStyle) {
-            StepCurveStyle style = (StepCurveStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.curveFont(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+            appendCurveStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleBoundary) {
-            StepSurfaceStyleBoundary style = (StepSurfaceStyleBoundary) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleBoundaryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleParameterLine) {
-            StepSurfaceStyleParameterLine style = (StepSurfaceStyleParameterLine) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleParameterLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleControlGrid) {
-            StepSurfaceStyleControlGrid style = (StepSurfaceStyleControlGrid) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleControlGridTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleSegmentationCurve) {
-            StepSurfaceStyleSegmentationCurve style = (StepSurfaceStyleSegmentationCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleSegmentationCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleSilhouette) {
-            StepSurfaceStyleSilhouette style = (StepSurfaceStyleSilhouette) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleSilhouetteTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCharacterGlyphStyleStroke) {
-            StepCharacterGlyphStyleStroke style = (StepCharacterGlyphStyleStroke) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.strokeStyle(), resolved, instanceIdsByTargetId);
+            appendCharacterGlyphStyleStrokeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCharacterGlyphStyleOutline) {
-            StepCharacterGlyphStyleOutline style = (StepCharacterGlyphStyleOutline) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
+            appendCharacterGlyphStyleOutlineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
-            StepCharacterGlyphStyleOutlineWithCharacteristics style = (StepCharacterGlyphStyleOutlineWithCharacteristics) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characteristics(), resolved, instanceIdsByTargetId);
+            appendCharacterGlyphStyleOutlineWithCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyle) {
-            StepTextStyle style = (StepTextStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+            appendTextStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyleWithSpacing) {
-            StepTextStyleWithSpacing style = (StepTextStyleWithSpacing) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+            appendTextStyleWithSpacingTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyleWithBoxCharacteristics) {
-            StepTextStyleWithBoxCharacteristics style = (StepTextStyleWithBoxCharacteristics) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+            appendTextStyleWithBoxCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyleWithJustification) {
-            StepTextStyleWithJustification style = (StepTextStyleWithJustification) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+            appendTextStyleWithJustificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyleWithMirror) {
-            StepTextStyleWithMirror style = (StepTextStyleWithMirror) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.mirrorPlacement(), resolved, instanceIdsByTargetId);
+            appendTextStyleWithMirrorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTextStyleForDefinedFont) {
-            StepTextStyleForDefinedFont style = (StepTextStyleForDefinedFont) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.textColour(), resolved, instanceIdsByTargetId);
+            appendTextStyleForDefinedFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPointStyle) {
-            StepPointStyle style = (StepPointStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.marker(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+            appendPointStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSymbolColour) {
-            StepSymbolColour style = (StepSymbolColour) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+            appendSymbolColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSymbolStyle) {
-            StepSymbolStyle style = (StepSymbolStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.styleOfSymbol(), resolved, instanceIdsByTargetId);
+            appendSymbolStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleTransparent) {
             StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
@@ -1412,763 +450,273 @@ public final class StepPmiTargetBuilder {
             StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
-            StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.specularColour(), resolved, instanceIdsByTargetId);
+            appendSurfaceStyleReflectanceAmbientDiffuseSpecularTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedSurfaceSideStyle) {
-            StepPreDefinedSurfaceSideStyle style = (StepPreDefinedSurfaceSideStyle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+            appendPreDefinedSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedColour) {
-            StepPreDefinedColour colour = (StepPreDefinedColour) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+            appendPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDraughtingPreDefinedColour) {
-            StepDraughtingPreDefinedColour colour = (StepDraughtingPreDefinedColour) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+            appendDraughtingPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepColourRgb) {
-            StepColourRgb colour = (StepColourRgb) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+            appendColourRgbTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepColourSpecification) {
-            StepColourSpecification colour = (StepColourSpecification) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+            appendColourSpecificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepColour) {
-            StepColour colour = (StepColour) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+            appendColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedCurveFont) {
-            StepPreDefinedCurveFont font = (StepPreDefinedCurveFont) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+            appendPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDraughtingPreDefinedCurveFont) {
-            StepDraughtingPreDefinedCurveFont font = (StepDraughtingPreDefinedCurveFont) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+            appendDraughtingPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedTextFont) {
-            StepPreDefinedTextFont font = (StepPreDefinedTextFont) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+            appendPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDraughtingPreDefinedTextFont) {
-            StepDraughtingPreDefinedTextFont font = (StepDraughtingPreDefinedTextFont) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+            appendDraughtingPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedTerminatorSymbol) {
-            StepPreDefinedTerminatorSymbol symbol = (StepPreDefinedTerminatorSymbol) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+            appendPreDefinedTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedSymbol) {
-            StepPreDefinedSymbol symbol = (StepPreDefinedSymbol) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+            appendPreDefinedSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedDimensionSymbol) {
-            StepPreDefinedDimensionSymbol symbol = (StepPreDefinedDimensionSymbol) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+            appendPreDefinedDimensionSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedGeometricalToleranceSymbol) {
-            StepPreDefinedGeometricalToleranceSymbol symbol = (StepPreDefinedGeometricalToleranceSymbol) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+            appendPreDefinedGeometricalToleranceSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedItem) {
-            StepPreDefinedItem item = (StepPreDefinedItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendPreDefinedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationPlane) {
-            StepAnnotationPlane plane = (StepAnnotationPlane) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
-            for (StepPresentationStyleAssignment style : plane.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
-            }
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, plane.item(), resolved, instanceIdsByTargetId);
-            for (StepEntity element : plane.elements()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
-            }
+            appendAnnotationPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDraughtingCallout) {
-            StepDraughtingCallout callout = (StepDraughtingCallout) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, callout, instanceIdsByTargetId);
-            for (StepEntity content : callout.contents()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, content, resolved, instanceIdsByTargetId);
-            }
+            appendDraughtingCalloutTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPresentationLayerAssignment) {
-            StepPresentationLayerAssignment assignment = (StepPresentationLayerAssignment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
-            for (StepEntity item : assignment.assignedItems()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
+            appendPresentationLayerAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
-            for (StepPresentationStyleAssignment style : styledItem.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
-            }
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
+            appendStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
-            for (StepPresentationStyleAssignment style : styledItem.styles()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
-            }
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.overRiddenStyle(), resolved, instanceIdsByTargetId);
+            appendOverRidingStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRepresentationMap) {
-            StepRepresentationMap representationMap = (StepRepresentationMap) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
-            appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
+            appendRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSymbolRepresentationMap) {
-            StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
-            appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
+            appendSymbolRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingSource(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingTarget(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, mappedItem, resolved, instanceIdsByTargetId);
+            appendMappedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, replica, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.parent(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.transformation(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, replica, resolved, instanceIdsByTargetId);
+            appendGeometricReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepItemDefinedTransformation) {
-            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem1(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem2(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
+            appendItemDefinedTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCartesianTransformationOperator) {
-            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
-            if (transformation.axis1() != null) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis1(), resolved, instanceIdsByTargetId);
-            }
-            if (transformation.axis2() != null) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis2(), resolved, instanceIdsByTargetId);
-            }
-            if (transformation.axis3() != null) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis3(), resolved, instanceIdsByTargetId);
-            }
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.localOrigin(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
+            appendCartesianTransformationOperatorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAxis1Placement) {
-            StepAxis1Placement placement = (StepAxis1Placement) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
+            appendAxis1PlacementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D placement = (StepAxis2Placement2D) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
+            appendAxis2Placement2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+            appendCartesianPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPoint) {
-            StepPoint point = (StepPoint) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+            appendPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDirection) {
-            StepDirection direction = (StepDirection) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, direction, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, direction, resolved, instanceIdsByTargetId);
+            appendDirectionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepVector) {
-            StepVector vector = (StepVector) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vector, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vector.orientation(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vector, resolved, instanceIdsByTargetId);
+            appendVectorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement = (StepAxis2Placement3D) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, placement, resolved, instanceIdsByTargetId);
+            appendAxis2Placement3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPlane) {
-            StepPlane plane = (StepPlane) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, plane.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, plane, resolved, instanceIdsByTargetId);
+            appendPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeometricSet) {
-            StepGeometricSet set = (StepGeometricSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
-            for (StepEntity element : set.elements()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+            appendGeometricSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet set = (StepGeometricCurveSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
-            for (StepEntity element : set.elements()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+            appendGeometricCurveSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPointSet) {
-            StepPointSet set = (StepPointSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
-            for (StepEntity point : set.points()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+            appendPointSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPath) {
-            StepPath path = (StepPath) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
-            for (StepOrientedEdge edge : path.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+            appendPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOpenPath) {
-            StepOpenPath path = (StepOpenPath) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
-            for (StepOrientedEdge edge : path.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+            appendOpenPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedPath) {
-            StepOrientedPath path = (StepOrientedPath) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.pathElement(), resolved, instanceIdsByTargetId);
-            for (StepOrientedEdge edge : path.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+            appendOrientedPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSubpath) {
-            StepSubpath path = (StepSubpath) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.parentPath(), resolved, instanceIdsByTargetId);
-            for (StepOrientedEdge edge : path.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+            appendSubpathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEdgeLoop) {
-            StepEdgeLoop loop = (StepEdgeLoop) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
-            for (StepOrientedEdge edge : loop.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+            appendEdgeLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPolyLoop) {
-            StepPolyLoop loop = (StepPolyLoop) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
-            for (StepCartesianPoint point : loop.polygon()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+            appendPolyLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConnectedEdgeSet) {
-            StepConnectedEdgeSet set = (StepConnectedEdgeSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
-            for (StepEntity edge : set.edges()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+            appendConnectedEdgeSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEdgeBasedWireframeModel) {
-            StepEdgeBasedWireframeModel model = (StepEdgeBasedWireframeModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            for (StepConnectedEdgeSet boundary : model.boundaries()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendEdgeBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepShellBasedWireframeModel) {
-            StepShellBasedWireframeModel model = (StepShellBasedWireframeModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            for (StepEntity boundary : model.boundaries()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendShellBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepWireShell) {
-            StepWireShell shell = (StepWireShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            for (StepLoop loop : shell.loops()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendWireShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepVertexShell) {
-            StepVertexShell shell = (StepVertexShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.extent(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendVertexShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepVertexLoop) {
-            StepVertexLoop loop = (StepVertexLoop) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop.loopVertex(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+            appendVertexLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedEdge) {
-            StepOrientedEdge edge = (StepOrientedEdge) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeElement(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            appendOrientedEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEdgeCurve) {
-            StepEdgeCurve edge = (StepEdgeCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.start(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.end(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeGeometry(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            appendEdgeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepVertexPoint) {
-            StepVertexPoint vertex = (StepVertexPoint) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vertex.point(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
+            appendVertexPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAdvancedFace) {
-            StepAdvancedFace face = (StepAdvancedFace) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
-            for (StepFaceBound bound : face.bounds()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            appendAdvancedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepFaceSurface) {
-            StepFaceSurface face = (StepFaceSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
-            for (StepFaceBound bound : face.bounds()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            appendFaceSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedFace) {
-            StepOrientedFace face = (StepOrientedFace) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceElement(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            appendOrientedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConnectedFaceSet) {
-            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
-            for (StepFaceEntity face : faceSet.faces()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
+            appendConnectedFaceSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConnectedFaceSubSet) {
-            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
-            for (StepFaceEntity face : faceSet.faces()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-            }
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet.parentFaceSet(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
+            appendConnectedFaceSubSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOpenShell) {
-            StepOpenShell shell = (StepOpenShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            for (StepFaceEntity face : shell.faces()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            for (StepFaceEntity face : shell.faces()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendSurfacedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepClosedShell) {
-            StepClosedShell shell = (StepClosedShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            for (StepFaceEntity face : shell.faces()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell shell = (StepOrientedOpenShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.openShellElement(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendOrientedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell shell = (StepOrientedClosedShell) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.closedShellElement(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            appendOrientedClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepFaceBasedSurfaceModel) {
-            StepFaceBasedSurfaceModel model = (StepFaceBasedSurfaceModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            for (StepEntity faceSet : model.faceSets()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendFaceBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepShellBasedSurfaceModel) {
-            StepShellBasedSurfaceModel model = (StepShellBasedSurfaceModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            for (StepEntity shell : model.shells()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendShellBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepManifoldSolidBrep) {
-            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendManifoldSolidBrepTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBrepWithVoids) {
-            StepBrepWithVoids solid = (StepBrepWithVoids) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
-            for (StepEntity voidShell : solid.voids()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, voidShell, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendBrepWithVoidsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid solid = (StepSweptAreaSolid) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptArea(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.position(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweepReference(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendSweptAreaSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSweptDiskSolid) {
-            StepSweptDiskSolid solid = (StepSweptDiskSolid) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptCurve(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendSweptDiskSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepComplexClippingResult) {
-            StepComplexClippingResult solid = (StepComplexClippingResult) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.firstOperand(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.secondOperand(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendComplexClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSolidReplica) {
-            StepSolidReplica solid = (StepSolidReplica) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.parentSolid(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.transformation(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendSolidReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepHalfSpaceSolid) {
-            StepHalfSpaceSolid solid = (StepHalfSpaceSolid) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.baseSurface(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.enclosure(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendHalfSpaceSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCsgSolid) {
-            StepCsgSolid solid = (StepCsgSolid) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.treeRootExpression(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+            appendCsgSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCsgPrimitive) {
-            StepCsgPrimitive primitive = (StepCsgPrimitive) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, primitive, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, primitive.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, primitive, resolved, instanceIdsByTargetId);
+            appendCsgPrimitiveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProfileDef) {
-            StepProfileDef profile = (StepProfileDef) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, profile, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, profile.position(), resolved, instanceIdsByTargetId);
-            for (StepEntity curve : profile.curves()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, profile, resolved, instanceIdsByTargetId);
+            appendProfileDefTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConicCurve) {
-            StepConicCurve curve = (StepConicCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendConicCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBSplineCurve) {
-            StepBSplineCurve curve = (StepBSplineCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBSplineCurveWithKnots) {
-            StepBSplineCurveWithKnots curve = (StepBSplineCurveWithKnots) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendBSplineCurveWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRationalBSplineCurve) {
-            StepRationalBSplineCurve curve = (StepRationalBSplineCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendRationalBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBezierCurve) {
-            StepBezierCurve curve = (StepBezierCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepUniformCurve) {
-            StepUniformCurve curve = (StepUniformCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepQuasiUniformCurve) {
-            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendQuasiUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPiecewiseBezierCurve) {
-            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendPiecewiseBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepLine) {
-            StepLine line = (StepLine) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, line, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.point(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.vector(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, line, resolved, instanceIdsByTargetId);
+            appendLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCircle) {
-            StepCircle circle = (StepCircle) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, circle, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, circle.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, circle, resolved, instanceIdsByTargetId);
+            appendCircleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEllipse) {
-            StepEllipse ellipse = (StepEllipse) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, ellipse, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, ellipse.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, ellipse, resolved, instanceIdsByTargetId);
+            appendEllipseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCurve) {
-            StepCurve curve = (StepCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPolyline) {
-            StepPolyline polyline = (StepPolyline) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, polyline, instanceIdsByTargetId);
-            for (StepCartesianPoint point : polyline.points()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, polyline, resolved, instanceIdsByTargetId);
+            appendPolylineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTrimmedCurve) {
-            StepTrimmedCurve curve = (StepTrimmedCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
-            for (StepValue trim : curve.trim1()) {
-                if (trim instanceof StepValue.ReferenceValue) {
-                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
-                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
-                }
-            }
-            for (StepValue trim : curve.trim2()) {
-                if (trim instanceof StepValue.ReferenceValue) {
-                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
-                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
-                }
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendTrimmedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D curve = (StepOffsetCurve2D) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendOffsetCurve2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D curve = (StepOffsetCurve3D) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.refDirection(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendOffsetCurve3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPcurve) {
-            StepPcurve curve = (StepPcurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendPcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve curve = (StepDegeneratePcurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendDegeneratePcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceCurve) {
-            StepSurfaceCurve curve = (StepSurfaceCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
-            for (StepEntity associated : curve.associatedGeometry()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendSurfaceCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSeamCurve) {
-            StepSeamCurve curve = (StepSeamCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
-            for (StepEntity associated : curve.associatedGeometry()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendSeamCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCompositeCurve) {
-            StepCompositeCurve curve = (StepCompositeCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            for (StepCompositeCurveSegment segment : curve.segments()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendCompositeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface curve = (StepCompositeCurveOnSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            for (StepCompositeCurveSegment segment : curve.segments()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendCompositeCurveOnSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCompositeCurveSegment) {
-            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, segment, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment.parentCurve(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
+            appendCompositeCurveSegmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCylindricalSurface) {
-            StepCylindricalSurface surface = (StepCylindricalSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendCylindricalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConicalSurface) {
-            StepConicalSurface surface = (StepConicalSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendConicalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSphericalSurface) {
-            StepSphericalSurface surface = (StepSphericalSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendSphericalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepToroidalSurface) {
-            StepToroidalSurface surface = (StepToroidalSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendToroidalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceOfLinearExtrusion) {
-            StepSurfaceOfLinearExtrusion surface = (StepSurfaceOfLinearExtrusion) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.extrusionAxis(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendSurfaceOfLinearExtrusionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceOfRevolution) {
-            StepSurfaceOfRevolution surface = (StepSurfaceOfRevolution) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.axisPosition(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendSurfaceOfRevolutionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface surface = (StepRectangularTrimmedSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendRectangularTrimmedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface surface = (StepCurveBoundedSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
-            for (StepEntity boundary : surface.boundaries()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
-            }
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendCurveBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOrientedSurface) {
-            StepOrientedSurface surface = (StepOrientedSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.surfaceElement(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendOrientedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepOffsetSurface) {
-            StepOffsetSurface surface = (StepOffsetSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendOffsetSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBSplineSurface) {
-            StepBSplineSurface surface = (StepBSplineSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots surface = (StepBSplineSurfaceWithKnots) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendBSplineSurfaceWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRationalBSplineSurface) {
-            StepRationalBSplineSurface surface = (StepRationalBSplineSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendRationalBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBezierSurface) {
-            StepBezierSurface surface = (StepBezierSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepUniformSurface) {
-            StepUniformSurface surface = (StepUniformSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface surface = (StepQuasiUniformSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendQuasiUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendPiecewiseBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepFace) {
-            StepFace face = (StepFace) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            appendFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBoundedCurve) {
-            StepBoundedCurve curve = (StepBoundedCurve) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            appendBoundedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBoundedSurface) {
-            StepBoundedSurface surface = (StepBoundedSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurface) {
-            StepSurface surface = (StepSurface) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+            appendSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepMeasureRepresentationItem) {
-            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item.unit(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendMeasureRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDescriptiveRepresentationItem) {
-            StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendDescriptiveRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepValueRepresentationItem) {
-            StepValueRepresentationItem item = (StepValueRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendValueRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSurfaceModel) {
-            StepSurfaceModel model = (StepSurfaceModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepSolidModel) {
-            StepSolidModel model = (StepSolidModel) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+            appendSolidModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRepresentationItem) {
-            StepRepresentationItem item = (StepRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeometricRepresentationItem) {
-            StepGeometricRepresentationItem item = (StepGeometricRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendGeometricRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTopologicalRepresentationItem) {
-            StepTopologicalRepresentationItem item = (StepTopologicalRepresentationItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendTopologicalRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepMeasureWithUnit) {
-            StepMeasureWithUnit measure = (StepMeasureWithUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+            appendMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepTypedMeasureWithUnit) {
-            StepTypedMeasureWithUnit measure = (StepTypedMeasureWithUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+            appendTypedMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepUncertaintyMeasureWithUnit) {
-            StepUncertaintyMeasureWithUnit measure = (StepUncertaintyMeasureWithUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+            appendUncertaintyMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConversionBasedUnit) {
-            StepConversionBasedUnit unit = (StepConversionBasedUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
+            appendConversionBasedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepConversionBasedUnitWithOffset) {
-            StepConversionBasedUnitWithOffset unit = (StepConversionBasedUnitWithOffset) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
+            appendConversionBasedUnitWithOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDerivedUnit) {
-            StepDerivedUnit unit = (StepDerivedUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-            for (StepDerivedUnitElement element : unit.elements()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
-            }
+            appendDerivedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDerivedUnitElement) {
-            StepDerivedUnitElement element = (StepDerivedUnitElement) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, element, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element.unit(), resolved, instanceIdsByTargetId);
+            appendDerivedUnitElementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepNamedUnit) {
             StepNamedUnit unit = (StepNamedUnit) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
@@ -2182,226 +730,53 @@ public final class StepPmiTargetBuilder {
             StepRepresentationContext context = (StepRepresentationContext) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
         } else if (definition instanceof StepGeometricRepresentationContext) {
-            StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
-            if (context.globalUnitAssignedContext() != null) {
-                appendNestedDefinitionTargets(
-                        targetsByUsageId,
-                        identifiedItem,
-                        context.globalUnitAssignedContext(),
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            }
-            if (context.globalUncertaintyAssignedContext() != null) {
-                appendNestedDefinitionTargets(
-                        targetsByUsageId,
-                        identifiedItem,
-                        context.globalUncertaintyAssignedContext(),
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            }
+            appendGeometricRepresentationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGlobalUnitAssignedContext) {
-            StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
-            for (StepEntity unit : context.units()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit, resolved, instanceIdsByTargetId);
-            }
+            appendGlobalUnitAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGlobalUncertaintyAssignedContext) {
-            StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
-            for (StepUncertaintyMeasureWithUnit uncertainty : context.uncertainties()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, uncertainty, resolved, instanceIdsByTargetId);
-            }
+            appendGlobalUncertaintyAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAddress) {
-            StepAddress address = (StepAddress) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, address, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, address, resolved, instanceIdsByTargetId);
+            appendAddressTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepCharacterizedObject) {
-            StepCharacterizedObject characterizedObject = (StepCharacterizedObject) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, characterizedObject, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, characterizedObject, resolved, instanceIdsByTargetId);
+            appendCharacterizedObjectTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepDimensionalExponents) {
-            StepDimensionalExponents exponents = (StepDimensionalExponents) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, exponents, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, exponents, resolved, instanceIdsByTargetId);
+            appendDimensionalExponentsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepVertex) {
-            StepVertex vertex = (StepVertex) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
+            appendVertexTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEdge) {
-            StepEdge edge = (StepEdge) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            appendEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAbstractVariable) {
-            StepAbstractVariable variable = (StepAbstractVariable) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    variable.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+            appendAbstractVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRowVariable) {
-            StepRowVariable variable = (StepRowVariable) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    variable.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+            appendRowVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepScalarVariable) {
-            StepScalarVariable variable = (StepScalarVariable) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    variable.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+            appendScalarVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepForwardChainingRulePremise) {
-            StepForwardChainingRulePremise variable = (StepForwardChainingRulePremise) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    variable.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+            appendForwardChainingRulePremiseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBackChainingRuleBody) {
-            StepBackChainingRuleBody variable = (StepBackChainingRuleBody) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    variable.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+            appendBackChainingRuleBodyTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPropertyDefinitionRepresentation) {
-            StepPropertyDefinitionRepresentation link = (StepPropertyDefinitionRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepActionPropertyRepresentation) {
-            StepActionPropertyRepresentation link = (StepActionPropertyRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendActionPropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepContactRatioRepresentation) {
-            StepContactRatioRepresentation link = (StepContactRatioRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendContactRatioRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepKinematicPropertyDefinitionRepresentation) {
-            StepKinematicPropertyDefinitionRepresentation link = (StepKinematicPropertyDefinitionRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendKinematicPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepKinematicPropertyMechanismRepresentation) {
-            StepKinematicPropertyMechanismRepresentation link = (StepKinematicPropertyMechanismRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendKinematicPropertyMechanismRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepKinematicPropertyRepresentationRelation) {
-            StepKinematicPropertyRepresentationRelation link = (StepKinematicPropertyRepresentationRelation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendKinematicPropertyRepresentationRelationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepKinematicPropertyTopologyRepresentation) {
-            StepKinematicPropertyTopologyRepresentation link = (StepKinematicPropertyTopologyRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendKinematicPropertyTopologyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepResourcePropertyRepresentation) {
-            StepResourcePropertyRepresentation link = (StepResourcePropertyRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendResourcePropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAttributeAssertion) {
-            StepAttributeAssertion assertion = (StepAttributeAssertion) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assertion, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assertion.definition(), resolved, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    assertion.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendAttributeAssertionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepShapeDefinitionRepresentation) {
-            StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
-            appendAttachedRepresentationRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    link.usedRepresentation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendShapeDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApplicationProtocolDefinition) {
-            StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition.application(), resolved, instanceIdsByTargetId);
+            appendApplicationProtocolDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProduct) {
             StepProduct product = (StepProduct) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, product, instanceIdsByTargetId);
@@ -2426,19 +801,11 @@ public final class StepPmiTargetBuilder {
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionShape, resolved, instanceIdsByTargetId);
             appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionShape.definition(), resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductContext) {
-            StepProductContext productContext = (StepProductContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productContext, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productContext, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productContext.frameOfReference(), resolved, instanceIdsByTargetId);
+            appendProductContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductDefinitionContext) {
-            StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionContext, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext.frameOfReference(), resolved, instanceIdsByTargetId);
+            appendProductDefinitionContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepApplicationContext) {
-            StepApplicationContext applicationContext = (StepApplicationContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, applicationContext, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, applicationContext, resolved, instanceIdsByTargetId);
+            appendApplicationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGroup) {
             StepGroup group = (StepGroup) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
@@ -2486,108 +853,35 @@ public final class StepPmiTargetBuilder {
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, category, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, category, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductRelatedProductCategory) {
-            StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relatedCategory, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relatedCategory, resolved, instanceIdsByTargetId);
-            for (StepProduct product : relatedCategory.products()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, product, resolved, instanceIdsByTargetId);
-            }
+            appendProductRelatedProductCategoryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepGeneralProperty) {
             StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, generalProperty, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, generalProperty, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepProductDefinitionEffectivity) {
-            StepProductDefinitionEffectivity effectivity = (StepProductDefinitionEffectivity) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, effectivity.productDefinition(), resolved, instanceIdsByTargetId);
+            appendProductDefinitionEffectivityDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepEffectivity) {
             StepEffectivity effectivity = (StepEffectivity) definition;
             appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
             appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRepresentationRelationship) {
-            StepRepresentationRelationship relationship = (StepRepresentationRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
-                appendPmiTarget(
-                        targetsByUsageId,
-                        identifiedItem.id(),
-                        target,
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(relationship),
-                        relationship.id()
-                );
-            }
+            appendRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepShapeRepresentationRelationship) {
-            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
-                appendPmiTarget(
-                        targetsByUsageId,
-                        identifiedItem.id(),
-                        target,
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(relationship),
-                        relationship.id()
-                );
-            }
+            appendShapeRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepContextDependentShapeRepresentation) {
-            StepContextDependentShapeRepresentation shapeRepresentation = (StepContextDependentShapeRepresentation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shapeRepresentation, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    shapeRepresentation.representationRelationship(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
-            appendNestedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    shapeRepresentation.representedProductRelation(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendContextDependentShapeRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepRepresentationRelationshipWithTransformation) {
-            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    relationship.transformationOperator(),
-                    resolved,
-                    instanceIdsByTargetId
-            );
+            appendRepresentationRelationshipWithTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBoxDomain) {
-            StepBoxDomain boxDomain = (StepBoxDomain) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain.corner(), resolved, instanceIdsByTargetId);
+            appendBoxDomainTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBooleanClippingResult) {
-            StepBooleanClippingResult result = (StepBooleanClippingResult) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
+            appendBooleanClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepBooleanResult) {
-            StepBooleanResult result = (StepBooleanResult) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
+            appendBooleanResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedMarker) {
-            StepPreDefinedMarker marker = (StepPreDefinedMarker) definition;
-            appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
+            appendPreDefinedMarkerTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepPreDefinedPointMarkerSymbol) {
-            StepPreDefinedPointMarkerSymbol marker = (StepPreDefinedPointMarkerSymbol) definition;
-            appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
+            appendPreDefinedPointMarkerSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         } else if (definition instanceof StepAnnotationSymbol) {
             StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) definition;
             appendMappedDefinitionTargets(
@@ -2657,6 +951,5718 @@ public final class StepPmiTargetBuilder {
                     definition.id()
             );
         }
+    }
+
+
+    private static void appendAnnotationOccurrenceRelationshipTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationOccurrenceRelationship)) {
+            return;
+        }
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendRelationshipSemanticTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.entityName(),
+                    relationship.id(),
+                    relationship.relatingAnnotationOccurrence(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendRelationshipSemanticTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.entityName(),
+                    relationship.id(),
+                    relationship.relatedAnnotationOccurrence(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            return;
+    }
+
+
+    private static void appendDraughtingCalloutRelationshipTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingCalloutRelationship)) {
+            return;
+        }
+            StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendRelationshipSemanticTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    "DRAUGHTING_CALLOUT_RELATIONSHIP",
+                    relationship.id(),
+                    relationship.relatingCallout(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendRelationshipSemanticTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    "DRAUGHTING_CALLOUT_RELATIONSHIP",
+                    relationship.id(),
+                    relationship.relatedCallout(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            return;
+    }
+
+
+    private static void appendPropertyDefinitionRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPropertyDefinitionRelationship)) {
+            return;
+        }
+            StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendPropertyRepresentationLinkTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    relationship.relatingPropertyDefinition(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendPropertyRepresentationLinkTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    relationship.relatedPropertyDefinition(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendPropertyDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPropertyDefinition)) {
+            return;
+        }
+            StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) definition;
+            appendPropertyDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    propertyDefinition,
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendPropertyRepresentationLinkTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    propertyDefinition,
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    propertyDefinition.definition(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendGeneralPropertyRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeneralPropertyRelationship)) {
+            return;
+        }
+            StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingGeneralProperty(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedGeneralProperty(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendShapeAspectRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShapeAspectRelationship)) {
+            return;
+        }
+            StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingShapeAspect(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedShapeAspect(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendProductRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductRelationship)) {
+            return;
+        }
+            StepProductRelationship relationship = (StepProductRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingProduct(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedProduct(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendProductDefinitionFormationRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductDefinitionFormationRelationship)) {
+            return;
+        }
+            StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingFormation(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedFormation(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendGroupRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGroupRelationship)) {
+            return;
+        }
+            StepGroupRelationship relationship = (StepGroupRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingGroup(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedGroup(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendDocumentRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDocumentRelationship)) {
+            return;
+        }
+            StepDocumentRelationship relationship = (StepDocumentRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingDocument(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedDocument(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendOrganizationRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrganizationRelationship)) {
+            return;
+        }
+            StepOrganizationRelationship relationship = (StepOrganizationRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingOrganization(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedOrganization(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendEffectivityRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEffectivityRelationship)) {
+            return;
+        }
+            StepEffectivityRelationship relationship = (StepEffectivityRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatingEffectivity(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relatedEffectivity(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendProductCategoryRelationshipDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductCategoryRelationship)) {
+            return;
+        }
+            StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relationship, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.category(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.subCategory(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendGroupTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGroup)) {
+            return;
+        }
+            StepGroup group = (StepGroup) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, group, resolved, instanceIdsByTargetId);
+            appendGroupRelationshipTargets(targetsByUsageId, identifiedItem.id(), group, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDocumentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDocument)) {
+            return;
+        }
+            StepDocument document = (StepDocument) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, document, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, document, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    document.kind(),
+                    instanceIdsByTargetId
+            );
+            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), document, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDocumentReferenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDocumentReference)) {
+            return;
+        }
+            StepDocumentReference reference = (StepDocumentReference) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    reference.assignedDocument(),
+                    instanceIdsByTargetId
+            );
+            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), reference.assignedDocument(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    reference.assignedDocument().kind(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedDocumentReferenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedDocumentReference)) {
+            return;
+        }
+            StepAppliedDocumentReference reference = (StepAppliedDocumentReference) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
+            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), reference.assignedDocument(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    reference.assignedDocument(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    reference.assignedDocument().kind(),
+                    definitionTypeName(reference.assignedDocument().kind()),
+                    reference.assignedDocument().kind().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    reference.assignedDocument().kind(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendApprovalAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApprovalAssignment)) {
+            return;
+        }
+            StepApprovalAssignment assignment = (StepApprovalAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedApproval(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval().status(), instanceIdsByTargetId);
+            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSecurityClassificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSecurityClassificationAssignment)) {
+            return;
+        }
+            StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedSecurityClassification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedSecurityClassification().securityLevel(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendContractAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepContractAssignment)) {
+            return;
+        }
+            StepContractAssignment assignment = (StepContractAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedContract(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedContract().kind(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendCertificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCertificationAssignment)) {
+            return;
+        }
+            StepCertificationAssignment assignment = (StepCertificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedCertification(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedCertification().kind(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendPersonAndOrganizationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPersonAndOrganizationAssignment)) {
+            return;
+        }
+            StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedPersonAndOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().person(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedPersonAndOrganization().organization(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrganizationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrganizationAssignment)) {
+            return;
+        }
+            StepOrganizationAssignment assignment = (StepOrganizationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedOrganization(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedOrganization(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendLanguageAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepLanguageAssignment)) {
+            return;
+        }
+            StepLanguageAssignment assignment = (StepLanguageAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedLanguage(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedLanguage(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendGroupAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGroupAssignment)) {
+            return;
+        }
+            StepGroupAssignment assignment = (StepGroupAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedGroup(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedGroup(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendClassificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepClassificationAssignment)) {
+            return;
+        }
+            StepClassificationAssignment assignment = (StepClassificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedClass(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedClass(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendDateAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDateAssignment)) {
+            return;
+        }
+            StepDateAssignment assignment = (StepDateAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDate(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDate(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendDateTimeAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDateTimeAssignment)) {
+            return;
+        }
+            StepDateTimeAssignment assignment = (StepDateTimeAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), assignment.assignedDateAndTime(), relationshipTypeName(assignment), assignment.id(), resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().dateComponent(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.assignedDateAndTime().timeComponent().zone(), instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), instanceIdsByTargetId);
+    }
+
+
+    private static void appendIdentificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepIdentificationAssignment)) {
+            return;
+        }
+            StepIdentificationAssignment assignment = (StepIdentificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendExternalIdentificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepExternalIdentificationAssignment)) {
+            return;
+        }
+            StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
+            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
+            appendExternallyDefinedItemTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEffectivityTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEffectivity)) {
+            return;
+        }
+            StepEffectivity effectivity = (StepEffectivity) definition;
+            appendProductDefinitionEffectivityTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    effectivity,
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendEffectivityRelationshipTargets(targetsByUsageId, identifiedItem.id(), effectivity, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendExternalSourceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepExternalSource)) {
+            return;
+        }
+            StepExternalSource source = (StepExternalSource) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, source, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
+            appendExternallyDefinedItemTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    source,
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendExternallyDefinedItemDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepExternallyDefinedItem)) {
+            return;
+        }
+            StepExternallyDefinedItem item = (StepExternallyDefinedItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(targetsByUsageId, identifiedItem, item.source(), instanceIdsByTargetId);
+            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDocumentUsageConstraintTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDocumentUsageConstraint)) {
+            return;
+        }
+            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    documentUsageConstraint.source(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    documentUsageConstraint.source().kind(),
+                    instanceIdsByTargetId
+            );
+            appendDocumentRelationshipTargets(targetsByUsageId, identifiedItem.id(), documentUsageConstraint.source(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRepresentation)) {
+            return;
+        }
+            StepRepresentation representation = (StepRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representation, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    representation,
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            if (representation.context() != null) {
+                appendNestedDefinitionTargets(
+                        targetsByUsageId,
+                        identifiedItem,
+                        representation.context(),
+                        resolved,
+                        instanceIdsByTargetId
+                );
+            }
+            for (StepEntity item : representation.items()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendShapeAspectOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShapeAspectOccurrence)) {
+            return;
+        }
+            StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    occurrence.definition(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendProductDefinitionRelationshipRelationshipTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductDefinitionRelationshipRelationship)) {
+            return;
+        }
+            StepProductDefinitionRelationshipRelationship relationship = (StepProductDefinitionRelationshipRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.relating(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    relationship.related(),
+                    relationshipTypeName(relationship),
+                    relationship.id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendApprovalPersonOrganizationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApprovalPersonOrganization)) {
+            return;
+        }
+            StepApprovalPersonOrganization assignment = (StepApprovalPersonOrganization) definition;
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.personOrganization(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.personOrganization().person(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.personOrganization().organization(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.authorizedApproval(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.authorizedApproval().status(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.role(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendApprovalDateTimeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApprovalDateTime)) {
+            return;
+        }
+            StepApprovalDateTime assignment = (StepApprovalDateTime) definition;
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.dateTime(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.dateTime().dateComponent(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.dateTime().timeComponent(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.dateTime().timeComponent().zone(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.datedApproval(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.datedApproval().status(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendCalendarDateTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCalendarDate)) {
+            return;
+        }
+            StepCalendarDate calendarDate = (StepCalendarDate) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, calendarDate, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, calendarDate, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendNameAttributeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepNameAttribute)) {
+            return;
+        }
+            StepNameAttribute attribute = (StepNameAttribute) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.namedItem(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDescriptionAttributeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDescriptionAttribute)) {
+            return;
+        }
+            StepDescriptionAttribute attribute = (StepDescriptionAttribute) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.describedItem(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendIdAttributeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepIdAttribute)) {
+            return;
+        }
+            StepIdAttribute attribute = (StepIdAttribute) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, attribute, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, attribute, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, attribute.identifiedItem(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendNameAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepNameAssignment)) {
+            return;
+        }
+            StepNameAssignment assignment = (StepNameAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAppliedNameAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedNameAssignment)) {
+            return;
+        }
+            StepAppliedNameAssignment assignment = (StepAppliedNameAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            for (StepEntity item : assignment.items()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendDateAndTimeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDateAndTime)) {
+            return;
+        }
+            StepDateAndTime dateAndTime = (StepDateAndTime) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, dateAndTime, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.dateComponent(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, dateAndTime.timeComponent(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendLocalTimeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepLocalTime)) {
+            return;
+        }
+            StepLocalTime localTime = (StepLocalTime) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, localTime, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, localTime, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, localTime.zone(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCoordinatedUniversalTimeOffsetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCoordinatedUniversalTimeOffset)) {
+            return;
+        }
+            StepCoordinatedUniversalTimeOffset zone = (StepCoordinatedUniversalTimeOffset) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, zone, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, zone, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendApprovalStatusTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApprovalStatus)) {
+            return;
+        }
+            StepApprovalStatus status = (StepApprovalStatus) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, status, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, status, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSecurityClassificationLevelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSecurityClassificationLevel)) {
+            return;
+        }
+            StepSecurityClassificationLevel level = (StepSecurityClassificationLevel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, level, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, level, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendContractTypeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepContractType)) {
+            return;
+        }
+            StepContractType kind = (StepContractType) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCertificationTypeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCertificationType)) {
+            return;
+        }
+            StepCertificationType kind = (StepCertificationType) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendApprovalRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApprovalRole)) {
+            return;
+        }
+            StepApprovalRole role = (StepApprovalRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrganizationRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrganizationRole)) {
+            return;
+        }
+            StepOrganizationRole role = (StepOrganizationRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPersonAndOrganizationRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPersonAndOrganizationRole)) {
+            return;
+        }
+            StepPersonAndOrganizationRole role = (StepPersonAndOrganizationRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendClassificationRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepClassificationRole)) {
+            return;
+        }
+            StepClassificationRole role = (StepClassificationRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDateRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDateRole)) {
+            return;
+        }
+            StepDateRole role = (StepDateRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDateTimeRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDateTimeRole)) {
+            return;
+        }
+            StepDateTimeRole role = (StepDateTimeRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendIdentificationRoleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepIdentificationRole)) {
+            return;
+        }
+            StepIdentificationRole role = (StepIdentificationRole) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, role, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, role, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDocumentTypeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDocumentType)) {
+            return;
+        }
+            StepDocumentType kind = (StepDocumentType) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, kind, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, kind, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendApprovalTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApproval)) {
+            return;
+        }
+            StepApproval approval = (StepApproval) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, approval, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, approval.status(), resolved, instanceIdsByTargetId);
+            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, approval, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSecurityClassificationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSecurityClassification)) {
+            return;
+        }
+            StepSecurityClassification classification = (StepSecurityClassification) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, classification, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, classification, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, classification.securityLevel(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendContractTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepContract)) {
+            return;
+        }
+            StepContract contract = (StepContract) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, contract, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, contract, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, contract.kind(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCertificationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCertification)) {
+            return;
+        }
+            StepCertification certification = (StepCertification) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, certification, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, certification, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, certification.kind(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPersonTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPerson)) {
+            return;
+        }
+            StepPerson person = (StepPerson) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, person, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, person, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPersonAndOrganizationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPersonAndOrganization)) {
+            return;
+        }
+            StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, personAndOrganization, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.person(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, personAndOrganization.organization(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendLanguageTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepLanguage)) {
+            return;
+        }
+            StepLanguage language = (StepLanguage) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, language, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, language, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAppliedClassificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedClassificationAssignment)) {
+            return;
+        }
+            StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedDateAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedDateAssignment)) {
+            return;
+        }
+            StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedDate(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.role(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedDateTimeAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedDateTimeAssignment)) {
+            return;
+        }
+            StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedDateAndTime(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedDateAndTime().timeComponent(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedDateAndTime().timeComponent().zone(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.role(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedApprovalAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedApprovalAssignment)) {
+            return;
+        }
+            StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedApproval(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.assignedApproval().status(),
+                    definitionTypeName(assignment.assignedApproval().status()),
+                    assignment.assignedApproval().status().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedApproval().status(),
+                    instanceIdsByTargetId
+            );
+            appendApprovalDecorationTargets(targetsByUsageId, identifiedItem, assignment.assignedApproval(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAppliedSecurityClassificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedSecurityClassificationAssignment)) {
+            return;
+        }
+            StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedSecurityClassification(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.assignedSecurityClassification().securityLevel(),
+                    definitionTypeName(assignment.assignedSecurityClassification().securityLevel()),
+                    assignment.assignedSecurityClassification().securityLevel().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedSecurityClassification().securityLevel(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedContractAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedContractAssignment)) {
+            return;
+        }
+            StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedContract(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.assignedContract().kind(),
+                    definitionTypeName(assignment.assignedContract().kind()),
+                    assignment.assignedContract().kind().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedContract().kind(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedCertificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedCertificationAssignment)) {
+            return;
+        }
+            StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedCertification(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.assignedCertification().kind(),
+                    definitionTypeName(assignment.assignedCertification().kind()),
+                    assignment.assignedCertification().kind().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedCertification().kind(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedPersonAndOrganizationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedPersonAndOrganizationAssignment)) {
+            return;
+        }
+            StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedPersonAndOrganization(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedPersonAndOrganization().person(),
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedPersonAndOrganization().organization(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.role(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedOrganizationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedOrganizationAssignment)) {
+            return;
+        }
+            StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedOrganization(),
+                    instanceIdsByTargetId
+            );
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.role(),
+                    definitionTypeName(assignment.role()),
+                    assignment.role().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.role(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedLanguageAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedLanguageAssignment)) {
+            return;
+        }
+            StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendDefinitionRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem.id(),
+                    assignment.assignedLanguage(),
+                    definitionTypeName(assignment.assignedLanguage()),
+                    assignment.assignedLanguage().id(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedLanguage(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedGroupAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedGroupAssignment)) {
+            return;
+        }
+            StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendExistingRepresentationDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.assignedGroup(),
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAppliedIdentificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedIdentificationAssignment)) {
+            return;
+        }
+            StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
+            for (StepEntity item : assignment.items()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendAppliedExternalIdentificationAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAppliedExternalIdentificationAssignment)) {
+            return;
+        }
+            StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, assignment, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.role(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assignment.source(), resolved, instanceIdsByTargetId);
+            appendExternalSourceRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.source(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendExternallyDefinedItemTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assignment.source(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            for (StepEntity item : assignment.items()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendAnnotationCurveOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationCurveOccurrence)) {
+            return;
+        }
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationFillAreaTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationFillArea)) {
+            return;
+        }
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, fillArea, instanceIdsByTargetId);
+            for (StepEntity boundary : fillArea.boundaries()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendAnnotationFillAreaOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationFillAreaOccurrence)) {
+            return;
+        }
+            StepAnnotationFillAreaOccurrence occurrence = (StepAnnotationFillAreaOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.fillStyleTarget(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationPlaceholderOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationPlaceholderOccurrence)) {
+            return;
+        }
+            StepAnnotationPlaceholderOccurrence occurrence = (StepAnnotationPlaceholderOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationPointOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationPointOccurrence)) {
+            return;
+        }
+            StepAnnotationPointOccurrence occurrence = (StepAnnotationPointOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationSymbolOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationSymbolOccurrence)) {
+            return;
+        }
+            StepAnnotationSymbolOccurrence occurrence = (StepAnnotationSymbolOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationSubfigureOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationSubfigureOccurrence)) {
+            return;
+        }
+            StepAnnotationSubfigureOccurrence occurrence = (StepAnnotationSubfigureOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationTextOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationTextOccurrence)) {
+            return;
+        }
+            StepAnnotationTextOccurrence occurrence = (StepAnnotationTextOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.position(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDraughtingAnnotationOccurrenceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingAnnotationOccurrence)) {
+            return;
+        }
+            StepDraughtingAnnotationOccurrence occurrence = (StepDraughtingAnnotationOccurrence) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, occurrence, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, occurrence.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTerminatorSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTerminatorSymbol)) {
+            return;
+        }
+            StepTerminatorSymbol symbol = (StepTerminatorSymbol) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.item(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, symbol.annotatedCurve(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPresentationStyleAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPresentationStyleAssignment)) {
+            return;
+        }
+            StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            for (StepEntity style : assignment.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendSurfaceStyleUsageTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleUsage)) {
+            return;
+        }
+            StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, usage, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, usage.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceSideStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceSideStyle)) {
+            return;
+        }
+            StepSurfaceSideStyle style = (StepSurfaceSideStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            for (StepEntity component : style.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendSurfaceStyleFillAreaTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleFillArea)) {
+            return;
+        }
+            StepSurfaceStyleFillArea style = (StepSurfaceStyleFillArea) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.fillStyle(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendFillAreaStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepFillAreaStyle)) {
+            return;
+        }
+            StepFillAreaStyle style = (StepFillAreaStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            for (StepFillAreaStyleColour component : style.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, component, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendFillAreaStyleColourTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepFillAreaStyleColour)) {
+            return;
+        }
+            StepFillAreaStyleColour style = (StepFillAreaStyleColour) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCurveStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCurveStyle)) {
+            return;
+        }
+            StepCurveStyle style = (StepCurveStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.curveFont(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleBoundaryTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleBoundary)) {
+            return;
+        }
+            StepSurfaceStyleBoundary style = (StepSurfaceStyleBoundary) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleParameterLineTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleParameterLine)) {
+            return;
+        }
+            StepSurfaceStyleParameterLine style = (StepSurfaceStyleParameterLine) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleControlGridTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleControlGrid)) {
+            return;
+        }
+            StepSurfaceStyleControlGrid style = (StepSurfaceStyleControlGrid) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleSegmentationCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleSegmentationCurve)) {
+            return;
+        }
+            StepSurfaceStyleSegmentationCurve style = (StepSurfaceStyleSegmentationCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleSilhouetteTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleSilhouette)) {
+            return;
+        }
+            StepSurfaceStyleSilhouette style = (StepSurfaceStyleSilhouette) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.style(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCharacterGlyphStyleStrokeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCharacterGlyphStyleStroke)) {
+            return;
+        }
+            StepCharacterGlyphStyleStroke style = (StepCharacterGlyphStyleStroke) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.strokeStyle(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCharacterGlyphStyleOutlineTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCharacterGlyphStyleOutline)) {
+            return;
+        }
+            StepCharacterGlyphStyleOutline style = (StepCharacterGlyphStyleOutline) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCharacterGlyphStyleOutlineWithCharacteristicsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCharacterGlyphStyleOutlineWithCharacteristics)) {
+            return;
+        }
+            StepCharacterGlyphStyleOutlineWithCharacteristics style = (StepCharacterGlyphStyleOutlineWithCharacteristics) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.outlineStyle(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characteristics(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyle)) {
+            return;
+        }
+            StepTextStyle style = (StepTextStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleWithSpacingTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyleWithSpacing)) {
+            return;
+        }
+            StepTextStyleWithSpacing style = (StepTextStyleWithSpacing) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleWithBoxCharacteristicsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyleWithBoxCharacteristics)) {
+            return;
+        }
+            StepTextStyleWithBoxCharacteristics style = (StepTextStyleWithBoxCharacteristics) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleWithJustificationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyleWithJustification)) {
+            return;
+        }
+            StepTextStyleWithJustification style = (StepTextStyleWithJustification) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleWithMirrorTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyleWithMirror)) {
+            return;
+        }
+            StepTextStyleWithMirror style = (StepTextStyleWithMirror) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.characterAppearance(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.mirrorPlacement(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTextStyleForDefinedFontTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTextStyleForDefinedFont)) {
+            return;
+        }
+            StepTextStyleForDefinedFont style = (StepTextStyleForDefinedFont) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.textColour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPointStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPointStyle)) {
+            return;
+        }
+            StepPointStyle style = (StepPointStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.marker(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSymbolColourTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSymbolColour)) {
+            return;
+        }
+            StepSymbolColour style = (StepSymbolColour) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.colour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSymbolStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSymbolStyle)) {
+            return;
+        }
+            StepSymbolStyle style = (StepSymbolStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.styleOfSymbol(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceStyleReflectanceAmbientDiffuseSpecularTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular)) {
+            return;
+        }
+            StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style.specularColour(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedSurfaceSideStyleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedSurfaceSideStyle)) {
+            return;
+        }
+            StepPreDefinedSurfaceSideStyle style = (StepPreDefinedSurfaceSideStyle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedColourTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedColour)) {
+            return;
+        }
+            StepPreDefinedColour colour = (StepPreDefinedColour) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDraughtingPreDefinedColourTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingPreDefinedColour)) {
+            return;
+        }
+            StepDraughtingPreDefinedColour colour = (StepDraughtingPreDefinedColour) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendColourRgbTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepColourRgb)) {
+            return;
+        }
+            StepColourRgb colour = (StepColourRgb) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendColourSpecificationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepColourSpecification)) {
+            return;
+        }
+            StepColourSpecification colour = (StepColourSpecification) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendColourTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepColour)) {
+            return;
+        }
+            StepColour colour = (StepColour) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, colour, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, colour, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedCurveFontTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedCurveFont)) {
+            return;
+        }
+            StepPreDefinedCurveFont font = (StepPreDefinedCurveFont) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDraughtingPreDefinedCurveFontTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingPreDefinedCurveFont)) {
+            return;
+        }
+            StepDraughtingPreDefinedCurveFont font = (StepDraughtingPreDefinedCurveFont) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedTextFontTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedTextFont)) {
+            return;
+        }
+            StepPreDefinedTextFont font = (StepPreDefinedTextFont) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDraughtingPreDefinedTextFontTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingPreDefinedTextFont)) {
+            return;
+        }
+            StepDraughtingPreDefinedTextFont font = (StepDraughtingPreDefinedTextFont) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, font, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, font, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedTerminatorSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedTerminatorSymbol)) {
+            return;
+        }
+            StepPreDefinedTerminatorSymbol symbol = (StepPreDefinedTerminatorSymbol) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedSymbol)) {
+            return;
+        }
+            StepPreDefinedSymbol symbol = (StepPreDefinedSymbol) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedDimensionSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedDimensionSymbol)) {
+            return;
+        }
+            StepPreDefinedDimensionSymbol symbol = (StepPreDefinedDimensionSymbol) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedGeometricalToleranceSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedGeometricalToleranceSymbol)) {
+            return;
+        }
+            StepPreDefinedGeometricalToleranceSymbol symbol = (StepPreDefinedGeometricalToleranceSymbol) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, symbol, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, symbol, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedItem)) {
+            return;
+        }
+            StepPreDefinedItem item = (StepPreDefinedItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAnnotationPlaneTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAnnotationPlane)) {
+            return;
+        }
+            StepAnnotationPlane plane = (StepAnnotationPlane) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
+            for (StepPresentationStyleAssignment style : plane.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+            }
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, plane.item(), resolved, instanceIdsByTargetId);
+            for (StepEntity element : plane.elements()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendDraughtingCalloutTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDraughtingCallout)) {
+            return;
+        }
+            StepDraughtingCallout callout = (StepDraughtingCallout) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, callout, instanceIdsByTargetId);
+            for (StepEntity content : callout.contents()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, content, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendPresentationLayerAssignmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPresentationLayerAssignment)) {
+            return;
+        }
+            StepPresentationLayerAssignment assignment = (StepPresentationLayerAssignment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assignment, instanceIdsByTargetId);
+            for (StepEntity item : assignment.assignedItems()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendStyledItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepStyledItem)) {
+            return;
+        }
+            StepStyledItem styledItem = (StepStyledItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
+            for (StepPresentationStyleAssignment style : styledItem.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+            }
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOverRidingStyledItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOverRidingStyledItem)) {
+            return;
+        }
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, styledItem, instanceIdsByTargetId);
+            for (StepPresentationStyleAssignment style : styledItem.styles()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, style, resolved, instanceIdsByTargetId);
+            }
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.item(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, styledItem.overRiddenStyle(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRepresentationMapTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRepresentationMap)) {
+            return;
+        }
+            StepRepresentationMap representationMap = (StepRepresentationMap) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
+            appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSymbolRepresentationMapTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSymbolRepresentationMap)) {
+            return;
+        }
+            StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
+            appendRepresentationMapDefinitionTargets(targetsByUsageId, identifiedItem, representationMap, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, representationMap, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendMappedItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepMappedItem)) {
+            return;
+        }
+            StepMappedItem mappedItem = (StepMappedItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingSource(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, mappedItem.mappingTarget(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, mappedItem, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendGeometricReplicaTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeometricReplica)) {
+            return;
+        }
+            StepGeometricReplica replica = (StepGeometricReplica) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, replica, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.parent(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, replica.transformation(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, replica, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendItemDefinedTransformationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepItemDefinedTransformation)) {
+            return;
+        }
+            StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem1(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.transformItem2(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCartesianTransformationOperatorTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCartesianTransformationOperator)) {
+            return;
+        }
+            StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, transformation, instanceIdsByTargetId);
+            if (transformation.axis1() != null) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis1(), resolved, instanceIdsByTargetId);
+            }
+            if (transformation.axis2() != null) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis2(), resolved, instanceIdsByTargetId);
+            }
+            if (transformation.axis3() != null) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.axis3(), resolved, instanceIdsByTargetId);
+            }
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, transformation.localOrigin(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, transformation, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAxis1PlacementTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAxis1Placement)) {
+            return;
+        }
+            StepAxis1Placement placement = (StepAxis1Placement) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAxis2Placement2DTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAxis2Placement2D)) {
+            return;
+        }
+            StepAxis2Placement2D placement = (StepAxis2Placement2D) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCartesianPointTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCartesianPoint)) {
+            return;
+        }
+            StepCartesianPoint point = (StepCartesianPoint) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPointTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPoint)) {
+            return;
+        }
+            StepPoint point = (StepPoint) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, point, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDirectionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDirection)) {
+            return;
+        }
+            StepDirection direction = (StepDirection) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, direction, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, direction, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendVectorTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepVector)) {
+            return;
+        }
+            StepVector vector = (StepVector) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vector, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vector.orientation(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vector, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAxis2Placement3DTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAxis2Placement3D)) {
+            return;
+        }
+            StepAxis2Placement3D placement = (StepAxis2Placement3D) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, placement, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.location(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.axis(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, placement.refDirection(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, placement, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPlaneTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPlane)) {
+            return;
+        }
+            StepPlane plane = (StepPlane) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, plane, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, plane.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, plane, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendGeometricSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeometricSet)) {
+            return;
+        }
+            StepGeometricSet set = (StepGeometricSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
+            for (StepEntity element : set.elements()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendGeometricCurveSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeometricCurveSet)) {
+            return;
+        }
+            StepGeometricCurveSet set = (StepGeometricCurveSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
+            for (StepEntity element : set.elements()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPointSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPointSet)) {
+            return;
+        }
+            StepPointSet set = (StepPointSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
+            for (StepEntity point : set.points()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPathTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPath)) {
+            return;
+        }
+            StepPath path = (StepPath) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
+            for (StepOrientedEdge edge : path.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOpenPathTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOpenPath)) {
+            return;
+        }
+            StepOpenPath path = (StepOpenPath) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
+            for (StepOrientedEdge edge : path.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedPathTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedPath)) {
+            return;
+        }
+            StepOrientedPath path = (StepOrientedPath) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.pathElement(), resolved, instanceIdsByTargetId);
+            for (StepOrientedEdge edge : path.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSubpathTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSubpath)) {
+            return;
+        }
+            StepSubpath path = (StepSubpath) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, path, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, path.parentPath(), resolved, instanceIdsByTargetId);
+            for (StepOrientedEdge edge : path.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, path, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEdgeLoopTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEdgeLoop)) {
+            return;
+        }
+            StepEdgeLoop loop = (StepEdgeLoop) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
+            for (StepOrientedEdge edge : loop.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPolyLoopTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPolyLoop)) {
+            return;
+        }
+            StepPolyLoop loop = (StepPolyLoop) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
+            for (StepCartesianPoint point : loop.polygon()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConnectedEdgeSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConnectedEdgeSet)) {
+            return;
+        }
+            StepConnectedEdgeSet set = (StepConnectedEdgeSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, set, instanceIdsByTargetId);
+            for (StepEntity edge : set.edges()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, set, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEdgeBasedWireframeModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEdgeBasedWireframeModel)) {
+            return;
+        }
+            StepEdgeBasedWireframeModel model = (StepEdgeBasedWireframeModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            for (StepConnectedEdgeSet boundary : model.boundaries()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendShellBasedWireframeModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShellBasedWireframeModel)) {
+            return;
+        }
+            StepShellBasedWireframeModel model = (StepShellBasedWireframeModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            for (StepEntity boundary : model.boundaries()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendWireShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepWireShell)) {
+            return;
+        }
+            StepWireShell shell = (StepWireShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            for (StepLoop loop : shell.loops()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendVertexShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepVertexShell)) {
+            return;
+        }
+            StepVertexShell shell = (StepVertexShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.extent(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendVertexLoopTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepVertexLoop)) {
+            return;
+        }
+            StepVertexLoop loop = (StepVertexLoop) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, loop, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, loop.loopVertex(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, loop, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedEdgeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedEdge)) {
+            return;
+        }
+            StepOrientedEdge edge = (StepOrientedEdge) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeElement(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEdgeCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEdgeCurve)) {
+            return;
+        }
+            StepEdgeCurve edge = (StepEdgeCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.start(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.end(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, edge.edgeGeometry(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendVertexPointTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepVertexPoint)) {
+            return;
+        }
+            StepVertexPoint vertex = (StepVertexPoint) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, vertex.point(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAdvancedFaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAdvancedFace)) {
+            return;
+        }
+            StepAdvancedFace face = (StepAdvancedFace) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
+            for (StepFaceBound bound : face.bounds()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendFaceSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepFaceSurface)) {
+            return;
+        }
+            StepFaceSurface face = (StepFaceSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceGeometry(), resolved, instanceIdsByTargetId);
+            for (StepFaceBound bound : face.bounds()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, bound, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedFaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedFace)) {
+            return;
+        }
+            StepOrientedFace face = (StepOrientedFace) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face.faceElement(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConnectedFaceSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConnectedFaceSet)) {
+            return;
+        }
+            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
+            for (StepFaceEntity face : faceSet.faces()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConnectedFaceSubSetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConnectedFaceSubSet)) {
+            return;
+        }
+            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, instanceIdsByTargetId);
+            for (StepFaceEntity face : faceSet.faces()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            }
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet.parentFaceSet(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOpenShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOpenShell)) {
+            return;
+        }
+            StepOpenShell shell = (StepOpenShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            for (StepFaceEntity face : shell.faces()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfacedOpenShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfacedOpenShell)) {
+            return;
+        }
+            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            for (StepFaceEntity face : shell.faces()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendClosedShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepClosedShell)) {
+            return;
+        }
+            StepClosedShell shell = (StepClosedShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            for (StepFaceEntity face : shell.faces()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedOpenShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedOpenShell)) {
+            return;
+        }
+            StepOrientedOpenShell shell = (StepOrientedOpenShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.openShellElement(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedClosedShellTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedClosedShell)) {
+            return;
+        }
+            StepOrientedClosedShell shell = (StepOrientedClosedShell) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shell, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell.closedShellElement(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendFaceBasedSurfaceModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepFaceBasedSurfaceModel)) {
+            return;
+        }
+            StepFaceBasedSurfaceModel model = (StepFaceBasedSurfaceModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            for (StepEntity faceSet : model.faceSets()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, faceSet, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendShellBasedSurfaceModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShellBasedSurfaceModel)) {
+            return;
+        }
+            StepShellBasedSurfaceModel model = (StepShellBasedSurfaceModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            for (StepEntity shell : model.shells()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, shell, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendManifoldSolidBrepTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepManifoldSolidBrep)) {
+            return;
+        }
+            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBrepWithVoidsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBrepWithVoids)) {
+            return;
+        }
+            StepBrepWithVoids solid = (StepBrepWithVoids) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.outer(), resolved, instanceIdsByTargetId);
+            for (StepEntity voidShell : solid.voids()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, voidShell, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSweptAreaSolidTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSweptAreaSolid)) {
+            return;
+        }
+            StepSweptAreaSolid solid = (StepSweptAreaSolid) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptArea(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.position(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweepReference(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSweptDiskSolidTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSweptDiskSolid)) {
+            return;
+        }
+            StepSweptDiskSolid solid = (StepSweptDiskSolid) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.sweptCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendComplexClippingResultTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepComplexClippingResult)) {
+            return;
+        }
+            StepComplexClippingResult solid = (StepComplexClippingResult) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.firstOperand(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.secondOperand(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSolidReplicaTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSolidReplica)) {
+            return;
+        }
+            StepSolidReplica solid = (StepSolidReplica) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.parentSolid(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.transformation(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendHalfSpaceSolidTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepHalfSpaceSolid)) {
+            return;
+        }
+            StepHalfSpaceSolid solid = (StepHalfSpaceSolid) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.baseSurface(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.enclosure(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCsgSolidTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCsgSolid)) {
+            return;
+        }
+            StepCsgSolid solid = (StepCsgSolid) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, solid, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, solid.treeRootExpression(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, solid, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCsgPrimitiveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCsgPrimitive)) {
+            return;
+        }
+            StepCsgPrimitive primitive = (StepCsgPrimitive) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, primitive, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, primitive.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, primitive, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendProfileDefTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProfileDef)) {
+            return;
+        }
+            StepProfileDef profile = (StepProfileDef) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, profile, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, profile.position(), resolved, instanceIdsByTargetId);
+            for (StepEntity curve : profile.curves()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, profile, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConicCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConicCurve)) {
+            return;
+        }
+            StepConicCurve curve = (StepConicCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBSplineCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBSplineCurve)) {
+            return;
+        }
+            StepBSplineCurve curve = (StepBSplineCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBSplineCurveWithKnotsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBSplineCurveWithKnots)) {
+            return;
+        }
+            StepBSplineCurveWithKnots curve = (StepBSplineCurveWithKnots) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRationalBSplineCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRationalBSplineCurve)) {
+            return;
+        }
+            StepRationalBSplineCurve curve = (StepRationalBSplineCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBezierCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBezierCurve)) {
+            return;
+        }
+            StepBezierCurve curve = (StepBezierCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendUniformCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepUniformCurve)) {
+            return;
+        }
+            StepUniformCurve curve = (StepUniformCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendQuasiUniformCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepQuasiUniformCurve)) {
+            return;
+        }
+            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPiecewiseBezierCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPiecewiseBezierCurve)) {
+            return;
+        }
+            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendSplineCurveControlPointTargets(targetsByUsageId, identifiedItem, curve.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendLineTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepLine)) {
+            return;
+        }
+            StepLine line = (StepLine) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, line, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.point(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, line.vector(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, line, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCircleTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCircle)) {
+            return;
+        }
+            StepCircle circle = (StepCircle) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, circle, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, circle.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, circle, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEllipseTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEllipse)) {
+            return;
+        }
+            StepEllipse ellipse = (StepEllipse) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, ellipse, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, ellipse.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, ellipse, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCurve)) {
+            return;
+        }
+            StepCurve curve = (StepCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPolylineTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPolyline)) {
+            return;
+        }
+            StepPolyline polyline = (StepPolyline) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, polyline, instanceIdsByTargetId);
+            for (StepCartesianPoint point : polyline.points()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, point, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, polyline, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTrimmedCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTrimmedCurve)) {
+            return;
+        }
+            StepTrimmedCurve curve = (StepTrimmedCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
+            for (StepValue trim : curve.trim1()) {
+                if (trim instanceof StepValue.ReferenceValue) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
+                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
+                }
+            }
+            for (StepValue trim : curve.trim2()) {
+                if (trim instanceof StepValue.ReferenceValue) {
+                    StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
+                    appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, resolved.get(ref.id()), resolved, instanceIdsByTargetId);
+                }
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOffsetCurve2DTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOffsetCurve2D)) {
+            return;
+        }
+            StepOffsetCurve2D curve = (StepOffsetCurve2D) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOffsetCurve3DTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOffsetCurve3D)) {
+            return;
+        }
+            StepOffsetCurve3D curve = (StepOffsetCurve3D) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisCurve(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.refDirection(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPcurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPcurve)) {
+            return;
+        }
+            StepPcurve curve = (StepPcurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDegeneratePcurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDegeneratePcurve)) {
+            return;
+        }
+            StepDegeneratePcurve curve = (StepDegeneratePcurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.basisSurface(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.referenceToCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceCurve)) {
+            return;
+        }
+            StepSurfaceCurve curve = (StepSurfaceCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
+            for (StepEntity associated : curve.associatedGeometry()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSeamCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSeamCurve)) {
+            return;
+        }
+            StepSeamCurve curve = (StepSeamCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, curve.curve3d(), resolved, instanceIdsByTargetId);
+            for (StepEntity associated : curve.associatedGeometry()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, associated, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCompositeCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCompositeCurve)) {
+            return;
+        }
+            StepCompositeCurve curve = (StepCompositeCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            for (StepCompositeCurveSegment segment : curve.segments()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCompositeCurveOnSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCompositeCurveOnSurface)) {
+            return;
+        }
+            StepCompositeCurveOnSurface curve = (StepCompositeCurveOnSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            for (StepCompositeCurveSegment segment : curve.segments()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCompositeCurveSegmentTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCompositeCurveSegment)) {
+            return;
+        }
+            StepCompositeCurveSegment segment = (StepCompositeCurveSegment) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, segment, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, segment.parentCurve(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, segment, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCylindricalSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCylindricalSurface)) {
+            return;
+        }
+            StepCylindricalSurface surface = (StepCylindricalSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConicalSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConicalSurface)) {
+            return;
+        }
+            StepConicalSurface surface = (StepConicalSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSphericalSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSphericalSurface)) {
+            return;
+        }
+            StepSphericalSurface surface = (StepSphericalSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendToroidalSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepToroidalSurface)) {
+            return;
+        }
+            StepToroidalSurface surface = (StepToroidalSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.position(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceOfLinearExtrusionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceOfLinearExtrusion)) {
+            return;
+        }
+            StepSurfaceOfLinearExtrusion surface = (StepSurfaceOfLinearExtrusion) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.extrusionAxis(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceOfRevolutionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceOfRevolution)) {
+            return;
+        }
+            StepSurfaceOfRevolution surface = (StepSurfaceOfRevolution) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.sweptCurve(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.axisPosition(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRectangularTrimmedSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRectangularTrimmedSurface)) {
+            return;
+        }
+            StepRectangularTrimmedSurface surface = (StepRectangularTrimmedSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCurveBoundedSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCurveBoundedSurface)) {
+            return;
+        }
+            StepCurveBoundedSurface surface = (StepCurveBoundedSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
+            for (StepEntity boundary : surface.boundaries()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boundary, resolved, instanceIdsByTargetId);
+            }
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOrientedSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOrientedSurface)) {
+            return;
+        }
+            StepOrientedSurface surface = (StepOrientedSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.surfaceElement(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendOffsetSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepOffsetSurface)) {
+            return;
+        }
+            StepOffsetSurface surface = (StepOffsetSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, surface.basisSurface(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBSplineSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBSplineSurface)) {
+            return;
+        }
+            StepBSplineSurface surface = (StepBSplineSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBSplineSurfaceWithKnotsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBSplineSurfaceWithKnots)) {
+            return;
+        }
+            StepBSplineSurfaceWithKnots surface = (StepBSplineSurfaceWithKnots) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRationalBSplineSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRationalBSplineSurface)) {
+            return;
+        }
+            StepRationalBSplineSurface surface = (StepRationalBSplineSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBezierSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBezierSurface)) {
+            return;
+        }
+            StepBezierSurface surface = (StepBezierSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendUniformSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepUniformSurface)) {
+            return;
+        }
+            StepUniformSurface surface = (StepUniformSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendQuasiUniformSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepQuasiUniformSurface)) {
+            return;
+        }
+            StepQuasiUniformSurface surface = (StepQuasiUniformSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPiecewiseBezierSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPiecewiseBezierSurface)) {
+            return;
+        }
+            StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendSplineSurfaceControlPointTargets(targetsByUsageId, identifiedItem, surface.controlPoints(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendFaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepFace)) {
+            return;
+        }
+            StepFace face = (StepFace) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, face, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, face, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBoundedCurveTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBoundedCurve)) {
+            return;
+        }
+            StepBoundedCurve curve = (StepBoundedCurve) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, curve, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, curve, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBoundedSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBoundedSurface)) {
+            return;
+        }
+            StepBoundedSurface surface = (StepBoundedSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurface)) {
+            return;
+        }
+            StepSurface surface = (StepSurface) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, surface, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, surface, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendMeasureRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepMeasureRepresentationItem)) {
+            return;
+        }
+            StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item.unit(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDescriptiveRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDescriptiveRepresentationItem)) {
+            return;
+        }
+            StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendValueRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepValueRepresentationItem)) {
+            return;
+        }
+            StepValueRepresentationItem item = (StepValueRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSurfaceModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSurfaceModel)) {
+            return;
+        }
+            StepSurfaceModel model = (StepSurfaceModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendSolidModelTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepSolidModel)) {
+            return;
+        }
+            StepSolidModel model = (StepSolidModel) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, model, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, model, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRepresentationItem)) {
+            return;
+        }
+            StepRepresentationItem item = (StepRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendGeometricRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeometricRepresentationItem)) {
+            return;
+        }
+            StepGeometricRepresentationItem item = (StepGeometricRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTopologicalRepresentationItemTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTopologicalRepresentationItem)) {
+            return;
+        }
+            StepTopologicalRepresentationItem item = (StepTopologicalRepresentationItem) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendMeasureWithUnitTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepMeasureWithUnit)) {
+            return;
+        }
+            StepMeasureWithUnit measure = (StepMeasureWithUnit) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendTypedMeasureWithUnitTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepTypedMeasureWithUnit)) {
+            return;
+        }
+            StepTypedMeasureWithUnit measure = (StepTypedMeasureWithUnit) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendUncertaintyMeasureWithUnitTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepUncertaintyMeasureWithUnit)) {
+            return;
+        }
+            StepUncertaintyMeasureWithUnit measure = (StepUncertaintyMeasureWithUnit) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, measure, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, measure.unitComponent(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, measure, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConversionBasedUnitTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConversionBasedUnit)) {
+            return;
+        }
+            StepConversionBasedUnit unit = (StepConversionBasedUnit) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendConversionBasedUnitWithOffsetTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepConversionBasedUnitWithOffset)) {
+            return;
+        }
+            StepConversionBasedUnitWithOffset unit = (StepConversionBasedUnitWithOffset) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit.conversionFactor(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDerivedUnitTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDerivedUnit)) {
+            return;
+        }
+            StepDerivedUnit unit = (StepDerivedUnit) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            for (StepDerivedUnitElement element : unit.elements()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendDerivedUnitElementTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDerivedUnitElement)) {
+            return;
+        }
+            StepDerivedUnitElement element = (StepDerivedUnitElement) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, element, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, element.unit(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendGeometricRepresentationContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGeometricRepresentationContext)) {
+            return;
+        }
+            StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
+            if (context.globalUnitAssignedContext() != null) {
+                appendNestedDefinitionTargets(
+                        targetsByUsageId,
+                        identifiedItem,
+                        context.globalUnitAssignedContext(),
+                        resolved,
+                        instanceIdsByTargetId
+                );
+            }
+            if (context.globalUncertaintyAssignedContext() != null) {
+                appendNestedDefinitionTargets(
+                        targetsByUsageId,
+                        identifiedItem,
+                        context.globalUncertaintyAssignedContext(),
+                        resolved,
+                        instanceIdsByTargetId
+                );
+            }
+    }
+
+
+    private static void appendGlobalUnitAssignedContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGlobalUnitAssignedContext)) {
+            return;
+        }
+            StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
+            for (StepEntity unit : context.units()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, unit, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendGlobalUncertaintyAssignedContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepGlobalUncertaintyAssignedContext)) {
+            return;
+        }
+            StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
+            for (StepUncertaintyMeasureWithUnit uncertainty : context.uncertainties()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, uncertainty, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendAddressTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAddress)) {
+            return;
+        }
+            StepAddress address = (StepAddress) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, address, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, address, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendCharacterizedObjectTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepCharacterizedObject)) {
+            return;
+        }
+            StepCharacterizedObject characterizedObject = (StepCharacterizedObject) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, characterizedObject, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, characterizedObject, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendDimensionalExponentsTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepDimensionalExponents)) {
+            return;
+        }
+            StepDimensionalExponents exponents = (StepDimensionalExponents) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, exponents, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, exponents, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendVertexTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepVertex)) {
+            return;
+        }
+            StepVertex vertex = (StepVertex) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, vertex, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, vertex, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendEdgeTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepEdge)) {
+            return;
+        }
+            StepEdge edge = (StepEdge) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, edge, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, edge, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendAbstractVariableTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAbstractVariable)) {
+            return;
+        }
+            StepAbstractVariable variable = (StepAbstractVariable) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    variable.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRowVariableTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRowVariable)) {
+            return;
+        }
+            StepRowVariable variable = (StepRowVariable) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    variable.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendScalarVariableTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepScalarVariable)) {
+            return;
+        }
+            StepScalarVariable variable = (StepScalarVariable) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    variable.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendForwardChainingRulePremiseTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepForwardChainingRulePremise)) {
+            return;
+        }
+            StepForwardChainingRulePremise variable = (StepForwardChainingRulePremise) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    variable.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBackChainingRuleBodyTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBackChainingRuleBody)) {
+            return;
+        }
+            StepBackChainingRuleBody variable = (StepBackChainingRuleBody) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, variable, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    variable.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, variable.definition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPropertyDefinitionRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPropertyDefinitionRepresentation)) {
+            return;
+        }
+            StepPropertyDefinitionRepresentation link = (StepPropertyDefinitionRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendActionPropertyRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepActionPropertyRepresentation)) {
+            return;
+        }
+            StepActionPropertyRepresentation link = (StepActionPropertyRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendContactRatioRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepContactRatioRepresentation)) {
+            return;
+        }
+            StepContactRatioRepresentation link = (StepContactRatioRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendKinematicPropertyDefinitionRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepKinematicPropertyDefinitionRepresentation)) {
+            return;
+        }
+            StepKinematicPropertyDefinitionRepresentation link = (StepKinematicPropertyDefinitionRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendKinematicPropertyMechanismRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepKinematicPropertyMechanismRepresentation)) {
+            return;
+        }
+            StepKinematicPropertyMechanismRepresentation link = (StepKinematicPropertyMechanismRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendKinematicPropertyRepresentationRelationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepKinematicPropertyRepresentationRelation)) {
+            return;
+        }
+            StepKinematicPropertyRepresentationRelation link = (StepKinematicPropertyRepresentationRelation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendKinematicPropertyTopologyRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepKinematicPropertyTopologyRepresentation)) {
+            return;
+        }
+            StepKinematicPropertyTopologyRepresentation link = (StepKinematicPropertyTopologyRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendResourcePropertyRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepResourcePropertyRepresentation)) {
+            return;
+        }
+            StepResourcePropertyRepresentation link = (StepResourcePropertyRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, link.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendAttributeAssertionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepAttributeAssertion)) {
+            return;
+        }
+            StepAttributeAssertion assertion = (StepAttributeAssertion) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, assertion, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, assertion.definition(), resolved, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    assertion.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendShapeDefinitionRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShapeDefinitionRepresentation)) {
+            return;
+        }
+            StepShapeDefinitionRepresentation link = (StepShapeDefinitionRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, link, instanceIdsByTargetId);
+            appendAttachedRepresentationRelationshipTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    link.usedRepresentation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendApplicationProtocolDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApplicationProtocolDefinition)) {
+            return;
+        }
+            StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, protocolDefinition.application(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendProductContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductContext)) {
+            return;
+        }
+            StepProductContext productContext = (StepProductContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productContext, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productContext, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productContext.frameOfReference(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendProductDefinitionContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductDefinitionContext)) {
+            return;
+        }
+            StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionContext, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionContext.frameOfReference(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendApplicationContextTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepApplicationContext)) {
+            return;
+        }
+            StepApplicationContext applicationContext = (StepApplicationContext) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, applicationContext, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, applicationContext, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendProductRelatedProductCategoryTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductRelatedProductCategory)) {
+            return;
+        }
+            StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relatedCategory, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, relatedCategory, resolved, instanceIdsByTargetId);
+            for (StepProduct product : relatedCategory.products()) {
+                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, product, resolved, instanceIdsByTargetId);
+            }
+    }
+
+
+    private static void appendProductDefinitionEffectivityDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepProductDefinitionEffectivity)) {
+            return;
+        }
+            StepProductDefinitionEffectivity effectivity = (StepProductDefinitionEffectivity) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, effectivity.productDefinition(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendRepresentationRelationshipTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRepresentationRelationship)) {
+            return;
+        }
+            StepRepresentationRelationship relationship = (StepRepresentationRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
+                appendPmiTarget(
+                        targetsByUsageId,
+                        identifiedItem.id(),
+                        target,
+                        instanceIdsByTargetId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        definitionTypeName(relationship),
+                        relationship.id()
+                );
+            }
+    }
+
+
+    private static void appendShapeRepresentationRelationshipTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepShapeRepresentationRelationship)) {
+            return;
+        }
+            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            for (StepEntity target : collectRepresentationTargetsFromRelationship(relationship)) {
+                appendPmiTarget(
+                        targetsByUsageId,
+                        identifiedItem.id(),
+                        target,
+                        instanceIdsByTargetId,
+                        null,
+                        null,
+                        null,
+                        null,
+                        definitionTypeName(relationship),
+                        relationship.id()
+                );
+            }
+    }
+
+
+    private static void appendContextDependentShapeRepresentationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepContextDependentShapeRepresentation)) {
+            return;
+        }
+            StepContextDependentShapeRepresentation shapeRepresentation = (StepContextDependentShapeRepresentation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, shapeRepresentation, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    shapeRepresentation.representationRelationship(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+            appendNestedDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    shapeRepresentation.representedProductRelation(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendRepresentationRelationshipWithTransformationTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepRepresentationRelationshipWithTransformation)) {
+            return;
+        }
+            StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, relationship, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(
+                    targetsByUsageId,
+                    identifiedItem,
+                    relationship.transformationOperator(),
+                    resolved,
+                    instanceIdsByTargetId
+            );
+    }
+
+
+    private static void appendBoxDomainTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBoxDomain)) {
+            return;
+        }
+            StepBoxDomain boxDomain = (StepBoxDomain) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, boxDomain.corner(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBooleanClippingResultTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBooleanClippingResult)) {
+            return;
+        }
+            StepBooleanClippingResult result = (StepBooleanClippingResult) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendBooleanResultTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepBooleanResult)) {
+            return;
+        }
+            StepBooleanResult result = (StepBooleanResult) definition;
+            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, result, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.firstOperand(), resolved, instanceIdsByTargetId);
+            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, result.secondOperand(), resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedMarkerTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedMarker)) {
+            return;
+        }
+            StepPreDefinedMarker marker = (StepPreDefinedMarker) definition;
+            appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
+    }
+
+
+    private static void appendPreDefinedPointMarkerSymbolTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        if (!(definition instanceof StepPreDefinedPointMarkerSymbol)) {
+            return;
+        }
+            StepPreDefinedPointMarkerSymbol marker = (StepPreDefinedPointMarkerSymbol) definition;
+            appendPointMarkerStyleTargets(targetsByUsageId, identifiedItem, marker.id(), resolved, instanceIdsByTargetId);
+            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, marker, resolved, instanceIdsByTargetId);
     }
 
 
