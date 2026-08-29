@@ -365,11 +365,7 @@ final class MeshTriangulatorParametric {
                 }
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return approximateUv(point, previous, 96, 64,
-                            0.0, Math.PI * 2.0,
-                            -4.0, 4.0,
-                            true,
-                            (u, v) -> revolution.pointAt(v, u));
+                    return projectRevolutionUv(revolution, point, previous);
                 }
                 @Override
                 public Double uPeriod() {
@@ -390,11 +386,7 @@ final class MeshTriangulatorParametric {
                 }
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return approximateUv(point, previous, 64, 48,
-                            -4.0, 4.0,
-                            0.0, 1.0,
-                            false,
-                            extrusion::pointAt);
+                    return projectExtrusionUv(extrusion, point, previous);
                 }
             };
         }
@@ -402,6 +394,170 @@ final class MeshTriangulatorParametric {
     }
 
     // --- UV approximation ---
+
+    /** Generatrix-parameter window scanned when a grid fallback is needed. */
+    private static final double GENERATRIX_MIN = -4.0;
+    private static final double GENERATRIX_MAX = 4.0;
+    private static final int GENERATRIX_STEPS = 96;
+    private static final double TWO_PI = Math.PI * 2.0;
+
+    /**
+     * Projects a point onto a surface of revolution without a 2D grid scan.
+     *
+     * <p>For a generatrix point C(s), the revolving circle is centered on the
+     * axis at height z(s) with radius r(s), so the squared distance from the
+     * target to that circle is (r(s) - r)^2 + (z(s) - z)^2 — a 1D minimization
+     * over s. The angle is then an atan2 in the generatrix's radial frame,
+     * matching the moving reference frame used by
+     * {@link SurfaceOfRevolution3#pointAt(double, double)}. Falls back to the
+     * grid search when the closed-form result fails to reproduce on the surface.
+     */
+    private static UvPoint projectRevolutionUv(
+            SurfaceOfRevolution3 revolution, CartesianPoint point, UvPoint previous) {
+        Vector3 axis = revolution.axisDirection().asVector();
+        double axisNorm = axis.norm();
+        if (axisNorm < 1e-12) {
+            return approximateUv(point, previous, 96, 64,
+                    0.0, TWO_PI, GENERATRIX_MIN, GENERATRIX_MAX, true,
+                    (u, v) -> revolution.pointAt(v, u));
+        }
+        axis = axis.scale(1.0 / axisNorm);
+        CartesianPoint origin = revolution.axisOrigin();
+        Vector3 offset = point.subtract(origin);
+        double axialP = offset.dot(axis);
+        Vector3 radialP = offset.subtract(axis.scale(axialP));
+        double radiusP = radialP.norm();
+
+        Curve3 generatrix = revolution.sweptCurve();
+        double bestS = GENERATRIX_MIN;
+        double bestDistanceSq = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= GENERATRIX_STEPS; i++) {
+            double s = GENERATRIX_MIN + (GENERATRIX_MAX - GENERATRIX_MIN) * i / GENERATRIX_STEPS;
+            double distanceSq = revolutionCircleDistanceSq(generatrix, origin, axis, s, axialP, radiusP);
+            if (distanceSq < bestDistanceSq) {
+                bestDistanceSq = distanceSq;
+                bestS = s;
+            }
+        }
+        double radius = (GENERATRIX_MAX - GENERATRIX_MIN) / GENERATRIX_STEPS;
+        for (int pass = 0; pass < 3; pass++) {
+            for (int k = -4; k <= 4; k++) {
+                double s = clamp(bestS + radius * k / 4.0, GENERATRIX_MIN, GENERATRIX_MAX);
+                double distanceSq = revolutionCircleDistanceSq(generatrix, origin, axis, s, axialP, radiusP);
+                if (distanceSq < bestDistanceSq) {
+                    bestDistanceSq = distanceSq;
+                    bestS = s;
+                }
+            }
+            radius /= 8.0;
+        }
+
+        double angle = revolutionAngleAt(generatrix, origin, axis, bestS, radialP, radiusP, previous);
+        double u = wrapPeriodic(angle, TWO_PI);
+        if (previous != null) {
+            u = unwrapPeriodic(u, previous.u(), TWO_PI);
+        }
+        UvPoint candidate = new UvPoint(u, bestS);
+        double actual = revolution.pointAt(bestS, u).distanceTo(point);
+        if (actual > Math.sqrt(bestDistanceSq) + 1e-6 * (1.0 + Math.sqrt(bestDistanceSq))) {
+            return approximateUv(point, previous, 96, 64,
+                    0.0, TWO_PI, GENERATRIX_MIN, GENERATRIX_MAX, true,
+                    (a, b) -> revolution.pointAt(b, a));
+        }
+        return candidate;
+    }
+
+    /** Squared distance from the target (axialP, radiusP) to the revolving circle at generatrix parameter s. */
+    private static double revolutionCircleDistanceSq(
+            Curve3 generatrix, CartesianPoint origin, Vector3 axis, double s, double axialP, double radiusP) {
+        Vector3 offset = generatrix.pointAt(s).subtract(origin);
+        double axial = offset.dot(axis);
+        double radial = offset.subtract(axis.scale(axial)).norm();
+        double dAxial = axial - axialP;
+        double dRadial = radial - radiusP;
+        return dAxial * dAxial + dRadial * dRadial;
+    }
+
+    /**
+     * Revolution angle of the target around the axis, measured in the same
+     * generatrix-relative frame {@link SurfaceOfRevolution3#pointAt(double, double)} uses.
+     */
+    private static double revolutionAngleAt(
+            Curve3 generatrix, CartesianPoint origin, Vector3 axis, double s,
+            Vector3 radialP, double radiusP, UvPoint previous) {
+        if (radiusP < 1e-12) {
+            return previous != null ? previous.u() : 0.0;
+        }
+        Vector3 offset = generatrix.pointAt(s).subtract(origin);
+        Vector3 axial = axis.scale(offset.dot(axis));
+        Vector3 radialC = offset.subtract(axial);
+        if (radialC.norm() < 1e-12) {
+            return previous != null ? previous.u() : 0.0;
+        }
+        Vector3 perp1 = radialC.normalize();
+        Vector3 perp2 = axis.cross(perp1).normalize();
+        Vector3 targetDir = radialP.scale(1.0 / radiusP);
+        return Math.atan2(targetDir.dot(perp2), targetDir.dot(perp1));
+    }
+
+    /**
+     * Projects a point onto a surface of linear extrusion without a 2D grid
+     * scan: for a fixed generatrix parameter s the extrusion segment is the
+     * straight line C(s) + t·direction (t in [0,1]), whose closest point to the
+     * target is closed-form, leaving a 1D minimization over s. Falls back to
+     * the grid search when the closed-form result fails to reproduce.
+     */
+    private static UvPoint projectExtrusionUv(
+            SurfaceOfLinearExtrusion3 extrusion, CartesianPoint point, UvPoint previous) {
+        Vector3 direction = extrusion.extrusionVector();
+        double directionSq = direction.dot(direction);
+        if (directionSq < 1e-24) {
+            return approximateUv(point, previous, 64, 48,
+                    GENERATRIX_MIN, GENERATRIX_MAX, 0.0, 1.0, false, extrusion::pointAt);
+        }
+        Curve3 generatrix = extrusion.sweptCurve();
+        double bestS = GENERATRIX_MIN;
+        double bestT = 0.0;
+        double bestDistanceSq = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= GENERATRIX_STEPS; i++) {
+            double s = GENERATRIX_MIN + (GENERATRIX_MAX - GENERATRIX_MIN) * i / GENERATRIX_STEPS;
+            double[] closest = extrusionSegmentClosest(generatrix, direction, directionSq, s, point);
+            if (closest[1] < bestDistanceSq) {
+                bestDistanceSq = closest[1];
+                bestS = s;
+                bestT = closest[0];
+            }
+        }
+        double radius = (GENERATRIX_MAX - GENERATRIX_MIN) / GENERATRIX_STEPS;
+        for (int pass = 0; pass < 3; pass++) {
+            for (int k = -4; k <= 4; k++) {
+                double s = clamp(bestS + radius * k / 4.0, GENERATRIX_MIN, GENERATRIX_MAX);
+                double[] closest = extrusionSegmentClosest(generatrix, direction, directionSq, s, point);
+                if (closest[1] < bestDistanceSq) {
+                    bestDistanceSq = closest[1];
+                    bestS = s;
+                    bestT = closest[0];
+                }
+            }
+            radius /= 8.0;
+        }
+        UvPoint candidate = new UvPoint(bestS, bestT);
+        double actual = extrusion.pointAt(bestS, bestT).distanceTo(point);
+        if (actual > Math.sqrt(bestDistanceSq) + 1e-6 * (1.0 + Math.sqrt(bestDistanceSq))) {
+            return approximateUv(point, previous, 64, 48,
+                    GENERATRIX_MIN, GENERATRIX_MAX, 0.0, 1.0, false, extrusion::pointAt);
+        }
+        return candidate;
+    }
+
+    /** Returns {t, distanceSquared} for the closest point on the segment C(s) + t·direction, t clamped to [0,1]. */
+    private static double[] extrusionSegmentClosest(
+            Curve3 generatrix, Vector3 direction, double directionSq, double s, CartesianPoint point) {
+        Vector3 offset = point.subtract(generatrix.pointAt(s));
+        double t = clamp(offset.dot(direction) / directionSq, 0.0, 1.0);
+        Vector3 delta = offset.subtract(direction.scale(t));
+        return new double[] {t, delta.normSquared()};
+    }
 
     private static UvPoint approximateUv(
             CartesianPoint point,
