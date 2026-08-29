@@ -784,6 +784,9 @@ public final class StepEntityResolver {
   final Map<Integer, StepEntityInstance> instancesById;
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
   private final Deque<Integer> resolutionStack = new ArrayDeque<>();
+  // O(1) mirror of resolutionStack for cycle detection; ArrayDeque.contains
+  // would be O(depth) on every resolve call.
+  private final Set<Integer> onResolutionStack = new HashSet<>();
   private final StepTopologyResolver topologyResolver;
   private final StepProductResolver productResolver;
   private final GeometryResolver geometryResolver;
@@ -880,6 +883,9 @@ public final class StepEntityResolver {
 
     EntityFactory factory = resolveFactory(instance);
     if (factory != null) {
+      if (!onResolutionStack.add(id)) {
+        throw new StepResolutionException(circularReferenceMessage(id));
+      }
       resolutionStack.push(id);
       try {
         StepEntity entity = factory.create(this, instance);
@@ -887,11 +893,21 @@ public final class StepEntityResolver {
         return entity;
       } finally {
         resolutionStack.pop();
+        onResolutionStack.remove(id);
       }
     }
 
     throw new UnsupportedStepEntityException(
         "unsupported STEP entity #" + instance.id() + " " + instance.name());
+  }
+
+  private String circularReferenceMessage(int id) {
+    StringBuilder path = new StringBuilder();
+    for (Iterator<Integer> it = resolutionStack.descendingIterator(); it.hasNext(); ) {
+      path.append('#').append(it.next()).append(" -> ");
+    }
+    path.append('#').append(id);
+    return "circular reference while resolving entity #" + id + " (resolution path: " + path + ")";
   }
 
   static EntityFactory resolveFactory(StepEntityInstance instance) {

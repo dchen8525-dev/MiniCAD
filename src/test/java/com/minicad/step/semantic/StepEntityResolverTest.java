@@ -523,6 +523,41 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldRejectSelfReferencingEntityWithCircularReference() {
+        String step =
+        "DATA;\n"
+        + "#1=EDGE_LOOP('',(#1));\n"
+        + "ENDSEC;";
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "circular reference while resolving entity #1 (resolution path: #1 -> #1)",
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectMutuallyReferencingEntitiesWithCircularReference() {
+        String step =
+        "DATA;\n"
+        + "#1=EDGE_LOOP('',(#2));\n"
+        + "#2=EDGE_LOOP('',(#1));\n"
+        + "ENDSEC;";
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step))
+        );
+
+        assertEquals(
+                "circular reference while resolving entity #1 (resolution path: #1 -> #2 -> #1)",
+                exception.getMessage());
+    }
+
+    @Test
     void shouldRejectWrongParameterCountWithEntityContext() {
         String step =
         "DATA;\n"
