@@ -247,7 +247,8 @@
                 </configuration>
             </plugin>
 
-            <!-- Code formatter -->
+            <!-- Code formatter: scoped to all hand-written sources (generated
+                 step.model and ANTLR output excluded). check runs in verify. -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -255,12 +256,7 @@
                 <configuration>
                     <java>
                         <includes>
-                            <include>src/main/java/com/minicad/app/**/*.java</include>
-                            <include>src/main/java/com/minicad/common/**/*.java</include>
-                            <include>src/main/java/com/minicad/geometry/**/*.java</include>
-                            <include>src/main/java/com/minicad/geometry2d/**/*.java</include>
-                            <include>src/main/java/com/minicad/topology/**/*.java</include>
-                            <include>src/main/java/com/minicad/tools/**/*.java</include>
+                            <include>src/main/java/**/*.java</include>
                             <include>src/test/java/**/*.java</include>
                         </includes>
                         <excludes>
@@ -271,6 +267,15 @@
                         <endWithNewline/>
                     </java>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>spotless-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Forbidden APIs check -->
@@ -280,7 +285,7 @@
                 <version>${forbiddenapis.version}</version>
                 <configuration>
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                    <failOnViolation>false</failOnViolation>
+                    <failOnViolation>true</failOnViolation>
                     <bundledSignatures>
                         <bundledSignature>jdk-deprecated</bundledSignature>
                     </bundledSignatures>

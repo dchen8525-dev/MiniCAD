@@ -370,7 +370,7 @@ public final class StepAssemblyGraphBuilder {
         };
     }
 
-    
+
 public static final class AssemblyGraph {
     private final List<AssemblyRepresentation> representations;
     private final List<AssemblyNode> nodes;

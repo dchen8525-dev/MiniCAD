@@ -6359,7 +6359,7 @@ public final class StepEntityResolver {
       String curveForm() { return curveForm; }
       boolean closedCurve() { return closedCurve; }
       boolean selfIntersect() { return selfIntersect; }
-      
+
       // Java Bean getters
       String getName() { return name; }
       int getDegree() { return degree; }
@@ -6402,7 +6402,7 @@ public final class StepEntityResolver {
       boolean uClosed() { return uClosed; }
       boolean vClosed() { return vClosed; }
       boolean selfIntersect() { return selfIntersect; }
-      
+
       // Java Bean getters
       String getName() { return name; }
       int getUDegree() { return uDegree; }

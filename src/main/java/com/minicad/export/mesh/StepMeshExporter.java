@@ -52,7 +52,7 @@ public final class StepMeshExporter {
     }
 
     // --- Semantic face processing methods (used by Triangulator and MeshTriangulatorParametric) ---
-    
+
     static StepEntity semanticFaceGeometry(com.minicad.step.model.StepFaceEntity stepFace) {
         if (stepFace instanceof com.minicad.step.model.StepAdvancedFace) {
             com.minicad.step.model.StepAdvancedFace advancedFace = (com.minicad.step.model.StepAdvancedFace) stepFace;
@@ -68,7 +68,7 @@ public final class StepMeshExporter {
         }
         throw new IllegalArgumentException("unsupported face subtype");
     }
-    
+
     static boolean semanticFaceSameSense(com.minicad.step.model.StepFaceEntity stepFace) {
         if (stepFace instanceof com.minicad.step.model.StepAdvancedFace) {
             com.minicad.step.model.StepAdvancedFace advancedFace = (com.minicad.step.model.StepAdvancedFace) stepFace;
@@ -85,7 +85,7 @@ public final class StepMeshExporter {
         }
         throw new IllegalArgumentException("unsupported face subtype");
     }
-    
+
     static SurfaceGeometry buildSemanticSurfaceGeometry(StepEntity geometry, StepCadBuilder builder) {
         if (geometry instanceof com.minicad.step.model.StepPlane) {
             com.minicad.step.model.StepPlane plane = (com.minicad.step.model.StepPlane) geometry;
@@ -176,7 +176,7 @@ public final class StepMeshExporter {
         }
         return null;
     }
-    
+
     private static SurfaceGeometry offsetSemanticSurfaceGeometry(SurfaceGeometry base, double distance) {
         if (base == null) {
             return null;
@@ -212,7 +212,7 @@ public final class StepMeshExporter {
         }
         return null;
     }
-    
+
     private static ConicalSurface offsetConicalSurface(ConicalSurface conicalSurface, double distance) {
         double semiAngle = conicalSurface.semiAngle();
         double radialOffset = distance * Math.cos(semiAngle);
@@ -226,7 +226,7 @@ public final class StepMeshExporter {
                 conicalSurface.radius() + radialOffset,
                 semiAngle);
     }
-    
+
     private static SurfaceGeometry transformSemanticSurfaceGeometry(
             SurfaceGeometry surface,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -291,7 +291,7 @@ public final class StepMeshExporter {
         }
         return null;
     }
-    
+
     private static Curve3 transformSemanticCurve3(
             Curve3 curve,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -379,7 +379,7 @@ public final class StepMeshExporter {
         }
         return null;
     }
-    
+
     private static Axis2Placement3D transformPlacement(
             Axis2Placement3D placement,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -390,7 +390,7 @@ public final class StepMeshExporter {
                 transformDirection3(placement.axis(), transformation, builder),
                 transformDirection3(placement.refDirection(), transformation, builder));
     }
-    
+
     static CartesianPoint transformPoint3(
             CartesianPoint point,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -405,7 +405,7 @@ public final class StepMeshExporter {
                 .add(basisZ.scale(point.z() * scale));
         return builder.buildPoint(transformation.localOrigin().id()).add(offset);
     }
-    
+
     private static Direction3 transformDirection3(
             Direction3 direction,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -420,7 +420,7 @@ public final class StepMeshExporter {
                         .add(basisY.scale(source.y()))
                         .add(basisZ.scale(source.z())));
     }
-    
+
     private static Vector3 transformVector3(
             Vector3 vector,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
@@ -434,7 +434,7 @@ public final class StepMeshExporter {
                 .add(basisY.scale(vector.y() * scale))
                 .add(basisZ.scale(vector.z() * scale));
     }
-    
+
     private static Vector3 transformAxis1_3(
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
@@ -443,7 +443,7 @@ public final class StepMeshExporter {
                 ? new Vector3(1.0, 0.0, 0.0)
                 : builder.buildDirection(transformation.axis1().id()).asVector();
     }
-    
+
     private static Vector3 transformAxis2OrDefault3(
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             Vector3 axis1,
@@ -455,7 +455,7 @@ public final class StepMeshExporter {
         Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
         return axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
     }
-    
+
     private static Vector3 transformAxis3OrDefault3(
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             Vector3 axis1,
@@ -468,11 +468,11 @@ public final class StepMeshExporter {
         Vector3 cross = axis1.cross(axis2);
         return cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
     }
-    
+
     private static double transformationScale(com.minicad.step.model.StepCartesianTransformationOperator transformation) {
         return transformation.scale() == null ? 1.0 : transformation.scale();
     }
-    
+
     /**
      * Exports STEP text to OBJ format.
      */

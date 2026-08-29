@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * Curve 2D builder - sample extraction from StepCadBuilder.
  * Demonstrates the refactoring pattern for extracting specialized builders.
- * 
+ *
  * This class shows how 2D curve build methods can be extracted into dedicated
  * builder classes, reducing the size of the main StepCadBuilder (7429 lines).
  * Full extraction would include all 2D curve build methods.
- * 
- * Note: This is a sample extraction showing the pattern. The actual build 
+ *
+ * Note: This is a sample extraction showing the pattern. The actual build
  * methods in StepCadBuilder use caching maps. For full extraction, those
  * caches would need to be moved or shared.
  */
@@ -65,7 +65,7 @@ final class StepCurve2DBuilder {
    */
   Line2 buildLine2(int id) {
     StepLine line = builder.requireEntity(id, StepLine.class, "LINE");
-    if (line.point().coordinates().size() != 2 
+    if (line.point().coordinates().size() != 2
         || line.vector().isOrientation().directionRatios().size() != 2) {
       throw new StepResolutionException("entity #" + id + " is not a 2D LINE");
     }
@@ -83,12 +83,12 @@ final class StepCurve2DBuilder {
     StepCircle circle = builder.requireEntity(id, StepCircle.class, "CIRCLE");
     // Get placement - can be 2D or 3D
     StepEntity position = circle.position();
-    
+
     if (position instanceof StepAxis2Placement2D) {
       StepAxis2Placement2D placement2d = (StepAxis2Placement2D) position;
       Point2 center = buildPoint2(placement2d.getLocation().id());
-      Direction2 xDir = placement2d.getRefDirection() != null 
-          ? buildDirection2(placement2d.getRefDirection().id()) 
+      Direction2 xDir = placement2d.getRefDirection() != null
+          ? buildDirection2(placement2d.getRefDirection().id())
           : Direction2.xAxis();
       double radius = circle.radius();
       if (radius <= 0) {
@@ -118,12 +118,12 @@ final class StepCurve2DBuilder {
   Ellipse2 buildEllipse2(int id) {
     StepEllipse ellipse = builder.requireEntity(id, StepEllipse.class, "ELLIPSE");
     StepEntity position = ellipse.position();
-    
+
     if (position instanceof StepAxis2Placement2D) {
       StepAxis2Placement2D placement2d = (StepAxis2Placement2D) position;
       Point2 center = buildPoint2(placement2d.getLocation().id());
-      Direction2 xDir = placement2d.getRefDirection() != null 
-          ? buildDirection2(placement2d.getRefDirection().id()) 
+      Direction2 xDir = placement2d.getRefDirection() != null
+          ? buildDirection2(placement2d.getRefDirection().id())
           : Direction2.xAxis();
       double semiAxis1 = ellipse.semiAxis1();
       double semiAxis2 = ellipse.semiAxis2();
@@ -173,9 +173,9 @@ final class StepCurve2DBuilder {
    * Demonstrates the correct constructor signature matching original implementation.
    */
   BSplineCurve2 buildBSplineCurve2(int id) {
-    StepBSplineCurveWithKnots spline = builder.requireEntity(id, StepBSplineCurveWithKnots.class, 
+    StepBSplineCurveWithKnots spline = builder.requireEntity(id, StepBSplineCurveWithKnots.class,
         "B_SPLINE_CURVE_WITH_KNOTS");
-    
+
     List<StepCartesianPoint> controlPoints = spline.getControlPoints();
     List<Point2> points2d = new ArrayList<>(controlPoints.size());
     for (StepCartesianPoint point : controlPoints) {
@@ -184,7 +184,7 @@ final class StepCurve2DBuilder {
       }
       points2d.add(buildPoint2(point.id()));
     }
-    
+
     return new BSplineCurve2(
         spline.getDegree(),
         points2d,
@@ -200,7 +200,7 @@ final class StepCurve2DBuilder {
   CompositeCurve2 buildCompositeCurve2(int id) {
     StepCompositeCurve composite = builder.requireEntity(id, StepCompositeCurve.class, "COMPOSITE_CURVE");
     List<StepCompositeCurveSegment> segments = composite.segments();
-    
+
     List<Curve2> curves = new ArrayList<>(segments.size());
     for (StepCompositeCurveSegment segment : segments) {
       Object built = builder.buildCurve2(segment.parentCurve());
@@ -210,7 +210,7 @@ final class StepCurve2DBuilder {
         throw new UnsupportedGeometryException("COMPOSITE_CURVE segment must be a 2D curve");
       }
     }
-    
+
     return new CompositeCurve2(curves);
   }
 

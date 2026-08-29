@@ -40,7 +40,8 @@ mvn package         # build the jar
 
 With the wrapper: `./mvnw test` (Linux/macOS) or `mvnw.cmd test` (Windows).
 
-Formatting is available through `mvn spotless:apply` (not bound to the build).
+Formatting: `mvn spotless:apply` to fix; `spotless:check` runs in the
+`verify` phase and fails the build on unformatted hand-written sources.
 
 The test suite covers geometry evaluation, STEP parsing/semantics, topology,
 preview, and the web apps. Coverage results land in `target/site/jacoco`.

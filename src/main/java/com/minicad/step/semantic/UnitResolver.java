@@ -247,7 +247,7 @@ final class UnitResolver {
     if (!(unwrapped instanceof StepValue.NumberValue)) {
       throw new StepResolutionException(
           "entity #" + instance.id() + " MEASURE_REPRESENTATION_ITEM" +
-          " parameter 1 typed measure must wrap a number, actual: " + 
+          " parameter 1 typed measure must wrap a number, actual: " +
           StepParameterReader.valueType(unwrapped));
     }
     StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;

@@ -31,7 +31,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- Inner classes for UV geometry ---
-    
+
     static final class UvPoint {
         private final double u;
         private final double v;
@@ -42,10 +42,10 @@ final class MeshTriangulatorParametric {
         }
         double u() { return u; }
         double v() { return v; }
-        @Override public boolean equals(Object o) { 
-            return this == o || o != null && getClass() == o.getClass() 
-                && Double.compare(u, ((UvPoint) o).u) == 0 
-                && Double.compare(v, ((UvPoint) o).v) == 0; 
+        @Override public boolean equals(Object o) {
+            return this == o || o != null && getClass() == o.getClass()
+                && Double.compare(u, ((UvPoint) o).u) == 0
+                && Double.compare(v, ((UvPoint) o).v) == 0;
         }
         @Override public int hashCode() { return Objects.hash(u, v); }
     }
@@ -103,7 +103,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- Main triangulation methods ---
-    
+
     /**
      * Triangulates a parametric face using grid-based approach.
      *
@@ -231,7 +231,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- ParametricMapper factory ---
-    
+
     static ParametricMapper mapperFor(SurfaceGeometry surface) {
         if (surface instanceof CylindricalSurface) {
             CylindricalSurface cylinder = (CylindricalSurface) surface;
@@ -402,7 +402,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- UV approximation ---
-    
+
     private static UvPoint approximateUv(
             CartesianPoint point,
             UvPoint previous,
@@ -483,7 +483,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- Loop building ---
-    
+
     static List<ParametricLoop> buildParametricLoops(Face face, ParametricMapper mapper, SurfaceGeometry surface) {
         List<ParametricLoop> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
@@ -937,7 +937,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- Curve2 sampling ---
-    
+
     private static List<UvPoint> sampleCurve2(Curve2 curve, UvPoint start, UvPoint end) {
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
@@ -1102,7 +1102,7 @@ final class MeshTriangulatorParametric {
     }
 
     // --- UV utilities ---
-    
+
     private static double uvDistance(UvPoint a, UvPoint b) {
         if (a == null || b == null) {
             return Double.POSITIVE_INFINITY;

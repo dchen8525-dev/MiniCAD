@@ -107,11 +107,11 @@ import java.util.stream.Collectors;
 
 /**
  * Builder for 2D and 3D curve geometry objects extracted from StepCadBuilder.
- * 
+ *
  * This class handles construction of curve geometry objects:
  * - 2D curves: Line2, Circle2, Ellipse2, BSplineCurve2, Polyline2, etc.
  * - 3D curves: Line3, Circle, Ellipse3, BSplineCurve3, etc.
- * 
+ *
  * Caching is provided to avoid rebuilding the same geometry multiple times.
  */
 final class StepCadCurveBuilder {
@@ -120,12 +120,12 @@ final class StepCadCurveBuilder {
 
     // Entity lookup
     private final Map<Integer, StepEntity> entitiesById;
-    
+
     // Dependencies
     private final StepCadGeometryBuilder geometryBuilder;
     private final StepCadGeometryOps geometryOps;
     private final StepTrimResolver trimResolver;
-    
+
     // 2D geometry caches
     private final Map<Integer, Point2> points2d;
     private final Map<Integer, Direction2> directions2d;
@@ -139,7 +139,7 @@ final class StepCadCurveBuilder {
     private final Map<Integer, TrimmedCurve2> trimmedCurves2d;
     private final Map<Integer, Hyperbola2> hyperbolas2d;
     private final Map<Integer, Parabola2> parabolas2d;
-    
+
     // 3D geometry caches
     private final Map<Integer, Line3> lines3d;
     private final Map<Integer, Circle> circles3d;
@@ -153,12 +153,12 @@ final class StepCadCurveBuilder {
     private final Map<Integer, Parabola3> parabolas3d;
     private final Map<Integer, Hyperbola3> hyperbolas3d;
     private final Map<Integer, Clothoid3> clothoids3d;
-    
+
     // Callbacks for cross-dependencies
     private final IntFunction<Axis2Placement3D> buildPlacementCallback;
     private final IntFunction<com.minicad.geometry.SurfaceGeometry> buildSurfaceCallback;
     private final IntFunction<Curve3> buildCurve3Callback; // For curves not handled by this builder
-    
+
     /**
      * Creates a new StepCadCurveBuilder with the specified cache maps and dependencies.
      *
@@ -260,7 +260,7 @@ final class StepCadCurveBuilder {
     }
 
     // ==================== 2D Point and Direction ====================
-    
+
     /**
      * Builds a Point2 from a STEP CARTESIAN_POINT entity.
      *

@@ -48,7 +48,7 @@ public final class Edge {
         // Check if this is a degenerate edge (start == end within tolerance)
         double vertexDistance = start.point().distanceTo(end.point());
         boolean isDegenerateEdge = vertexDistance <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE;
-        
+
         if (isDegenerateEdge && !isClosedCurve(curve)) {
             // Degenerate edges are only allowed on closed curves (circle, ellipse, closed B-spline)
             throw new TopologyException("edge must have distinct vertices unless on a closed curve");
@@ -58,7 +58,7 @@ public final class Edge {
         this.curve = curve;
         this.sameSense = sameSense;
     }
-    
+
     /**
      * Checks if a curve is closed (start and end points coincide by construction).
      * Closed curves include Circle, Ellipse, and closed B-Splines.
@@ -100,7 +100,7 @@ public final class Edge {
         }
         return false;  // Line3, Polyline3, SurfaceCurve3 are not closed
     }
-    
+
     /**
      * Checks if a composite curve forms a closed loop.
      */

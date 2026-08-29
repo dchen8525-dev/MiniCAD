@@ -23,13 +23,13 @@ import java.util.function.IntFunction;
 
 /**
  * Builder for basic CAD geometry primitives extracted from StepCadBuilder.
- * 
+ *
  * This class handles construction of fundamental geometry objects:
  * - Points (CARTESIAN_POINT)
  * - Directions (DIRECTION)
  * - Vectors (VECTOR)
  * - Placements (AXIS2_PLACEMENT_3D, AXIS1_PLACEMENT)
- * 
+ *
  * Phase 1 extraction target: methods that build these basic types.
  * Caching is provided to avoid rebuilding the same geometry multiple times.
  */
@@ -178,7 +178,7 @@ final class StepCadGeometryBuilder {
 
   /**
    * Builds an Axis2Placement3D from a STEP AXIS2_PLACEMENT_3D entity.
-   * 
+   *
    * @param id the STEP entity ID
    * @return the Axis2Placement3D geometry object
    */

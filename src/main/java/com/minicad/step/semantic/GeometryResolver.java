@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Geometry resolver - sample extraction from StepEntityResolver.
  * Demonstrates the refactoring pattern for extracting specialized resolvers.
- * 
+ *
  * This class shows how resolve methods can be extracted into dedicated
  * resolver classes, reducing the size of the main StepEntityResolver.
  * Full extraction would include ~150 geometry resolve methods.

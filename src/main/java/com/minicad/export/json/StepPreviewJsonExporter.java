@@ -881,13 +881,6 @@ public final class StepPreviewJsonExporter {
 
     // Delegate to StepSummaryBuilder - extracted utility class
 
-    
-    
-    
-
-    
-
-    
 
 
 
@@ -897,7 +890,14 @@ public final class StepPreviewJsonExporter {
 
 
 
-    
+
+
+
+
+
+
+
+
     // Delegate to StepGeometryHelper - extracted utility class
 
     // Delegate to StepPayloadBuilder - extracted utility class
@@ -977,6 +977,6 @@ public final class StepPreviewJsonExporter {
 
 
 
-    
-    
+
+
 }

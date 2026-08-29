@@ -9,7 +9,7 @@ import com.minicad.step.syntax.StepEntityInstance;
 import java.util.List;
 
 /**
- * Bezier resolver - handles Bezier curves/surfaces, Offset curves/surfaces, 
+ * Bezier resolver - handles Bezier curves/surfaces, Offset curves/surfaces,
  * Oriented geometry, Composite curves, Uniform/QuasiUniform curves/surfaces.
  */
 final class BezierResolver {

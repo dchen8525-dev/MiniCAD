@@ -79,7 +79,7 @@ public final class StepCapabilityRegistry {
         throw new IOException("invalid boolean '" + text + "' at line " + lineNumber);
     }
 
-    
+
 public static final class Capability {
     private final String entity;
     private final String level;

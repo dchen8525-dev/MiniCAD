@@ -2253,7 +2253,7 @@ public final class StepCadBuilder {
         return Direction3.from(ab.cross(ac));
     }
 
-    
+
     /**
      *
      * @param id STEP entity id
