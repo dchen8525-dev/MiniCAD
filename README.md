@@ -28,15 +28,17 @@ mesh usable by the bundled browser viewer.
 ## Requirements
 
 - JDK 11+
-- Maven 3.9+
+- Maven 3.9+ (or use the bundled wrapper: `./mvnw` / `mvnw.cmd`, pinned to 3.9.16)
 
 ## Build & test
 
 ```sh
-mvn test            # compile + run the full test suite (1921 tests)
-mvn verify          # also runs the JaCoCo coverage gate (≥70%) and forbiddenapis
+mvn test            # compile + run the full test suite (2047 tests, includes the JaCoCo gate)
+mvn verify          # additionally runs forbiddenapis and the Spotless check
 mvn package         # build the jar
 ```
+
+With the wrapper: `./mvnw test` (Linux/macOS) or `mvnw.cmd test` (Windows).
 
 Formatting is available through `mvn spotless:apply` (not bound to the build).
 
@@ -86,5 +88,5 @@ src/main/java/com/minicad/
 
 ## Repository hygiene
 
-- `.workbuddy/`, `lib/`, `target/` are developer-local and ignored.
+- `.workbuddy/`, `target/` are developer-local and ignored.
 - Reports from earlier refactoring sessions are archived under `docs/archive/`.
